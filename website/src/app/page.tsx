@@ -49,14 +49,14 @@ function StatsBar() {
   ];
   return (
     <section className="border-b border-border bg-surface">
-      <div className="mx-auto grid max-w-6xl grid-cols-2 divide-x divide-border sm:grid-cols-4">
+      <dl className="mx-auto grid max-w-6xl grid-cols-2 divide-x divide-border sm:grid-cols-4">
         {stats.map((s) => (
           <div key={s.label} className="px-6 py-8 text-center">
-            <div className="text-3xl font-bold text-accent">{s.value}</div>
-            <div className="mt-1 text-sm text-muted">{s.label}</div>
+            <dd className="text-3xl font-bold text-accent">{s.value}</dd>
+            <dt className="mt-1 text-sm text-muted">{s.label}</dt>
           </div>
         ))}
-      </div>
+      </dl>
     </section>
   );
 }
@@ -148,7 +148,7 @@ function PipelineSection() {
               <div className="mt-1 font-semibold">{s.name}</div>
               <div className="mt-1 text-xs text-muted">{s.desc}</div>
               {i < stages.length - 1 && (
-                <div className="absolute right-0 top-6 hidden text-border sm:block">
+                <div className="absolute right-0 top-6 hidden text-border sm:block" aria-hidden="true">
                   &rarr;
                 </div>
               )}

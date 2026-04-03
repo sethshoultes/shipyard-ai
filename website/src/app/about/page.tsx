@@ -10,43 +10,43 @@ const agents = [
     name: "Phil Jackson",
     role: "Orchestrator",
     desc: "Dispatches tasks, balances workloads, keeps the pipeline flowing. Triangle offense.",
-    icon: "&#9670;",
+    icon: "\u25C6",
   },
   {
     name: "Steve Jobs",
     role: "Creative Director",
     desc: "Design, brand, UX, messaging. If it's not insanely great, it doesn't ship.",
-    icon: "&#9733;",
+    icon: "\u2605",
   },
   {
     name: "Elon Musk",
     role: "Engineering Director",
     desc: "Architecture, performance, deployment. First principles. Can it scale 10x?",
-    icon: "&#9889;",
+    icon: "\u26A1",
   },
   {
     name: "Margaret Hamilton",
     role: "QA Director",
     desc: "Continuous testing, accessibility, security. Blocks ship on P0 issues.",
-    icon: "&#9745;",
+    icon: "\u2611",
   },
   {
     name: "Jensen Huang",
     role: "Advisor",
     desc: "Strategic reviews, architecture guidance. Thinks in systems and throughput.",
-    icon: "&#9632;",
+    icon: "\u25A0",
   },
   {
     name: "Jony Ive",
     role: "Visual Design",
     desc: "UI components, design tokens, visual craft. Reports to Steve.",
-    icon: "&#9675;",
+    icon: "\u25CB",
   },
   {
     name: "Maya Angelou",
     role: "Copywriter",
     desc: "Messaging, microcopy, content strategy. Words that matter.",
-    icon: "&#9998;",
+    icon: "\u270E",
   },
 ];
 
@@ -78,8 +78,10 @@ export default function AboutPage() {
             <div className="flex items-center gap-3">
               <span
                 className="flex h-10 w-10 items-center justify-center rounded-lg bg-background text-accent"
-                dangerouslySetInnerHTML={{ __html: a.icon }}
-              />
+                aria-hidden="true"
+              >
+                {a.icon}
+              </span>
               <div>
                 <div className="font-semibold">{a.name}</div>
                 <div className="text-xs text-accent">{a.role}</div>
