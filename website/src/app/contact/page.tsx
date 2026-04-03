@@ -2,8 +2,19 @@ import type { Metadata } from "next";
 import { ContactForm } from "./ContactForm";
 
 export const metadata: Metadata = {
-  title: "Start a Project — Shipyard AI",
+  title: "Submit a PRD — Shipyard AI",
   description: "Submit your PRD and we'll scope it, quote tokens, and start building.",
+  openGraph: {
+    title: "Submit a PRD — Shipyard AI",
+    description: "Submit your PRD and we'll build your Emdash site, theme, or plugin.",
+    url: "https://shipyard.company/contact",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Submit a PRD — Shipyard AI",
+    description: "Submit your PRD and we'll build your Emdash site, theme, or plugin.",
+  },
 };
 
 export default function ContactPage() {

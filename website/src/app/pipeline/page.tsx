@@ -4,6 +4,17 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Pipeline — Shipyard AI",
   description: "Six stages from PRD to production. See exactly how your project gets built.",
+  openGraph: {
+    title: "Pipeline — Shipyard AI",
+    description: "How Shipyard AI turns PRDs into production: intake, debate, plan, build, review, deploy.",
+    url: "https://shipyard.company/pipeline",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pipeline — Shipyard AI",
+    description: "How Shipyard AI turns PRDs into production: intake, debate, plan, build, review, deploy.",
+  },
 };
 
 const stages = [

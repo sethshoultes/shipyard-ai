@@ -4,6 +4,17 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Services — Shipyard AI",
   description: "Emdash sites, themes, and plugins built from PRDs with transparent token-based pricing.",
+  openGraph: {
+    title: "Services — Shipyard AI",
+    description: "Emdash sites, themes, and plugins. Built by AI agents, deployed to production.",
+    url: "https://shipyard.company/services",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Services — Shipyard AI",
+    description: "Emdash sites, themes, and plugins. Built by AI agents, deployed to production.",
+  },
 };
 
 const tiers = [
