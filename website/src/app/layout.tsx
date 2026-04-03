@@ -1,0 +1,94 @@
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
+import "./globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "Shipyard AI — PRD to Production",
+  description:
+    "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs. Ship production-quality digital products at machine speed.",
+};
+
+function Header() {
+  return (
+    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
+      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
+          <span className="text-accent">&#9670;</span> Shipyard AI
+        </Link>
+        <div className="flex items-center gap-8 text-sm font-medium text-muted">
+          <Link href="/services" className="transition hover:text-foreground">
+            Services
+          </Link>
+          <Link href="/about" className="transition hover:text-foreground">
+            About
+          </Link>
+          <Link href="/pipeline" className="transition hover:text-foreground">
+            Pipeline
+          </Link>
+          <Link
+            href="/contact"
+            className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-black transition hover:bg-accent-dim"
+          >
+            Start a Project
+          </Link>
+        </div>
+      </nav>
+    </header>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="border-t border-border bg-surface">
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-10 sm:flex-row">
+        <div className="text-sm text-muted">
+          &copy; {new Date().getFullYear()} Shipyard AI. PRD in, production out.
+        </div>
+        <div className="flex gap-6 text-sm text-muted">
+          <Link href="/services" className="transition hover:text-foreground">
+            Services
+          </Link>
+          <Link href="/about" className="transition hover:text-foreground">
+            About
+          </Link>
+          <Link href="/pipeline" className="transition hover:text-foreground">
+            Pipeline
+          </Link>
+          <Link href="/contact" className="transition hover:text-foreground">
+            Contact
+          </Link>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+    >
+      <body className="flex min-h-full flex-col">
+        <Header />
+        <main className="flex-1">{children}</main>
+        <Footer />
+      </body>
+    </html>
+  );
+}
