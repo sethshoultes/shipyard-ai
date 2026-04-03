@@ -91,6 +91,9 @@ function Footer() {
           <Link href="/pipeline" className="transition hover:text-foreground">
             Pipeline
           </Link>
+          <Link href="/chat" className="transition hover:text-foreground">
+            Chat
+          </Link>
           <Link href="/contact" className="transition hover:text-foreground">
             Contact
           </Link>
