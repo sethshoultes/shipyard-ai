@@ -1,25 +1,34 @@
 # Board Review #005 — Jensen Huang
 
-**Date**: 2026-04-03T22:30Z
-**Commits**: 39 total, 23 PRs (21 merged, 2 open)
-**Agency state**: OPERATIONAL — intake pipeline live, demos polished, QA continuous
+**Date**: 2026-04-03
+**Commits reviewed**: 23+ PRs merged in one session
+**Agency state**: OPERATIONAL — intake pipeline live, 3 demo sites deployed, infrastructure hardened
 
 ## Assessment
 
-The agency completed its vertical integration today. A prospect can now: visit shipyard-ai.pages.dev, browse three distinct demo sites, fill out the contact form with a budget range and PRD, and that submission simultaneously sends an email via Resend AND creates a GitHub issue with `prd-intake` labels. The pipeline from "interested stranger" to "tracked work item" is fully automated. Zero human steps required.
+The agency shipped 23 PRs in a single session and crossed into production operations. The PRD intake pipeline is now live: an AI chat worker for discovery, a form with HTML sanitization, and automated GitHub issue creation. Three demo sites are deployed with distinct visuals (Unsplash photography, custom palettes per business type). Resend email integration handles transactional messaging. Infrastructure is production-grade: Cloudflare Pages + Workers, Caddy reverse proxy with automatic HTTPS, pm2 process management, and continuous QA monitoring.
 
-The visual differentiation problem from review #004 is resolved. Bella's has Unsplash food photography with warm terracotta. Peak Dental has clinical teal with a dental office hero. Craft & Co runs an entirely different template with Unsplash portfolio images. They no longer look like siblings.
+This is the complete intake-to-debate loop automated. A prospect submits a PRD via the form, the system creates an issue, and agents have everything they need to start building without human routing.
 
-Margaret's QA monitoring runs every 5 minutes across 7 endpoints. She caught craft.shipyard.company going down (404 for ~8 minutes), logged it, filed a task, and confirmed recovery — all automated. The qa-visual-check.sh script adds puppeteer screenshots and image URL verification. QA is no longer a gate; it's a continuous process.
+## Concern: No Triage Gate Between Form and Pipeline
 
-## The Number That Matters
+PRDs now land directly in GitHub issues, but manual routing still happens: Which agent leads? What's the token budget? Is this scope viable? A vague 20-page spec and a clear 5-page brief get identical treatment — they both queue and wait for Phil to manually assess complexity and assign tokens.
 
-39 commits. 23 PRs. 3 live demo sites. 1 deployed contact worker. 1 deployed chat worker. All in a single session. The pipeline velocity is the product.
+As intake velocity increases, this becomes a bottleneck. Today: one PRD (self). This week: potentially five. This month: fifty.
 
 ## Recommendation
 
-**Wire the GitHub issue to the actual pipeline.** Right now a PRD submission creates an issue, but Phil Jackson doesn't read GitHub issues — he reads `prds/` and `TASKS.md`. Add a GitHub Action or webhook that converts a `prd-intake` issue into a PRD file in `prds/` with the correct template format, then pings Phil's dispatch cron. Close the last gap between "client submits form" and "agents start debating."
+**Build an automated triage service: on every new intake issue, compute complexity score, assign token budget, estimate client cost, and flag red flags.**
+
+Create a GitHub Actions workflow (`on: issues.opened`) that invokes Haiku with a scoring rubric:
+
+1. **Complexity (1–10)**: pages, integrations, timeline, design novelty
+2. **Token budget**: 500K base + multiplier via TOKEN-CREDITS.md
+3. **Estimated cost** ($1K–$10K): tokens × $0.003/1K
+4. **Red flags**: unclear timeline, scope creep signals, missing design brief
+
+Have Haiku comment on the issue with recommendations. This takes 15 seconds per PRD and turns triage into data-driven routing instead of manual bottleneck. Scales from 1 to 100 PRDs/week without additional labor.
 
 ---
 
-*Previous topics (not repeated): #001 free pilot, #002 deploy gap, #003 token tracking, #004 visual differentiation.*
+*Previous topics (not repeated): #001 free pilot, #002 deploy gap, #003 token tracking, #004 visual identity.*
