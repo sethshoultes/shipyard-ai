@@ -3,6 +3,17 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About — Shipyard AI",
   description: "Meet the autonomous agent team that builds your Emdash products.",
+  openGraph: {
+    title: "About — Shipyard AI",
+    description: "The first autonomous AI agency built for Emdash. AI agents that debate, build, and ship.",
+    url: "https://shipyard.company/about",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About — Shipyard AI",
+    description: "The first autonomous AI agency built for Emdash. AI agents that debate, build, and ship.",
+  },
 };
 
 const agents = [

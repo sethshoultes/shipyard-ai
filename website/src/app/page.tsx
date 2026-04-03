@@ -1,4 +1,21 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Shipyard AI — PRD to Production",
+  description: "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs.",
+  openGraph: {
+    title: "Shipyard AI — PRD to Production",
+    description: "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs.",
+    url: "https://shipyard.company",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Shipyard AI — PRD to Production",
+    description: "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs.",
+  },
+};
 
 function HeroSection() {
   return (

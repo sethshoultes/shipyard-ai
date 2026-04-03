@@ -15,9 +15,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://shipyard.company"),
   title: "Shipyard AI — PRD to Production",
   description:
     "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs. Ship production-quality digital products at machine speed.",
+  openGraph: {
+    title: "Shipyard AI — PRD to Production",
+    description:
+      "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs.",
+    url: "https://shipyard.company",
+    siteName: "Shipyard AI",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Shipyard AI — PRD to Production",
+    description:
+      "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs.",
+  },
 };
 
 function Header() {
@@ -87,6 +102,28 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Shipyard AI",
+              url: "https://shipyard.company",
+              description:
+                "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs.",
+              foundingDate: "2026",
+              knowsAbout: [
+                "EmDash",
+                "Astro",
+                "Cloudflare",
+                "Web Development",
+                "AI Agents",
+                "CMS",
+              ],
+            }),
+          }}
+        />
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:bg-accent focus:px-4 focus:py-2 focus:text-black">
           Skip to main content
         </a>
