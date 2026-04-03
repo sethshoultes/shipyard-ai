@@ -58,8 +58,8 @@
 						{
 							"_type": "marketing.hero",
 							"_key": "hero",
-							"headline": "Your smile deserves the best care",
-							"subheadline": "Family & cosmetic dentistry in downtown Denver. New patients welcome — same-day appointments available.",
+							"headline": "Dentistry shouldn't be scary. Let's fix that.",
+							"subheadline": "Led by Dr. Sarah Kim, an endodontist with 18 years of experience making nervous patients feel at home. Family & cosmetic dentistry in downtown Denver. New patients welcome — same-day appointments and anxiety-friendly care.",
 							"primaryCta": { "label": "Book Appointment", "url": "/contact" },
 							"secondaryCta": { "label": "Our Services", "url": "/#features" }
 						},
@@ -67,37 +67,37 @@
 							"_type": "marketing.features",
 							"_key": "features",
 							"headline": "Complete dental care under one roof",
-							"subheadline": "",
+							"subheadline": "Dr. Kim believes every patient deserves a dentist who listens, explains everything, and never rushes. Here's what we offer:",
 							"features": [
 								{
 									"icon": "shield",
 									"title": "Preventive Care",
-									"description": "Cleanings, exams, and X-rays to keep your smile healthy for life."
+									"description": "Gentle cleanings and exams that actually feel good. We catch problems early so you avoid pain and big procedures later. No judgment, just care."
 								},
 								{
 									"icon": "zap",
 									"title": "Cosmetic Dentistry",
-									"description": "Teeth whitening, veneers, and smile makeovers that look natural."
+									"description": "Teeth whitening, veneers, and smile design that looks natural and feels like you. We work with you to create the smile you've always wanted."
 								},
 								{
 									"icon": "users",
 									"title": "Family Friendly",
-									"description": "Care for every age — from first tooth to golden years."
+									"description": "Kids love coming here. We make first visits fun and anxiety-free. Parents trust us with their whole family — infants through grandparents."
 								},
 								{
 									"icon": "chart",
-									"title": "Invisalign",
-									"description": "Straighten your teeth discreetly with clear aligners."
+									"title": "Invisalign & Orthodontics",
+									"description": "Straighten your teeth discreetly without metal brackets. Comes off for eating and brushing — life doesn't stop during treatment."
 								},
 								{
 									"icon": "code",
 									"title": "Dental Implants",
-									"description": "Permanent tooth replacement that looks and feels like your own."
+									"description": "Permanent tooth replacement that functions like a real tooth. We guide you through every step so you know exactly what to expect."
 								},
 								{
 									"icon": "globe",
 									"title": "Emergency Care",
-									"description": "Toothache? Broken tooth? We see urgent cases the same day."
+									"description": "Toothache at midnight? Broken tooth before a big event? We keep same-day slots open and will see you fast. Because dental emergencies can't wait."
 								}
 							]
 						},
@@ -107,45 +107,45 @@
 							"headline": "What our patients say",
 							"testimonials": [
 								{
-									"quote": "Dr. Kim made me actually look forward to my dental visits. The whole team is incredible.",
+									"quote": "I was terrified of the dentist. Dr. Kim spent 20 minutes just talking with me before my first root canal. She explained everything step-by-step, and honestly? It wasn't scary at all. I've been coming back for 5 years now — she's the reason I finally take care of my teeth.",
 									"author": "Jessica Torres",
 									"role": "Patient",
-									"company": "5 years"
+									"company": "5 years with us"
 								},
 								{
-									"quote": "My Invisalign results exceeded my expectations. I smile so much more now.",
+									"quote": "I did Invisalign with Dr. Kim and my smile is completely transformed. Everyone notices. The whole process was so easy — she checked in every month and answered every question. Two years later, my teeth are still perfect.",
 									"author": "David Park",
 									"role": "Patient",
-									"company": "2 years"
+									"company": "Invisalign patient"
 								},
 								{
-									"quote": "Best pediatric care in Denver. My kids actually ask to go to the dentist.",
+									"quote": "My kids, Emma and Lucas, actually ask to go to the dentist now. They love the team there. Dr. Kim is patient, makes them feel safe, and never treats them like they're nervous. As a parent, that's everything.",
 									"author": "Maria Santos",
 									"role": "Parent",
-									"company": ""
+									"company": "2 children, 3 years with us"
 								}
 							]
 						},
 						{
 							"_type": "marketing.faq",
 							"_key": "faq",
-							"headline": "Common questions",
+							"headline": "Questions we hear a lot",
 							"items": [
 								{
-									"question": "Do you accept insurance?",
-									"answer": "Yes, we accept most major dental insurance plans. Our office manager can verify your coverage and help you understand your benefits."
+									"question": "Do you accept my insurance?",
+									"answer": "Yep, we work with all the major plans. When you call to book, we'll verify your coverage and go over your benefits with you. No surprises. We also work with patients who don't have insurance — check out our payment options below."
 								},
 								{
-									"question": "What should I expect at my first visit?",
-									"answer": "We'll do a comprehensive exam, take X-rays, and discuss your oral health goals. Your first appointment usually takes about an hour."
+									"question": "I'm really nervous about the dentist. What happens on my first visit?",
+									"answer": "We get it. We start by just talking — no pressure. You'll meet Dr. Kim and the team. Then we do a gentle exam, take some digital X-rays, and talk through any concerns you have. Your first appointment is about an hour. We never rush, and we explain everything as we go. Lots of patients come in anxious and leave feeling so much better."
 								},
 								{
-									"question": "What do I do if I have a dental emergency?",
-									"answer": "Call us immediately. We keep same-day slots open for emergencies and can usually see you within a few hours."
+									"question": "What if I have a dental emergency?",
+									"answer": "Call us right away — we have same-day emergency slots. Whether it's a toothache, broken tooth, or lost filling, we'll work you in usually within a few hours. Dental pain is real, and you shouldn't have to wait."
 								},
 								{
-									"question": "Do you offer payment plans?",
-									"answer": "Yes, we offer flexible financing options including payment plans for larger procedures. Ask our team about what works for you."
+									"question": "What if I can't afford a big procedure?",
+									"answer": "We offer flexible payment plans so you can spread costs over time. We also partner with financing companies for bigger treatments. And yes, we give a discount for cash payment if you're able. The point is: cost shouldn't stop you from getting the care you need. Talk to our team and we'll find something that works."
 								}
 							]
 						}
@@ -162,8 +162,8 @@
 						{
 							"_type": "marketing.hero",
 							"_key": "pricing-hero",
-							"headline": "Transparent pricing",
-							"subheadline": "Quality dental care shouldn't be a mystery. Here's what to expect.",
+							"headline": "No surprise bills. No hidden fees.",
+							"subheadline": "Dr. Kim believes you deserve to know exactly what something costs before you commit. We're upfront, transparent, and we work with you to make quality care affordable. No judgment. No surprises.",
 							"centered": true
 						},
 						{
@@ -174,12 +174,13 @@
 									"name": "Preventive",
 									"price": "$0",
 									"period": "with insurance",
-									"description": "Core health maintenance",
+									"description": "Keep your teeth healthy and avoid bigger problems down the road",
 									"features": [
-										"Cleanings & exams",
-										"Digital X-rays",
-										"Fluoride treatments",
-										"Sealants"
+										"Professional cleanings twice a year",
+										"Comprehensive oral exams",
+										"Digital X-rays (quick and low-radiation)",
+										"Fluoride treatments for extra protection",
+										"Sealants to protect molars"
 									],
 									"cta": { "label": "Learn More", "url": "/contact" }
 								},
@@ -187,12 +188,12 @@
 									"name": "Cosmetic",
 									"price": "$299",
 									"period": "starting at",
-									"description": "Your best smile",
+									"description": "A smile you're actually proud to show off",
 									"features": [
-										"Teeth whitening",
-										"Porcelain veneers",
-										"Bonding",
-										"Smile design"
+										"Professional teeth whitening (1-2 shades brighter)",
+										"Porcelain veneers (life-like and durable)",
+										"Cosmetic bonding (quick fixes for chips/gaps)",
+										"Smile design consultation (see your new smile before treatment)"
 									],
 									"cta": { "label": "Schedule Consultation", "url": "/contact" },
 									"highlighted": true
@@ -200,12 +201,12 @@
 								{
 									"name": "Restorative",
 									"price": "Custom",
-									"description": "Complex smile solutions",
+									"description": "Restore function and beauty when teeth need serious repair",
 									"features": [
-										"Dental implants",
-										"Crowns & bridges",
-										"Dentures",
-										"Root canal therapy"
+										"Dental implants (permanent, like a real tooth)",
+										"Crowns & bridges (strong and natural-looking)",
+										"Dentures (comfortable and custom-fitted)",
+										"Root canal therapy (save a tooth from extraction)"
 									],
 									"cta": { "label": "Call for Estimate", "url": "/contact" }
 								}
@@ -214,19 +215,19 @@
 						{
 							"_type": "marketing.faq",
 							"_key": "pricing-faq",
-							"headline": "Pricing FAQ",
+							"headline": "Payment questions",
 							"items": [
 								{
-									"question": "What if my insurance doesn't cover a procedure?",
-									"answer": "We offer flexible payment plans and financing options to make treatment affordable. Our team will work with you to find a solution."
+									"question": "What if insurance doesn't cover my procedure?",
+									"answer": "We get it — insurance can be complicated. We'll give you a full cost estimate upfront. Then we work with you. Most patients qualify for payment plans, and we can spread bigger procedures over several months. You're never on your own figuring this out."
 								},
 								{
-									"question": "Do you offer financing for larger procedures?",
-									"answer": "Yes, we partner with financing companies to offer low-interest payment plans for procedures like implants and cosmetic treatments."
+									"question": "Can I finance a big procedure like implants?",
+									"answer": "Absolutely. We partner with CareCredit and other financing companies so you can do low-interest payment plans. Interest-free options available for 6-12 months if you qualify. Just ask us — we'll walk through the options."
 								},
 								{
-									"question": "Do you offer discounts for cash payment?",
-									"answer": "Yes, we offer a small discount for patients who pay in full at the time of treatment."
+									"question": "Do you give a discount if I pay cash?",
+									"answer": "Yes, we give a small courtesy discount for cash or credit card payment at the time of treatment. Ask our team for the exact amount — it varies by procedure."
 								}
 							]
 						}
@@ -243,8 +244,8 @@
 						{
 							"_type": "marketing.hero",
 							"_key": "contact-hero",
-							"headline": "Schedule your visit",
-							"subheadline": "New patients welcome. Call us or book online — we'll get you in fast.",
+							"headline": "Let's take care of your smile",
+							"subheadline": "New patients welcome. Book online or call us — we have same-day slots available, and we'll make sure your first visit feels comfortable and anxiety-free.",
 							"centered": true
 						}
 					]

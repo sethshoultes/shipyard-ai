@@ -59,7 +59,7 @@
 							"_type": "marketing.hero",
 							"_key": "hero",
 							"headline": "Handmade Italian in the heart of Austin",
-							"subheadline": "From nonna's kitchen to yours. Fresh pasta made daily, wood-fired pizzas, and a wine list that tells a story. Dinner served Tuesday through Sunday.",
+							"subheadline": "Taste the flour dust on fresh tagliatelle. Smell the wood smoke curling off a 900°F oven. Feel the warmth of family-style dining. Bella's brings the quiet intensity of Italian nonna cooking to South Congress — where every plate tells the story of real ingredients, real technique, and the kind of care you taste in every bite.",
 							"primaryCta": { "label": "Reserve a Table", "url": "/contact" },
 							"secondaryCta": { "label": "See the Menu", "url": "/pricing" }
 						},
@@ -72,32 +72,32 @@
 								{
 									"icon": "zap",
 									"title": "Fresh Pasta Daily",
-									"description": "Our pasta is made in-house every morning. Tagliatelle, pappardelle, ravioli — rolled by hand, cut to order."
+									"description": "Every morning, you can taste the warmth of freshly made dough. We roll and cut by hand — tagliatelle, pappardelle, ravioli with delicate fillings. The pasta dries for just hours, then hits your plate before noon. That tender bite is what we're after."
 								},
 								{
 									"icon": "shield",
 									"title": "Wood-Fired Pizza",
-									"description": "Our imported Stefano Ferrara oven runs at 900°F. Neapolitan-style pies with a 60-second bake."
+									"description": "Our imported Stefano Ferrara oven roars at 900°F, turning out Neapolitan pizzas in 60 seconds. The char, the stretch, the smoke — that's the wood-fire magic. Order one and watch the blister bloom across the crust."
 								},
 								{
 									"icon": "users",
 									"title": "Family Style Available",
-									"description": "Hosting a group? Our family-style menu feeds the whole table. Just show up hungry."
+									"description": "Hosting a group? We do family-style right — platters passed hand to hand, everyone sharing from the same dishes. It's how Italians eat. Just show up hungry and bring people you like talking to."
 								},
 								{
 									"icon": "chart",
 									"title": "Curated Wine List",
-									"description": "Over 40 Italian wines by the bottle. Our sommelier picks a new 'wine of the week' every Tuesday."
+									"description": "Over 40 Italian wines by the bottle — all chosen by our sommelier with one rule: drink what you want to drink. Every Tuesday, he picks a new 'wine of the week' that pairs gorgeously with whatever's on the specials board. He'll talk your ear off about terroir if you let him."
 								},
 								{
 									"icon": "code",
 									"title": "Private Events",
-									"description": "Our back room seats 24. Perfect for birthdays, rehearsal dinners, and corporate gatherings."
+									"description": "Our back room is intimate — exposed brick, warm lighting, seats 24. Birthdays feel special here. Rehearsal dinners feel like celebrations. Even corporate dinners turn into conversations over wine and time."
 								},
 								{
 									"icon": "globe",
 									"title": "Seasonal Specials",
-									"description": "The menu changes with what's fresh. Our farmers market haul dictates the specials board."
+									"description": "The menu follows the season — peaches in summer, mushrooms in fall, citrus in winter. Every Tuesday morning, we hit the farmers market. Whatever's at peak ripeness becomes the specials board. That's where the magic lives."
 								}
 							]
 						},
@@ -107,19 +107,19 @@
 							"headline": "What our guests say",
 							"testimonials": [
 								{
-									"quote": "The cacio e pepe alone is worth the drive from San Antonio. This is the real deal.",
+									"quote": "I drove from San Antonio just for the cacio e pepe. Four cheeses, cracked pepper, and pasta water — simple, but something transcendent happens when they come together. This is the real deal. Worth every mile.",
 									"author": "James K.",
 									"role": "Google Review",
 									"company": "5 stars"
 								},
 								{
-									"quote": "We've had our anniversary dinner here three years running. The osso buco is unforgettable.",
+									"quote": "We've had our anniversary dinner here three years running. The osso buco — falling off the bone, swimming in that deep brown ragù, with the bright citrus of gremolata — somehow tastes better each time. It's become our tradition.",
 									"author": "Maria & Tony R.",
 									"role": "Yelp Review",
 									"company": "5 stars"
 								},
 								{
-									"quote": "Best Italian in Austin, hands down. The burrata appetizer changed my life.",
+									"quote": "Best Italian in Austin, hands down. The burrata appetizer — that creamy, almost molten center with the stretchy mozzarella shell — over heirloom tomatoes the color of sunset. It shouldn't be complicated, but somehow it's unforgettable.",
 									"author": "Priya S.",
 									"role": "Google Review",
 									"company": "5 stars"
@@ -133,19 +133,19 @@
 							"items": [
 								{
 									"question": "Do you take reservations?",
-									"answer": "Yes! We recommend reserving for Friday and Saturday evenings. Walk-ins are welcome Tuesday through Thursday and for Sunday brunch. Book online or call us at (512) 555-0142."
+									"answer": "Yes! Book a table for Friday and Saturday evenings — those nights fill up fast. We love walk-ins Tuesday through Thursday, and Sunday brunch is mostly first-come, first-served. Reserve online or call (512) 555-0142. Our host will greet you by name."
 								},
 								{
 									"question": "Do you accommodate dietary restrictions?",
-									"answer": "Absolutely. We have gluten-free pasta options, and many of our dishes are naturally vegetarian. Let your server know about any allergies — our kitchen takes them seriously."
+									"answer": "Absolutely. We make gluten-free pasta in-house — same care, same technique. Many dishes are naturally vegetarian too. Tell your server about allergies before you sit down. Our kitchen takes them seriously. We'd rather remake something than rush it."
 								},
 								{
 									"question": "Is there parking?",
-									"answer": "We have a small lot behind the restaurant (enter from 3rd Street). Street parking is also available on South Congress. Valet is offered Friday and Saturday evenings."
+									"answer": "We have a small lot behind the restaurant — enter from 3rd Street. Street parking is easy along South Congress too. On Friday and Saturday evenings, we offer valet so you can walk in with your hands free and your appetite ready."
 								},
 								{
 									"question": "Do you cater?",
-									"answer": "Yes — we offer catering for groups of 20 or more. Contact us at catering@bellasbistro.com for a custom menu and quote."
+									"answer": "Yes — we do catering for groups of 20 or more. We bring the wood-fired energy to your event. Email catering@bellasbistro.com with your date and guest count, and we'll build a menu that feels like Bella's — handmade, seasonal, unforgettable."
 								}
 							]
 						}
@@ -163,7 +163,7 @@
 							"_type": "marketing.hero",
 							"_key": "menu-hero",
 							"headline": "Our Menu",
-							"subheadline": "Seasonal Italian fare. Everything made fresh, in-house, with ingredients we're proud of.",
+							"subheadline": "Chef Marco believes in three things: ingredients you can trust, technique that honors them, and the kind of time a dish deserves. Nothing is rushed. Nothing is precious. Everything is made with the quiet intensity of someone who learned to cook in their grandmother's kitchen. This is what that looks like.",
 							"centered": true
 						},
 						{
@@ -173,28 +173,28 @@
 								{
 									"name": "Antipasti",
 									"price": "$12–$18",
-									"description": "Start with something beautiful",
+									"description": "Begin the night with something beautiful — fresh, bright, unexpected.",
 									"features": [
-										"Burrata with heirloom tomatoes & basil",
-										"Wood-fired octopus with lemon & capers",
-										"Prosciutto & fig crostini",
-										"Seasonal soup (ask your server)",
-										"Arancini — crispy risotto balls with marinara"
+										"Burrata with heirloom tomatoes & basil oil — the center still creamy at room temperature",
+										"Wood-fired octopus with lemon, capers & peperoncini — charred and impossibly tender",
+										"Prosciutto San Daniele & fig jam crostini with aged balsamic",
+										"Seasonal soup (ask your server — changes daily with market finds)",
+										"Arancini — saffron risotto fried golden, filled with ragù & fresh peas, served hot with warm marinara for dipping"
 									],
 									"cta": { "label": "Reserve a Table", "url": "/contact" }
 								},
 								{
 									"name": "Pasta & Entrées",
 									"price": "$22–$38",
-									"description": "Handmade. Every day.",
+									"description": "Our pasta is rolled by hand. Our sauces are built over hours. This is where technique becomes art.",
 									"features": [
-										"Cacio e pepe — our signature",
-										"Pappardelle with wild boar ragù",
-										"Lobster ravioli in saffron cream",
-										"Osso buco with gremolata",
-										"Branzino al forno — whole roasted sea bass",
-										"12oz Bistecca alla Fiorentina",
-										"Eggplant parmigiana (vegetarian)"
+										"Cacio e pepe — our signature dish. Pecorino Romano, cracked black pepper, fresh egg pasta. Simple. Perfect.",
+										"Pappardelle with wild boar ragù — braised for 4 hours until it darkens and deepens. Served with a whisper of Pecorino",
+										"Lobster ravioli in saffron cream with crispy sage — delicate pasta folded around sweet Maine lobster",
+										"Osso buco with gremolata — veal shank braised until the marrow begs to be eaten. Bright citrus zest brings it all alive",
+										"Branzino al forno — whole Mediterranean sea bass roasted until skin crackles, served with lemon & wild herbs",
+										"12oz Bistecca alla Fiorentina — dry-aged Florentine steak, grilled on high heat, finished with fleur de sel & olive oil",
+										"Eggplant parmigiana — layered eggplant, fresh mozzarella, basil, and tomato sauce, baked until bubbling and golden"
 									],
 									"cta": { "label": "Reserve a Table", "url": "/contact" },
 									"highlighted": true
@@ -202,13 +202,13 @@
 								{
 									"name": "Dolci",
 									"price": "$10–$14",
-									"description": "End on a sweet note",
+									"description": "Finish the way the Italians do — with something sweet, something small, something you'll remember.",
 									"features": [
-										"Classic tiramisu",
-										"Panna cotta with seasonal fruit",
-										"Affogato — espresso over gelato",
-										"Cannoli (filled to order)",
-										"Chocolate torta"
+										"Classic tiramisu — mascarpone, espresso, cocoa. Made fresh each morning",
+										"Panna cotta with seasonal fruit — silky cream wobbling on your spoon, topped with what's at peak ripeness",
+										"Affogato — hot espresso poured over cold vanilla gelato. Simple chemistry. Pure joy.",
+										"Cannoli (filled to order) — crispy shell, creamy ricotta filling with dark chocolate chips. Nonna's recipe",
+										"Chocolate torta — dark chocolate, ground almonds, a whisper of grappa. Served at room temperature"
 									],
 									"cta": { "label": "See Wine List", "url": "/contact" }
 								}
@@ -221,15 +221,15 @@
 							"items": [
 								{
 									"question": "Does the menu change?",
-									"answer": "Our core dishes are always available, but we add seasonal specials based on what's fresh at the farmers market. The specials board changes weekly."
+									"answer": "Our core pasta and pizza menu stays steady. But the specials board? That changes weekly. Every Tuesday morning, we load up at the farmers market and whatever is singing gets added to our menu. That's the best meal you'll have here — something seasonal, something unexpected."
 								},
 								{
 									"question": "Can you accommodate large groups?",
-									"answer": "Yes — for parties of 8 or more, we offer a family-style prix fixe menu at $55 per person. Includes antipasti, two pasta courses, an entrée, and dessert."
+									"answer": "Yes — for groups of 8 or more, we offer a family-style prix fixe at $55 per person (or $75 with wine pairings). You get: a shared antipasti board, two pasta courses, your choice of an entrée, family-style sides, and dessert. No decisions to make. Just show up hungry."
 								},
 								{
 									"question": "Do you have a kids menu?",
-									"answer": "We offer kid-sized portions of our pasta dishes for $12. Buttered noodles are always available for the little ones."
+									"answer": "We do. Kid portions of our pasta dishes run $12 — real food, smaller plates. And yes, we have buttered noodles for the pickier diners. But honestly, kids love the pizza. A lot of them end up ordering off the regular menu and polishing their plates."
 								}
 							]
 						}
