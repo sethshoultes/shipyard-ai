@@ -3,7 +3,7 @@
 # Visual QA check for all Shipyard AI example sites
 # Takes screenshots, checks images, verifies no template defaults remain
 
-set -euo pipefail
+set +e  # Don't exit on errors — we want to check everything even if some fail
 
 export LD_LIBRARY_PATH=~/libs/extracted/usr/lib/x86_64-linux-gnu
 
