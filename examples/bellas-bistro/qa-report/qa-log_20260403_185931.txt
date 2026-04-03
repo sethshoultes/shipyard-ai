@@ -1,0 +1,6 @@
+Starting QA for site: examples/bellas-bistro
+Report: examples/bellas-bistro/qa-report/qa-report_20260403_185931.md
+Log: examples/bellas-bistro/qa-report/qa-log_20260403_185931.txt
+
+[0;34m## Pre-Flight Checks[0m
+[0;32m✓ PASS[0m: node_modules exists
