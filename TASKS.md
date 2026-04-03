@@ -20,13 +20,14 @@
 
 | # | Task | Assigned To | Status | Branch | Notes |
 |---|------|-------------|--------|--------|-------|
-| 13 | PRD-001: Enhance homepage — refine copy, add SEO, JSON-LD | Steve Jobs | open | feature/prd-001-build | Hero, services grid, process, tech stack, CTA |
-| 14 | PRD-001: Enhance services page — pricing cards, detailed descriptions | Steve Jobs | open | feature/prd-001-build | Sites $2.5K, Themes $1.5K, Plugins $1K, Migration $3.5K |
-| 15 | PRD-001: Enhance about page — agent team, principles, why EmDash | Steve Jobs | open | feature/prd-001-build | Show the agent roster as a selling point |
-| 16 | PRD-001: Build contact form — PRD submission | Elon Musk | open | feature/prd-001-build | Static form → Formspree or mailto |
-| 17 | PRD-001: Add SEO metadata to all pages | Steve Jobs | open | feature/prd-001-build | OG, Twitter cards, JSON-LD Organization + SoftwareApplication |
-| 18 | PRD-001: Blog placeholder (3 teaser posts) | Sub-agent (haiku) | open | feature/prd-001-build | Nice-to-have, only if token budget allows |
-| 19 | PRD-001: QA pass + deploy | Margaret Hamilton | open | — | Build, a11y, lighthouse, deploy to Vercel |
+| 13 | PRD-001: Enhance homepage | Steve Jobs | done | PR #4 | SEO, JSON-LD, tech stack, refined copy |
+| 14 | PRD-001: Enhance services page | Steve Jobs | done | PR #4 | Full pricing, detailed includes |
+| 15 | PRD-001: Enhance about page | Steve Jobs | done | PR #4 | Agent team, why EmDash, principles |
+| 16 | PRD-001: Contact form via Resend | Elon Musk | done | PR #7 | Cloudflare Worker → Resend email |
+| 17 | PRD-001: SEO metadata all pages | Steve Jobs | done | PR #4 | OG, Twitter, JSON-LD per page |
+| 18 | PRD-001: Blog placeholder | Sub-agent | open | — | Nice-to-have, deferred |
+| 19 | PRD-001: Deploy to Cloudflare | Phil Jackson | done | — | Live at shipyard-ai.pages.dev |
+| 20 | 3 example EmDash sites | Phil + haiku subs | done | PR #8 | Bella's Bistro, Peak Dental, Craft & Co |
 
 ## P1 — Core Systems
 
