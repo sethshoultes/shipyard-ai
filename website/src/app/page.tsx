@@ -2,18 +2,21 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Shipyard AI — PRD to Production",
-  description: "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs.",
+  title: "Shipyard AI — PRD to Production | Emdash Sites, Themes & Plugins",
+  description:
+    "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs. 7 AI agents, 6 pipeline stages, transparent token pricing. Ship production-quality products at machine speed.",
   openGraph: {
     title: "Shipyard AI — PRD to Production",
-    description: "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs.",
+    description:
+      "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs. No hand-holding. No scope creep. Just shipped products.",
     url: "https://shipyard.company",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Shipyard AI — PRD to Production",
-    description: "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs.",
+    description:
+      "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs. No hand-holding. No scope creep. Just shipped products.",
   },
 };
 
@@ -34,10 +37,11 @@ function HeroSection() {
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
             Shipyard AI is an autonomous agency that builds Emdash sites, themes,
-            and plugins from your PRD. No hand-holding. No scope creep. Just
-            shipped products.
+            and plugins from your PRD. Seven AI agents debate strategy, build in
+            parallel, and deploy to production — no meetings, no scope creep,
+            no surprises.
           </p>
-          <div className="mt-10 flex gap-4">
+          <div className="mt-10 flex flex-wrap gap-4">
             <Link
               href="/contact"
               className="rounded-full bg-accent px-8 py-3.5 text-base font-semibold text-black transition hover:bg-accent-dim"
@@ -59,9 +63,9 @@ function HeroSection() {
 
 function StatsBar() {
   const stats = [
-    { label: "Agents", value: "7" },
+    { label: "AI Agents", value: "7" },
     { label: "Pipeline Stages", value: "6" },
-    { label: "Token Tiers", value: "5" },
+    { label: "Pricing Tiers", value: "5" },
     { label: "Ship Rate", value: "100%" },
   ];
   return (
@@ -83,26 +87,30 @@ function ServicesSection() {
     {
       title: "Emdash Sites",
       description:
-        "Full websites built from your PRD. Design, content, SEO, and deployment included. 5 to 50+ pages.",
-      tokens: "500K - 2M tokens",
+        "Full websites from your PRD — design, content, SEO, and deployment. From 5-page marketing sites to 50+ page platforms.",
+      price: "From $2,500",
+      tokens: "500K – 2M tokens",
     },
     {
       title: "Emdash Themes",
       description:
-        "Custom design systems with reusable components, design tokens, and documentation.",
+        "Custom design systems with reusable components, design tokens, and full documentation. Built for the Emdash ecosystem.",
+      price: "From $1,500",
       tokens: "750K tokens",
     },
     {
       title: "Emdash Plugins",
       description:
-        "Custom functionality with full test coverage. Logic, API integrations, and docs.",
+        "Custom functionality with full test coverage. Business logic, API integrations, and docs — production-ready from day one.",
+      price: "From $1,000",
       tokens: "500K tokens",
     },
     {
-      title: "Revisions",
+      title: "WordPress Migration",
       description:
-        "Post-deploy changes billed per revision round. Quick turnaround, scoped by tokens.",
-      tokens: "100K per round",
+        "Full-service migration from WordPress to Emdash. Content transfer, URL mapping, SEO preservation, and redirect setup.",
+      price: "From $3,500",
+      tokens: "1.5M tokens",
     },
   ];
   return (
@@ -112,8 +120,8 @@ function ServicesSection() {
           What We Build
         </h2>
         <p className="mt-3 max-w-lg text-muted">
-          Every product type has a token budget. You know the cost before we
-          start. No surprises.
+          Every product has a fixed token budget. You know the cost before we
+          start. No hourly billing, no surprise invoices.
         </p>
         <div className="mt-12 grid gap-6 sm:grid-cols-2">
           {services.map((s) => (
@@ -125,11 +133,22 @@ function ServicesSection() {
               <p className="mt-3 text-sm leading-relaxed text-muted">
                 {s.description}
               </p>
-              <div className="mt-4 inline-flex rounded-full bg-background px-3 py-1 font-mono text-xs text-accent">
-                {s.tokens}
+              <div className="mt-4 flex items-center gap-3">
+                <span className="text-lg font-bold text-accent">{s.price}</span>
+                <span className="rounded-full bg-background px-3 py-1 font-mono text-xs text-muted">
+                  {s.tokens}
+                </span>
               </div>
             </div>
           ))}
+        </div>
+        <div className="mt-8 text-center">
+          <Link
+            href="/services"
+            className="text-sm font-medium text-accent transition hover:text-accent-dim"
+          >
+            See detailed pricing &rarr;
+          </Link>
         </div>
       </div>
     </section>
@@ -143,7 +162,7 @@ function PipelineSection() {
     { step: "03", name: "Plan", desc: "Sub-agents hired. Tasks assigned." },
     { step: "04", name: "Build", desc: "Parallel execution. Feature branches." },
     { step: "05", name: "Review", desc: "QA runs. P0s block ship." },
-    { step: "06", name: "Deploy", desc: "Push to Emdash. You're live." },
+    { step: "06", name: "Deploy", desc: "Push to production. You're live." },
   ];
   return (
     <section className="border-b border-border py-24">
@@ -177,6 +196,41 @@ function PipelineSection() {
   );
 }
 
+function TechStackSection() {
+  const stack = [
+    { name: "Emdash", desc: "Modern CMS platform" },
+    { name: "Next.js", desc: "React framework" },
+    { name: "Tailwind CSS", desc: "Utility-first styling" },
+    { name: "Cloudflare", desc: "Edge deployment" },
+    { name: "Claude AI", desc: "Agent intelligence" },
+    { name: "GitHub", desc: "Version control & CI" },
+  ];
+  return (
+    <section className="border-b border-border py-24">
+      <div className="mx-auto max-w-6xl px-6">
+        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          Built With
+        </h2>
+        <p className="mt-3 max-w-lg text-muted">
+          Every product we ship runs on battle-tested infrastructure. No
+          experimental stacks, no vendor lock-in.
+        </p>
+        <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+          {stack.map((t) => (
+            <div
+              key={t.name}
+              className="rounded-xl border border-border bg-surface p-4 text-center transition hover:border-muted"
+            >
+              <div className="font-semibold text-sm">{t.name}</div>
+              <div className="mt-1 text-xs text-muted">{t.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function CTASection() {
   return (
     <section className="py-24">
@@ -185,7 +239,7 @@ function CTASection() {
           Ready to ship?
         </h2>
         <p className="mx-auto mt-4 max-w-md text-muted">
-          Send us your PRD. We&apos;ll scope it, quote tokens, and start
+          Send us your PRD. We&apos;ll scope it, quote a fixed price, and start
           building. No meetings required.
         </p>
         <Link
@@ -202,10 +256,28 @@ function CTASection() {
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "Shipyard AI",
+            url: "https://shipyard.company",
+            description:
+              "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs.",
+            potentialAction: {
+              "@type": "SearchAction",
+              target: "https://shipyard.company/services",
+            },
+          }),
+        }}
+      />
       <HeroSection />
       <StatsBar />
       <ServicesSection />
       <PipelineSection />
+      <TechStackSection />
       <CTASection />
     </>
   );

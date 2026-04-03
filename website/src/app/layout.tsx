@@ -105,23 +105,41 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "Shipyard AI",
-              url: "https://shipyard.company",
-              description:
-                "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs.",
-              foundingDate: "2026",
-              knowsAbout: [
-                "EmDash",
-                "Astro",
-                "Cloudflare",
-                "Web Development",
-                "AI Agents",
-                "CMS",
-              ],
-            }),
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                name: "Shipyard AI",
+                url: "https://shipyard.company",
+                email: "hello@shipyard.company",
+                description:
+                  "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs.",
+                foundingDate: "2026",
+                knowsAbout: [
+                  "EmDash",
+                  "Astro",
+                  "Cloudflare",
+                  "Web Development",
+                  "AI Agents",
+                  "CMS",
+                ],
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "SoftwareApplication",
+                name: "Shipyard AI Pipeline",
+                applicationCategory: "DeveloperApplication",
+                operatingSystem: "Cloud",
+                description:
+                  "Autonomous AI agent pipeline that builds Emdash sites, themes, and plugins from product requirements documents.",
+                offers: {
+                  "@type": "AggregateOffer",
+                  lowPrice: "1000",
+                  highPrice: "10000",
+                  priceCurrency: "USD",
+                },
+              },
+            ]),
           }}
         />
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:bg-accent focus:px-4 focus:py-2 focus:text-black">

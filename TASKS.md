@@ -1,6 +1,6 @@
 # Shipyard AI — Task Board
 
-**Last dispatch**: 2026-04-03 17:30 UTC
+**Last dispatch**: 2026-04-03 18:00 UTC
 **Dispatcher**: Phil Jackson (Orchestrator)
 
 ## Task States
@@ -20,13 +20,13 @@
 
 | # | Task | Assigned To | Status | Branch | Notes |
 |---|------|-------------|--------|--------|-------|
-| 13 | PRD-001: Enhance homepage — refine copy, add SEO, JSON-LD | Steve Jobs | open | feature/prd-001-build | Hero, services grid, process, tech stack, CTA |
-| 14 | PRD-001: Enhance services page — pricing cards, detailed descriptions | Steve Jobs | open | feature/prd-001-build | Sites $2.5K, Themes $1.5K, Plugins $1K, Migration $3.5K |
-| 15 | PRD-001: Enhance about page — agent team, principles, why EmDash | Steve Jobs | open | feature/prd-001-build | Show the agent roster as a selling point |
-| 16 | PRD-001: Build contact form — PRD submission | Elon Musk | open | feature/prd-001-build | Static form → Formspree or mailto |
-| 17 | PRD-001: Add SEO metadata to all pages | Steve Jobs | open | feature/prd-001-build | OG, Twitter cards, JSON-LD Organization + SoftwareApplication |
+| 13 | PRD-001: Enhance homepage — refine copy, add SEO, JSON-LD | Steve Jobs | done | feature/prd-001-build | Added tech stack section, dollar pricing, refined copy, WebSite JSON-LD |
+| 14 | PRD-001: Enhance services page — pricing cards, detailed descriptions | Steve Jobs | done | feature/prd-001-build | Full pricing ($2.5K-$10K sites, $1.5K themes, $1K plugins, $3.5K migration), detailed includes, revision pricing, how-it-works |
+| 15 | PRD-001: Enhance about page — agent team, principles, why EmDash | Steve Jobs | done | feature/prd-001-build | Why Emdash section, directors vs sub-agents split, model labels, How We're Different stats, enriched descriptions |
+| 16 | PRD-001: Build contact form — PRD submission | Elon Musk | done | PR #5 | Enhanced: added budget range field, WordPress migration option, better UX |
+| 17 | PRD-001: Add SEO metadata to all pages | Steve Jobs | done | feature/prd-001-build | Enhanced: page-specific JSON-LD (Service, AboutPage, ContactPage, WebSite, SoftwareApplication) |
 | 18 | PRD-001: Blog placeholder (3 teaser posts) | Sub-agent (haiku) | open | feature/prd-001-build | Nice-to-have, only if token budget allows |
-| 19 | PRD-001: QA pass + deploy | Margaret Hamilton | open | — | Build, a11y, lighthouse, deploy to Vercel |
+| 19 | PRD-001: QA pass + deploy | Margaret Hamilton | done | PR #2,#5 | Deployed to Cloudflare Pages (shipyard-ai.pages.dev) |
 
 ## P1 — Core Systems
 

@@ -21,6 +21,7 @@ export function ContactForm() {
     const email = (data.get("email") as string)?.trim();
     const description = (data.get("description") as string)?.trim();
     const projectType = data.get("project-type") as string;
+    const budget = data.get("budget") as string;
 
     if (!name || !email || !description) {
       setState({ success: false, message: "Please fill in all required fields." });
@@ -34,10 +35,9 @@ export function ContactForm() {
 
     setPending(true);
 
-    // Compose mailto with form data
     const subject = encodeURIComponent(`PRD Submission: ${projectType} from ${name}`);
     const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\nProject Type: ${projectType}\n\nDescription:\n${description}`
+      `Name: ${name}\nEmail: ${email}\nProject Type: ${projectType}\nBudget Range: ${budget}\n\nDescription:\n${description}`
     );
     window.location.href = `mailto:hello@shipyard.company?subject=${subject}&body=${body}`;
 
@@ -50,8 +50,13 @@ export function ContactForm() {
 
   return (
     <div className="rounded-xl border border-border bg-surface p-8">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Honeypot field — hidden from humans, catches bots */}
+      <h2 className="text-xl font-bold">Project Details</h2>
+      <p className="mt-2 text-sm text-muted">
+        Fill in what you know. We&apos;ll figure out the rest.
+      </p>
+
+      <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+        {/* Honeypot field */}
         <div className="hidden" aria-hidden="true">
           <label htmlFor="website">Website</label>
           <input type="text" id="website" name="website" tabIndex={-1} autoComplete="off" />
@@ -95,7 +100,24 @@ export function ContactForm() {
             <option>Emdash Site</option>
             <option>Emdash Theme</option>
             <option>Emdash Plugin</option>
+            <option>WordPress Migration</option>
             <option>Revision</option>
+            <option>Not sure yet</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="budget" className="block text-sm font-medium">
+            Budget Range
+          </label>
+          <select
+            id="budget"
+            name="budget"
+            className="mt-2 block w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+          >
+            <option>Under $2,500</option>
+            <option>$2,500 – $5,000</option>
+            <option>$5,000 – $10,000</option>
+            <option>$10,000+</option>
             <option>Not sure yet</option>
           </select>
         </div>
@@ -131,10 +153,10 @@ export function ContactForm() {
           disabled={pending}
           className="w-full rounded-full bg-accent py-3.5 text-sm font-semibold text-black transition hover:bg-accent-dim disabled:opacity-50"
         >
-          {pending ? "Submitting..." : "Submit"}
+          {pending ? "Submitting..." : "Submit Project"}
         </button>
         <p className="text-center text-xs text-muted">
-          We&apos;ll respond with a token quote within 24 hours.
+          We&apos;ll respond with a scope and token quote within 24 hours.
         </p>
       </form>
     </div>
