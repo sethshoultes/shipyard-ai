@@ -1,0 +1,8 @@
+name = "shipyard-contact"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+[vars]
+FROM_EMAIL = "hello@shipyard.company"
+TO_EMAIL = "seth@caseproof.com"
+CORS_ORIGIN = "https://shipyard.company"
