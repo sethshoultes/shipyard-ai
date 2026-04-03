@@ -26,7 +26,7 @@ const projects = [
     vertical: "Restaurant",
     location: "Austin, TX",
     template: "Marketing",
-    url: "https://bellas.shipyard.company",
+    url: "https://moss-offer-push-lived.trycloudflare.com",
     description:
       "Handmade Italian restaurant site with full menu and pricing, customer reviews, FAQ, and reservation booking. Built on the EmDash marketing template with custom content blocks.",
     features: [
@@ -47,7 +47,7 @@ const projects = [
     vertical: "Dental Practice",
     location: "Denver, CO",
     template: "Marketing",
-    url: "https://dental.shipyard.company",
+    url: "https://ted-scenario-tan-ivory.trycloudflare.com",
     description:
       "Modern dental practice site with transparent service pricing, patient testimonials, insurance FAQ, and same-day appointment booking. Professional and trustworthy.",
     features: [
@@ -68,7 +68,7 @@ const projects = [
     vertical: "Design Agency",
     location: "Portland, OR",
     template: "Portfolio",
-    url: "https://craft.shipyard.company",
+    url: "https://epinions-processing-existence-capabilities.trycloudflare.com",
     description:
       "Creative agency portfolio with 5 case study projects, filterable by category. Brand identity, web design, packaging, and illustration work for food & beverage and outdoor brands.",
     features: [
