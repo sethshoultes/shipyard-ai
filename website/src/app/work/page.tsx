@@ -26,7 +26,8 @@ const projects = [
     vertical: "Restaurant",
     location: "Austin, TX",
     template: "Marketing",
-    url: "https://moss-offer-push-lived.trycloudflare.com",
+    url: "https://bellas.shipyard.company",
+    screenshot: "/screenshots/bellas-bistro.png",
     description:
       "Handmade Italian restaurant site with full menu and pricing, customer reviews, FAQ, and reservation booking. Built on the EmDash marketing template with custom content blocks.",
     features: [
@@ -40,14 +41,14 @@ const projects = [
     accent: "text-red-400",
     badge: "bg-red-500/10 text-red-400 border-red-500/20",
     previewBg: "bg-gradient-to-br from-red-950 via-orange-950 to-amber-950",
-    previewEmoji: "🍝",
   },
   {
     name: "Peak Dental Care",
     vertical: "Dental Practice",
     location: "Denver, CO",
     template: "Marketing",
-    url: "https://ted-scenario-tan-ivory.trycloudflare.com",
+    url: "https://dental.shipyard.company",
+    screenshot: "/screenshots/peak-dental.png",
     description:
       "Modern dental practice site with transparent service pricing, patient testimonials, insurance FAQ, and same-day appointment booking. Professional and trustworthy.",
     features: [
@@ -61,14 +62,14 @@ const projects = [
     accent: "text-sky-400",
     badge: "bg-sky-500/10 text-sky-400 border-sky-500/20",
     previewBg: "bg-gradient-to-br from-sky-950 via-blue-950 to-indigo-950",
-    previewEmoji: "🦷",
   },
   {
     name: "Craft & Co Studio",
     vertical: "Design Agency",
     location: "Portland, OR",
     template: "Portfolio",
-    url: "https://epinions-processing-existence-capabilities.trycloudflare.com",
+    url: "https://craft.shipyard.company",
+    screenshot: "/screenshots/craft-co-studio.png",
     description:
       "Creative agency portfolio with 5 case study projects, filterable by category. Brand identity, web design, packaging, and illustration work for food & beverage and outdoor brands.",
     features: [
@@ -82,7 +83,6 @@ const projects = [
     accent: "text-purple-400",
     badge: "bg-purple-500/10 text-purple-400 border-purple-500/20",
     previewBg: "bg-gradient-to-br from-purple-950 via-violet-950 to-fuchsia-950",
-    previewEmoji: "🎨",
   },
 ];
 
@@ -153,9 +153,11 @@ export default function WorkPage() {
                         {project.url.replace("https://", "")}
                       </div>
                     </div>
-                    <div className="flex h-40 items-center justify-center text-6xl">
-                      {project.previewEmoji}
-                    </div>
+                    <img
+                      src={project.screenshot}
+                      alt={`${project.name} website screenshot`}
+                      className="w-full h-40 object-cover object-top"
+                    />
                   </div>
                   <div className="px-8 pb-8 pt-6">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
