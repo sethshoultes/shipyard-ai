@@ -55,6 +55,9 @@ function Header() {
           <Link href="/pipeline" className="transition hover:text-foreground">
             Pipeline
           </Link>
+          <Link href="/chat" className="transition hover:text-foreground">
+            Chat
+          </Link>
           <Link
             href="/contact"
             className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-black transition hover:bg-accent-dim"
