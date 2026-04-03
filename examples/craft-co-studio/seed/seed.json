@@ -1,0 +1,479 @@
+{
+	"$schema": "https://emdashcms.com/seed.schema.json",
+	"version": "1",
+	"meta": {
+		"name": "Craft & Co Studio Portfolio",
+		"description": "A portfolio for a Portland design studio specializing in brand identity, web design, packaging, and illustration",
+		"author": "Craft & Co Studio"
+	},
+
+	"settings": {
+		"title": "Craft & Co Studio",
+		"tagline": "Design with intention"
+	},
+
+	"collections": [
+		{
+			"slug": "projects",
+			"label": "Projects",
+			"labelSingular": "Project",
+			"supports": ["drafts", "revisions", "search", "seo"],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Title",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "featured_image",
+					"label": "Featured Image",
+					"type": "image",
+					"required": true
+				},
+				{
+					"slug": "client",
+					"label": "Client",
+					"type": "string"
+				},
+				{
+					"slug": "year",
+					"label": "Year",
+					"type": "string"
+				},
+				{
+					"slug": "summary",
+					"label": "Summary",
+					"type": "text",
+					"searchable": true
+				},
+				{
+					"slug": "content",
+					"label": "Content",
+					"type": "portableText",
+					"searchable": true
+				},
+				{
+					"slug": "gallery",
+					"label": "Gallery",
+					"type": "json"
+				},
+				{
+					"slug": "url",
+					"label": "Project URL",
+					"type": "string"
+				}
+			]
+		},
+		{
+			"slug": "pages",
+			"label": "Pages",
+			"labelSingular": "Page",
+			"supports": ["drafts", "revisions", "search"],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Title",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "content",
+					"label": "Content",
+					"type": "portableText",
+					"searchable": true
+				}
+			]
+		}
+	],
+
+	"taxonomies": [
+		{
+			"name": "category",
+			"label": "Categories",
+			"labelSingular": "Category",
+			"hierarchical": false,
+			"collections": ["projects"],
+			"terms": [
+				{ "slug": "branding", "label": "Branding" },
+				{ "slug": "web", "label": "Web Design" },
+				{ "slug": "print", "label": "Print" },
+				{ "slug": "illustration", "label": "Illustration" }
+			]
+		},
+		{
+			"name": "tag",
+			"label": "Tags",
+			"labelSingular": "Tag",
+			"hierarchical": false,
+			"collections": ["projects"],
+			"terms": [
+				{ "slug": "identity", "label": "Identity" },
+				{ "slug": "packaging", "label": "Packaging" },
+				{ "slug": "ecommerce", "label": "E-commerce" },
+				{ "slug": "wayfinding", "label": "Wayfinding" },
+				{ "slug": "editorial", "label": "Editorial" },
+				{ "slug": "beverage", "label": "Beverage" },
+				{ "slug": "lifestyle", "label": "Lifestyle" }
+			]
+		}
+	],
+
+	"menus": [
+		{
+			"name": "primary",
+			"label": "Primary Navigation",
+			"items": [
+				{ "type": "custom", "label": "Work", "url": "/work" },
+				{ "type": "custom", "label": "Contact", "url": "/contact" }
+			]
+		}
+	],
+
+	"content": {
+		"pages": [
+			{
+				"id": "about",
+				"slug": "about",
+				"status": "published",
+				"data": {
+					"title": "About",
+					"content": [
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "Craft & Co is a Portland design studio founded in 2019. We believe great design starts with listening — to your story, your customers, and the details that make your brand uniquely yours. We work with food & beverage, outdoor, and lifestyle brands."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "Our approach is rooted in craft and intention. We spend time understanding what makes your business different, then we create visual identities and experiences that feel genuine and memorable. Every project is a collaboration."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"children": [{ "_type": "span", "text": "What we do" }]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "We specialize in brand identity design, web design, packaging design, and custom illustration. Whether you're launching a new brand or refreshing an established one, we bring the same level of care and attention to detail."
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"projects": [
+			{
+				"id": "timber-brewing-co",
+				"slug": "timber-brewing-co",
+				"status": "published",
+				"data": {
+					"title": "Timber Brewing Co",
+					"client": "Timber Brewing Co",
+					"year": "2024",
+					"summary": "Complete brand identity and packaging design for a craft brewery focused on sustainability and heritage.",
+					"featured_image": "https://images.unsplash.com/photo-1599823123271-475ec33ea520?w=1200&h=900&fit=crop",
+					"url": "https://timberbrewing.example.com",
+					"content": [
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "Timber Brewing Co is a new craft brewery in Portland committed to using local ingredients and sustainable practices. They needed a visual identity that reflected their values while standing out in a crowded market."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"children": [{ "_type": "span", "text": "The identity" }]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "We created a wordmark inspired by timber grain and brewing tradition, paired with a warm, earthy color palette. The mark works at any scale and translates beautifully to their can and bottle designs."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"children": [{ "_type": "span", "text": "Packaging" }]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "The packaging extends the identity with custom illustrations that reference the brewery's sourcing practices. Each beer style has a unique illustration, making the collection feel cohesive yet distinct."
+								}
+							]
+						}
+					]
+				},
+				"taxonomies": {
+					"category": ["branding", "print"],
+					"tag": ["identity", "packaging", "beverage"]
+				}
+			},
+			{
+				"id": "fern-and-moss",
+				"slug": "fern-and-moss",
+				"status": "published",
+				"data": {
+					"title": "Fern & Moss",
+					"client": "Fern & Moss",
+					"year": "2024",
+					"summary": "E-commerce website design for an online plant shop specializing in rare and unusual houseplants.",
+					"featured_image": "https://images.unsplash.com/photo-1490599967868-a82a260ecc6d?w=1200&h=900&fit=crop",
+					"url": "https://fernandmoss.example.com",
+					"content": [
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "Fern & Moss is an online plant shop built on the belief that unusual plants deserve equally unusual homes. They needed an e-commerce website that felt like browsing a curated collection rather than shopping a catalog."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"children": [{ "_type": "span", "text": "Design approach" }]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "We designed the site to showcase each plant as a character. Large photography, minimal text, and an organic layout create an immersive browsing experience. The color palette shifts subtly based on plant type, creating natural categories without cluttering the interface."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"children": [{ "_type": "span", "text": "Features" }]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "Custom care guides for each plant, a plant identification tool, and a community forum where collectors share photos of their plants. The site has increased engagement and repeat purchases."
+								}
+							]
+						}
+					]
+				},
+				"taxonomies": {
+					"category": ["web"],
+					"tag": ["ecommerce", "lifestyle"]
+				}
+			},
+			{
+				"id": "mountain-journal",
+				"slug": "mountain-journal",
+				"status": "published",
+				"data": {
+					"title": "Mountain Journal",
+					"client": "Mountain Journal",
+					"year": "2023",
+					"summary": "Editorial design for a quarterly outdoor magazine celebrating mountain culture and environmental storytelling.",
+					"featured_image": "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=1200&h=900&fit=crop",
+					"content": [
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "Mountain Journal is a quarterly publication dedicated to mountain culture, environmental conservation, and the people who live in and care for mountain communities."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"children": [{ "_type": "span", "text": "The design system" }]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "We developed a flexible design system that uses bold typography, generous white space, and a restrained color palette. Each issue explores a new region, and the design adapts while maintaining a consistent visual language."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"children": [{ "_type": "span", "text": "Layout philosophy" }]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "We prioritize the photography and editorial content, using a modular grid that adapts to different story types. Pull quotes and callouts are treated as design elements, breaking up the rhythm of longer features."
+								}
+							]
+						}
+					]
+				},
+				"taxonomies": {
+					"category": ["print"],
+					"tag": ["editorial", "lifestyle"]
+				}
+			},
+			{
+				"id": "nomad-coffee",
+				"slug": "nomad-coffee",
+				"status": "published",
+				"data": {
+					"title": "Nomad Coffee",
+					"client": "Nomad Coffee",
+					"year": "2023",
+					"summary": "Complete rebrand for a specialty coffee roaster expanding from their Portland roastery to national distribution.",
+					"featured_image": "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1200&h=900&fit=crop",
+					"url": "https://nomadcoffee.example.com",
+					"content": [
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "Nomad Coffee started as a local roastery but quickly gained a following for their single-origin beans and commitment to direct trade. They needed a rebrand that could scale nationally while maintaining their craft authenticity."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"children": [{ "_type": "span", "text": "The mark" }]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "We created a simplified wordmark that feels both timeless and contemporary. The accompanying badge system allows flexibility for different product lines and collaborations."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"children": [{ "_type": "span", "text": "Packaging and collateral" }]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "Custom bag designs feature origin maps and tasting notes, turning each product into a storytelling opportunity. A refined color palette and consistent typography create a premium feel that supports their direct trade positioning."
+								}
+							]
+						}
+					]
+				},
+				"taxonomies": {
+					"category": ["branding", "print"],
+					"tag": ["identity", "packaging", "beverage"]
+				}
+			},
+			{
+				"id": "pacific-trails",
+				"slug": "pacific-trails",
+				"status": "published",
+				"data": {
+					"title": "Pacific Trails",
+					"client": "Pacific Trails State Park",
+					"year": "2023",
+					"summary": "Wayfinding and signage system design for a 40,000-acre state park spanning three distinct ecosystems.",
+					"featured_image": "https://images.unsplash.com/photo-1469022563149-aa64dbd37dce?w=1200&h=900&fit=crop",
+					"content": [
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "Pacific Trails State Park encompasses forests, wetlands, and coastal bluffs. The park needed a comprehensive wayfinding system that could guide visitors across diverse landscapes while respecting the natural environment."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"children": [{ "_type": "span", "text": "System design" }]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "We developed a modular signage system using natural materials and minimal visual hierarchy. Each zone uses distinct colors derived from the landscape, helping visitors understand which ecosystem they're in."
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"children": [{ "_type": "span", "text": "Implementation" }]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "Custom trail maps, marker designs, and interpretive signage create a cohesive experience that encourages exploration while providing clear navigation. The system uses locally-sourced cedar and weather-resistant finishes for durability and sustainability."
+								}
+							]
+						}
+					]
+				},
+				"taxonomies": {
+					"category": ["print"],
+					"tag": ["wayfinding", "lifestyle"]
+				}
+			}
+		]
+	}
+}
