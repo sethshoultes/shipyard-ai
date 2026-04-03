@@ -54,10 +54,23 @@
 | 11 | Case study template | Steve Jobs | in-progress | — | Dispatched 19:10 UTC |
 | 12 | Client onboarding flow | Sara Blakely | in-progress | — | Dispatched 19:10 UTC |
 
+## QA — Live Site Issues (Margaret Hamilton, 2026-04-03)
+
+| # | Issue | Severity | Site | Status | Notes |
+|---|-------|----------|------|--------|-------|
+| 22 | /signup returns 404 — primary CTA broken | P0 | bellas.shipyard.company | fix-ready | Local source fixed (uses /contact). Needs redeployment. |
+| 23 | /signup returns 404 — primary CTA broken | P0 | dental.shipyard.company | fix-ready | Local source fixed (uses /contact). Needs redeployment. |
+| 24 | Social links go to bare domain (no profile path) | P1 | craft.shipyard.company | fix-ready | Local source fixed (added /craftcostudio paths). Needs redeployment. |
+| 25 | "Acme" fallback in Base.astro + index.astro | P1 | bellas-bistro (local) | done | Fixed to "Bellas" + proper tagline |
+| 26 | "Acme" fallback in index.astro | P1 | peak-dental (local) | done | Fixed to "Peak Dental Care" |
+| 27 | Marketing template uses /signup | P1 | emdash-templates | done | Both templates fixed to /contact |
+| 28 | "Build products people actually want" fallback tagline | P2 | bellas + dental (local) | done | Replaced with business-specific taglines |
+
 ## Blocked
 
 | Issue | Blocker | Action Needed |
 |-------|---------|---------------|
+| P0-22,23: /signup 404 on live sites | Live sites running old marketing template, not customized source | Redeploy bellas + dental from examples/ source |
 | Example sites returning 404 | EmDash needs D1 databases; API token lacks D1 permissions | Owner: create broader CF token or approve DigitalOcean hosting |
 
 ---
