@@ -21,35 +21,54 @@ function HeroSection() {
   return (
     <section className="relative overflow-hidden border-b border-border">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-900/20 via-transparent to-transparent" />
-      <div className="relative mx-auto max-w-6xl px-6 py-28 sm:py-40">
-        <div className="max-w-3xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-1.5 text-sm text-muted">
-            <span className="h-2 w-2 rounded-full bg-green-500" />
-            Accepting new PRDs
+      <div className="relative mx-auto max-w-6xl px-6 py-20 sm:py-32">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-1.5 text-sm text-muted">
+              <span className="h-2 w-2 rounded-full bg-green-500" />
+              Accepting new PRDs
+            </div>
+            <h1 className="text-5xl font-bold leading-tight tracking-tight sm:text-7xl">
+              PRD in.
+              <br />
+              <span className="text-accent">Production out.</span>
+            </h1>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
+              Shipyard AI is an autonomous agency that builds Emdash sites, themes,
+              and plugins from your PRD. No hand-holding. No scope creep. Just
+              shipped products.
+            </p>
+            <div className="mt-10 flex gap-4">
+              <Link
+                href="/contact"
+                className="rounded-full bg-accent px-8 py-3.5 text-base font-semibold text-black transition hover:bg-accent-dim"
+              >
+                Submit a PRD
+              </Link>
+              <Link
+                href="/pipeline"
+                className="rounded-full border border-border px-8 py-3.5 text-base font-semibold transition hover:border-muted hover:bg-surface"
+              >
+                See How It Works
+              </Link>
+            </div>
           </div>
-          <h1 className="text-5xl font-bold leading-tight tracking-tight sm:text-7xl">
-            PRD in.
-            <br />
-            <span className="text-accent">Production out.</span>
-          </h1>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
-            Shipyard AI is an autonomous agency that builds Emdash sites, themes,
-            and plugins from your PRD. No hand-holding. No scope creep. Just
-            shipped products.
-          </p>
-          <div className="mt-10 flex gap-4">
-            <Link
-              href="/contact"
-              className="rounded-full bg-accent px-8 py-3.5 text-base font-semibold text-black transition hover:bg-accent-dim"
-            >
-              Submit a PRD
-            </Link>
-            <Link
-              href="/pipeline"
-              className="rounded-full border border-border px-8 py-3.5 text-base font-semibold transition hover:border-muted hover:bg-surface"
-            >
-              See How It Works
-            </Link>
+          <div className="hidden lg:block">
+            <div className="overflow-hidden rounded-2xl border border-border shadow-2xl shadow-accent/5">
+              <div className="flex items-center gap-2 border-b border-border bg-surface px-4 py-2.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-red-500/60" />
+                <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/60" />
+                <span className="h-2.5 w-2.5 rounded-full bg-green-500/60" />
+                <span className="ml-2 flex-1 rounded bg-background px-3 py-1 text-xs text-muted">bellas.shipyard.company</span>
+              </div>
+              <img
+                src="/screenshots/bellas-bistro.png"
+                alt="Bella's Bistro — an EmDash site built by Shipyard AI"
+                className="w-full"
+                width={640}
+                height={400}
+              />
+            </div>
           </div>
         </div>
       </div>
