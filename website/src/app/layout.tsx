@@ -46,6 +46,9 @@ function Header() {
           <Link href="/services" className="transition hover:text-foreground">
             Services
           </Link>
+          <Link href="/work" className="transition hover:text-foreground">
+            Work
+          </Link>
           <Link href="/about" className="transition hover:text-foreground">
             About
           </Link>
@@ -75,6 +78,9 @@ function Footer() {
         <div className="flex gap-6 text-sm text-muted">
           <Link href="/services" className="transition hover:text-foreground">
             Services
+          </Link>
+          <Link href="/work" className="transition hover:text-foreground">
+            Work
           </Link>
           <Link href="/about" className="transition hover:text-foreground">
             About
