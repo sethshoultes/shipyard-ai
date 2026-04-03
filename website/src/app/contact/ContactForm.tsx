@@ -1,14 +1,56 @@
 "use client";
 
-import { useActionState } from "react";
-import { submitContact, type FormState } from "./actions";
+import { useState, type FormEvent } from "react";
 
 export function ContactForm() {
-  const [state, action, pending] = useActionState<FormState, FormData>(submitContact, null);
+  const [state, setState] = useState<{ success: boolean; message: string } | null>(null);
+  const [pending, setPending] = useState(false);
+
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const data = new FormData(form);
+
+    const honeypot = data.get("website") as string;
+    if (honeypot) {
+      setState({ success: true, message: "Thanks! We'll be in touch within 24 hours." });
+      return;
+    }
+
+    const name = (data.get("name") as string)?.trim();
+    const email = (data.get("email") as string)?.trim();
+    const description = (data.get("description") as string)?.trim();
+    const projectType = data.get("project-type") as string;
+
+    if (!name || !email || !description) {
+      setState({ success: false, message: "Please fill in all required fields." });
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setState({ success: false, message: "Please enter a valid email address." });
+      return;
+    }
+
+    setPending(true);
+
+    // Compose mailto with form data
+    const subject = encodeURIComponent(`PRD Submission: ${projectType} from ${name}`);
+    const body = encodeURIComponent(
+      `Name: ${name}\nEmail: ${email}\nProject Type: ${projectType}\n\nDescription:\n${description}`
+    );
+    window.location.href = `mailto:hello@shipyard.company?subject=${subject}&body=${body}`;
+
+    setTimeout(() => {
+      setPending(false);
+      setState({ success: true, message: "Thanks! Your email client should have opened. We'll scope your project and respond within 24 hours." });
+      form.reset();
+    }, 1000);
+  }
 
   return (
     <div className="rounded-xl border border-border bg-surface p-8">
-      <form action={action} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Honeypot field — hidden from humans, catches bots */}
         <div className="hidden" aria-hidden="true">
           <label htmlFor="website">Website</label>
