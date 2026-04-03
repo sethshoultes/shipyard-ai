@@ -1,0 +1,258 @@
+{
+	"$schema": "https://emdashcms.com/seed.schema.json",
+	"version": "1",
+	"meta": {
+		"name": "Bella's Bistro",
+		"description": "Italian restaurant in Austin, TX — built by Shipyard AI",
+		"author": "Shipyard AI"
+	},
+
+	"settings": {
+		"title": "Bella's Bistro",
+		"tagline": "Handmade Italian in the heart of Austin"
+	},
+
+	"collections": [
+		{
+			"slug": "pages",
+			"label": "Pages",
+			"labelSingular": "Page",
+			"supports": ["drafts", "revisions", "seo"],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Title",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "content",
+					"label": "Content",
+					"type": "portableText"
+				}
+			]
+		}
+	],
+
+	"menus": [
+		{
+			"name": "primary",
+			"label": "Primary Navigation",
+			"items": [
+				{ "type": "custom", "label": "About", "url": "/#features" },
+				{ "type": "custom", "label": "Menu", "url": "/pricing" },
+				{ "type": "custom", "label": "Reserve a Table", "url": "/contact" }
+			]
+		}
+	],
+
+	"content": {
+		"pages": [
+			{
+				"id": "home",
+				"slug": "home",
+				"status": "published",
+				"data": {
+					"title": "Home",
+					"content": [
+						{
+							"_type": "marketing.hero",
+							"_key": "hero",
+							"headline": "Handmade Italian in the heart of Austin",
+							"subheadline": "From nonna's kitchen to yours. Fresh pasta made daily, wood-fired pizzas, and a wine list that tells a story. Dinner served Tuesday through Sunday.",
+							"primaryCta": { "label": "Reserve a Table", "url": "/contact" },
+							"secondaryCta": { "label": "See the Menu", "url": "/pricing" }
+						},
+						{
+							"_type": "marketing.features",
+							"_key": "features",
+							"headline": "Why people love Bella's",
+							"subheadline": "Simple ingredients. Real technique. Every dish made with intention.",
+							"features": [
+								{
+									"icon": "zap",
+									"title": "Fresh Pasta Daily",
+									"description": "Our pasta is made in-house every morning. Tagliatelle, pappardelle, ravioli — rolled by hand, cut to order."
+								},
+								{
+									"icon": "shield",
+									"title": "Wood-Fired Pizza",
+									"description": "Our imported Stefano Ferrara oven runs at 900°F. Neapolitan-style pies with a 60-second bake."
+								},
+								{
+									"icon": "users",
+									"title": "Family Style Available",
+									"description": "Hosting a group? Our family-style menu feeds the whole table. Just show up hungry."
+								},
+								{
+									"icon": "chart",
+									"title": "Curated Wine List",
+									"description": "Over 40 Italian wines by the bottle. Our sommelier picks a new 'wine of the week' every Tuesday."
+								},
+								{
+									"icon": "code",
+									"title": "Private Events",
+									"description": "Our back room seats 24. Perfect for birthdays, rehearsal dinners, and corporate gatherings."
+								},
+								{
+									"icon": "globe",
+									"title": "Seasonal Specials",
+									"description": "The menu changes with what's fresh. Our farmers market haul dictates the specials board."
+								}
+							]
+						},
+						{
+							"_type": "marketing.testimonials",
+							"_key": "testimonials",
+							"headline": "What our guests say",
+							"testimonials": [
+								{
+									"quote": "The cacio e pepe alone is worth the drive from San Antonio. This is the real deal.",
+									"author": "James K.",
+									"role": "Google Review",
+									"company": "5 stars"
+								},
+								{
+									"quote": "We've had our anniversary dinner here three years running. The osso buco is unforgettable.",
+									"author": "Maria & Tony R.",
+									"role": "Yelp Review",
+									"company": "5 stars"
+								},
+								{
+									"quote": "Best Italian in Austin, hands down. The burrata appetizer changed my life.",
+									"author": "Priya S.",
+									"role": "Google Review",
+									"company": "5 stars"
+								}
+							]
+						},
+						{
+							"_type": "marketing.faq",
+							"_key": "faq",
+							"headline": "Good to know",
+							"items": [
+								{
+									"question": "Do you take reservations?",
+									"answer": "Yes! We recommend reserving for Friday and Saturday evenings. Walk-ins are welcome Tuesday through Thursday and for Sunday brunch. Book online or call us at (512) 555-0142."
+								},
+								{
+									"question": "Do you accommodate dietary restrictions?",
+									"answer": "Absolutely. We have gluten-free pasta options, and many of our dishes are naturally vegetarian. Let your server know about any allergies — our kitchen takes them seriously."
+								},
+								{
+									"question": "Is there parking?",
+									"answer": "We have a small lot behind the restaurant (enter from 3rd Street). Street parking is also available on South Congress. Valet is offered Friday and Saturday evenings."
+								},
+								{
+									"question": "Do you cater?",
+									"answer": "Yes — we offer catering for groups of 20 or more. Contact us at catering@bellasbistro.com for a custom menu and quote."
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "pricing",
+				"slug": "pricing",
+				"status": "published",
+				"data": {
+					"title": "Menu",
+					"content": [
+						{
+							"_type": "marketing.hero",
+							"_key": "menu-hero",
+							"headline": "Our Menu",
+							"subheadline": "Seasonal Italian fare. Everything made fresh, in-house, with ingredients we're proud of.",
+							"centered": true
+						},
+						{
+							"_type": "marketing.pricing",
+							"_key": "menu-sections",
+							"plans": [
+								{
+									"name": "Antipasti",
+									"price": "$12–$18",
+									"description": "Start with something beautiful",
+									"features": [
+										"Burrata with heirloom tomatoes & basil",
+										"Wood-fired octopus with lemon & capers",
+										"Prosciutto & fig crostini",
+										"Seasonal soup (ask your server)",
+										"Arancini — crispy risotto balls with marinara"
+									],
+									"cta": { "label": "Reserve a Table", "url": "/contact" }
+								},
+								{
+									"name": "Pasta & Entrées",
+									"price": "$22–$38",
+									"description": "Handmade. Every day.",
+									"features": [
+										"Cacio e pepe — our signature",
+										"Pappardelle with wild boar ragù",
+										"Lobster ravioli in saffron cream",
+										"Osso buco with gremolata",
+										"Branzino al forno — whole roasted sea bass",
+										"12oz Bistecca alla Fiorentina",
+										"Eggplant parmigiana (vegetarian)"
+									],
+									"cta": { "label": "Reserve a Table", "url": "/contact" },
+									"highlighted": true
+								},
+								{
+									"name": "Dolci",
+									"price": "$10–$14",
+									"description": "End on a sweet note",
+									"features": [
+										"Classic tiramisu",
+										"Panna cotta with seasonal fruit",
+										"Affogato — espresso over gelato",
+										"Cannoli (filled to order)",
+										"Chocolate torta"
+									],
+									"cta": { "label": "See Wine List", "url": "/contact" }
+								}
+							]
+						},
+						{
+							"_type": "marketing.faq",
+							"_key": "menu-faq",
+							"headline": "Menu notes",
+							"items": [
+								{
+									"question": "Does the menu change?",
+									"answer": "Our core dishes are always available, but we add seasonal specials based on what's fresh at the farmers market. The specials board changes weekly."
+								},
+								{
+									"question": "Can you accommodate large groups?",
+									"answer": "Yes — for parties of 8 or more, we offer a family-style prix fixe menu at $55 per person. Includes antipasti, two pasta courses, an entrée, and dessert."
+								},
+								{
+									"question": "Do you have a kids menu?",
+									"answer": "We offer kid-sized portions of our pasta dishes for $12. Buttered noodles are always available for the little ones."
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "contact",
+				"slug": "contact",
+				"status": "published",
+				"data": {
+					"title": "Reserve a Table",
+					"content": [
+						{
+							"_type": "marketing.hero",
+							"_key": "contact-hero",
+							"headline": "Reserve a table",
+							"subheadline": "Walk-ins welcome Tuesday–Thursday. Reservations recommended for Friday, Saturday, and Sunday brunch. Call (512) 555-0142 or book below.",
+							"centered": true
+						}
+					]
+				}
+			}
+		]
+	}
+}
