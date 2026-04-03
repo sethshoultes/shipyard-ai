@@ -165,24 +165,108 @@ Any state → blocked → (human resolves) → previous state
 
 **Quality gate:** QA report verdict is SHIP (not BLOCK).
 
-### 2.6 DEPLOY
+### 2.6 DEPLOY (MCP-Native)
 
 **Trigger:** QA verdict = SHIP
 **Owner:** Elon Musk (or deploy sub-agent)
 **Token budget:** 5% of project total
 
+EmDash exposes a built-in **MCP server** on every instance. Our agents connect
+directly via MCP to create content types, populate content, configure plugins,
+and deploy — no custom scripts needed.
+
 **Process:**
-1. Push to Emdash staging environment
-2. Smoke test on staging (hit key pages, verify rendering)
-3. If staging passes: promote to production
-4. Configure custom domain (if specified in PRD)
-5. Git tag the release: `v1.0.0-{project-slug}`
-6. Generate deploy log: `projects/{slug}/deploy/deploy-log.md`
-7. Update STATUS.json: `"stage": "done"`
+1. **Provision EmDash instance** on Cloudflare Workers (or target platform)
+2. **Connect via MCP** — agent authenticates with the instance's MCP endpoint
+3. **Create content types** via MCP: define schema for pages, posts, products
+4. **Populate content** via MCP: push Portable Text content from build artifacts
+5. **Configure plugins** via MCP: install + set capability manifests
+6. **Apply theme** — push Astro theme project to Cloudflare Pages
+7. **Smoke test** on staging URL (hit key pages, verify rendering)
+8. If staging passes: **promote to production** via MCP
+9. Configure custom domain (if specified in PRD)
+10. Git tag the release: `v1.0.0-{project-slug}`
+11. Generate deploy log: `projects/{slug}/deploy/deploy-log.md`
+12. Update STATUS.json: `"stage": "done"`
+
+**EmDash CLI fallback:** If MCP connection fails, use the EmDash CLI with
+JSON output mode for programmatic site management.
 
 **Output:** Live site + deploy log
 
 **Quality gate:** Site loads on production URL. All pages render. No console errors.
+
+---
+
+## 2.7 EmDash Technical Integration
+
+### Stack Alignment
+
+| Shipyard AI | EmDash | Integration |
+|-------------|--------|-------------|
+| Build artifacts (TypeScript) | Themes (Astro 6 + TypeScript) | Direct — our agents write Astro themes natively |
+| Content generation | Portable Text (JSON) | Direct — AI generates structured JSON, not HTML |
+| Plugin development | Sandboxed Workers + capability manifests | Direct — TypeScript plugins with declared permissions |
+| Deploy | MCP server + CLI | Direct — programmatic control of every instance |
+| Database | Kysely ORM (D1, PostgreSQL, SQLite, Turso) | Compatible — type-safe queries |
+
+### MCP Integration Points
+
+```
+Agent → MCP Server → EmDash Instance
+  │
+  ├── content.create(type, data)     — Create content entries
+  ├── content.list(type, filters)    — Query existing content
+  ├── schema.define(contentType)     — Define content types
+  ├── plugin.install(manifest)       — Install plugin with capabilities
+  ├── plugin.configure(id, config)   — Configure plugin settings
+  ├── site.deploy()                  — Deploy to production
+  └── site.status()                  — Check deploy status
+```
+
+### Theme Architecture (Astro 6)
+
+Themes our agents build will follow this structure:
+```
+theme-{name}/
+  src/
+    pages/
+      index.astro          — Homepage
+      [...slug].astro      — Dynamic content pages
+      blog/[slug].astro    — Blog post template
+    layouts/
+      Base.astro           — Base layout (head, nav, footer)
+    components/
+      Hero.astro           — Reusable components
+      Card.astro
+    styles/
+      global.css           — Design tokens + global styles
+  astro.config.mjs         — Astro + EmDash integration
+  package.json
+```
+
+### Plugin Architecture (Cloudflare Workers)
+
+Plugins our agents build will follow this structure:
+```
+plugin-{name}/
+  src/
+    index.ts               — Plugin entry point
+    capabilities.ts        — Capability manifest
+  manifest.json            — Declared permissions
+  tests/
+    index.test.ts
+  package.json
+```
+
+Capability manifest example:
+```json
+{
+  "name": "contact-form",
+  "capabilities": ["read:content", "email:send"],
+  "network": ["api.sendgrid.com"]
+}
+```
 
 ---
 
