@@ -13,6 +13,32 @@ interface Env {
   FROM_EMAIL: string;
   TO_EMAIL: string;
   CORS_ORIGIN: string;
+  GITHUB_TOKEN: string;
+  GITHUB_REPO: string; // e.g. "sethshoultes/shipyard-ai"
+}
+
+const MAX_NAME_LENGTH = 200;
+const MAX_EMAIL_LENGTH = 320;
+const MAX_DESCRIPTION_LENGTH = 50_000;
+const MAX_FIELD_LENGTH = 500;
+
+const XSS_PATTERNS = [
+  /<script[\s>]/i,
+  /javascript:/i,
+  /on\w+\s*=/i,
+  /data:\s*text\/html/i,
+];
+
+function stripHtml(str: string): string {
+  return str.replace(/<[^>]*>/g, "");
+}
+
+function sanitizeField(str: string, maxLength: number): string {
+  return stripHtml(str).trim().slice(0, maxLength);
+}
+
+function containsXss(str: string): boolean {
+  return XSS_PATTERNS.some((pattern) => pattern.test(str));
 }
 
 interface ContactPayload {
@@ -59,8 +85,15 @@ export default {
         );
       }
 
+      // Sanitize all inputs
+      body.name = sanitizeField(body.name || "", MAX_NAME_LENGTH);
+      body.email = sanitizeField(body.email || "", MAX_EMAIL_LENGTH);
+      body.projectType = sanitizeField(body.projectType || "", MAX_FIELD_LENGTH);
+      body.budget = sanitizeField(body.budget || "", MAX_FIELD_LENGTH);
+      body.description = stripHtml(body.description || "").trim().slice(0, MAX_DESCRIPTION_LENGTH);
+
       // Validate required fields
-      if (!body.name?.trim() || !body.email?.trim() || !body.description?.trim()) {
+      if (!body.name || !body.email || !body.description) {
         return new Response(
           JSON.stringify({ success: false, message: "Please fill in all required fields." }),
           { status: 400, headers: { ...headers, "Content-Type": "application/json" } }
@@ -70,6 +103,15 @@ export default {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
         return new Response(
           JSON.stringify({ success: false, message: "Please enter a valid email address." }),
+          { status: 400, headers: { ...headers, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Reject XSS patterns
+      const allFields = [body.name, body.email, body.projectType, body.budget, body.description];
+      if (allFields.some(containsXss)) {
+        return new Response(
+          JSON.stringify({ success: false, message: "Invalid input detected." }),
           { status: 400, headers: { ...headers, "Content-Type": "application/json" } }
         );
       }
@@ -107,6 +149,38 @@ export default {
           JSON.stringify({ success: false, message: "Failed to send. Please email us directly at hello@shipyard.company." }),
           { status: 500, headers: { ...headers, "Content-Type": "application/json" } }
         );
+      }
+
+      // Create GitHub issue for PRD intake tracking
+      if (env.GITHUB_TOKEN && env.GITHUB_REPO) {
+        try {
+          await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/issues`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${env.GITHUB_TOKEN}`,
+              "Content-Type": "application/json",
+              "User-Agent": "Shipyard-AI-Contact-Worker",
+            },
+            body: JSON.stringify({
+              title: `PRD Intake: ${body.projectType} from ${body.name}`,
+              body: [
+                `## Contact Details`,
+                `- **Name:** ${body.name}`,
+                `- **Email:** ${body.email}`,
+                `- **Project Type:** ${body.projectType}`,
+                `- **Budget:** ${body.budget || "Not specified"}`,
+                ``,
+                `## Project Description / PRD`,
+                ``,
+                body.description,
+              ].join("\n"),
+              labels: ["prd-intake", body.projectType.toLowerCase().replace(/\s+/g, "-")],
+            }),
+          });
+        } catch (e) {
+          // Don't fail the response if GitHub issue creation fails
+          console.error("GitHub issue creation failed:", e);
+        }
       }
 
       return new Response(
