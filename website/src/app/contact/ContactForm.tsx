@@ -6,7 +6,7 @@ export function ContactForm() {
   const [state, setState] = useState<{ success: boolean; message: string } | null>(null);
   const [pending, setPending] = useState(false);
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const data = new FormData(form);
@@ -32,20 +32,24 @@ export function ContactForm() {
       return;
     }
 
+    const budget = (data.get("budget") as string) || "";
+
     setPending(true);
 
-    // Compose mailto with form data
-    const subject = encodeURIComponent(`PRD Submission: ${projectType} from ${name}`);
-    const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\nProject Type: ${projectType}\n\nDescription:\n${description}`
-    );
-    window.location.href = `mailto:hello@shipyard.company?subject=${subject}&body=${body}`;
-
-    setTimeout(() => {
+    try {
+      const res = await fetch("https://shipyard-contact.seth-a02.workers.dev/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, projectType, budget, description }),
+      });
+      const result = await res.json();
+      setState({ success: result.success, message: result.message });
+      if (result.success) form.reset();
+    } catch {
+      setState({ success: false, message: "Network error. Please email us directly at hello@shipyard.company." });
+    } finally {
       setPending(false);
-      setState({ success: true, message: "Thanks! Your email client should have opened. We'll scope your project and respond within 24 hours." });
-      form.reset();
-    }, 1000);
+    }
   }
 
   return (
