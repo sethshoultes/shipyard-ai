@@ -38,8 +38,8 @@ const { headline, subheadline, primaryCta, secondaryCta, image, centered } = nod
 			<img src={image.url} alt={image.alt || ""} loading="eager" />
 		</div>
 	) : !centered && (
-		<div class="hero-visual" aria-hidden="true">
-			<img src="/hero-visual.svg" alt="Peak Dental Care" width="800" height="800" />
+		<div class="hero-photo">
+			<img src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&h=600&fit=crop" alt="Modern dental office" width="800" height="600" loading="eager" />
 		</div>
 	)}
 </section>
@@ -120,17 +120,30 @@ const { headline, subheadline, primaryCta, secondaryCta, image, centered } = nod
 		filter: blur(20px);
 	}
 
-	/* Hero visual (external SVG image) */
-	.hero-visual {
+	.hero-photo {
 		position: relative;
 		width: 100%;
 		max-width: 550px;
 		justify-self: center;
 	}
 
-	.hero-visual img {
+	.hero-photo img {
 		width: 100%;
 		height: auto;
+		border-radius: 16px;
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+		object-fit: cover;
+	}
+
+	.hero-photo::before {
+		content: "";
+		position: absolute;
+		inset: -8px;
+		background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-accent-light) 100%);
+		border-radius: 20px;
+		z-index: -1;
+		opacity: 0.2;
+		filter: blur(16px);
 	}
 
 	@media (max-width: 1024px) {
@@ -157,7 +170,7 @@ const { headline, subheadline, primaryCta, secondaryCta, image, centered } = nod
 		}
 
 		.hero-image,
-		.hero-visual {
+		.hero-photo {
 			order: -1;
 		}
 	}

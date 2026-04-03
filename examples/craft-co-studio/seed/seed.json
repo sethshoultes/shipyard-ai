@@ -190,7 +190,7 @@
 					"client": "Timber Brewing Co",
 					"year": "2024",
 					"summary": "Complete brand identity and packaging design for a craft brewery focused on sustainability and heritage.",
-					"featured_image": "https://images.unsplash.com/photo-1599823123271-475ec33ea520?w=1200&h=900&fit=crop",
+					"featured_image": "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=1200&h=900&fit=crop",
 					"url": "https://timberbrewing.example.com",
 					"content": [
 						{
@@ -249,7 +249,7 @@
 					"client": "Fern & Moss",
 					"year": "2024",
 					"summary": "E-commerce website design for an online plant shop specializing in rare and unusual houseplants.",
-					"featured_image": "https://images.unsplash.com/photo-1490599967868-a82a260ecc6d?w=1200&h=900&fit=crop",
+					"featured_image": "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=1200&h=900&fit=crop",
 					"url": "https://fernandmoss.example.com",
 					"content": [
 						{
@@ -425,7 +425,7 @@
 					"client": "Pacific Trails State Park",
 					"year": "2023",
 					"summary": "Wayfinding and signage system design for a 40,000-acre state park spanning three distinct ecosystems.",
-					"featured_image": "https://images.unsplash.com/photo-1469022563149-aa64dbd37dce?w=1200&h=900&fit=crop",
+					"featured_image": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&h=900&fit=crop",
 					"content": [
 						{
 							"_type": "block",
