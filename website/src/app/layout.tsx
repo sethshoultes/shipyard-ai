@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { MobileNav } from "@/components/MobileNav";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,7 +27,7 @@ function Header() {
         <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
           <span className="text-accent">&#9670;</span> Shipyard AI
         </Link>
-        <div className="flex items-center gap-8 text-sm font-medium text-muted">
+        <div className="hidden items-center gap-8 text-sm font-medium text-muted sm:flex">
           <Link href="/services" className="transition hover:text-foreground">
             Services
           </Link>
@@ -43,6 +44,7 @@ function Header() {
             Start a Project
           </Link>
         </div>
+        <MobileNav />
       </nav>
     </header>
   );
@@ -85,8 +87,11 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:bg-accent focus:px-4 focus:py-2 focus:text-black">
+          Skip to main content
+        </a>
         <Header />
-        <main className="flex-1">{children}</main>
+        <main id="main-content" className="flex-1">{children}</main>
         <Footer />
       </body>
     </html>
