@@ -26,6 +26,7 @@ const projects = [
     vertical: "Restaurant",
     location: "Austin, TX",
     template: "Marketing",
+    url: "https://bellas-bistro.pages.dev",
     description:
       "Handmade Italian restaurant site with full menu and pricing, customer reviews, FAQ, and reservation booking. Built on the EmDash marketing template with custom content blocks.",
     features: [
@@ -38,12 +39,15 @@ const projects = [
     color: "from-red-900/30 to-orange-900/10",
     accent: "text-red-400",
     badge: "bg-red-500/10 text-red-400 border-red-500/20",
+    previewBg: "bg-gradient-to-br from-red-950 via-orange-950 to-amber-950",
+    previewEmoji: "🍝",
   },
   {
     name: "Peak Dental Care",
     vertical: "Dental Practice",
     location: "Denver, CO",
     template: "Marketing",
+    url: "https://peak-dental.pages.dev",
     description:
       "Modern dental practice site with transparent service pricing, patient testimonials, insurance FAQ, and same-day appointment booking. Professional and trustworthy.",
     features: [
@@ -56,12 +60,15 @@ const projects = [
     color: "from-sky-900/30 to-blue-900/10",
     accent: "text-sky-400",
     badge: "bg-sky-500/10 text-sky-400 border-sky-500/20",
+    previewBg: "bg-gradient-to-br from-sky-950 via-blue-950 to-indigo-950",
+    previewEmoji: "🦷",
   },
   {
     name: "Craft & Co Studio",
     vertical: "Design Agency",
     location: "Portland, OR",
     template: "Portfolio",
+    url: "https://craft-co-studio.pages.dev",
     description:
       "Creative agency portfolio with 5 case study projects, filterable by category. Brand identity, web design, packaging, and illustration work for food & beverage and outdoor brands.",
     features: [
@@ -74,6 +81,8 @@ const projects = [
     color: "from-purple-900/30 to-violet-900/10",
     accent: "text-purple-400",
     badge: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    previewBg: "bg-gradient-to-br from-purple-950 via-violet-950 to-fuchsia-950",
+    previewEmoji: "🎨",
   },
 ];
 
@@ -128,28 +137,46 @@ export default function WorkPage() {
                 key={project.name}
                 className="overflow-hidden rounded-xl border border-border bg-surface"
               >
-                {/* Header gradient */}
+                {/* Preview + Header */}
                 <div
-                  className={`bg-gradient-to-r ${project.color} px-8 py-10`}
+                  className={`${project.previewBg} relative overflow-hidden`}
                 >
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                      <span
-                        className={`inline-block rounded-full border px-3 py-1 text-xs font-medium ${project.badge}`}
-                      >
-                        {project.vertical}
-                      </span>
-                      <h2 className="mt-3 text-3xl font-bold tracking-tight">
-                        {project.name}
-                      </h2>
-                      <p className="mt-1 text-sm text-muted">
-                        {project.location} &middot; EmDash {project.template}{" "}
-                        Template
-                      </p>
+                  {/* Browser mockup */}
+                  <div className="mx-8 mt-8 overflow-hidden rounded-t-lg border border-white/10 bg-black/40 backdrop-blur">
+                    <div className="flex items-center gap-2 border-b border-white/10 px-4 py-2.5">
+                      <div className="flex gap-1.5">
+                        <span className="h-2.5 w-2.5 rounded-full bg-red-500/60" />
+                        <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/60" />
+                        <span className="h-2.5 w-2.5 rounded-full bg-green-500/60" />
+                      </div>
+                      <div className="ml-2 flex-1 rounded bg-white/5 px-3 py-1 text-xs text-muted">
+                        {project.url.replace("https://", "")}
+                      </div>
                     </div>
-                    <span className="font-mono text-sm text-muted">
-                      #{String(i + 1).padStart(2, "0")}
-                    </span>
+                    <div className="flex h-40 items-center justify-center text-6xl">
+                      {project.previewEmoji}
+                    </div>
+                  </div>
+                  <div className="px-8 pb-8 pt-6">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <span
+                          className={`inline-block rounded-full border px-3 py-1 text-xs font-medium ${project.badge}`}
+                        >
+                          {project.vertical}
+                        </span>
+                        <h2 className="mt-3 text-3xl font-bold tracking-tight">
+                          {project.name}
+                        </h2>
+                        <p className="mt-1 text-sm text-muted">
+                          {project.location} &middot; EmDash{" "}
+                          {project.template} Template
+                        </p>
+                      </div>
+                      <span className="font-mono text-sm text-muted">
+                        #{String(i + 1).padStart(2, "0")}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
@@ -178,19 +205,30 @@ export default function WorkPage() {
                     </ul>
                   </div>
 
-                  <div className="mt-6 flex items-center gap-3 border-t border-border pt-6">
-                    <span className="rounded bg-surface px-2 py-1 font-mono text-xs text-muted">
-                      EmDash CMS
-                    </span>
-                    <span className="rounded bg-surface px-2 py-1 font-mono text-xs text-muted">
-                      Astro 6
-                    </span>
-                    <span className="rounded bg-surface px-2 py-1 font-mono text-xs text-muted">
-                      Cloudflare
-                    </span>
-                    <span className="rounded bg-surface px-2 py-1 font-mono text-xs text-muted">
-                      TypeScript
-                    </span>
+                  <div className="mt-6 flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="rounded bg-surface px-2 py-1 font-mono text-xs text-muted">
+                        EmDash CMS
+                      </span>
+                      <span className="rounded bg-surface px-2 py-1 font-mono text-xs text-muted">
+                        Astro 6
+                      </span>
+                      <span className="rounded bg-surface px-2 py-1 font-mono text-xs text-muted">
+                        Cloudflare
+                      </span>
+                      <span className="rounded bg-surface px-2 py-1 font-mono text-xs text-muted">
+                        TypeScript
+                      </span>
+                    </div>
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-2 text-sm font-semibold text-accent transition hover:bg-accent/20"
+                    >
+                      View Live Site
+                      <span aria-hidden="true">&rarr;</span>
+                    </a>
                   </div>
                 </div>
               </article>
