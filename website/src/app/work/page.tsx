@@ -156,7 +156,7 @@ export default function WorkPage() {
                     <img
                       src={project.screenshot}
                       alt={`${project.name} website screenshot`}
-                      className="w-full h-40 object-cover object-top"
+                      className="w-full h-56 object-cover object-top"
                     />
                   </div>
                   <div className="px-8 pb-8 pt-6">
