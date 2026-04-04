@@ -116,7 +116,7 @@ export default function BlogPage() {
               placeholder="your@email.com"
               className="flex-1 rounded-full border border-border bg-background px-4 py-3 text-foreground placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent/50"
             />
-            <button className="rounded-full bg-accent px-6 py-3 font-semibold text-black transition hover:bg-accent-dim">
+            <button className="rounded-full bg-accent px-6 py-3 font-semibold text-white transition hover:bg-accent-dim">
               Subscribe
             </button>
           </div>

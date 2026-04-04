@@ -110,7 +110,7 @@ export default function ChatPage() {
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                   msg.role === "user"
-                    ? "bg-accent text-black rounded-br-md"
+                    ? "bg-accent text-white rounded-br-md"
                     : "bg-background border border-border text-foreground rounded-bl-md"
                 }`}
               >
@@ -140,7 +140,7 @@ export default function ChatPage() {
             {!prdSubmitted ? (
               <button
                 onClick={submitPrd}
-                className="mt-4 rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-black transition hover:bg-accent-dim"
+                className="mt-4 rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-dim"
               >
                 Submit PRD
               </button>
@@ -168,7 +168,7 @@ export default function ChatPage() {
         <button
           type="submit"
           disabled={loading || !input.trim()}
-          className="rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-black transition hover:bg-accent-dim disabled:opacity-40"
+          className="rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-dim disabled:opacity-40"
         >
           Send
         </button>

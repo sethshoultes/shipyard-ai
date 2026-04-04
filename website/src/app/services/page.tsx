@@ -85,7 +85,7 @@ export default function ServicesPage() {
               href="/contact"
               className={`mt-8 block rounded-full py-3 text-center text-sm font-semibold transition ${
                 t.featured
-                  ? "bg-accent text-black hover:bg-accent-dim"
+                  ? "bg-accent text-white hover:bg-accent-dim"
                   : "border border-border hover:border-muted hover:bg-surface-hover"
               }`}
             >

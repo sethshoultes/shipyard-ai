@@ -21,43 +21,43 @@ const agents = [
     name: "Phil Jackson",
     role: "Orchestrator",
     desc: "Dispatches tasks, balances workloads, keeps the pipeline flowing. Triangle offense.",
-    icon: "\u25C6",
+    avatar: "/agents/phil-jackson.png",
   },
   {
     name: "Steve Jobs",
     role: "Creative Director",
     desc: "Design, brand, UX, messaging. If it's not insanely great, it doesn't ship.",
-    icon: "\u2605",
+    avatar: "/agents/steve-jobs.png",
   },
   {
     name: "Elon Musk",
     role: "Engineering Director",
     desc: "Architecture, performance, deployment. First principles. Can it scale 10x?",
-    icon: "\u26A1",
+    avatar: "/agents/elon-musk.png",
   },
   {
     name: "Margaret Hamilton",
     role: "QA Director",
     desc: "Continuous testing, accessibility, security. Blocks ship on P0 issues.",
-    icon: "\u2611",
+    avatar: "/agents/margaret-hamilton.png",
   },
   {
     name: "Jensen Huang",
     role: "Advisor",
     desc: "Strategic reviews, architecture guidance. Thinks in systems and throughput.",
-    icon: "\u25A0",
+    avatar: "/agents/jensen-huang.png",
   },
   {
     name: "Jony Ive",
     role: "Visual Design",
     desc: "UI components, design tokens, visual craft. Reports to Steve.",
-    icon: "\u25CB",
+    avatar: "/agents/jony-ive.png",
   },
   {
     name: "Maya Angelou",
     role: "Copywriter",
     desc: "Messaging, microcopy, content strategy. Words that matter.",
-    icon: "\u270E",
+    avatar: "/agents/maya-angelou.png",
   },
 ];
 
@@ -87,12 +87,13 @@ export default function AboutPage() {
             className="rounded-xl border border-border bg-surface p-6 transition hover:border-muted"
           >
             <div className="flex items-center gap-3">
-              <span
-                className="flex h-10 w-10 items-center justify-center rounded-lg bg-background text-accent"
-                aria-hidden="true"
-              >
-                {a.icon}
-              </span>
+              <img
+                src={a.avatar}
+                alt={a.name}
+                className="h-12 w-12 rounded-full object-cover border-2 border-border"
+                width={48}
+                height={48}
+              />
               <div>
                 <div className="font-semibold">{a.name}</div>
                 <div className="text-xs text-accent">{a.role}</div>

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 function HeroSection() {
   return (
     <section className="relative overflow-hidden border-b border-border">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-900/20 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent" />
       <div className="relative mx-auto max-w-6xl px-6 py-12 sm:py-16">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
@@ -41,7 +41,7 @@ function HeroSection() {
             <div className="mt-10 flex gap-4">
               <Link
                 href="/contact"
-                className="rounded-full bg-accent px-8 py-3.5 text-base font-semibold text-black transition hover:bg-accent-dim"
+                className="rounded-full bg-accent px-8 py-3.5 text-base font-semibold text-white transition hover:bg-accent-dim"
               >
                 Submit a PRD
               </Link>
@@ -206,7 +206,7 @@ function CTASection() {
         </p>
         <Link
           href="/contact"
-          className="mt-8 inline-flex rounded-full bg-accent px-10 py-4 text-base font-semibold text-black transition hover:bg-accent-dim"
+          className="mt-8 inline-flex rounded-full bg-accent px-10 py-4 text-base font-semibold text-white transition hover:bg-accent-dim"
         >
           Submit Your PRD
         </Link>

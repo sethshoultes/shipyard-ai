@@ -251,7 +251,7 @@ export default function WorkPage() {
           <div className="mt-8 flex justify-center gap-4">
             <Link
               href="/contact"
-              className="rounded-full bg-accent px-6 py-3 font-semibold text-black transition hover:bg-accent-dim"
+              className="rounded-full bg-accent px-6 py-3 font-semibold text-white transition hover:bg-accent-dim"
             >
               Start a Project
             </Link>

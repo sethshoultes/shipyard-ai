@@ -149,7 +149,7 @@ export default function PipelinePage() {
       <div className="mt-16 text-center">
         <Link
           href="/contact"
-          className="inline-flex rounded-full bg-accent px-10 py-4 text-base font-semibold text-black transition hover:bg-accent-dim"
+          className="inline-flex rounded-full bg-accent px-10 py-4 text-base font-semibold text-white transition hover:bg-accent-dim"
         >
           Submit Your PRD
         </Link>
