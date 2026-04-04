@@ -50,9 +50,11 @@ interface ContactPayload {
   website?: string; // honeypot
 }
 
-function corsHeaders(origin: string): Record<string, string> {
+function corsHeaders(origin: string, requestOrigin?: string): Record<string, string> {
+  const allowed = [origin, origin.replace("://", "://www."), "https://shipyard-ai.pages.dev"];
+  const matchedOrigin = requestOrigin && allowed.includes(requestOrigin) ? requestOrigin : origin;
   return {
-    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Origin": matchedOrigin,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
   };
@@ -60,7 +62,8 @@ function corsHeaders(origin: string): Record<string, string> {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const headers = corsHeaders(env.CORS_ORIGIN);
+    const requestOrigin = request.headers.get("Origin") || "";
+    const headers = corsHeaders(env.CORS_ORIGIN, requestOrigin);
 
     // Handle CORS preflight
     if (request.method === "OPTIONS") {

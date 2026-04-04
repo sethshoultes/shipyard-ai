@@ -103,9 +103,12 @@ function containsXss(str: string): boolean {
   return XSS_PATTERNS.some((pattern) => pattern.test(str));
 }
 
-function corsHeaders(origin: string): Record<string, string> {
+function corsHeaders(origin: string, requestOrigin?: string): Record<string, string> {
+  // Allow both shipyard.company and www.shipyard.company + pages.dev
+  const allowed = [origin, origin.replace("://", "://www."), "https://shipyard-ai.pages.dev"];
+  const matchedOrigin = requestOrigin && allowed.includes(requestOrigin) ? requestOrigin : origin;
   return {
-    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Origin": matchedOrigin,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
   };
@@ -320,7 +323,8 @@ async function parseWithAI(
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const headers = corsHeaders(env.CORS_ORIGIN);
+    const requestOrigin = request.headers.get("Origin") || "";
+    const headers = corsHeaders(env.CORS_ORIGIN, requestOrigin);
     const url = new URL(request.url);
 
     // Handle CORS preflight
