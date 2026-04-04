@@ -21,7 +21,7 @@ function HeroSection() {
   return (
     <section className="relative overflow-hidden border-b border-border">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-900/20 via-transparent to-transparent" />
-      <div className="relative mx-auto max-w-6xl px-6 py-20 sm:py-32">
+      <div className="relative mx-auto max-w-6xl px-6 py-12 sm:py-16">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-1.5 text-sm text-muted">
@@ -54,7 +54,7 @@ function HeroSection() {
             </div>
           </div>
           <div className="hidden lg:block">
-            <div className="overflow-hidden rounded-2xl border border-border shadow-2xl shadow-accent/5">
+            <div className="overflow-hidden rounded-2xl border border-border shadow-2xl shadow-accent/5 max-h-[420px]">
               <div className="flex items-center gap-2 border-b border-border bg-surface px-4 py-2.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-red-500/60" />
                 <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/60" />
