@@ -95,10 +95,10 @@ export default function WorkPage() {
           <div className="max-w-3xl">
             <p className="mb-4 font-mono text-sm text-accent">PORTFOLIO</p>
             <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
-              What we&apos;ve shipped
+              Sites we&apos;ve shipped
             </h1>
             <p className="mt-4 text-lg leading-relaxed text-muted">
-              Sites, themes, and plugins — built by our AI agent pipeline. Each one started
+              Real EmDash sites built by our AI agent pipeline. Each one started
               as a PRD and was debated, built, tested, and deployed — all
               without a human writing code.
             </p>
@@ -110,16 +110,16 @@ export default function WorkPage() {
       <section className="border-b border-border bg-surface/50">
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-6 py-10 sm:grid-cols-4">
           <div>
-            <p className="text-3xl font-bold text-accent">5</p>
-            <p className="text-sm text-muted">Products shipped</p>
+            <p className="text-3xl font-bold text-accent">3</p>
+            <p className="text-sm text-muted">Sites shipped</p>
           </div>
           <div>
-            <p className="text-3xl font-bold">14</p>
-            <p className="text-sm text-muted">AI agents</p>
+            <p className="text-3xl font-bold">3</p>
+            <p className="text-sm text-muted">Verticals covered</p>
           </div>
           <div>
             <p className="text-3xl font-bold">2</p>
-            <p className="text-sm text-muted">Platforms (EmDash + WordPress)</p>
+            <p className="text-sm text-muted">EmDash templates used</p>
           </div>
           <div>
             <p className="text-3xl font-bold">&lt;45s</p>
@@ -235,68 +235,6 @@ export default function WorkPage() {
                 </div>
               </article>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* WordPress Plugins */}
-      <section className="border-b border-border">
-        <div className="mx-auto max-w-6xl px-6 py-16">
-          <p className="mb-2 font-mono text-sm text-accent">WORDPRESS PLUGINS</p>
-          <h2 className="text-3xl font-bold tracking-tight mb-8">Built by 14 AI agents in one session</h2>
-          <div className="grid gap-8 sm:grid-cols-2">
-            <Link href="/work/dash" className="group overflow-hidden rounded-xl border border-border bg-surface transition hover:border-accent/30">
-              <div className="bg-gradient-to-br from-zinc-900 to-zinc-800 p-8">
-                <div className="rounded-xl border border-border/50 bg-background/80 p-1 shadow-lg max-w-[280px] mx-auto">
-                  <div className="flex items-center gap-2 border-b border-border/50 px-3 py-2">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                    <span className="text-xs text-muted">Search commands...</span>
-                  </div>
-                  <div className="py-1">
-                    <div className="px-3 py-1.5 text-xs bg-accent/10 text-accent">Search Posts</div>
-                    <div className="px-3 py-1.5 text-xs text-muted">New Post</div>
-                    <div className="px-3 py-1.5 text-xs text-muted">Clear Cache</div>
-                  </div>
-                </div>
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold group-hover:text-accent transition">Dash</h3>
-                <p className="text-sm text-accent mt-1">Cmd+K for WordPress</p>
-                <p className="mt-2 text-sm text-muted leading-relaxed">Command palette for WordPress admin. Vanilla JS, zero deps, 6KB gzipped, FULLTEXT search, 16 built-in commands, developer API.</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="rounded bg-surface px-2 py-0.5 text-[10px] font-mono text-muted">6KB</span>
-                  <span className="rounded bg-surface px-2 py-0.5 text-[10px] font-mono text-muted">0 deps</span>
-                  <span className="rounded bg-surface px-2 py-0.5 text-[10px] font-mono text-muted">16 commands</span>
-                </div>
-              </div>
-            </Link>
-
-            <Link href="/work/pinned" className="group overflow-hidden rounded-xl border border-border bg-surface transition hover:border-accent/30">
-              <div className="bg-gradient-to-br from-amber-950/50 to-yellow-950/30 p-8 relative overflow-hidden" style={{minHeight: "180px"}}>
-                <div className="absolute shadow-md" style={{backgroundColor: "#FEF08A", borderLeft: "3px solid #EAB308", width: "140px", padding: "10px", borderRadius: "3px", transform: "rotate(-2deg)", top: "20px", left: "30px"}}>
-                  <p style={{fontSize: "10px", fontWeight: 600, color: "#1a1a1a"}}>Update hero copy before launch</p>
-                  <p style={{fontSize: "8px", color: "#666", marginTop: "4px"}}>2h ago</p>
-                </div>
-                <div className="absolute shadow-md" style={{backgroundColor: "#FBCFE8", borderLeft: "3px solid #EC4899", width: "130px", padding: "10px", borderRadius: "3px", transform: "rotate(1deg)", top: "30px", right: "30px"}}>
-                  <p style={{fontSize: "10px", fontWeight: 600, color: "#1a1a1a"}}>URGENT: SSL expires Fri</p>
-                  <p style={{fontSize: "8px", color: "#666", marginTop: "4px"}}>Just now</p>
-                </div>
-                <div className="absolute shadow-md" style={{backgroundColor: "#BBF7D0", borderLeft: "3px solid #22C55E", width: "150px", padding: "10px", borderRadius: "3px", transform: "rotate(-1deg)", bottom: "15px", left: "60px"}}>
-                  <p style={{fontSize: "10px", fontWeight: 600, color: "#1a1a1a"}}>Client approved pricing ✓</p>
-                  <p style={{fontSize: "8px", color: "#666", marginTop: "4px"}}>3 days ago</p>
-                </div>
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold group-hover:text-accent transition">Pinned</h3>
-                <p className="text-sm text-accent mt-1">Sticky notes for WordPress</p>
-                <p className="mt-2 text-sm text-muted leading-relaxed">Post-it notes on your admin dashboard. Team handoff notes, @mentions, note aging, 5 colors, REST API.</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="rounded bg-surface px-2 py-0.5 text-[10px] font-mono text-muted">@mentions</span>
-                  <span className="rounded bg-surface px-2 py-0.5 text-[10px] font-mono text-muted">5 colors</span>
-                  <span className="rounded bg-surface px-2 py-0.5 text-[10px] font-mono text-muted">REST API</span>
-                </div>
-              </div>
-            </Link>
           </div>
         </div>
       </section>
