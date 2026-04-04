@@ -1,0 +1,98 @@
+name: Auto-Pipeline — PRD to Site
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  build-site:
+    if: github.event.label.name == 'prd-intake'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Extract issue body
+        id: issue
+        run: |
+          echo "body<<EOFBODY" >> $GITHUB_OUTPUT
+          echo "${{ github.event.issue.body }}" >> $GITHUB_OUTPUT
+          echo "EOFBODY" >> $GITHUB_OUTPUT
+          echo "number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+          echo "title=${{ github.event.issue.title }}" >> $GITHUB_OUTPUT
+
+      - name: Parse PRD
+        id: parse
+        run: |
+          echo '${{ steps.issue.outputs.body }}' > /tmp/prd-input.txt
+          node pipeline/auto/parse-prd.mjs /tmp/prd-input.txt > /tmp/parsed-prd.json
+          cat /tmp/parsed-prd.json
+        continue-on-error: true
+
+      - name: Generate seed
+        id: seed
+        run: |
+          node pipeline/auto/generate-seed.mjs /tmp/parsed-prd.json > examples/bellas-bistro/seed/auto-seed.json
+          cat examples/bellas-bistro/seed/auto-seed.json | head -20
+        continue-on-error: true
+
+      - name: Build site
+        id: build
+        run: |
+          cd examples/bellas-bistro
+          npm ci
+          npx astro build
+        continue-on-error: true
+
+      - name: Deploy to Cloudflare Pages
+        id: deploy
+        run: |
+          npm install -g wrangler
+          wrangler pages project create shipyard-auto-${{ steps.issue.outputs.number }} --production-branch main 2>/dev/null || true
+          DEPLOY_URL=$(wrangler pages deploy examples/bellas-bistro/dist/client --project-name shipyard-auto-${{ steps.issue.outputs.number }} --branch main --commit-dirty=true 2>&1 | grep -o 'https://[^ ]*')
+          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        continue-on-error: true
+
+      - name: Comment on issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const parse = '${{ steps.parse.outcome }}';
+            const seed = '${{ steps.seed.outcome }}';
+            const build = '${{ steps.build.outcome }}';
+            const deploy = '${{ steps.deploy.outcome }}';
+            const url = '${{ steps.deploy.outputs.url }}' || 'N/A';
+            
+            const body = [
+              '## Auto-Pipeline Results',
+              '',
+              `| Step | Status |`,
+              `|------|--------|`,
+              `| Parse PRD | ${parse === 'success' ? '✅' : '❌'} ${parse} |`,
+              `| Generate Seed | ${seed === 'success' ? '✅' : '❌'} ${seed} |`,
+              `| Build Site | ${build === 'success' ? '✅' : '❌'} ${build} |`,
+              `| Deploy | ${deploy === 'success' ? '✅' : '❌'} ${deploy} |`,
+              '',
+              deploy === 'success' ? `🚀 **Live at:** ${url}` : '⚠️ Deploy failed — check the workflow logs.',
+              '',
+              '_Built by Shipyard AI auto-pipeline_'
+            ].join('\n');
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ steps.issue.outputs.number }},
+              body
+            });
