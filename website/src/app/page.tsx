@@ -54,20 +54,17 @@ function HeroSection() {
             </div>
           </div>
           <div className="hidden lg:block">
-            <div className="overflow-hidden rounded-2xl border border-border shadow-2xl shadow-accent/5 max-h-[420px]">
-              <div className="flex items-center gap-2 border-b border-border bg-surface px-4 py-2.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-red-500/60" />
-                <span className="h-2.5 w-2.5 rounded-full bg-yellow-500/60" />
-                <span className="h-2.5 w-2.5 rounded-full bg-green-500/60" />
-                <span className="ml-2 flex-1 rounded bg-background px-3 py-1 text-xs text-muted">bellas.shipyard.company</span>
+            <div className="overflow-hidden rounded-2xl border border-border shadow-2xl shadow-accent/5">
+              <div className="aspect-video">
+                <iframe
+                  src="https://www.youtube.com/embed/tibnEd80D5g"
+                  title="Shipyard AI — PRD to Production"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="h-full w-full"
+                  loading="lazy"
+                />
               </div>
-              <img
-                src="/screenshots/bellas-bistro.png"
-                alt="Bella's Bistro — an EmDash site built by Shipyard AI"
-                className="w-full"
-                width={640}
-                height={400}
-              />
             </div>
           </div>
         </div>
