@@ -11,7 +11,7 @@ jobs:
     permissions:
       issues: write
       contents: read
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,35 +21,36 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Extract issue body
-        id: issue
+      - name: Save issue body to file
         run: |
-          echo "body<<EOFBODY" >> $GITHUB_OUTPUT
-          echo "${{ github.event.issue.body }}" >> $GITHUB_OUTPUT
-          echo "EOFBODY" >> $GITHUB_OUTPUT
-          echo "number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
-          echo "title=${{ github.event.issue.title }}" >> $GITHUB_OUTPUT
+          cat > /tmp/prd-input.txt << 'ISSUEBODY'
+          ${{ github.event.issue.body }}
+          ISSUEBODY
 
       - name: Parse PRD
         id: parse
-        run: |
-          echo '${{ steps.issue.outputs.body }}' > /tmp/prd-input.txt
-          node pipeline/auto/parse-prd.mjs /tmp/prd-input.txt > /tmp/parsed-prd.json
-          cat /tmp/parsed-prd.json
+        run: node pipeline/auto/parse-prd.mjs /tmp/prd-input.txt > /tmp/parsed-prd.json
         continue-on-error: true
 
       - name: Generate seed
         id: seed
         run: |
-          node pipeline/auto/generate-seed.mjs /tmp/parsed-prd.json > examples/bellas-bistro/seed/auto-seed.json
-          cat examples/bellas-bistro/seed/auto-seed.json | head -20
+          if [ -f /tmp/parsed-prd.json ] && [ -s /tmp/parsed-prd.json ]; then
+            node pipeline/auto/generate-seed.mjs /tmp/parsed-prd.json > examples/bellas-bistro/seed/seed.json
+          else
+            echo "No parsed data — using default seed"
+          fi
         continue-on-error: true
+
+      - name: Install deps
+        run: |
+          cd examples/bellas-bistro
+          npm ci
 
       - name: Build site
         id: build
         run: |
           cd examples/bellas-bistro
-          npm ci
           npx astro build
         continue-on-error: true
 
@@ -57,9 +58,12 @@ jobs:
         id: deploy
         run: |
           npm install -g wrangler
-          wrangler pages project create shipyard-auto-${{ steps.issue.outputs.number }} --production-branch main 2>/dev/null || true
-          DEPLOY_URL=$(wrangler pages deploy examples/bellas-bistro/dist/client --project-name shipyard-auto-${{ steps.issue.outputs.number }} --branch main --commit-dirty=true 2>&1 | grep -o 'https://[^ ]*')
-          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          PROJECT="shipyard-auto-${{ github.event.issue.number }}"
+          wrangler pages project create $PROJECT --production-branch main 2>/dev/null || true
+          DEPLOY_OUT=$(wrangler pages deploy examples/bellas-bistro/dist/client --project-name $PROJECT --branch main --commit-dirty=true 2>&1)
+          echo "$DEPLOY_OUT"
+          URL=$(echo "$DEPLOY_OUT" | grep -o 'https://[^ ]*' | tail -1)
+          echo "url=$URL" >> $GITHUB_OUTPUT
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -74,25 +78,26 @@ jobs:
             const build = '${{ steps.build.outcome }}';
             const deploy = '${{ steps.deploy.outcome }}';
             const url = '${{ steps.deploy.outputs.url }}' || 'N/A';
-            
+
+            const icon = s => s === 'success' ? '✅' : '❌';
             const body = [
               '## Auto-Pipeline Results',
               '',
-              `| Step | Status |`,
-              `|------|--------|`,
-              `| Parse PRD | ${parse === 'success' ? '✅' : '❌'} ${parse} |`,
-              `| Generate Seed | ${seed === 'success' ? '✅' : '❌'} ${seed} |`,
-              `| Build Site | ${build === 'success' ? '✅' : '❌'} ${build} |`,
-              `| Deploy | ${deploy === 'success' ? '✅' : '❌'} ${deploy} |`,
+              '| Step | Status |',
+              '|------|--------|',
+              `| Parse PRD | ${icon(parse)} ${parse} |`,
+              `| Generate Seed | ${icon(seed)} ${seed} |`,
+              `| Build Site | ${icon(build)} ${build} |`,
+              `| Deploy | ${icon(deploy)} ${deploy} |`,
               '',
-              deploy === 'success' ? `🚀 **Live at:** ${url}` : '⚠️ Deploy failed — check the workflow logs.',
+              deploy === 'success' ? `🚀 **Live at:** ${url}` : '⚠️ Deploy failed — check workflow logs.',
               '',
               '_Built by Shipyard AI auto-pipeline_'
             ].join('\n');
-            
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: ${{ steps.issue.outputs.number }},
+              issue_number: ${{ github.event.issue.number }},
               body
             });

@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * generate-seed.mjs
- *
- * Takes parsed PRD JSON and generates a valid EmDash marketing seed.json
- * Uses the Bella's Bistro seed as a base template
+ * generate-seed.mjs — Takes parsed PRD JSON file, outputs seed.json to stdout
+ * Input: file path to parsed JSON
+ * Output: complete EmDash seed.json to stdout
  */
 
 import fs from 'fs';
@@ -13,164 +12,84 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-/**
- * Load the base seed template
- */
 function loadBaseSeed() {
-  const baseSeedPath = path.join(__dirname, '../../examples/bellas-bistro/seed/seed.json');
-  const content = fs.readFileSync(baseSeedPath, 'utf-8');
-  return JSON.parse(content);
+  const p = path.join(__dirname, '../../examples/bellas-bistro/seed/seed.json');
+  return JSON.parse(fs.readFileSync(p, 'utf-8'));
 }
 
-/**
- * Generate features array from parsed data
- */
-function generateFeatures(features = []) {
-  const icons = ['zap', 'shield', 'users', 'chart', 'code', 'globe'];
-  return features.map((feature, idx) => ({
-    icon: icons[idx % icons.length],
-    title: feature.title || feature,
-    description: feature.description || ''
-  }));
-}
-
-/**
- * Generate testimonials array from parsed data
- */
-function generateTestimonials(testimonials = []) {
-  return testimonials.map((testimonial) => ({
-    quote: testimonial.quote || testimonial,
-    author: testimonial.author || 'Anonymous',
-    role: testimonial.role || 'Customer',
-    company: testimonial.company || '5 stars'
-  }));
-}
-
-/**
- * Generate FAQ items from parsed data
- */
-function generateFaqItems(faqItems = []) {
-  return faqItems.map((item) => ({
-    question: item.question || item.q,
-    answer: item.answer || item.a
-  }));
-}
-
-/**
- * Generate menu sections from parsed features (as a placeholder)
- */
-function generateMenuSections(businessName = 'Bella\'s') {
-  return [
-    {
-      name: 'Featured Offerings',
-      price: 'Varies',
-      description: 'Our most popular items and signature specialties.',
-      features: [
-        'Signature dishes crafted with care',
-        'Locally sourced ingredients',
-        'Chef\'s specials that rotate seasonally',
-        'Premium options available'
-      ],
-      cta: { label: 'Reserve a Table', url: '/contact' }
-    }
-  ];
-}
-
-/**
- * Generate the complete seed.json
- */
-function generateSeed(parsedData) {
+function generateSeed(d) {
   const base = loadBaseSeed();
+  const name = d.businessName || 'New Business';
+  const tagline = d.tagline || `Welcome to ${name}`;
+  const icons = ['zap', 'shield', 'users', 'chart', 'code', 'globe'];
 
-  const businessName = parsedData.businessName || 'New Business';
-  const tagline = parsedData.tagline || 'Your destination for excellence';
-  const heroHeadline = parsedData.heroHeadline || businessName;
-  const vertical = parsedData.vertical || 'General';
-
-  // Update metadata
-  base.meta.name = businessName;
-  base.meta.description = `${businessName} — built by Shipyard AI`;
-
-  // Update settings
-  base.settings.title = businessName;
+  base.meta.name = name;
+  base.meta.description = `${name} — built by Shipyard AI`;
+  base.settings.title = name;
   base.settings.tagline = tagline;
 
-  // Update home page content
-  const homePage = base.content.pages[0];
-  const heroBlock = homePage.data.content[0];
-  heroBlock.headline = heroHeadline;
-  heroBlock.subheadline = parsedData.subheadline ||
-    `Experience the best of ${vertical.toLowerCase()}. Quality, care, and excellence in every detail.`;
+  // Home page
+  const home = base.content.pages[0];
+  home.data.content[0].headline = d.heroHeadline || name;
+  home.data.content[0].subheadline = d.heroSubheadline || tagline;
+  home.data.content[0].primaryCta = { label: 'Get Started', url: '/contact' };
+  home.data.content[0].secondaryCta = { label: 'Learn More', url: '/#features' };
 
-  // Update features
-  const featuresBlock = homePage.data.content[1];
-  featuresBlock.headline = 'Why Choose Us';
-  featuresBlock.subheadline = `${businessName} stands out through our commitment to excellence and customer satisfaction.`;
-  featuresBlock.features = generateFeatures(parsedData.features || []);
+  // Features
+  const features = (d.features || []).map((f, i) => ({
+    icon: icons[i % icons.length],
+    title: typeof f === 'string' ? f : f.title || f,
+    description: typeof f === 'string' ? '' : f.description || '',
+  }));
+  if (features.length > 0) {
+    home.data.content[1].headline = `Why choose ${name}`;
+    home.data.content[1].features = features;
+  }
 
-  // Update testimonials
-  const testimonialsBlock = homePage.data.content[2];
-  testimonialsBlock.headline = 'What Our Customers Say';
-  testimonialsBlock.testimonials = generateTestimonials(parsedData.testimonials || []);
+  // Testimonials
+  const testimonials = (d.testimonials || []).map(t => ({
+    quote: typeof t === 'string' ? t : t.quote || t,
+    author: t.author || 'Happy Customer',
+    role: t.role || 'Client',
+    company: t.company || '5 stars',
+  }));
+  if (testimonials.length > 0) {
+    home.data.content[2].testimonials = testimonials;
+  }
 
-  // Update FAQ
-  const faqBlock = homePage.data.content[3];
-  faqBlock.headline = 'Frequently Asked Questions';
-  faqBlock.items = generateFaqItems(parsedData.faqItems || []);
+  // FAQ
+  const faq = (d.faqItems || []).map(f => ({
+    question: f.question || f.q || f,
+    answer: f.answer || f.a || '',
+  }));
+  if (faq.length > 0) {
+    home.data.content[3].items = faq;
+  }
 
-  // Update pricing (menu) page
-  const pricingPage = base.content.pages[1];
-  pricingPage.data.content[0].headline = 'Our Offerings';
-  pricingPage.data.content[0].subheadline = `Explore what ${businessName} has to offer.`;
-  pricingPage.data.content[1].plans = generateMenuSections(businessName);
-
-  // Update primary nav to include business name
-  base.menus[0].items[0].label = 'Features';
+  // Menu nav
+  base.menus[0].items = [
+    { type: 'custom', label: 'About', url: '/#features' },
+    { type: 'custom', label: 'Services', url: '/pricing' },
+    { type: 'custom', label: 'Contact', url: '/contact' },
+  ];
 
   return base;
 }
 
-/**
- * Main entry point
- */
 async function main() {
-  const inputJson = process.argv[2];
-  const outputDir = process.argv[3] || '/tmp/emdash-seed';
-
-  if (!inputJson) {
-    console.error('Usage: node generate-seed.mjs "<parsed-json>" [outputDir]');
+  const inputPath = process.argv[2];
+  if (!inputPath) {
+    console.error('Usage: node generate-seed.mjs <parsed-prd.json>');
     process.exit(1);
   }
 
-  try {
-    // Parse input
-    let parsedData;
-    try {
-      parsedData = JSON.parse(inputJson);
-    } catch (err) {
-      console.error('Invalid JSON input:', err.message);
-      process.exit(1);
-    }
-
-    // Generate seed
-    const seed = generateSeed(parsedData);
-
-    // Ensure output directory exists
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
-
-    // Write seed file
-    const seedPath = path.join(outputDir, 'seed.json');
-    fs.writeFileSync(seedPath, JSON.stringify(seed, null, 2));
-
-    // Output the path to stdout (for GitHub Actions to capture)
-    console.log(seedPath);
-    process.exit(0);
-  } catch (err) {
-    console.error('Error generating seed:', err.message);
-    process.exit(1);
-  }
+  const raw = fs.readFileSync(inputPath, 'utf-8');
+  const parsed = JSON.parse(raw);
+  const seed = generateSeed(parsed);
+  console.log(JSON.stringify(seed, null, 2));
 }
 
-main();
+main().catch(err => {
+  console.error('Fatal:', err.message);
+  process.exit(1);
+});

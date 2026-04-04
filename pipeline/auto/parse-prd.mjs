@@ -1,82 +1,77 @@
 #!/usr/bin/env node
 
 /**
- * parse-prd.mjs
- *
- * Takes a GitHub issue body and calls the Shipyard PRD parser Worker
- * to extract structured data: businessName, vertical, tagline, heroHeadline,
- * features[], testimonials[], faqItems[]
+ * parse-prd.mjs — Calls the /parse endpoint on the PRD chat worker
+ * Input: file path containing PRD text (or stdin)
+ * Output: structured JSON to stdout
  */
 
-import https from 'https';
+import fs from 'fs';
 
-const PARSER_ENDPOINT = 'https://shipyard-prd-chat.seth-a02.workers.dev/';
+const PARSE_ENDPOINT = 'https://shipyard-prd-chat.seth-a02.workers.dev/parse';
 
-/**
- * Makes a POST request to the parser endpoint
- */
-function parseWithWorker(issueBody) {
-  return new Promise((resolve, reject) => {
-    const data = JSON.stringify({
-      issueBody
-    });
-
-    const options = {
-      hostname: 'shipyard-prd-chat.seth-a02.workers.dev',
-      port: 443,
-      path: '/',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': data.length
-      }
-    };
-
-    const req = https.request(options, (res) => {
-      let responseData = '';
-
-      res.on('data', (chunk) => {
-        responseData += chunk;
-      });
-
-      res.on('end', () => {
-        try {
-          const parsed = JSON.parse(responseData);
-          resolve(parsed);
-        } catch (err) {
-          reject(new Error(`Failed to parse worker response: ${err.message}`));
-        }
-      });
-    });
-
-    req.on('error', reject);
-    req.write(data);
-    req.end();
-  });
-}
-
-/**
- * Main entry point
- */
 async function main() {
-  const issueBody = process.argv[2];
+  // Read PRD text from file arg or stdin
+  let prdText;
+  if (process.argv[2]) {
+    prdText = fs.readFileSync(process.argv[2], 'utf-8');
+  } else {
+    prdText = fs.readFileSync(0, 'utf-8');
+  }
 
-  if (!issueBody) {
-    console.error('Usage: node parse-prd.mjs "<issue-body>"');
+  if (!prdText.trim()) {
+    console.error('Error: empty PRD input');
     process.exit(1);
   }
 
-  try {
-    console.error('Calling Shipyard PRD parser...');
-    const parsed = await parseWithWorker(issueBody);
+  console.error('Calling /parse endpoint...');
+  
+  const res = await fetch(PARSE_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prd: prdText }),
+  });
 
-    // Output structured JSON to stdout
-    console.log(JSON.stringify(parsed, null, 2));
+  if (!res.ok) {
+    console.error(`Parse failed: HTTP ${res.status}`);
+    // Fallback: extract basic info from the PRD text directly
+    const fallback = extractBasicInfo(prdText);
+    console.log(JSON.stringify(fallback, null, 2));
     process.exit(0);
-  } catch (err) {
-    console.error('Error parsing PRD:', err.message);
-    process.exit(1);
   }
+
+  const data = await res.json();
+  console.log(JSON.stringify(data, null, 2));
 }
 
-main();
+// Fallback parser if the Worker is down
+function extractBasicInfo(text) {
+  const lines = text.split('\n');
+  const titleMatch = text.match(/(?:PRD:|Project:|Build|Site for)\s*(.+)/i);
+  const businessName = titleMatch ? titleMatch[1].trim() : 'New Business';
+  
+  return {
+    businessName,
+    vertical: 'services',
+    tagline: `Welcome to ${businessName}`,
+    heroHeadline: businessName,
+    heroSubheadline: lines.find(l => l.includes('Target') || l.includes('audience')) || `Professional services you can trust.`,
+    features: [
+      { title: 'Quality Service', description: 'Committed to excellence in everything we do.' },
+      { title: 'Experienced Team', description: 'Years of expertise serving our community.' },
+      { title: 'Customer First', description: 'Your satisfaction is our top priority.' },
+    ],
+    testimonials: [
+      { quote: 'Outstanding service and attention to detail.', author: 'Happy Customer', role: 'Client' },
+    ],
+    faqItems: [
+      { question: 'How do I get started?', answer: 'Contact us to schedule a consultation.' },
+      { question: 'What are your hours?', answer: 'We are open Monday through Friday, 9am to 5pm.' },
+    ],
+  };
+}
+
+main().catch(err => {
+  console.error('Fatal:', err.message);
+  process.exit(1);
+});
