@@ -47,8 +47,17 @@ async function main() {
 // Fallback parser if the Worker is down
 function extractBasicInfo(text) {
   const lines = text.split('\n');
-  const titleMatch = text.match(/(?:PRD:|Project:|Build|Site for)\s*(.+)/i);
-  const businessName = titleMatch ? titleMatch[1].trim() : 'New Business';
+  // Try to extract business name from common PRD patterns
+  const namePatterns = [
+    /(?:site for|website for)\s+([A-Z][\w\s&']+?)(?:\s+in\s|\.|,|$)/im,
+    /(?:PRD:|Project:)\s*([A-Z][\w\s&']+?)(?:\s*[-—]|\.|,|$)/im,
+    /(?:Build|Create)\s+(?:an?\s+\w+\s+(?:site|website)\s+for\s+)?([A-Z][\w\s&']+?)(?:\s+in\s|\.|,|$)/im,
+  ];
+  let businessName = 'New Business';
+  for (const pat of namePatterns) {
+    const m = text.match(pat);
+    if (m) { businessName = m[1].trim(); break; }
+  }
   
   return {
     businessName,
