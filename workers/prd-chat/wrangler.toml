@@ -1,9 +1,10 @@
 name = "shipyard-prd-chat"
 main = "src/index.ts"
 compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
 
-[env.production]
-route = "prd-api.shipyard.company/*"
+[ai]
+binding = "AI"
 
 [vars]
 CORS_ORIGIN = "https://shipyard.company"

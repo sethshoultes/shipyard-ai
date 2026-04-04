@@ -432,15 +432,61 @@ export default {
       }
     }
 
-    // Chat endpoint (placeholder for existing functionality)
+    // Chat endpoint — AI-powered PRD intake conversation
     if (url.pathname === "/chat" && request.method === "POST") {
-      return new Response(
-        JSON.stringify({ message: "Chat endpoint - coming soon" }),
-        {
-          status: 200,
-          headers: { ...headers, "Content-Type": "application/json" },
+      try {
+        const body = await request.json() as { message: string; history?: { role: string; content: string }[] };
+        if (!body.message?.trim()) {
+          return new Response(JSON.stringify({ error: "Message is required" }), { status: 400, headers: { ...headers, "Content-Type": "application/json" } });
         }
-      );
+
+        const userMessage = sanitizePrd(body.message.trim());
+        const SYSTEM_PROMPT = `You are Shipyard AI's PRD intake assistant. Guide clients through describing their project so our AI agents can build it.
+
+Ask about these topics one at a time (don't dump all at once):
+1. Project type (EmDash site, theme, or plugin)
+2. Business name and what they do
+3. Target audience
+4. Pages/features needed
+5. Design preferences (colors, reference sites)
+6. Budget range (Under $1K, $1K-$2.5K, $2.5K-$5K, $5K-$10K, $10K+)
+
+When you have enough info, output a formatted PRD in markdown. Prefix it with "---PRD-READY---" so the system can detect it.
+Be conversational, friendly, concise. One question at a time.`;
+
+        const messages: { role: "system" | "user" | "assistant"; content: string }[] = [
+          { role: "system", content: SYSTEM_PROMPT },
+        ];
+        if (body.history && Array.isArray(body.history)) {
+          for (const msg of body.history.slice(-20)) {
+            messages.push({ role: msg.role === "assistant" ? "assistant" : "user", content: sanitizePrd(msg.content) });
+          }
+        }
+        messages.push({ role: "user", content: userMessage });
+
+        const aiResponse = await env.AI.run("@cf/meta/llama-2-7b-chat-int8", {
+          messages,
+          max_tokens: 1024,
+        }) as Record<string, unknown>;
+
+        const reply = String(aiResponse.response || aiResponse.result || aiResponse.text || JSON.stringify(aiResponse));
+        const isPrdReady = reply.includes("---PRD-READY---");
+
+        return new Response(
+          JSON.stringify({
+            reply: reply.replace("---PRD-READY---", "").trim(),
+            prdReady: isPrdReady,
+            prd: isPrdReady ? reply.split("---PRD-READY---")[1]?.trim() : null,
+          }),
+          { status: 200, headers: { ...headers, "Content-Type": "application/json" } }
+        );
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        return new Response(
+          JSON.stringify({ error: "Chat failed: " + msg }),
+          { status: 500, headers: { ...headers, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     return new Response(
