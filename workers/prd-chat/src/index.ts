@@ -288,20 +288,28 @@ async function parseWithAI(
   prdText: string
 ): Promise<StructuredPRD | null> {
   try {
-    const systemPrompt =
-      'Extract the following from this PRD and return valid JSON only, no other text: { businessName, vertical (restaurant/dental/salon/services/portfolio/other), tagline, heroHeadline, heroSubheadline, features: [{icon, title, description}], testimonials: [{quote, author, role, company}], faqItems: [{question, answer}], pages: [home/pricing/contact], primaryCta: {label, url}, secondaryCta: {label, url} }';
+    const systemPrompt = `You are a JSON extraction tool. Given a PRD (Product Requirements Document), extract business information and return ONLY valid JSON. No explanation, no markdown, just JSON.
+
+Fill in ALL fields with reasonable content based on the PRD. If info isn't explicitly stated, infer it from context. Generate at least 3 features, 2 testimonials, and 3 FAQ items.
+
+Required JSON format:
+{"businessName":"","vertical":"","tagline":"short catchy tagline","heroHeadline":"main headline","heroSubheadline":"2 sentence description","features":[{"title":"","description":""}],"testimonials":[{"quote":"","author":"","role":"Customer"}],"faqItems":[{"question":"","answer":""}],"pages":["home","pricing","contact"],"primaryCta":{"label":"Get Started","url":"/contact"},"secondaryCta":{"label":"Learn More","url":"/#features"}}`;
 
     const response = await ai.run("@cf/meta/llama-2-7b-chat-int8", {
-      prompt: `${systemPrompt}\n\nPRD Text:\n${prdText}`,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `Extract structured data from this PRD:\n\n${prdText}` },
+      ],
+      max_tokens: 2048,
     });
 
-    if (!response || typeof response.response !== "string") {
+    if (!response || typeof (response as Record<string,unknown>).response !== "string") {
       console.error("Invalid AI response format", response);
       return null;
     }
 
     // Extract JSON from the response
-    const jsonMatch = response.response.match(/\{[\s\S]*\}/);
+    const jsonMatch = ((response as Record<string,unknown>).response as string).match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       console.error("No JSON found in AI response", response.response);
       return null;
