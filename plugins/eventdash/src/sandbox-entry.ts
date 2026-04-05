@@ -5,6 +5,17 @@ import type { PluginContext } from "emdash";
  * Type definitions
  */
 
+interface TicketType {
+	id: string; // Unique within event
+	name: string; // "Early Bird", "VIP", "General"
+	stripePriceId: string; // Stripe price ID
+	price: number; // In cents
+	capacity: number; // Seats available
+	sold: number; // Seats sold
+	description?: string;
+	availableUntil?: string; // ISO date for early bird cutoff
+}
+
 interface EventRecord {
 	id: string;
 	title: string;
@@ -17,6 +28,11 @@ interface EventRecord {
 	registered: number;
 	templateId?: string; // If this is an instance from a template
 	createdAt: string;
+	// NEW: Stripe fields for paid events
+	requiresPayment?: boolean; // true = paid event (default false)
+	stripeProductId?: string; // Stripe product ID
+	ticketTypes?: TicketType[]; // Array of ticket variants (early bird, VIP, general, etc.)
+	totalRevenue?: number; // Cumulative revenue in cents from successful payments
 }
 
 interface RegistrationRecord {
@@ -25,6 +41,11 @@ interface RegistrationRecord {
 	status: "registered" | "cancelled";
 	ticketCount: number;
 	createdAt: string;
+	// NEW: Stripe payment fields
+	stripePaymentIntentId?: string; // Payment intent ID
+	ticketType?: string; // Which ticket type purchased
+	amountPaid?: number; // What they actually paid in cents
+	paymentStatus?: "pending" | "paid" | "refunded"; // Payment status (default: "paid" for backwards compatibility)
 }
 
 interface WaitlistRecord {
@@ -313,7 +334,7 @@ export default definePlugin({
 		 * POST /eventdash/events/:id/register
 		 * Register for an event. If full, adds to waitlist.
 		 *
-		 * Body: { name: string, email: string }
+		 * Body: { name: string, email: string, ticketType?: string, stripePaymentIntentId?: string, amountPaid?: number, paymentStatus?: "pending" | "paid" | "refunded" }
 		 * Returns: { success: boolean, status: "registered" | "waitlisted", message: string }
 		 */
 		register: {
@@ -325,6 +346,10 @@ export default definePlugin({
 					const input = rc.input as Record<string, unknown>;
 					const name = validateStringLength(String(input.name ?? "").trim(), 100, "Name");
 					const email = validateStringLength(String(input.email ?? "").trim().toLowerCase(), 254, "Email");
+					const ticketType = String(input.ticketType ?? "").trim();
+					const stripePaymentIntentId = String(input.stripePaymentIntentId ?? "").trim();
+					const amountPaid = input.amountPaid ? parseInt(String(input.amountPaid), 10) : undefined;
+					const paymentStatus = String(input.paymentStatus ?? "paid").trim() as "pending" | "paid" | "refunded";
 
 					// Validate input
 					if (!eventId) {
@@ -451,10 +476,20 @@ export default definePlugin({
 							createdAt: now,
 						};
 
+						// Add payment fields if provided
+						if (ticketType) registration.ticketType = ticketType;
+						if (stripePaymentIntentId) registration.stripePaymentIntentId = stripePaymentIntentId;
+						if (amountPaid !== undefined) registration.amountPaid = amountPaid;
+						if (paymentStatus) registration.paymentStatus = paymentStatus;
+
 						await ctx.kv.set(regKey, JSON.stringify(registration));
 
 						// Increment registered count
 						freshEvent.registered++;
+						// Update total revenue if payment was made
+						if (amountPaid && paymentStatus === "paid") {
+							freshEvent.totalRevenue = (freshEvent.totalRevenue ?? 0) + amountPaid;
+						}
 						await ctx.kv.set(`event:${eventId}`, JSON.stringify(freshEvent));
 
 						// Send confirmation email if provider available
@@ -466,7 +501,7 @@ export default definePlugin({
 							});
 						}
 
-						ctx.log.info(`Registration confirmed: ${email} for event ${eventId}`);
+						ctx.log.info(`Registration confirmed: ${email} for event ${eventId}${ticketType ? ` (${ticketType})` : ""}`);
 
 						return {
 							success: true,
@@ -653,7 +688,8 @@ export default definePlugin({
 		 * POST /eventdash/events/create
 		 * Create a new event (admin only).
 		 *
-		 * Body: { title, date, time, location, capacity, description?, endTime? }
+		 * Body: { title, date, time, location, capacity, description?, endTime?, requiresPayment?, stripeProductId?, ticketTypes? }
+		 * ticketTypes: array of { name, stripePriceId, price, capacity, description?, availableUntil? }
 		 * Returns: { success: boolean, eventId: string }
 		 */
 		createEvent: {
@@ -678,6 +714,8 @@ export default definePlugin({
 					const capacity = parseInt(String(input.capacity ?? "1"), 10);
 					const description = validateStringLength(String(input.description ?? "").trim(), 5000, "Description");
 					const endTime = String(input.endTime ?? "").trim();
+					const requiresPayment = input.requiresPayment === true;
+					const stripeProductId = String(input.stripeProductId ?? "").trim();
 
 					if (!title || !date || !time || !location || capacity < 1) {
 						throw new Response(
@@ -686,6 +724,48 @@ export default definePlugin({
 							}),
 							{ status: 400, headers: { "Content-Type": "application/json" } }
 						);
+					}
+
+					// Validate ticketTypes if provided
+					let ticketTypes: TicketType[] | undefined;
+					if (input.ticketTypes && Array.isArray(input.ticketTypes)) {
+						ticketTypes = (input.ticketTypes as Array<Record<string, unknown>>).map((tt) => {
+							const name = validateStringLength(String(tt.name ?? "").trim(), 100, "Ticket type name");
+							const stripePriceId = String(tt.stripePriceId ?? "").trim();
+							const price = parseInt(String(tt.price ?? "0"), 10);
+							const ticketCapacity = parseInt(String(tt.capacity ?? "1"), 10);
+							const availableUntil = String(tt.availableUntil ?? "").trim();
+							const ticketDescription = validateStringLength(String(tt.description ?? "").trim(), 500, "Ticket description");
+
+							if (!name || !stripePriceId || price < 0 || ticketCapacity < 1) {
+								throw new Response(
+									JSON.stringify({
+										error: "Ticket type requires: name, stripePriceId, price, capacity",
+									}),
+									{ status: 400, headers: { "Content-Type": "application/json" } }
+								);
+							}
+
+							return {
+								id: generateId(),
+								name,
+								stripePriceId,
+								price,
+								capacity: ticketCapacity,
+								sold: 0,
+								...(ticketDescription && { description: ticketDescription }),
+								...(availableUntil && { availableUntil }),
+							};
+						});
+
+						if (requiresPayment && ticketTypes.length === 0) {
+							throw new Response(
+								JSON.stringify({
+									error: "Paid events require at least one ticket type",
+								}),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
 					}
 
 					const eventId = generateId();
@@ -702,6 +782,10 @@ export default definePlugin({
 
 					if (description) event.description = description;
 					if (endTime) event.endTime = endTime;
+					if (requiresPayment) event.requiresPayment = requiresPayment;
+					if (stripeProductId) event.stripeProductId = stripeProductId;
+					if (ticketTypes) event.ticketTypes = ticketTypes;
+					event.totalRevenue = 0;
 
 					await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
 
@@ -711,7 +795,7 @@ export default definePlugin({
 					eventIds.push(eventId);
 					await ctx.kv.set("events:list", JSON.stringify(eventIds));
 
-					ctx.log.info(`Event created: ${eventId}`);
+					ctx.log.info(`Event created: ${eventId}${requiresPayment ? " (paid)" : ""}`);
 
 					return { success: true, eventId };
 				} catch (error) {
@@ -939,8 +1023,17 @@ export default definePlugin({
 						const events = await getAllEventsWithDates(ctx);
 
 						const eventRows = [];
+						let totalRevenue = 0;
 						for (const event of events) {
 							const waitlist = await getWaitlist(ctx, event.id);
+							const eventRevenue = event.totalRevenue ?? 0;
+							totalRevenue += eventRevenue;
+							const revenueDisplay =
+								event.requiresPayment && eventRevenue > 0
+									? `$${(eventRevenue / 100).toFixed(2)}`
+									: event.requiresPayment
+										? "—"
+										: "N/A";
 							eventRows.push({
 								id: event.id,
 								title: event.title,
@@ -949,6 +1042,8 @@ export default definePlugin({
 								registered: `${event.registered}/${event.capacity}`,
 								waitlist: waitlist.length.toString(),
 								status: event.registered >= event.capacity ? "Full" : "Open",
+								type: event.requiresPayment ? "Paid" : "Free",
+								revenue: revenueDisplay,
 							});
 						}
 
@@ -971,6 +1066,10 @@ export default definePlugin({
 												.reduce((sum, e) => sum + e.registered, 0)
 												.toString(),
 										},
+										{
+											label: "Total Revenue",
+											value: `$${(totalRevenue / 100).toFixed(2)}`,
+										},
 									],
 								},
 								{
@@ -990,6 +1089,8 @@ export default definePlugin({
 											label: "Waitlist",
 											format: "text" as const,
 										},
+										{ key: "type", label: "Type", format: "text" as const },
+										{ key: "revenue", label: "Revenue", format: "text" as const },
 										{ key: "status", label: "Status", format: "badge" as const },
 									],
 									rows: eventRows,
