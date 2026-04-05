@@ -1,0 +1,249 @@
+/**
+ * AdminPulse Dashboard Widget Styles
+ *
+ * Provides severity-based color coding with accessible contrast.
+ *
+ * @package AdminPulse
+ * @version 1.0.0
+ */
+
+/* Widget Container */
+.adminpulse-widget {
+	padding: 0;
+	margin: 0;
+}
+
+/* Loading Skeleton */
+.adminpulse-loading {
+	padding: 10px 0;
+}
+
+.adminpulse-skeleton {
+	background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+	background-size: 200% 100%;
+	animation: adminpulse-shimmer 1.5s infinite;
+	border-radius: 4px;
+}
+
+.adminpulse-skeleton-line {
+	height: 16px;
+	margin-bottom: 10px;
+}
+
+.adminpulse-skeleton-line:nth-child(1) {
+	width: 80%;
+}
+
+.adminpulse-skeleton-line:nth-child(2) {
+	width: 60%;
+}
+
+.adminpulse-skeleton-line:nth-child(3) {
+	width: 70%;
+}
+
+@keyframes adminpulse-shimmer {
+	0% {
+		background-position: 200% 0;
+	}
+	100% {
+		background-position: -200% 0;
+	}
+}
+
+/* Healthy State */
+.adminpulse-healthy {
+	text-align: center;
+	padding: 20px 10px;
+}
+
+.adminpulse-healthy .dashicons {
+	font-size: 48px;
+	width: 48px;
+	height: 48px;
+	margin-bottom: 10px;
+}
+
+.adminpulse-healthy p {
+	margin: 0;
+	font-size: 14px;
+	color: #1e1e1e;
+}
+
+/* Error State */
+.adminpulse-error {
+	text-align: center;
+	padding: 20px 10px;
+	color: #8b0000;
+}
+
+.adminpulse-error .dashicons {
+	font-size: 36px;
+	width: 36px;
+	height: 36px;
+	margin-bottom: 10px;
+	color: #d63638;
+}
+
+.adminpulse-error p {
+	margin: 0;
+	font-size: 14px;
+}
+
+/* Summary */
+.adminpulse-summary {
+	margin: 0 0 12px;
+	font-size: 14px;
+	font-weight: 600;
+	color: #1e1e1e;
+}
+
+/* Issues List */
+.adminpulse-issues-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.adminpulse-issue {
+	padding: 12px;
+	margin-bottom: 8px;
+	border-radius: 4px;
+	border-left: 4px solid #dcdcde;
+	background: #f6f7f7;
+}
+
+.adminpulse-issue:last-child {
+	margin-bottom: 0;
+}
+
+/* Severity Classes - Critical (Red) */
+.adminpulse-critical {
+	border-left-color: #d63638;
+	background: #fcf0f1;
+}
+
+.adminpulse-issue.adminpulse-critical {
+	border-left-width: 4px;
+}
+
+/* Severity Classes - Warning/Recommended (Yellow/Orange) */
+.adminpulse-warning {
+	border-left-color: #dba617;
+	background: #fcf9e8;
+}
+
+/* Severity Classes - Good (Green) */
+.adminpulse-good {
+	color: #00a32a;
+}
+
+/* Severity Badges */
+.adminpulse-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	border-radius: 3px;
+	margin-right: 8px;
+}
+
+.adminpulse-badge.adminpulse-critical {
+	background: #d63638;
+	color: #ffffff;
+}
+
+.adminpulse-badge.adminpulse-warning {
+	background: #dba617;
+	color: #1e1e1e;
+}
+
+/* Issue Header */
+.adminpulse-issue-header {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	margin-bottom: 6px;
+}
+
+.adminpulse-issue-label {
+	font-size: 13px;
+	font-weight: 600;
+	color: #1e1e1e;
+	flex: 1;
+}
+
+/* Issue Description */
+.adminpulse-issue-description {
+	margin: 0 0 8px;
+	font-size: 12px;
+	color: #50575e;
+	line-height: 1.5;
+}
+
+/* Action Links */
+.adminpulse-issue-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.adminpulse-action-link {
+	font-size: 12px;
+	text-decoration: none;
+	color: #2271b1;
+}
+
+.adminpulse-action-link:hover,
+.adminpulse-action-link:focus {
+	color: #135e96;
+	text-decoration: underline;
+}
+
+/* Footer with Refresh Button */
+.adminpulse-footer {
+	padding-top: 12px;
+	margin-top: 12px;
+	border-top: 1px solid #dcdcde;
+}
+
+.adminpulse-refresh-btn {
+	width: 100%;
+}
+
+.adminpulse-refresh-btn.adminpulse-loading-btn {
+	opacity: 0.7;
+	cursor: wait;
+}
+
+/* Accessibility: Ensure color is not the only indicator */
+.adminpulse-badge::before {
+	content: '';
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+	.adminpulse-badge.adminpulse-critical {
+		background: #8b0000;
+		border: 2px solid #000;
+	}
+
+	.adminpulse-badge.adminpulse-warning {
+		background: #b8860b;
+		border: 2px solid #000;
+	}
+
+	.adminpulse-issue {
+		border-left-width: 6px;
+	}
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+	.adminpulse-skeleton {
+		animation: none;
+		background: #e0e0e0;
+	}
+}
