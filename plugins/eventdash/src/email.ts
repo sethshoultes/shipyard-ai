@@ -60,12 +60,27 @@ export async function sendEmail(
 }
 
 /**
- * Format an ISO datetime for display
+ * Format an ISO datetime for display.
+ * For multi-day events with endDate, shows "April 5-7, 2026" style range.
  */
-export function formatDateTime(date: string, time: string): string {
+export function formatDateTime(date: string, time: string, endDate?: string): string {
 	try {
 		const [hours, minutes] = time.split(":").map(Number);
 		const dt = new Date(`${date}T${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00Z`);
+
+		if (endDate && endDate !== date) {
+			const endDt = new Date(`${endDate}T00:00:00Z`);
+			const startMonth = new Intl.DateTimeFormat("en-US", { month: "long" }).format(dt);
+			const endMonth = new Intl.DateTimeFormat("en-US", { month: "long" }).format(endDt);
+			const startDay = dt.getUTCDate();
+			const endDay = endDt.getUTCDate();
+			const year = dt.getUTCFullYear();
+
+			if (startMonth === endMonth) {
+				return `${startMonth} ${startDay}-${endDay}, ${year}`;
+			}
+			return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${year}`;
+		}
 
 		const formatter = new Intl.DateTimeFormat("en-US", {
 			weekday: "long",
@@ -92,15 +107,21 @@ export function generateCalendarLink(
 	date: string,
 	time: string,
 	endTime?: string,
-	location?: string
+	location?: string,
+	endDate?: string
 ): string {
 	try {
 		const [startHours, startMinutes] = time.split(":").map(Number);
 		const startDateTime = `${date.replace(/-/g, "")}T${String(startHours).padStart(2, "0")}${String(startMinutes).padStart(2, "0")}00`;
 
-		// Calculate end time (default 1 hour after start if not specified)
+		// Calculate end datetime (multi-day aware)
 		let endDateTime = startDateTime;
-		if (endTime) {
+		if (endDate && endDate !== date) {
+			// Multi-day event: end at endTime on endDate, or 23:59 if no endTime
+			const eHours = endTime ? parseInt(endTime.split(":")[0], 10) : 23;
+			const eMinutes = endTime ? parseInt(endTime.split(":")[1], 10) : 59;
+			endDateTime = `${endDate.replace(/-/g, "")}T${String(eHours).padStart(2, "0")}${String(eMinutes).padStart(2, "0")}00`;
+		} else if (endTime) {
 			const [endHours, endMinutes] = endTime.split(":").map(Number);
 			endDateTime = `${date.replace(/-/g, "")}T${String(endHours).padStart(2, "0")}${String(endMinutes).padStart(2, "0")}00`;
 		} else {

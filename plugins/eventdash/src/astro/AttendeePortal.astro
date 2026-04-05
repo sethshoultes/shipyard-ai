@@ -22,7 +22,8 @@
 interface RegistrationRecord {
 	eventId: string;
 	eventTitle: string;
-	eventDate: string; // ISO date
+	eventDate: string; // ISO date (start)
+	eventEndDate?: string; // ISO date (end, for multi-day events)
 	eventTime: string; // HH:MM format
 	eventLocation: string;
 	ticketType?: string;
@@ -88,12 +89,28 @@ if (attendeeEmail) {
 }
 
 /**
- * Format date and time for display
+ * Format date and time for display.
+ * For multi-day events, shows "Apr 5-7, 2026" style date range.
  */
-function formatDateTime(dateStr: string, timeStr: string): string {
+function formatDateTime(dateStr: string, timeStr: string, endDateStr?: string): string {
 	try {
 		const [hours, minutes] = timeStr.split(":");
-		const dateObj = new Date(`${dateStr}T${hours}:${minutes}:00Z`);
+		const startObj = new Date(`${dateStr}T${hours}:${minutes}:00Z`);
+
+		if (endDateStr && endDateStr !== dateStr) {
+			const endObj = new Date(`${endDateStr}T00:00:00Z`);
+			const startMonth = new Intl.DateTimeFormat("en-US", { month: "short" }).format(startObj);
+			const endMonth = new Intl.DateTimeFormat("en-US", { month: "short" }).format(endObj);
+			const startDay = startObj.getUTCDate();
+			const endDay = endObj.getUTCDate();
+			const year = startObj.getUTCFullYear();
+
+			if (startMonth === endMonth) {
+				return `${startMonth} ${startDay}-${endDay}, ${year}`;
+			}
+			return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${year}`;
+		}
+
 		return new Intl.DateTimeFormat("en-US", {
 			weekday: "short",
 			month: "short",
@@ -102,7 +119,7 @@ function formatDateTime(dateStr: string, timeStr: string): string {
 			hour: "numeric",
 			minute: "2-digit",
 			hour12: true,
-		}).format(dateObj);
+		}).format(startObj);
 	} catch {
 		return `${dateStr} at ${timeStr}`;
 	}
@@ -149,10 +166,10 @@ const pastCount = portalData.pastRegistrations.length;
 const totalCount = upcomingCount + pastCount;
 ---
 
-<div class="attendee-portal">
+<div class="attendee-portal" role="region" aria-label="Attendee portal">
 	<!-- Header -->
 	<div class="attendee-portal__header">
-		<h2 class="attendee-portal__title">{title}</h2>
+		<h2 class="attendee-portal__title" id="portal-title">{title}</h2>
 		{portalData.attendee?.name && (
 			<p class="attendee-portal__welcome">
 				Welcome back, <span class="attendee-portal__name">{portalData.attendee.name}</span>
@@ -167,9 +184,9 @@ const totalCount = upcomingCount + pastCount;
 
 	<!-- Error state -->
 	{error && (
-		<div class="attendee-portal__error">
+		<div class="attendee-portal__error" role="alert">
 			<p>{error}</p>
-			<a href="#retry" class="attendee-portal__retry-btn">Retry</a>
+			<a href="#retry" class="attendee-portal__retry-btn" aria-label="Retry loading events">Retry</a>
 		</div>
 	)}
 
@@ -181,12 +198,12 @@ const totalCount = upcomingCount + pastCount;
 			</h3>
 			<div class="attendee-portal__events-list">
 				{portalData.upcomingRegistrations.map((reg) => (
-					<div class="attendee-portal__event-card">
+					<article class="attendee-portal__event-card" aria-label={`Registration for ${reg.eventTitle}`}>
 						<div class="attendee-portal__event-header">
 							<div class="attendee-portal__event-info">
 								<h4 class="attendee-portal__event-title">{reg.eventTitle}</h4>
 								<p class="attendee-portal__event-datetime">
-									{formatDateTime(reg.eventDate, reg.eventTime)}
+									{formatDateTime(reg.eventDate, reg.eventTime, reg.eventEndDate)}
 								</p>
 								<p class="attendee-portal__event-location">{reg.eventLocation}</p>
 							</div>
@@ -242,9 +259,11 @@ const totalCount = upcomingCount + pastCount;
 									class="attendee-portal__event-ical"
 									data-event-id={reg.eventId}
 									data-event-date={reg.eventDate}
+									data-event-end-date={reg.eventEndDate || ""}
 									data-event-time={reg.eventTime}
 									data-event-title={reg.eventTitle}
 									data-event-location={reg.eventLocation}
+									aria-label={`Add ${reg.eventTitle} to calendar`}
 								>
 									Add to Calendar
 								</button>
@@ -273,7 +292,7 @@ const totalCount = upcomingCount + pastCount;
 							<div>
 								<h4 class="attendee-portal__past-event-title">{reg.eventTitle}</h4>
 								<p class="attendee-portal__past-event-date">
-									{formatDateTime(reg.eventDate, reg.eventTime)}
+									{formatDateTime(reg.eventDate, reg.eventTime, reg.eventEndDate)}
 								</p>
 							</div>
 
@@ -312,6 +331,7 @@ const totalCount = upcomingCount + pastCount;
 		if (target.classList.contains("attendee-portal__event-ical")) {
 			const eventId = target.dataset.eventId || "";
 			const eventDate = target.dataset.eventDate || "";
+			const eventEndDate = target.dataset.eventEndDate || "";
 			const eventTime = target.dataset.eventTime || "";
 			const eventTitle = target.dataset.eventTitle || "";
 			const eventLocation = target.dataset.eventLocation || "";
@@ -322,8 +342,14 @@ const totalCount = upcomingCount + pastCount;
 			const [hours, minutes] = eventTime.split(":");
 			const eventDateTime = new Date(`${eventDate}T${hours}:${minutes}:00Z`);
 
+			// For multi-day events, end date is end of the last day
+			let eventEndDateTime: Date | undefined;
+			if (eventEndDate && eventEndDate !== eventDate) {
+				eventEndDateTime = new Date(`${eventEndDate}T23:59:00Z`);
+			}
+
 			// Create iCal event
-			const icsContent = createICS(eventDateTime, eventTitle, eventLocation);
+			const icsContent = createICS(eventDateTime, eventTitle, eventLocation, eventEndDateTime);
 
 			// Create blob and download
 			const blob = new Blob([icsContent], { type: "text/calendar" });
@@ -344,7 +370,8 @@ const totalCount = upcomingCount + pastCount;
 	function createICS(
 		eventDate: Date,
 		eventTitle: string,
-		eventLocation: string
+		eventLocation: string,
+		endDateTime?: Date
 	): string {
 		const now = new Date();
 
@@ -363,7 +390,9 @@ const totalCount = upcomingCount + pastCount;
 		};
 
 		const startTime = formatICSDate(eventDate);
-		const endTime = formatICSDate(new Date(eventDate.getTime() + 60 * 60 * 1000)); // +1 hour
+		const endTime = endDateTime
+			? formatICSDate(endDateTime)
+			: formatICSDate(new Date(eventDate.getTime() + 60 * 60 * 1000)); // +1 hour default
 		const createdTime = formatICSDate(now);
 		const uid = `event-${Date.now()}@events.local`;
 
@@ -642,6 +671,13 @@ END:VCALENDAR`.trim()
 	.attendee-portal__event-link:hover,
 	.attendee-portal__event-ical:hover {
 		background-color: #b55939;
+	}
+
+	.attendee-portal__event-link:focus-visible,
+	.attendee-portal__event-ical:focus-visible {
+		outline: 2px solid #c4704b;
+		outline-offset: 2px;
+		box-shadow: 0 0 0 4px rgba(196, 112, 75, 0.2);
 	}
 
 	.attendee-portal__event-ical {
