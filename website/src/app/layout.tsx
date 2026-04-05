@@ -52,8 +52,8 @@ function Header() {
           <Link href="/about" className="transition hover:text-foreground">
             About
           </Link>
-          <Link href="/pipeline" className="transition hover:text-foreground">
-            Pipeline
+          <Link href="/blog" className="transition hover:text-foreground">
+            Blog
           </Link>
           <Link href="/chat" className="transition hover:text-foreground">
             Chat
@@ -88,8 +88,8 @@ function Footer() {
           <Link href="/about" className="transition hover:text-foreground">
             About
           </Link>
-          <Link href="/pipeline" className="transition hover:text-foreground">
-            Pipeline
+          <Link href="/blog" className="transition hover:text-foreground">
+            Blog
           </Link>
           <Link href="/chat" className="transition hover:text-foreground">
             Chat
