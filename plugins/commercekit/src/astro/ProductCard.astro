@@ -1,0 +1,144 @@
+---
+/**
+ * ProductCard — Single product display card.
+ * Props: product (Product object with id, name, price, compareAtPrice, currency, images, slug)
+ */
+
+interface Props {
+  product: {
+    id: string;
+    name: string;
+    slug: string;
+    price: number;
+    compareAtPrice?: number;
+    currency: string;
+    images: string[];
+    description?: string;
+  };
+}
+
+const { product } = Astro.props;
+
+function formatPrice(cents: number, currency: string): string {
+  const symbol = currency.toLowerCase() === "usd" ? "$" : currency.toUpperCase() + " ";
+  return `${symbol}${(cents / 100).toFixed(2)}`;
+}
+
+const isOnSale = product.compareAtPrice && product.compareAtPrice > product.price;
+const mainImage = product.images?.[0];
+---
+
+<div class="ck-product-card" data-product-id={product.id}>
+  <a href={`/products/${product.slug}`} class="ck-product-card__link">
+    {mainImage ? (
+      <img
+        src={mainImage}
+        alt={product.name}
+        class="ck-product-card__image"
+        loading="lazy"
+      />
+    ) : (
+      <div class="ck-product-card__image ck-product-card__image--placeholder">
+        <span>No image</span>
+      </div>
+    )}
+
+    <div class="ck-product-card__info">
+      <h3 class="ck-product-card__name">{product.name}</h3>
+      <div class="ck-product-card__pricing">
+        {isOnSale && (
+          <span class="ck-product-card__compare-price">
+            {formatPrice(product.compareAtPrice!, product.currency)}
+          </span>
+        )}
+        <span class={`ck-product-card__price ${isOnSale ? "ck-product-card__price--sale" : ""}`}>
+          {formatPrice(product.price, product.currency)}
+        </span>
+      </div>
+    </div>
+  </a>
+
+  <button
+    class="ck-product-card__add-btn"
+    data-product-id={product.id}
+    type="button"
+  >
+    Add to Cart
+  </button>
+</div>
+
+<style>
+  .ck-product-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--ck-card-bg, #fff);
+    border: 1px solid var(--ck-border, #e5e5e5);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .ck-product-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  .ck-product-card__link {
+    text-decoration: none;
+    color: inherit;
+  }
+  .ck-product-card__image {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    background: #f5f5f5;
+  }
+  .ck-product-card__image--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 0.9rem;
+  }
+  .ck-product-card__info {
+    padding: 1rem;
+  }
+  .ck-product-card__name {
+    font-family: var(--ck-heading-font, Lora, serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+    color: var(--ck-text, #2c2c2c);
+  }
+  .ck-product-card__pricing {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .ck-product-card__price {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--ck-primary, #C4704B);
+  }
+  .ck-product-card__price--sale {
+    color: #c62828;
+  }
+  .ck-product-card__compare-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9rem;
+  }
+  .ck-product-card__add-btn {
+    margin: 0 1rem 1rem;
+    padding: 0.75rem;
+    background: var(--ck-primary, #C4704B);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: inherit;
+  }
+  .ck-product-card__add-btn:hover {
+    background: var(--ck-primary-hover, #a85d3d);
+  }
+</style>

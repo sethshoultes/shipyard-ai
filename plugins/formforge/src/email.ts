@@ -149,3 +149,47 @@ export function generateAutoResponseHTML(
 </body>
 </html>`;
 }
+
+/**
+ * Variable substitution map for auto-response emails.
+ * Supported variables: {submitterName}, {formName}, {submissionDate}
+ */
+export interface AutoResponseVariables {
+	submitterName: string;
+	formName: string;
+	submissionDate: string;
+}
+
+/**
+ * Process variable substitution in a string.
+ * Replaces {submitterName}, {formName}, {submissionDate} with actual values.
+ */
+export function substituteVariables(
+	text: string,
+	variables: AutoResponseVariables
+): string {
+	return text
+		.replace(/\{submitterName\}/g, variables.submitterName)
+		.replace(/\{formName\}/g, variables.formName)
+		.replace(/\{submissionDate\}/g, variables.submissionDate);
+}
+
+/**
+ * Generate auto-response email HTML with variable substitution.
+ * Processes {submitterName}, {formName}, {submissionDate} in both subject and body
+ * before rendering the HTML template.
+ */
+export function generateAutoResponseWithVariablesHTML(
+	subject: string,
+	body: string,
+	variables: AutoResponseVariables
+): string {
+	const processedSubject = substituteVariables(subject, variables);
+	const processedBody = substituteVariables(body, variables);
+
+	return generateAutoResponseHTML(
+		processedSubject,
+		processedBody,
+		variables.formName
+	);
+}

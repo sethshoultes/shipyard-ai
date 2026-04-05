@@ -1,0 +1,109 @@
+---
+/**
+ * SeoHead.astro
+ * Injects SEO meta tags into the <head> of the page.
+ *
+ * Props:
+ *   - path: string — URL path to fetch SEO data for (e.g. "/about")
+ *
+ * Fetches page SEO data from the public API endpoint and renders:
+ *   <title>, <meta> description, <meta> robots, <link> canonical,
+ *   all OG tags, all Twitter tags, and JSON-LD structured data.
+ *
+ * Graceful fallback if no SEO data exists for the path.
+ */
+
+interface PageSeoPublic {
+	path: string;
+	title: string;
+	description: string;
+	canonicalUrl?: string;
+	noIndex: boolean;
+	noFollow: boolean;
+	ogTitle?: string;
+	ogDescription?: string;
+	ogImage?: string;
+	ogType?: string;
+	twitterCard?: "summary" | "summary_large_image";
+	twitterTitle?: string;
+	twitterDescription?: string;
+	twitterImage?: string;
+	structuredData?: string;
+	keywords?: string[];
+}
+
+interface Props {
+	path: string;
+}
+
+const { path } = Astro.props;
+
+const apiBase = Astro.url.origin;
+let seoData: PageSeoPublic | null = null;
+
+try {
+	const response = await fetch(
+		`${apiBase}/_emdash/api/plugins/seodash/getPagePublic?path=${encodeURIComponent(path)}`
+	);
+
+	if (response.ok) {
+		const json = (await response.json()) as { page: PageSeoPublic };
+		seoData = json.page;
+	}
+} catch (error) {
+	console.error("SEODash: Error fetching SEO data:", error);
+}
+
+const ogTitle = seoData?.ogTitle || seoData?.title || "";
+const ogDescription = seoData?.ogDescription || seoData?.description || "";
+const twTitle = seoData?.twitterTitle || ogTitle;
+const twDescription = seoData?.twitterDescription || ogDescription;
+const twCard = seoData?.twitterCard || "summary";
+const ogType = seoData?.ogType || "website";
+
+// Build robots content
+const robotsParts: string[] = [];
+if (seoData?.noIndex) robotsParts.push("noindex");
+if (seoData?.noFollow) robotsParts.push("nofollow");
+const robotsContent = robotsParts.length > 0 ? robotsParts.join(", ") : null;
+---
+
+{seoData && (
+	<>
+		<title>{seoData.title}</title>
+		<meta name="description" content={seoData.description} />
+
+		{robotsContent && (
+			<meta name="robots" content={robotsContent} />
+		)}
+
+		{seoData.canonicalUrl && (
+			<link rel="canonical" href={seoData.canonicalUrl} />
+		)}
+
+		{seoData.keywords && seoData.keywords.length > 0 && (
+			<meta name="keywords" content={seoData.keywords.join(", ")} />
+		)}
+
+		{/* Open Graph tags */}
+		<meta property="og:title" content={ogTitle} />
+		<meta property="og:description" content={ogDescription} />
+		<meta property="og:type" content={ogType} />
+		{seoData.ogImage && (
+			<meta property="og:image" content={seoData.ogImage} />
+		)}
+
+		{/* Twitter Card tags */}
+		<meta name="twitter:card" content={twCard} />
+		<meta name="twitter:title" content={twTitle} />
+		<meta name="twitter:description" content={twDescription} />
+		{(seoData.twitterImage || seoData.ogImage) && (
+			<meta name="twitter:image" content={seoData.twitterImage || seoData.ogImage} />
+		)}
+
+		{/* Structured Data (JSON-LD) */}
+		{seoData.structuredData && (
+			<script type="application/ld+json" set:html={seoData.structuredData} />
+		)}
+	</>
+)}

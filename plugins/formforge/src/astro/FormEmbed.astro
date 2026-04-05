@@ -63,18 +63,24 @@ interface FormDefinition {
 interface Props {
 	formId: string;
 	heading?: string;
+	submitUrl?: string;
 	submitLabel?: string;
 	successMessage?: string;
 	compact?: boolean;
+	theme?: "light" | "dark";
 }
 
 const {
 	formId,
 	heading,
+	submitUrl: customSubmitUrl,
 	submitLabel = "Submit",
 	successMessage = "Thank you! Your submission has been received.",
 	compact = false,
+	theme = "light",
 } = Astro.props;
+
+const resolvedSubmitUrl = customSubmitUrl || "/_emdash/api/plugins/formforge/submit";
 
 let form: FormDefinition | null = null;
 let error: string | null = null;
@@ -138,7 +144,7 @@ if (form) {
 ---
 
 <div
-	class={`ff-form ${compact ? "ff-form--compact" : ""}`}
+	class={`ff-form ${compact ? "ff-form--compact" : ""} ${theme === "dark" ? "ff-form--dark" : ""}`}
 	data-form-id={formId}
 	id={instanceId}
 >
@@ -158,7 +164,7 @@ if (form) {
 			<form
 				class="ff-form__form"
 				data-form-id={formId}
-				data-submit-url={`/_emdash/api/plugins/formforge/submit`}
+				data-submit-url={resolvedSubmitUrl}
 				data-has-steps={hasSteps ? "true" : "false"}
 				data-total-steps={totalSteps.toString()}
 				data-steps-json={hasSteps ? JSON.stringify(steps) : ""}
@@ -1480,5 +1486,47 @@ if (form) {
 			min-height: 44px;
 			padding: 0.75rem 1rem;
 		}
+	}
+
+	/* Dark theme */
+	.ff-form--dark {
+		--ff-color-text: #e8e0d8;
+		--ff-color-muted: #a0a0a0;
+		--ff-color-border: #444;
+		--ff-color-input-bg: #2a2a2a;
+		--ff-color-bg-hover: #333;
+		--ff-color-divider: #444;
+	}
+
+	.ff-form--dark .ff-form__input,
+	.ff-form--dark .ff-form__select,
+	.ff-form--dark .ff-form__textarea {
+		background-color: #2a2a2a;
+		color: #e8e0d8;
+		border-color: #444;
+	}
+
+	.ff-form--dark .ff-form__success {
+		background: linear-gradient(135deg, #1b3a1b 0%, #1e3320 100%);
+		border-color: #2e7d32;
+	}
+
+	.ff-form--dark .ff-form__success-message {
+		color: #81c784;
+	}
+
+	.ff-form--dark .ff-form__status--error {
+		background-color: #3e1a1a;
+		border-color: #c62828;
+		color: #ef9a9a;
+	}
+
+	.ff-form--dark .ff-form__error-banner {
+		background-color: #3e1a1a;
+		border-color: #c62828;
+	}
+
+	.ff-form--dark .ff-form__error-banner p {
+		color: #ef9a9a;
 	}
 </style>

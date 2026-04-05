@@ -4,7 +4,16 @@ import {
 	sendEmail,
 	generateSubmissionNotificationHTML,
 	generateAutoResponseHTML,
+	generateAutoResponseWithVariablesHTML,
+	substituteVariables,
 } from "./email";
+import type { AutoResponseVariables } from "./email";
+import {
+	renderFormListPage,
+	renderSubmissionListPage,
+	renderFormActivityWidget,
+} from "./admin-ui";
+import type { FormSummary, SubmissionSummary } from "./admin-ui";
 
 // ============================================================================
 // Type Definitions
@@ -78,6 +87,19 @@ export interface FormSettings {
 	maxSubmissionSizeBytes: number;
 	rateLimitPerWindow: number;
 	rateLimitWindowMinutes: number;
+}
+
+export interface AnalyticsSnapshot {
+	formId: string;
+	dailyCounts: Record<string, number>; // "YYYY-MM-DD" -> count
+	updatedAt: string;
+}
+
+function htmlResponse(html: string, status = 200): Response {
+	return new Response(html, {
+		status,
+		headers: { "Content-Type": "text/html; charset=utf-8" },
+	});
 }
 
 // ============================================================================
@@ -252,6 +274,139 @@ async function getSettings(kv: PluginContext["kv"]): Promise<FormSettings> {
 		return { ...DEFAULT_SETTINGS, ...JSON.parse(json) } as FormSettings;
 	} catch {
 		return DEFAULT_SETTINGS;
+	}
+}
+
+// ============================================================================
+// Analytics Helpers
+// ============================================================================
+
+async function getAnalyticsSnapshot(kv: PluginContext["kv"], formId: string): Promise<AnalyticsSnapshot> {
+	const json = await kv.get<string>(`form-analytics:${formId}`);
+	if (!json) {
+		return { formId, dailyCounts: {}, updatedAt: new Date().toISOString() };
+	}
+	try {
+		return JSON.parse(json) as AnalyticsSnapshot;
+	} catch {
+		return { formId, dailyCounts: {}, updatedAt: new Date().toISOString() };
+	}
+}
+
+async function updateAnalyticsSnapshot(kv: PluginContext["kv"], formId: string, submittedAt: string): Promise<void> {
+	const snapshot = await getAnalyticsSnapshot(kv, formId);
+	const dateKey = submittedAt.slice(0, 10); // "YYYY-MM-DD"
+	snapshot.dailyCounts[dateKey] = (snapshot.dailyCounts[dateKey] || 0) + 1;
+	snapshot.updatedAt = submittedAt;
+	await kv.set(`form-analytics:${formId}`, JSON.stringify(snapshot));
+}
+
+function extractSubmitterName(
+	fields: FormFieldDefinition[],
+	data: Record<string, string>
+): string {
+	// Look for a field with id "name" or type "text" with "name" in the label
+	const nameField = fields.find(
+		(f) => f.id === "name" || (f.type === "text" && f.label.toLowerCase().includes("name"))
+	);
+	if (nameField && data[nameField.id]) {
+		return data[nameField.id];
+	}
+	// Fallback to first text field
+	const firstText = fields.find((f) => f.type === "text");
+	if (firstText && data[firstText.id]) {
+		return data[firstText.id];
+	}
+	return "Valued Customer";
+}
+
+function formatSubmissionDate(iso: string): string {
+	try {
+		return new Date(iso).toLocaleDateString("en-US", {
+			weekday: "long",
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+		});
+	} catch {
+		return iso;
+	}
+}
+
+// ============================================================================
+// Webhook Dispatch
+// ============================================================================
+
+export async function computeHmacSignature(secret: string, payload: string): Promise<string> {
+	const encoder = new TextEncoder();
+	const key = await crypto.subtle.importKey(
+		"raw",
+		encoder.encode(secret),
+		{ name: "HMAC", hash: "SHA-256" },
+		false,
+		["sign"]
+	);
+	const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(payload));
+	return Array.from(new Uint8Array(signature))
+		.map((b) => b.toString(16).padStart(2, "0"))
+		.join("");
+}
+
+export async function dispatchWebhooks(
+	ctx: PluginContext,
+	form: FormDefinition,
+	submission: FormSubmission
+): Promise<void> {
+	if (!form.webhooks || form.webhooks.length === 0) return;
+
+	for (const webhook of form.webhooks) {
+		if (!webhook.events.includes("submission.created")) continue;
+
+		const payload = JSON.stringify({
+			event: "submission.created",
+			formId: form.id,
+			formName: form.name,
+			submissionId: submission.id,
+			data: submission.data,
+			submittedAt: submission.submittedAt,
+		});
+
+		const headers: Record<string, string> = { "Content-Type": "application/json" };
+
+		if (webhook.secret) {
+			const signature = await computeHmacSignature(webhook.secret, payload);
+			headers["X-FormForge-Signature"] = signature;
+		}
+
+		// Fire-and-forget with logging
+		fetch(webhook.url, { method: "POST", headers, body: payload })
+			.then(async (response) => {
+				await ctx.kv.set(
+					`webhook-log:${form.id}`,
+					JSON.stringify({
+						lastFiredAt: new Date().toISOString(),
+						lastUrl: webhook.url,
+						lastStatus: response.status,
+						lastSuccess: response.ok,
+						event: "submission.created",
+					})
+				);
+				ctx.log.info(`Webhook fired to ${webhook.url}: ${response.status}`);
+			})
+			.catch(async (err) => {
+				await ctx.kv.set(
+					`webhook-log:${form.id}`,
+					JSON.stringify({
+						lastFiredAt: new Date().toISOString(),
+						lastUrl: webhook.url,
+						lastStatus: 0,
+						lastSuccess: false,
+						event: "submission.created",
+						error: String(err),
+					})
+				);
+				ctx.log.error(`Webhook failed to ${webhook.url}: ${String(err)}`);
+			});
 	}
 }
 
@@ -575,6 +730,9 @@ export default definePlugin({
 				form.lastSubmissionAt = now;
 				await saveForm(ctx.kv, form);
 
+				// Update analytics snapshot in KV
+				await updateAnalyticsSnapshot(ctx.kv, formId, now);
+
 				// Update rate limit counter
 				await ctx.kv.set(rateLimitKey, String(currentCount + 1), { ex: settings.rateLimitWindowMinutes * 60 });
 
@@ -600,28 +758,122 @@ export default definePlugin({
 					}
 				}
 
-				// Send auto-response if configured
+				// Send auto-response if configured (with variable substitution)
 				if (form.autoResponse?.enabled) {
 					const emailField = form.fields.find((f) => f.type === "email");
 					const submitterEmail = emailField ? submissionData[emailField.id] : null;
 
 					if (submitterEmail && isValidEmail(submitterEmail)) {
-						const html = generateAutoResponseHTML(
+						const variables: AutoResponseVariables = {
+							submitterName: extractSubmitterName(form.fields, submissionData),
+							formName: form.name,
+							submissionDate: formatSubmissionDate(now),
+						};
+
+						const html = generateAutoResponseWithVariablesHTML(
 							form.autoResponse.subject,
 							form.autoResponse.body,
-							form.name
+							variables
+						);
+
+						const processedSubject = substituteVariables(
+							form.autoResponse.subject,
+							variables
 						);
 
 						sendEmail(ctx, {
 							to: submitterEmail,
-							subject: form.autoResponse.subject,
+							subject: processedSubject,
 							html,
 						}).catch(() => {}); // fire-and-forget
 					}
 				}
 
+				// Dispatch webhooks (fire-and-forget)
+				dispatchWebhooks(ctx, form, submission).catch(() => {});
+
 				ctx.log.info(`Submission ${submissionId} for form ${formId}`);
 				return { success: true, submissionId };
+			},
+		},
+
+		// ====================================================================
+		// Webhook Management
+		// ====================================================================
+
+		webhookTest: {
+			handler: async (routeCtx: any, ctx: any) => {
+				if (!routeCtx.user?.isAdmin) {
+					throw errorResponse("Admin access required", 403);
+				}
+
+				const formId = routeCtx.input?.formId;
+				const webhookUrl = routeCtx.input?.url;
+				const webhookSecret = routeCtx.input?.secret;
+
+				if (!formId) throw errorResponse("Form ID is required", 400);
+				if (!webhookUrl) throw errorResponse("Webhook URL is required", 400);
+
+				const form = await getFormFromKV(ctx.kv, formId);
+				if (!form) {
+					throw errorResponse("Form not found", 404);
+				}
+
+				const testPayload = JSON.stringify({
+					event: "test",
+					formId: form.id,
+					formName: form.name,
+					submissionId: "test-" + generateId(),
+					data: { _test: "This is a test webhook from FormForge" },
+					submittedAt: new Date().toISOString(),
+				});
+
+				const headers: Record<string, string> = { "Content-Type": "application/json" };
+
+				if (webhookSecret) {
+					const signature = await computeHmacSignature(webhookSecret, testPayload);
+					headers["X-FormForge-Signature"] = signature;
+				}
+
+				try {
+					const response = await fetch(webhookUrl, {
+						method: "POST",
+						headers,
+						body: testPayload,
+					});
+
+					const success = response.ok;
+
+					// Log the test
+					await ctx.kv.set(
+						`webhook-log:${formId}`,
+						JSON.stringify({
+							lastFiredAt: new Date().toISOString(),
+							lastUrl: webhookUrl,
+							lastStatus: response.status,
+							lastSuccess: success,
+							event: "test",
+						})
+					);
+
+					ctx.log.info(`Webhook test to ${webhookUrl}: ${response.status}`);
+					return { success, status: response.status };
+				} catch (err) {
+					// Log the failure
+					await ctx.kv.set(
+						`webhook-log:${formId}`,
+						JSON.stringify({
+							lastFiredAt: new Date().toISOString(),
+							lastUrl: webhookUrl,
+							lastStatus: 0,
+							lastSuccess: false,
+							event: "test",
+							error: String(err),
+						})
+					);
+
+					return { success: false, error: "Failed to reach webhook URL" };
+				}
 			},
 		},
 
@@ -769,6 +1021,268 @@ export default definePlugin({
 
 				const csv = csvRows.join("\n");
 				return { success: true, csv, count: submissions.length };
+			},
+		},
+
+		// ====================================================================
+		// Analytics Routes (Wave 4)
+		// ====================================================================
+
+		formAnalytics: {
+			handler: async (routeCtx: any, ctx: any) => {
+				if (!routeCtx.user?.isAdmin) {
+					throw errorResponse("Admin access required", 403);
+				}
+
+				const formId = routeCtx.pathParams?.id || routeCtx.input?.formId;
+				if (!formId) throw errorResponse("Form ID is required", 400);
+
+				const form = await getFormFromKV(ctx.kv, formId);
+				if (!form) {
+					throw errorResponse("Form not found", 404);
+				}
+
+				const snapshot = await getAnalyticsSnapshot(ctx.kv, formId);
+
+				// Submissions per day for last 30 days
+				const now = new Date();
+				const dailyData: Array<{ date: string; count: number }> = [];
+				for (let i = 29; i >= 0; i--) {
+					const d = new Date(now);
+					d.setDate(d.getDate() - i);
+					const dateKey = d.toISOString().slice(0, 10);
+					dailyData.push({ date: dateKey, count: snapshot.dailyCounts[dateKey] || 0 });
+				}
+
+				// Submissions per week for last 12 weeks
+				const weeklyData: Array<{ weekStart: string; count: number }> = [];
+				for (let w = 11; w >= 0; w--) {
+					const weekStart = new Date(now);
+					weekStart.setDate(weekStart.getDate() - (w * 7 + weekStart.getDay()));
+					let weekCount = 0;
+					for (let d = 0; d < 7; d++) {
+						const day = new Date(weekStart);
+						day.setDate(day.getDate() + d);
+						const dateKey = day.toISOString().slice(0, 10);
+						weekCount += snapshot.dailyCounts[dateKey] || 0;
+					}
+					weeklyData.push({ weekStart: weekStart.toISOString().slice(0, 10), count: weekCount });
+				}
+
+				// Top fields by completion rate
+				const allSubIds = await getSubmissionList(ctx.kv, formId);
+				const fieldCompletionCounts: Record<string, number> = {};
+				for (const field of form.fields) {
+					fieldCompletionCounts[field.id] = 0;
+				}
+
+				let totalSubs = 0;
+				for (const subId of allSubIds) {
+					const subJson = await ctx.kv.get<string>(`submission:${formId}:${subId}`);
+					if (subJson) {
+						try {
+							const sub = JSON.parse(subJson) as FormSubmission;
+							totalSubs++;
+							for (const field of form.fields) {
+								if (sub.data[field.id] && sub.data[field.id].trim() !== "") {
+									fieldCompletionCounts[field.id]++;
+								}
+							}
+						} catch {}
+					}
+				}
+
+				const fieldCompletion = form.fields.map((f) => ({
+					fieldId: f.id,
+					label: f.label,
+					completionRate: totalSubs > 0 ? Math.round((fieldCompletionCounts[f.id] / totalSubs) * 100) : 0,
+					filled: fieldCompletionCounts[f.id],
+					total: totalSubs,
+				})).sort((a, b) => b.completionRate - a.completionRate);
+
+				return {
+					success: true,
+					formId,
+					daily: dailyData,
+					weekly: weeklyData,
+					fieldCompletion,
+					totalSubmissions: form.totalSubmissions,
+				};
+			},
+		},
+
+		dashboardAnalytics: {
+			handler: async (routeCtx: any, ctx: any) => {
+				if (!routeCtx.user?.isAdmin) {
+					throw errorResponse("Admin access required", 403);
+				}
+
+				const formIds = await getFormList(ctx.kv);
+				let totalSubmissions = 0;
+				const formSummaries: Array<{ id: string; name: string; submissions: number }> = [];
+
+				for (const fid of formIds) {
+					const form = await getFormFromKV(ctx.kv, fid);
+					if (form) {
+						totalSubmissions += form.totalSubmissions;
+						formSummaries.push({
+							id: fid,
+							name: form.name,
+							submissions: form.totalSubmissions,
+						});
+					}
+				}
+
+				// Most active forms (top 5)
+				const mostActive = [...formSummaries]
+					.sort((a, b) => b.submissions - a.submissions)
+					.slice(0, 5);
+
+				// Submissions trend: last 7 days vs previous 7 days
+				const now = new Date();
+				let last7 = 0;
+				let prev7 = 0;
+
+				for (const fid of formIds) {
+					const snapshot = await getAnalyticsSnapshot(ctx.kv, fid);
+					for (let i = 0; i < 7; i++) {
+						const d = new Date(now);
+						d.setDate(d.getDate() - i);
+						const dateKey = d.toISOString().slice(0, 10);
+						last7 += snapshot.dailyCounts[dateKey] || 0;
+					}
+					for (let i = 7; i < 14; i++) {
+						const d = new Date(now);
+						d.setDate(d.getDate() - i);
+						const dateKey = d.toISOString().slice(0, 10);
+						prev7 += snapshot.dailyCounts[dateKey] || 0;
+					}
+				}
+
+				const trend = last7 > prev7 ? "up" : last7 < prev7 ? "down" : "stable";
+
+				return {
+					success: true,
+					totalSubmissions,
+					mostActive,
+					trend: {
+						last7days: last7,
+						previous7days: prev7,
+						direction: trend,
+					},
+				};
+			},
+		},
+
+		// ====================================================================
+		// Admin Page Routes (Wave 4)
+		// ====================================================================
+
+		adminFormsPage: {
+			handler: async (routeCtx: any, ctx: any) => {
+				if (!routeCtx.user?.isAdmin) {
+					throw errorResponse("Admin access required", 403);
+				}
+
+				const formIds = await getFormList(ctx.kv);
+				const forms: FormSummary[] = [];
+
+				for (const fid of formIds) {
+					const form = await getFormFromKV(ctx.kv, fid);
+					if (form) {
+						const subIds = await getSubmissionList(ctx.kv, fid);
+						forms.push({
+							id: form.id,
+							name: form.name,
+							description: form.description,
+							fieldCount: form.fields.length,
+							submissionCount: subIds.length,
+							lastSubmissionAt: form.lastSubmissionAt,
+							createdAt: form.createdAt,
+						});
+					}
+				}
+
+				const html = renderFormListPage(forms);
+				return { success: true, html };
+			},
+		},
+
+		adminSubmissionsPage: {
+			handler: async (routeCtx: any, ctx: any) => {
+				if (!routeCtx.user?.isAdmin) {
+					throw errorResponse("Admin access required", 403);
+				}
+
+				const formId = routeCtx.pathParams?.id || routeCtx.input?.formId;
+				if (!formId) throw errorResponse("Form ID is required", 400);
+
+				const form = await getFormFromKV(ctx.kv, formId);
+				if (!form) {
+					throw errorResponse("Form not found", 404);
+				}
+
+				const allIds = await getSubmissionList(ctx.kv, formId);
+				const limit = parseInt(routeCtx.input?.limit || "20", 10);
+				const offset = parseInt(routeCtx.input?.offset || "0", 10);
+
+				const paginatedIds = allIds.slice(offset, offset + limit);
+				const submissions: SubmissionSummary[] = [];
+
+				for (const subId of paginatedIds) {
+					const json = await ctx.kv.get<string>(`submission:${formId}:${subId}`);
+					if (json) {
+						try {
+							const sub = JSON.parse(json) as FormSubmission;
+							submissions.push({
+								id: sub.id,
+								data: sub.data,
+								submittedAt: sub.submittedAt,
+							});
+						} catch {}
+					}
+				}
+
+				const html = renderSubmissionListPage(
+					{
+						id: form.id,
+						name: form.name,
+						fields: form.fields.map((f) => ({ id: f.id, label: f.label })),
+					},
+					submissions,
+					{ total: allIds.length, limit, offset }
+				);
+
+				return { success: true, html };
+			},
+		},
+
+		adminFormActivityWidget: {
+			handler: async (routeCtx: any, ctx: any) => {
+				if (!routeCtx.user?.isAdmin) {
+					throw errorResponse("Admin access required", 403);
+				}
+
+				const formIds = await getFormList(ctx.kv);
+				const forms: FormSummary[] = [];
+
+				for (const fid of formIds) {
+					const form = await getFormFromKV(ctx.kv, fid);
+					if (form) {
+						const subIds = await getSubmissionList(ctx.kv, fid);
+						forms.push({
+							id: form.id,
+							name: form.name,
+							fieldCount: form.fields.length,
+							submissionCount: subIds.length,
+							lastSubmissionAt: form.lastSubmissionAt,
+							createdAt: form.createdAt,
+						});
+					}
+				}
+
+				const html = renderFormActivityWidget(forms);
+				return { success: true, html };
 			},
 		},
 	},

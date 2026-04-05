@@ -1,0 +1,280 @@
+---
+/**
+ * ReviewGrid.astro
+ * Featured reviews displayed in a responsive card grid layout.
+ *
+ * Props:
+ *   - maxReviews: Maximum number of reviews to display (default 6)
+ *   - columns: Number of columns at desktop (2 or 3, default 3)
+ *
+ * Fetches from /reviewpulse/widgetData endpoint.
+ * Themed via CSS custom properties (same as ReviewWidget.astro).
+ * Responsive: 3 → 2 → 1 columns based on viewport width.
+ */
+
+interface ReviewData {
+	author: string;
+	rating: number;
+	text: string;
+	date: string;
+	source: string;
+}
+
+interface WidgetResponse {
+	averageRating: number;
+	totalCount: number;
+	reviews: ReviewData[];
+}
+
+interface Props {
+	maxReviews?: number;
+	columns?: 2 | 3;
+}
+
+const { maxReviews = 6, columns = 3 } = Astro.props;
+
+// Fetch widget data from the public API endpoint
+const apiBase = Astro.url.origin;
+let widgetResponse: WidgetResponse | null = null;
+
+try {
+	const response = await fetch(
+		`${apiBase}/_emdash/api/plugins/reviewpulse/widgetData?limit=${maxReviews}`
+	);
+
+	if (response.ok) {
+		widgetResponse = (await response.json()) as WidgetResponse;
+	} else {
+		console.error(`ReviewGrid: Failed to fetch reviews: ${response.statusText}`);
+	}
+} catch (error) {
+	console.error("ReviewGrid: Error fetching reviews:", error);
+}
+
+const reviews = widgetResponse?.reviews ?? [];
+
+/**
+ * Format a date string for display.
+ */
+function formatDate(dateStr: string): string {
+	try {
+		const date = new Date(dateStr);
+		return new Intl.DateTimeFormat("en-US", {
+			year: "numeric",
+			month: "short",
+			day: "numeric",
+		}).format(date);
+	} catch {
+		return dateStr;
+	}
+}
+
+/**
+ * Truncate text to a max character length at word boundaries.
+ */
+function truncateText(text: string, maxLength: number = 160): string {
+	if (text.length <= maxLength) return text;
+	const cut = text.slice(0, maxLength);
+	const lastSpace = cut.lastIndexOf(" ");
+	return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut) + "\u2026";
+}
+
+/**
+ * Generate star ARIA label.
+ */
+function starLabel(rating: number): string {
+	return `${rating} out of 5 stars`;
+}
+
+/**
+ * Capitalize source name for badge.
+ */
+function sourceBadge(source: string): string {
+	return source.charAt(0).toUpperCase() + source.slice(1);
+}
+
+const gridClass = columns === 2 ? "review-grid--2col" : "review-grid--3col";
+---
+
+<div class={`review-grid ${gridClass}`} role="region" aria-label="Featured reviews">
+	{reviews.length === 0 ? (
+		<div class="review-grid__empty">
+			<p>No reviews available yet.</p>
+		</div>
+	) : (
+		reviews.map((review: ReviewData, index: number) => (
+			<article class="review-grid__card" aria-labelledby={`rg-author-${index}`}>
+				{/* Star rating */}
+				<div
+					class="review-grid__stars"
+					role="img"
+					aria-label={starLabel(review.rating)}
+				>
+					{[1, 2, 3, 4, 5].map((i) => {
+						const filled = i <= review.rating;
+						return (
+							<svg
+								class={`review-grid__star ${filled ? "review-grid__star--filled" : ""}`}
+								viewBox="0 0 20 20"
+								width="18"
+								height="18"
+								aria-hidden="true"
+							>
+								<path d="M10 1l2.39 5.64L18 7.24l-4 4.13L15 18l-5-3.07L5 18l1-6.63-4-4.13 5.61-.6z" />
+							</svg>
+						);
+					})}
+				</div>
+
+				{/* Review text */}
+				<p class="review-grid__text">{truncateText(review.text)}</p>
+
+				{/* Meta: author + source badge */}
+				<div class="review-grid__meta">
+					<span class="review-grid__author" id={`rg-author-${index}`}>
+						{review.author}
+					</span>
+					<span class="review-grid__sep" aria-hidden="true">&middot;</span>
+					<time class="review-grid__date" datetime={review.date}>
+						{formatDate(review.date)}
+					</time>
+				</div>
+
+				<span class="review-grid__source">{sourceBadge(review.source)}</span>
+			</article>
+		))
+	)}
+</div>
+
+<style>
+	/* -------------------------------------------------------
+	   ReviewGrid — themed via CSS custom properties
+	   Same custom properties as ReviewWidget.astro:
+	     --color-primary (#C4704B), --color-accent (#D4A853),
+	     --color-text (#2C2C2C), --color-surface (#FAF8F5), etc.
+	   ------------------------------------------------------- */
+
+	.review-grid {
+		display: grid;
+		gap: 1.25rem;
+		font-family: var(--font-body, "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+		color: var(--color-text, #2C2C2C);
+		line-height: 1.6;
+	}
+
+	.review-grid--3col {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.review-grid--2col {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	/* Card
+	   ------------------------------------------------------- */
+
+	.review-grid__card {
+		background: var(--color-surface, #FAF8F5);
+		border: 1px solid var(--color-border, #e5e5e5);
+		border-radius: 0.5rem;
+		padding: 1.25rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		position: relative;
+	}
+
+	/* Stars
+	   ------------------------------------------------------- */
+
+	.review-grid__stars {
+		display: flex;
+		gap: 0.125rem;
+	}
+
+	.review-grid__star {
+		fill: var(--color-star-bg, #e0dbd5);
+	}
+
+	.review-grid__star--filled {
+		fill: var(--color-accent, #D4A853);
+	}
+
+	/* Text
+	   ------------------------------------------------------- */
+
+	.review-grid__text {
+		margin: 0;
+		font-size: 0.95rem;
+		color: var(--color-text, #2C2C2C);
+		line-height: 1.55;
+		flex: 1;
+	}
+
+	/* Meta
+	   ------------------------------------------------------- */
+
+	.review-grid__meta {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.85rem;
+		color: var(--color-text-secondary, #666);
+	}
+
+	.review-grid__author {
+		font-weight: 600;
+		color: var(--color-text, #2C2C2C);
+	}
+
+	.review-grid__date {
+		color: var(--color-text-secondary, #666);
+	}
+
+	/* Source badge
+	   ------------------------------------------------------- */
+
+	.review-grid__source {
+		display: inline-block;
+		align-self: flex-start;
+		font-size: 0.7rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		background: var(--color-primary, #C4704B);
+		color: white;
+		padding: 0.15rem 0.5rem;
+		border-radius: 0.25rem;
+	}
+
+	/* Empty state
+	   ------------------------------------------------------- */
+
+	.review-grid__empty {
+		grid-column: 1 / -1;
+		text-align: center;
+		padding: 2rem;
+		color: var(--color-text-secondary, #666);
+		font-style: italic;
+	}
+
+	/* Responsive
+	   ------------------------------------------------------- */
+
+	@media (max-width: 960px) {
+		.review-grid--3col {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (max-width: 640px) {
+		.review-grid--3col,
+		.review-grid--2col {
+			grid-template-columns: 1fr;
+		}
+
+		.review-grid__card {
+			padding: 1rem;
+		}
+	}
+</style>

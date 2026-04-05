@@ -61,6 +61,9 @@ export function createMockContext(kvOverride?: MockKV) {
 		url: (path: string) => `https://test.example.com${path}`,
 		env: {
 			GOOGLE_PLACES_API_KEY: "test-api-key-123",
+			YELP_API_KEY: "test-yelp-key",
+			RESEND_API_KEY: "test-resend-key",
+			REVIEW_FROM_EMAIL: "noreply@test.com",
 		},
 	};
 }

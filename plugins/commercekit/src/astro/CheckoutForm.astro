@@ -1,0 +1,204 @@
+---
+/**
+ * CheckoutForm — Collects customer information and initiates Stripe checkout.
+ * Props: cartId (string) — the cart identifier
+ */
+
+interface Props {
+  cartId: string;
+}
+
+const { cartId } = Astro.props;
+---
+
+<div class="ck-checkout" data-cart-id={cartId}>
+  <h2 class="ck-checkout__title">Checkout</h2>
+
+  <div class="ck-checkout__summary" id="ck-checkout-summary">
+    <p style="color:#999;font-style:italic;">Loading order summary...</p>
+  </div>
+
+  <form class="ck-checkout__form" id="ck-checkout-form">
+    <input type="hidden" name="cartId" value={cartId} />
+
+    <fieldset class="ck-checkout__fieldset">
+      <legend class="ck-checkout__legend">Contact Information</legend>
+
+      <label class="ck-checkout__label">
+        Full Name
+        <input type="text" name="name" required class="ck-checkout__input" placeholder="Jane Doe" />
+      </label>
+
+      <label class="ck-checkout__label">
+        Email
+        <input type="email" name="email" required class="ck-checkout__input" placeholder="jane@example.com" />
+      </label>
+    </fieldset>
+
+    <fieldset class="ck-checkout__fieldset">
+      <legend class="ck-checkout__legend">Shipping Address</legend>
+
+      <label class="ck-checkout__label">
+        Address Line 1
+        <input type="text" name="line1" required class="ck-checkout__input" placeholder="123 Main St" />
+      </label>
+
+      <label class="ck-checkout__label">
+        Address Line 2
+        <input type="text" name="line2" class="ck-checkout__input" placeholder="Apt 4B" />
+      </label>
+
+      <div class="ck-checkout__row">
+        <label class="ck-checkout__label ck-checkout__label--half">
+          City
+          <input type="text" name="city" required class="ck-checkout__input" />
+        </label>
+        <label class="ck-checkout__label ck-checkout__label--quarter">
+          State
+          <input type="text" name="state" required class="ck-checkout__input" />
+        </label>
+        <label class="ck-checkout__label ck-checkout__label--quarter">
+          ZIP
+          <input type="text" name="zip" required class="ck-checkout__input" />
+        </label>
+      </div>
+    </fieldset>
+
+    <button type="submit" class="ck-checkout__submit" id="ck-checkout-submit">
+      Proceed to Payment
+    </button>
+  </form>
+</div>
+
+<style>
+  .ck-checkout {
+    font-family: var(--ck-body-font, "Source Sans 3", sans-serif);
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: var(--ck-text, #2c2c2c);
+  }
+  .ck-checkout__title {
+    font-family: var(--ck-heading-font, Lora, serif);
+    font-size: 1.75rem;
+    margin: 0 0 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--ck-accent, #D4A853);
+  }
+  .ck-checkout__summary {
+    background: var(--ck-bg, #faf8f5);
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .ck-checkout__fieldset {
+    border: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+  }
+  .ck-checkout__legend {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    color: var(--ck-secondary, #7A8B6F);
+  }
+  .ck-checkout__label {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #555;
+  }
+  .ck-checkout__input {
+    display: block;
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    margin-top: 0.25rem;
+    border: 1px solid #d4c4b5;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+  .ck-checkout__input:focus {
+    outline: none;
+    border-color: var(--ck-primary, #C4704B);
+    box-shadow: 0 0 0 2px rgba(196, 112, 75, 0.15);
+  }
+  .ck-checkout__row {
+    display: flex;
+    gap: 0.75rem;
+  }
+  .ck-checkout__label--half { flex: 2; }
+  .ck-checkout__label--quarter { flex: 1; }
+  .ck-checkout__submit {
+    display: block;
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--ck-primary, #C4704B);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: inherit;
+  }
+  .ck-checkout__submit:hover {
+    background: var(--ck-primary-hover, #a85d3d);
+  }
+  .ck-checkout__submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+</style>
+
+<script define:vars={{ cartId }}>
+  const form = document.getElementById('ck-checkout-form');
+  const submitBtn = document.getElementById('ck-checkout-submit');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Processing...';
+
+    const formData = new FormData(form);
+    try {
+      const res = await fetch('/_emdash/api/plugins/commercekit/createCheckout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cartId,
+          customer: {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            address: {
+              line1: formData.get('line1'),
+              line2: formData.get('line2'),
+              city: formData.get('city'),
+              state: formData.get('state'),
+              zip: formData.get('zip'),
+              country: 'US',
+            },
+          },
+        }),
+      });
+      const data = await res.json();
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        alert('Checkout failed. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Proceed to Payment';
+      }
+    } catch (err) {
+      console.error('Checkout error:', err);
+      alert('An error occurred. Please try again.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Proceed to Payment';
+    }
+  });
+</script>

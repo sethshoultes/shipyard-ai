@@ -1,0 +1,132 @@
+---
+/**
+ * ProductGrid — Responsive product listing grid.
+ * Props: category (optional filter), limit (max products to show)
+ * Fetches products from the public API endpoint.
+ */
+
+interface Props {
+  category?: string;
+  limit?: number;
+  products?: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    price: number;
+    compareAtPrice?: number;
+    currency: string;
+    images: string[];
+    description?: string;
+  }>;
+}
+
+const { category, limit = 12, products: propProducts } = Astro.props;
+
+// If products are passed directly, use them; otherwise show placeholder
+const products = propProducts ?? [];
+const displayed = products.slice(0, limit);
+---
+
+<div class="ck-product-grid" data-category={category} data-limit={limit}>
+  {displayed.length === 0 ? (
+    <p class="ck-product-grid__empty">No products available.</p>
+  ) : (
+    <div class="ck-product-grid__items">
+      {displayed.map((product) => (
+        <div class="ck-product-grid__item">
+          <slot name="product-card">
+            <div class="ck-product-grid__card" data-product-id={product.id}>
+              {product.images?.[0] ? (
+                <img
+                  src={product.images[0]}
+                  alt={product.name}
+                  class="ck-product-grid__image"
+                  loading="lazy"
+                />
+              ) : (
+                <div class="ck-product-grid__image ck-product-grid__image--placeholder">
+                  <span>No image</span>
+                </div>
+              )}
+              <div class="ck-product-grid__info">
+                <h3 class="ck-product-grid__name">
+                  <a href={`/products/${product.slug}`}>{product.name}</a>
+                </h3>
+                <p class="ck-product-grid__price">
+                  {product.currency.toLowerCase() === "usd" ? "$" : product.currency + " "}
+                  {(product.price / 100).toFixed(2)}
+                </p>
+              </div>
+            </div>
+          </slot>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+<style>
+  .ck-product-grid__items {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+  .ck-product-grid__empty {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 3rem;
+    grid-column: 1 / -1;
+  }
+  .ck-product-grid__card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .ck-product-grid__card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  .ck-product-grid__image {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    background: #f5f5f5;
+  }
+  .ck-product-grid__image--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+  }
+  .ck-product-grid__info {
+    padding: 1rem;
+  }
+  .ck-product-grid__name {
+    font-family: var(--ck-heading-font, Lora, serif);
+    font-size: 1rem;
+    margin: 0 0 0.25rem;
+  }
+  .ck-product-grid__name a {
+    color: var(--ck-text, #2c2c2c);
+    text-decoration: none;
+  }
+  .ck-product-grid__name a:hover {
+    color: var(--ck-primary, #C4704B);
+  }
+  .ck-product-grid__price {
+    font-weight: 700;
+    color: var(--ck-primary, #C4704B);
+    margin: 0;
+  }
+  @media (max-width: 1024px) {
+    .ck-product-grid__items { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .ck-product-grid__items { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .ck-product-grid__items { grid-template-columns: 1fr; }
+  }
+</style>

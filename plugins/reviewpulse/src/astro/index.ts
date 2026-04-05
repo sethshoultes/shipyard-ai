@@ -4,9 +4,11 @@
  */
 
 import ReviewWidget from "./ReviewWidget.astro";
+import ReviewGrid from "./ReviewGrid.astro";
 
 export const blockComponents = {
 	"review-widget": ReviewWidget,
+	"review-grid": ReviewGrid,
 };
 
-export { ReviewWidget };
+export { ReviewWidget, ReviewGrid };

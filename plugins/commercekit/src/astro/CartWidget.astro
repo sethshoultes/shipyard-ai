@@ -1,0 +1,129 @@
+---
+/**
+ * CartWidget — Shopping cart sidebar/drawer component.
+ * Props: cartId (string) — the cart identifier stored in cookie/session
+ */
+
+interface Props {
+  cartId: string;
+}
+
+const { cartId } = Astro.props;
+---
+
+<div class="ck-cart-widget" data-cart-id={cartId} id="ck-cart">
+  <div class="ck-cart-widget__header">
+    <h3 class="ck-cart-widget__title">Shopping Cart</h3>
+    <button class="ck-cart-widget__close" type="button" aria-label="Close cart">&times;</button>
+  </div>
+
+  <div class="ck-cart-widget__items" id="ck-cart-items">
+    <p class="ck-cart-widget__empty">Your cart is empty.</p>
+  </div>
+
+  <div class="ck-cart-widget__footer" id="ck-cart-footer" style="display:none;">
+    <div class="ck-cart-widget__subtotal">
+      <span>Subtotal</span>
+      <strong id="ck-cart-subtotal">$0.00</strong>
+    </div>
+    <a href="/checkout" class="ck-cart-widget__checkout-btn">Checkout</a>
+  </div>
+</div>
+
+<style>
+  .ck-cart-widget {
+    font-family: var(--ck-body-font, "Source Sans 3", sans-serif);
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 1.5rem;
+    max-width: 400px;
+    color: var(--ck-text, #2c2c2c);
+  }
+  .ck-cart-widget__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--ck-accent, #D4A853);
+  }
+  .ck-cart-widget__title {
+    font-family: var(--ck-heading-font, Lora, serif);
+    font-size: 1.25rem;
+    margin: 0;
+  }
+  .ck-cart-widget__close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #999;
+    padding: 0;
+    line-height: 1;
+  }
+  .ck-cart-widget__close:hover { color: #333; }
+  .ck-cart-widget__empty {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 2rem 0;
+  }
+  .ck-cart-widget__footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e5e5;
+  }
+  .ck-cart-widget__subtotal {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+  .ck-cart-widget__checkout-btn {
+    display: block;
+    text-align: center;
+    background: var(--ck-primary, #C4704B);
+    color: #fff;
+    padding: 0.75rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+  .ck-cart-widget__checkout-btn:hover {
+    background: var(--ck-primary-hover, #a85d3d);
+  }
+</style>
+
+<script define:vars={{ cartId }}>
+  // Client-side cart loading (hydrated at runtime)
+  async function loadCart() {
+    try {
+      const res = await fetch(`/_emdash/api/plugins/commercekit/getCart`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cartId }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const cart = data.cart;
+      const itemsEl = document.getElementById('ck-cart-items');
+      const footerEl = document.getElementById('ck-cart-footer');
+      const subtotalEl = document.getElementById('ck-cart-subtotal');
+      if (!cart.items.length) return;
+
+      itemsEl.innerHTML = cart.items.map(item =>
+        `<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #eee;">
+          <div><strong>${item.name}</strong><br><span style="color:#999;font-size:0.85rem;">Qty: ${item.quantity}</span></div>
+          <div style="font-weight:600;color:#C4704B;">$${((item.price * item.quantity) / 100).toFixed(2)}</div>
+        </div>`
+      ).join('');
+      subtotalEl.textContent = `$${(cart.subtotal / 100).toFixed(2)}`;
+      footerEl.style.display = 'block';
+    } catch (e) {
+      console.error('Failed to load cart:', e);
+    }
+  }
+  loadCart();
+</script>

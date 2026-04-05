@@ -1,0 +1,23 @@
+{
+	"name": "@shipyard/seodash",
+	"version": "1.0.0",
+	"type": "module",
+	"description": "SEO toolkit for EmDash CMS: meta tags, sitemaps, robots.txt, social previews, SEO auditing.",
+	"exports": {
+		".": "./src/index.ts",
+		"./sandbox": "./src/sandbox-entry.ts",
+		"./astro": "./src/astro/index.ts"
+	},
+	"scripts": {
+		"test": "vitest run",
+		"test:watch": "vitest"
+	},
+	"peerDependencies": {
+		"emdash": "^0.1.0"
+	},
+	"devDependencies": {
+		"emdash": "^0.1.0",
+		"typescript": "^5.5",
+		"vitest": "^4.1.2"
+	}
+}
