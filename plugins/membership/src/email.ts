@@ -24,6 +24,7 @@ export interface EmailVariables {
 	features?: string[];
 	paymentError?: string;
 	nextRetryDate?: string;
+	contentName?: string; // For drip content unlock emails
 }
 
 /**
@@ -421,6 +422,54 @@ ${vars.features.map((f) => `<li>${f}</li>`).join("\n")}
 <p>Questions? Reply to this email anytime.</p>
 
 <p>Best,<br/>
+The ${siteName} Team</p>
+</body>
+</html>`,
+	};
+}
+
+/**
+ * Template: Drip Content Unlock (sent when drip-gated content becomes available)
+ * Celebrates the milestone, invites member to access new content
+ */
+export function createDripUnlockTemplate(vars: EmailVariables): EmailTemplate {
+	const memberName = vars.memberName || "friend";
+	const siteName = vars.siteName || "our community";
+	const contentName = vars.contentName || "new content";
+	const portalLink = vars.portalLink || "your member dashboard";
+
+	return {
+		subject: `New content unlocked! Check out "${contentName}"`,
+		text: `Hi ${memberName},
+
+Great news! As a ${vars.planName} member, you've unlocked access to new content today.
+
+${contentName} is now available in your library.
+
+Head to your member dashboard to start exploring: ${portalLink}
+
+This is part of your membership journey with us. We believe in revealing content progressively, so you can absorb and enjoy each piece fully.
+
+If you have questions or want to share feedback, just reply to this email.
+
+Happy learning!
+
+The ${siteName} Team`,
+		html: `<html>
+<body style="font-family: 'Georgia', serif; line-height: 1.6; color: #333;">
+<p>Hi ${memberName},</p>
+
+<p>Great news! As a <strong>${vars.planName}</strong> member, you've unlocked access to new content today.</p>
+
+<p><strong>${contentName}</strong> is now available in your library.</p>
+
+<p><a href="${portalLink}" style="display: inline-block; padding: 12px 24px; background-color: #2E7D32; color: white; text-decoration: none; border-radius: 4px;">View New Content</a></p>
+
+<p>This is part of your membership journey with us. We believe in revealing content progressively, so you can absorb and enjoy each piece fully.</p>
+
+<p>If you have questions or want to share feedback, just reply to this email.</p>
+
+<p>Happy learning!<br/>
 The ${siteName} Team</p>
 </body>
 </html>`,

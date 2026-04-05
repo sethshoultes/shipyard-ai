@@ -101,9 +101,16 @@ const showBadge = badgeText.length > 0 && node.badge !== "default";
 const teaserText = node.teaser || "This content is exclusive to members. Upgrade to access.";
 ---
 
-<div class={`gated-content ${accessResult.hasAccess ? "gated-content--unlocked" : "gated-content--locked"}`}>
+<div
+	class={`gated-content ${accessResult.hasAccess ? "gated-content--unlocked" : "gated-content--locked"}`}
+	role={accessResult.hasAccess ? "region" : "complementary"}
+	aria-label={accessResult.hasAccess ? "Full content" : "Locked content preview"}
+>
 	{showBadge && (
-		<div class={`gated-content__badge gated-content__badge--${node.badge}`}>
+		<div
+			class={`gated-content__badge gated-content__badge--${node.badge}`}
+			aria-label={`Content badge: ${badgeText}`}
+		>
 			{badgeText}
 		</div>
 	)}
@@ -126,7 +133,11 @@ const teaserText = node.teaser || "This content is exclusive to members. Upgrade
 				</p>
 			)}
 
-			<a href="/members/portal#upgrade" class="gated-content__cta">
+			<a
+				href="/members/portal#upgrade"
+				class="gated-content__cta"
+				aria-label={accessResult.requiredPlan ? `Upgrade to ${accessResult.requiredPlan} plan` : "View membership options"}
+			>
 				{accessResult.requiredPlan ? `Upgrade to access` : "View membership options"}
 			</a>
 		</div>
@@ -177,16 +188,30 @@ const teaserText = node.teaser || "This content is exclusive to members. Upgrade
 	.gated-content__cta {
 		display: inline-block;
 		padding: 0.75rem 1.5rem;
+		min-height: 44px;
 		background-color: #c4704b; /* Terracotta primary */
 		color: white;
 		text-decoration: none;
 		border-radius: 0.25rem;
 		font-weight: 500;
 		transition: background-color 0.2s ease;
+		line-height: 1.5;
+		text-align: center;
 	}
 
 	.gated-content__cta:hover {
 		background-color: #b55939;
+	}
+
+	.gated-content__cta:focus {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	/* Keyboard navigation indicator for accessibility */
+	.gated-content__cta:focus-visible {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
 	}
 
 	/* Badge styling */

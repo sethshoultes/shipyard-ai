@@ -137,10 +137,10 @@ function getContentTypeBadge(type: string): string {
 }
 ---
 
-<div class="member-portal">
+<div class="member-portal" role="main" aria-label="Member portal">
 	<!-- Header -->
 	<div class="member-portal__header">
-		<h2 class="member-portal__title">{title}</h2>
+		<h1 class="member-portal__title">{title}</h1>
 		{portalData.member?.name && (
 			<p class="member-portal__welcome">
 				Welcome, <span class="member-portal__name">{portalData.member.name}</span>
@@ -150,7 +150,7 @@ function getContentTypeBadge(type: string): string {
 
 	<!-- Error state -->
 	{error && (
-		<div class="member-portal__error">
+		<div class="member-portal__error" role="alert" aria-live="polite">
 			<p>{error}</p>
 			<a href="#retry" class="member-portal__retry-btn">Retry</a>
 		</div>
@@ -197,15 +197,15 @@ function getContentTypeBadge(type: string): string {
 
 	<!-- Accessible content section -->
 	{accessibleContent.length > 0 ? (
-		<div class="member-portal__content-section">
-			<h3 class="member-portal__section-title">
+		<section class="member-portal__content-section" aria-label="Available content">
+			<h2 class="member-portal__section-title">
 				Available Content ({accessibleContent.length})
-			</h3>
+			</h2>
 			<div class="member-portal__content-grid">
 				{accessibleContent.map((item) => (
-					<div class="member-portal__content-item">
+					<article class="member-portal__content-item">
 						<div class="member-portal__content-header">
-							<h4 class="member-portal__content-title">
+							<h3 class="member-portal__content-title">
 								{item.url ? (
 									<a href={item.url} class="member-portal__content-link">
 										{item.title}
@@ -213,8 +213,11 @@ function getContentTypeBadge(type: string): string {
 								) : (
 									<span>{item.title}</span>
 								)}
-							</h4>
-							<span class={`member-portal__content-badge member-portal__content-badge--${item.type}`}>
+							</h3>
+							<span
+								class={`member-portal__content-badge member-portal__content-badge--${item.type}`}
+								aria-label={`Content type: ${getContentTypeBadge(item.type)}`}
+							>
 								{getContentTypeBadge(item.type)}
 							</span>
 						</div>
@@ -226,25 +229,27 @@ function getContentTypeBadge(type: string): string {
 						<a
 							href={item.url || "#"}
 							class="member-portal__content-btn"
+							aria-label={`View ${item.title}`}
 						>
-							View Content →
+							View Content
+							<span aria-hidden="true">→</span>
 						</a>
-					</div>
+					</article>
 				))}
 			</div>
-		</div>
+		</section>
 	) : (
-		<div class="member-portal__empty">
+		<div class="member-portal__empty" role="status" aria-live="polite">
 			<p>No content available yet. Check back soon!</p>
 		</div>
 	)}
 
 	<!-- Locked content section -->
 	{showLockedContent && lockedContent.length > 0 && (
-		<div class="member-portal__locked-section">
-			<h3 class="member-portal__section-title">
+		<section class="member-portal__locked-section" aria-label="Coming soon content">
+			<h2 class="member-portal__section-title">
 				Coming Soon ({lockedContent.length})
-			</h3>
+			</h2>
 			<p class="member-portal__locked-subtitle">
 				These items will unlock as part of your membership journey.
 			</p>
@@ -282,7 +287,7 @@ function getContentTypeBadge(type: string): string {
 					</div>
 				))}
 			</div>
-		</div>
+		</section>
 	)}
 
 	<!-- Footer with last sync info -->
@@ -344,17 +349,30 @@ function getContentTypeBadge(type: string): string {
 
 	.member-portal__retry-btn {
 		display: inline-block;
-		padding: 0.5rem 1rem;
+		padding: 0.75rem 1.5rem;
+		min-height: 44px;
 		background-color: #c62828;
 		color: white;
 		text-decoration: none;
 		border-radius: 0.25rem;
 		font-weight: 500;
 		transition: background-color 0.2s;
+		line-height: 1.5;
+		text-align: center;
 	}
 
 	.member-portal__retry-btn:hover {
 		background-color: #b71c1c;
+	}
+
+	.member-portal__retry-btn:focus {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	.member-portal__retry-btn:focus-visible {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
 	}
 
 	/* Plan section */
@@ -570,7 +588,8 @@ function getContentTypeBadge(type: string): string {
 	}
 
 	.member-portal__content-btn {
-		padding: 0.5rem 0.75rem;
+		padding: 0.75rem 1.5rem;
+		min-height: 44px;
 		background-color: #c4704b;
 		color: white;
 		text-decoration: none;
@@ -579,10 +598,21 @@ function getContentTypeBadge(type: string): string {
 		font-size: 0.85rem;
 		text-align: center;
 		transition: background-color 0.2s;
+		line-height: 1.5;
 	}
 
 	.member-portal__content-btn:hover {
 		background-color: #b55939;
+	}
+
+	.member-portal__content-btn:focus {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	.member-portal__content-btn:focus-visible {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
 	}
 
 	/* Locked content unlock info */
@@ -628,7 +658,7 @@ function getContentTypeBadge(type: string): string {
 		color: #999;
 	}
 
-	/* Mobile responsive */
+	/* Mobile responsive: 375px and above */
 	@media (max-width: 768px) {
 		.member-portal {
 			gap: 1.5rem;
@@ -647,6 +677,42 @@ function getContentTypeBadge(type: string): string {
 			flex-direction: column;
 			align-items: start;
 			gap: 0.5rem;
+		}
+
+		.member-portal__content-btn {
+			width: 100%;
+		}
+
+		.member-portal__retry-btn {
+			width: 100%;
+		}
+	}
+
+	/* Extra small screens: 320px and above */
+	@media (max-width: 375px) {
+		.member-portal {
+			padding: 0.75rem;
+			gap: 1rem;
+		}
+
+		.member-portal__title {
+			font-size: 1.25rem;
+		}
+
+		.member-portal__plan-card {
+			padding: 1rem;
+		}
+
+		.member-portal__content-item,
+		.member-portal__locked-item {
+			padding: 0.75rem;
+		}
+
+		.member-portal__content-btn,
+		.member-portal__retry-btn {
+			width: 100%;
+			min-height: 44px;
+			padding: 0.75rem 1rem;
 		}
 	}
 </style>

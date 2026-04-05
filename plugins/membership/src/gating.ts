@@ -123,9 +123,21 @@ export async function canAccessContent(
 		if (member.status !== "active" && member.status !== "trialing") {
 			return {
 				hasAccess: false,
-				reason: "No active subscription",
+				reason: member.status === "expired" ? "Your subscription has expired" : "No active subscription",
 				requiredPlan: gatingRule.planIds[0], // Suggest first plan
 			};
+		}
+
+		// Check if subscription has expired based on expiresAt date
+		if (member.expiresAt) {
+			const expiryDate = new Date(member.expiresAt);
+			if (expiryDate < new Date()) {
+				return {
+					hasAccess: false,
+					reason: "Your subscription has expired",
+					requiredPlan: gatingRule.planIds[0],
+				};
+			}
 		}
 
 		// Check if member's plan is in the allowed list
