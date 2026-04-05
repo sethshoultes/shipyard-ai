@@ -49,6 +49,10 @@ interface EventRecord {
 	stripeProductId?: string; // Stripe product ID
 	ticketTypes?: TicketType[]; // Array of ticket variants (early bird, VIP, general, etc.)
 	totalRevenue?: number; // Cumulative revenue in cents from successful payments
+	// Phase 4 Wave 2 fields
+	categoryIds?: string[]; // Array of category IDs
+	venueId?: string; // Optional venue reference
+	seriesId?: string; // Optional series reference
 }
 
 interface RegistrationRecord {
@@ -85,6 +89,58 @@ interface EventTemplateRecord {
 	capacity: number;
 	dayOfWeek: number; // 0=Sunday, 1=Monday, ..., 6=Saturday
 	createdAt: string;
+}
+
+/**
+ * Phase 4 Wave 2: Event Categories
+ */
+interface CategoryRecord {
+	id: string;
+	name: string;
+	color: string; // Hex color code
+	icon?: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/**
+ * Phase 4 Wave 2: Venue Management
+ */
+interface VenueRecord {
+	id: string;
+	name: string;
+	address: string;
+	city: string;
+	state: string;
+	capacity: number;
+	lat?: number;
+	lng?: number;
+	description?: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/**
+ * Phase 4 Wave 2: Event Series
+ */
+interface SeriesRecord {
+	id: string;
+	name: string;
+	description?: string;
+	brandingColor?: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+/**
+ * Phase 4 Wave 2: Waitlist Notification Record
+ */
+interface WaitlistNotificationRecord {
+	email: string;
+	eventId: string;
+	createdAt: string;
+	notified?: boolean;
+	notifiedAt?: string;
 }
 
 interface AdminInteraction {
@@ -344,6 +400,7 @@ export default definePlugin({
 		 * Query params:
 		 *   - limit: max number of events (default 20)
 		 *   - upcomingOnly: if "true", filter to future events only (default true)
+		 *   - category: filter by category ID (Phase 4 Wave 2)
 		 *
 		 * Returns: { events: EventRecord[], total: number }
 		 */
@@ -358,6 +415,7 @@ export default definePlugin({
 						100
 					);
 					const upcomingOnly = String(input.upcomingOnly ?? "true") === "true";
+					const categoryFilter = input.category ? String(input.category).trim() : undefined;
 
 					let events = await getAllEventsWithDates(ctx);
 
@@ -368,6 +426,13 @@ export default definePlugin({
 							const eventTime = dateTimeToTimestamp(e.date, e.time);
 							return eventTime > now.getTime();
 						});
+					}
+
+					// Phase 4 Wave 2: Filter by category
+					if (categoryFilter) {
+						events = events.filter((e) =>
+							e.categoryIds && e.categoryIds.includes(categoryFilter)
+						);
 					}
 
 					// Limit results
@@ -423,10 +488,37 @@ export default definePlugin({
 					const waitlist = await getWaitlist(ctx, eventId);
 					const spotsRemaining = Math.max(0, event.capacity - event.registered);
 
+					// Phase 4 Wave 2: Include venue and series details
+					let venue: VenueRecord | null = null;
+					if (event.venueId) {
+						const venueJson = await ctx.kv.get<string>(`venue:${event.venueId}`);
+						if (venueJson) venue = parseJSON<VenueRecord>(venueJson, null);
+					}
+
+					let series: SeriesRecord | null = null;
+					if (event.seriesId) {
+						const seriesJson = await ctx.kv.get<string>(`series:${event.seriesId}`);
+						if (seriesJson) series = parseJSON<SeriesRecord>(seriesJson, null);
+					}
+
+					let categories: CategoryRecord[] = [];
+					if (event.categoryIds && event.categoryIds.length > 0) {
+						for (const catId of event.categoryIds) {
+							const catJson = await ctx.kv.get<string>(`category:${catId}`);
+							if (catJson) {
+								const cat = parseJSON<CategoryRecord>(catJson, null);
+								if (cat) categories.push(cat);
+							}
+						}
+					}
+
 					return {
 						event,
 						spotsRemaining,
 						waitlistCount: waitlist.length,
+						...(venue && { venue }),
+						...(series && { series }),
+						...(categories.length > 0 && { categories }),
 					};
 				} catch (error) {
 					if (error instanceof Response) throw error;
@@ -878,6 +970,10 @@ export default definePlugin({
 					const endTime = String(input.endTime ?? "").trim();
 					const requiresPayment = input.requiresPayment === true;
 					const stripeProductId = String(input.stripeProductId ?? "").trim();
+					// Phase 4 Wave 2: category, venue, series support
+					const categoryIds = input.categoryIds as string[] | undefined;
+					const venueId = input.venueId ? String(input.venueId).trim() : undefined;
+					const seriesId = input.seriesId ? String(input.seriesId).trim() : undefined;
 
 					if (!title || !date || !time || !location || capacity < 1) {
 						throw new Response(
@@ -948,6 +1044,10 @@ export default definePlugin({
 					if (stripeProductId) event.stripeProductId = stripeProductId;
 					if (ticketTypes) event.ticketTypes = ticketTypes;
 					event.totalRevenue = 0;
+					// Phase 4 Wave 2: category, venue, series
+					if (categoryIds && Array.isArray(categoryIds) && categoryIds.length > 0) event.categoryIds = categoryIds;
+					if (venueId) event.venueId = venueId;
+					if (seriesId) event.seriesId = seriesId;
 
 					await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
 
@@ -3589,6 +3689,1268 @@ END:VCALENDAR`;
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Revenue report error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/** PHASE 4 WAVE 2: Task 6 - Event Categories + Filtering */
+
+		/**
+		 * POST /eventdash/categories/create
+		 * Admin creates event category.
+		 *
+		 * Body: { name, color, icon? }
+		 * Returns: { success: true, category: CategoryRecord }
+		 */
+		categoryCreate: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const name = String(input.name ?? "").trim();
+					const color = String(input.color ?? "").trim();
+					const icon = input.icon ? String(input.icon).trim() : undefined;
+
+					if (!name || name.length > 100) {
+						throw new Response(
+							JSON.stringify({ error: "Category name is required (max 100 chars)" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!color || !/^#[0-9A-Fa-f]{6}$/.test(color)) {
+						throw new Response(
+							JSON.stringify({ error: "Valid hex color required (e.g. #FF5733)" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const categoryId = generateId();
+					const now = new Date().toISOString();
+					const category: CategoryRecord = {
+						id: categoryId,
+						name,
+						color,
+						createdAt: now,
+						updatedAt: now,
+					};
+					if (icon) category.icon = icon;
+
+					await ctx.kv.set(`category:${categoryId}`, JSON.stringify(category));
+
+					// Add to categories list
+					const listJson = await ctx.kv.get<string>("categories:list");
+					const catIds = parseJSON<string[]>(listJson, []);
+					catIds.push(categoryId);
+					await ctx.kv.set("categories:list", JSON.stringify(catIds));
+
+					ctx.log.info(`Category created: ${categoryId} — ${name}`);
+
+					return { success: true, category };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Category create error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/categories
+		 * List all event categories.
+		 *
+		 * Returns: { categories: CategoryRecord[], total: number }
+		 */
+		categoryList: {
+			public: true,
+			handler: async (_routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const listJson = await ctx.kv.get<string>("categories:list");
+					const catIds = parseJSON<string[]>(listJson, []);
+
+					const categories: CategoryRecord[] = [];
+					for (const id of catIds) {
+						const catJson = await ctx.kv.get<string>(`category:${id}`);
+						if (catJson) {
+							const cat = parseJSON<CategoryRecord>(catJson, null);
+							if (cat) categories.push(cat);
+						}
+					}
+
+					categories.sort((a, b) => a.name.localeCompare(b.name));
+
+					return { categories, total: categories.length };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Category list error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * PUT /eventdash/categories/:id
+		 * Update an event category.
+		 *
+		 * Body: { name?, color?, icon? }
+		 * Returns: { success: true, category: CategoryRecord }
+		 */
+		categoryUpdate: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const categoryId = String((rc.pathParams as Record<string, unknown>)?.id ?? "").trim();
+					const input = rc.input as Record<string, unknown>;
+
+					if (!categoryId) {
+						throw new Response(
+							JSON.stringify({ error: "Category ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const catJson = await ctx.kv.get<string>(`category:${categoryId}`);
+					if (!catJson) {
+						throw new Response(
+							JSON.stringify({ error: "Category not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const category = parseJSON<CategoryRecord>(catJson, null);
+					if (!category) {
+						throw new Response(
+							JSON.stringify({ error: "Category not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (input.name !== undefined) {
+						const updatedName = String(input.name).trim();
+						if (!updatedName || updatedName.length > 100) {
+							throw new Response(
+								JSON.stringify({ error: "Category name must be 1-100 chars" }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+						category.name = updatedName;
+					}
+
+					if (input.color !== undefined) {
+						const updatedColor = String(input.color).trim();
+						if (!/^#[0-9A-Fa-f]{6}$/.test(updatedColor)) {
+							throw new Response(
+								JSON.stringify({ error: "Valid hex color required (e.g. #FF5733)" }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+						category.color = updatedColor;
+					}
+
+					if (input.icon !== undefined) {
+						category.icon = input.icon ? String(input.icon).trim() : undefined;
+					}
+
+					category.updatedAt = new Date().toISOString();
+					await ctx.kv.set(`category:${categoryId}`, JSON.stringify(category));
+
+					ctx.log.info(`Category updated: ${categoryId}`);
+
+					return { success: true, category };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Category update error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * DELETE /eventdash/categories/:id
+		 * Delete an event category.
+		 *
+		 * Returns: { success: true }
+		 */
+		categoryDelete: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const categoryId = String((rc.pathParams as Record<string, unknown>)?.id ?? "").trim();
+
+					if (!categoryId) {
+						throw new Response(
+							JSON.stringify({ error: "Category ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const catJson = await ctx.kv.get<string>(`category:${categoryId}`);
+					if (!catJson) {
+						throw new Response(
+							JSON.stringify({ error: "Category not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					await ctx.kv.delete(`category:${categoryId}`);
+
+					// Remove from list
+					const listJson = await ctx.kv.get<string>("categories:list");
+					const catIds = parseJSON<string[]>(listJson, []);
+					const updated = catIds.filter((id) => id !== categoryId);
+					await ctx.kv.set("categories:list", JSON.stringify(updated));
+
+					ctx.log.info(`Category deleted: ${categoryId}`);
+
+					return { success: true };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Category delete error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/** PHASE 4 WAVE 2: Task 7 - Venue Management */
+
+		/**
+		 * POST /eventdash/venues/create
+		 * Admin creates a venue.
+		 *
+		 * Body: { name, address, city, state, capacity, lat?, lng?, description? }
+		 * Returns: { success: true, venue: VenueRecord }
+		 */
+		venueCreate: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const name = String(input.name ?? "").trim();
+					const address = String(input.address ?? "").trim();
+					const city = String(input.city ?? "").trim();
+					const state = String(input.state ?? "").trim();
+					const capacity = parseInt(String(input.capacity ?? "0"), 10);
+					const lat = input.lat !== undefined ? Number(input.lat) : undefined;
+					const lng = input.lng !== undefined ? Number(input.lng) : undefined;
+					const description = input.description ? String(input.description).trim() : undefined;
+
+					if (!name || name.length > 200) {
+						throw new Response(
+							JSON.stringify({ error: "Venue name is required (max 200 chars)" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!address || address.length > 500) {
+						throw new Response(
+							JSON.stringify({ error: "Address is required (max 500 chars)" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!city || city.length > 100) {
+						throw new Response(
+							JSON.stringify({ error: "City is required (max 100 chars)" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!state || state.length > 100) {
+						throw new Response(
+							JSON.stringify({ error: "State is required (max 100 chars)" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (capacity < 1) {
+						throw new Response(
+							JSON.stringify({ error: "Capacity must be at least 1" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (lat !== undefined && (lat < -90 || lat > 90)) {
+						throw new Response(
+							JSON.stringify({ error: "Latitude must be between -90 and 90" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (lng !== undefined && (lng < -180 || lng > 180)) {
+						throw new Response(
+							JSON.stringify({ error: "Longitude must be between -180 and 180" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const venueId = generateId();
+					const now = new Date().toISOString();
+					const venue: VenueRecord = {
+						id: venueId,
+						name,
+						address,
+						city,
+						state,
+						capacity,
+						createdAt: now,
+						updatedAt: now,
+					};
+					if (lat !== undefined) venue.lat = lat;
+					if (lng !== undefined) venue.lng = lng;
+					if (description) venue.description = description;
+
+					await ctx.kv.set(`venue:${venueId}`, JSON.stringify(venue));
+
+					// Add to venues list
+					const listJson = await ctx.kv.get<string>("venues:list");
+					const venueIds = parseJSON<string[]>(listJson, []);
+					venueIds.push(venueId);
+					await ctx.kv.set("venues:list", JSON.stringify(venueIds));
+
+					ctx.log.info(`Venue created: ${venueId} — ${name}`);
+
+					return { success: true, venue };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Venue create error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/venues
+		 * List all venues.
+		 *
+		 * Returns: { venues: VenueRecord[], total: number }
+		 */
+		venueList: {
+			public: true,
+			handler: async (_routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const listJson = await ctx.kv.get<string>("venues:list");
+					const venueIds = parseJSON<string[]>(listJson, []);
+
+					const venues: VenueRecord[] = [];
+					for (const id of venueIds) {
+						const venueJson = await ctx.kv.get<string>(`venue:${id}`);
+						if (venueJson) {
+							const venue = parseJSON<VenueRecord>(venueJson, null);
+							if (venue) venues.push(venue);
+						}
+					}
+
+					venues.sort((a, b) => a.name.localeCompare(b.name));
+
+					return { venues, total: venues.length };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Venue list error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/venues/:id
+		 * Get venue details.
+		 *
+		 * Returns: { venue: VenueRecord }
+		 */
+		venueDetail: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const venueId = String((rc.pathParams as Record<string, unknown>)?.id ?? "").trim();
+
+					if (!venueId) {
+						throw new Response(
+							JSON.stringify({ error: "Venue ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const venueJson = await ctx.kv.get<string>(`venue:${venueId}`);
+					if (!venueJson) {
+						throw new Response(
+							JSON.stringify({ error: "Venue not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const venue = parseJSON<VenueRecord>(venueJson, null);
+					if (!venue) {
+						throw new Response(
+							JSON.stringify({ error: "Venue not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					return { venue };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Venue detail error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * PUT /eventdash/venues/:id
+		 * Update venue details.
+		 *
+		 * Body: { name?, address?, city?, state?, capacity?, lat?, lng?, description? }
+		 * Returns: { success: true, venue: VenueRecord }
+		 */
+		venueUpdate: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const venueId = String((rc.pathParams as Record<string, unknown>)?.id ?? "").trim();
+					const input = rc.input as Record<string, unknown>;
+
+					if (!venueId) {
+						throw new Response(
+							JSON.stringify({ error: "Venue ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const venueJson = await ctx.kv.get<string>(`venue:${venueId}`);
+					if (!venueJson) {
+						throw new Response(
+							JSON.stringify({ error: "Venue not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const venue = parseJSON<VenueRecord>(venueJson, null);
+					if (!venue) {
+						throw new Response(
+							JSON.stringify({ error: "Venue not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (input.name !== undefined) {
+						const updatedName = String(input.name).trim();
+						if (!updatedName || updatedName.length > 200) {
+							throw new Response(
+								JSON.stringify({ error: "Venue name must be 1-200 chars" }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+						venue.name = updatedName;
+					}
+
+					if (input.address !== undefined) {
+						const updatedAddress = String(input.address).trim();
+						if (!updatedAddress || updatedAddress.length > 500) {
+							throw new Response(
+								JSON.stringify({ error: "Address must be 1-500 chars" }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+						venue.address = updatedAddress;
+					}
+
+					if (input.city !== undefined) {
+						const updatedCity = String(input.city).trim();
+						if (!updatedCity || updatedCity.length > 100) {
+							throw new Response(
+								JSON.stringify({ error: "City must be 1-100 chars" }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+						venue.city = updatedCity;
+					}
+
+					if (input.state !== undefined) {
+						const updatedState = String(input.state).trim();
+						if (!updatedState || updatedState.length > 100) {
+							throw new Response(
+								JSON.stringify({ error: "State must be 1-100 chars" }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+						venue.state = updatedState;
+					}
+
+					if (input.capacity !== undefined) {
+						const updatedCapacity = parseInt(String(input.capacity), 10);
+						if (updatedCapacity < 1) {
+							throw new Response(
+								JSON.stringify({ error: "Capacity must be at least 1" }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+						venue.capacity = updatedCapacity;
+					}
+
+					if (input.lat !== undefined) {
+						const updatedLat = Number(input.lat);
+						if (updatedLat < -90 || updatedLat > 90) {
+							throw new Response(
+								JSON.stringify({ error: "Latitude must be between -90 and 90" }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+						venue.lat = updatedLat;
+					}
+
+					if (input.lng !== undefined) {
+						const updatedLng = Number(input.lng);
+						if (updatedLng < -180 || updatedLng > 180) {
+							throw new Response(
+								JSON.stringify({ error: "Longitude must be between -180 and 180" }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+						venue.lng = updatedLng;
+					}
+
+					if (input.description !== undefined) {
+						venue.description = input.description ? String(input.description).trim() : undefined;
+					}
+
+					venue.updatedAt = new Date().toISOString();
+					await ctx.kv.set(`venue:${venueId}`, JSON.stringify(venue));
+
+					ctx.log.info(`Venue updated: ${venueId}`);
+
+					return { success: true, venue };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Venue update error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * DELETE /eventdash/venues/:id
+		 * Delete a venue.
+		 *
+		 * Returns: { success: true }
+		 */
+		venueDelete: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const venueId = String((rc.pathParams as Record<string, unknown>)?.id ?? "").trim();
+
+					if (!venueId) {
+						throw new Response(
+							JSON.stringify({ error: "Venue ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const venueJson = await ctx.kv.get<string>(`venue:${venueId}`);
+					if (!venueJson) {
+						throw new Response(
+							JSON.stringify({ error: "Venue not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					await ctx.kv.delete(`venue:${venueId}`);
+
+					// Remove from list
+					const listJson = await ctx.kv.get<string>("venues:list");
+					const venueIds = parseJSON<string[]>(listJson, []);
+					const updated = venueIds.filter((id) => id !== venueId);
+					await ctx.kv.set("venues:list", JSON.stringify(updated));
+
+					ctx.log.info(`Venue deleted: ${venueId}`);
+
+					return { success: true };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Venue delete error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/** PHASE 4 WAVE 2: Task 8 - Event Series */
+
+		/**
+		 * POST /eventdash/series/create
+		 * Admin creates an event series.
+		 *
+		 * Body: { name, description?, brandingColor? }
+		 * Returns: { success: true, series: SeriesRecord }
+		 */
+		seriesCreate: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const name = String(input.name ?? "").trim();
+					const description = input.description ? String(input.description).trim() : undefined;
+					const brandingColor = input.brandingColor ? String(input.brandingColor).trim() : undefined;
+
+					if (!name || name.length > 200) {
+						throw new Response(
+							JSON.stringify({ error: "Series name is required (max 200 chars)" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (brandingColor && !/^#[0-9A-Fa-f]{6}$/.test(brandingColor)) {
+						throw new Response(
+							JSON.stringify({ error: "Valid hex color required (e.g. #FF5733)" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const seriesId = generateId();
+					const now = new Date().toISOString();
+					const series: SeriesRecord = {
+						id: seriesId,
+						name,
+						createdAt: now,
+						updatedAt: now,
+					};
+					if (description) series.description = description;
+					if (brandingColor) series.brandingColor = brandingColor;
+
+					await ctx.kv.set(`series:${seriesId}`, JSON.stringify(series));
+
+					// Add to series list
+					const listJson = await ctx.kv.get<string>("series:list");
+					const seriesIds = parseJSON<string[]>(listJson, []);
+					seriesIds.push(seriesId);
+					await ctx.kv.set("series:list", JSON.stringify(seriesIds));
+
+					ctx.log.info(`Series created: ${seriesId} — ${name}`);
+
+					return { success: true, series };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Series create error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/series
+		 * List all event series.
+		 *
+		 * Returns: { series: SeriesRecord[], total: number }
+		 */
+		seriesList: {
+			public: true,
+			handler: async (_routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const listJson = await ctx.kv.get<string>("series:list");
+					const seriesIds = parseJSON<string[]>(listJson, []);
+
+					const allSeries: SeriesRecord[] = [];
+					for (const id of seriesIds) {
+						const seriesJson = await ctx.kv.get<string>(`series:${id}`);
+						if (seriesJson) {
+							const s = parseJSON<SeriesRecord>(seriesJson, null);
+							if (s) allSeries.push(s);
+						}
+					}
+
+					allSeries.sort((a, b) => a.name.localeCompare(b.name));
+
+					return { series: allSeries, total: allSeries.length };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Series list error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/series/:id
+		 * Get series details with linked events.
+		 *
+		 * Returns: { series: SeriesRecord, events: EventRecord[] }
+		 */
+		seriesDetail: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const seriesId = String((rc.pathParams as Record<string, unknown>)?.id ?? "").trim();
+
+					if (!seriesId) {
+						throw new Response(
+							JSON.stringify({ error: "Series ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const seriesJson = await ctx.kv.get<string>(`series:${seriesId}`);
+					if (!seriesJson) {
+						throw new Response(
+							JSON.stringify({ error: "Series not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const series = parseJSON<SeriesRecord>(seriesJson, null);
+					if (!series) {
+						throw new Response(
+							JSON.stringify({ error: "Series not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Find all events in this series
+					const allEvents = await getAllEventsWithDates(ctx);
+					const seriesEvents = allEvents.filter((e) => e.seriesId === seriesId);
+
+					return { series, events: seriesEvents };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Series detail error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * PUT /eventdash/series/:id
+		 * Update an event series.
+		 *
+		 * Body: { name?, description?, brandingColor? }
+		 * Returns: { success: true, series: SeriesRecord }
+		 */
+		seriesUpdate: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const seriesId = String((rc.pathParams as Record<string, unknown>)?.id ?? "").trim();
+					const input = rc.input as Record<string, unknown>;
+
+					if (!seriesId) {
+						throw new Response(
+							JSON.stringify({ error: "Series ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const seriesJson = await ctx.kv.get<string>(`series:${seriesId}`);
+					if (!seriesJson) {
+						throw new Response(
+							JSON.stringify({ error: "Series not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const series = parseJSON<SeriesRecord>(seriesJson, null);
+					if (!series) {
+						throw new Response(
+							JSON.stringify({ error: "Series not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (input.name !== undefined) {
+						const updatedName = String(input.name).trim();
+						if (!updatedName || updatedName.length > 200) {
+							throw new Response(
+								JSON.stringify({ error: "Series name must be 1-200 chars" }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+						series.name = updatedName;
+					}
+
+					if (input.description !== undefined) {
+						series.description = input.description ? String(input.description).trim() : undefined;
+					}
+
+					if (input.brandingColor !== undefined) {
+						if (input.brandingColor) {
+							const updatedColor = String(input.brandingColor).trim();
+							if (!/^#[0-9A-Fa-f]{6}$/.test(updatedColor)) {
+								throw new Response(
+									JSON.stringify({ error: "Valid hex color required (e.g. #FF5733)" }),
+									{ status: 400, headers: { "Content-Type": "application/json" } }
+								);
+							}
+							series.brandingColor = updatedColor;
+						} else {
+							series.brandingColor = undefined;
+						}
+					}
+
+					series.updatedAt = new Date().toISOString();
+					await ctx.kv.set(`series:${seriesId}`, JSON.stringify(series));
+
+					ctx.log.info(`Series updated: ${seriesId}`);
+
+					return { success: true, series };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Series update error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/** PHASE 4 WAVE 2: Task 10 - Embeddable Widgets + Waitlist Notifications */
+
+		/**
+		 * GET /eventdash/widget/upcoming
+		 * Public endpoint returning next 5 upcoming events as JSON (for iframe embed).
+		 *
+		 * Returns: { events: EventRecord[] }
+		 */
+		widgetUpcoming: {
+			public: true,
+			handler: async (_routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const allEvents = await getAllEventsWithDates(ctx);
+					const now = new Date();
+
+					const upcoming = allEvents
+						.filter((e) => dateTimeToTimestamp(e.date, e.time) > now.getTime())
+						.slice(0, 5)
+						.map((e) => ({
+							id: e.id,
+							title: e.title,
+							description: e.description,
+							date: e.date,
+							time: e.time,
+							endTime: e.endTime,
+							location: e.location,
+							capacity: e.capacity,
+							registered: e.registered,
+							spotsRemaining: Math.max(0, e.capacity - e.registered),
+							requiresPayment: e.requiresPayment || false,
+							categoryIds: e.categoryIds,
+							venueId: e.venueId,
+							seriesId: e.seriesId,
+						}));
+
+					return { events: upcoming };
+				} catch (error) {
+					ctx.log.error(`Widget upcoming error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/widget/embed-code
+		 * Returns HTML/JS embed snippet for embedding upcoming events widget.
+		 *
+		 * Returns: { embedCode: string }
+		 */
+		widgetEmbedCode: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const siteUrl = String(input.siteUrl ?? (ctx as unknown as Record<string, unknown>).siteUrl ?? "https://example.com").trim();
+
+					const embedCode = `<!-- EventDash Upcoming Events Widget -->
+<div id="eventdash-widget"></div>
+<script>
+(function() {
+  var container = document.getElementById('eventdash-widget');
+  fetch('${siteUrl}/api/plugins/eventdash/widget/upcoming')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data.events || data.events.length === 0) {
+        container.innerHTML = '<p>No upcoming events.</p>';
+        return;
+      }
+      var html = '<div style="font-family:sans-serif;max-width:400px;">';
+      html += '<h3 style="margin-bottom:12px;">Upcoming Events</h3>';
+      data.events.forEach(function(e) {
+        html += '<div style="border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:8px;">';
+        html += '<strong>' + e.title + '</strong><br>';
+        html += '<span style="color:#6b7280;font-size:0.9em;">' + e.date + ' at ' + e.time + '</span><br>';
+        html += '<span style="color:#6b7280;font-size:0.9em;">' + e.location + '</span><br>';
+        var spots = e.spotsRemaining;
+        html += '<span style="color:' + (spots > 0 ? '#059669' : '#dc2626') + ';font-size:0.85em;">';
+        html += spots > 0 ? spots + ' spots left' : 'Full';
+        html += '</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    })
+    .catch(function() {
+      container.innerHTML = '<p>Unable to load events.</p>';
+    });
+})();
+</script>`;
+
+					return { embedCode };
+				} catch (error) {
+					ctx.log.error(`Widget embed code error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /eventdash/waitlist/join
+		 * Public. Join waitlist for a full event.
+		 *
+		 * Body: { email, eventId, name? }
+		 * Returns: { success: true, message: string }
+		 */
+		waitlistJoin: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const email = String(input.email ?? "").trim().toLowerCase();
+					const eventId = String(input.eventId ?? "").trim();
+					const name = String(input.name ?? "").trim();
+
+					if (!email || !isValidEmail(email)) {
+						throw new Response(
+							JSON.stringify({ error: "Valid email is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!eventId) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Verify event exists
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					if (!eventJson) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Check if already on waitlist
+					const existingKey = `waitlist-notify:${eventId}:${emailToKvKey(email)}`;
+					const existing = await ctx.kv.get<string>(existingKey);
+					if (existing) {
+						return { success: true, message: "Already on waitlist" };
+					}
+
+					// Store waitlist notification entry
+					const record: WaitlistNotificationRecord = {
+						email,
+						eventId,
+						createdAt: new Date().toISOString(),
+						notified: false,
+					};
+					await ctx.kv.set(existingKey, JSON.stringify(record));
+
+					// Add to event's waitlist notification list
+					const listKey = `waitlist-notify:${eventId}:list`;
+					const listJson = await ctx.kv.get<string>(listKey);
+					const emails = parseJSON<string[]>(listJson, []);
+					if (!emails.includes(email)) {
+						emails.push(email);
+						await ctx.kv.set(listKey, JSON.stringify(emails));
+					}
+
+					// Also add to the standard waitlist if not already there
+					const waitlist = await getWaitlist(ctx, eventId);
+					const alreadyWaitlisted = waitlist.some((w) => w.email === email);
+					if (!alreadyWaitlisted) {
+						const newEntry: WaitlistRecord = {
+							email,
+							name: name || email,
+							createdAt: new Date().toISOString(),
+							position: waitlist.length + 1,
+						};
+						waitlist.push(newEntry);
+						await ctx.kv.set(`waitlist:${eventId}`, JSON.stringify(waitlist));
+					}
+
+					ctx.log.info(`Waitlist join: ${email} for event ${eventId}`);
+
+					return { success: true, message: "Added to waitlist. You will be notified when a spot opens." };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Waitlist join error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/waitlist/:eventId
+		 * Admin lists waitlisted people for an event.
+		 *
+		 * Returns: { waitlist: WaitlistNotificationRecord[], total: number }
+		 */
+		waitlistAdminList: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const eventId = String((rc.pathParams as Record<string, unknown>)?.eventId ?? "").trim();
+
+					if (!eventId) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const listKey = `waitlist-notify:${eventId}:list`;
+					const listJson = await ctx.kv.get<string>(listKey);
+					const emailList = parseJSON<string[]>(listJson, []);
+
+					const records: WaitlistNotificationRecord[] = [];
+					for (const email of emailList) {
+						const recJson = await ctx.kv.get<string>(`waitlist-notify:${eventId}:${emailToKvKey(email)}`);
+						if (recJson) {
+							const rec = parseJSON<WaitlistNotificationRecord>(recJson, null);
+							if (rec) records.push(rec);
+						}
+					}
+
+					// Sort by created date
+					records.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+					return { waitlist: records, total: records.length };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Waitlist list error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /eventdash/waitlist/notify
+		 * Admin manually triggers notification for first waitlisted person.
+		 *
+		 * Body: { eventId }
+		 * Returns: { success: true, notifiedEmail?: string, message: string }
+		 */
+		waitlistNotify: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const eventId = String(input.eventId ?? "").trim();
+
+					if (!eventId) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get event
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					if (!eventJson) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get notification waitlist
+					const listKey = `waitlist-notify:${eventId}:list`;
+					const listJson = await ctx.kv.get<string>(listKey);
+					const emailList = parseJSON<string[]>(listJson, []);
+
+					// Find first un-notified person
+					let notifiedEmail: string | null = null;
+					for (const email of emailList) {
+						const recKey = `waitlist-notify:${eventId}:${emailToKvKey(email)}`;
+						const recJson = await ctx.kv.get<string>(recKey);
+						if (!recJson) continue;
+						const rec = parseJSON<WaitlistNotificationRecord>(recJson, null);
+						if (!rec || rec.notified) continue;
+
+						// Send notification email
+						const siteUrl = String((ctx as unknown as Record<string, unknown>).siteUrl ?? "https://example.com");
+						const registerLink = `${siteUrl}/events/${eventId}/register?email=${encodeURIComponent(email)}`;
+						const promotionEmailHTML = generateWaitlistPromotionEmailHTML(
+							email,
+							event.title,
+							registerLink
+						);
+						await sendEmail(ctx, {
+							to: email,
+							subject: `A spot opened up — ${event.title}`,
+							html: promotionEmailHTML,
+						});
+
+						// Mark as notified
+						rec.notified = true;
+						rec.notifiedAt = new Date().toISOString();
+						await ctx.kv.set(recKey, JSON.stringify(rec));
+
+						notifiedEmail = email;
+						ctx.log.info(`Waitlist notification sent: ${email} for event ${eventId}`);
+						break;
+					}
+
+					if (!notifiedEmail) {
+						return { success: true, message: "No un-notified people on waitlist" };
+					}
+
+					return { success: true, notifiedEmail, message: `Notification sent to ${notifiedEmail}` };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Waitlist notify error: ${String(error)}`);
 					throw new Response(
 						JSON.stringify({ error: "Internal server error" }),
 						{ status: 500, headers: { "Content-Type": "application/json" } }
