@@ -420,9 +420,15 @@ export default definePlugin({
 					let events = await getAllEventsWithDates(ctx);
 
 					// Filter to upcoming events if requested
+					// Multi-day events are included if their end date is still in the future
 					if (upcomingOnly) {
 						const now = new Date();
 						events = events.filter((e) => {
+							if (e.endDate) {
+								// Multi-day: show if end date is today or later
+								const endDateTime = dateTimeToTimestamp(e.endDate, e.endTime || "23:59");
+								return endDateTime > now.getTime();
+							}
 							const eventTime = dateTimeToTimestamp(e.date, e.time);
 							return eventTime > now.getTime();
 						});
@@ -712,7 +718,8 @@ export default definePlugin({
 								freshEvent.date,
 								freshEvent.time,
 								freshEvent.endTime,
-								freshEvent.location
+								freshEvent.location,
+								freshEvent.endDate
 							);
 
 							let emailHTML: string;
@@ -1523,7 +1530,8 @@ export default definePlugin({
 											evt.date,
 											evt.time,
 											evt.endTime,
-											evt.location
+											evt.location,
+											evt.endDate
 										);
 
 										const price = registration.amountPaid || 0;
@@ -4951,6 +4959,263 @@ END:VCALENDAR`;
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Waitlist notify error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /eventdash/import/attendees
+		 * Admin. Bulk import attendees from CSV data.
+		 *
+		 * Body: { eventId: string, csv: string, dryRun?: boolean }
+		 *   - eventId: target event ID
+		 *   - csv: CSV string with header row (name, email, ticket_type)
+		 *   - dryRun: if true, validate only without importing
+		 *
+		 * Returns: { dryRun: boolean, imported: number, skipped: number, errors: Array<{ row: number, message: string }>, total: number }
+		 */
+		importAttendees: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const eventId = String(input.eventId ?? "").trim();
+					const csvData = String(input.csv ?? "").trim();
+					const dryRun = input.dryRun === true || input.dryRun === "true";
+
+					// Validate eventId
+					if (!eventId || eventId.length > 128) {
+						throw new Response(
+							JSON.stringify({ error: "Valid eventId is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Validate CSV data present
+					if (!csvData) {
+						throw new Response(
+							JSON.stringify({ error: "CSV data is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Verify event exists
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					if (!eventJson) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Parse CSV lines
+					const lines = csvData.split(/\r?\n/).filter((line) => line.trim() !== "");
+					if (lines.length < 2) {
+						throw new Response(
+							JSON.stringify({ error: "CSV must contain a header row and at least one data row" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Validate header row
+					const headerLine = lines[0].toLowerCase().trim();
+					const csvHeaders = headerLine.split(",").map((h) => h.trim().replace(/^"|"$/g, ""));
+					const nameIdx = csvHeaders.indexOf("name");
+					const emailIdx = csvHeaders.indexOf("email");
+					const ticketTypeIdx = csvHeaders.indexOf("ticket_type");
+
+					if (nameIdx === -1 || emailIdx === -1) {
+						throw new Response(
+							JSON.stringify({ error: "CSV header must include 'name' and 'email' columns. Optional: 'ticket_type'" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Simple CSV field parser that handles quoted fields
+					const parseCsvRow = (line: string): string[] => {
+						const fields: string[] = [];
+						let current = "";
+						let inQuotes = false;
+						for (let i = 0; i < line.length; i++) {
+							const ch = line[i];
+							if (inQuotes) {
+								if (ch === '"') {
+									if (i + 1 < line.length && line[i + 1] === '"') {
+										current += '"';
+										i++; // skip escaped quote
+									} else {
+										inQuotes = false;
+									}
+								} else {
+									current += ch;
+								}
+							} else {
+								if (ch === '"') {
+									inQuotes = true;
+								} else if (ch === ",") {
+									fields.push(current.trim());
+									current = "";
+								} else {
+									current += ch;
+								}
+							}
+						}
+						fields.push(current.trim());
+						return fields;
+					};
+
+					// Get existing attendees list for tracking
+					const attendeesListJson = await ctx.kv.get<string>("event-attendees:list");
+					const attendeesList = parseJSON<string[]>(attendeesListJson, []);
+
+					// Track results
+					let imported = 0;
+					let skipped = 0;
+					const importErrors: Array<{ row: number; message: string }> = [];
+					const toImport: Array<{ name: string; email: string; ticketType: string }> = [];
+
+					// Validate all rows first, then import
+					const spotsAvailable = event.capacity - event.registered;
+					let newRegistrations = 0;
+
+					for (let i = 1; i < lines.length; i++) {
+						const rowNum = i + 1; // 1-based, accounting for header
+						const fields = parseCsvRow(lines[i]);
+
+						const name = (fields[nameIdx] ?? "").trim();
+						const email = (fields[emailIdx] ?? "").trim().toLowerCase();
+						const ticketType = ticketTypeIdx !== -1 ? (fields[ticketTypeIdx] ?? "").trim() : "";
+
+						// Validate name
+						if (!name) {
+							importErrors.push({ row: rowNum, message: "Name is required" });
+							continue;
+						}
+						if (name.length > 100) {
+							importErrors.push({ row: rowNum, message: "Name must be 100 characters or less" });
+							continue;
+						}
+
+						// Validate email
+						if (!email) {
+							importErrors.push({ row: rowNum, message: "Email is required" });
+							continue;
+						}
+						if (!isValidEmail(email)) {
+							importErrors.push({ row: rowNum, message: `Invalid email format: ${email}` });
+							continue;
+						}
+						if (email.length > 254) {
+							importErrors.push({ row: rowNum, message: "Email must be 254 characters or less" });
+							continue;
+						}
+
+						// Check for duplicate registration in this event
+						const regKey = `registration:${eventId}:${emailToKvKey(email)}`;
+						const existingReg = await ctx.kv.get<string>(regKey);
+						if (existingReg) {
+							const existing = parseJSON<RegistrationRecord>(existingReg, null);
+							if (existing && existing.status === "registered") {
+								skipped++;
+								continue;
+							}
+						}
+
+						// Check capacity
+						if (newRegistrations + 1 > spotsAvailable) {
+							importErrors.push({ row: rowNum, message: "Event capacity exceeded" });
+							continue;
+						}
+
+						newRegistrations++;
+						toImport.push({ name, email, ticketType });
+					}
+
+					// If dry run, return validation results without importing
+					if (dryRun) {
+						return {
+							dryRun: true,
+							imported: toImport.length,
+							skipped,
+							errors: importErrors,
+							total: lines.length - 1,
+						};
+					}
+
+					// Perform the actual import
+					const now = new Date().toISOString();
+
+					for (const row of toImport) {
+						const registration: RegistrationRecord = {
+							email: row.email,
+							name: row.name,
+							status: "registered",
+							ticketCount: 1,
+							createdAt: now,
+							checkInCode: generateCheckInCode(),
+							checkedIn: false,
+						};
+
+						if (row.ticketType) {
+							registration.ticketType = row.ticketType;
+						}
+
+						const regKey = `registration:${eventId}:${emailToKvKey(row.email)}`;
+						await ctx.kv.set(regKey, JSON.stringify(registration));
+
+						// Track attendee in global list
+						const encodedEmail = emailToKvKey(row.email);
+						if (!attendeesList.includes(encodedEmail)) {
+							attendeesList.push(encodedEmail);
+						}
+
+						imported++;
+					}
+
+					// Update attendees list and event registered count
+					if (imported > 0) {
+						await ctx.kv.set("event-attendees:list", JSON.stringify(attendeesList));
+
+						const freshEventJson = await ctx.kv.get<string>(`event:${eventId}`);
+						const freshEvent = parseJSON<EventRecord>(freshEventJson, null);
+						if (freshEvent) {
+							freshEvent.registered += imported;
+							await ctx.kv.set(`event:${eventId}`, JSON.stringify(freshEvent));
+						}
+					}
+
+					ctx.log.info(`CSV import for event ${eventId}: ${imported} imported, ${skipped} skipped, ${importErrors.length} errors`);
+
+					return {
+						dryRun: false,
+						imported,
+						skipped,
+						errors: importErrors,
+						total: lines.length - 1,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`CSV import error: ${String(error)}`);
 					throw new Response(
 						JSON.stringify({ error: "Internal server error" }),
 						{ status: 500, headers: { "Content-Type": "application/json" } }
