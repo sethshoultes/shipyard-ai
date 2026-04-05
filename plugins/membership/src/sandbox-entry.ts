@@ -7,6 +7,18 @@ import {
 	createPayload,
 	type JWTPayload,
 } from "./auth";
+import {
+	createWelcomeTemplate,
+	createPaymentReceiptTemplate,
+	createRenewalReminderTemplate,
+	createPaymentFailedTemplate,
+	createExpiringTemplate,
+	createCancellationTemplate,
+	createUpgradeTemplate,
+	sendMembershipEmail,
+	checkEmailRateLimit,
+	type EmailVariables,
+} from "./email";
 
 /**
  * Type definitions
@@ -402,45 +414,302 @@ async function handleCheckoutCompleted(
 
 /**
  * Email helpers (async, non-blocking)
+ * These functions send emails via Resend or ctx.email provider
  */
+
 async function sendWelcomeEmail(
 	member: MemberRecord,
-	_ctx: PluginContext
+	ctx: PluginContext
 ): Promise<void> {
-	// Placeholder - will integrate with Resend in Task 9
-	return Promise.resolve();
+	try {
+		// Check rate limit to prevent duplicate emails
+		const canSend = await checkEmailRateLimit(member.email, "welcome", ctx);
+		if (!canSend) {
+			ctx.log.info(
+				`Skipped welcome email for ${member.email}: rate limited`
+			);
+			return;
+		}
+
+		// Get plans to pull features
+		const plansJson = await ctx.kv.get<string>("plans");
+		const plans = parseJSON<PlanConfig[]>(plansJson, DEFAULT_PLANS);
+		const plan = plans.find((p) => p.id === member.plan);
+
+		// Fetch site config for name and portal link
+		const siteNameKey = "settings:siteName";
+		const portalLinkKey = "settings:portalLink";
+		const siteName = await ctx.kv.get<string>(siteNameKey);
+		const portalLink = await ctx.kv.get<string>(portalLinkKey);
+
+		const vars: EmailVariables = {
+			memberEmail: member.email,
+			memberName:
+				member.email.split("@")[0].charAt(0).toUpperCase() +
+				member.email.split("@")[0].slice(1),
+			planName: plan?.name || member.plan,
+			siteName: siteName || "our community",
+			price: plan?.price,
+			renewalDate: member.currentPeriodEnd || member.expiresAt,
+			features: plan?.features,
+			portalLink: portalLink || "your account dashboard",
+		};
+
+		const template = createWelcomeTemplate(vars);
+		await sendMembershipEmail(template, member.email, ctx);
+	} catch (error) {
+		ctx.log.error(`sendWelcomeEmail error: ${String(error)}`);
+	}
 }
 
 async function sendUpdateEmail(
 	member: MemberRecord,
-	_ctx: PluginContext
+	ctx: PluginContext
 ): Promise<void> {
-	// Placeholder - will integrate with Resend in Task 9
-	return Promise.resolve();
+	try {
+		// Check rate limit
+		const canSend = await checkEmailRateLimit(member.email, "upgrade", ctx);
+		if (!canSend) {
+			ctx.log.info(`Skipped upgrade email for ${member.email}: rate limited`);
+			return;
+		}
+
+		// Get plans
+		const plansJson = await ctx.kv.get<string>("plans");
+		const plans = parseJSON<PlanConfig[]>(plansJson, DEFAULT_PLANS);
+		const plan = plans.find((p) => p.id === member.plan);
+
+		// Fetch site config
+		const siteName = await ctx.kv.get<string>("settings:siteName");
+		const portalLink = await ctx.kv.get<string>("settings:portalLink");
+
+		const vars: EmailVariables = {
+			memberEmail: member.email,
+			memberName:
+				member.email.split("@")[0].charAt(0).toUpperCase() +
+				member.email.split("@")[0].slice(1),
+			planName: plan?.name || member.plan,
+			siteName: siteName || "our community",
+			price: plan?.price,
+			renewalDate: member.currentPeriodEnd,
+			features: plan?.features,
+			portalLink: portalLink || "your account dashboard",
+		};
+
+		const template = createUpgradeTemplate(vars);
+		await sendMembershipEmail(template, member.email, ctx);
+	} catch (error) {
+		ctx.log.error(`sendUpdateEmail error: ${String(error)}`);
+	}
 }
 
 async function sendCancelledEmail(
 	member: MemberRecord,
-	_ctx: PluginContext
+	ctx: PluginContext
 ): Promise<void> {
-	// Placeholder - will integrate with Resend in Task 9
-	return Promise.resolve();
+	try {
+		// Check rate limit
+		const canSend = await checkEmailRateLimit(member.email, "cancelled", ctx);
+		if (!canSend) {
+			ctx.log.info(
+				`Skipped cancellation email for ${member.email}: rate limited`
+			);
+			return;
+		}
+
+		// Get plans
+		const plansJson = await ctx.kv.get<string>("plans");
+		const plans = parseJSON<PlanConfig[]>(plansJson, DEFAULT_PLANS);
+		const plan = plans.find((p) => p.id === member.plan);
+
+		// Fetch site config
+		const siteName = await ctx.kv.get<string>("settings:siteName");
+		const portalLink = await ctx.kv.get<string>("settings:portalLink");
+
+		const vars: EmailVariables = {
+			memberEmail: member.email,
+			memberName:
+				member.email.split("@")[0].charAt(0).toUpperCase() +
+				member.email.split("@")[0].slice(1),
+			planName: plan?.name || member.plan,
+			siteName: siteName || "our community",
+			expiryDate: new Date().toISOString(),
+			portalLink: portalLink || "your account dashboard",
+		};
+
+		const template = createCancellationTemplate(vars);
+		await sendMembershipEmail(template, member.email, ctx);
+	} catch (error) {
+		ctx.log.error(`sendCancelledEmail error: ${String(error)}`);
+	}
 }
 
 async function sendPaymentFailedEmail(
 	member: MemberRecord,
-	_ctx: PluginContext
+	ctx: PluginContext
 ): Promise<void> {
-	// Placeholder - will integrate with Resend in Task 9
-	return Promise.resolve();
+	try {
+		// Check rate limit
+		const canSend = await checkEmailRateLimit(member.email, "payment_failed", ctx);
+		if (!canSend) {
+			ctx.log.info(
+				`Skipped payment failed email for ${member.email}: rate limited`
+			);
+			return;
+		}
+
+		// Get plans
+		const plansJson = await ctx.kv.get<string>("plans");
+		const plans = parseJSON<PlanConfig[]>(plansJson, DEFAULT_PLANS);
+		const plan = plans.find((p) => p.id === member.plan);
+
+		// Fetch site config
+		const siteName = await ctx.kv.get<string>("settings:siteName");
+		const portalLink = await ctx.kv.get<string>("settings:portalLink");
+
+		// Calculate next retry date (3 days from now)
+		const nextRetry = new Date();
+		nextRetry.setDate(nextRetry.getDate() + 3);
+
+		const vars: EmailVariables = {
+			memberEmail: member.email,
+			memberName:
+				member.email.split("@")[0].charAt(0).toUpperCase() +
+				member.email.split("@")[0].slice(1),
+			planName: plan?.name || member.plan,
+			siteName: siteName || "our community",
+			nextRetryDate: nextRetry.toISOString(),
+			portalLink: portalLink || "your account dashboard",
+		};
+
+		const template = createPaymentFailedTemplate(vars);
+		await sendMembershipEmail(template, member.email, ctx);
+	} catch (error) {
+		ctx.log.error(`sendPaymentFailedEmail error: ${String(error)}`);
+	}
 }
 
 async function sendPaymentReceivedEmail(
 	member: MemberRecord,
-	_ctx: PluginContext
+	ctx: PluginContext
 ): Promise<void> {
-	// Placeholder - will integrate with Resend in Task 9
-	return Promise.resolve();
+	try {
+		// Check rate limit
+		const canSend = await checkEmailRateLimit(member.email, "payment_received", ctx);
+		if (!canSend) {
+			ctx.log.info(
+				`Skipped payment received email for ${member.email}: rate limited`
+			);
+			return;
+		}
+
+		// Get plans
+		const plansJson = await ctx.kv.get<string>("plans");
+		const plans = parseJSON<PlanConfig[]>(plansJson, DEFAULT_PLANS);
+		const plan = plans.find((p) => p.id === member.plan);
+
+		// Fetch site config
+		const siteName = await ctx.kv.get<string>("settings:siteName");
+		const portalLink = await ctx.kv.get<string>("settings:portalLink");
+
+		const vars: EmailVariables = {
+			memberEmail: member.email,
+			memberName:
+				member.email.split("@")[0].charAt(0).toUpperCase() +
+				member.email.split("@")[0].slice(1),
+			planName: plan?.name || member.plan,
+			siteName: siteName || "our community",
+			amount: plan?.price,
+			renewalDate: member.currentPeriodEnd,
+			portalLink: portalLink || "your account dashboard",
+		};
+
+		const template = createPaymentReceiptTemplate(vars);
+		await sendMembershipEmail(template, member.email, ctx);
+	} catch (error) {
+		ctx.log.error(`sendPaymentReceivedEmail error: ${String(error)}`);
+	}
+}
+
+async function sendRenewalReminderEmail(
+	member: MemberRecord,
+	ctx: PluginContext
+): Promise<void> {
+	try {
+		// Check rate limit
+		const canSend = await checkEmailRateLimit(member.email, "renewal_reminder", ctx);
+		if (!canSend) {
+			ctx.log.info(
+				`Skipped renewal reminder email for ${member.email}: rate limited`
+			);
+			return;
+		}
+
+		// Get plans
+		const plansJson = await ctx.kv.get<string>("plans");
+		const plans = parseJSON<PlanConfig[]>(plansJson, DEFAULT_PLANS);
+		const plan = plans.find((p) => p.id === member.plan);
+
+		// Fetch site config
+		const siteName = await ctx.kv.get<string>("settings:siteName");
+		const portalLink = await ctx.kv.get<string>("settings:portalLink");
+
+		const vars: EmailVariables = {
+			memberEmail: member.email,
+			memberName:
+				member.email.split("@")[0].charAt(0).toUpperCase() +
+				member.email.split("@")[0].slice(1),
+			planName: plan?.name || member.plan,
+			siteName: siteName || "our community",
+			price: plan?.price,
+			renewalDate: member.currentPeriodEnd,
+			portalLink: portalLink || "your account dashboard",
+		};
+
+		const template = createRenewalReminderTemplate(vars);
+		await sendMembershipEmail(template, member.email, ctx);
+	} catch (error) {
+		ctx.log.error(`sendRenewalReminderEmail error: ${String(error)}`);
+	}
+}
+
+async function sendExpiringEmail(
+	member: MemberRecord,
+	ctx: PluginContext
+): Promise<void> {
+	try {
+		// Check rate limit
+		const canSend = await checkEmailRateLimit(member.email, "expiring", ctx);
+		if (!canSend) {
+			ctx.log.info(`Skipped expiring email for ${member.email}: rate limited`);
+			return;
+		}
+
+		// Get plans
+		const plansJson = await ctx.kv.get<string>("plans");
+		const plans = parseJSON<PlanConfig[]>(plansJson, DEFAULT_PLANS);
+		const plan = plans.find((p) => p.id === member.plan);
+
+		// Fetch site config
+		const siteName = await ctx.kv.get<string>("settings:siteName");
+		const portalLink = await ctx.kv.get<string>("settings:portalLink");
+
+		const vars: EmailVariables = {
+			memberEmail: member.email,
+			memberName:
+				member.email.split("@")[0].charAt(0).toUpperCase() +
+				member.email.split("@")[0].slice(1),
+			planName: plan?.name || member.plan,
+			siteName: siteName || "our community",
+			expiryDate: member.expiresAt || member.currentPeriodEnd,
+			portalLink: portalLink || "your account dashboard",
+		};
+
+		const template = createExpiringTemplate(vars);
+		await sendMembershipEmail(template, member.email, ctx);
+	} catch (error) {
+		ctx.log.error(`sendExpiringEmail error: ${String(error)}`);
+	}
 }
 
 /**
@@ -489,6 +758,16 @@ export default definePlugin({
 				// Initialize with default plans
 				await ctx.kv.set("plans", JSON.stringify(DEFAULT_PLANS));
 				await ctx.kv.set("settings:requirePaymentApproval", "true");
+
+				// Initialize email settings (can be customized via admin)
+				await ctx.kv.set("settings:siteName", "our community");
+				await ctx.kv.set(
+					"settings:portalLink",
+					"https://account.example.com/billing"
+				);
+				await ctx.kv.set("settings:emailFrom", "noreply@example.com");
+
+				ctx.log.info("Email settings initialized");
 			},
 		},
 	},
@@ -993,6 +1272,334 @@ export default definePlugin({
 				} catch (error) {
 					ctx.log.error(`Webhook handler error: ${String(error)}`);
 					return { received: true };
+				}
+			},
+		},
+
+		/**
+		 * GET /membership/dashboard
+		 * Get member dashboard data (subscription details).
+		 *
+		 * Requires: JWT token from cookie
+		 * Returns: { plan, price, interval, renewalDate, paymentMethod, cancelAtPeriodEnd, status }
+		 */
+		dashboard: {
+			public: false,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const headers = rc.headers as Record<string, string> | undefined;
+					const authHeader = headers?.["authorization"] || headers?.["cookie"];
+
+					// Extract token from header or cookie
+					let token: string | null = null;
+					if (authHeader) {
+						if (authHeader.startsWith("Bearer ")) {
+							token = extractToken(authHeader);
+						} else if (authHeader.includes("Authorization=")) {
+							// Parse from cookie format
+							const match = authHeader.match(/Authorization=([^;]+)/);
+							if (match) {
+								token = decodeURIComponent(match[1]);
+							}
+						}
+					}
+
+					if (!token) {
+						throw new Response(
+							JSON.stringify({ error: "Unauthorized" }),
+							{ status: 401, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Verify JWT
+					const jwtSecret = (ctx as any).env?.JWT_SECRET as string | undefined;
+					if (!jwtSecret) {
+						throw new Response(
+							JSON.stringify({ error: "JWT secret not configured" }),
+							{ status: 500, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const payload = await verifyJWT(token, jwtSecret);
+					if (!payload) {
+						throw new Response(
+							JSON.stringify({ error: "Invalid or expired token" }),
+							{ status: 401, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get member from KV
+					const encodedEmail = emailToKvKey(payload.email);
+					const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
+					if (!memberJson) {
+						throw new Response(
+							JSON.stringify({ error: "Member not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const member = parseJSON<MemberRecord>(memberJson, null);
+					if (!member) {
+						throw new Response(
+							JSON.stringify({ error: "Member not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get plan details
+					const plansJson = await ctx.kv.get<string>("plans");
+					const plans = parseJSON(plansJson, DEFAULT_PLANS);
+					const plan = plans.find((p: PlanConfig) => p.id === member.plan);
+
+					if (!plan) {
+						throw new Response(
+							JSON.stringify({ error: "Plan not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					return {
+						email: member.email,
+						plan: plan.name,
+						planId: plan.id,
+						price: plan.price,
+						interval: plan.interval,
+						currentPeriodEnd: member.currentPeriodEnd || member.expiresAt,
+						status: member.status,
+						cancelAtPeriodEnd: member.cancelAtPeriodEnd || false,
+						stripePaymentMethod: member.stripePaymentMethod,
+						stripeSubscriptionId: member.stripeSubscriptionId,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Dashboard error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /membership/dashboard/cancel
+		 * Cancel subscription at period end.
+		 *
+		 * Requires: JWT token from cookie
+		 * Returns: { success: true, cancelDate: string }
+		 */
+		dashboardCancel: {
+			public: false,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const headers = rc.headers as Record<string, string> | undefined;
+					const authHeader = headers?.["authorization"] || headers?.["cookie"];
+
+					// Extract token
+					let token: string | null = null;
+					if (authHeader) {
+						if (authHeader.startsWith("Bearer ")) {
+							token = extractToken(authHeader);
+						} else if (authHeader.includes("Authorization=")) {
+							const match = authHeader.match(/Authorization=([^;]+)/);
+							if (match) {
+								token = decodeURIComponent(match[1]);
+							}
+						}
+					}
+
+					if (!token) {
+						throw new Response(
+							JSON.stringify({ error: "Unauthorized" }),
+							{ status: 401, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Verify JWT
+					const jwtSecret = (ctx as any).env?.JWT_SECRET as string | undefined;
+					if (!jwtSecret) {
+						throw new Response(
+							JSON.stringify({ error: "JWT secret not configured" }),
+							{ status: 500, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const payload = await verifyJWT(token, jwtSecret);
+					if (!payload) {
+						throw new Response(
+							JSON.stringify({ error: "Invalid or expired token" }),
+							{ status: 401, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get member
+					const encodedEmail = emailToKvKey(payload.email);
+					const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
+					if (!memberJson) {
+						throw new Response(
+							JSON.stringify({ error: "Member not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const member = parseJSON<MemberRecord>(memberJson, null);
+					if (!member) {
+						throw new Response(
+							JSON.stringify({ error: "Member not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Update member to mark for cancellation
+					member.cancelAtPeriodEnd = true;
+					member.status = "active"; // Keep active until period end
+					member.lastSyncAt = new Date().toISOString();
+
+					await ctx.kv.set(`member:${encodedEmail}`, JSON.stringify(member));
+					ctx.log.info(`Subscription cancelled at period end for ${member.email}`);
+
+					return {
+						success: true,
+						cancelDate: member.currentPeriodEnd || member.expiresAt,
+						message: `Your subscription will be cancelled on ${member.currentPeriodEnd || member.expiresAt}. You'll maintain access until then.`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Dashboard cancel error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /membership/dashboard/upgrade
+		 * Upgrade to a different plan.
+		 *
+		 * Requires: JWT token from cookie
+		 * Expects: { newPlanId: string }
+		 * Returns: { success: true, newPlan: string, newPrice: number }
+		 */
+		dashboardUpgrade: {
+			public: false,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const headers = rc.headers as Record<string, string> | undefined;
+					const authHeader = headers?.["authorization"] || headers?.["cookie"];
+					const input = rc.input as Record<string, unknown>;
+
+					// Extract token
+					let token: string | null = null;
+					if (authHeader) {
+						if (authHeader.startsWith("Bearer ")) {
+							token = extractToken(authHeader);
+						} else if (authHeader.includes("Authorization=")) {
+							const match = authHeader.match(/Authorization=([^;]+)/);
+							if (match) {
+								token = decodeURIComponent(match[1]);
+							}
+						}
+					}
+
+					if (!token) {
+						throw new Response(
+							JSON.stringify({ error: "Unauthorized" }),
+							{ status: 401, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Verify JWT
+					const jwtSecret = (ctx as any).env?.JWT_SECRET as string | undefined;
+					if (!jwtSecret) {
+						throw new Response(
+							JSON.stringify({ error: "JWT secret not configured" }),
+							{ status: 500, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const payload = await verifyJWT(token, jwtSecret);
+					if (!payload) {
+						throw new Response(
+							JSON.stringify({ error: "Invalid or expired token" }),
+							{ status: 401, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const newPlanId = String(input.newPlanId ?? "").trim();
+					if (!newPlanId) {
+						throw new Response(
+							JSON.stringify({ error: "New plan ID is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get member
+					const encodedEmail = emailToKvKey(payload.email);
+					const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
+					if (!memberJson) {
+						throw new Response(
+							JSON.stringify({ error: "Member not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const member = parseJSON<MemberRecord>(memberJson, null);
+					if (!member) {
+						throw new Response(
+							JSON.stringify({ error: "Member not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get plans
+					const plansJson = await ctx.kv.get<string>("plans");
+					const plans = parseJSON(plansJson, DEFAULT_PLANS);
+
+					const newPlan = plans.find((p: PlanConfig) => p.id === newPlanId);
+					if (!newPlan) {
+						throw new Response(
+							JSON.stringify({ error: "Plan not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const currentPlan = plans.find((p: PlanConfig) => p.id === member.plan);
+					if (!currentPlan) {
+						throw new Response(
+							JSON.stringify({ error: "Current plan not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Update member plan
+					member.plan = newPlanId;
+					member.lastSyncAt = new Date().toISOString();
+					member.cancelAtPeriodEnd = false; // Clear cancellation flag on upgrade
+
+					await ctx.kv.set(`member:${encodedEmail}`, JSON.stringify(member));
+					ctx.log.info(`Member upgraded from ${currentPlan.id} to ${newPlanId}: ${member.email}`);
+
+					return {
+						success: true,
+						newPlan: newPlan.name,
+						newPlanId: newPlan.id,
+						newPrice: newPlan.price,
+						interval: newPlan.interval,
+						priceDifference: newPlan.price - currentPlan.price,
+						message: `Successfully upgraded to ${newPlan.name}. Your new price is $${(newPlan.price / 100).toFixed(2)}/${newPlan.interval}.`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Dashboard upgrade error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
 				}
 			},
 		},
