@@ -1,0 +1,95 @@
+---
+import { getEmDashEntry } from "emdash";
+import Base from "../layouts/Base.astro";
+import MarketingBlocks from "../components/MarketingBlocks.astro";
+
+const { entry: page, cacheHint } = await getEmDashEntry("pages", "pricing");
+
+try {
+	Astro.cache.set(cacheHint);
+} catch {}
+
+const pageContent = page?.data.content;
+
+// Handle Stripe Checkout return states
+const url = new URL(Astro.request.url);
+const checkoutSuccess = url.searchParams.get("success") === "true";
+const checkoutCancelled = url.searchParams.get("cancelled") === "true";
+---
+
+<Base
+	title="Pricing & Memberships"
+	description="Flexible pricing for every practice. Drop-in at $20/class, Monthly Unlimited at $99/month, or Annual Unlimited at $899/year. First class is always free."
+>
+	{checkoutSuccess && (
+		<div class="checkout-banner checkout-success">
+			<div class="container">
+				<p>Welcome to Sunrise Yoga! Your membership is active. Check your email for confirmation details.</p>
+			</div>
+		</div>
+	)}
+
+	{checkoutCancelled && (
+		<div class="checkout-banner checkout-cancelled">
+			<div class="container">
+				<p>Checkout was cancelled. No worries — you can sign up anytime. <a href="/contact">Questions? Contact us.</a></p>
+			</div>
+		</div>
+	)}
+
+	{
+		pageContent ? (
+			<MarketingBlocks value={pageContent} />
+		) : (
+			<div class="empty-state">
+				<h1>Pricing</h1>
+				<p>Add pricing content in the admin.</p>
+				<a href="/_emdash/admin" class="btn btn-primary">
+					Open Admin
+				</a>
+			</div>
+		)
+	}
+</Base>
+
+<style>
+	.checkout-banner {
+		padding: var(--spacing-md) 0;
+		text-align: center;
+		font-size: var(--font-size-sm);
+		font-weight: 500;
+	}
+
+	.checkout-success {
+		background: #e8f5e9;
+		color: #2e7d32;
+		border-bottom: 1px solid #c8e6c9;
+	}
+
+	.checkout-cancelled {
+		background: #fff3e0;
+		color: #e65100;
+		border-bottom: 1px solid #ffe0b2;
+	}
+
+	.checkout-cancelled a {
+		color: inherit;
+		text-decoration: underline;
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: var(--spacing-5xl) var(--spacing-lg);
+		max-width: var(--max-width);
+		margin: 0 auto;
+	}
+
+	.empty-state h1 {
+		margin-bottom: var(--spacing-md);
+	}
+
+	.empty-state p {
+		color: var(--color-muted);
+		margin-bottom: var(--spacing-xl);
+	}
+</style>

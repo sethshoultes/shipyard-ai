@@ -1,0 +1,59 @@
+{
+  "description": "EventDash seed data for Sunrise Yoga Studio. Apply via admin API after site is running.",
+  "templates": [
+    {
+      "title": "Vinyasa Flow",
+      "description": "Dynamic, breath-linked movement that builds strength, flexibility, and focus. Led by Elena Rodriguez. All levels welcome. 60 minutes.",
+      "time": "07:00",
+      "endTime": "08:00",
+      "location": "Sunrise Yoga Studio — Main Room",
+      "capacity": 25,
+      "daysOfWeek": [1, 3, 5],
+      "instructor": "Elena Rodriguez",
+      "level": "All Levels",
+      "requiresPayment": true,
+      "dropInPrice": 2000
+    },
+    {
+      "title": "Yin & Restorative",
+      "description": "Slow, deep stretches held for minutes at a time. Perfect for recovery, stress relief, and finding stillness. Led by Marcus Chen. 75 minutes.",
+      "time": "18:00",
+      "endTime": "19:15",
+      "location": "Sunrise Yoga Studio — Quiet Room",
+      "capacity": 20,
+      "daysOfWeek": [2, 4],
+      "instructor": "Marcus Chen",
+      "level": "All Levels",
+      "requiresPayment": true,
+      "dropInPrice": 2000
+    },
+    {
+      "title": "Hot Yoga",
+      "description": "Practice in a heated room to deepen stretches, detoxify, and build endurance. Led by Jasmine Park. Bring water and a towel. 60 minutes.",
+      "time": "12:00",
+      "endTime": "13:00",
+      "location": "Sunrise Yoga Studio — Hot Room",
+      "capacity": 20,
+      "daysOfWeek": [1, 3, 5],
+      "instructor": "Jasmine Park",
+      "level": "Intermediate",
+      "requiresPayment": true,
+      "dropInPrice": 2000
+    },
+    {
+      "title": "Community Class",
+      "description": "Donation-based class open to everyone. A welcoming, inclusive practice for all bodies and all budgets. Led by rotating instructors. 60 minutes.",
+      "time": "10:00",
+      "endTime": "11:00",
+      "location": "Sunrise Yoga Studio — Main Room",
+      "capacity": 30,
+      "daysOfWeek": [6],
+      "instructor": "Rotating",
+      "level": "All Levels",
+      "requiresPayment": false,
+      "dropInPrice": 0
+    }
+  ],
+  "generateWeeks": 8,
+  "notes": "Run `node seed/seed-events.mjs` after the site is running to populate EventDash with recurring class instances."
+}
