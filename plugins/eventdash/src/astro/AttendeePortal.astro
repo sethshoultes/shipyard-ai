@@ -149,10 +149,10 @@ const pastCount = portalData.pastRegistrations.length;
 const totalCount = upcomingCount + pastCount;
 ---
 
-<div class="attendee-portal">
+<div class="attendee-portal" role="region" aria-label="Attendee portal">
 	<!-- Header -->
 	<div class="attendee-portal__header">
-		<h2 class="attendee-portal__title">{title}</h2>
+		<h2 class="attendee-portal__title" id="portal-title">{title}</h2>
 		{portalData.attendee?.name && (
 			<p class="attendee-portal__welcome">
 				Welcome back, <span class="attendee-portal__name">{portalData.attendee.name}</span>
@@ -167,9 +167,9 @@ const totalCount = upcomingCount + pastCount;
 
 	<!-- Error state -->
 	{error && (
-		<div class="attendee-portal__error">
+		<div class="attendee-portal__error" role="alert">
 			<p>{error}</p>
-			<a href="#retry" class="attendee-portal__retry-btn">Retry</a>
+			<a href="#retry" class="attendee-portal__retry-btn" aria-label="Retry loading events">Retry</a>
 		</div>
 	)}
 
@@ -181,7 +181,7 @@ const totalCount = upcomingCount + pastCount;
 			</h3>
 			<div class="attendee-portal__events-list">
 				{portalData.upcomingRegistrations.map((reg) => (
-					<div class="attendee-portal__event-card">
+					<article class="attendee-portal__event-card" aria-label={`Registration for ${reg.eventTitle}`}>
 						<div class="attendee-portal__event-header">
 							<div class="attendee-portal__event-info">
 								<h4 class="attendee-portal__event-title">{reg.eventTitle}</h4>
@@ -245,6 +245,7 @@ const totalCount = upcomingCount + pastCount;
 									data-event-time={reg.eventTime}
 									data-event-title={reg.eventTitle}
 									data-event-location={reg.eventLocation}
+									aria-label={`Add ${reg.eventTitle} to calendar`}
 								>
 									Add to Calendar
 								</button>
@@ -642,6 +643,13 @@ END:VCALENDAR`.trim()
 	.attendee-portal__event-link:hover,
 	.attendee-portal__event-ical:hover {
 		background-color: #b55939;
+	}
+
+	.attendee-portal__event-link:focus-visible,
+	.attendee-portal__event-ical:focus-visible {
+		outline: 2px solid #c4704b;
+		outline-offset: 2px;
+		box-shadow: 0 0 0 4px rgba(196, 112, 75, 0.2);
 	}
 
 	.attendee-portal__event-ical {

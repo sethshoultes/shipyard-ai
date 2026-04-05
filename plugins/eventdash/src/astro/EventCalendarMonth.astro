@@ -21,7 +21,8 @@
 interface EventRecord {
 	id: string;
 	title: string;
-	date: string; // ISO date YYYY-MM-DD
+	date: string; // ISO date YYYY-MM-DD (start date)
+	endDate?: string; // ISO date YYYY-MM-DD (end date for multi-day events)
 	time: string; // HH:MM format
 	location: string;
 	capacity: number;
@@ -97,7 +98,11 @@ function buildCalendarGrid(
  */
 function getEventsForDate(day: number, month: number, year: number): EventRecord[] {
 	const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-	return allEvents.filter((e) => e.date === dateStr);
+	return allEvents.filter((e) => {
+		const startDate = e.date;
+		const endDate = e.endDate || e.date;
+		return dateStr >= startDate && dateStr <= endDate;
+	});
 }
 
 /**
@@ -142,9 +147,9 @@ const today = new Date();
 const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 ---
 
-<div class="event-calendar-month">
+<div class="event-calendar-month" role="region" aria-label={`Event calendar for ${monthYearLabel}`}>
 	<!-- Header with navigation -->
-	<div class="event-calendar-month__header">
+	<nav class="event-calendar-month__header" aria-label="Calendar navigation">
 		<button
 			class="event-calendar-month__nav-btn"
 			data-action="prev-month"
@@ -152,7 +157,7 @@ const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart
 		>
 			← Prev
 		</button>
-		<h2 class="event-calendar-month__title">{monthYearLabel}</h2>
+		<h2 class="event-calendar-month__title" aria-live="polite">{monthYearLabel}</h2>
 		<button
 			class="event-calendar-month__nav-btn"
 			data-action="next-month"
@@ -160,17 +165,17 @@ const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart
 		>
 			Next →
 		</button>
-	</div>
+	</nav>
 
 	<!-- Day headers -->
-	<div class="event-calendar-month__weekdays">
+	<div class="event-calendar-month__weekdays" role="row" aria-label="Days of the week">
 		{weekDays.map((day) => (
-			<div class="event-calendar-month__weekday">{day}</div>
+			<div class="event-calendar-month__weekday" role="columnheader" aria-label={day}>{day}</div>
 		))}
 	</div>
 
 	<!-- Calendar grid -->
-	<div class="event-calendar-month__grid">
+	<div class="event-calendar-month__grid" role="grid" aria-label="Calendar days">
 		{grid.map((week) =>
 			week.map((day) => {
 				const isCurrentDay = day !== null && isToday(day, initialMonth, initialYear);
@@ -178,17 +183,24 @@ const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart
 				const dateStr = day
 					? `${initialYear}-${String(initialMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
 					: "";
+				const dayLabel = day
+					? `${formatDateDisplay(day, initialMonth, initialYear)}${dayEvents.length > 0 ? `, ${dayEvents.length} event${dayEvents.length > 1 ? 's' : ''}` : ''}${isCurrentDay ? ', today' : ''}`
+					: "";
 
 				return (
 					<div
 						class={`event-calendar-month__day ${day === null ? "event-calendar-month__day--other-month" : ""} ${isCurrentDay && highlightToday ? "event-calendar-month__day--today" : ""} ${dayEvents.length > 0 ? "event-calendar-month__day--has-events" : ""}`}
 						data-date={dateStr}
+						role={day !== null ? "gridcell" : "presentation"}
+						tabindex={day !== null && dayEvents.length > 0 ? 0 : -1}
+						aria-label={dayLabel}
+						aria-current={isCurrentDay ? "date" : undefined}
 					>
 						{day && (
 							<>
 								<div class="event-calendar-month__day-number">{day}</div>
 								{dayEvents.length > 0 && (
-									<div class="event-calendar-month__events-indicator">
+									<div class="event-calendar-month__events-indicator" aria-hidden="true">
 										{dayEvents.slice(0, 3).map((event, idx) => (
 											<div
 												key={event.id}
@@ -212,7 +224,7 @@ const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart
 	</div>
 
 	<!-- Selected day events panel -->
-	<div class="event-calendar-month__day-panel" id="dayPanel">
+	<div class="event-calendar-month__day-panel" id="dayPanel" role="region" aria-live="polite" aria-label="Selected day events">
 		<div class="event-calendar-month__day-panel-empty">
 			Select a day to view events
 		</div>
@@ -270,6 +282,22 @@ const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart
 		html += `</div>`;
 		panel.innerHTML = html;
 	}
+
+	/**
+	 * Handle keyboard navigation on calendar grid
+	 */
+	document.addEventListener("keydown", (e: KeyboardEvent) => {
+		const target = e.target as HTMLElement;
+		if (!target.closest(".event-calendar-month__day")) return;
+
+		const dayCell = target.closest(".event-calendar-month__day") as HTMLElement;
+		if (!dayCell.dataset.date) return;
+
+		if (e.key === "Enter" || e.key === " ") {
+			e.preventDefault();
+			dayCell.click();
+		}
+	});
 
 	/**
 	 * Handle day click
@@ -406,6 +434,12 @@ const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart
 		background-color: #b55939;
 	}
 
+	.event-calendar-month__nav-btn:focus-visible {
+		outline: 2px solid #c4704b;
+		outline-offset: 2px;
+		box-shadow: 0 0 0 4px rgba(196, 112, 75, 0.2);
+	}
+
 	.event-calendar-month__weekdays {
 		display: grid;
 		grid-template-columns: repeat(7, 1fr);
@@ -461,6 +495,13 @@ const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart
 	.event-calendar-month__day:hover:not(.event-calendar-month__day--other-month) {
 		background-color: #f9f9f9;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.event-calendar-month__day:focus-visible {
+		outline: 2px solid #c4704b;
+		outline-offset: 2px;
+		box-shadow: 0 0 0 4px rgba(196, 112, 75, 0.2);
+		z-index: 1;
 	}
 
 	.event-calendar-month__day-number {
@@ -587,6 +628,55 @@ const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart
 
 		.event-calendar-month__title {
 			font-size: 1.2rem;
+		}
+
+		.event-calendar-month__day-panel {
+			padding: 1rem;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.event-calendar-month {
+			padding: 0.5rem;
+			gap: 1rem;
+		}
+
+		.event-calendar-month__weekdays,
+		.event-calendar-month__grid {
+			gap: 0.25rem;
+		}
+
+		.event-calendar-month__day {
+			min-height: 3rem;
+			padding: 0.25rem;
+			aspect-ratio: auto;
+		}
+
+		.event-calendar-month__day-number {
+			font-size: 0.8rem;
+		}
+
+		.event-calendar-month__event-dot {
+			width: 0.3rem;
+			height: 0.3rem;
+		}
+
+		.event-calendar-month__weekday {
+			font-size: 0.7rem;
+			padding: 0.25rem 0;
+		}
+
+		.event-calendar-month__nav-btn {
+			padding: 0.35rem 0.5rem;
+			font-size: 0.75rem;
+		}
+
+		.event-calendar-month__title {
+			font-size: 1rem;
+		}
+
+		.event-calendar-month__header {
+			gap: 0.5rem;
 		}
 	}
 </style>

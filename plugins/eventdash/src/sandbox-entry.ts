@@ -36,7 +36,8 @@ interface EventRecord {
 	id: string;
 	title: string;
 	description?: string;
-	date: string; // ISO date string
+	date: string; // ISO date string (start date)
+	endDate?: string; // ISO date string (end date for multi-day events)
 	time: string; // HH:MM format
 	endTime?: string; // HH:MM format
 	location: string;
@@ -151,6 +152,7 @@ interface AdminInteraction {
 	eventId?: string;
 	title?: string;
 	date?: string;
+	endDate?: string;
 	time?: string;
 	endTime?: string;
 	location?: string;
@@ -302,6 +304,263 @@ async function verifyStripeSignature(
 		return expected === v1;
 	} catch (error) {
 		return false;
+	}
+}
+
+
+/**
+ * Developer Webhook Types
+ */
+interface WebhookEndpoint {
+	id: string;
+	url: string;
+	events: string[]; // e.g., ["registration.created", "event.updated"]
+	secret: string; // HMAC-SHA256 signing secret
+	active: boolean;
+	status: "active" | "failing"; // "failing" = dead-lettered after 3 consecutive failures
+	createdAt: string;
+	lastFiredAt?: string;
+	failedCount: number; // Consecutive failure count
+}
+
+interface WebhookDeliveryLog {
+	id: string;
+	webhookId: string;
+	eventType: string;
+	payload: string;
+	responseCode?: number;
+	responseBody?: string;
+	firedAt: string;
+	success: boolean;
+	attempt: number; // Which attempt succeeded/failed (1-3)
+}
+
+/**
+ * Utility: Generate UUID v4
+ */
+function generateUUID(): string {
+	if (typeof crypto !== "undefined" && crypto.randomUUID) {
+		return crypto.randomUUID();
+	}
+	return `${Date.now()}-${Math.random().toString(36).slice(2, 12)}-${Math.random().toString(36).slice(2, 12)}`;
+}
+
+/**
+ * Utility: Generate HMAC-SHA256 webhook signature
+ * Returns hex-encoded signature for the X-Signature-256 header.
+ */
+async function generateWebhookSignature(payload: string, secret: string): Promise<string> {
+	const key = await crypto.subtle.importKey(
+		"raw",
+		new TextEncoder().encode(secret),
+		{ name: "HMAC", hash: "SHA-256" },
+		false,
+		["sign"]
+	);
+	const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload));
+	return Array.from(new Uint8Array(sig))
+		.map(b => b.toString(16).padStart(2, "0"))
+		.join("");
+}
+
+/**
+ * Advanced Webhooks: Rate limiting — max 100 deliveries per minute per site.
+ */
+let webhookFireTimestamps: number[] = [];
+
+function isWebhookRateLimited(): boolean {
+	const now = Date.now();
+	const oneMinuteAgo = now - 60_000;
+	webhookFireTimestamps = webhookFireTimestamps.filter(t => t > oneMinuteAgo);
+	return webhookFireTimestamps.length >= 100;
+}
+
+/**
+ * Advanced Webhooks: Fire webhook with retry + signing + dead letter
+ *
+ * - HMAC-SHA256 signing: X-Signature-256 header on every delivery
+ * - 3x retry with exponential backoff: 1 min, 5 min, 30 min
+ * - Rate limiting: 100 deliveries/min per site
+ * - Dead letter: after 3 consecutive failures, mark webhook as "failing" and stop retries
+ * - Delivery log: stores last 50 deliveries per webhook
+ */
+async function fireWebhook(
+	endpoint: WebhookEndpoint,
+	eventType: string,
+	data: Record<string, any>,
+	ctx: PluginContext
+): Promise<WebhookDeliveryLog> {
+	// Skip if webhook is dead-lettered
+	if (endpoint.status === "failing") {
+		ctx.log.warn(`Webhook ${endpoint.id} is in failing state — skipping delivery for ${eventType}`);
+		const log: WebhookDeliveryLog = {
+			id: generateUUID(),
+			webhookId: endpoint.id,
+			eventType,
+			payload: JSON.stringify({ event: eventType, data }),
+			responseCode: 0,
+			responseBody: "Webhook in failing state — re-enable via admin to resume deliveries",
+			firedAt: new Date().toISOString(),
+			success: false,
+			attempt: 0,
+		};
+		await storeDeliveryLog(endpoint.id, log, ctx);
+		return log;
+	}
+
+	const payload = JSON.stringify({
+		event: eventType,
+		timestamp: new Date().toISOString(),
+		data,
+	});
+
+	const signature = await generateWebhookSignature(payload, endpoint.secret);
+
+	// Rate limit check
+	if (isWebhookRateLimited()) {
+		ctx.log.warn(`Webhook rate limited: ${endpoint.id} for ${eventType}`);
+		const log: WebhookDeliveryLog = {
+			id: generateUUID(),
+			webhookId: endpoint.id,
+			eventType,
+			payload,
+			responseCode: 429,
+			responseBody: "Rate limited — exceeded 100 deliveries/min",
+			firedAt: new Date().toISOString(),
+			success: false,
+			attempt: 0,
+		};
+		await storeDeliveryLog(endpoint.id, log, ctx);
+		return log;
+	}
+
+	let responseCode: number | undefined;
+	let responseBody: string | undefined;
+	let success = false;
+	let finalAttempt = 1;
+
+	// Retry with exponential backoff: immediate, then 1min, 5min, 30min
+	const retryDelays = [0, 60_000, 300_000, 1_800_000];
+	const maxAttempts = 3;
+
+	for (let attempt = 0; attempt < maxAttempts; attempt++) {
+		if (attempt > 0) {
+			const delay = retryDelays[attempt];
+			ctx.log.info(`Webhook retry ${attempt}/${maxAttempts - 1} for ${endpoint.id} after ${delay}ms`);
+			await new Promise(resolve => setTimeout(resolve, delay));
+		}
+
+		try {
+			const response = await fetch(endpoint.url, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"X-Signature-256": `sha256=${signature}`,
+					"X-Shipyard-Event": eventType,
+					"X-Shipyard-Delivery": generateUUID(),
+				},
+				body: payload,
+			});
+			responseCode = response.status;
+			success = response.ok;
+			try {
+				responseBody = await response.text();
+			} catch {
+				responseBody = "(response unreadable)";
+			}
+
+			finalAttempt = attempt + 1;
+			if (success) break;
+		} catch (error) {
+			responseCode = 0;
+			responseBody = String(error);
+			success = false;
+			finalAttempt = attempt + 1;
+		}
+
+		if (attempt < maxAttempts - 1) {
+			ctx.log.warn(`Webhook attempt ${attempt + 1} failed for ${endpoint.id}: ${responseCode}`);
+		}
+	}
+
+	// Track for rate limiting
+	webhookFireTimestamps.push(Date.now());
+
+	const log: WebhookDeliveryLog = {
+		id: generateUUID(),
+		webhookId: endpoint.id,
+		eventType,
+		payload,
+		responseCode,
+		responseBody,
+		firedAt: new Date().toISOString(),
+		success,
+		attempt: finalAttempt,
+	};
+
+	// Store delivery log (last 50 per webhook)
+	await storeDeliveryLog(endpoint.id, log, ctx);
+
+	// Update endpoint state
+	if (success) {
+		endpoint.lastFiredAt = log.firedAt;
+		endpoint.failedCount = 0;
+		endpoint.status = "active";
+	} else {
+		endpoint.failedCount++;
+		// Dead letter: after 3 consecutive failures, mark as "failing"
+		if (endpoint.failedCount >= 3) {
+			endpoint.status = "failing";
+			ctx.log.error(`Webhook ${endpoint.id} dead-lettered after ${endpoint.failedCount} consecutive failures`);
+		}
+	}
+	await ctx.kv.set(`webhook:${endpoint.id}`, JSON.stringify(endpoint));
+
+	return log;
+}
+
+/**
+ * Store a delivery log entry, keeping only the last 50 per webhook.
+ */
+async function storeDeliveryLog(
+	webhookId: string,
+	log: WebhookDeliveryLog,
+	ctx: PluginContext
+): Promise<void> {
+	await ctx.kv.set(`webhook:log:${log.id}`, JSON.stringify(log));
+	const logsJson = await ctx.kv.get<string>(`webhook:${webhookId}:logs`);
+	const logs = parseJSON<string[]>(logsJson, []);
+	logs.push(log.id);
+	while (logs.length > 50) {
+		const removed = logs.shift();
+		if (removed) {
+			await ctx.kv.delete(`webhook:log:${removed}`);
+		}
+	}
+	await ctx.kv.set(`webhook:${webhookId}:logs`, JSON.stringify(logs));
+}
+
+/**
+ * Broadcast a webhook event to all registered endpoints that subscribe to this event type.
+ */
+async function broadcastWebhookEvent(
+	eventType: string,
+	data: Record<string, any>,
+	ctx: PluginContext
+): Promise<void> {
+	const listJson = await ctx.kv.get<string>("webhooks:list");
+	const webhookIds = parseJSON<string[]>(listJson, []);
+
+	for (const id of webhookIds) {
+		const webhookJson = await ctx.kv.get<string>(`webhook:${id}`);
+		if (!webhookJson) continue;
+		const webhook = parseJSON<WebhookEndpoint>(webhookJson, null);
+		if (!webhook || !webhook.active) continue;
+		if (!webhook.events.includes(eventType) && !webhook.events.includes("*")) continue;
+
+		fireWebhook(webhook, eventType, data, ctx).catch(err => {
+			ctx.log.error(`Webhook broadcast error for ${id}: ${String(err)}`);
+		});
 	}
 }
 
@@ -949,7 +1208,8 @@ export default definePlugin({
 		 * POST /eventdash/events/create
 		 * Create a new event (admin only).
 		 *
-		 * Body: { title, date, time, location, capacity, description?, endTime?, requiresPayment?, stripeProductId?, ticketTypes? }
+		 * Body: { title, date, time, location, capacity, description?, endDate?, endTime?, requiresPayment?, stripeProductId?, ticketTypes? }
+		 * endDate: ISO date for multi-day events (e.g., "2026-04-07"). If omitted, event is single-day.
 		 * ticketTypes: array of { name, stripePriceId, price, capacity, description?, availableUntil? }
 		 * Returns: { success: boolean, eventId: string }
 		 */
@@ -974,6 +1234,7 @@ export default definePlugin({
 					const location = validateStringLength(String(input.location ?? "").trim(), 500, "Location");
 					const capacity = parseInt(String(input.capacity ?? "1"), 10);
 					const description = validateStringLength(String(input.description ?? "").trim(), 5000, "Description");
+					const endDate = String(input.endDate ?? "").trim();
 					const endTime = String(input.endTime ?? "").trim();
 					const requiresPayment = input.requiresPayment === true;
 					const stripeProductId = String(input.stripeProductId ?? "").trim();
@@ -1046,6 +1307,17 @@ export default definePlugin({
 					};
 
 					if (description) event.description = description;
+					if (endDate) {
+						if (endDate < date) {
+							throw new Response(
+								JSON.stringify({ error: "End date must be on or after start date" }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+						if (endDate !== date) {
+							event.endDate = endDate;
+						}
+					}
 					if (endTime) event.endTime = endTime;
 					if (requiresPayment) event.requiresPayment = requiresPayment;
 					if (stripeProductId) event.stripeProductId = stripeProductId;
@@ -2180,11 +2452,16 @@ export default definePlugin({
 					// Get all events
 					let events = await getAllEventsWithDates(ctx);
 
-					// Filter to events in the specified month
-					events = events.filter((e) => {
-						const eventDate = new Date(e.date);
-						return eventDate.getUTCFullYear() === year && (eventDate.getUTCMonth() + 1) === month;
-					});
+					// Filter to events that overlap with the specified month (multi-day aware)
+					{
+						const mStart = new Date(Date.UTC(year, month - 1, 1));
+						const mEnd = new Date(Date.UTC(year, month, 0, 23, 59, 59));
+						events = events.filter((e) => {
+							const eventStart = new Date(e.date);
+							const eventEnd = e.endDate ? new Date(e.endDate) : eventStart;
+							return eventEnd >= mStart && eventStart <= mEnd;
+						});
+					}
 
 					const total = events.length;
 					const pages = Math.ceil(total / limit);
@@ -2233,11 +2510,16 @@ export default definePlugin({
 					// Get all events
 					let events = await getAllEventsWithDates(ctx);
 
-					// Filter to events in the specified month
-					events = events.filter((e) => {
-						const eventDate = new Date(e.date);
-						return eventDate.getUTCFullYear() === year && (eventDate.getUTCMonth() + 1) === month;
-					});
+					// Filter to events that overlap with the specified month (multi-day aware)
+					{
+						const mStart = new Date(Date.UTC(year, month - 1, 1));
+						const mEnd = new Date(Date.UTC(year, month, 0, 23, 59, 59));
+						events = events.filter((e) => {
+							const eventStart = new Date(e.date);
+							const eventEnd = e.endDate ? new Date(e.endDate) : eventStart;
+							return eventEnd >= mStart && eventStart <= mEnd;
+						});
+					}
 
 					// Group by day
 					const days: Record<string, EventRecord[]> = {};
@@ -2982,7 +3264,10 @@ export default definePlugin({
 
 					// Build iCal
 					const dtStart = formatICalDate(event.date, event.time);
-					const dtEnd = formatICalDate(event.date, event.endTime || event.time);
+					// Multi-day events: DTEND uses endDate; otherwise same-day endTime or start time
+					const endDateForIcal = event.endDate || event.date;
+					const endTimeForIcal = event.endDate ? (event.endTime || "23:59") : (event.endTime || event.time);
+					const dtEnd = formatICalDate(endDateForIcal, endTimeForIcal);
 					const summary = escapeICalString(event.title);
 					const description = event.description ? escapeICalString(event.description) : "";
 					const location = escapeICalString(event.location);
@@ -3052,16 +3337,24 @@ END:VCALENDAR`;
 					// Get all events
 					let events = await getAllEventsWithDates(ctx);
 
-					// Filter to events in the specified month
-					events = events.filter((e) => {
-						const eventDate = new Date(e.date);
-						return eventDate.getUTCFullYear() === year && (eventDate.getUTCMonth() + 1) === month;
-					});
+					// Filter to events that overlap with the specified month (multi-day aware)
+					{
+						const mStart = new Date(Date.UTC(year, month - 1, 1));
+						const mEnd = new Date(Date.UTC(year, month, 0, 23, 59, 59));
+						events = events.filter((e) => {
+							const eventStart = new Date(e.date);
+							const eventEnd = e.endDate ? new Date(e.endDate) : eventStart;
+							return eventEnd >= mStart && eventStart <= mEnd;
+						});
+					}
 
 					// Build iCal with multiple events
 					const vevents = events.map((event) => {
 						const dtStart = formatICalDate(event.date, event.time);
-						const dtEnd = formatICalDate(event.date, event.endTime || event.time);
+						// Multi-day events: DTEND uses endDate; otherwise same-day endTime or start time
+						const endDateForIcal = event.endDate || event.date;
+						const endTimeForIcal = event.endDate ? (event.endTime || "23:59") : (event.endTime || event.time);
+						const dtEnd = formatICalDate(endDateForIcal, endTimeForIcal);
 						const summary = escapeICalString(event.title);
 						const description = event.description ? escapeICalString(event.description) : "";
 						const location = escapeICalString(event.location);
@@ -3226,13 +3519,19 @@ END:VCALENDAR`;
 										{
 											type: "text_input",
 											action_id: "date",
-											label: "Date (YYYY-MM-DD)",
+											label: "Start Date (YYYY-MM-DD)",
 											placeholder: "2026-04-15",
 										},
 										{
 											type: "text_input",
+											action_id: "endDate",
+											label: "End Date (YYYY-MM-DD, optional for multi-day)",
+											placeholder: "2026-04-17",
+										},
+										{
+											type: "text_input",
 											action_id: "time",
-											label: "Time (HH:MM)",
+											label: "Start Time (HH:MM)",
 											placeholder: "18:00",
 										},
 										{
@@ -3270,6 +3569,7 @@ END:VCALENDAR`;
 					if (interaction.type === "form_submit" && interaction.action === "create") {
 						const title = String(interaction.title ?? "").trim();
 						const date = String(interaction.date ?? "").trim();
+						const endDate = String(interaction.endDate ?? "").trim();
 						const time = String(interaction.time ?? "").trim();
 						const location = String(interaction.location ?? "").trim();
 						const capacity = parseInt(String(interaction.capacity ?? "1"), 10);
@@ -3328,6 +3628,18 @@ END:VCALENDAR`;
 						};
 
 						if (description) event.description = description;
+						if (endDate && endDate !== date) {
+							if (endDate < date) {
+								return {
+									blocks: [],
+									toast: {
+										message: "End date must be on or after start date",
+										type: "error" as const,
+									},
+								};
+							}
+							event.endDate = endDate;
+						}
 						if (endTime) event.endTime = endTime;
 
 						await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
@@ -5223,5 +5535,500 @@ END:VCALENDAR`;
 				}
 			},
 		},
+		/** ================================================================
+		 *  ADVANCED WEBHOOKS — Register, Delete, List, Test, Health,
+		 *  Rotate Secret, Delivery Logs, Re-enable
+		 *  ================================================================ */
+
+		/**
+		 * POST /eventdash/webhooks/register
+		 * Register a new developer webhook endpoint.
+		 * Body: { url: string, events: string[] }
+		 * Supported events: registration.created, registration.cancelled,
+		 *   event.created, event.updated, event.deleted, checkin.completed, *
+		 */
+		webhookRegister: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const url = String(input.url ?? "").trim();
+					const events = input.events as string[] | undefined;
+
+					if (!url || !events || events.length === 0) {
+						throw new Response(
+							JSON.stringify({ error: "URL and events are required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Validate URL
+					try {
+						new URL(url);
+					} catch {
+						throw new Response(
+							JSON.stringify({ error: "Invalid URL" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const webhookId = generateUUID();
+					const secret = generateUUID();
+					const webhook: WebhookEndpoint = {
+						id: webhookId,
+						url,
+						events,
+						secret,
+						active: true,
+						status: "active",
+						createdAt: new Date().toISOString(),
+						failedCount: 0,
+					};
+
+					await ctx.kv.set(`webhook:${webhookId}`, JSON.stringify(webhook));
+
+					// Add to webhooks list
+					const listJson = await ctx.kv.get<string>("webhooks:list");
+					const webhooks = parseJSON<string[]>(listJson, []);
+					webhooks.push(webhookId);
+					await ctx.kv.set("webhooks:list", JSON.stringify(webhooks));
+
+					ctx.log.info(`Webhook registered: ${webhookId} for ${events.join(", ")}`);
+
+					return {
+						success: true,
+						webhook,
+						secret: webhook.secret,
+						message: "Webhook registered. Store the secret — it won't be shown again in full.",
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook register error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * DELETE /eventdash/webhooks/:id
+		 * Delete a registered webhook and clean up its delivery logs.
+		 * Body: { webhookId: string }
+		 */
+		webhookDelete: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const webhookId = String(input.webhookId ?? "").trim();
+					validateId(webhookId, "webhookId");
+
+					const webhookJson = await ctx.kv.get<string>(`webhook:${webhookId}`);
+					if (!webhookJson) {
+						throw new Response(
+							JSON.stringify({ error: "Webhook not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Delete webhook
+					await ctx.kv.delete(`webhook:${webhookId}`);
+
+					// Clean up delivery logs
+					const logIdsJson = await ctx.kv.get<string>(`webhook:${webhookId}:logs`);
+					const logIds = parseJSON<string[]>(logIdsJson, []);
+					for (const logId of logIds) {
+						await ctx.kv.delete(`webhook:log:${logId}`);
+					}
+					await ctx.kv.delete(`webhook:${webhookId}:logs`);
+
+					// Remove from list
+					const listJson = await ctx.kv.get<string>("webhooks:list");
+					const webhooks = parseJSON<string[]>(listJson, []);
+					const idx = webhooks.indexOf(webhookId);
+					if (idx !== -1) {
+						webhooks.splice(idx, 1);
+						await ctx.kv.set("webhooks:list", JSON.stringify(webhooks));
+					}
+
+					ctx.log.info(`Webhook deleted: ${webhookId}`);
+
+					return { success: true, message: "Webhook deleted" };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook delete error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/webhooks
+		 * List all registered webhooks (admin only). Secrets are masked.
+		 */
+		webhookList: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const listJson = await ctx.kv.get<string>("webhooks:list");
+					const webhookIds = parseJSON<string[]>(listJson, []);
+
+					const webhooks: Array<Omit<WebhookEndpoint, "secret"> & { secret: string }> = [];
+					for (const id of webhookIds) {
+						const webhookJson = await ctx.kv.get<string>(`webhook:${id}`);
+						if (webhookJson) {
+							const webhook = parseJSON<WebhookEndpoint>(webhookJson, null);
+							if (webhook) {
+								webhooks.push({
+									...webhook,
+									secret: webhook.secret.substring(0, 8) + "...",
+								});
+							}
+						}
+					}
+
+					return { webhooks, total: webhooks.length };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook list error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /eventdash/webhooks/test
+		 * Fire a test webhook delivery to verify endpoint connectivity.
+		 * Body: { webhookId: string }
+		 */
+		webhookTest: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const webhookId = String(input.webhookId ?? "").trim();
+					validateId(webhookId, "webhookId");
+
+					const webhookJson = await ctx.kv.get<string>(`webhook:${webhookId}`);
+					if (!webhookJson) {
+						throw new Response(
+							JSON.stringify({ error: "Webhook not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const webhook = parseJSON<WebhookEndpoint>(webhookJson, null);
+					if (!webhook) {
+						throw new Response(
+							JSON.stringify({ error: "Webhook not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const testData = {
+						event_id: "test-evt-001",
+						title: "Test Event",
+						email: "test@example.com",
+						name: "Test Attendee",
+						registered_at: new Date().toISOString(),
+					};
+
+					const log = await fireWebhook(webhook, "registration.created", testData, ctx);
+
+					return { success: log.success, log };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook test error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/webhooks/health
+		 * Webhook health dashboard. Returns stats on registered webhooks,
+		 * 24h delivery metrics, and any failing/dead-lettered endpoints.
+		 */
+		webhookHealth: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const listJson = await ctx.kv.get<string>("webhooks:list");
+					const webhookIds = parseJSON<string[]>(listJson, []);
+
+					let totalFires24h = 0;
+					let successFires24h = 0;
+					const failingWebhooks: Array<{ id: string; url: string; failedCount: number; status: string }> = [];
+					const now = Date.now();
+					const oneDayAgo = now - 24 * 60 * 60 * 1000;
+
+					for (const id of webhookIds) {
+						const webhookJson = await ctx.kv.get<string>(`webhook:${id}`);
+						if (!webhookJson) continue;
+						const webhook = parseJSON<WebhookEndpoint>(webhookJson, null as any);
+						if (!webhook) continue;
+
+						if (webhook.failedCount > 0 || webhook.status === "failing") {
+							failingWebhooks.push({
+								id: webhook.id,
+								url: webhook.url,
+								failedCount: webhook.failedCount,
+								status: webhook.status,
+							});
+						}
+
+						const logIdsJson = await ctx.kv.get<string>(`webhook:${id}:logs`);
+						const logIds = parseJSON<string[]>(logIdsJson, []);
+						for (const logId of logIds) {
+							const logJson = await ctx.kv.get<string>(`webhook:log:${logId}`);
+							if (!logJson) continue;
+							const log = parseJSON<WebhookDeliveryLog>(logJson, null as any);
+							if (!log) continue;
+							const logTime = new Date(log.firedAt).getTime();
+							if (logTime >= oneDayAgo) {
+								totalFires24h++;
+								if (log.success) successFires24h++;
+							}
+						}
+					}
+
+					const successRate = totalFires24h > 0 ? Math.round((successFires24h / totalFires24h) * 100) : 100;
+
+					return {
+						totalRegistered: webhookIds.length,
+						last24hFires: totalFires24h,
+						last24hSuccessRate: `${successRate}%`,
+						failingWebhooks,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook health error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /eventdash/webhooks/:id/secret
+		 * Rotate the HMAC signing secret for a webhook.
+		 * Body: { webhookId: string }
+		 */
+		webhookRotateSecret: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const webhookId = String(input.webhookId ?? "").trim();
+					validateId(webhookId, "webhookId");
+
+					const webhookJson = await ctx.kv.get<string>(`webhook:${webhookId}`);
+					if (!webhookJson) {
+						throw new Response(
+							JSON.stringify({ error: "Webhook not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const webhook = parseJSON<WebhookEndpoint>(webhookJson, null as any);
+					if (!webhook) {
+						throw new Response(
+							JSON.stringify({ error: "Webhook not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const newSecret = generateUUID();
+					webhook.secret = newSecret;
+					await ctx.kv.set(`webhook:${webhookId}`, JSON.stringify(webhook));
+
+					ctx.log.info(`Webhook secret rotated: ${webhookId}`);
+
+					return { success: true, webhookId, secret: newSecret };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook secret rotate error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/webhooks/logs
+		 * Paginated delivery logs for a specific webhook (admin only).
+		 * Query: { webhookId: string, limit?: number, offset?: number }
+		 */
+		webhookLogs: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const webhookId = String(input.webhookId ?? "").trim();
+					const limit = Math.min(Number(input.limit ?? 50), 50);
+					const offset = Number(input.offset ?? 0);
+
+					if (!webhookId) {
+						throw new Response(
+							JSON.stringify({ error: "webhookId is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const logIdsJson = await ctx.kv.get<string>(`webhook:${webhookId}:logs`);
+					const allLogIds = parseJSON<string[]>(logIdsJson, []);
+
+					// Newest first
+					const reversed = [...allLogIds].reverse();
+					const pageIds = reversed.slice(offset, offset + limit);
+
+					const logs: WebhookDeliveryLog[] = [];
+					for (const logId of pageIds) {
+						const logJson = await ctx.kv.get<string>(`webhook:log:${logId}`);
+						if (logJson) {
+							const log = parseJSON<WebhookDeliveryLog>(logJson, null as any);
+							if (log) logs.push(log);
+						}
+					}
+
+					return { logs, total: allLogIds.length, limit, offset };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook logs error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /eventdash/webhooks/:id/re-enable
+		 * Re-enable a dead-lettered webhook. Resets failedCount and status.
+		 * Body: { webhookId: string }
+		 */
+		webhookReEnable: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const webhookId = String(input.webhookId ?? "").trim();
+					validateId(webhookId, "webhookId");
+
+					const webhookJson = await ctx.kv.get<string>(`webhook:${webhookId}`);
+					if (!webhookJson) {
+						throw new Response(
+							JSON.stringify({ error: "Webhook not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const webhook = parseJSON<WebhookEndpoint>(webhookJson, null as any);
+					if (!webhook) {
+						throw new Response(
+							JSON.stringify({ error: "Webhook not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					webhook.status = "active";
+					webhook.failedCount = 0;
+					webhook.active = true;
+					await ctx.kv.set(`webhook:${webhookId}`, JSON.stringify(webhook));
+
+					ctx.log.info(`Webhook re-enabled: ${webhookId}`);
+
+					return { success: true, webhookId, status: "active", message: "Webhook re-enabled — deliveries will resume" };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook re-enable error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
 	},
 });
