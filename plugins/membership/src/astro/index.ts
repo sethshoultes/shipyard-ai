@@ -5,6 +5,7 @@
 
 import AdminReporting from "./AdminReporting.astro";
 import GatedContent from "./GatedContent.astro";
+import GroupManagement from "./GroupManagement.astro";
 import MemberDashboard from "./MemberDashboard.astro";
 import MemberPortal from "./MemberPortal.astro";
 
@@ -13,4 +14,4 @@ export const blockComponents = {
 	"member-portal": MemberPortal,
 };
 
-export { AdminReporting, MemberDashboard, MemberPortal };
+export { AdminReporting, GroupManagement, MemberDashboard, MemberPortal };

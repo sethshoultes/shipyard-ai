@@ -1,0 +1,1086 @@
+---
+/**
+ * GroupManagement.astro — Phase 5 Wave 1
+ *
+ * Group management section for the member portal.
+ * - Group owner view: seat count, member list, invite + remove buttons
+ * - Group member view: org badge, read-only member list
+ * - Invite modal: generate invite link, copy to clipboard
+ * - Remove confirmation: dialog before removing a member
+ *
+ * Data source: /membership/groups/my (memberGroupLookup endpoint)
+ *
+ * Usage:
+ * <GroupManagement />
+ */
+
+interface GroupRecord {
+	id: string;
+	orgName: string;
+	orgEmail: string;
+	adminEmail: string;
+	planId: string;
+	maxSeats: number;
+	members: string[];
+	createdAt: string;
+	updatedAt: string;
+}
+
+interface GroupLookupResult {
+	found: boolean;
+	group?: GroupRecord;
+	isOwner?: boolean;
+	seatsUsed?: number;
+	seatsAvailable?: number;
+}
+
+// Get member email from cookie (same pattern as MemberPortal.astro)
+const memberEmail = Astro.cookies.get("membership-email")?.value?.toLowerCase() || "";
+
+let groupData: GroupLookupResult = { found: false };
+let error: string | null = null;
+
+if (memberEmail) {
+	try {
+		const response = await fetch(
+			new URL(
+				`/_emdash/api/plugins/membership/memberGroupLookup?email=${encodeURIComponent(memberEmail)}`,
+				Astro.url.origin
+			),
+			{ credentials: "include" }
+		);
+
+		if (response.ok) {
+			groupData = (await response.json()) as GroupLookupResult;
+		} else {
+			error = "Failed to load group data";
+		}
+	} catch (err) {
+		console.error("Group data fetch error:", err);
+		error = "Error loading group information";
+	}
+}
+
+const group = groupData.group;
+const isOwner = groupData.isOwner ?? false;
+const seatsUsed = groupData.seatsUsed ?? 0;
+const seatsAvailable = groupData.seatsAvailable ?? 0;
+---
+
+{groupData.found && group && (
+<section class="group-mgmt" role="region" aria-label="Group Management">
+	<div class="group-mgmt__header">
+		<div class="group-mgmt__title-row">
+			<h2 class="group-mgmt__title">
+				{isOwner ? "Your Group" : "Your Organization"}
+			</h2>
+			<span class={`group-mgmt__role-badge group-mgmt__role-badge--${isOwner ? "owner" : "member"}`}>
+				{isOwner ? "Owner" : "Member"}
+			</span>
+		</div>
+
+		{/* Org name badge for members */}
+		<div class="group-mgmt__org-badge">
+			<span class="group-mgmt__org-icon" aria-hidden="true">
+				<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M8 1L2 4v8l6 3 6-3V4L8 1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+					<path d="M8 8v7M2 4l6 4 6-4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+				</svg>
+			</span>
+			<span class="group-mgmt__org-name">{group.orgName}</span>
+		</div>
+	</div>
+
+	{/* Seat count — owner view */}
+	{isOwner && (
+		<div class="group-mgmt__seats">
+			<div class="group-mgmt__seats-bar">
+				<div class="group-mgmt__seats-fill" style={`width: ${Math.round((seatsUsed / group.maxSeats) * 100)}%`}></div>
+			</div>
+			<div class="group-mgmt__seats-label">
+				<span class="group-mgmt__seats-count">{seatsUsed}</span>
+				<span class="group-mgmt__seats-separator">/</span>
+				<span class="group-mgmt__seats-total">{group.maxSeats}</span>
+				<span class="group-mgmt__seats-text">seats used</span>
+			</div>
+		</div>
+	)}
+
+	{/* Member list */}
+	<div class="group-mgmt__members">
+		<h3 class="group-mgmt__members-title">
+			Members ({group.members.length})
+		</h3>
+		<ul class="group-mgmt__members-list" role="list">
+			{group.members.map((email) => (
+				<li class="group-mgmt__member-item">
+					<div class="group-mgmt__member-info">
+						<span class="group-mgmt__member-avatar" aria-hidden="true">
+							{email.charAt(0).toUpperCase()}
+						</span>
+						<span class="group-mgmt__member-email">{email}</span>
+						{email === group.adminEmail && (
+							<span class="group-mgmt__member-owner-tag">Owner</span>
+						)}
+					</div>
+					{isOwner && email !== group.adminEmail && (
+						<button
+							class="group-mgmt__remove-btn"
+							data-email={email}
+							data-group-id={group.id}
+							aria-label={`Remove ${email} from group`}
+							type="button"
+						>
+							Remove
+						</button>
+					)}
+				</li>
+			))}
+		</ul>
+	</div>
+
+	{/* Invite button — owner only */}
+	{isOwner && seatsAvailable > 0 && (
+		<div class="group-mgmt__actions">
+			<button
+				class="group-mgmt__invite-btn"
+				id="groupInviteBtn"
+				type="button"
+				aria-haspopup="dialog"
+			>
+				<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+					<path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+				</svg>
+				Invite Member
+			</button>
+			<span class="group-mgmt__seats-hint">
+				{seatsAvailable} seat{seatsAvailable !== 1 ? "s" : ""} available
+			</span>
+		</div>
+	)}
+
+	{isOwner && seatsAvailable === 0 && (
+		<div class="group-mgmt__full-notice" role="status">
+			All seats are filled. Remove a member to invite someone new.
+		</div>
+	)}
+
+	{/* Invite modal */}
+	<div class="group-mgmt__modal-overlay" id="inviteModal" role="dialog" aria-modal="true" aria-labelledby="inviteModalTitle" hidden>
+		<div class="group-mgmt__modal">
+			<div class="group-mgmt__modal-header">
+				<h3 class="group-mgmt__modal-title" id="inviteModalTitle">Invite a Member</h3>
+				<button class="group-mgmt__modal-close" id="inviteModalClose" type="button" aria-label="Close dialog">
+					<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+						<path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+					</svg>
+				</button>
+			</div>
+			<div class="group-mgmt__modal-body">
+				<label class="group-mgmt__modal-label" for="inviteEmailInput">
+					Email address (optional)
+				</label>
+				<input
+					type="email"
+					id="inviteEmailInput"
+					class="group-mgmt__modal-input"
+					placeholder="member@example.com"
+					autocomplete="email"
+				/>
+				<p class="group-mgmt__modal-hint">
+					Leave empty to generate a general invite link.
+				</p>
+
+				<button
+					class="group-mgmt__modal-generate-btn"
+					id="generateInviteBtn"
+					type="button"
+				>
+					Generate Invite Link
+				</button>
+
+				<div class="group-mgmt__invite-result" id="inviteResult" hidden>
+					<label class="group-mgmt__modal-label" for="inviteLinkOutput">
+						Invite link
+					</label>
+					<div class="group-mgmt__invite-link-row">
+						<input
+							type="text"
+							id="inviteLinkOutput"
+							class="group-mgmt__modal-input group-mgmt__modal-input--readonly"
+							readonly
+						/>
+						<button
+							class="group-mgmt__copy-btn"
+							id="copyInviteBtn"
+							type="button"
+							aria-label="Copy invite link to clipboard"
+						>
+							Copy
+						</button>
+					</div>
+					<p class="group-mgmt__invite-success" id="inviteSuccessMsg"></p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{/* Remove confirmation dialog */}
+	<div class="group-mgmt__modal-overlay" id="removeModal" role="dialog" aria-modal="true" aria-labelledby="removeModalTitle" hidden>
+		<div class="group-mgmt__modal group-mgmt__modal--sm">
+			<div class="group-mgmt__modal-header">
+				<h3 class="group-mgmt__modal-title" id="removeModalTitle">Remove Member</h3>
+				<button class="group-mgmt__modal-close" id="removeModalClose" type="button" aria-label="Close dialog">
+					<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+						<path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+					</svg>
+				</button>
+			</div>
+			<div class="group-mgmt__modal-body">
+				<p class="group-mgmt__remove-msg">
+					Are you sure you want to remove <strong id="removeEmailDisplay"></strong> from the group? They will lose access immediately.
+				</p>
+				<div class="group-mgmt__modal-actions">
+					<button class="group-mgmt__modal-cancel-btn" id="removeCancelBtn" type="button">
+						Cancel
+					</button>
+					<button class="group-mgmt__modal-confirm-btn" id="removeConfirmBtn" type="button">
+						Remove Member
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+)}
+
+{error && (
+<div class="group-mgmt__error" role="alert">
+	<p>{error}</p>
+</div>
+)}
+
+<style>
+	.group-mgmt {
+		padding: 1.5rem;
+		background: #faf8f5;
+		border-radius: 0.5rem;
+		border: 1px solid #e5e5e5;
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	/* Header */
+	.group-mgmt__header {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.group-mgmt__title-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.group-mgmt__title {
+		margin: 0;
+		font-size: 1.25rem;
+		color: #2c2c2c;
+		font-family: Lora, serif;
+		font-weight: 600;
+	}
+
+	.group-mgmt__role-badge {
+		padding: 0.25rem 0.75rem;
+		border-radius: 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		white-space: nowrap;
+	}
+
+	.group-mgmt__role-badge--owner {
+		background-color: #fff3e0;
+		color: #c4704b;
+		border: 1px solid #d4a853;
+	}
+
+	.group-mgmt__role-badge--member {
+		background-color: #e8f5e9;
+		color: #2e7d32;
+	}
+
+	.group-mgmt__org-badge {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		background: white;
+		border: 1px solid #d4c4b5;
+		border-radius: 0.375rem;
+		width: fit-content;
+	}
+
+	.group-mgmt__org-icon {
+		color: #7a8b6f;
+		display: flex;
+		align-items: center;
+	}
+
+	.group-mgmt__org-name {
+		font-weight: 600;
+		color: #2c2c2c;
+		font-size: 0.95rem;
+	}
+
+	/* Seats progress bar */
+	.group-mgmt__seats {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.group-mgmt__seats-bar {
+		height: 8px;
+		background: #e5e5e5;
+		border-radius: 4px;
+		overflow: hidden;
+	}
+
+	.group-mgmt__seats-fill {
+		height: 100%;
+		background: linear-gradient(90deg, #7a8b6f, #c4704b);
+		border-radius: 4px;
+		transition: width 0.3s ease;
+		min-width: 4px;
+	}
+
+	.group-mgmt__seats-label {
+		display: flex;
+		align-items: baseline;
+		gap: 0.2rem;
+		font-size: 0.9rem;
+		color: #666;
+	}
+
+	.group-mgmt__seats-count {
+		font-weight: 700;
+		color: #2c2c2c;
+		font-size: 1.1rem;
+	}
+
+	.group-mgmt__seats-separator {
+		color: #999;
+	}
+
+	.group-mgmt__seats-total {
+		font-weight: 600;
+		color: #666;
+	}
+
+	.group-mgmt__seats-text {
+		margin-left: 0.25rem;
+	}
+
+	/* Member list */
+	.group-mgmt__members {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.group-mgmt__members-title {
+		margin: 0;
+		font-size: 1rem;
+		color: #2c2c2c;
+		font-family: Lora, serif;
+		font-weight: 600;
+	}
+
+	.group-mgmt__members-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.group-mgmt__member-item {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		padding: 0.75rem;
+		background: white;
+		border: 1px solid #e5e5e5;
+		border-radius: 0.375rem;
+		transition: border-color 0.2s;
+	}
+
+	.group-mgmt__member-item:hover {
+		border-color: #d4c4b5;
+	}
+
+	.group-mgmt__member-info {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		min-width: 0;
+		flex: 1;
+	}
+
+	.group-mgmt__member-avatar {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		background: #7a8b6f;
+		color: white;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 700;
+		font-size: 0.85rem;
+		flex-shrink: 0;
+	}
+
+	.group-mgmt__member-email {
+		font-size: 0.9rem;
+		color: #2c2c2c;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.group-mgmt__member-owner-tag {
+		padding: 0.15rem 0.5rem;
+		background: #fff3e0;
+		color: #c4704b;
+		border-radius: 0.2rem;
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		white-space: nowrap;
+		flex-shrink: 0;
+	}
+
+	.group-mgmt__remove-btn {
+		padding: 0.4rem 0.75rem;
+		min-height: 36px;
+		background: white;
+		color: #c62828;
+		border: 1px solid #fca5a5;
+		border-radius: 0.25rem;
+		font-size: 0.8rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s;
+		white-space: nowrap;
+		flex-shrink: 0;
+		font-family: inherit;
+	}
+
+	.group-mgmt__remove-btn:hover {
+		background: #ffebee;
+		border-color: #ef5350;
+	}
+
+	.group-mgmt__remove-btn:focus-visible {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	/* Actions (invite button) */
+	.group-mgmt__actions {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		flex-wrap: wrap;
+	}
+
+	.group-mgmt__invite-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem 1.5rem;
+		min-height: 44px;
+		background: #c4704b;
+		color: white;
+		border: none;
+		border-radius: 0.25rem;
+		font-size: 0.95rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s;
+		font-family: inherit;
+	}
+
+	.group-mgmt__invite-btn:hover {
+		background: #b55939;
+		transform: translateY(-1px);
+		box-shadow: 0 2px 8px rgba(196, 112, 75, 0.25);
+	}
+
+	.group-mgmt__invite-btn:focus-visible {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	.group-mgmt__seats-hint {
+		font-size: 0.85rem;
+		color: #7a8b6f;
+		font-weight: 500;
+	}
+
+	.group-mgmt__full-notice {
+		padding: 0.75rem 1rem;
+		background: #fff3e0;
+		border: 1px solid #d4a853;
+		border-radius: 0.375rem;
+		font-size: 0.9rem;
+		color: #8a6d3b;
+	}
+
+	/* Modal overlay */
+	.group-mgmt__modal-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 9999;
+		background: rgba(0, 0, 0, 0.5);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1rem;
+	}
+
+	.group-mgmt__modal-overlay[hidden] {
+		display: none;
+	}
+
+	.group-mgmt__modal {
+		background: white;
+		border-radius: 0.5rem;
+		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+		width: 100%;
+		max-width: 480px;
+		max-height: 90vh;
+		overflow-y: auto;
+	}
+
+	.group-mgmt__modal--sm {
+		max-width: 400px;
+	}
+
+	.group-mgmt__modal-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1.25rem 1.5rem;
+		border-bottom: 1px solid #e5e5e5;
+	}
+
+	.group-mgmt__modal-title {
+		margin: 0;
+		font-size: 1.1rem;
+		color: #2c2c2c;
+		font-family: Lora, serif;
+		font-weight: 600;
+	}
+
+	.group-mgmt__modal-close {
+		background: none;
+		border: none;
+		padding: 0.25rem;
+		cursor: pointer;
+		color: #999;
+		display: flex;
+		align-items: center;
+		transition: color 0.2s;
+	}
+
+	.group-mgmt__modal-close:hover {
+		color: #2c2c2c;
+	}
+
+	.group-mgmt__modal-close:focus-visible {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	.group-mgmt__modal-body {
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.group-mgmt__modal-label {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: #666;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.group-mgmt__modal-input {
+		padding: 0.75rem;
+		min-height: 44px;
+		border: 1px solid #d4c4b5;
+		border-radius: 0.25rem;
+		font-size: 0.95rem;
+		color: #2c2c2c;
+		background: white;
+		transition: border-color 0.2s;
+		font-family: inherit;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.group-mgmt__modal-input:focus {
+		outline: none;
+		border-color: #c4704b;
+		box-shadow: 0 0 0 3px rgba(196, 112, 75, 0.1);
+	}
+
+	.group-mgmt__modal-input--readonly {
+		background: #f5f5f5;
+		color: #555;
+		cursor: text;
+	}
+
+	.group-mgmt__modal-hint {
+		margin: 0;
+		font-size: 0.8rem;
+		color: #999;
+		font-style: italic;
+	}
+
+	.group-mgmt__modal-generate-btn {
+		padding: 0.75rem 1.5rem;
+		min-height: 44px;
+		background: #c4704b;
+		color: white;
+		border: none;
+		border-radius: 0.25rem;
+		font-size: 0.95rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background-color 0.2s;
+		font-family: inherit;
+		margin-top: 0.5rem;
+	}
+
+	.group-mgmt__modal-generate-btn:hover {
+		background: #b55939;
+	}
+
+	.group-mgmt__modal-generate-btn:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.group-mgmt__modal-generate-btn:focus-visible {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	.group-mgmt__invite-result {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		margin-top: 0.5rem;
+		padding-top: 0.75rem;
+		border-top: 1px solid #e5e5e5;
+	}
+
+	.group-mgmt__invite-result[hidden] {
+		display: none;
+	}
+
+	.group-mgmt__invite-link-row {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.group-mgmt__invite-link-row .group-mgmt__modal-input {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.group-mgmt__copy-btn {
+		padding: 0.75rem 1rem;
+		min-height: 44px;
+		background: #7a8b6f;
+		color: white;
+		border: none;
+		border-radius: 0.25rem;
+		font-size: 0.85rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background-color 0.2s;
+		white-space: nowrap;
+		font-family: inherit;
+		flex-shrink: 0;
+	}
+
+	.group-mgmt__copy-btn:hover {
+		background: #6a7b5f;
+	}
+
+	.group-mgmt__copy-btn:focus-visible {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	.group-mgmt__invite-success {
+		margin: 0;
+		font-size: 0.85rem;
+		color: #2e7d32;
+		font-weight: 500;
+	}
+
+	/* Remove confirmation modal */
+	.group-mgmt__remove-msg {
+		margin: 0;
+		font-size: 0.95rem;
+		color: #2c2c2c;
+		line-height: 1.6;
+	}
+
+	.group-mgmt__modal-actions {
+		display: flex;
+		gap: 0.75rem;
+		margin-top: 0.75rem;
+		justify-content: flex-end;
+	}
+
+	.group-mgmt__modal-cancel-btn {
+		padding: 0.75rem 1.25rem;
+		min-height: 44px;
+		background: white;
+		color: #2c2c2c;
+		border: 1px solid #d4c4b5;
+		border-radius: 0.25rem;
+		font-size: 0.9rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s;
+		font-family: inherit;
+	}
+
+	.group-mgmt__modal-cancel-btn:hover {
+		background: #faf8f5;
+		border-color: #c4704b;
+	}
+
+	.group-mgmt__modal-cancel-btn:focus-visible {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	.group-mgmt__modal-confirm-btn {
+		padding: 0.75rem 1.25rem;
+		min-height: 44px;
+		background: #c62828;
+		color: white;
+		border: none;
+		border-radius: 0.25rem;
+		font-size: 0.9rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background-color 0.2s;
+		font-family: inherit;
+	}
+
+	.group-mgmt__modal-confirm-btn:hover {
+		background: #b71c1c;
+	}
+
+	.group-mgmt__modal-confirm-btn:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.group-mgmt__modal-confirm-btn:focus-visible {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	/* Error state */
+	.group-mgmt__error {
+		padding: 1rem;
+		background: #ffebee;
+		border: 1px solid #ef5350;
+		border-radius: 0.5rem;
+	}
+
+	.group-mgmt__error p {
+		margin: 0;
+		color: #c62828;
+		font-size: 0.9rem;
+	}
+
+	/* Responsive */
+	@media (max-width: 768px) {
+		.group-mgmt {
+			padding: 1rem;
+			gap: 1rem;
+		}
+
+		.group-mgmt__title {
+			font-size: 1.1rem;
+		}
+
+		.group-mgmt__member-item {
+			flex-direction: column;
+			align-items: stretch;
+			gap: 0.5rem;
+		}
+
+		.group-mgmt__remove-btn {
+			width: 100%;
+			text-align: center;
+		}
+
+		.group-mgmt__actions {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.group-mgmt__invite-btn {
+			width: 100%;
+			justify-content: center;
+		}
+
+		.group-mgmt__modal {
+			max-width: 100%;
+			margin: 0.5rem;
+		}
+
+		.group-mgmt__modal-actions {
+			flex-direction: column;
+		}
+
+		.group-mgmt__modal-cancel-btn,
+		.group-mgmt__modal-confirm-btn {
+			width: 100%;
+			text-align: center;
+		}
+
+		.group-mgmt__invite-link-row {
+			flex-direction: column;
+		}
+	}
+
+	@media (max-width: 375px) {
+		.group-mgmt {
+			padding: 0.75rem;
+		}
+
+		.group-mgmt__title-row {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.5rem;
+		}
+
+		.group-mgmt__modal-body {
+			padding: 1rem;
+		}
+
+		.group-mgmt__modal-header {
+			padding: 1rem;
+		}
+	}
+</style>
+
+<script define:vars={{ memberEmail, groupId: group?.id || '', isOwner }}>
+	// Only run client-side JS if there's a group and user is owner
+	if (typeof document !== 'undefined' && groupId) {
+		document.addEventListener('DOMContentLoaded', () => {
+			// --- Invite modal ---
+			const inviteBtn = document.getElementById('groupInviteBtn');
+			const inviteModal = document.getElementById('inviteModal');
+			const inviteClose = document.getElementById('inviteModalClose');
+			const generateBtn = document.getElementById('generateInviteBtn');
+			const inviteResult = document.getElementById('inviteResult');
+			const inviteLinkOutput = document.getElementById('inviteLinkOutput');
+			const copyBtn = document.getElementById('copyInviteBtn');
+			const inviteEmailInput = document.getElementById('inviteEmailInput');
+			const inviteSuccessMsg = document.getElementById('inviteSuccessMsg');
+
+			function openInviteModal() {
+				if (inviteModal) {
+					inviteModal.hidden = false;
+					if (inviteEmailInput) inviteEmailInput.focus();
+				}
+			}
+
+			function closeInviteModal() {
+				if (inviteModal) {
+					inviteModal.hidden = true;
+					// Reset state
+					if (inviteEmailInput) inviteEmailInput.value = '';
+					if (inviteResult) inviteResult.hidden = true;
+					if (inviteLinkOutput) inviteLinkOutput.value = '';
+					if (inviteSuccessMsg) inviteSuccessMsg.textContent = '';
+				}
+			}
+
+			if (inviteBtn) inviteBtn.addEventListener('click', openInviteModal);
+			if (inviteClose) inviteClose.addEventListener('click', closeInviteModal);
+
+			// Close on overlay click
+			if (inviteModal) {
+				inviteModal.addEventListener('click', (e) => {
+					if (e.target === inviteModal) closeInviteModal();
+				});
+			}
+
+			// Generate invite link
+			if (generateBtn) {
+				generateBtn.addEventListener('click', async () => {
+					generateBtn.disabled = true;
+					generateBtn.textContent = 'Generating...';
+
+					try {
+						const email = inviteEmailInput ? inviteEmailInput.value.trim() : '';
+						const response = await fetch('/_emdash/api/plugins/membership/memberGroupInvite', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							credentials: 'include',
+							body: JSON.stringify({
+								ownerEmail: memberEmail,
+								groupId: groupId,
+								email: email,
+							}),
+						});
+
+						const data = await response.json();
+
+						if (response.ok && data.success) {
+							if (inviteLinkOutput) inviteLinkOutput.value = data.inviteLink || '';
+							if (inviteSuccessMsg) inviteSuccessMsg.textContent = data.message || 'Invite created!';
+							if (inviteResult) inviteResult.hidden = false;
+						} else {
+							alert(data.error || 'Failed to generate invite link');
+						}
+					} catch (err) {
+						alert('Error generating invite link. Please try again.');
+					} finally {
+						generateBtn.disabled = false;
+						generateBtn.textContent = 'Generate Invite Link';
+					}
+				});
+			}
+
+			// Copy to clipboard
+			if (copyBtn) {
+				copyBtn.addEventListener('click', async () => {
+					const link = inviteLinkOutput ? inviteLinkOutput.value : '';
+					if (!link) return;
+
+					try {
+						await navigator.clipboard.writeText(link);
+						copyBtn.textContent = 'Copied!';
+						setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
+					} catch {
+						// Fallback: select the text
+						if (inviteLinkOutput) {
+							inviteLinkOutput.select();
+							document.execCommand('copy');
+							copyBtn.textContent = 'Copied!';
+							setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
+						}
+					}
+				});
+			}
+
+			// --- Remove confirmation modal ---
+			const removeModal = document.getElementById('removeModal');
+			const removeClose = document.getElementById('removeModalClose');
+			const removeCancelBtn = document.getElementById('removeCancelBtn');
+			const removeConfirmBtn = document.getElementById('removeConfirmBtn');
+			const removeEmailDisplay = document.getElementById('removeEmailDisplay');
+			let pendingRemoveEmail = '';
+
+			function openRemoveModal(email) {
+				pendingRemoveEmail = email;
+				if (removeEmailDisplay) removeEmailDisplay.textContent = email;
+				if (removeModal) removeModal.hidden = false;
+			}
+
+			function closeRemoveModal() {
+				if (removeModal) removeModal.hidden = true;
+				pendingRemoveEmail = '';
+			}
+
+			if (removeClose) removeClose.addEventListener('click', closeRemoveModal);
+			if (removeCancelBtn) removeCancelBtn.addEventListener('click', closeRemoveModal);
+
+			if (removeModal) {
+				removeModal.addEventListener('click', (e) => {
+					if (e.target === removeModal) closeRemoveModal();
+				});
+			}
+
+			// Wire up all remove buttons
+			document.querySelectorAll('.group-mgmt__remove-btn').forEach((btn) => {
+				btn.addEventListener('click', () => {
+					const email = btn.getAttribute('data-email');
+					if (email) openRemoveModal(email);
+				});
+			});
+
+			// Confirm remove
+			if (removeConfirmBtn) {
+				removeConfirmBtn.addEventListener('click', async () => {
+					if (!pendingRemoveEmail) return;
+
+					removeConfirmBtn.disabled = true;
+					removeConfirmBtn.textContent = 'Removing...';
+
+					try {
+						const response = await fetch('/_emdash/api/plugins/membership/memberGroupRemove', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							credentials: 'include',
+							body: JSON.stringify({
+								ownerEmail: memberEmail,
+								groupId: groupId,
+								email: pendingRemoveEmail,
+							}),
+						});
+
+						const data = await response.json();
+
+						if (response.ok && data.success) {
+							closeRemoveModal();
+							// Reload to reflect changes
+							window.location.reload();
+						} else {
+							alert(data.error || 'Failed to remove member');
+						}
+					} catch (err) {
+						alert('Error removing member. Please try again.');
+					} finally {
+						removeConfirmBtn.disabled = false;
+						removeConfirmBtn.textContent = 'Remove Member';
+					}
+				});
+			}
+
+			// Escape key closes modals
+			document.addEventListener('keydown', (e) => {
+				if (e.key === 'Escape') {
+					if (inviteModal && !inviteModal.hidden) closeInviteModal();
+					if (removeModal && !removeModal.hidden) closeRemoveModal();
+				}
+			});
+		});
+	}
+</script>
