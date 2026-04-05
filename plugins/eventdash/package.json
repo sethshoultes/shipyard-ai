@@ -1,15 +1,22 @@
 {
 	"name": "@shipyard/eventdash",
-	"version": "0.1.0",
-	"description": "Events & ticketing plugin for EmDash CMS",
+	"version": "1.0.0",
 	"type": "module",
+	"description": "Event registration, capacity management, waitlist, and recurring events for EmDash CMS.",
 	"exports": {
 		".": "./src/index.ts",
-		"./sandbox": "./src/sandbox-entry.ts"
+		"./sandbox": "./src/sandbox-entry.ts",
+		"./astro": "./src/astro/index.ts"
 	},
-	"keywords": ["emdash", "plugin", "events", "ticketing"],
-	"license": "MIT",
+	"files": [
+		"src",
+		"README.md"
+	],
 	"peerDependencies": {
+		"emdash": "^0.1.0"
+	},
+	"devDependencies": {
+		"typescript": "^5.5",
 		"emdash": "^0.1.0"
 	}
 }

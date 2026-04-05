@@ -1,26 +1,35 @@
 import type { PluginDescriptor } from "emdash";
 
 /**
- * EventDash Plugin
+ * EventDash plugin descriptor.
  *
- * Provides events & ticketing capabilities for EmDash sites.
- * Includes event management, registration tracking, iCal exports, and admin UI.
+ * Provides event registration, capacity management, waitlist,
+ * recurring event templates, and Portable Text block for event listings.
+ *
+ * Storage: All data in KV
+ * - Events: `event:{id}` → event data
+ * - Registrations: `registration:{eventId}:{email}` → registration data
+ * - Waitlist: `waitlist:{eventId}:{email}` → waitlist entry
+ * - Event list: `events:list` → [id1, id2, ...] sorted by date
+ * - Event templates: `event-template:{id}` → template data
+ *
+ * Admin UI: Block Kit pages for event management, attendee lists, check-in
+ * Portable Text: "event-listing" block type for displaying upcoming events
  */
-export function eventDashPlugin(): PluginDescriptor {
+export function eventdashPlugin(): PluginDescriptor {
 	return {
 		id: "eventdash",
-		version: "0.1.0",
+		version: "1.0.0",
 		format: "standard",
 		entrypoint: "@shipyard/eventdash/sandbox",
+		capabilities: ["email:send"],
 		options: {},
-		capabilities: ["kv:storage", "api:routes"],
-		storage: {
-			events: {
-				indexes: ["date", "recurringId", "createdAt"],
-			},
-			registrations: {
-				indexes: ["eventId", "email", "createdAt"],
-			},
-		},
+		adminPages: [
+			{ path: "/events", label: "Events", icon: "calendar" },
+			{ path: "/create", label: "Create Event", icon: "plus" },
+		],
+		adminWidgets: [
+			{ id: "upcoming-events", title: "Upcoming Events", size: "half" },
+		],
 	};
 }

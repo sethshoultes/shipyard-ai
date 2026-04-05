@@ -1,0 +1,337 @@
+---
+/**
+ * EventListing.astro
+ * Portable Text block component for displaying upcoming events.
+ *
+ * Props:
+ *   - limit: Number of events to display (default 5)
+ *   - showWaitlist: Show "Full - Join Waitlist" when at capacity (default true)
+ */
+
+interface Props {
+	limit?: number;
+	showWaitlist?: boolean;
+}
+
+const { limit = 5, showWaitlist = true } = Astro.props;
+
+// Fetch upcoming events from the API
+const apiBase = Astro.url.origin;
+const response = await fetch(`${apiBase}/_emdash/api/plugins/eventdash/events?limit=${limit}&upcomingOnly=true`);
+const data = await response.json();
+const events = data.events || [];
+
+/**
+ * Format date and time for display
+ */
+function formatDateTime(date: string, time: string): string {
+	try {
+		const [hours, minutes] = time.split(':');
+		const dateObj = new Date(`${date}T${hours}:${minutes}:00Z`);
+		return new Intl.DateTimeFormat('en-US', {
+			weekday: 'short',
+			month: 'short',
+			day: 'numeric',
+			hour: 'numeric',
+			minute: '2-digit',
+		}).format(dateObj);
+	} catch {
+		return `${date} at ${time}`;
+	}
+}
+
+/**
+ * Check if event is at capacity
+ */
+function isEventFull(event: any): boolean {
+	return event.registered >= event.capacity;
+}
+---
+
+<div class="event-listing">
+	{events.length === 0 ? (
+		<div class="event-listing__empty">
+			<p>No upcoming events scheduled.</p>
+		</div>
+	) : (
+		<div class="event-listing__events">
+			{events.map((event: any) => (
+				<div class="event-listing__item" key={event.id}>
+					<div class="event-listing__header">
+						<h3 class="event-listing__title">{event.title}</h3>
+						<span class={`event-listing__capacity ${isEventFull(event) ? 'event-listing__capacity--full' : ''}`}>
+							{event.registered}/{event.capacity}
+						</span>
+					</div>
+
+					{event.description && (
+						<p class="event-listing__description">{event.description}</p>
+					)}
+
+					<div class="event-listing__details">
+						<div class="event-listing__detail">
+							<span class="event-listing__label">When:</span>
+							<span class="event-listing__value">{formatDateTime(event.date, event.time)}</span>
+						</div>
+						<div class="event-listing__detail">
+							<span class="event-listing__label">Where:</span>
+							<span class="event-listing__value">{event.location}</span>
+						</div>
+					</div>
+
+					<form class="event-listing__form" data-event-id={event.id}>
+						<input
+							type="text"
+							name="name"
+							placeholder="Your name"
+							required
+							class="event-listing__input"
+						/>
+						<input
+							type="email"
+							name="email"
+							placeholder="your@email.com"
+							required
+							class="event-listing__input"
+						/>
+
+						{isEventFull(event) && showWaitlist ? (
+							<button
+								type="submit"
+								class="event-listing__button event-listing__button--waitlist"
+								data-action="waitlist"
+							>
+								Full — Join Waitlist
+							</button>
+						) : (
+							<button type="submit" class="event-listing__button">
+								Register
+							</button>
+						)}
+					</form>
+
+					<div class="event-listing__message" data-event-id={event.id}></div>
+				</div>
+			))}
+		</div>
+	)}
+</div>
+
+<script>
+	/**
+	 * Handle event registration form submission
+	 */
+	document.addEventListener('submit', async (event: Event) => {
+		const form = event.target as HTMLFormElement;
+
+		// Only handle event listing forms
+		if (!form.classList.contains('event-listing__form')) return;
+		if (!form.dataset.eventId) return;
+
+		event.preventDefault();
+
+		const eventId = form.dataset.eventId;
+		const name = (form.querySelector('input[name="name"]') as HTMLInputElement)?.value?.trim();
+		const email = (form.querySelector('input[name="email"]') as HTMLInputElement)?.value?.trim();
+
+		if (!name || !email) {
+			showMessage(eventId, 'Please fill in all fields', 'error');
+			return;
+		}
+
+		try {
+			const response = await fetch(
+				`/_emdash/api/plugins/eventdash/register?id=${encodeURIComponent(eventId)}`,
+				{
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ name, email }),
+				}
+			);
+
+			const result = await response.json();
+
+			if (response.ok && result.success) {
+				showMessage(eventId, result.message, 'success');
+				form.reset();
+			} else {
+				showMessage(eventId, result.error || 'Registration failed', 'error');
+			}
+		} catch (error) {
+			showMessage(eventId, 'An error occurred. Please try again.', 'error');
+			console.error('Registration error:', error);
+		}
+	});
+
+	/**
+	 * Display message to user
+	 */
+	function showMessage(eventId: string, message: string, type: 'success' | 'error') {
+		const messageEl = document.querySelector(
+			`[data-event-id="${eventId}"].event-listing__message`
+		) as HTMLElement | null;
+
+		if (!messageEl) return;
+
+		messageEl.textContent = message;
+		messageEl.className = `event-listing__message event-listing__message--${type}`;
+		messageEl.style.display = 'block';
+
+		// Auto-hide success messages after 4 seconds
+		if (type === 'success') {
+			setTimeout(() => {
+				messageEl.style.display = 'none';
+			}, 4000);
+		}
+	}
+</script>
+
+<style>
+	.event-listing {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.event-listing__empty {
+		text-align: center;
+		padding: 2rem;
+		color: #666;
+		font-style: italic;
+	}
+
+	.event-listing__events {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.event-listing__item {
+		border: 1px solid #e0e0e0;
+		border-radius: 0.5rem;
+		padding: 1.5rem;
+		background-color: #fafafa;
+	}
+
+	.event-listing__header {
+		display: flex;
+		justify-content: space-between;
+		align-items: start;
+		margin-bottom: 0.75rem;
+	}
+
+	.event-listing__title {
+		margin: 0;
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: #1a1a1a;
+		flex: 1;
+	}
+
+	.event-listing__capacity {
+		font-size: 0.875rem;
+		padding: 0.25rem 0.5rem;
+		background-color: #e8f5e9;
+		border-radius: 0.25rem;
+		color: #2e7d32;
+		white-space: nowrap;
+	}
+
+	.event-listing__capacity--full {
+		background-color: #ffebee;
+		color: #c62828;
+	}
+
+	.event-listing__description {
+		margin: 0.5rem 0 0.75rem 0;
+		color: #555;
+		font-size: 0.95rem;
+	}
+
+	.event-listing__details {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		margin-bottom: 1rem;
+		font-size: 0.95rem;
+	}
+
+	.event-listing__detail {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.event-listing__label {
+		font-weight: 500;
+		color: #666;
+		min-width: 5rem;
+	}
+
+	.event-listing__value {
+		color: #1a1a1a;
+	}
+
+	.event-listing__form {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.event-listing__input {
+		padding: 0.75rem;
+		border: 1px solid #d0d0d0;
+		border-radius: 0.25rem;
+		font-size: 0.95rem;
+		font-family: inherit;
+	}
+
+	.event-listing__input:focus {
+		outline: none;
+		border-color: #0066cc;
+		box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
+	}
+
+	.event-listing__button {
+		padding: 0.75rem 1rem;
+		border: none;
+		border-radius: 0.25rem;
+		font-size: 0.95rem;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background-color 0.2s;
+		background-color: #0066cc;
+		color: white;
+	}
+
+	.event-listing__button:hover {
+		background-color: #0052a3;
+	}
+
+	.event-listing__button--waitlist {
+		background-color: #ff9800;
+	}
+
+	.event-listing__button--waitlist:hover {
+		background-color: #e68900;
+	}
+
+	.event-listing__message {
+		display: none;
+		padding: 0.75rem;
+		border-radius: 0.25rem;
+		font-size: 0.9rem;
+	}
+
+	.event-listing__message--success {
+		background-color: #e8f5e9;
+		color: #2e7d32;
+		border-left: 4px solid #2e7d32;
+	}
+
+	.event-listing__message--error {
+		background-color: #ffebee;
+		color: #c62828;
+		border-left: 4px solid #c62828;
+	}
+</style>

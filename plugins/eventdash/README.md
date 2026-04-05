@@ -1,30 +1,34 @@
-# EventDash Plugin
+# EventDash Plugin v1.0
 
-The first events and ticketing plugin in the EmDash ecosystem. Manage events, track registrations, and export calendars.
+Event registration and management plugin for EmDash CMS. Manage events, handle capacity-based registrations, maintain automatic waitlists, support recurring event templates, and display events via Portable Text blocks.
 
 ## Features
 
-- **Event Management** — Create and manage events with capacity, pricing, and recurring schedules
-- **Registration Tracking** — Register attendees, track capacity, and manage paid/free events
-- **iCal Export** — Export events as an iCal feed for calendar integration
-- **Admin UI** — Manage events and registrations through the EmDash admin panel
-- **REST API** — Full API for querying events and managing registrations
+- **Event Management** — Create one-off and recurring events with date, time, location, and capacity
+- **Email-Only Registration** — No accounts required; register with name + email
+- **Capacity & Waitlist** — Enforce capacity limits with automatic waitlist management
+- **Recurring Events** — Create templates for weekly/monthly events; auto-generate instances
+- **Email Notifications** — Optional Resend integration for confirmations, cancellations, and waitlist promotions (works without it)
+- **Portable Text Block** — "event-listing" block displays upcoming events with inline registration
+- **Admin UI** — Block Kit-based admin pages for event management and attendee tracking
+- **REST API** — Full API for listing events, registering, cancelling, and creating events
+- **No Stripe** — Free registrations only (v1.0)
 
 ## Installation
 
-EventDash is a standard-format EmDash plugin that works in both trusted (in-process) and sandboxed (V8 isolate) modes.
+EventDash is a standard-format EmDash plugin that works in both trusted (in-process) and sandboxed modes.
 
 ### Register in astro.config.mjs
 
 ```typescript
-import { eventDashPlugin } from "@shipyard/eventdash";
+import { eventdashPlugin } from "@shipyard/eventdash";
 
 export default defineConfig({
 	integrations: [
 		emdash({
-			plugins: [eventDashPlugin()], // Trusted mode
+			plugins: [eventdashPlugin()], // Trusted mode
 			// OR
-			// sandboxed: [eventDashPlugin()], // Sandboxed mode on Cloudflare
+			// sandboxed: [eventdashPlugin()], // Sandboxed mode on Cloudflare
 		}),
 	],
 });
@@ -36,19 +40,17 @@ export default defineConfig({
 
 ```typescript
 {
-	id: string;                    // Unique event ID
-	title: string;                 // Event name
-	description: string;           // Full description
-	date: string;                  // ISO date (YYYY-MM-DD)
-	time: string;                  // Time (HH:mm)
-	location: string;              // Physical location or URL
-	capacity: number;              // Max attendees
-	registered: number;            // Current registrations
-	price: number;                 // Ticket price (0 for free)
-	recurring?: string;            // "daily" | "weekly" | "monthly" (optional)
-	recurringId?: string;          // For grouping recurring instances (optional)
-	createdAt: string;             // ISO timestamp
-	updatedAt: string;             // ISO timestamp
+	id: string;           // Unique event ID
+	title: string;        // Event name
+	description?: string; // Full description (optional)
+	date: string;         // ISO date (YYYY-MM-DD)
+	time: string;         // Start time (HH:MM)
+	endTime?: string;     // End time (HH:MM, optional)
+	location: string;     // Physical location
+	capacity: number;     // Max attendees
+	registered: number;   // Current registrations
+	templateId?: string;  // If instance of recurring template (optional)
+	createdAt: string;    // ISO timestamp
 }
 ```
 
@@ -56,13 +58,38 @@ export default defineConfig({
 
 ```typescript
 {
-	id: string;         // Unique registration ID
-	eventId: string;    // Event ID
-	name: string;       // Attendee name
+	email: string;           // Attendee email
+	name: string;            // Attendee name
+	status: "registered";    // Always "registered" when active
+	ticketCount: number;     // Always 1 (v1.0)
+	createdAt: string;       // Registration timestamp
+}
+```
+
+### Waitlist
+
+```typescript
+{
 	email: string;      // Attendee email
-	ticketCount: number; // Number of tickets
-	paid: boolean;      // Payment status
-	createdAt: string;  // ISO timestamp
+	name: string;       // Attendee name
+	position: number;   // Position in waitlist (1-based)
+	createdAt: string;  // Joined waitlist timestamp
+}
+```
+
+### Event Template (for recurring events)
+
+```typescript
+{
+	id: string;            // Template ID
+	title: string;         // Event name
+	description?: string;  // Description (optional)
+	time: string;          // Start time (HH:MM)
+	endTime?: string;      // End time (HH:MM, optional)
+	location: string;      // Location
+	capacity: number;      // Capacity per instance
+	dayOfWeek: number;     // 0=Sunday, 1=Monday, ..., 6=Saturday
+	createdAt: string;     // Template creation timestamp
 }
 ```
 
@@ -72,74 +99,66 @@ All routes are available at `/_emdash/api/plugins/eventdash/<route>`.
 
 ### GET `/events`
 
-List all upcoming events with pagination.
+List all upcoming events sorted by date/time.
 
 **Query Parameters:**
-- `limit` (optional) — Results per page, max 100. Default: 50.
-- `cursor` (optional) — Pagination cursor from previous response.
+- `limit` (optional) — Max events to return (default 20, max 100)
+- `upcomingOnly` (optional) — Filter to future events only (default "true")
 
 **Response:**
 ```json
 {
-	"items": [
+	"events": [
 		{
-			"id": "evt_123",
-			"title": "Community Meetup",
-			"date": "2026-05-15",
+			"id": "1712243400000-abc123",
+			"title": "Tuesday Yoga Class",
+			"date": "2026-04-08",
 			"time": "18:00",
-			"location": "Downtown Coffee",
-			"capacity": 50,
-			"registered": 28,
-			"price": 0,
-			"createdAt": "2026-04-05T10:00:00Z",
-			"updatedAt": "2026-04-05T10:00:00Z"
+			"location": "Sunrise Yoga Studio",
+			"capacity": 20,
+			"registered": 15,
+			"createdAt": "2026-04-05T10:00:00Z"
 		}
 	],
-	"cursor": "next_page_token",
-	"hasMore": true
+	"total": 1
 }
 ```
 
-### GET `/events/:id`
+### GET `/events/:id` (via `eventDetail` route)
 
-Get single event details with registration count.
-
-**Path Parameters:**
-- `id` — Event ID
+Get single event details with registration and waitlist counts.
 
 **Response:**
 ```json
 {
-	"id": "evt_123",
-	"title": "Community Meetup",
-	"date": "2026-05-15",
-	"time": "18:00",
-	"location": "Downtown Coffee",
-	"capacity": 50,
-	"registered": 28,
-	"price": 0,
-	"createdAt": "2026-04-05T10:00:00Z",
-	"updatedAt": "2026-04-05T10:00:00Z"
+	"event": {
+		"id": "1712243400000-abc123",
+		"title": "Tuesday Yoga Class",
+		"date": "2026-04-08",
+		"time": "18:00",
+		"location": "Sunrise Yoga Studio",
+		"capacity": 20,
+		"registered": 20,
+		"createdAt": "2026-04-05T10:00:00Z"
+	},
+	"spotsRemaining": 0,
+	"waitlistCount": 3
 }
 ```
 
 **Errors:**
+- `400` — Event ID required
 - `404` — Event not found
 
 ### POST `/events/:id/register`
 
-Register an attendee for an event.
-
-**Path Parameters:**
-- `id` — Event ID
+Register an attendee for an event or add to waitlist if full.
 
 **Request Body:**
 ```json
 {
 	"name": "Jane Doe",
-	"email": "jane@example.com",
-	"ticketCount": 2,
-	"paid": false
+	"email": "jane@example.com"
 }
 ```
 
@@ -147,34 +166,33 @@ Register an attendee for an event.
 ```json
 {
 	"success": true,
-	"registrationId": "reg_abc123",
-	"registration": {
-		"id": "reg_abc123",
-		"eventId": "evt_123",
-		"name": "Jane Doe",
-		"email": "jane@example.com",
-		"ticketCount": 2,
-		"paid": false,
-		"createdAt": "2026-04-05T12:30:00Z"
-	}
+	"status": "registered",
+	"message": "Registered for Tuesday Yoga Class"
+}
+```
+
+Or if at capacity:
+```json
+{
+	"success": true,
+	"status": "waitlisted",
+	"message": "Added to waitlist. You're #3"
 }
 ```
 
 **Errors:**
+- `400` — Name, valid email, or event ID missing
 - `404` — Event not found
-- `400` — Not enough tickets available
+- `429` — Registration in progress (concurrent request)
 
 ### POST `/events/:id/cancel`
 
-Cancel a registration.
-
-**Path Parameters:**
-- `id` — Event ID
+Cancel a registration. If successful, promotes first person from waitlist.
 
 **Request Body:**
 ```json
 {
-	"registrationId": "reg_abc123"
+	"email": "jane@example.com"
 }
 ```
 
@@ -182,57 +200,140 @@ Cancel a registration.
 ```json
 {
 	"success": true,
-	"deleted": "reg_abc123"
+	"message": "Registration cancelled"
 }
 ```
 
 **Errors:**
+- `400` — Email required
 - `404` — Registration not found
 
-### GET `/events/ical`
+### POST `/events/create` (admin only)
 
-Export all events as an iCal feed.
+Create a new event.
+
+**Request Body:**
+```json
+{
+	"title": "Tuesday Yoga Class",
+	"date": "2026-04-08",
+	"time": "18:00",
+	"location": "123 Main St",
+	"capacity": 20,
+	"description": "Beginner-friendly vinyasa flow",
+	"endTime": "19:00"
+}
+```
 
 **Response:**
-- Content-Type: `text/calendar`
-- Standard iCal format (RFC 5545)
-
-**Usage:**
-```bash
-curl https://your-site.com/_emdash/api/plugins/eventdash/events/ical > events.ics
+```json
+{
+	"success": true,
+	"eventId": "1712243400000-abc123"
+}
 ```
 
-## Settings
+**Errors:**
+- `400` — Missing required fields
+- `403` — Admin access required
 
-EventDash stores configuration in KV storage:
+### POST `/events/generate-recurring` (admin only)
 
-- `settings:defaultCapacity` — Default capacity for new events (default: 100)
-- `settings:requirePayment` — Whether payment is required (default: false)
-- `settings:notificationEmail` — Email for registration notifications (default: empty)
+Generate N weeks of instances from a recurring event template.
 
-**Access in routes:**
-```typescript
-const capacity = (await ctx.kv.get<number>("settings:defaultCapacity")) ?? 100;
-const email = await ctx.kv.get<string>("settings:notificationEmail");
+**Request Body:**
+```json
+{
+	"templateId": "template-123",
+	"weeks": 8,
+	"startDate": "2026-04-08"
+}
 ```
 
-## Storage Collections
+**Response:**
+```json
+{
+	"success": true,
+	"generatedCount": 8
+}
+```
 
-EventDash uses two storage collections, automatically scoped to this plugin:
+**Errors:**
+- `400` — Template ID or weeks missing
+- `403` — Admin access required
+- `404` — Template not found
 
-### `events`
+## Portable Text Block: "event-listing"
 
-Document collection with indexes on:
-- `date` — Event date (for chronological queries)
-- `recurringId` — Recurring event grouping
-- `createdAt` — Creation timestamp
+Display upcoming events with inline registration on your site.
 
-### `registrations`
+### Block Configuration
 
-Document collection with indexes on:
-- `eventId` — Event association (for finding registrations per event)
-- `email` — Attendee email (for finding attendee's registrations)
-- `createdAt` — Registration timestamp
+```json
+{
+	"type": "event-listing",
+	"limit": 5,
+	"showWaitlist": true
+}
+```
+
+### Block Props
+
+- `limit` (number, default 5) — How many upcoming events to display
+- `showWaitlist` (boolean, default true) — Show "Full — Join Waitlist" button when at capacity
+
+### Example Usage
+
+In your Portable Text editor, add an "event-listing" block to any page. The block:
+1. Fetches upcoming events from the API
+2. Displays title, date, time, location, and capacity
+3. Shows inline registration form (name + email)
+4. Displays "Register" or "Full — Join Waitlist" button based on capacity
+5. Shows success/error messages inline
+
+## Admin UI
+
+EventDash provides Block Kit admin pages accessible in the EmDash admin panel.
+
+### Pages
+
+**Events** (`/events`)
+- Table of all events with date, time, registration count, waitlist count, and status
+- Quick stats: total events, total registrations
+- Click through to event details
+
+**Create Event** (`/create`)
+- Form to create new events
+- Fields: title, date (YYYY-MM-DD), time (HH:MM), end time (optional), location, capacity, description (optional)
+
+### Widgets
+
+**Upcoming Events** — Dashboard widget showing:
+- Count of upcoming events
+- Total registrations across upcoming events
+
+## Email Notifications
+
+EventDash optionally sends emails via the `ctx.email` API when an email provider is configured (e.g., Resend).
+
+Notifications sent:
+- **Registration Confirmation** — Sent when attendee registers
+- **Cancellation Confirmation** — Sent when attendee cancels
+- **Waitlist Added** — Sent when attendee joins waitlist
+- **Waitlist Promoted** — Sent when attendee is promoted from waitlist
+
+If no email provider is configured, registrations work normally but no emails are sent.
+
+## Settings & Configuration
+
+All data stored in KV:
+- `event:{id}` — Event details
+- `registration:{eventId}:{email}` — Attendee registration
+- `waitlist:{eventId}` — Waitlist entries (JSON array)
+- `event-template:{id}` — Recurring event template
+- `events:list` — List of all event IDs
+
+Email is optional and works with any provider configured in EmDash.
 
 ## Development
 
@@ -240,15 +341,40 @@ Document collection with indexes on:
 
 ```
 src/
-  index.ts           — Plugin descriptor (runs in Vite at build time)
-  sandbox-entry.ts   — Plugin definition with hooks and routes (runs at request time)
+  index.ts              — Plugin descriptor (runs in Vite at build time)
+  sandbox-entry.ts      — Plugin definition (runs at request time)
+  astro/
+    EventListing.astro  — Portable Text block component
+    index.ts            — Block exports
 ```
 
-### TypeScript
+### Key Utilities
 
-EventDash is written in strict TypeScript. All types are exported from `sandbox-entry.ts`.
+- `emailToKvKey(email)` — URL-encodes email for safe KV key usage
+- `generateId()` — Creates unique event/registration IDs
+- `parseJSON<T>(json, fallback)` — Safe JSON parsing with fallback
+- `isValidEmail(email)` — Basic email validation
+- `dateTimeToTimestamp(date, time)` — Converts ISO date + time to comparable timestamp
 
-### Testing
+### Concurrency Handling
+
+Registration uses locks to prevent race conditions:
+```typescript
+const lockKey = `register-lock:${eventId}:${emailToKvKey(email)}`;
+await ctx.kv.set(lockKey, "1", { ex: 5 }); // 5 second lock
+```
+
+### Error Handling
+
+All routes use Response objects for HTTP errors:
+```typescript
+throw new Response(
+	JSON.stringify({ error: "Message" }),
+	{ status: 400, headers: { "Content-Type": "application/json" } }
+);
+```
+
+## Testing
 
 Test locally in trusted mode:
 
@@ -258,30 +384,35 @@ npm install @shipyard/eventdash
 npx emdash dev
 ```
 
-Then call routes:
-
+Call routes:
 ```bash
-# Get events
+# List events
 curl http://localhost:4321/_emdash/api/plugins/eventdash/events
 
 # Register
-curl -X POST http://localhost:4321/_emdash/api/plugins/eventdash/events/evt_123/register \
+curl -X POST http://localhost:4321/_emdash/api/plugins/eventdash/register?id=EVENT_ID \
   -H "Content-Type: application/json" \
-  -d '{"name": "John", "email": "john@example.com", "ticketCount": 1}'
+  -d '{"name": "Jane", "email": "jane@example.com"}'
+
+# Create event (admin only - requires auth)
+curl -X POST http://localhost:4321/_emdash/api/plugins/eventdash/createEvent \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Yoga", "date": "2026-04-15", "time": "18:00", "location": "Studio", "capacity": 20}'
 ```
 
 ## Sandboxing
 
-EventDash works in sandboxed mode on Cloudflare Workers without code changes. The plugin declares `kv:storage` and `api:routes` capabilities, which are enforced at runtime via the RPC bridge.
+EventDash works in sandboxed mode on Cloudflare Workers. The plugin declares `email:send` capability, enforced at runtime via RPC bridge. All code uses Web APIs only (no Node.js built-ins).
 
 ## Future Enhancements
 
-- Paid event processing with payment gateway integration
-- Email notifications for registrations
-- Recurring event automation
-- Waitlist management
+- Paid event processing with Stripe
+- Calendar view (iCal export)
 - Custom registration forms
+- Email digest/confirmation templates
 - Analytics and reporting
+- Multi-day events
+- Event categories/filtering
 
 ## License
 

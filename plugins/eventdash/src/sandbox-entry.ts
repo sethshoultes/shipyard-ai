@@ -1,292 +1,1012 @@
 import { definePlugin } from "emdash";
 import type { PluginContext } from "emdash";
-import { z } from "astro/zod";
 
 /**
- * Event data structure
+ * Type definitions
  */
-interface Event {
+
+interface EventRecord {
 	id: string;
 	title: string;
-	description: string;
-	date: string; // ISO date YYYY-MM-DD
-	time: string; // HH:mm format
+	description?: string;
+	date: string; // ISO date string
+	time: string; // HH:MM format
+	endTime?: string; // HH:MM format
 	location: string;
 	capacity: number;
 	registered: number;
-	price: number; // 0 for free
-	recurring?: string; // "daily" | "weekly" | "monthly" | undefined for one-time
-	recurringId?: string; // ID for grouping recurring events
+	templateId?: string; // If this is an instance from a template
 	createdAt: string;
-	updatedAt: string;
 }
 
-/**
- * Registration data structure
- */
-interface Registration {
-	id: string;
-	eventId: string;
-	name: string;
+interface RegistrationRecord {
 	email: string;
+	name: string;
+	status: "registered" | "cancelled";
 	ticketCount: number;
-	paid: boolean;
 	createdAt: string;
 }
 
-/**
- * iCal event data
- */
-interface ICalEvent {
-	uid: string;
-	summary: string;
-	description: string;
+interface WaitlistRecord {
+	email: string;
+	name: string;
+	createdAt: string;
+	position: number;
+}
+
+interface EventTemplateRecord {
+	id: string;
+	title: string;
+	description?: string;
+	time: string; // HH:MM format
+	endTime?: string;
 	location: string;
-	dtstart: string;
-	dtend: string;
-	dtstamp: string;
-	created: string;
-	modified: string;
+	capacity: number;
+	dayOfWeek: number; // 0=Sunday, 1=Monday, ..., 6=Saturday
+	createdAt: string;
+}
+
+interface AdminInteraction {
+	type: string;
+	page?: string;
+	widgetId?: string;
+	action?: string;
+	eventId?: string;
+	title?: string;
+	date?: string;
+	time?: string;
+	endTime?: string;
+	location?: string;
+	capacity?: number | string;
+	description?: string;
+}
+
+/**
+ * Utility: Validate email format
+ */
+function isValidEmail(email: string): boolean {
+	const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	return re.test(email);
+}
+
+/**
+ * Utility: Generate unique IDs
+ */
+function generateId(): string {
+	return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+/**
+ * Utility: Parse JSON safely
+ */
+function parseJSON<T>(json: string | undefined | null, fallback: T): T {
+	if (!json) return fallback;
+	try {
+		return JSON.parse(json) as T;
+	} catch {
+		return fallback;
+	}
+}
+
+/**
+ * Utility: Encode email for safe KV key usage
+ */
+function emailToKvKey(email: string): string {
+	return encodeURIComponent(email.toLowerCase().trim());
+}
+
+/**
+ * Utility: Parse ISO date and time into a comparable timestamp
+ */
+function dateTimeToTimestamp(date: string, time: string): number {
+	try {
+		const [hours, minutes] = time.split(":").map(Number);
+		const dt = new Date(`${date}T${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00Z`);
+		return dt.getTime();
+	} catch {
+		return 0;
+	}
+}
+
+/**
+ * Utility: Get all events and sort by date/time
+ */
+async function getAllEventsWithDates(ctx: PluginContext): Promise<EventRecord[]> {
+	const listJson = await ctx.kv.get<string>("events:list");
+	const eventIds = parseJSON<string[]>(listJson, []);
+
+	const events: EventRecord[] = [];
+	for (const id of eventIds) {
+		const eventJson = await ctx.kv.get<string>(`event:${id}`);
+		if (eventJson) {
+			const event = parseJSON<EventRecord>(eventJson, null);
+			if (event) {
+				events.push(event);
+			}
+		}
+	}
+
+	// Sort by date and time
+	events.sort((a, b) => {
+		const aTimestamp = dateTimeToTimestamp(a.date, a.time);
+		const bTimestamp = dateTimeToTimestamp(b.date, b.time);
+		return aTimestamp - bTimestamp;
+	});
+
+	return events;
+}
+
+/**
+ * Utility: Get waitlist for an event, sorted by position
+ */
+async function getWaitlist(ctx: PluginContext, eventId: string): Promise<WaitlistRecord[]> {
+	const waitlistKey = `waitlist:${eventId}`;
+	const waitlistJson = await ctx.kv.get<string>(waitlistKey);
+	const waitlist = parseJSON<WaitlistRecord[]>(waitlistJson, []);
+
+	// Sort by position
+	waitlist.sort((a, b) => a.position - b.position);
+	return waitlist;
+}
+
+/**
+ * Utility: Get first person on waitlist and remove them
+ */
+async function promoteFromWaitlist(
+	ctx: PluginContext,
+	eventId: string
+): Promise<WaitlistRecord | null> {
+	const waitlist = await getWaitlist(ctx, eventId);
+
+	if (waitlist.length === 0) return null;
+
+	const promoted = waitlist[0];
+	const remaining = waitlist.slice(1);
+
+	// Renumber positions
+	const updated = remaining.map((w, index) => ({ ...w, position: index + 1 }));
+
+	if (updated.length > 0) {
+		await ctx.kv.set(`waitlist:${eventId}`, JSON.stringify(updated));
+	} else {
+		await ctx.kv.delete(`waitlist:${eventId}`);
+	}
+
+	return promoted;
+}
+
+/**
+ * Hook: Initialize plugin on install
+ */
+function initializePlugin(ctx: PluginContext): void {
+	ctx.log.info("EventDash plugin installed");
+	// No default data needed — events are created by admin
 }
 
 export default definePlugin({
 	hooks: {
 		"plugin:install": {
-			handler: async (_event: any, ctx: PluginContext) => {
-				ctx.log.info("EventDash plugin installed");
-				// Set default settings
-				await ctx.kv.set("settings:defaultCapacity", 100);
-				await ctx.kv.set("settings:requirePayment", false);
-				await ctx.kv.set("settings:notificationEmail", "");
+			handler: async (_event: unknown, ctx: PluginContext) => {
+				initializePlugin(ctx);
 			},
 		},
 	},
 
 	routes: {
-		// Get all upcoming events
-		"events": {
-			handler: async (routeCtx: any, ctx: PluginContext) => {
-				const url = new URL(routeCtx.request.url);
-				const limit = Math.min(parseInt(url.searchParams.get("limit") || "50", 10) || 50, 100);
-				const cursor = url.searchParams.get("cursor") || undefined;
+		/**
+		 * GET /eventdash/events
+		 * List all upcoming events sorted by date.
+		 *
+		 * Query params:
+		 *   - limit: max number of events (default 20)
+		 *   - upcomingOnly: if "true", filter to future events only (default true)
+		 *
+		 * Returns: { events: EventRecord[], total: number }
+		 */
+		events: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const limit = Math.min(
+						Math.max(1, parseInt(String(input.limit ?? "20"), 10) || 20),
+						100
+					);
+					const upcomingOnly = String(input.upcomingOnly ?? "true") === "true";
 
-				const result = await ctx.storage.events!.query({
-					orderBy: { date: "asc" },
-					limit,
-					cursor,
-				});
+					let events = await getAllEventsWithDates(ctx);
 
-				return {
-					items: result.items.map((item: any) => ({
-						id: item.id,
-						...item.data,
-					})),
-					cursor: result.cursor,
-					hasMore: result.hasMore,
-				};
-			},
-		},
+					// Filter to upcoming events if requested
+					if (upcomingOnly) {
+						const now = new Date();
+						events = events.filter((e) => {
+							const eventTime = dateTimeToTimestamp(e.date, e.time);
+							return eventTime > now.getTime();
+						});
+					}
 
-		// Get single event with registration count
-		"events/:id": {
-			input: z.object({
-				id: z.string(),
-			}),
-			handler: async (routeCtx: any, ctx: PluginContext) => {
-				const { id } = routeCtx.input;
-				const event = await ctx.storage.events!.get(id);
+					// Limit results
+					const limited = events.slice(0, limit);
 
-				if (!event) {
-					throw new Response(JSON.stringify({ error: "Event not found" }), {
-						status: 404,
-						headers: { "Content-Type": "application/json" },
-					});
-				}
-
-				const registrationCount = await ctx.storage.registrations!.count({
-					eventId: id,
-				});
-
-				return {
-					id,
-					...event,
-					registered: registrationCount,
-				};
-			},
-		},
-
-		// Register for an event
-		"events/:id/register": {
-			input: z.object({
-				id: z.string(),
-				name: z.string().min(1).max(200),
-				email: z.string().email(),
-				ticketCount: z.number().int().min(1).default(1),
-				paid: z.boolean().default(false),
-			}),
-			handler: async (routeCtx: any, ctx: PluginContext) => {
-				const { id, name, email, ticketCount, paid } = routeCtx.input;
-
-				// Verify event exists
-				const event = (await ctx.storage.events!.get(id)) as Event | null;
-				if (!event) {
-					throw new Response(JSON.stringify({ error: "Event not found" }), {
-						status: 404,
-						headers: { "Content-Type": "application/json" },
-					});
-				}
-
-				// Check capacity
-				const registrationCount = await ctx.storage.registrations!.count({
-					eventId: id,
-				});
-
-				if (registrationCount + ticketCount > event.capacity) {
+					return { events: limited, total: events.length };
+				} catch (error) {
+					ctx.log.error(`Events list error: ${String(error)}`);
 					throw new Response(
-						JSON.stringify({
-							error: "Not enough tickets available",
-							available: event.capacity - registrationCount,
-						}),
-						{
-							status: 400,
-							headers: { "Content-Type": "application/json" },
-						}
+						JSON.stringify({ error: "Failed to fetch events" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
 					);
 				}
-
-				// Create registration
-				const registrationId = `${id}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-				const registration: Registration = {
-					id: registrationId,
-					eventId: id,
-					name,
-					email,
-					ticketCount,
-					paid,
-					createdAt: new Date().toISOString(),
-				};
-
-				await ctx.storage.registrations!.put(registrationId, registration);
-
-				// Log registration
-				ctx.log.info(`New registration for event ${id}`, { email, ticketCount });
-
-				return {
-					success: true,
-					registrationId,
-					registration,
-				};
 			},
 		},
 
-		// Cancel registration
-		"events/:id/cancel": {
-			input: z.object({
-				id: z.string(),
-				registrationId: z.string(),
-			}),
-			handler: async (routeCtx: any, ctx: PluginContext) => {
-				const { registrationId } = routeCtx.input;
+		/**
+		 * GET /eventdash/events/:id
+		 * Get event details with registration count and spots remaining.
+		 *
+		 * Returns: { event: EventRecord, spotsRemaining: number, waitlistCount: number }
+		 */
+		eventDetail: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const eventId = String(rc.pathParams?.id ?? "").trim();
 
-				const registration = (await ctx.storage.registrations!.get(registrationId)) as Registration | null;
-				if (!registration) {
-					throw new Response(JSON.stringify({ error: "Registration not found" }), {
-						status: 404,
-						headers: { "Content-Type": "application/json" },
-					});
-				}
+					if (!eventId) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
 
-				await ctx.storage.registrations!.delete(registrationId);
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					if (!eventJson) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
 
-				ctx.log.info(`Registration cancelled: ${registrationId}`);
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
 
-				return { success: true, deleted: registrationId };
-			},
-		},
-
-		// Export events as iCal feed
-		"events/ical": {
-			handler: async (routeCtx: any, ctx: PluginContext) => {
-				const result = await ctx.storage.events!.query({
-					orderBy: { date: "asc" },
-					limit: 500,
-				});
-
-				// Build iCal events
-				const icalEvents: ICalEvent[] = result.items.map((item: any) => {
-					const event = item.data as Event;
-					const [year, month, day] = event.date.split("-");
-					const [hour, minute] = event.time.split(":");
-
-					// Format: YYYYMMDDTHHMMSS
-					const dtstart = `${year}${month}${day}T${hour}${minute}00`;
-					const dtend = `${year}${month}${day}T${String(parseInt(hour) + 1).padStart(2, "0")}${minute}00`;
-					const dtstamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
+					const waitlist = await getWaitlist(ctx, eventId);
+					const spotsRemaining = Math.max(0, event.capacity - event.registered);
 
 					return {
-						uid: `${item.id}@eventdash`,
-						summary: event.title,
-						description: event.description,
-						location: event.location,
-						dtstart,
-						dtend,
-						dtstamp,
-						created: event.createdAt.replace(/[-:]/g, "").replace(/\.\d+/, ""),
-						modified: event.updatedAt.replace(/[-:]/g, "").replace(/\.\d+/, ""),
+						event,
+						spotsRemaining,
+						waitlistCount: waitlist.length,
 					};
-				});
-
-				// Build iCal file
-				const now = new Date();
-				const prodId = "-//EventDash//EmDash Events//EN";
-				const calId = `events-${now.getTime()}@eventdash`;
-
-				let ical = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:${prodId}
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-X-WR-CALNAME:Events
-X-WR-TIMEZONE:UTC
-DTSTAMP:${now.toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "")}Z
-`;
-
-				for (const event of icalEvents) {
-					ical += `BEGIN:VEVENT
-UID:${event.uid}
-DTSTAMP:${event.dtstamp}Z
-DTSTART:${event.dtstart}Z
-DTEND:${event.dtend}Z
-SUMMARY:${escapeICalString(event.summary)}
-DESCRIPTION:${escapeICalString(event.description)}
-LOCATION:${escapeICalString(event.location)}
-CREATED:${event.created}Z
-LAST-MODIFIED:${event.modified}Z
-END:VEVENT
-`;
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Event detail error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to fetch event" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
 				}
+			},
+		},
 
-				ical += `END:VCALENDAR`;
+		/**
+		 * POST /eventdash/events/:id/register
+		 * Register for an event. If full, adds to waitlist.
+		 *
+		 * Body: { name: string, email: string }
+		 * Returns: { success: boolean, status: "registered" | "waitlisted", message: string }
+		 */
+		register: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const eventId = String(rc.pathParams?.id ?? "").trim();
+					const input = rc.input as Record<string, unknown>;
+					const name = String(input.name ?? "").trim();
+					const email = String(input.email ?? "").trim().toLowerCase();
 
-				// Return as iCal MIME type
-				return new Response(ical, {
-					headers: {
-						"Content-Type": "text/calendar; charset=utf-8",
-						"Content-Disposition": 'attachment; filename="events.ics"',
-					},
-				});
+					// Validate input
+					if (!eventId) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!name) {
+						throw new Response(
+							JSON.stringify({ error: "Name is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!email || !isValidEmail(email)) {
+						throw new Response(
+							JSON.stringify({ error: "Valid email is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					if (!eventJson) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Acquire lock to prevent race condition
+					const lockKey = `register-lock:${eventId}:${emailToKvKey(email)}`;
+					const existingLock = await ctx.kv.get<string>(lockKey);
+					if (existingLock) {
+						throw new Response(
+							JSON.stringify({ error: "Registration in progress, please try again" }),
+							{ status: 429, headers: { "Content-Type": "application/json" } }
+						);
+					}
+					await ctx.kv.set(lockKey, "1", { ex: 5 }); // 5 second lock
+
+					try {
+						// Check if already registered
+						const regKey = `registration:${eventId}:${emailToKvKey(email)}`;
+						const existingReg = await ctx.kv.get<string>(regKey);
+						if (existingReg) {
+							const existing = parseJSON<RegistrationRecord>(existingReg, null);
+							if (existing && existing.status === "registered") {
+								return {
+									success: true,
+									status: "registered",
+									message: "Already registered for this event",
+								};
+							}
+						}
+
+						const now = new Date().toISOString();
+						let status: "registered" | "waitlisted" = "registered";
+
+						// Check capacity
+						if (event.registered >= event.capacity) {
+							// Full — add to waitlist
+							status = "waitlisted";
+							const waitlist = await getWaitlist(ctx, eventId);
+							const position = waitlist.length + 1;
+
+							const waitlistEntry: WaitlistRecord = {
+								email,
+								name,
+								createdAt: now,
+								position,
+							};
+
+							waitlist.push(waitlistEntry);
+							await ctx.kv.set(`waitlist:${eventId}`, JSON.stringify(waitlist));
+
+							// Send waitlist email if provider available
+							if (ctx.email) {
+								await ctx.email.send({
+									to: email,
+									subject: `Waitlisted for ${event.title}`,
+									text: `Hi ${name},\n\nYou've been added to the waitlist for ${event.title} on ${event.date} at ${event.time}.\n\nYou're #${position} on the waitlist.`,
+								});
+							}
+
+							return {
+								success: true,
+								status: "waitlisted",
+								message: `Added to waitlist. You're #${position}`,
+							};
+						}
+
+						// Register the attendee
+						const registration: RegistrationRecord = {
+							email,
+							name,
+							status: "registered",
+							ticketCount: 1,
+							createdAt: now,
+						};
+
+						await ctx.kv.set(regKey, JSON.stringify(registration));
+
+						// Increment registered count
+						event.registered++;
+						await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
+
+						// Send confirmation email if provider available
+						if (ctx.email) {
+							await ctx.email.send({
+								to: email,
+								subject: `Registered for ${event.title}`,
+								text: `Hi ${name},\n\nYou're registered for ${event.title} on ${event.date} at ${event.time}.\n\nLocation: ${event.location}`,
+							});
+						}
+
+						ctx.log.info(`Registration confirmed: ${email} for event ${eventId}`);
+
+						return {
+							success: true,
+							status: "registered",
+							message: `Registered for ${event.title}`,
+						};
+					} finally {
+						// Release the lock
+						await ctx.kv.delete(lockKey);
+					}
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Registration error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Registration failed" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /eventdash/events/:id/cancel
+		 * Cancel registration and optionally promote from waitlist.
+		 *
+		 * Body: { email: string }
+		 * Returns: { success: boolean, message: string }
+		 */
+		cancel: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const eventId = String(rc.pathParams?.id ?? "").trim();
+					const input = rc.input as Record<string, unknown>;
+					const email = String(input.email ?? "").trim().toLowerCase();
+
+					if (!eventId || !email || !isValidEmail(email)) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID and valid email required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					if (!eventJson) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Check if registered
+					const regKey = `registration:${eventId}:${emailToKvKey(email)}`;
+					const regJson = await ctx.kv.get<string>(regKey);
+					if (!regJson) {
+						throw new Response(
+							JSON.stringify({ error: "Registration not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const registration = parseJSON<RegistrationRecord>(regJson, null);
+					if (!registration) {
+						throw new Response(
+							JSON.stringify({ error: "Registration not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Mark as cancelled
+					registration.status = "cancelled";
+					await ctx.kv.set(regKey, JSON.stringify(registration));
+
+					// Decrement registered count
+					if (event.registered > 0) {
+						event.registered--;
+						await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
+					}
+
+					// Send cancellation email if provider available
+					if (ctx.email) {
+						await ctx.email.send({
+							to: email,
+							subject: `Cancelled for ${event.title}`,
+							text: `Your registration for ${event.title} has been cancelled.`,
+						});
+					}
+
+					// Promote from waitlist if someone is waiting
+					const promoted = await promoteFromWaitlist(ctx, eventId);
+					if (promoted) {
+						// Create registration for promoted person
+						const promRegKey = `registration:${eventId}:${emailToKvKey(promoted.email)}`;
+						const promRegistration: RegistrationRecord = {
+							email: promoted.email,
+							name: promoted.name,
+							status: "registered",
+							ticketCount: 1,
+							createdAt: new Date().toISOString(),
+						};
+						await ctx.kv.set(promRegKey, JSON.stringify(promRegistration));
+
+						// Increment registered count
+						event.registered++;
+						await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
+
+						// Send promotion email if provider available
+						if (ctx.email) {
+							await ctx.email.send({
+								to: promoted.email,
+								subject: `You're promoted from the waitlist for ${event.title}`,
+								text: `Hi ${promoted.name},\n\nA spot has opened up for ${event.title} on ${event.date} at ${event.time}.\n\nLocation: ${event.location}`,
+							});
+						}
+
+						ctx.log.info(`Promoted from waitlist: ${promoted.email} for event ${eventId}`);
+					}
+
+					ctx.log.info(`Cancelled registration: ${email} for event ${eventId}`);
+
+					return {
+						success: true,
+						message: "Registration cancelled",
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Cancellation error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Cancellation failed" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /eventdash/events/create
+		 * Create a new event (admin only).
+		 *
+		 * Body: { title, date, time, location, capacity, description?, endTime? }
+		 * Returns: { success: boolean, eventId: string }
+		 */
+		createEvent: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+
+					// Check admin auth
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const title = String(input.title ?? "").trim();
+					const date = String(input.date ?? "").trim();
+					const time = String(input.time ?? "").trim();
+					const location = String(input.location ?? "").trim();
+					const capacity = parseInt(String(input.capacity ?? "1"), 10);
+					const description = String(input.description ?? "").trim();
+					const endTime = String(input.endTime ?? "").trim();
+
+					if (!title || !date || !time || !location || capacity < 1) {
+						throw new Response(
+							JSON.stringify({
+								error: "Title, date, time, location, and capacity required",
+							}),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const eventId = generateId();
+					const event: EventRecord = {
+						id: eventId,
+						title,
+						date,
+						time,
+						location,
+						capacity,
+						registered: 0,
+						createdAt: new Date().toISOString(),
+					};
+
+					if (description) event.description = description;
+					if (endTime) event.endTime = endTime;
+
+					await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
+
+					// Add to events list
+					const listJson = await ctx.kv.get<string>("events:list");
+					const eventIds = parseJSON<string[]>(listJson, []);
+					eventIds.push(eventId);
+					await ctx.kv.set("events:list", JSON.stringify(eventIds));
+
+					ctx.log.info(`Event created: ${eventId}`);
+
+					return { success: true, eventId };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Create event error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to create event" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /eventdash/events/generate-recurring
+		 * Generate recurring event instances from a template (admin only).
+		 *
+		 * Body: { templateId: string, weeks: number, startDate?: string }
+		 * Returns: { success: boolean, generatedCount: number }
+		 */
+		generateRecurring: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+
+					// Check admin auth
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const templateId = String(input.templateId ?? "").trim();
+					const weeks = Math.max(1, parseInt(String(input.weeks ?? "4"), 10));
+					const startDateInput = String(input.startDate ?? "");
+
+					if (!templateId) {
+						throw new Response(
+							JSON.stringify({ error: "Template ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const templateJson = await ctx.kv.get<string>(`event-template:${templateId}`);
+					if (!templateJson) {
+						throw new Response(
+							JSON.stringify({ error: "Template not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const template = parseJSON<EventTemplateRecord>(templateJson, null);
+					if (!template) {
+						throw new Response(
+							JSON.stringify({ error: "Template not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Determine start date
+					let currentDate = new Date();
+					if (startDateInput) {
+						currentDate = new Date(startDateInput);
+					}
+
+					// Generate instances for N weeks
+					const generatedIds: string[] = [];
+					for (let i = 0; i < weeks; i++) {
+						// Find the next occurrence of the target day of week
+						while (currentDate.getUTCDay() !== template.dayOfWeek) {
+							currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+						}
+
+						const dateStr = currentDate.toISOString().split("T")[0];
+						const eventId = generateId();
+
+						const event: EventRecord = {
+							id: eventId,
+							title: template.title,
+							date: dateStr,
+							time: template.time,
+							location: template.location,
+							capacity: template.capacity,
+							registered: 0,
+							templateId,
+							createdAt: new Date().toISOString(),
+						};
+
+						if (template.description) event.description = template.description;
+						if (template.endTime) event.endTime = template.endTime;
+
+						await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
+						generatedIds.push(eventId);
+
+						// Move to next week
+						currentDate.setUTCDate(currentDate.getUTCDate() + 7);
+					}
+
+					// Add to events list
+					const listJson = await ctx.kv.get<string>("events:list");
+					const eventIds = parseJSON<string[]>(listJson, []);
+					eventIds.push(...generatedIds);
+					await ctx.kv.set("events:list", JSON.stringify(eventIds));
+
+					ctx.log.info(
+						`Generated ${generatedIds.length} recurring events from template ${templateId}`
+					);
+
+					return { success: true, generatedCount: generatedIds.length };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Generate recurring error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to generate recurring events" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * Block Kit admin handler for pages and widgets
+		 */
+		admin: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const interaction = rc.input as AdminInteraction;
+
+					// Check admin auth
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Events page
+					if (interaction.type === "page_load" && interaction.page === "/events") {
+						const events = await getAllEventsWithDates(ctx);
+
+						const eventRows = [];
+						for (const event of events) {
+							const waitlist = await getWaitlist(ctx, event.id);
+							eventRows.push({
+								id: event.id,
+								title: event.title,
+								date: event.date,
+								time: event.time,
+								registered: `${event.registered}/${event.capacity}`,
+								waitlist: waitlist.length.toString(),
+								status: event.registered >= event.capacity ? "Full" : "Open",
+							});
+						}
+
+						return {
+							blocks: [
+								{
+									type: "header",
+									text: "Events",
+								},
+								{
+									type: "stats",
+									stats: [
+										{
+											label: "Total Events",
+											value: events.length.toString(),
+										},
+										{
+											label: "Total Registrations",
+											value: events
+												.reduce((sum, e) => sum + e.registered, 0)
+												.toString(),
+										},
+									],
+								},
+								{
+									type: "table",
+									blockId: "events-table",
+									columns: [
+										{ key: "title", label: "Event", format: "text" as const },
+										{ key: "date", label: "Date", format: "text" as const },
+										{ key: "time", label: "Time", format: "text" as const },
+										{
+											key: "registered",
+											label: "Registered",
+											format: "text" as const,
+										},
+										{
+											key: "waitlist",
+											label: "Waitlist",
+											format: "text" as const,
+										},
+										{ key: "status", label: "Status", format: "badge" as const },
+									],
+									rows: eventRows,
+								},
+							],
+						};
+					}
+
+					// Create event page
+					if (interaction.type === "page_load" && interaction.page === "/create") {
+						return {
+							blocks: [
+								{
+									type: "header",
+									text: "Create Event",
+								},
+								{
+									type: "form",
+									blockId: "create-event-form",
+									fields: [
+										{
+											type: "text_input",
+											action_id: "title",
+											label: "Event Title",
+											placeholder: "e.g., Yoga Class",
+										},
+										{
+											type: "text_input",
+											action_id: "date",
+											label: "Date (YYYY-MM-DD)",
+											placeholder: "2026-04-15",
+										},
+										{
+											type: "text_input",
+											action_id: "time",
+											label: "Time (HH:MM)",
+											placeholder: "18:00",
+										},
+										{
+											type: "text_input",
+											action_id: "endTime",
+											label: "End Time (HH:MM, optional)",
+											placeholder: "19:00",
+										},
+										{
+											type: "text_input",
+											action_id: "location",
+											label: "Location",
+											placeholder: "123 Main St, City",
+										},
+										{
+											type: "number_input",
+											action_id: "capacity",
+											label: "Capacity",
+											placeholder: "30",
+										},
+										{
+											type: "text_input",
+											action_id: "description",
+											label: "Description (optional)",
+											placeholder: "Event details",
+										},
+									],
+									submit: { label: "Create Event", action_id: "create" },
+								},
+							],
+						};
+					}
+
+					// Process event creation
+					if (interaction.type === "form_submit" && interaction.action === "create") {
+						const title = String(interaction.title ?? "").trim();
+						const date = String(interaction.date ?? "").trim();
+						const time = String(interaction.time ?? "").trim();
+						const location = String(interaction.location ?? "").trim();
+						const capacity = parseInt(String(interaction.capacity ?? "1"), 10);
+						const description = String(interaction.description ?? "").trim();
+						const endTime = String(interaction.endTime ?? "").trim();
+
+						if (!title || !date || !time || !location || capacity < 1) {
+							return {
+								blocks: [],
+								toast: {
+									message: "Please fill in all required fields",
+									type: "error" as const,
+								},
+							};
+						}
+
+						const eventId = generateId();
+						const event: EventRecord = {
+							id: eventId,
+							title,
+							date,
+							time,
+							location,
+							capacity,
+							registered: 0,
+							createdAt: new Date().toISOString(),
+						};
+
+						if (description) event.description = description;
+						if (endTime) event.endTime = endTime;
+
+						await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
+
+						const listJson = await ctx.kv.get<string>("events:list");
+						const eventIds = parseJSON<string[]>(listJson, []);
+						eventIds.push(eventId);
+						await ctx.kv.set("events:list", JSON.stringify(eventIds));
+
+						ctx.log.info(`Event created: ${eventId}`);
+
+						return {
+							blocks: [],
+							toast: {
+								message: `Event created: ${title}`,
+								type: "success" as const,
+							},
+						};
+					}
+
+					// Widget: upcoming events count
+					if (interaction.type === "widget_load" && interaction.widgetId === "upcoming-events") {
+						const events = await getAllEventsWithDates(ctx);
+						const now = new Date();
+						const upcoming = events.filter(
+							(e) => dateTimeToTimestamp(e.date, e.time) > now.getTime()
+						);
+
+						return {
+							blocks: [
+								{
+									type: "stats",
+									stats: [
+										{
+											label: "Upcoming Events",
+											value: upcoming.length.toString(),
+										},
+										{
+											label: "Total Registrations",
+											value: upcoming
+												.reduce((sum, e) => sum + e.registered, 0)
+												.toString(),
+										},
+									],
+								},
+							],
+						};
+					}
+
+					return { blocks: [] };
+				} catch (error) {
+					ctx.log.error(`Admin handler error: ${String(error)}`);
+					return {
+						blocks: [
+							{
+								type: "banner",
+								title: "Error",
+								description: "Failed to load admin page",
+								variant: "error" as const,
+							},
+						],
+					};
+				}
 			},
 		},
 	},
 });
-
-/**
- * Escape special characters in iCal strings
- */
-function escapeICalString(str: string): string {
-	return str
-		.replace(/\\/g, "\\\\")
-		.replace(/,/g, "\\,")
-		.replace(/;/g, "\\;")
-		.replace(/\n/g, "\\n");
-}
