@@ -1,13 +1,13 @@
 # Shipyard AI — Status
 
 ## Current State
-- **Agency state**: BUILD (first PRD in pipeline)
+- **Agency state**: PLAN
 - **Founded**: 2026-04-03
 - **Server**: 8GB RAM / 4 vCPU (resized)
 - **Repo**: github.com/sethshoultes/shipyard-ai
 - **Domain**: shipyard.company
-- **Active projects**: 1
-- **Current branch**: `fix/qa-p0s` — QA P0 fixes done, PRD-001 layered on top
+- **Active projects**: 2
+- **Current branch**: `feature/phase3-wave1`
 
 ## Active Project: PRD-001 (Shipyard Portfolio)
 
@@ -44,8 +44,31 @@
 | P0-A11Y-002: No mobile nav | FIXED |
 | P0-A11Y-003 / P0-SEC-001: Broken contact form | FIXED |
 
+## Active Project: PRD-002 (Shipwright — Auto-Pipeline)
+
+| Field | Value |
+|-------|-------|
+| Stage | PLAN (debate complete) |
+| Token budget | 500K |
+| Product name | Shipwright — "Describe it. It's live." |
+| Stack | GitHub Actions + Workers AI + Cloudflare (Workers/D1/R2) |
+| Deploy target | `preview.shipwright.site/{slug}` |
+| Locked decisions | rounds/002-auto-pipeline/decisions.md |
+| Rick Rubin essence | rounds/002-auto-pipeline/rick-rubin-essence.md |
+| Debate rounds | 2 complete (Steve + Elon, full convergence) |
+
+### v1 Scope (3 pipeline steps)
+1. Parse PRD (Workers AI from GitHub issue)
+2. Generate seed + deploy to Cloudflare preview
+3. Comment formatted URL on issue
+
+### The 3 Things That Matter (Rick Rubin)
+1. Simplicity is the interface — PRD in, URL out, nothing else
+2. Design system is non-negotiable — curated lookup tables, not random generation
+3. Every failure must speak — labeled, logged, commented back on the issue
+
 ## Next Steps
-1. BUILD phase: Steve enhances pages, Elon wires contact form
-2. QA pass by Margaret
-3. Deploy to production at shipyard.company
-4. Write case study: "PRD-001: How we built our own site in 24 hours"
+1. PLAN phase: Directors define sub-agent teams + assignments in `team/`
+2. BUILD phase: Parallel agent execution (workflow, parser, seed generator, commenter)
+3. QA pass by Margaret
+4. Deploy + open-source the reusable workflow
