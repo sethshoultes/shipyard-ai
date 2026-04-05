@@ -1,18 +1,65 @@
 # Membership Plugin for EmDash
 
-Email-based membership and gated content plugin for EmDash CMS. Integrate with Stripe Payment Links for hassle-free payment collection.
+Email-based membership and gated content plugin for EmDash CMS with full Stripe integration, member dashboard, JWT authentication, email automation, and coupon discount codes.
 
-**Version:** 1.0.0
-**Status:** Stable
+**Version:** 2.0.0  
+**Status:** Production  
+**Phase:** 2 (Complete with Stripe, Dashboard, JWT, Webhooks, Coupons)
 
 ## Features
 
-- **Email-only registration** — No visitor authentication required. Members register with their email.
-- **Flexible membership plans** — Configure unlimited plans with custom prices, intervals, and features.
-- **Stripe Payment Links** — Integrate with Stripe Payment Links (admin-configured, no webhooks needed in v1.0).
-- **Content gating** — Use the `gated-content` Portable Text block to restrict content to members only.
-- **Admin UI** — Manage members, approve/revoke access, configure plans, and monitor revenue.
-- **Member status API** — Check membership status via simple REST endpoints.
+### Membership & Plans
+- **Flexible membership plans** — Configure unlimited plans with custom prices, intervals (once, monthly, yearly), and features
+- **Email-only registration** — No password required; email is the unique identifier
+- **Free and paid plans** — Support free tier, time-limited trials, and recurring subscriptions
+- **Plan management** — Admin UI to create, edit, and manage all membership plans
+
+### Payment Processing
+- **Stripe Checkout integration** — Direct Stripe Checkout for one-click payment (no Payment Links required)
+- **Multiple payment intervals** — Support once, monthly, and yearly billing cycles
+- **Stripe customer management** — Automatic creation and syncing of Stripe customers and subscriptions
+- **Webhook support** — Real-time payment events (charge succeeded, refunded, subscription cancelled, etc.)
+- **Revenue tracking** — Total revenue per plan and member lifetime value
+- **Failed payment handling** — Track failed and refunded transactions; contact members for retry
+
+### Member Authentication
+- **JWT-based auth** — Secure httpOnly cookies with JWT tokens (15-minute access, 7-day refresh)
+- **Token refresh flow** — Automatic token refresh without re-authentication
+- **Member dashboard** — Authenticated portal for members to view subscriptions, update payment methods, and manage their account
+- **Session persistence** — Tokens stored securely in httpOnly cookies; no localStorage
+
+### Content Gating
+- **Portable Text block** — `gated-content` block to restrict content to specific plans
+- **Granular access control** — Gate by specific plan (e.g., Pro only) or any active member
+- **Fallback messaging** — Show custom message to non-members with upgrade call-to-action
+- **Public status checks** — Query member status without authentication
+
+### Email Automation
+- **Welcome email** — Sent on successful registration
+- **Payment receipt** — Automatic invoice email after payment
+- **Payment failure alerts** — Email when payment fails with retry instructions
+- **Renewal reminders** — Email 7 days before subscription renews
+- **Cancellation confirmation** — Email when member cancels subscription
+- **Upgrade notification** — Email when member upgrades plan
+- **Customizable templates** — Use Portable Text or HTML for email templates
+- **Resend integration** — High-deliverability email via Resend API
+
+### Admin Features
+- **Members table** — View all members with status, plan, signup date, expiry date
+- **Search & filter** — Filter by plan, status (active/inactive), or date range
+- **Approve/revoke actions** — Manually approve pending members or revoke access
+- **Coupons management** — Create, list, and manage discount codes with usage limits
+- **Plans management** — View all plans with member counts and MRR (Monthly Recurring Revenue)
+- **Revenue dashboard** — Total revenue, MRR, and per-plan breakdown
+- **Cron jobs** — Automated token refresh, renewal reminder emails, and subscription cleanup
+
+### Coupons & Discounts
+- **Percentage and fixed discounts** — Create $5 off or 10% off coupons
+- **Usage limits** — Set maximum uses per coupon
+- **Expiration dates** — Auto-expire coupons on specified dates
+- **Plan restrictions** — Limit coupon to specific plans or open to all
+- **Real-time validation** — Validate coupons during checkout with instant feedback
+- **Tracking** — Count uses and log applied coupons per member
 
 ## Installation
 
@@ -38,13 +85,59 @@ export default defineConfig({
 npm install @shipyard/membership
 ```
 
+## Environment Configuration
+
+Add these variables to your `.env` file:
+
+```bash
+# Stripe API keys (get from https://dashboard.stripe.com/apikeys)
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_test_...
+
+# JWT signing secret (generate a random string)
+JWT_SECRET=your_random_secret_key_here
+
+# Email service (Resend)
+RESEND_API_KEY=re_...
+
+# Optional: Email sender
+MEMBERSHIP_EMAIL_FROM=noreply@yoursite.com
+```
+
+### Environment Variable Reference
+
+| Variable | Required | Purpose | Example |
+|----------|----------|---------|---------|
+| `STRIPE_SECRET_KEY` | Yes | Stripe API key for backend | `sk_test_123...` |
+| `STRIPE_PUBLISHABLE_KEY` | Yes | Stripe key for frontend | `pk_test_456...` |
+| `STRIPE_WEBHOOK_SECRET` | Yes | Webhook signature verification | `whsec_789...` |
+| `JWT_SECRET` | Yes | Secret for signing JWT tokens | Random 32+ char string |
+| `RESEND_API_KEY` | Yes | Email delivery service | `re_abc123...` |
+| `MEMBERSHIP_EMAIL_FROM` | No | Sender email address | `noreply@site.com` |
+
 ## Configuration
 
-The plugin stores all configuration in KV (key-value storage). No environment variables required.
+### Setup Stripe
 
-### Default Plans
+1. **Create a Stripe account** at https://stripe.com
+2. **Get API keys** from https://dashboard.stripe.com/apikeys
+3. **Create a webhook endpoint:**
+   - Go to https://dashboard.stripe.com/webhooks
+   - Click "Add endpoint"
+   - Endpoint URL: `https://your-site.com/membership/webhooks/stripe`
+   - Select events: `charge.succeeded`, `charge.refunded`, `customer.subscription.updated`, `customer.subscription.deleted`
+   - Copy the Webhook Signing Secret
+4. **Add keys to `.env`:**
+   ```
+   STRIPE_SECRET_KEY=sk_test_...
+   STRIPE_PUBLISHABLE_KEY=pk_test_...
+   STRIPE_WEBHOOK_SECRET=whsec_...
+   ```
 
-On first install, the plugin initializes with three default plans:
+### Create Membership Plans
+
+Plans are created via the admin API. Default plans:
 
 ```json
 {
@@ -61,9 +154,9 @@ On first install, the plugin initializes with three default plans:
 {
   "id": "pro",
   "name": "Pro",
-  "price": 99,
+  "price": 9900,
   "interval": "month",
-  "description": "Full access with email support",
+  "description": "Full access with support",
   "features": ["All content", "Priority email support", "Monthly newsletter"]
 }
 ```
@@ -72,105 +165,344 @@ On first install, the plugin initializes with three default plans:
 {
   "id": "premium",
   "name": "Premium",
-  "price": 999,
+  "price": 99900,
   "interval": "year",
-  "description": "VIP access and priority support",
+  "description": "VIP access",
   "features": ["All content", "Priority support", "Early access", "Annual digest"]
 }
 ```
 
-Prices are in cents (e.g., 99 = $0.99).
+Prices are in cents (99 = $0.99, 9900 = $99.00).
 
-### Managing Plans
+## API Routes
 
-1. Go to **Admin → Plugins → Membership → Plans**
-2. View all active plans
-3. To add or modify a plan:
-   - Use the admin API route (see API Reference below)
-   - Or manually edit plans in KV storage
+All endpoints are at `/_emdash/api/plugins/membership/<route>`.
 
-### Stripe Payment Links
+### Authentication Routes
 
-To accept payments via Stripe:
+#### `POST /auth/register`
+Register a new member and return JWT token.
 
-1. **Create Payment Links in Stripe Dashboard**
-   - Go to https://dashboard.stripe.com/payment-links
-   - Create a new Payment Link for each paid plan
-   - Copy the link URL
+**Access:** Public
 
-2. **Update Plan with Payment Link**
-   - Go to **Admin → Plugins → Membership → Plans**
-   - Update the plan's `paymentLink` field with the Stripe URL
-   - Save
-
-3. **Registration Flow**
-   - User registers with email and selects a paid plan
-   - If the plan has a payment link, they're redirected to Stripe
-   - After payment, they return to your site
-   - **Admin manually approves** the member in the admin UI
-
-Free plans are immediately active on registration.
-
-## Usage
-
-### For Site Visitors
-
-#### Register for a Plan
-
-Make a POST request to `/_emdash/api/plugins/membership/register`:
-
-```bash
-curl -X POST https://your-site.com/_emdash/api/plugins/membership/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "plan": "pro"
-  }'
-```
-
-Response:
-
+**Input:**
 ```json
 {
-  "memberId": "user@example.com",
-  "status": "active",
-  "plan": "pro",
-  "paymentLink": "https://stripe.com/pay/xyz" 
+  "email": "user@example.com",
+  "plan": "pro"
 }
 ```
 
-If the plan is paid and has a payment link, redirect the user to `paymentLink`.
-
-#### Check Membership Status
-
-Make a GET request to `/_emdash/api/plugins/membership/status`:
-
-```bash
-curl https://your-site.com/_emdash/api/plugins/membership/status?email=user@example.com
+**Response:**
+```json
+{
+  "success": true,
+  "memberId": "user@example.com",
+  "email": "user@example.com",
+  "plan": "pro",
+  "status": "active",
+  "token": "eyJhbGc...",
+  "message": "Member registered"
+}
 ```
 
-Response:
+#### `POST /auth/login`
+Authenticate and get JWT token (email-based, no password).
 
+**Access:** Public
+
+**Input:**
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "token": "eyJhbGc...",
+  "expiresIn": 900,
+  "message": "Login successful"
+}
+```
+
+#### `POST /auth/refresh`
+Refresh an expired JWT token.
+
+**Access:** Public (requires valid refresh token in cookie)
+
+**Response:**
+```json
+{
+  "success": true,
+  "token": "eyJhbGc...",
+  "expiresIn": 900
+}
+```
+
+### Member Routes
+
+#### `GET /member/me`
+Get current authenticated member details.
+
+**Access:** Requires valid JWT token
+
+**Response:**
+```json
+{
+  "email": "user@example.com",
+  "plan": "pro",
+  "status": "active",
+  "createdAt": "2026-01-15T10:00:00Z",
+  "expiresAt": "2026-02-15T10:00:00Z",
+  "stripeCustomerId": "cus_123...",
+  "stripeSubscriptionId": "sub_456...",
+  "stripePaymentMethod": "visa ••••4242"
+}
+```
+
+#### `GET /member/status?email=user@example.com`
+Check membership status (no auth required).
+
+**Access:** Public
+
+**Response:**
 ```json
 {
   "email": "user@example.com",
   "active": true,
   "plan": "pro",
   "status": "active",
-  "expiresAt": "2025-05-05T12:00:00Z"
+  "expiresAt": "2026-02-15T10:00:00Z"
 }
 ```
 
-#### Get Available Plans
+### Checkout Routes
 
-Make a GET request to `/_emdash/api/plugins/membership/plans`:
+#### `POST /checkout/create`
+Create a Stripe Checkout session for payment.
 
-```bash
-curl https://your-site.com/_emdash/api/plugins/membership/plans
+**Access:** Requires valid JWT token
+
+**Input:**
+```json
+{
+  "planId": "pro",
+  "couponCode": "SAVE10" (optional)
+}
 ```
 
-Response:
+**Response:**
+```json
+{
+  "sessionId": "cs_test_...",
+  "url": "https://checkout.stripe.com/pay/cs_test_..."
+}
+```
 
+#### `GET /checkout/success?session_id=cs_test_...`
+Retrieve checkout success details.
+
+**Access:** Public
+
+**Response:**
+```json
+{
+  "success": true,
+  "email": "user@example.com",
+  "plan": "pro",
+  "amount": 9900,
+  "status": "paid",
+  "message": "Payment confirmed"
+}
+```
+
+### Dashboard Routes
+
+#### `GET /dashboard`
+Get member dashboard data (subscriptions, usage, billing).
+
+**Access:** Requires valid JWT token
+
+**Response:**
+```json
+{
+  "member": { ... },
+  "subscriptions": [
+    {
+      "id": "sub_123...",
+      "plan": "pro",
+      "status": "active",
+      "currentPeriodEnd": "2026-02-15T10:00:00Z",
+      "cancelAtPeriodEnd": false
+    }
+  ],
+  "invoices": [
+    {
+      "id": "in_123...",
+      "amount": 9900,
+      "date": "2026-01-15",
+      "status": "paid"
+    }
+  ]
+}
+```
+
+#### `POST /dashboard/upgrade`
+Upgrade to a higher plan.
+
+**Access:** Requires valid JWT token
+
+**Input:**
+```json
+{
+  "newPlanId": "premium"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "newPlan": "Premium",
+  "newPrice": 99900,
+  "message": "Successfully upgraded to Premium"
+}
+```
+
+#### `POST /dashboard/downgrade`
+Downgrade to a lower plan (prorated).
+
+**Access:** Requires valid JWT token
+
+**Input:**
+```json
+{
+  "newPlanId": "free"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "newPlan": "Free",
+  "message": "Downgraded to Free plan"
+}
+```
+
+#### `POST /dashboard/cancel`
+Cancel membership (takes effect at end of billing period).
+
+**Access:** Requires valid JWT token
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Subscription cancelled at end of billing period"
+}
+```
+
+### Coupon Routes
+
+#### `POST /coupons/create`
+Create a new coupon (admin only).
+
+**Access:** Admin only
+
+**Input:**
+```json
+{
+  "code": "SAVE10",
+  "discountType": "percent",
+  "discountAmount": 10,
+  "maxUses": 100,
+  "expiresAt": "2026-12-31",
+  "applicablePlans": ["pro", "premium"],
+  "description": "Holiday sale"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "coupon": {
+    "code": "SAVE10",
+    "discountType": "percent",
+    "discountAmount": 10,
+    "usedCount": 0,
+    "maxUses": 100,
+    "expiresAt": "2026-12-31",
+    "createdAt": "2026-01-15T10:00:00Z"
+  }
+}
+```
+
+#### `GET /coupons`
+List all coupons (admin only).
+
+**Access:** Admin only
+
+**Response:**
+```json
+{
+  "coupons": [
+    {
+      "code": "SAVE10",
+      "discountType": "percent",
+      "discountAmount": 10,
+      "usedCount": 24,
+      "maxUses": 100,
+      "expiresAt": "2026-12-31"
+    }
+  ],
+  "total": 1
+}
+```
+
+#### `POST /coupons/validate`
+Validate a coupon code (public).
+
+**Access:** Public
+
+**Input:**
+```json
+{
+  "code": "SAVE10",
+  "planId": "pro"
+}
+```
+
+**Response (valid):**
+```json
+{
+  "valid": true,
+  "discountType": "percent",
+  "discountAmount": 10,
+  "message": "Save 10% with this code!"
+}
+```
+
+**Response (invalid):**
+```json
+{
+  "valid": false,
+  "reason": "Coupon has expired"
+}
+```
+
+### Plan Routes
+
+#### `GET /plans`
+Get all available membership plans.
+
+**Access:** Public
+
+**Response:**
 ```json
 {
   "plans": [
@@ -185,7 +517,7 @@ Response:
     {
       "id": "pro",
       "name": "Pro",
-      "price": 99,
+      "price": 9900,
       "interval": "month",
       "description": "Full access",
       "features": ["All content", "Priority support"]
@@ -194,165 +526,8 @@ Response:
 }
 ```
 
-### For Site Editors
-
-#### Gate Content with Portable Text
-
-In any Portable Text field (e.g., page body):
-
-1. Press `/` to open the block menu
-2. Select **Gated Content**
-3. Fill in:
-   - **Required Plan ID** (optional) — If empty, any active member can see it
-   - **Message for Non-Members** — What to show to non-members
-4. Add your content inside the block
-
-Example:
-
-```json
-{
-  "_type": "gated-content",
-  "_key": "abc123",
-  "requiredPlan": "pro",
-  "fallbackMessage": "Upgrade to Pro to access this exclusive guide.",
-  "children": [
-    {
-      "_type": "block",
-      "text": "This is exclusive content for Pro members only..."
-    }
-  ]
-}
-```
-
-### For Site Admins
-
-#### Manage Members
-
-Go to **Admin → Plugins → Membership → Members**
-
-The Members page shows:
-
-- **Members table** — Email, plan, status (pending/active/revoked), expiry date
-- **Stats** — Total members, active count, pending count
-- **Admin actions** — Approve pending members or revoke access
-
-#### Approve a Member
-
-1. Go to **Members** page
-2. Enter the member's email
-3. Select "Approve" action
-4. Click "Execute"
-
-This activates a pending member (useful after manual payment verification).
-
-#### Revoke Access
-
-1. Go to **Members** page
-2. Enter the member's email
-3. Select "Revoke" action
-4. Click "Execute"
-
-This immediately deactivates the member.
-
-#### Configure Plans
-
-Go to **Admin → Plugins → Membership → Plans**
-
-The Plans page shows all active plans and their payment links. To update:
-
-- Use the API (see API Reference below)
-- Or use admin tools to edit KV storage directly
-
-## API Reference
-
-### REST Endpoints
-
-All endpoints are at `/_emdash/api/plugins/membership/<route>`.
-
-#### POST `/register`
-
-Register a new member or retrieve existing membership.
-
-**Access:** Public (no auth required)
-
-**Input:**
-```json
-{
-  "email": "user@example.com",
-  "plan": "pro"
-}
-```
-
-**Returns:**
-```json
-{
-  "memberId": "user@example.com",
-  "status": "pending|active",
-  "plan": "pro",
-  "paymentLink": "https://stripe.com/pay/xyz"
-}
-```
-
-**Errors:**
-- `400 Bad Request` — Invalid email or plan not found
-- `500 Internal Server Error` — Registration failed
-
----
-
-#### GET `/status`
-
-Check membership status for an email.
-
-**Access:** Public (no auth required)
-
-**Query Params:**
-- `email` (required) — Member email address
-
-**Returns:**
-```json
-{
-  "email": "user@example.com",
-  "active": true|false,
-  "plan": "pro",
-  "status": "pending|active|revoked",
-  "expiresAt": "2025-05-05T12:00:00Z"
-}
-```
-
-**Notes:**
-- Returns `active: false` if member doesn't exist
-- Returns `active: false` if membership is expired
-- `status` can be "pending", "active", or "revoked"
-
----
-
-#### GET `/plans`
-
-Get all available membership plans.
-
-**Access:** Public (no auth required)
-
-**Returns:**
-```json
-{
-  "plans": [
-    {
-      "id": "pro",
-      "name": "Pro",
-      "price": 99,
-      "interval": "month",
-      "description": "Full access",
-      "features": ["All content", "Priority support"]
-    }
-  ]
-}
-```
-
----
-
-#### POST `/approve`
-
-Manually approve a pending member.
+#### `POST /approve`
+Manually approve a pending member (admin only).
 
 **Access:** Admin only
 
@@ -363,23 +538,15 @@ Manually approve a pending member.
 }
 ```
 
-**Returns:**
+**Response:**
 ```json
 {
   "success": true
 }
 ```
 
-**Errors:**
-- `400 Bad Request` — Invalid email
-- `404 Not Found` — Member not found
-- `500 Internal Server Error` — Approval failed
-
----
-
-#### POST `/revoke`
-
-Revoke a member's access.
+#### `POST /revoke`
+Revoke a member's access (admin only).
 
 **Access:** Admin only
 
@@ -390,62 +557,112 @@ Revoke a member's access.
 }
 ```
 
-**Returns:**
+**Response:**
 ```json
 {
   "success": true
 }
 ```
 
-**Errors:**
-- `400 Bad Request` — Invalid email
-- `404 Not Found` — Member not found
-- `500 Internal Server Error` — Revoke failed
+### Webhook Routes
 
----
+#### `POST /webhooks/stripe`
+Stripe webhook handler for payment events.
 
-### Admin Handler
+**Access:** Public (Stripe IP whitelist via signature verification)
 
-**Route:** `POST /admin`
+**Handled Events:**
+- `charge.succeeded` — Payment successful
+- `charge.refunded` — Payment refunded
+- `charge.failed` — Payment failed
+- `customer.subscription.updated` — Subscription changed
+- `customer.subscription.deleted` — Subscription cancelled
+- `invoice.payment_failed` — Invoice payment failed
 
-Block Kit admin UI handler. Manages the admin pages and widgets.
+## Email Templates
+
+The plugin supports automatic email notifications for all membership events:
+
+### Welcome Email
+Sent when member registers.
+
+**Variables:**
+- `{memberName}` — Member's name (if available)
+- `{planName}` — Membership plan name
+- `{planPrice}` — Plan price
+- `{billingInterval}` — Billing interval (month/year/once)
+- `{dashboardUrl}` — Link to member dashboard
+
+### Payment Receipt
+Sent after successful payment.
+
+**Variables:**
+- `{amount}` — Payment amount
+- `{planName}` — Plan purchased
+- `{date}` — Transaction date
+- `{invoiceUrl}` — Link to invoice
+
+### Renewal Reminder
+Sent 7 days before subscription renews.
+
+**Variables:**
+- `{renewalDate}` — When renewal occurs
+- `{amount}` — Renewal amount
+- `{planName}` — Current plan
+
+### Cancellation Confirmation
+Sent when member cancels.
+
+**Variables:**
+- `{cancellationDate}` — When access ends
+- `{planName}` — Cancelled plan
+- `{refundInfo}` — Refund details if applicable
 
 ## Data Storage
 
 All data is stored in KV (key-value store):
 
-| Key | Value | Purpose |
-|-----|-------|---------|
-| `plans` | JSON array | Membership plans configuration |
-| `member:{email}` | JSON object | Member record (email, plan, status, etc.) |
-| `members:list` | JSON array | List of all member emails for enumeration |
-| `settings:requirePaymentApproval` | string | Whether to require manual approval for paid plans |
+| Key | Format | Purpose |
+|-----|--------|---------|
+| `plans` | JSON array | Membership plans config |
+| `member:{email}` | JSON object | Member record |
+| `members:list` | JSON array | All member emails |
+| `coupon:{code}` | JSON object | Coupon details |
+| `coupons:list` | JSON array | All coupon codes |
 
-### Member Record Schema
+### MemberRecord Schema
 
 ```typescript
 interface MemberRecord {
-  email: string;                    // Member email
-  plan: string;                     // Plan ID (e.g., "pro")
-  status: "pending" | "active" | "revoked";
-  paymentLink?: string;             // Stripe Payment Link (if applicable)
-  createdAt: string;                // ISO 8601 timestamp
-  expiresAt?: string;               // ISO 8601 expiry (for recurring plans)
-  approvedAt?: string;              // When admin approved (for paid plans)
+  email: string;
+  plan: string;
+  status: "pending" | "active" | "revoked" | "cancelled" | "past_due";
+  createdAt: string;
+  expiresAt?: string;
+  approvedAt?: string;
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  stripePaymentMethod?: string;
+  planInterval?: "month" | "year" | "once";
+  currentPeriodEnd?: string;
+  cancelAtPeriodEnd?: boolean;
+  lastSyncAt?: string;
 }
 ```
 
-### Plan Config Schema
+### CouponRecord Schema
 
 ```typescript
-interface PlanConfig {
-  id: string;                       // Unique plan ID
-  name: string;                     // Display name
-  price: number;                    // Price in cents (0 for free)
-  interval: "once" | "month" | "year";
-  description: string;
-  paymentLink?: string;             // Stripe Payment Link URL
-  features: string[];               // Feature list
+interface CouponRecord {
+  code: string;
+  discountType: "percent" | "fixed";
+  discountAmount: number;
+  expiresAt?: string;
+  maxUses?: number;
+  usedCount: number;
+  applicablePlans?: string[];
+  createdAt: string;
+  description?: string;
 }
 ```
 
@@ -453,124 +670,138 @@ interface PlanConfig {
 
 ### gated-content
 
-Gate content visible only to active members.
-
-**Block Type:** `gated-content`
+Gate content visible only to members with specific plans.
 
 **Fields:**
-- `requiredPlan` (string, optional) — Plan ID requirement. If set, only members with this plan can see the content.
-- `fallbackMessage` (string, optional) — Message shown to non-members. Defaults to generic message.
-
-**Rendering:**
-- If member is active and has required plan: render content
-- Otherwise: show fallback message
+- `requiredPlan` (optional) — Plan ID. If empty, any active member can see it.
+- `fallbackMessage` (optional) — Message for non-members.
 
 **Example:**
 
 ```json
 {
   "_type": "gated-content",
-  "_key": "exclusive-guide",
+  "_key": "premium-guide",
   "requiredPlan": "pro",
-  "fallbackMessage": "Upgrade to Pro to read our exclusive guide.",
+  "fallbackMessage": "Upgrade to Pro to access this guide.",
   "children": [
     {
       "_type": "heading",
-      "children": [{ "text": "Exclusive Guide for Pro Members" }]
-    },
-    {
-      "_type": "block",
-      "children": [{ "text": "This content is only for Pro members..." }]
+      "children": [{ "text": "Exclusive Guide" }]
     }
   ]
 }
 ```
 
-## Member Status Flow
+## Member Flow
 
 ```
 Registration
   ├─ Free Plan
-  │   └─ → Immediately Active
+  │   ├─ Email sent (welcome)
+  │   └─ Status: Active immediately
   │
-  └─ Paid Plan (with Payment Link)
-      ├─ Register with email + plan
-      ├─ Receive payment link
-      ├─ User pays via Stripe
-      └─ Status: Pending (awaiting admin approval)
-          └─ Admin approves in Members UI
-              └─ → Active
+  └─ Paid Plan
+      ├─ Checkout session created
+      ├─ Stripe payment processed
+      ├─ Webhook confirms charge.succeeded
+      ├─ Stripe customer + subscription created
+      ├─ Email sent (receipt)
+      └─ Status: Active (recurring)
+
+Member Dashboard
+  ├─ View current subscription
+  ├─ Update payment method
+  ├─ Upgrade/downgrade plan
+  ├─ Cancel subscription
+  └─ View billing history
+
+Subscription Renewal
+  ├─ 7 days before: renewal reminder email
+  ├─ On renewal date: charge customer
+  ├─ On success: refresh member record, send receipt
+  └─ On failure: send payment failure email
+
+Cancellation
+  ├─ Member requests cancellation
+  ├─ Stripe subscription marked cancel_at_period_end
+  ├─ Email confirmation sent
+  ├─ At period end: subscription deleted
+  └─ Status: Cancelled
 ```
-
-## Webhook Integration (v1.1+)
-
-Version 1.0 requires manual approval of paid registrations. Future versions will support Stripe webhooks for automatic approval.
-
-To migrate to v1.1:
-- No code changes required in the membership plugin
-- Admin will configure Stripe webhook secret in settings
-- Payments will be verified automatically
 
 ## Troubleshooting
 
 ### Member can't access gated content
+1. Check status: `GET /member/status?email=user@example.com`
+2. Verify JWT token is set in httpOnly cookie
+3. Check expiry date hasn't passed
+4. Confirm plan has required access
 
-1. **Check membership status:**
-   ```bash
-   curl "https://your-site.com/_emdash/api/plugins/membership/status?email=user@example.com"
-   ```
+### Payment fails
+1. Verify Stripe keys are correct
+2. Check webhook endpoint is configured
+3. Review Stripe dashboard for error logs
+4. Ensure payment method is valid
 
-2. **Verify email cookie is set:**
-   - The `membership-email` cookie must be set in the browser
-   - Check browser DevTools → Cookies
+### Email not sending
+1. Verify RESEND_API_KEY is set
+2. Check email logs in admin
+3. Verify sender email is allowlisted in Resend
+4. Check spam folder
 
-3. **Check expiry date:**
-   - If `expiresAt` is in the past, the membership is expired
-   - Use the admin UI to manually extend or approve
-
-### Payment link not in registration response
-
-1. **Check plan configuration:**
-   ```bash
-   curl "https://your-site.com/_emdash/api/plugins/membership/plans"
-   ```
-
-2. **Verify payment link is set:**
-   - The plan's `paymentLink` field must be a valid Stripe URL
-   - Go to **Admin → Plugins → Membership → Plans** to add the link
-
-3. **For free plans:**
-   - Free plans never return a `paymentLink`
-   - They are immediately active on registration
+### Webhook not receiving events
+1. Verify webhook secret matches
+2. Confirm endpoint URL is reachable
+3. Check Stripe dashboard → Webhooks → Event logs
+4. Verify required event types are selected
 
 ## Best Practices
 
-1. **Create Stripe Payment Links carefully**
-   - Use unique links for each plan
-   - Include proper product names and descriptions
-   - Test the link before adding to the plugin
+1. **Security**
+   - Keep JWT_SECRET secure
+   - Use https in production
+   - Regenerate secrets periodically
+   - Monitor failed payment patterns
 
-2. **Monitor pending members**
-   - Check the admin dashboard regularly
-   - Approve members shortly after they pay
-   - Use email notifications to alert admins
+2. **Stripe Setup**
+   - Test in Stripe test mode first
+   - Use test card: 4242 4242 4242 4242
+   - Create invoice templates in Stripe dashboard
+   - Set up dunning management for failed payments
 
-3. **Plan pricing**
-   - Store prices in cents (99 = $0.99)
-   - Use consistent pricing intervals
-   - Document which products use monthly vs. yearly billing
+3. **Email**
+   - Test email templates before launch
+   - Monitor deliverability rates
+   - Add unsubscribe links
+   - Verify sender domain
 
-4. **Content strategy**
-   - Use `gated-content` blocks for high-value content
-   - Set clear fallback messages so visitors know how to subscribe
-   - Consider free trial content to reduce friction
+4. **Coupons**
+   - Create time-limited promotions
+   - Track ROI per coupon
+   - Expire old coupons regularly
+   - Limit usage to prevent abuse
 
-## Support
+5. **Member Communication**
+   - Welcome email with clear onboarding
+   - Renewal reminders 7 days before
+   - Failed payment alerts with retry link
+   - Cancellation exit surveys
 
-For issues or questions:
-1. Check logs: **Admin → System → Logs**
-2. Review the troubleshooting section above
-3. Verify KV storage is working in your EmDash instance
+## Support & Debugging
+
+**View logs:**
+- Admin UI → System → Logs
+- Search for "membership" or error keywords
+
+**Check KV storage:**
+- Admin UI → Developer Tools → KV Store
+- View member records and coupon codes
+
+**Stripe dashboard:**
+- Review failed payments
+- Check webhook delivery status
+- Monitor customer and subscription events
 
 ## License
 

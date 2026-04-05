@@ -24,6 +24,12 @@ interface TicketType {
 	sold: number; // Seats sold
 	description?: string;
 	availableUntil?: string; // ISO date for early bird cutoff
+	// New Phase 2 Wave 4 fields
+	earlyBirdDeadline?: string; // ISO date when early bird pricing expires
+	earlyBirdPrice?: number; // Early bird price in cents (optional, for early bird tickets)
+	groupMin?: number; // Minimum tickets for group discount
+	groupDiscount?: number; // Group discount percentage (1-100)
+	vipPerks?: string[]; // Array of VIP perks/benefits (e.g., "Priority seating", "Complimentary drink")
 }
 
 interface EventRecord {
@@ -1519,6 +1525,372 @@ export default definePlugin({
 					ctx.log.error(`Checkout success error: ${String(error)}`);
 					throw new Response(
 						JSON.stringify({ error: "Failed to fetch confirmation" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /events/:id/tickets
+		 * List ticket types for an event with availability and pricing.
+		 *
+		 * Returns: { event: EventRecord, ticketTypes: (TicketType & { available: boolean, seatsLeft: number })[] }
+		 */
+		eventTickets: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const eventId = String(rc.eventId ?? "").trim();
+
+					if (!eventId) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					if (!eventJson) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const now = new Date();
+					const ticketTypes = (event.ticketTypes || []).map((ticket) => {
+						// Check if ticket type is expired
+						const isExpired = ticket.availableUntil && new Date(ticket.availableUntil) < now;
+						const isSoldOut = ticket.sold >= ticket.capacity;
+						const available = !isExpired && !isSoldOut;
+						const seatsLeft = Math.max(0, ticket.capacity - ticket.sold);
+
+						// Determine price: use early bird if applicable
+						let displayPrice = ticket.price;
+						let displayLabel = ticket.name;
+
+						if (ticket.earlyBirdPrice && ticket.earlyBirdDeadline && new Date(ticket.earlyBirdDeadline) > now) {
+							displayPrice = ticket.earlyBirdPrice;
+							displayLabel = `${ticket.name} (Early Bird)`;
+						}
+
+						return {
+							...ticket,
+							available,
+							seatsLeft,
+							displayPrice,
+							displayLabel,
+							isExpired: !!isExpired,
+							isSoldOut: !!isSoldOut,
+						};
+					});
+
+					return {
+						event,
+						ticketTypes,
+						totalAvailable: ticketTypes.filter((t) => t.available).length,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Event tickets error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /events/:id/ticket-types/create
+		 * Admin endpoint to create a new ticket type for an event.
+		 *
+		 * Expects: { eventId, name, price, capacity, availableUntil?, earlyBirdPrice?, earlyBirdDeadline?, groupMin?, groupDiscount?, vipPerks? }
+		 * Returns: { success: true, ticketType: TicketType }
+		 */
+		createTicketType: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const eventId = String(input.eventId ?? "").trim();
+					const name = String(input.name ?? "").trim();
+					const price = Number(input.price ?? 0);
+					const capacity = Number(input.capacity ?? 0);
+					const availableUntil = input.availableUntil ? String(input.availableUntil).trim() : undefined;
+					const earlyBirdPrice = input.earlyBirdPrice ? Number(input.earlyBirdPrice) : undefined;
+					const earlyBirdDeadline = input.earlyBirdDeadline ? String(input.earlyBirdDeadline).trim() : undefined;
+					const groupMin = input.groupMin ? Number(input.groupMin) : undefined;
+					const groupDiscount = input.groupDiscount ? Number(input.groupDiscount) : undefined;
+					const vipPerks = input.vipPerks as string[] | undefined;
+
+					if (!eventId) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!name) {
+						throw new Response(
+							JSON.stringify({ error: "Ticket type name required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (price <= 0 || capacity <= 0) {
+						throw new Response(
+							JSON.stringify({ error: "Price and capacity must be greater than 0" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get event
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					if (!eventJson) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Create ticket type
+					const ticketType: TicketType = {
+						id: generateId(),
+						name,
+						stripePriceId: `price_${generateId()}`, // Placeholder; in real impl, create via Stripe API
+						price,
+						capacity,
+						sold: 0,
+					};
+
+					if (availableUntil) ticketType.availableUntil = availableUntil;
+					if (earlyBirdPrice) ticketType.earlyBirdPrice = earlyBirdPrice;
+					if (earlyBirdDeadline) ticketType.earlyBirdDeadline = earlyBirdDeadline;
+					if (groupMin) ticketType.groupMin = groupMin;
+					if (groupDiscount) ticketType.groupDiscount = groupDiscount;
+					if (vipPerks && vipPerks.length > 0) ticketType.vipPerks = vipPerks;
+
+					// Add to event
+					if (!event.ticketTypes) {
+						event.ticketTypes = [];
+					}
+					event.ticketTypes.push(ticketType);
+
+					// Save event
+					await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
+
+					ctx.log.info(`Ticket type created: ${ticketType.id} for event ${eventId}`);
+
+					return {
+						success: true,
+						ticketType,
+						message: `Ticket type "${name}" created successfully`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Create ticket type error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * PATCH /events/:id/ticket-types/:typeId/update
+		 * Admin endpoint to update a ticket type.
+		 *
+		 * Expects: { eventId, ticketTypeId, updates: { name?, price?, capacity?, ... } }
+		 * Returns: { success: true, ticketType: TicketType }
+		 */
+		updateTicketType: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const eventId = String(input.eventId ?? "").trim();
+					const ticketTypeId = String(input.ticketTypeId ?? "").trim();
+					const updates = input.updates as Record<string, unknown> | undefined;
+
+					if (!eventId || !ticketTypeId || !updates) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID, ticket type ID, and updates required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get event
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					if (!eventJson) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event || !event.ticketTypes) {
+						throw new Response(
+							JSON.stringify({ error: "Event or ticket types not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Find and update ticket type
+					const ticketIndex = event.ticketTypes.findIndex((t) => t.id === ticketTypeId);
+					if (ticketIndex === -1) {
+						throw new Response(
+							JSON.stringify({ error: "Ticket type not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const ticket = event.ticketTypes[ticketIndex];
+
+					// Apply updates
+					if (updates.name) ticket.name = String(updates.name).trim();
+					if (updates.price) ticket.price = Number(updates.price);
+					if (updates.capacity) ticket.capacity = Number(updates.capacity);
+					if (updates.availableUntil !== undefined) {
+						ticket.availableUntil = updates.availableUntil ? String(updates.availableUntil).trim() : undefined;
+					}
+					if (updates.earlyBirdPrice !== undefined) {
+						ticket.earlyBirdPrice = updates.earlyBirdPrice ? Number(updates.earlyBirdPrice) : undefined;
+					}
+					if (updates.earlyBirdDeadline !== undefined) {
+						ticket.earlyBirdDeadline = updates.earlyBirdDeadline ? String(updates.earlyBirdDeadline).trim() : undefined;
+					}
+					if (updates.groupMin !== undefined) {
+						ticket.groupMin = updates.groupMin ? Number(updates.groupMin) : undefined;
+					}
+					if (updates.groupDiscount !== undefined) {
+						ticket.groupDiscount = updates.groupDiscount ? Number(updates.groupDiscount) : undefined;
+					}
+					if (updates.vipPerks !== undefined) {
+						ticket.vipPerks = updates.vipPerks as string[] | undefined;
+					}
+
+					// Save event
+					await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
+
+					ctx.log.info(`Ticket type updated: ${ticketTypeId}`);
+
+					return {
+						success: true,
+						ticketType: ticket,
+						message: "Ticket type updated successfully",
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Update ticket type error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * DELETE /events/:id/ticket-types/:typeId/delete
+		 * Admin endpoint to delete a ticket type.
+		 *
+		 * Expects: { eventId, ticketTypeId }
+		 * Returns: { success: true }
+		 */
+		deleteTicketType: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const eventId = String(input.eventId ?? "").trim();
+					const ticketTypeId = String(input.ticketTypeId ?? "").trim();
+
+					if (!eventId || !ticketTypeId) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID and ticket type ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get event
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					if (!eventJson) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event || !event.ticketTypes) {
+						throw new Response(
+							JSON.stringify({ error: "Event or ticket types not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Remove ticket type
+					event.ticketTypes = event.ticketTypes.filter((t) => t.id !== ticketTypeId);
+
+					// Save event
+					await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
+
+					ctx.log.info(`Ticket type deleted: ${ticketTypeId}`);
+
+					return {
+						success: true,
+						message: "Ticket type deleted successfully",
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Delete ticket type error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
 						{ status: 500, headers: { "Content-Type": "application/json" } }
 					);
 				}
