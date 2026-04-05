@@ -6030,5 +6030,423 @@ END:VCALENDAR`;
 			},
 		},
 
+		/** WAVE 3: Cohort Analysis & Advanced Analytics */
+
+		/**
+		 * GET /eventdash/reports/cohorts
+		 * Admin. Retention cohort analysis — group attendees by first-event month,
+		 * show return rates in subsequent months as a cohort table.
+		 *
+		 * Query params:
+		 *   - months: number of months to look back (default 12)
+		 *
+		 * Returns: {
+		 *   cohorts: Array<{ cohortMonth, cohortSize, retentionByMonth: [...] }>,
+		 *   summary: { totalUniqueAttendees, avgRetentionMonth1, avgRetentionMonth3 }
+		 * }
+		 */
+		reportCohorts: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const months = Math.min(Math.max(1, Number(input.months ?? 12)), 36);
+
+					const now = new Date();
+					const cutoff = new Date(now.getFullYear(), now.getMonth() - months, 1);
+
+					const eventsListJson = await ctx.kv.get<string>("events:list");
+					const eventIds = parseJSON<string[]>(eventsListJson, []);
+
+					// Build map: attendee email -> array of event months attended
+					const attendeeEvents: Map<string, string[]> = new Map();
+
+					for (const eventId of eventIds) {
+						const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+						if (!eventJson) continue;
+						const event = parseJSON<EventRecord>(eventJson, null);
+						if (!event) continue;
+
+						const eventDate = new Date(event.date);
+						if (eventDate < cutoff) continue;
+
+						const eventMonth = `${eventDate.getFullYear()}-${String(eventDate.getMonth() + 1).padStart(2, "0")}`;
+
+						const regsListJson = await ctx.kv.get<string>(`event:${eventId}:registrations`);
+						const regEmails = parseJSON<string[]>(regsListJson, []);
+
+						for (const encodedEmail of regEmails) {
+							const regJson = await ctx.kv.get<string>(`event:${eventId}:registration:${encodedEmail}`);
+							if (!regJson) continue;
+							const reg = parseJSON<RegistrationRecord>(regJson, null);
+							if (!reg || reg.status !== "registered") continue;
+
+							if (!attendeeEvents.has(encodedEmail)) {
+								attendeeEvents.set(encodedEmail, []);
+							}
+							const monthList = attendeeEvents.get(encodedEmail)!;
+							if (!monthList.includes(eventMonth)) {
+								monthList.push(eventMonth);
+							}
+						}
+					}
+
+					for (const [, monthList] of attendeeEvents) {
+						monthList.sort();
+					}
+
+					// Group by first-event month (cohort)
+					const cohortMap: Map<string, {
+						emails: Set<string>;
+						monthActivity: Map<string, Set<string>>;
+					}> = new Map();
+
+					for (const [email, monthList] of attendeeEvents) {
+						if (monthList.length === 0) continue;
+						const firstMonth = monthList[0]!;
+
+						if (!cohortMap.has(firstMonth)) {
+							cohortMap.set(firstMonth, { emails: new Set(), monthActivity: new Map() });
+						}
+						const cohort = cohortMap.get(firstMonth)!;
+						cohort.emails.add(email);
+
+						for (const m of monthList) {
+							if (!cohort.monthActivity.has(m)) {
+								cohort.monthActivity.set(m, new Set());
+							}
+							cohort.monthActivity.get(m)!.add(email);
+						}
+					}
+
+					const allMonths: string[] = [];
+					const cursor = new Date(cutoff.getFullYear(), cutoff.getMonth(), 1);
+					while (cursor <= now) {
+						allMonths.push(`${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, "0")}`);
+						cursor.setMonth(cursor.getMonth() + 1);
+					}
+
+					const cohorts: Array<{
+						cohortMonth: string;
+						cohortSize: number;
+						retentionByMonth: Array<{ monthOffset: number; month: string; activeCount: number; retentionRate: string }>;
+					}> = [];
+
+					let totalMonth1Retention = 0;
+					let totalMonth3Retention = 0;
+					let cohortsWithMonth1 = 0;
+					let cohortsWithMonth3 = 0;
+
+					for (const cohortMonth of Array.from(cohortMap.keys()).sort()) {
+						const cohort = cohortMap.get(cohortMonth)!;
+						const cohortSize = cohort.emails.size;
+						const cohortMonthIdx = allMonths.indexOf(cohortMonth);
+						if (cohortMonthIdx < 0) continue;
+
+						const retentionByMonth: Array<{ monthOffset: number; month: string; activeCount: number; retentionRate: string }> = [];
+
+						for (let offset = 0; offset < allMonths.length - cohortMonthIdx; offset++) {
+							const targetMonth = allMonths[cohortMonthIdx + offset];
+							if (!targetMonth) break;
+							const activeEmails = cohort.monthActivity.get(targetMonth);
+							const activeCount = activeEmails ? activeEmails.size : 0;
+							const rate = cohortSize > 0 ? Math.round((activeCount / cohortSize) * 100) : 0;
+
+							retentionByMonth.push({ monthOffset: offset, month: targetMonth, activeCount, retentionRate: `${rate}%` });
+
+							if (offset === 1) { totalMonth1Retention += rate; cohortsWithMonth1++; }
+							if (offset === 3) { totalMonth3Retention += rate; cohortsWithMonth3++; }
+						}
+
+						cohorts.push({ cohortMonth, cohortSize, retentionByMonth });
+					}
+
+					return {
+						cohorts,
+						summary: {
+							totalUniqueAttendees: attendeeEvents.size,
+							avgRetentionMonth1: cohortsWithMonth1 > 0 ? `${Math.round(totalMonth1Retention / cohortsWithMonth1)}%` : "N/A",
+							avgRetentionMonth3: cohortsWithMonth3 > 0 ? `${Math.round(totalMonth3Retention / cohortsWithMonth3)}%` : "N/A",
+						},
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Cohort report error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/reports/popular-times
+		 * Admin. Heatmap of event attendance by day-of-week x time-of-day.
+		 *
+		 * Query params:
+		 *   - days: lookback period (default 180)
+		 *
+		 * Returns: { heatmap, peakTimes, totalDataPoints, period }
+		 */
+		reportPopularTimes: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const days = Math.min(Math.max(1, Number(input.days ?? 180)), 730);
+					const now = new Date();
+					const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
+					const eventsListJson = await ctx.kv.get<string>("events:list");
+					const eventIds = parseJSON<string[]>(eventsListJson, []);
+
+					const grid: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0) as number[]);
+					let totalDataPoints = 0;
+
+					for (const eventId of eventIds) {
+						const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+						if (!eventJson) continue;
+						const event = parseJSON<EventRecord>(eventJson, null);
+						if (!event) continue;
+
+						const eventDate = new Date(event.date);
+						if (eventDate < cutoff) continue;
+
+						const dayOfWeek = eventDate.getDay();
+						const hours = Number(event.time.split(":")[0]);
+						if (isNaN(hours) || hours < 0 || hours > 23) continue;
+
+						const regsListJson = await ctx.kv.get<string>(`event:${eventId}:registrations`);
+						const regEmails = parseJSON<string[]>(regsListJson, []);
+
+						let attendeeCount = 0;
+						for (const encodedEmail of regEmails) {
+							const regJson = await ctx.kv.get<string>(`event:${eventId}:registration:${encodedEmail}`);
+							if (!regJson) continue;
+							const reg = parseJSON<RegistrationRecord>(regJson, null);
+							if (!reg || reg.status !== "registered") continue;
+							attendeeCount++;
+						}
+
+						const weight = Math.max(1, attendeeCount);
+						grid[dayOfWeek]![hours] += weight;
+						totalDataPoints += weight;
+					}
+
+					const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+					const heatmap: Array<{ day: number; dayName: string; hour: number; hourLabel: string; count: number }> = [];
+
+					for (let day = 0; day < 7; day++) {
+						for (let hour = 0; hour < 24; hour++) {
+							heatmap.push({
+								day,
+								dayName: dayNames[day]!,
+								hour,
+								hourLabel: `${String(hour).padStart(2, "0")}:00`,
+								count: grid[day]![hour]!,
+							});
+						}
+					}
+
+					const peakTimes = [...heatmap]
+						.filter(h => h.count > 0)
+						.sort((a, b) => b.count - a.count)
+						.slice(0, 5)
+						.map(h => ({ dayName: h.dayName, hourLabel: h.hourLabel, count: h.count }));
+
+					return { heatmap, peakTimes, totalDataPoints, period: `last ${days} days` };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Popular times report error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/reports/funnel
+		 * Admin. Registration funnel: interest -> registered -> confirmed -> attended.
+		 *
+		 * Query params:
+		 *   - days: lookback period (default 90)
+		 *   - eventId: optional single-event scope
+		 *
+		 * Returns: { funnel, byEvent, summary, period }
+		 */
+		reportFunnel: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const days = Math.min(Math.max(1, Number(input.days ?? 90)), 730);
+					const filterEventId = input.eventId ? String(input.eventId).trim() : undefined;
+					const now = new Date();
+					const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
+					const eventsListJson = await ctx.kv.get<string>("events:list");
+					const eventIds = parseJSON<string[]>(eventsListJson, []);
+
+					let totalCapacity = 0;
+					let totalRegistered = 0;
+					let totalCheckedIn = 0;
+					let totalCancelled = 0;
+					let totalWaitlisted = 0;
+					let eventsWithCheckIn = 0;
+					let totalShowRateSum = 0;
+
+					const byEvent: Array<{
+						eventId: string; title: string; date: string;
+						funnel: Array<{ stage: string; count: number; percentage: string }>;
+					}> = [];
+
+					for (const eventId of eventIds) {
+						if (filterEventId && eventId !== filterEventId) continue;
+
+						const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+						if (!eventJson) continue;
+						const event = parseJSON<EventRecord>(eventJson, null);
+						if (!event) continue;
+						if (new Date(event.date) < cutoff) continue;
+
+						const regsListJson = await ctx.kv.get<string>(`event:${eventId}:registrations`);
+						const regEmails = parseJSON<string[]>(regsListJson, []);
+
+						let eventRegistered = 0;
+						let eventCheckedIn = 0;
+						let eventCancelled = 0;
+
+						for (const encodedEmail of regEmails) {
+							const regJson = await ctx.kv.get<string>(`event:${eventId}:registration:${encodedEmail}`);
+							if (!regJson) continue;
+							const reg = parseJSON<RegistrationRecord>(regJson, null);
+							if (!reg) continue;
+							if (reg.status === "registered") {
+								eventRegistered++;
+								if (reg.checkedIn) eventCheckedIn++;
+							} else if (reg.status === "cancelled") {
+								eventCancelled++;
+							}
+						}
+
+						const waitlistListJson = await ctx.kv.get<string>(`event:${eventId}:waitlist`);
+						const eventWaitlisted = parseJSON<string[]>(waitlistListJson, []).length;
+						const eventViewed = event.capacity + eventWaitlisted + eventCancelled;
+
+						totalCapacity += eventViewed;
+						totalRegistered += eventRegistered;
+						totalCheckedIn += eventCheckedIn;
+						totalCancelled += eventCancelled;
+						totalWaitlisted += eventWaitlisted;
+
+						if (eventCheckedIn > 0) {
+							eventsWithCheckIn++;
+							totalShowRateSum += eventRegistered > 0 ? (eventCheckedIn / eventRegistered) * 100 : 0;
+						}
+
+						byEvent.push({
+							eventId,
+							title: event.title,
+							date: event.date,
+							funnel: [
+								{ stage: "Interest (capacity + waitlist)", count: eventViewed, percentage: "100%" },
+								{ stage: "Registered", count: eventRegistered + eventCancelled, percentage: eventViewed > 0 ? `${Math.round(((eventRegistered + eventCancelled) / eventViewed) * 100)}%` : "0%" },
+								{ stage: "Confirmed (not cancelled)", count: eventRegistered, percentage: eventViewed > 0 ? `${Math.round((eventRegistered / eventViewed) * 100)}%` : "0%" },
+								{ stage: "Attended (checked in)", count: eventCheckedIn, percentage: eventRegistered > 0 ? `${Math.round((eventCheckedIn / eventRegistered) * 100)}%` : "N/A" },
+							],
+						});
+					}
+
+					byEvent.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+					const totalStarted = totalRegistered + totalCancelled;
+					const funnel = [
+						{ stage: "Interest (capacity + waitlist + cancellations)", count: totalCapacity, percentage: "100%", dropoff: "\u2014" },
+						{ stage: "Started Registration", count: totalStarted, percentage: totalCapacity > 0 ? `${Math.round((totalStarted / totalCapacity) * 100)}%` : "0%", dropoff: totalCapacity > 0 ? `${Math.round(((totalCapacity - totalStarted) / totalCapacity) * 100)}%` : "0%" },
+						{ stage: "Completed Registration", count: totalRegistered, percentage: totalCapacity > 0 ? `${Math.round((totalRegistered / totalCapacity) * 100)}%` : "0%", dropoff: totalStarted > 0 ? `${Math.round(((totalStarted - totalRegistered) / totalStarted) * 100)}%` : "0%" },
+						{ stage: "Attended (Checked In)", count: totalCheckedIn, percentage: totalRegistered > 0 ? `${Math.round((totalCheckedIn / totalRegistered) * 100)}%` : "N/A", dropoff: totalRegistered > 0 ? `${Math.round(((totalRegistered - totalCheckedIn) / totalRegistered) * 100)}%` : "N/A" },
+					];
+
+					return {
+						funnel,
+						byEvent: filterEventId ? byEvent : byEvent.slice(0, 20),
+						summary: {
+							overallConversionRate: totalCapacity > 0 ? `${Math.round((totalRegistered / totalCapacity) * 100)}%` : "0%",
+							avgShowRate: eventsWithCheckIn > 0 ? `${Math.round(totalShowRateSum / eventsWithCheckIn)}%` : "N/A",
+							totalEvents: byEvent.length,
+							totalRegistered,
+							totalCheckedIn,
+							totalWaitlisted,
+							totalCancelled,
+						},
+						period: `last ${days} days`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Funnel report error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/health
+		 * Public health check endpoint.
+		 */
+		health: {
+			public: true,
+			handler: async (_routeCtx: unknown, _ctx: PluginContext) => {
+				return {
+					status: "ok",
+					version: "1.5.0",
+					features: [
+						"registration",
+						"waitlist",
+						"check-in",
+						"reporting",
+						"categories",
+						"venues",
+						"series",
+						"csv-export",
+						"csv-import",
+						"webhooks",
+						"cohort-analysis",
+						"popular-times",
+						"funnel-analytics",
+					],
+				};
+			},
+		},
+
 	},
 });
