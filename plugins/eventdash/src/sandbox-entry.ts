@@ -90,9 +90,23 @@ function parseJSON<T>(json: string | undefined | null, fallback: T): T {
 
 /**
  * Utility: Encode email for safe KV key usage
+ * Normalizes email for KV storage (lowercase + trim), then encodes special characters.
  */
 function emailToKvKey(email: string): string {
 	return encodeURIComponent(email.toLowerCase().trim());
+}
+
+/**
+ * Utility: Validate string length
+ */
+function validateStringLength(value: string, maxLength: number, fieldName: string): string {
+	if (value.length > maxLength) {
+		throw new Response(
+			JSON.stringify({ error: `${fieldName} must be ${maxLength} characters or less` }),
+			{ status: 400, headers: { "Content-Type": "application/json" } }
+		);
+	}
+	return value;
 }
 
 /**
@@ -309,8 +323,8 @@ export default definePlugin({
 					const rc = routeCtx as Record<string, unknown>;
 					const eventId = String(rc.pathParams?.id ?? "").trim();
 					const input = rc.input as Record<string, unknown>;
-					const name = String(input.name ?? "").trim();
-					const email = String(input.email ?? "").trim().toLowerCase();
+					const name = validateStringLength(String(input.name ?? "").trim(), 100, "Name");
+					const email = validateStringLength(String(input.email ?? "").trim().toLowerCase(), 254, "Email");
 
 					// Validate input
 					if (!eventId) {
@@ -350,8 +364,10 @@ export default definePlugin({
 						);
 					}
 
-					// Acquire lock to prevent race condition
-					const lockKey = `register-lock:${eventId}:${emailToKvKey(email)}`;
+					// Acquire event-level lock to prevent capacity overflow (P0 fix)
+					// Lock is per-event, not per-email, to prevent race condition where
+					// two different users both see capacity available
+					const lockKey = `register-lock:${eventId}`;
 					const existingLock = await ctx.kv.get<string>(lockKey);
 					if (existingLock) {
 						throw new Response(
@@ -362,6 +378,16 @@ export default definePlugin({
 					await ctx.kv.set(lockKey, "1", { ex: 5 }); // 5 second lock
 
 					try {
+						// Reload event to ensure fresh capacity check within lock
+						const freshEventJson = await ctx.kv.get<string>(`event:${eventId}`);
+						const freshEvent = parseJSON<EventRecord>(freshEventJson, null);
+						if (!freshEvent) {
+							throw new Response(
+								JSON.stringify({ error: "Event not found" }),
+								{ status: 404, headers: { "Content-Type": "application/json" } }
+							);
+						}
+
 						// Check if already registered
 						const regKey = `registration:${eventId}:${emailToKvKey(email)}`;
 						const existingReg = await ctx.kv.get<string>(regKey);
@@ -374,13 +400,17 @@ export default definePlugin({
 									message: "Already registered for this event",
 								};
 							}
+							// If cancelled, delete the old record before creating new one (P0 fix)
+							if (existing && existing.status === "cancelled") {
+								await ctx.kv.delete(regKey);
+							}
 						}
 
 						const now = new Date().toISOString();
 						let status: "registered" | "waitlisted" = "registered";
 
-						// Check capacity
-						if (event.registered >= event.capacity) {
+						// Check capacity (fresh data within lock)
+						if (freshEvent.registered >= freshEvent.capacity) {
 							// Full — add to waitlist
 							status = "waitlisted";
 							const waitlist = await getWaitlist(ctx, eventId);
@@ -400,8 +430,8 @@ export default definePlugin({
 							if (ctx.email) {
 								await ctx.email.send({
 									to: email,
-									subject: `Waitlisted for ${event.title}`,
-									text: `Hi ${name},\n\nYou've been added to the waitlist for ${event.title} on ${event.date} at ${event.time}.\n\nYou're #${position} on the waitlist.`,
+									subject: `Waitlisted for ${freshEvent.title}`,
+									text: `Hi ${name},\n\nYou've been added to the waitlist for ${freshEvent.title} on ${freshEvent.date} at ${freshEvent.time}.\n\nYou're #${position} on the waitlist.`,
 								});
 							}
 
@@ -424,15 +454,15 @@ export default definePlugin({
 						await ctx.kv.set(regKey, JSON.stringify(registration));
 
 						// Increment registered count
-						event.registered++;
-						await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
+						freshEvent.registered++;
+						await ctx.kv.set(`event:${eventId}`, JSON.stringify(freshEvent));
 
 						// Send confirmation email if provider available
 						if (ctx.email) {
 							await ctx.email.send({
 								to: email,
-								subject: `Registered for ${event.title}`,
-								text: `Hi ${name},\n\nYou're registered for ${event.title} on ${event.date} at ${event.time}.\n\nLocation: ${event.location}`,
+								subject: `Registered for ${freshEvent.title}`,
+								text: `Hi ${name},\n\nYou're registered for ${freshEvent.title} on ${freshEvent.date} at ${freshEvent.time}.\n\nLocation: ${freshEvent.location}`,
 							});
 						}
 
@@ -441,7 +471,7 @@ export default definePlugin({
 						return {
 							success: true,
 							status: "registered",
-							message: `Registered for ${event.title}`,
+							message: `Registered for ${freshEvent.title}`,
 						};
 					} finally {
 						// Release the lock
@@ -460,7 +490,7 @@ export default definePlugin({
 
 		/**
 		 * POST /eventdash/events/:id/cancel
-		 * Cancel registration and optionally promote from waitlist.
+		 * Cancel registration or waitlist entry and optionally promote from waitlist.
 		 *
 		 * Body: { email: string }
 		 * Returns: { success: boolean, message: string }
@@ -472,7 +502,7 @@ export default definePlugin({
 					const rc = routeCtx as Record<string, unknown>;
 					const eventId = String(rc.pathParams?.id ?? "").trim();
 					const input = rc.input as Record<string, unknown>;
-					const email = String(input.email ?? "").trim().toLowerCase();
+					const email = validateStringLength(String(input.email ?? "").trim().toLowerCase(), 254, "Email");
 
 					if (!eventId || !email || !isValidEmail(email)) {
 						throw new Response(
@@ -500,75 +530,113 @@ export default definePlugin({
 					// Check if registered
 					const regKey = `registration:${eventId}:${emailToKvKey(email)}`;
 					const regJson = await ctx.kv.get<string>(regKey);
-					if (!regJson) {
-						throw new Response(
-							JSON.stringify({ error: "Registration not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
-					}
+					let isRegistered = false;
 
-					const registration = parseJSON<RegistrationRecord>(regJson, null);
-					if (!registration) {
-						throw new Response(
-							JSON.stringify({ error: "Registration not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
-					}
+					if (regJson) {
+						const registration = parseJSON<RegistrationRecord>(regJson, null);
+						if (!registration) {
+							throw new Response(
+								JSON.stringify({ error: "Registration not found" }),
+								{ status: 404, headers: { "Content-Type": "application/json" } }
+							);
+						}
+						isRegistered = true;
 
-					// Mark as cancelled
-					registration.status = "cancelled";
-					await ctx.kv.set(regKey, JSON.stringify(registration));
+						// Mark as cancelled
+						registration.status = "cancelled";
+						await ctx.kv.set(regKey, JSON.stringify(registration));
 
-					// Decrement registered count
-					if (event.registered > 0) {
-						event.registered--;
-						await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
-					}
+						// Decrement registered count
+						if (event.registered > 0) {
+							event.registered--;
+							await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
+						}
 
-					// Send cancellation email if provider available
-					if (ctx.email) {
-						await ctx.email.send({
-							to: email,
-							subject: `Cancelled for ${event.title}`,
-							text: `Your registration for ${event.title} has been cancelled.`,
-						});
-					}
-
-					// Promote from waitlist if someone is waiting
-					const promoted = await promoteFromWaitlist(ctx, eventId);
-					if (promoted) {
-						// Create registration for promoted person
-						const promRegKey = `registration:${eventId}:${emailToKvKey(promoted.email)}`;
-						const promRegistration: RegistrationRecord = {
-							email: promoted.email,
-							name: promoted.name,
-							status: "registered",
-							ticketCount: 1,
-							createdAt: new Date().toISOString(),
-						};
-						await ctx.kv.set(promRegKey, JSON.stringify(promRegistration));
-
-						// Increment registered count
-						event.registered++;
-						await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
-
-						// Send promotion email if provider available
+						// Send cancellation email if provider available
 						if (ctx.email) {
 							await ctx.email.send({
-								to: promoted.email,
-								subject: `You're promoted from the waitlist for ${event.title}`,
-								text: `Hi ${promoted.name},\n\nA spot has opened up for ${event.title} on ${event.date} at ${event.time}.\n\nLocation: ${event.location}`,
+								to: email,
+								subject: `Cancelled for ${event.title}`,
+								text: `Your registration for ${event.title} has been cancelled.`,
 							});
 						}
 
-						ctx.log.info(`Promoted from waitlist: ${promoted.email} for event ${eventId}`);
+						ctx.log.info(`Cancelled registration: ${email} for event ${eventId}`);
 					}
 
-					ctx.log.info(`Cancelled registration: ${email} for event ${eventId}`);
+					// Check if on waitlist (P0 fix: support cancellation from waitlist)
+					let isWaitlisted = false;
+					const waitlist = await getWaitlist(ctx, eventId);
+					const waitlistIndex = waitlist.findIndex((w) => w.email === email);
+
+					if (waitlistIndex >= 0) {
+						isWaitlisted = true;
+						// Remove from waitlist
+						const updated = waitlist.filter((w) => w.email !== email);
+
+						// Renumber positions
+						const renumbered = updated.map((w, index) => ({ ...w, position: index + 1 }));
+
+						if (renumbered.length > 0) {
+							await ctx.kv.set(`waitlist:${eventId}`, JSON.stringify(renumbered));
+						} else {
+							await ctx.kv.delete(`waitlist:${eventId}`);
+						}
+
+						// Send cancellation email if provider available
+						if (ctx.email) {
+							await ctx.email.send({
+								to: email,
+								subject: `Waitlist cancelled for ${event.title}`,
+								text: `Your waitlist entry for ${event.title} has been cancelled.`,
+							});
+						}
+
+						ctx.log.info(`Cancelled waitlist entry: ${email} for event ${eventId}`);
+					}
+
+					if (!isRegistered && !isWaitlisted) {
+						throw new Response(
+							JSON.stringify({ error: "No registration or waitlist entry found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Promote from waitlist if someone is waiting and we just freed a registered spot
+					if (isRegistered) {
+						const promoted = await promoteFromWaitlist(ctx, eventId);
+						if (promoted) {
+							// Create registration for promoted person
+							const promRegKey = `registration:${eventId}:${emailToKvKey(promoted.email)}`;
+							const promRegistration: RegistrationRecord = {
+								email: promoted.email,
+								name: promoted.name,
+								status: "registered",
+								ticketCount: 1,
+								createdAt: new Date().toISOString(),
+							};
+							await ctx.kv.set(promRegKey, JSON.stringify(promRegistration));
+
+							// Increment registered count
+							event.registered++;
+							await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
+
+							// Send promotion email if provider available
+							if (ctx.email) {
+								await ctx.email.send({
+									to: promoted.email,
+									subject: `You're promoted from the waitlist for ${event.title}`,
+									text: `Hi ${promoted.name},\n\nA spot has opened up for ${event.title} on ${event.date} at ${event.time}.\n\nLocation: ${event.location}`,
+								});
+							}
+
+							ctx.log.info(`Promoted from waitlist: ${promoted.email} for event ${eventId}`);
+						}
+					}
 
 					return {
 						success: true,
-						message: "Registration cancelled",
+						message: isWaitlisted ? "Waitlist entry cancelled" : "Registration cancelled",
 					};
 				} catch (error) {
 					if (error instanceof Response) throw error;
@@ -603,12 +671,12 @@ export default definePlugin({
 						);
 					}
 
-					const title = String(input.title ?? "").trim();
+					const title = validateStringLength(String(input.title ?? "").trim(), 200, "Title");
 					const date = String(input.date ?? "").trim();
 					const time = String(input.time ?? "").trim();
-					const location = String(input.location ?? "").trim();
+					const location = validateStringLength(String(input.location ?? "").trim(), 500, "Location");
 					const capacity = parseInt(String(input.capacity ?? "1"), 10);
-					const description = String(input.description ?? "").trim();
+					const description = validateStringLength(String(input.description ?? "").trim(), 5000, "Description");
 					const endTime = String(input.endTime ?? "").trim();
 
 					if (!title || !date || !time || !location || capacity < 1) {
@@ -651,6 +719,76 @@ export default definePlugin({
 					ctx.log.error(`Create event error: ${String(error)}`);
 					throw new Response(
 						JSON.stringify({ error: "Failed to create event" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /eventdash/events/create-template
+		 * Create a recurring event template (admin only).
+		 *
+		 * Body: { title, time, location, capacity, dayOfWeek, description?, endTime? }
+		 * dayOfWeek: 0=Sunday, 1=Monday, ..., 6=Saturday
+		 * Returns: { success: boolean, templateId: string }
+		 */
+		createTemplate: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+
+					// Check admin auth
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const title = validateStringLength(String(input.title ?? "").trim(), 200, "Title");
+					const time = String(input.time ?? "").trim();
+					const location = validateStringLength(String(input.location ?? "").trim(), 500, "Location");
+					const capacity = parseInt(String(input.capacity ?? "1"), 10);
+					const dayOfWeek = parseInt(String(input.dayOfWeek ?? "0"), 10);
+					const description = validateStringLength(String(input.description ?? "").trim(), 5000, "Description");
+					const endTime = String(input.endTime ?? "").trim();
+
+					if (!title || !time || !location || capacity < 1 || dayOfWeek < 0 || dayOfWeek > 6) {
+						throw new Response(
+							JSON.stringify({
+								error: "Title, time, location, capacity, and dayOfWeek (0-6) required",
+							}),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const templateId = generateId();
+					const template: EventTemplateRecord = {
+						id: templateId,
+						title,
+						time,
+						location,
+						capacity,
+						dayOfWeek,
+						createdAt: new Date().toISOString(),
+					};
+
+					if (description) template.description = description;
+					if (endTime) template.endTime = endTime;
+
+					await ctx.kv.set(`event-template:${templateId}`, JSON.stringify(template));
+
+					ctx.log.info(`Event template created: ${templateId}`);
+
+					return { success: true, templateId };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Create template error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to create template" }),
 						{ status: 500, headers: { "Content-Type": "application/json" } }
 					);
 				}
@@ -710,6 +848,17 @@ export default definePlugin({
 					let currentDate = new Date();
 					if (startDateInput) {
 						currentDate = new Date(startDateInput);
+					}
+
+					// Validate start date is in the future (P1 fix)
+					const now = new Date();
+					now.setHours(0, 0, 0, 0);
+					currentDate.setHours(0, 0, 0, 0);
+					if (currentDate < now) {
+						throw new Response(
+							JSON.stringify({ error: "Start date must be in the future" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
 					}
 
 					// Generate instances for N weeks
@@ -925,6 +1074,35 @@ export default definePlugin({
 								blocks: [],
 								toast: {
 									message: "Please fill in all required fields",
+									type: "error" as const,
+								},
+							};
+						}
+
+						// Validate string lengths
+						if (title.length > 200) {
+							return {
+								blocks: [],
+								toast: {
+									message: "Title must be 200 characters or less",
+									type: "error" as const,
+								},
+							};
+						}
+						if (location.length > 500) {
+							return {
+								blocks: [],
+								toast: {
+									message: "Location must be 500 characters or less",
+									type: "error" as const,
+								},
+							};
+						}
+						if (description.length > 5000) {
+							return {
+								blocks: [],
+								toast: {
+									message: "Description must be 5000 characters or less",
 									type: "error" as const,
 								},
 							};
