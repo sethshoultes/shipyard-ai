@@ -1,5 +1,15 @@
 import { definePlugin } from "emdash";
 import type { PluginContext } from "emdash";
+import {
+	sendEmail,
+	formatDateTime,
+	generateCalendarLink,
+	generateFreeEventEmailHTML,
+	generatePaidEventEmailHTML,
+	generateCancellationEmailHTML,
+	generateWaitlistEmailHTML,
+	generateWaitlistPromotionEmailHTML,
+} from "./email";
 
 /**
  * Type definitions
@@ -259,7 +269,10 @@ async function promoteFromWaitlist(
  */
 function initializePlugin(ctx: PluginContext): void {
 	ctx.log.info("EventDash plugin installed");
-	// No default data needed — events are created by admin
+	// Initialize Resend configuration
+	// Admin should set RESEND_API_KEY and EVENT_FROM_EMAIL environment variables
+	// Alternatively, store in KV via admin settings endpoint
+	ctx.log.info("EventDash: Configure email settings via RESEND_API_KEY and EVENT_FROM_EMAIL environment variables");
 }
 
 export default definePlugin({
@@ -495,14 +508,13 @@ export default definePlugin({
 							waitlist.push(waitlistEntry);
 							await ctx.kv.set(`waitlist:${eventId}`, JSON.stringify(waitlist));
 
-							// Send waitlist email if provider available
-							if (ctx.email) {
-								await ctx.email.send({
-									to: email,
-									subject: `Waitlisted for ${freshEvent.title}`,
-									text: `Hi ${name},\n\nYou've been added to the waitlist for ${freshEvent.title} on ${freshEvent.date} at ${freshEvent.time}.\n\nYou're #${position} on the waitlist.`,
-								});
-							}
+							// Send waitlist email via Resend
+							const waitlistEmailHTML = generateWaitlistEmailHTML(name, freshEvent.title, position);
+							await sendEmail(ctx, {
+								to: email,
+								subject: `Waitlisted for ${freshEvent.title}`,
+								html: waitlistEmailHTML,
+							});
 
 							return {
 								success: true,
@@ -536,12 +548,51 @@ export default definePlugin({
 						}
 						await ctx.kv.set(`event:${eventId}`, JSON.stringify(freshEvent));
 
-						// Send confirmation email if provider available
-						if (ctx.email) {
-							await ctx.email.send({
+						// Send confirmation email via Resend
+						// For free events or pending payments, send immediately
+						// For paid events with confirmed payment, send in webhook handler
+						if (!freshEvent.requiresPayment || paymentStatus === "paid") {
+							const calendarLink = generateCalendarLink(
+								freshEvent.title,
+								freshEvent.date,
+								freshEvent.time,
+								freshEvent.endTime,
+								freshEvent.location
+							);
+
+							let emailHTML: string;
+							if (freshEvent.requiresPayment && paymentStatus === "paid") {
+								// Paid event with payment confirmed
+								const price = amountPaid || 0;
+								const ticketTypeDisplay = ticketType || "General";
+								emailHTML = generatePaidEventEmailHTML(
+									name,
+									freshEvent.title,
+									ticketTypeDisplay,
+									price,
+									freshEvent.date,
+									freshEvent.time,
+									freshEvent.location,
+									calendarLink,
+									freshEvent.endTime
+								);
+							} else {
+								// Free event or pending payment
+								emailHTML = generateFreeEventEmailHTML(
+									name,
+									freshEvent.title,
+									freshEvent.date,
+									freshEvent.time,
+									freshEvent.location,
+									calendarLink,
+									freshEvent.endTime
+								);
+							}
+
+							await sendEmail(ctx, {
 								to: email,
-								subject: `Registered for ${freshEvent.title}`,
-								text: `Hi ${name},\n\nYou're registered for ${freshEvent.title} on ${freshEvent.date} at ${freshEvent.time}.\n\nLocation: ${freshEvent.location}`,
+								subject: `You're registered for ${freshEvent.title}!`,
+								html: emailHTML,
 							});
 						}
 
@@ -631,14 +682,13 @@ export default definePlugin({
 							await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
 						}
 
-						// Send cancellation email if provider available
-						if (ctx.email) {
-							await ctx.email.send({
-								to: email,
-								subject: `Cancelled for ${event.title}`,
-								text: `Your registration for ${event.title} has been cancelled.`,
-							});
-						}
+						// Send cancellation email via Resend
+						const cancellationEmailHTML = generateCancellationEmailHTML(registration.name, event.title);
+						await sendEmail(ctx, {
+							to: email,
+							subject: `Registration cancelled — ${event.title}`,
+							html: cancellationEmailHTML,
+						});
 
 						ctx.log.info(`Cancelled registration: ${email} for event ${eventId}`);
 					}
@@ -662,14 +712,14 @@ export default definePlugin({
 							await ctx.kv.delete(`waitlist:${eventId}`);
 						}
 
-						// Send cancellation email if provider available
-						if (ctx.email) {
-							await ctx.email.send({
-								to: email,
-								subject: `Waitlist cancelled for ${event.title}`,
-								text: `Your waitlist entry for ${event.title} has been cancelled.`,
-							});
-						}
+						// Send cancellation email via Resend
+						const waitlistName = waitlist.find((w) => w.email === email)?.name || "there";
+						const cancellationEmailHTML = generateCancellationEmailHTML(waitlistName, event.title);
+						await sendEmail(ctx, {
+							to: email,
+							subject: `Waitlist cancelled — ${event.title}`,
+							html: cancellationEmailHTML,
+						});
 
 						ctx.log.info(`Cancelled waitlist entry: ${email} for event ${eventId}`);
 					}
@@ -700,14 +750,19 @@ export default definePlugin({
 							event.registered++;
 							await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
 
-							// Send promotion email if provider available
-							if (ctx.email) {
-								await ctx.email.send({
-									to: promoted.email,
-									subject: `You're promoted from the waitlist for ${event.title}`,
-									text: `Hi ${promoted.name},\n\nA spot has opened up for ${event.title} on ${event.date} at ${event.time}.\n\nLocation: ${event.location}`,
-								});
-							}
+							// Send promotion email via Resend
+							const siteUrl = (ctx as unknown as Record<string, unknown>).siteUrl || "https://example.com";
+							const registerLink = `${siteUrl}/events/${eventId}/register?email=${encodeURIComponent(promoted.email)}`;
+							const promotionEmailHTML = generateWaitlistPromotionEmailHTML(
+								promoted.name,
+								event.title,
+								registerLink
+							);
+							await sendEmail(ctx, {
+								to: promoted.email,
+								subject: `A spot opened up — ${event.title}`,
+								html: promotionEmailHTML,
+							});
 
 							ctx.log.info(`Promoted from waitlist: ${promoted.email} for event ${eventId}`);
 						}
@@ -1276,7 +1331,7 @@ export default definePlugin({
 
 					switch (eventType) {
 						case "payment_intent.succeeded": {
-							// Payment succeeded: update registration status
+							// Payment succeeded: update registration status and send confirmation email
 							const metadata = object.metadata as Record<string, string> | undefined;
 							if (!metadata) break;
 
@@ -1295,6 +1350,41 @@ export default definePlugin({
 								if (registration) {
 									registration.paymentStatus = "paid";
 									await ctx.kv.set(regKey, JSON.stringify(registration));
+
+									// Send confirmation email for paid event
+									const eventJson = await ctx.kv.get<string>(`event:${piEventId}`);
+									const evt = parseJSON<EventRecord>(eventJson, null);
+									if (evt && evt.requiresPayment) {
+										const calendarLink = generateCalendarLink(
+											evt.title,
+											evt.date,
+											evt.time,
+											evt.endTime,
+											evt.location
+										);
+
+										const price = registration.amountPaid || 0;
+										const ticketType = registration.ticketType || "General";
+
+										const emailHTML = generatePaidEventEmailHTML(
+											registration.name,
+											evt.title,
+											ticketType,
+											price,
+											evt.date,
+											evt.time,
+											evt.location,
+											calendarLink,
+											evt.endTime
+										);
+
+										await sendEmail(ctx, {
+											to: email,
+											subject: `Payment confirmed! You're registered for ${evt.title}`,
+											html: emailHTML,
+										});
+									}
+
 									ctx.log.info(`Payment confirmed for ${email} on event ${piEventId}`);
 								}
 							}

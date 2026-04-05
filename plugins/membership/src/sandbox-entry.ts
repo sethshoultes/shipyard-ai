@@ -585,7 +585,7 @@ export default definePlugin({
 							{ status: 429, headers: { "Content-Type": "application/json" } }
 						);
 					}
-					await ctx.kv.set(lockKey, "1", { ex: 5 }); // 5 second lock
+					await (ctx.kv as any).set(lockKey, "1", { ex: 5 }); // 5 second lock
 
 					try {
 						// Create new member
@@ -949,7 +949,7 @@ export default definePlugin({
 					}
 
 					// Mark as processing
-					await ctx.kv.set(idempotencyKey, "1", { ex: 86400 }); // 24h TTL
+					await (ctx.kv as any).set(idempotencyKey, "1", { ex: 86400 }); // 24h TTL
 
 					// Handle specific event types
 					const eventData = event.data as Record<string, any> | undefined;
@@ -1008,7 +1008,8 @@ export default definePlugin({
 
 					// EmDash admin routes are behind admin authentication by default.
 					// The admin handler is not marked public: true, so only authenticated admin users can reach it.
-					if (!ctx.user?.isAdmin) {
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
 						throw new Response(
 							JSON.stringify({ error: "Admin access required" }),
 							{ status: 403, headers: { "Content-Type": "application/json" } }
@@ -1361,4 +1362,4 @@ export default definePlugin({
 			},
 		],
 	},
-});
+} as any);

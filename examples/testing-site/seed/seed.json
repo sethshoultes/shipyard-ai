@@ -1,0 +1,106 @@
+{
+  "$schema": "https://emdashcms.com/seed.schema.json",
+  "version": "1",
+  "meta": {
+    "name": "Shipyard QA Testing Site",
+    "description": "Internal testing site for Shipyard AI plugin development and QA",
+    "author": "Shipyard AI"
+  },
+  "settings": {
+    "title": "Shipyard QA",
+    "tagline": "Plugin testing & QA environment"
+  },
+  "collections": [
+    {
+      "slug": "pages",
+      "label": "Pages",
+      "labelSingular": "Page",
+      "supports": ["drafts", "revisions", "seo"],
+      "fields": [
+        { "slug": "title", "label": "Title", "type": "string", "required": true },
+        { "slug": "content", "label": "Content", "type": "portableText" }
+      ]
+    }
+  ],
+  "menus": [
+    {
+      "name": "primary",
+      "label": "Primary Navigation",
+      "items": [
+        { "type": "custom", "label": "Home", "url": "/" },
+        { "type": "custom", "label": "Test Pages", "url": "/pricing" },
+        { "type": "custom", "label": "Contact", "url": "/contact" }
+      ]
+    }
+  ],
+  "content": {
+    "pages": [
+      {
+        "id": "home",
+        "slug": "home",
+        "status": "published",
+        "data": {
+          "title": "Shipyard QA Testing",
+          "content": [
+            {
+              "_type": "marketing.hero",
+              "_key": "hero",
+              "headline": "Shipyard QA Testing Environment",
+              "subheadline": "This site is used by Margaret Hamilton and the QA team to test EmDash plugins, themes, and features before they ship to production.",
+              "primaryCta": { "label": "Admin Panel", "url": "/_emdash/admin" },
+              "secondaryCta": { "label": "View Plugins", "url": "/pricing" }
+            },
+            {
+              "_type": "marketing.features",
+              "_key": "features",
+              "headline": "What we test here",
+              "subheadline": "Every plugin goes through QA on this site before shipping.",
+              "features": [
+                { "icon": "shield", "title": "MemberShip Plugin", "description": "Membership plans, gated content, Stripe Payment Links, member management." },
+                { "icon": "zap", "title": "EventDash Plugin", "description": "Events, ticketing, registration, calendar views, iCal export." },
+                { "icon": "users", "title": "ReviewPulse Plugin", "description": "Google/Yelp review integration, display widgets, sentiment tracking." },
+                { "icon": "code", "title": "FormForge Plugin", "description": "Form builder, submissions, spam protection, webhooks." },
+                { "icon": "chart", "title": "SEODash Plugin", "description": "Meta tags, sitemaps, social previews, readability analysis." },
+                { "icon": "globe", "title": "CommerceKit Plugin", "description": "Products, cart, checkout, orders, inventory." }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "pricing",
+        "slug": "pricing",
+        "status": "published",
+        "data": {
+          "title": "Plugin Test Pages",
+          "content": [
+            {
+              "_type": "marketing.hero",
+              "_key": "test-hero",
+              "headline": "Plugin Test Area",
+              "subheadline": "Each plugin installs test content here. Use the admin panel to manage.",
+              "centered": true
+            }
+          ]
+        }
+      },
+      {
+        "id": "contact",
+        "slug": "contact",
+        "status": "published",
+        "data": {
+          "title": "QA Contact",
+          "content": [
+            {
+              "_type": "marketing.hero",
+              "_key": "contact-hero",
+              "headline": "Report Issues",
+              "subheadline": "Found a bug? Create a GitHub issue at sethshoultes/shipyard-ai with the qa-fix label.",
+              "centered": true
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
