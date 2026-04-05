@@ -8,6 +8,10 @@
 		"./sandbox": "./src/sandbox-entry.ts",
 		"./astro": "./src/astro/index.ts"
 	},
+	"scripts": {
+		"test": "vitest run",
+		"test:watch": "vitest"
+	},
 	"files": [
 		"src",
 		"README.md"
@@ -16,7 +20,8 @@
 		"emdash": "^0.1.0"
 	},
 	"devDependencies": {
+		"emdash": "^0.1.0",
 		"typescript": "^5.5",
-		"emdash": "^0.1.0"
+		"vitest": "^4.1.2"
 	}
 }
