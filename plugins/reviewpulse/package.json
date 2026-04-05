@@ -2,7 +2,7 @@
 	"name": "@shipyard/reviewpulse",
 	"version": "1.0.0",
 	"type": "module",
-	"description": "Review aggregation, display widget, and reputation management for EmDash CMS.",
+	"description": "Review aggregation, management, and display widgets for EmDash CMS.",
 	"exports": {
 		".": "./src/index.ts",
 		"./sandbox": "./src/sandbox-entry.ts",
