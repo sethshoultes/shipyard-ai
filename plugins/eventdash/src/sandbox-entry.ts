@@ -150,6 +150,36 @@ function generateCheckInCode(): string {
 }
 
 /**
+ * Utility: Format date and time for iCal (RFC 5545 format: YYYYMMDDTHHmmssZ)
+ */
+function formatICalDate(date: string, time: string): string {
+	try {
+		const [hours, minutes] = time.split(":").map(Number);
+		const dateObj = new Date(`${date}T${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00Z`);
+		const year = dateObj.getUTCFullYear();
+		const month = String(dateObj.getUTCMonth() + 1).padStart(2, "0");
+		const day = String(dateObj.getUTCDate()).padStart(2, "0");
+		const h = String(dateObj.getUTCHours()).padStart(2, "0");
+		const m = String(dateObj.getUTCMinutes()).padStart(2, "0");
+		const s = String(dateObj.getUTCSeconds()).padStart(2, "0");
+		return `${year}${month}${day}T${h}${m}${s}Z`;
+	} catch {
+		return "";
+	}
+}
+
+/**
+ * Utility: Escape special characters for iCal
+ */
+function escapeICalString(str: string): string {
+	return str
+		.replace(/\\/g, "\\\\")
+		.replace(/,/g, "\\,")
+		.replace(/;/g, "\\;")
+		.replace(/\n/g, "\\n");
+}
+
+/**
  * Utility: Validate string length
  */
 function validateStringLength(value: string, maxLength: number, fieldName: string): string {
@@ -552,6 +582,8 @@ export default definePlugin({
 							status: "registered",
 							ticketCount: 1,
 							createdAt: now,
+							checkInCode: generateCheckInCode(), // Generate check-in code for Wave 3
+							checkedIn: false,
 						};
 
 						// Add payment fields if provided
@@ -561,6 +593,15 @@ export default definePlugin({
 						if (paymentStatus) registration.paymentStatus = paymentStatus;
 
 						await ctx.kv.set(regKey, JSON.stringify(registration));
+
+						// Track attendee email for bulk operations (Wave 3)
+						const attendeesListJson = await ctx.kv.get<string>("event-attendees:list");
+						const attendeesList = parseJSON<string[]>(attendeesListJson, []);
+						const encodedEmail = emailToKvKey(email);
+						if (!attendeesList.includes(encodedEmail)) {
+							attendeesList.push(encodedEmail);
+							await ctx.kv.set("event-attendees:list", JSON.stringify(attendeesList));
+						}
 
 						// Increment registered count
 						freshEvent.registered++;
@@ -2108,6 +2149,849 @@ export default definePlugin({
 					ctx.log.error(`Calendar month error: ${String(error)}`);
 					throw new Response(
 						JSON.stringify({ error: "Failed to fetch calendar events" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * WAVE 3 TASK 9: GET /eventdash/events/:id/registrations
+		 * Admin: List all registrations for an event
+		 *
+		 * Query params:
+		 *   - status: filter by "registered" or "cancelled" (default: all)
+		 *   - page: page number (default: 1)
+		 *   - limit: results per page (default: 50, max: 100)
+		 *
+		 * Returns: { registrations: RegistrationRecord[], total: number, page: number, pages: number }
+		 */
+		registrations: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const eventId = String(input.id ?? "").trim();
+					const statusFilter = String(input.status ?? "");
+					const page = Math.max(1, parseInt(String(input.page ?? "1"), 10) || 1);
+					const limit = Math.min(Math.max(1, parseInt(String(input.limit ?? "50"), 10) || 50), 100);
+
+					// Check admin auth
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!eventId) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get event to verify it exists
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					if (!eventJson) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get all registrations for this event
+					const listJson = await ctx.kv.get<string>("events:list");
+					const eventIds = parseJSON<string[]>(listJson, []);
+
+					const allRegs: RegistrationRecord[] = [];
+
+					// Iterate through all members to find their registrations for this event
+					const membersListJson = await ctx.kv.get<string>("event-attendees:list");
+					const attendeeKeys = parseJSON<string[]>(membersListJson, []);
+
+					for (const encodedEmail of attendeeKeys) {
+						const regKey = `registration:${eventId}:${encodedEmail}`;
+						const regJson = await ctx.kv.get<string>(regKey);
+						if (regJson) {
+							const reg = parseJSON<RegistrationRecord>(regJson, null);
+							if (reg) {
+								// Apply status filter
+								if (!statusFilter || reg.status === statusFilter) {
+									allRegs.push(reg);
+								}
+							}
+						}
+					}
+
+					// Paginate
+					const total = allRegs.length;
+					const pages = Math.ceil(total / limit);
+					const start = (page - 1) * limit;
+					const paged = allRegs.slice(start, start + limit);
+
+					return {
+						registrations: paged,
+						total,
+						page,
+						pages,
+					};
+				} catch (error) {
+					ctx.log.error(`Registrations list error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to fetch registrations" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * WAVE 3 TASK 9: POST /eventdash/events/:id/registrations/export
+		 * Admin: Export CSV of all registrations for an event
+		 *
+		 * Body: { eventId: string, status?: string }
+		 *
+		 * Returns: CSV string with Content-Type: text/csv
+		 */
+		registrationsExport: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const eventId = String(input.id ?? "").trim();
+					const statusFilter = String(input.status ?? "");
+
+					// Check admin auth
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!eventId) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get event to verify it exists
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get all registrations
+					const membersListJson = await ctx.kv.get<string>("event-attendees:list");
+					const attendeeKeys = parseJSON<string[]>(membersListJson, []);
+
+					const registrations: RegistrationRecord[] = [];
+					for (const encodedEmail of attendeeKeys) {
+						const regKey = `registration:${eventId}:${encodedEmail}`;
+						const regJson = await ctx.kv.get<string>(regKey);
+						if (regJson) {
+							const reg = parseJSON<RegistrationRecord>(regJson, null);
+							if (reg && (!statusFilter || reg.status === statusFilter)) {
+								registrations.push(reg);
+							}
+						}
+					}
+
+					// Build CSV
+					const headers = ["Email", "Name", "Status", "Ticket Type", "Tickets", "Amount Paid", "Payment Status", "Registered At", "Checked In At"];
+					const rows = registrations.map((r) => [
+						`"${r.email.replace(/"/g, '""')}"`,
+						`"${r.name.replace(/"/g, '""')}"`,
+						r.status,
+						r.ticketType || "",
+						r.ticketCount.toString(),
+						r.amountPaid ? `$${(r.amountPaid / 100).toFixed(2)}` : "",
+						r.paymentStatus || "paid",
+						r.createdAt,
+						r.checkedInAt || "",
+					]);
+
+					const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+
+					return new Response(csv, {
+						status: 200,
+						headers: {
+							"Content-Type": "text/csv",
+							"Content-Disposition": `attachment; filename="event-${eventId}-registrations.csv"`,
+						},
+					});
+				} catch (error) {
+					ctx.log.error(`Registrations export error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to export registrations" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * WAVE 3 TASK 9: POST /eventdash/events/:id/notify
+		 * Admin: Send bulk email to all registrants
+		 *
+		 * Body: { eventId: string, subject: string, message: string }
+		 *
+		 * Returns: { sent: number, failed: number }
+		 */
+		notifyRegistrants: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const eventId = String(input.id ?? "").trim();
+					const subject = String(input.subject ?? "").trim();
+					const message = String(input.message ?? "").trim();
+
+					// Check admin auth
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!eventId || !subject || !message) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID, subject, and message required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get event
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get all registrations
+					const membersListJson = await ctx.kv.get<string>("event-attendees:list");
+					const attendeeKeys = parseJSON<string[]>(membersListJson, []);
+
+					let sent = 0;
+					let failed = 0;
+
+					for (const encodedEmail of attendeeKeys) {
+						const regKey = `registration:${eventId}:${encodedEmail}`;
+						const regJson = await ctx.kv.get<string>(regKey);
+						if (regJson) {
+							const reg = parseJSON<RegistrationRecord>(regJson, null);
+							if (reg && reg.status === "registered") {
+								try {
+									// Send email using Resend (or sendEmail function)
+									await sendEmail({
+										to: reg.email,
+										subject: subject,
+										html: `<p>${message.replace(/\n/g, "<br>")}</p>`,
+									});
+									sent++;
+								} catch (err) {
+									ctx.log.error(`Failed to send email to ${reg.email}: ${String(err)}`);
+									failed++;
+								}
+							}
+						}
+					}
+
+					ctx.log.info(`Bulk email sent for event ${eventId}: ${sent} sent, ${failed} failed`);
+
+					return { sent, failed };
+				} catch (error) {
+					ctx.log.error(`Notify registrants error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to send notifications" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * WAVE 3 TASK 10: GET /eventdash/events/:id/tickets/sales
+		 * Admin: Ticket sales breakdown (per type, revenue, remaining)
+		 *
+		 * Returns: { eventId, eventName, ticketSales: { type, sold, capacity, remaining, revenue } }
+		 */
+		ticketSales: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const eventId = String(input.id ?? "").trim();
+
+					// Check admin auth
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!eventId) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get event
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!event.ticketTypes || event.ticketTypes.length === 0) {
+						return {
+							eventId,
+							eventName: event.title,
+							ticketSales: [],
+							totalRevenue: event.totalRevenue || 0,
+						};
+					}
+
+					// Calculate sales per ticket type
+					const ticketSales = event.ticketTypes.map((tt) => ({
+						type: tt.name,
+						sold: tt.sold,
+						capacity: tt.capacity,
+						remaining: tt.capacity - tt.sold,
+						revenue: (tt.price * tt.sold) / 100, // Convert cents to dollars
+						price: tt.price / 100,
+					}));
+
+					return {
+						eventId,
+						eventName: event.title,
+						ticketSales,
+						totalRevenue: (event.totalRevenue || 0) / 100,
+					};
+				} catch (error) {
+					ctx.log.error(`Ticket sales error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to fetch ticket sales" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * WAVE 3 TASK 10: POST /eventdash/events/:id/tickets/transfer
+		 * Admin: Transfer ticket between attendees
+		 *
+		 * Body: { eventId: string, fromEmail: string, toEmail: string }
+		 *
+		 * Returns: { success: boolean, message: string }
+		 */
+		ticketTransfer: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const eventId = String(input.id ?? "").trim();
+					const fromEmail = String(input.fromEmail ?? "").trim().toLowerCase();
+					const toEmail = String(input.toEmail ?? "").trim().toLowerCase();
+
+					// Check admin auth
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!eventId || !fromEmail || !toEmail) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID, fromEmail, and toEmail required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!isValidEmail(fromEmail) || !isValidEmail(toEmail)) {
+						throw new Response(
+							JSON.stringify({ error: "Invalid email format" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get event
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get from registration
+					const fromKey = `registration:${eventId}:${emailToKvKey(fromEmail)}`;
+					const fromJson = await ctx.kv.get<string>(fromKey);
+					const fromReg = parseJSON<RegistrationRecord>(fromJson, null);
+
+					if (!fromReg || fromReg.status !== "registered") {
+						throw new Response(
+							JSON.stringify({ error: `No active registration found for ${fromEmail}` }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Check if toEmail already has registration
+					const toKey = `registration:${eventId}:${emailToKvKey(toEmail)}`;
+					const toJson = await ctx.kv.get<string>(toKey);
+					const toReg = parseJSON<RegistrationRecord>(toJson, null);
+
+					if (toReg && toReg.status === "registered") {
+						throw new Response(
+							JSON.stringify({ error: `${toEmail} already has an active registration` }),
+							{ status: 409, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Transfer: create new registration for toEmail, cancel fromEmail
+					const newReg: RegistrationRecord = {
+						email: toEmail,
+						name: fromReg.name,
+						status: "registered",
+						ticketCount: fromReg.ticketCount,
+						createdAt: new Date().toISOString(),
+						ticketType: fromReg.ticketType,
+						amountPaid: fromReg.amountPaid,
+						paymentStatus: fromReg.paymentStatus,
+						checkInCode: fromReg.checkInCode,
+						checkedIn: false,
+					};
+
+					await ctx.kv.set(toKey, JSON.stringify(newReg));
+
+					// Cancel original
+					fromReg.status = "cancelled";
+					await ctx.kv.set(fromKey, JSON.stringify(fromReg));
+
+					ctx.log.info(`Ticket transferred: ${fromEmail} -> ${toEmail} for event ${eventId}`);
+
+					return {
+						success: true,
+						message: `Ticket transferred from ${fromEmail} to ${toEmail}`,
+					};
+				} catch (error) {
+					ctx.log.error(`Ticket transfer error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to transfer ticket" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * WAVE 3 TASK 11: POST /eventdash/events/:id/checkin
+		 * Check in attendee using QR code or confirmation code
+		 *
+		 * Body: { eventId: string, code: string }
+		 *
+		 * Returns: { success: boolean, attendeeName?: string, message: string, checkedInAt?: string }
+		 */
+		checkIn: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const eventId = String(input.id ?? "").trim();
+					const code = String(input.code ?? "").trim().toUpperCase();
+
+					if (!eventId || !code) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID and code required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get event
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Search for registration with matching checkInCode
+					const membersListJson = await ctx.kv.get<string>("event-attendees:list");
+					const attendeeKeys = parseJSON<string[]>(membersListJson, []);
+
+					for (const encodedEmail of attendeeKeys) {
+						const regKey = `registration:${eventId}:${encodedEmail}`;
+						const regJson = await ctx.kv.get<string>(regKey);
+						if (regJson) {
+							const reg = parseJSON<RegistrationRecord>(regJson, null);
+							if (reg && reg.checkInCode === code && reg.status === "registered") {
+								if (reg.checkedIn) {
+									return {
+										success: false,
+										message: `Already checked in at ${reg.checkedInAt}`,
+										attendeeName: reg.name,
+									};
+								}
+
+								const now = new Date().toISOString();
+								reg.checkedIn = true;
+								reg.checkedInAt = now;
+								await ctx.kv.set(regKey, JSON.stringify(reg));
+
+								ctx.log.info(`Checked in: ${reg.email} for event ${eventId}`);
+
+								return {
+									success: true,
+									attendeeName: reg.name,
+									message: `Welcome ${reg.name}!`,
+									checkedInAt: now,
+								};
+							}
+						}
+					}
+
+					return {
+						success: false,
+						message: "Check-in code not recognized",
+					};
+				} catch (error) {
+					ctx.log.error(`Check-in error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to check in attendee" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * WAVE 3 TASK 11: POST /eventdash/events/:id/checkin/manual
+		 * Admin: Manual check-in by email
+		 *
+		 * Body: { eventId: string, email: string }
+		 *
+		 * Returns: { success: boolean, message: string }
+		 */
+		checkInManual: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const eventId = String(input.id ?? "").trim();
+					const email = String(input.email ?? "").trim().toLowerCase();
+
+					// Check admin auth
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!eventId || !email || !isValidEmail(email)) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID and valid email required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get event
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get registration
+					const regKey = `registration:${eventId}:${emailToKvKey(email)}`;
+					const regJson = await ctx.kv.get<string>(regKey);
+					const reg = parseJSON<RegistrationRecord>(regJson, null);
+
+					if (!reg || reg.status !== "registered") {
+						throw new Response(
+							JSON.stringify({ error: `No active registration found for ${email}` }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (reg.checkedIn) {
+						return {
+							success: false,
+							message: `${email} already checked in at ${reg.checkedInAt}`,
+						};
+					}
+
+					const now = new Date().toISOString();
+					reg.checkedIn = true;
+					reg.checkedInAt = now;
+					await ctx.kv.set(regKey, JSON.stringify(reg));
+
+					ctx.log.info(`Manual check-in: ${email} for event ${eventId}`);
+
+					return {
+						success: true,
+						message: `${email} checked in successfully`,
+					};
+				} catch (error) {
+					ctx.log.error(`Manual check-in error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to check in attendee" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * WAVE 3 TASK 11: GET /eventdash/events/:id/checkin/stats
+		 * Get check-in statistics (checked in vs total)
+		 *
+		 * Returns: { eventId, eventName, checkedIn: number, total: number, percentage: number }
+		 */
+		checkInStats: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const eventId = String(input.id ?? "").trim();
+
+					if (!eventId) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get event
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Count check-ins
+					const membersListJson = await ctx.kv.get<string>("event-attendees:list");
+					const attendeeKeys = parseJSON<string[]>(membersListJson, []);
+
+					let checkedIn = 0;
+					let total = 0;
+
+					for (const encodedEmail of attendeeKeys) {
+						const regKey = `registration:${eventId}:${encodedEmail}`;
+						const regJson = await ctx.kv.get<string>(regKey);
+						if (regJson) {
+							const reg = parseJSON<RegistrationRecord>(regJson, null);
+							if (reg && reg.status === "registered") {
+								total++;
+								if (reg.checkedIn) {
+									checkedIn++;
+								}
+							}
+						}
+					}
+
+					const percentage = total > 0 ? Math.round((checkedIn / total) * 100) : 0;
+
+					return {
+						eventId,
+						eventName: event.title,
+						checkedIn,
+						total,
+						percentage,
+					};
+				} catch (error) {
+					ctx.log.error(`Check-in stats error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to fetch check-in stats" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * WAVE 3 TASK 12: GET /eventdash/events/:id/ical
+		 * Single event iCal file (.ics format)
+		 *
+		 * Returns: iCalendar file with VEVENT
+		 */
+		eventIcal: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const eventId = String(input.id ?? "").trim();
+
+					if (!eventId) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get event
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Build iCal
+					const dtStart = formatICalDate(event.date, event.time);
+					const dtEnd = formatICalDate(event.date, event.endTime || event.time);
+					const summary = escapeICalString(event.title);
+					const description = event.description ? escapeICalString(event.description) : "";
+					const location = escapeICalString(event.location);
+
+					const ical = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Shipyard AI//EventDash//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:${summary}
+X-WR-TIMEZONE:UTC
+BEGIN:VEVENT
+UID:${eventId}@eventdash.shipyard.ai
+DTSTAMP:${formatICalDate(new Date().toISOString().split("T")[0], new Date().toISOString().split("T")[1])}
+DTSTART:${dtStart}
+DTEND:${dtEnd}
+SUMMARY:${summary}
+LOCATION:${location}
+DESCRIPTION:${description}
+URL:https://events.shipyard.ai/events/${eventId}
+END:VEVENT
+END:VCALENDAR`;
+
+					return new Response(ical, {
+						status: 200,
+						headers: {
+							"Content-Type": "text/calendar",
+							"Content-Disposition": `attachment; filename="event-${eventId}.ics"`,
+						},
+					});
+				} catch (error) {
+					ctx.log.error(`Event iCal error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to generate iCal" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * WAVE 3 TASK 12: GET /eventdash/calendar/ical?month=2026-04
+		 * Month calendar subscription feed (iCal)
+		 *
+		 * Query params:
+		 *   - month: YYYY-MM format (default: current month)
+		 *
+		 * Returns: iCalendar file with all events in the month
+		 */
+		calendarIcal: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const monthStr = String(input.month ?? "").trim() || new Date().toISOString().slice(0, 7);
+
+					// Parse month string (YYYY-MM)
+					const [year, month] = monthStr.split("-").map(Number);
+					if (!year || !month || month < 1 || month > 12) {
+						throw new Response(
+							JSON.stringify({ error: "Invalid month format (use YYYY-MM)" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get all events
+					let events = await getAllEventsWithDates(ctx);
+
+					// Filter to events in the specified month
+					events = events.filter((e) => {
+						const eventDate = new Date(e.date);
+						return eventDate.getUTCFullYear() === year && (eventDate.getUTCMonth() + 1) === month;
+					});
+
+					// Build iCal with multiple events
+					const vevents = events.map((event) => {
+						const dtStart = formatICalDate(event.date, event.time);
+						const dtEnd = formatICalDate(event.date, event.endTime || event.time);
+						const summary = escapeICalString(event.title);
+						const description = event.description ? escapeICalString(event.description) : "";
+						const location = escapeICalString(event.location);
+
+						return `BEGIN:VEVENT
+UID:${event.id}@eventdash.shipyard.ai
+DTSTAMP:${formatICalDate(new Date().toISOString().split("T")[0], new Date().toISOString().split("T")[1])}
+DTSTART:${dtStart}
+DTEND:${dtEnd}
+SUMMARY:${summary}
+LOCATION:${location}
+DESCRIPTION:${description}
+URL:https://events.shipyard.ai/events/${event.id}
+END:VEVENT`;
+					}).join("\n");
+
+					const ical = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Shipyard AI//EventDash Calendar//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Events - ${monthStr}
+X-WR-TIMEZONE:UTC
+X-WR-CALDESC:Events for ${monthStr}
+${vevents}
+END:VCALENDAR`;
+
+					return new Response(ical, {
+						status: 200,
+						headers: {
+							"Content-Type": "text/calendar",
+							"Content-Disposition": `attachment; filename="events-${monthStr}.ics"`,
+						},
+					});
+				} catch (error) {
+					ctx.log.error(`Calendar iCal error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to generate calendar iCal" }),
 						{ status: 500, headers: { "Content-Type": "application/json" } }
 					);
 				}
