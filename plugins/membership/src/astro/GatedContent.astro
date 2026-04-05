@@ -1,0 +1,96 @@
+---
+/**
+ * GatedContent.astro
+ *
+ * Renders gated content visible only to active members.
+ * Checks member status via email cookie and membership API.
+ *
+ * Props from Portable Text block:
+ *   - requiredPlan?: string (optional plan ID requirement)
+ *   - fallbackMessage?: string (message for non-members)
+ *   - children?: any (content to render if access granted)
+ */
+
+import { PortableText } from "emdash/ui";
+
+interface Props {
+	node: {
+		requiredPlan?: string;
+		fallbackMessage?: string;
+		_rawChildren?: unknown;
+	};
+	children?: any;
+}
+
+const { node, children } = Astro.props;
+
+// Get member email from cookie
+const memberEmail = Astro.cookies.get("membership-email")?.value?.toLowerCase() || "";
+
+let hasAccess = false;
+let memberPlan: string | undefined;
+
+// Check membership status via API if email is available
+if (memberEmail) {
+	try {
+		const response = await fetch(
+			new URL(
+				`/_emdash/api/plugins/membership/status?email=${encodeURIComponent(memberEmail)}`,
+				Astro.url.origin
+			),
+			{ credentials: "include" }
+		);
+
+		if (response.ok) {
+			const data = (await response.json()) as {
+				active?: boolean;
+				plan?: string;
+			};
+			hasAccess = data.active === true;
+			memberPlan = data.plan;
+		}
+	} catch (error) {
+		// If API call fails, deny access for safety
+		console.error("Failed to check membership status:", error);
+	}
+}
+
+// If a specific plan is required, check membership matches
+if (hasAccess && node.requiredPlan && memberPlan !== node.requiredPlan) {
+	hasAccess = false;
+}
+
+const fallbackMessage = node.fallbackMessage || "This content is for members only. Please subscribe to access.";
+---
+
+{
+	hasAccess ? (
+		<div class="gated-content">
+			{children}
+		</div>
+	) : (
+		<div class="gated-content-fallback">
+			<p>{fallbackMessage}</p>
+		</div>
+	)
+}
+
+<style>
+	.gated-content {
+		/* Content is rendered normally */
+	}
+
+	.gated-content-fallback {
+		padding: 1rem;
+		border: 1px solid #ddd;
+		border-radius: 4px;
+		background-color: #f9f9f9;
+		color: #666;
+		text-align: center;
+	}
+
+	.gated-content-fallback p {
+		margin: 0;
+		font-size: 0.95rem;
+	}
+</style>
