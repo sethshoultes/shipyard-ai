@@ -1,5 +1,12 @@
 import { definePlugin } from "emdash";
 import type { PluginContext } from "emdash";
+import {
+	signJWT,
+	verifyJWT,
+	extractToken,
+	createPayload,
+	type JWTPayload,
+} from "./auth";
 
 /**
  * Type definitions
@@ -13,6 +20,13 @@ interface MemberRecord {
 	createdAt: string;
 	expiresAt?: string;
 	approvedAt?: string;
+	// Stripe integration fields
+	stripeCustomerId?: string;
+	stripeSubscriptionId?: string;
+	stripePaymentMethod?: string; // Last 4 digits + brand for display
+	planInterval?: "month" | "year" | "once";
+	currentPeriodEnd?: string; // ISO date — when current billing period ends
+	cancelAtPeriodEnd?: boolean; // True if scheduled to cancel
 }
 
 interface PlanConfig {
@@ -139,6 +153,13 @@ export default definePlugin({
 					const input = rc.input as Record<string, unknown>;
 					const email = String(input.email ?? "").trim().toLowerCase();
 					const planId = String(input.plan ?? "").trim();
+					// Optional Stripe fields
+					const stripeCustomerId = input.stripeCustomerId ? String(input.stripeCustomerId).trim() : undefined;
+					const stripeSubscriptionId = input.stripeSubscriptionId ? String(input.stripeSubscriptionId).trim() : undefined;
+					const stripePaymentMethod = input.stripePaymentMethod ? String(input.stripePaymentMethod).trim() : undefined;
+					const planInterval = input.planInterval as "month" | "year" | "once" | undefined;
+					const currentPeriodEnd = input.currentPeriodEnd ? String(input.currentPeriodEnd).trim() : undefined;
+					const cancelAtPeriodEnd = Boolean(input.cancelAtPeriodEnd ?? false);
 
 					// Validate input
 					if (!email) {
@@ -229,17 +250,29 @@ export default definePlugin({
 						status,
 						paymentLink: selectedPlan.paymentLink || undefined,
 						createdAt: now,
+						// Add Stripe fields if provided
+						stripeCustomerId,
+						stripeSubscriptionId,
+						stripePaymentMethod,
+						planInterval: planInterval || selectedPlan.interval,
+						currentPeriodEnd,
+						cancelAtPeriodEnd,
 					};
 
-					// For paid plans, set expiry
+					// For paid plans, set expiry if not provided from Stripe
 					if (selectedPlan.price > 0) {
-						const expiry = new Date();
-						if (selectedPlan.interval === "month") {
-							expiry.setMonth(expiry.getMonth() + 1);
-						} else if (selectedPlan.interval === "year") {
-							expiry.setFullYear(expiry.getFullYear() + 1);
+						if (!currentPeriodEnd) {
+							const expiry = new Date();
+							if (selectedPlan.interval === "month") {
+								expiry.setMonth(expiry.getMonth() + 1);
+							} else if (selectedPlan.interval === "year") {
+								expiry.setFullYear(expiry.getFullYear() + 1);
+							}
+							member.expiresAt = expiry.toISOString();
+						} else {
+							// Use currentPeriodEnd from Stripe if provided
+							member.expiresAt = currentPeriodEnd;
 						}
-						member.expiresAt = expiry.toISOString();
 					}
 
 						await ctx.kv.set(`member:${encodedEmail}`, JSON.stringify(member));
@@ -340,6 +373,13 @@ export default definePlugin({
 						plan: member.plan,
 						status: member.status,
 						expiresAt: member.expiresAt,
+						// Include Stripe subscription info
+						stripeCustomerId: member.stripeCustomerId,
+						stripeSubscriptionId: member.stripeSubscriptionId,
+						stripePaymentMethod: member.stripePaymentMethod,
+						planInterval: member.planInterval,
+						currentPeriodEnd: member.currentPeriodEnd,
+						cancelAtPeriodEnd: member.cancelAtPeriodEnd,
 					};
 				} catch (error) {
 					ctx.log.error(`Status check error: ${String(error)}`);
@@ -517,6 +557,12 @@ export default definePlugin({
 										status: member.status,
 										createdAt: member.createdAt,
 										expiresAt: member.expiresAt || "",
+										stripeCustomerId: member.stripeCustomerId || "",
+										stripeSubscriptionId: member.stripeSubscriptionId || "",
+										stripePaymentMethod: member.stripePaymentMethod || "",
+										planInterval: member.planInterval || "",
+										currentPeriodEnd: member.currentPeriodEnd || "",
+										cancelAtPeriodEnd: member.cancelAtPeriodEnd ? "Yes" : "No",
 									});
 								}
 							}
@@ -568,6 +614,12 @@ export default definePlugin({
 											label: "Expires",
 											format: "relative_time" as const,
 										},
+										{ key: "stripeCustomerId", label: "Stripe Customer", format: "text" as const },
+										{ key: "stripeSubscriptionId", label: "Stripe Subscription", format: "text" as const },
+										{ key: "stripePaymentMethod", label: "Payment Method", format: "text" as const },
+										{ key: "planInterval", label: "Interval", format: "text" as const },
+										{ key: "currentPeriodEnd", label: "Period End", format: "text" as const },
+										{ key: "cancelAtPeriodEnd", label: "Cancels At", format: "text" as const },
 									],
 									rows: members,
 								},
