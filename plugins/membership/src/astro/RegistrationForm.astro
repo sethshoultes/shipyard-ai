@@ -31,11 +31,17 @@ interface FormFieldDefinition {
 	placeholder?: string;
 }
 
+interface FormStep {
+	label: string;
+	fieldIds: string[];
+}
+
 interface FormDefinition {
 	id: string;
 	name: string;
 	description?: string;
 	fields: FormFieldDefinition[];
+	steps?: FormStep[];
 	createdAt: string;
 	updatedAt: string;
 }
@@ -90,6 +96,21 @@ const formTitle = heading || form?.name || "Registration";
 const formDescription = form?.description;
 // Unique identifier for this form instance (supports multiple forms on one page)
 const instanceId = `reg-form-${formId}`;
+
+// Multi-step wizard support
+const hasSteps = !!(form?.steps && form.steps.length > 1);
+const steps = form?.steps || [];
+const totalSteps = steps.length;
+
+// Build a lookup: fieldId -> stepIndex (for wizard mode)
+const fieldStepMap: Record<string, number> = {};
+if (hasSteps) {
+	steps.forEach((step, idx) => {
+		step.fieldIds.forEach((fid) => {
+			fieldStepMap[fid] = idx;
+		});
+	});
+}
 ---
 
 <div
@@ -114,9 +135,34 @@ const instanceId = `reg-form-${formId}`;
 				class="registration-form__form"
 				data-form-id={formId}
 				data-submit-url={`/_emdash/api/plugins/membership/forms/${encodeURIComponent(formId)}/submit`}
+				data-has-steps={hasSteps ? "true" : "false"}
+				data-total-steps={totalSteps.toString()}
+				data-steps-json={hasSteps ? JSON.stringify(steps) : ""}
 				novalidate
 				aria-label={formTitle}
 			>
+				{/* Progress indicator for multi-step forms */}
+				{hasSteps && (
+					<div class="registration-form__progress" role="navigation" aria-label="Form progress">
+						<p class="registration-form__progress-text">
+							Step <span data-current-step>1</span> of {totalSteps}
+						</p>
+						<div class="registration-form__progress-bar">
+							<div
+								class="registration-form__progress-fill"
+								style={`width: ${(1 / totalSteps) * 100}%`}
+								role="progressbar"
+								aria-valuenow={1}
+								aria-valuemin={1}
+								aria-valuemax={totalSteps}
+							></div>
+						</div>
+						<p class="registration-form__step-label" aria-live="polite">
+							{steps[0].label}
+						</p>
+					</div>
+				)}
+
 				<div class="registration-form__fields">
 					{form.fields.map((field) => (
 						<div
@@ -124,6 +170,7 @@ const instanceId = `reg-form-${formId}`;
 							data-field-id={field.id}
 							data-field-type={field.type}
 							data-field-required={field.required ? "true" : "false"}
+							data-step-index={hasSteps && fieldStepMap[field.id] !== undefined ? fieldStepMap[field.id].toString() : undefined}
 						>
 							{field.type === "checkbox" ? (
 								<div class="registration-form__checkbox-wrapper">
@@ -221,9 +268,29 @@ const instanceId = `reg-form-${formId}`;
 				</div>
 
 				<div class="registration-form__actions">
+					{hasSteps && (
+						<button
+							type="button"
+							class="registration-form__back"
+							style="display: none;"
+							aria-label="Go to previous step"
+						>
+							Back
+						</button>
+					)}
+					{hasSteps && (
+						<button
+							type="button"
+							class="registration-form__next"
+							aria-label="Go to next step"
+						>
+							Next
+						</button>
+					)}
 					<button
 						type="submit"
 						class="registration-form__submit"
+						style={hasSteps ? "display: none;" : undefined}
 					>
 						{submitLabel}
 					</button>
@@ -266,6 +333,19 @@ const instanceId = `reg-form-${formId}`;
 		const successEl = container.querySelector(".registration-form__success");
 		const statusEl = container.querySelector(".registration-form__status");
 		const submitBtn = formEl.querySelector(".registration-form__submit");
+
+		// Multi-step wizard state
+		const hasSteps = formEl.getAttribute("data-has-steps") === "true";
+		const totalSteps = parseInt(formEl.getAttribute("data-total-steps") || "0", 10);
+		const stepsJson = formEl.getAttribute("data-steps-json");
+		const stepsConfig = stepsJson ? JSON.parse(stepsJson) : [];
+		let currentStep = 0;
+
+		const backBtn = formEl.querySelector(".registration-form__back");
+		const nextBtn = formEl.querySelector(".registration-form__next");
+		const progressText = formEl.querySelector("[data-current-step]");
+		const progressFill = formEl.querySelector(".registration-form__progress-fill");
+		const stepLabel = formEl.querySelector(".registration-form__step-label");
 
 		/**
 		 * Validate email format
@@ -347,6 +427,78 @@ const instanceId = `reg-form-${formId}`;
 		}
 
 		/**
+		 * Validate a single field wrapper, return true if valid
+		 */
+		function validateField(fieldWrapper) {
+			const fieldId = fieldWrapper.getAttribute("data-field-id");
+			const fieldType = fieldWrapper.getAttribute("data-field-type");
+			const isRequired = fieldWrapper.getAttribute("data-field-required") === "true";
+			const inputEl = document.getElementById(instanceId + "-" + fieldId);
+
+			if (!inputEl) return true;
+
+			let value;
+			if (fieldType === "checkbox") {
+				value = inputEl.checked;
+			} else {
+				value = inputEl.value.trim();
+			}
+
+			clearFieldError(fieldId);
+
+			if (isRequired) {
+				if (fieldType === "checkbox" && !value) {
+					const label = fieldWrapper.querySelector("label")?.textContent?.replace("*", "").trim() || "This field";
+					showFieldError(fieldId, label + " is required");
+					return false;
+				} else if (fieldType !== "checkbox" && (value === "" || value === undefined)) {
+					const label = fieldWrapper.querySelector("label")?.textContent?.replace("*", "").trim() || "This field";
+					showFieldError(fieldId, label + " is required");
+					return false;
+				}
+			}
+
+			if (fieldType !== "checkbox" && (value === "" || value === undefined)) {
+				return true;
+			}
+
+			if (fieldType === "email" && !isValidEmail(value)) {
+				showFieldError(fieldId, "Please enter a valid email address");
+				return false;
+			}
+
+			if (fieldType === "phone" && !isValidPhone(value)) {
+				showFieldError(fieldId, "Please enter a valid phone number");
+				return false;
+			}
+
+			return true;
+		}
+
+		/**
+		 * Validate fields for a specific wizard step.
+		 * Returns { valid, firstInvalidId }
+		 */
+		function validateStep(stepIndex) {
+			const stepFieldIds = stepsConfig[stepIndex]?.fieldIds || [];
+			let firstInvalidId = null;
+			let allValid = true;
+
+			for (const fid of stepFieldIds) {
+				const fieldWrapper = formEl.querySelector('[data-field-id="' + fid + '"]');
+				if (!fieldWrapper) continue;
+
+				const isValid = validateField(fieldWrapper);
+				if (!isValid) {
+					if (!firstInvalidId) firstInvalidId = fid;
+					allValid = false;
+				}
+			}
+
+			return { valid: allValid, firstInvalidId };
+		}
+
+		/**
 		 * Validate all fields, return { valid, data, firstInvalidId }
 		 */
 		function validateForm() {
@@ -358,10 +510,16 @@ const instanceId = `reg-form-${formId}`;
 			fields.forEach((fieldWrapper) => {
 				const fieldId = fieldWrapper.getAttribute("data-field-id");
 				const fieldType = fieldWrapper.getAttribute("data-field-type");
-				const isRequired = fieldWrapper.getAttribute("data-field-required") === "true";
 				const inputEl = document.getElementById(instanceId + "-" + fieldId);
 
 				if (!inputEl) return;
+
+				const isValid = validateField(fieldWrapper);
+				if (!isValid) {
+					errors.push(fieldId);
+					if (!firstInvalidId) firstInvalidId = fieldId;
+					return;
+				}
 
 				let value;
 				if (fieldType === "checkbox") {
@@ -370,49 +528,86 @@ const instanceId = `reg-form-${formId}`;
 					value = inputEl.value.trim();
 				}
 
-				clearFieldError(fieldId);
-
-				// Required check
-				if (isRequired) {
-					if (fieldType === "checkbox" && !value) {
-						const label = fieldWrapper.querySelector("label")?.textContent?.replace("*", "").trim() || "This field";
-						showFieldError(fieldId, label + " is required");
-						errors.push(fieldId);
-						if (!firstInvalidId) firstInvalidId = fieldId;
-						return;
-					} else if (fieldType !== "checkbox" && (value === "" || value === undefined)) {
-						const label = fieldWrapper.querySelector("label")?.textContent?.replace("*", "").trim() || "This field";
-						showFieldError(fieldId, label + " is required");
-						errors.push(fieldId);
-						if (!firstInvalidId) firstInvalidId = fieldId;
-						return;
-					}
+				if (fieldType === "checkbox" || (value !== "" && value !== undefined)) {
+					data[fieldId] = value;
 				}
-
-				// Skip validation for empty optional fields
-				if (fieldType !== "checkbox" && (value === "" || value === undefined)) {
-					return;
-				}
-
-				// Type-specific validation
-				if (fieldType === "email" && !isValidEmail(value)) {
-					showFieldError(fieldId, "Please enter a valid email address");
-					errors.push(fieldId);
-					if (!firstInvalidId) firstInvalidId = fieldId;
-					return;
-				}
-
-				if (fieldType === "phone" && !isValidPhone(value)) {
-					showFieldError(fieldId, "Please enter a valid phone number");
-					errors.push(fieldId);
-					if (!firstInvalidId) firstInvalidId = fieldId;
-					return;
-				}
-
-				data[fieldId] = value;
 			});
 
 			return { valid: errors.length === 0, data, firstInvalidId };
+		}
+
+		/**
+		 * Multi-step wizard: show/hide fields for current step.
+		 * Data is preserved because we toggle visibility, not destroy elements.
+		 */
+		function updateStepVisibility() {
+			if (!hasSteps) return;
+
+			const allFields = formEl.querySelectorAll("[data-field-id]");
+			allFields.forEach((field) => {
+				const stepIdx = field.getAttribute("data-step-index");
+				if (stepIdx !== null) {
+					field.style.display = parseInt(stepIdx, 10) === currentStep ? "" : "none";
+				}
+			});
+
+			// Update progress indicator
+			if (progressText) progressText.textContent = (currentStep + 1).toString();
+			if (progressFill) {
+				progressFill.style.width = ((currentStep + 1) / totalSteps * 100) + "%";
+				progressFill.setAttribute("aria-valuenow", (currentStep + 1).toString());
+			}
+			if (stepLabel && stepsConfig[currentStep]) {
+				stepLabel.textContent = stepsConfig[currentStep].label;
+			}
+
+			// Update button visibility
+			if (backBtn) backBtn.style.display = currentStep > 0 ? "" : "none";
+			if (nextBtn) nextBtn.style.display = currentStep < totalSteps - 1 ? "" : "none";
+			if (submitBtn) submitBtn.style.display = currentStep === totalSteps - 1 ? "" : "none";
+		}
+
+		// Initialize step visibility on load
+		if (hasSteps) {
+			updateStepVisibility();
+		}
+
+		// Next button: validate current step, then advance
+		if (nextBtn) {
+			nextBtn.addEventListener("click", () => {
+				hideStatus();
+				const { valid, firstInvalidId } = validateStep(currentStep);
+
+				if (!valid) {
+					if (firstInvalidId) {
+						const el = document.getElementById(instanceId + "-" + firstInvalidId);
+						if (el) el.focus();
+					}
+					return;
+				}
+
+				currentStep++;
+				updateStepVisibility();
+
+				// Focus first visible input of new step for keyboard accessibility
+				const newStepFields = stepsConfig[currentStep]?.fieldIds || [];
+				if (newStepFields.length > 0) {
+					const firstInput = document.getElementById(instanceId + "-" + newStepFields[0]);
+					if (firstInput) firstInput.focus();
+				}
+			});
+		}
+
+		// Back button: go to previous step (no validation, data preserved)
+		if (backBtn) {
+			backBtn.addEventListener("click", () => {
+				hideStatus();
+				clearAllErrors();
+				if (currentStep > 0) {
+					currentStep--;
+					updateStepVisibility();
+				}
+			});
 		}
 
 		// Clear field error on input
@@ -438,11 +633,32 @@ const instanceId = `reg-form-${formId}`;
 			clearAllErrors();
 			hideStatus();
 
+			// For wizard forms, validate current (final) step first
+			if (hasSteps) {
+				const { valid: stepValid, firstInvalidId: stepInvalidId } = validateStep(currentStep);
+				if (!stepValid) {
+					if (stepInvalidId) {
+						const el = document.getElementById(instanceId + "-" + stepInvalidId);
+						if (el) el.focus();
+					}
+					return;
+				}
+			}
+
+			// Full form validation (all steps)
 			const { valid, data, firstInvalidId } = validateForm();
 
 			if (!valid) {
-				// Focus first invalid field for keyboard accessibility
 				if (firstInvalidId) {
+					// If wizard mode, navigate to the step with the invalid field
+					if (hasSteps) {
+						const fieldWrapper = formEl.querySelector('[data-field-id="' + firstInvalidId + '"]');
+						if (fieldWrapper) {
+							const stepIdx = parseInt(fieldWrapper.getAttribute("data-step-index") || "0", 10);
+							currentStep = stepIdx;
+							updateStepVisibility();
+						}
+					}
 					const firstInvalid = document.getElementById(instanceId + "-" + firstInvalidId);
 					if (firstInvalid) firstInvalid.focus();
 				}
@@ -466,13 +682,11 @@ const instanceId = `reg-form-${formId}`;
 				const result = await response.json();
 
 				if (response.ok && result.success) {
-					// Show success state, hide form
 					formEl.style.display = "none";
 					if (successEl) {
 						successEl.style.display = "block";
 					}
 				} else {
-					// Show server-side errors
 					if (result.details && Array.isArray(result.details)) {
 						showStatus(result.details.join(". "), true);
 					} else {
@@ -631,9 +845,104 @@ const instanceId = `reg-form-${formId}`;
 		min-height: 0;
 	}
 
+	/* Progress indicator (multi-step wizard) */
+	.registration-form__progress {
+		margin-bottom: 1.5rem;
+		padding-bottom: 1.25rem;
+		border-bottom: 1px solid #e8e0d8;
+	}
+
+	.registration-form__progress-text {
+		margin: 0 0 0.5rem 0;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: #666;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.registration-form__progress-bar {
+		width: 100%;
+		height: 6px;
+		background-color: #e8e0d8;
+		border-radius: 3px;
+		overflow: hidden;
+	}
+
+	.registration-form__progress-fill {
+		height: 100%;
+		background-color: #c4704b;
+		border-radius: 3px;
+		transition: width 0.3s ease;
+	}
+
+	.registration-form__step-label {
+		margin: 0.5rem 0 0 0;
+		font-size: 1rem;
+		font-weight: 600;
+		color: #2c2c2c;
+	}
+
 	/* Actions */
 	.registration-form__actions {
 		margin-top: 1.5rem;
+		display: flex;
+		gap: 0.75rem;
+		align-items: center;
+	}
+
+	.registration-form__back {
+		display: inline-block;
+		padding: 0.75rem 1.5rem;
+		min-height: 44px;
+		background-color: transparent;
+		color: #666;
+		border: 1px solid #d4c4b5;
+		border-radius: 0.25rem;
+		font-size: 1rem;
+		font-weight: 600;
+		font-family: inherit;
+		cursor: pointer;
+		transition: background-color 0.2s ease, border-color 0.2s ease;
+		line-height: 1.5;
+		text-align: center;
+	}
+
+	.registration-form__back:hover {
+		background-color: #f5f0eb;
+		border-color: #c4704b;
+		color: #2c2c2c;
+	}
+
+	.registration-form__back:focus-visible {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	.registration-form__next {
+		display: inline-block;
+		padding: 0.75rem 2rem;
+		min-height: 44px;
+		background-color: #7a8b6f;
+		color: white;
+		border: none;
+		border-radius: 0.25rem;
+		font-size: 1rem;
+		font-weight: 600;
+		font-family: inherit;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+		line-height: 1.5;
+		text-align: center;
+	}
+
+	.registration-form__next:hover {
+		background-color: #6a7a60;
+	}
+
+	.registration-form__next:focus-visible {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
 	}
 
 	.registration-form__submit {
@@ -757,13 +1066,23 @@ const instanceId = `reg-form-${formId}`;
 		padding: 0.5rem 0.75rem;
 	}
 
+	.registration-form--compact .registration-form__progress {
+		margin-bottom: 1rem;
+		padding-bottom: 0.75rem;
+	}
+
 	.registration-form--compact .registration-form__actions {
 		margin-top: 1rem;
 	}
 
-	.registration-form--compact .registration-form__submit {
-		width: 100%;
+	.registration-form--compact .registration-form__submit,
+	.registration-form--compact .registration-form__next {
+		flex: 1;
 		padding: 0.75rem 1.5rem;
+	}
+
+	.registration-form--compact .registration-form__back {
+		flex: 0 0 auto;
 	}
 
 	.registration-form--compact .registration-form__success {
