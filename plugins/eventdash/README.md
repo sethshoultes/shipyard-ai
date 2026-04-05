@@ -1,10 +1,10 @@
 # EventDash Plugin for EmDash
 
-Full-featured event management and registration plugin for EmDash CMS. Manage free and paid events, handle capacity-based registrations, automatic waitlists, recurring event templates, multiple ticket types with early bird pricing, and Stripe payment processing.
+Full-featured event management and registration plugin for EmDash CMS. Manage free and paid events, handle capacity-based registrations, automatic waitlists, recurring event templates, multiple ticket types with early bird pricing, Stripe payment processing, attendee portals, QR code tickets, check-in system, and iCal export.
 
-**Version:** 2.0.0  
+**Version:** 3.0.0  
 **Status:** Production  
-**Phase:** 2 (Complete with Stripe, Ticket Types, Early Bird, VIP, Group Discounts)
+**Phase:** 3 (Complete with Stripe, Tickets, Portal, Check-in, iCal, QR Codes)
 
 ## Features
 
@@ -56,10 +56,28 @@ Full-featured event management and registration plugin for EmDash CMS. Manage fr
 - **Revenue reporting** — Track revenue per event and ticket type
 - **Event statistics** — Registrations, waitlist counts, revenue totals
 
+### Attendee Portal (Phase 3)
+- **My registrations** — View all attendee's event registrations and ticket types
+- **QR code tickets** — Mobile-friendly QR codes for each registration
+- **Calendar export** — Export events to Google, Apple, or Outlook calendars
+- **iCal subscription** — Subscribe to events as an ICS feed
+- **Ticket details** — View ticket type, purchase date, and total paid
+- **Registration management** — Cancel registrations and request refunds
+- **Status tracking** — See confirmation status and check-in status
+- **Mobile responsive** — Optimized for 320px+ devices with 44px touch targets
+
+### Check-In System (Phase 3)
+- **QR code scanning** — Scan attendee tickets for instant check-in
+- **Confirmation codes** — 6-character alphanumeric codes for manual entry
+- **Check-in validation** — Prevent double check-ins with concurrency control
+- **Real-time stats** — Live check-in count vs total registrations
+- **Admin manual check-in** — Offline check-in by email lookup
+
 ### Portable Text Integration
 - **event-listing block** — Display upcoming events with inline registration
 - **Calendar links** — Add to calendar (Google, Apple, Outlook)
 - **Responsive design** — Mobile-friendly event cards and registration forms
+- **Month/List calendar views** — Custom calendar components for event discovery
 
 ## Installation
 

@@ -15,6 +15,7 @@ import {
 	createExpiringTemplate,
 	createCancellationTemplate,
 	createUpgradeTemplate,
+	createDripUnlockTemplate,
 	sendMembershipEmail,
 	checkEmailRateLimit,
 	type EmailVariables,
@@ -2832,6 +2833,160 @@ export default definePlugin({
 							hasAccess: false,
 							reason: "Access check failed",
 						};
+					}
+				},
+			},
+
+			/**
+			 * POST /membership/drip/process
+			 * Admin cron endpoint: Process drip content unlocks for all members
+			 *
+			 * Checks all members with active subscriptions and drip gating rules.
+			 * If member's daysAfterJoin >= rule.dripDays, unlocks content and sends email.
+			 * Uses UTC midnight boundary for consistency.
+			 *
+			 * Returns: { processed: number, unlocked: number, errors?: string[] }
+			 */
+			processDripUnlocks: {
+				public: true,
+				handler: async (routeCtx: unknown, ctx: PluginContext) => {
+					try {
+						const rc = routeCtx as Record<string, unknown>;
+						const headers = rc.headers as Record<string, string> | undefined;
+						const cronSecret = headers?.["x-cron-secret"] || "";
+
+						// Verify cron secret if configured
+						const expectedCronSecret = (ctx as any).env?.CRON_SECRET as string | undefined;
+						if (expectedCronSecret && cronSecret !== expectedCronSecret) {
+							ctx.log.warn("Drip process: unauthorized cron request");
+							throw new Response(
+								JSON.stringify({ error: "Unauthorized" }),
+								{ status: 401, headers: { "Content-Type": "application/json" } }
+							);
+						}
+
+						let processed = 0;
+						let unlocked = 0;
+						const errors: string[] = [];
+
+						// Get all members
+						const membersListJson = await ctx.kv.get<string>("members:list");
+						const memberEmails = parseJSON<string[]>(membersListJson, []);
+
+						// Get all drip gating rules
+						const rulesListJson = await ctx.kv.get<string>("gating-rules:list");
+						const ruleIds = parseJSON<string[]>(rulesListJson, []);
+
+						// Collect drip rules
+						const dripRules = [];
+						for (const ruleId of ruleIds) {
+							const ruleJson = await ctx.kv.get<string>(`gating-rule:${ruleId}`);
+							if (ruleJson) {
+								const rule = parseJSON<any>(ruleJson, null);
+								if (rule && rule.type === "drip") {
+									dripRules.push(rule);
+								}
+							}
+						}
+
+						// Process each member
+						for (const encodedEmail of memberEmails) {
+							try {
+								processed++;
+								const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
+								const member = parseJSON<MemberRecord>(memberJson, null);
+
+								if (!member || member.status !== "active") {
+									continue;
+								}
+
+								// Check if subscription has expired
+								if (member.expiresAt && new Date(member.expiresAt) < new Date()) {
+									continue;
+								}
+
+								if (!member.joinDate) {
+									// No join date, skip drip checks
+									continue;
+								}
+
+								const joinDate = new Date(member.joinDate);
+								const joinMidnight = new Date(joinDate.getUTCFullYear(), joinDate.getUTCMonth(), joinDate.getUTCDate(), 0, 0, 0, 0);
+								const joinMidnightUTC = new Date(joinMidnight.getTime() - joinMidnight.getTimezoneOffset() * 60000);
+
+								// Initialize content access array if not present
+								if (!member.contentAccess) {
+									member.contentAccess = [];
+								}
+
+								// Check each drip rule
+								for (const rule of dripRules) {
+									// Skip if member doesn't have the required plan
+									if (!rule.planIds || !rule.planIds.includes(member.plan)) {
+										continue;
+									}
+
+									// Skip if already unlocked
+									if (member.contentAccess && member.contentAccess.includes(rule.contentId)) {
+										continue;
+									}
+
+									// Calculate unlock time
+									const unlockMidnight = new Date(joinMidnightUTC.getTime() + (rule.dripDays || 0) * 24 * 60 * 60 * 1000);
+									const nowMidnight = new Date(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate(), 0, 0, 0, 0);
+									const nowMidnightUTC = new Date(nowMidnight.getTime() - nowMidnight.getTimezoneOffset() * 60000);
+
+									// Check if unlock time has passed
+									if (nowMidnightUTC >= unlockMidnight) {
+										// Unlock content
+										if (!member.contentAccess) {
+											member.contentAccess = [];
+										}
+										member.contentAccess.push(rule.contentId);
+										unlocked++;
+
+										// Send unlock email notification
+										try {
+											const emailVars: EmailVariables = {
+												memberEmail: member.email,
+												planName: member.plan,
+												contentName: rule.contentId,
+												siteName: "our community",
+											};
+											const emailTemplate = createDripUnlockTemplate(emailVars);
+											await sendMembershipEmail(emailTemplate, member.email, ctx);
+										} catch (emailError) {
+											ctx.log.warn(`Drip unlock email failed for ${member.email}: ${String(emailError)}`);
+											// Continue anyway, content is unlocked
+										}
+									}
+								}
+
+								// Save updated member
+								await updateMember(member, ctx);
+							} catch (memberError) {
+								errors.push(`Member ${encodedEmail}: ${String(memberError)}`);
+								ctx.log.error(`Drip process member error: ${String(memberError)}`);
+							}
+						}
+
+						ctx.log.info(`Drip unlock process: ${processed} members processed, ${unlocked} items unlocked`);
+
+						return {
+							success: true,
+							processed,
+							unlocked,
+							errors: errors.length > 0 ? errors : undefined,
+						};
+					} catch (error) {
+						if (error instanceof Response) {
+							throw error;
+						}
+						ctx.log.error(`Drip process error: ${String(error)}`);
+						throw new Response(
+							JSON.stringify({ error: "Internal server error", message: String(error) }),
+							{ status: 500, headers: { "Content-Type": "application/json" } }
+						);
 					}
 				},
 			},

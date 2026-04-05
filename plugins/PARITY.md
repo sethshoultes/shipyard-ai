@@ -16,10 +16,11 @@
 - [x] **Stripe Checkout integration** (Phase 2 - real subscriptions with Session API)
 - [x] **Stripe webhooks** (Phase 2 - subscription lifecycle, payments, cancellation)
 - [x] **Member dashboard** (Phase 2 - self-serve portal: view plan, upgrade/downgrade, cancel)
-- [ ] **Content rules engine** (per-page, per-category, partial content gating)
+- [x] **Content rules engine** (Phase 3 - per-page, per-block, and drip gating)
 - [x] **Email automation** (Phase 2 - welcome, expiring soon, expired, payment receipt, renewal, cancellation)
 - [x] **Coupon/discount codes** (Phase 2 - percentage, fixed amount, expiring, usage limits, plan restrictions)
-- [ ] **Drip content** (time-released access based on join date)
+- [x] **Drip content** (Phase 3 - time-released access based on join date with automated unlock)
+- [x] **Member portal** (Phase 3 - content library, plan info, drip visibility, accessibility)
 - [ ] **Registration forms** (custom fields, multi-step)
 - [x] **Upgrade/downgrade** (Phase 2 - pro-rated plan switching via Stripe API)
 - [ ] **Reporting** (revenue charts, churn rate, LTV, growth, member activity)
@@ -39,15 +40,16 @@
 - [x] Portable Text event-listing block
 
 ### Missing for Parity
-- [ ] **Calendar views** (month, week, day, list)
+- [x] **Calendar views** (Phase 3 - month and list custom components)
 - [x] **Stripe Checkout** (Phase 2 - paid events with PaymentIntent + inline checkout)
 - [x] **Ticket types** (Phase 2 - early bird, VIP, general admission, group discounts)
 - [ ] **Multi-day events** (conferences, festivals)
 - [ ] **Event categories/tags** with filtering
 - [ ] **Venue management** (saved locations, maps, directions)
 - [ ] **Organizer profiles** (who's hosting)
-- [ ] **iCal/Google Calendar** subscribe links
-- [ ] **Check-in system** (QR codes, attendee check-in at door)
+- [x] **iCal/Google Calendar** subscribe links (Phase 3 - iCal export endpoint)
+- [x] **Check-in system** (Phase 3 - QR codes, confirmation codes, concurrency control, stats)
+- [x] **Attendee portal** (Phase 3 - registrations, tickets, check-in status, QR codes)
 - [x] **Attendee communication** (Phase 2 - email confirmation templates on registration)
 - [x] **Refund handling** (Phase 2 - charge.refunded webhook updates registration status)
 - [ ] **Reporting** (attendance, revenue per event, popular times)

@@ -1,10 +1,10 @@
 # Membership Plugin for EmDash
 
-Email-based membership and gated content plugin for EmDash CMS with full Stripe integration, member dashboard, JWT authentication, email automation, and coupon discount codes.
+Email-based membership and gated content plugin for EmDash CMS with full Stripe integration, member dashboard, JWT authentication, email automation, coupon discount codes, drip content, and member portals.
 
-**Version:** 2.0.0  
+**Version:** 3.0.0  
 **Status:** Production  
-**Phase:** 2 (Complete with Stripe, Dashboard, JWT, Webhooks, Coupons)
+**Phase:** 3 (Complete with Stripe, Dashboard, JWT, Webhooks, Coupons, Drip Content, Portals, Gating)
 
 ## Features
 
@@ -28,11 +28,23 @@ Email-based membership and gated content plugin for EmDash CMS with full Stripe 
 - **Member dashboard** — Authenticated portal for members to view subscriptions, update payment methods, and manage their account
 - **Session persistence** — Tokens stored securely in httpOnly cookies; no localStorage
 
-### Content Gating
+### Content Gating (Phase 3)
 - **Portable Text block** — `gated-content` block to restrict content to specific plans
 - **Granular access control** — Gate by specific plan (e.g., Pro only) or any active member
 - **Fallback messaging** — Show custom message to non-members with upgrade call-to-action
 - **Public status checks** — Query member status without authentication
+- **Drip content unlock** — Time-released access based on days after join date
+- **Automatic unlock processing** — Admin cron endpoint processes drips daily at UTC midnight
+- **Unlock notifications** — Email sent when drip content becomes available
+- **Access rules engine** — Create membership/drip rules for any content
+
+### Member Portal (Phase 3)
+- **Content library view** — Display accessible and locked content with unlock dates
+- **Plan information** — Show current plan, features, renewal date, payment method
+- **Drip schedule visibility** — See when locked content will unlock
+- **Skeleton loading** — Smooth UX with placeholder content during fetch
+- **Mobile responsive** — Optimized for 320px+ devices with 44px touch targets
+- **Accessibility** — WCAG 2.1 AA compliant with aria-labels and focus indicators
 
 ### Email Automation
 - **Welcome email** — Sent on successful registration
