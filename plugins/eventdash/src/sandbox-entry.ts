@@ -144,6 +144,50 @@ function dateTimeToTimestamp(date: string, time: string): number {
 }
 
 /**
+ * Utility: Verify Stripe signature on webhook
+ */
+async function verifyStripeSignature(
+	payload: string,
+	signature: string,
+	secret: string
+): Promise<boolean> {
+	try {
+		const parts = signature.split(",");
+		const timestamp = parts.find((p) => p.startsWith("t="))?.slice(2);
+		const v1 = parts.find((p) => p.startsWith("v1="))?.slice(3);
+
+		if (!timestamp || !v1) return false;
+
+		const signedPayload = `${timestamp}.${payload}`;
+
+		// Import HMAC key
+		const key = await crypto.subtle.importKey(
+			"raw",
+			new TextEncoder().encode(secret),
+			{ name: "HMAC", hash: "SHA-256" },
+			false,
+			["sign"]
+		);
+
+		// Sign the payload
+		const sig = await crypto.subtle.sign(
+			"HMAC",
+			key,
+			new TextEncoder().encode(signedPayload)
+		);
+
+		// Convert signature to hex
+		const expected = Array.from(new Uint8Array(sig))
+			.map((b) => b.toString(16).padStart(2, "0"))
+			.join("");
+
+		return expected === v1;
+	} catch (error) {
+		return false;
+	}
+}
+
+/**
  * Utility: Get all events and sort by date/time
  */
 async function getAllEventsWithDates(ctx: PluginContext): Promise<EventRecord[]> {
@@ -994,6 +1038,397 @@ export default definePlugin({
 					ctx.log.error(`Generate recurring error: ${String(error)}`);
 					throw new Response(
 						JSON.stringify({ error: "Failed to generate recurring events" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /eventdash/events/:id/checkout
+		 * Create a Stripe Checkout Session for a paid event ticket.
+		 *
+		 * Body: { name: string, email: string, ticketType: string }
+		 * Returns: { clientSecret: string, amount: number, status: "pending" }
+		 */
+		checkout: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const eventId = String(rc.pathParams?.id ?? "").trim();
+					const input = rc.input as Record<string, unknown>;
+					const name = validateStringLength(String(input.name ?? "").trim(), 100, "Name");
+					const email = validateStringLength(String(input.email ?? "").trim().toLowerCase(), 254, "Email");
+					const ticketType = validateStringLength(String(input.ticketType ?? "").trim(), 100, "Ticket type");
+
+					if (!eventId || !name || !email || !ticketType || !isValidEmail(email)) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID, name, email, and ticket type required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get event
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					if (!eventJson) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Validate it's a paid event
+					if (!event.requiresPayment || !event.ticketTypes || event.ticketTypes.length === 0) {
+						throw new Response(
+							JSON.stringify({ error: "Event does not accept paid registrations" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Find the ticket type
+					const selectedTicket = event.ticketTypes.find((t) => t.name === ticketType);
+					if (!selectedTicket) {
+						throw new Response(
+							JSON.stringify({ error: "Ticket type not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Check capacity
+					if (selectedTicket.sold >= selectedTicket.capacity) {
+						throw new Response(
+							JSON.stringify({ error: "Ticket type is sold out" }),
+							{ status: 409, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get Stripe API key
+					const stripeKey = ctx.env?.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY;
+					if (!stripeKey) {
+						ctx.log.error("Stripe secret key not configured");
+						throw new Response(
+							JSON.stringify({ error: "Payment processing not available" }),
+							{ status: 503, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Create payment intent via Stripe API
+					const paymentIntentResponse = await fetch("https://api.stripe.com/v1/payment_intents", {
+						method: "POST",
+						headers: {
+							Authorization: `Bearer ${stripeKey}`,
+							"Content-Type": "application/x-www-form-urlencoded",
+						},
+						body: new URLSearchParams({
+							amount: String(selectedTicket.price),
+							currency: "usd",
+							receipt_email: email,
+							metadata: JSON.stringify({
+								eventId,
+								ticketTypeId: selectedTicket.id,
+								email,
+								name,
+								ticketTypeName: ticketType,
+							}),
+						}).toString(),
+					});
+
+					if (!paymentIntentResponse.ok) {
+						ctx.log.error(`Stripe API error: ${paymentIntentResponse.status}`);
+						throw new Response(
+							JSON.stringify({ error: "Failed to create payment intent" }),
+							{ status: 502, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const paymentIntent = (await paymentIntentResponse.json()) as Record<string, unknown>;
+					const clientSecret = String(paymentIntent.client_secret ?? "");
+
+					if (!clientSecret) {
+						throw new Response(
+							JSON.stringify({ error: "Failed to create payment intent" }),
+							{ status: 502, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Create pending registration record
+					const now = new Date().toISOString();
+					const registration: RegistrationRecord = {
+						email,
+						name,
+						status: "registered",
+						ticketCount: 1,
+						createdAt: now,
+						ticketType,
+						stripePaymentIntentId: String(paymentIntent.id ?? ""),
+						amountPaid: selectedTicket.price,
+						paymentStatus: "pending",
+					};
+
+					const regKey = `registration:${eventId}:${emailToKvKey(email)}`;
+					await ctx.kv.set(regKey, JSON.stringify(registration));
+
+					// Decrement capacity (optimistic)
+					selectedTicket.sold++;
+					await ctx.kv.set(`event:${eventId}`, JSON.stringify(event));
+
+					ctx.log.info(`Checkout created: ${email} for event ${eventId}, ticket: ${ticketType}`);
+
+					return {
+						clientSecret,
+						amount: selectedTicket.price,
+						status: "pending",
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Checkout error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Checkout failed" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /eventdash/webhook
+		 * Stripe webhook handler for payment and charge events.
+		 * Public route: true (required for Stripe webhooks)
+		 *
+		 * Handles:
+		 *   - payment_intent.succeeded → update registration to paid
+		 *   - charge.refunded → update registration to refunded, free up capacity
+		 *
+		 * Returns: { received: true }
+		 */
+		webhook: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const stripeSecret = ctx.env?.STRIPE_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET;
+
+					if (!stripeSecret) {
+						ctx.log.warn("Stripe webhook secret not configured");
+						return { received: true };
+					}
+
+					// Get raw body and signature
+					const rawBody = rc.rawBody as string | undefined;
+					const signature = rc.headers?.["stripe-signature"] as string | undefined;
+
+					if (!rawBody || !signature) {
+						ctx.log.warn("Missing webhook payload or signature");
+						return { received: true };
+					}
+
+					// Verify Stripe signature
+					const isValid = await verifyStripeSignature(rawBody, signature, stripeSecret);
+					if (!isValid) {
+						ctx.log.warn("Invalid Stripe signature");
+						return { received: true };
+					}
+
+					// Parse event
+					let event: Record<string, unknown>;
+					try {
+						event = JSON.parse(rawBody) as Record<string, unknown>;
+					} catch {
+						ctx.log.error("Failed to parse webhook payload");
+						return { received: true };
+					}
+
+					const eventId = String(event.id ?? "");
+					const eventType = String(event.type ?? "");
+
+					if (!eventId || !eventType) {
+						ctx.log.warn("Missing event id or type");
+						return { received: true };
+					}
+
+					// Idempotency check
+					const idempotencyKey = `stripe:webhook:${eventId}`;
+					const processed = await ctx.kv.get<string>(idempotencyKey);
+					if (processed) {
+						ctx.log.info(`Webhook already processed: ${eventId}`);
+						return { received: true };
+					}
+
+					// Mark as processing
+					await ctx.kv.set(idempotencyKey, "1", { ex: 86400 }); // 24h TTL
+
+					const eventData = event.data as Record<string, unknown> | undefined;
+					const object = eventData?.object as Record<string, unknown> | undefined;
+
+					if (!object) {
+						ctx.log.warn(`Webhook ${eventType}: missing data.object`);
+						return { received: true };
+					}
+
+					switch (eventType) {
+						case "payment_intent.succeeded": {
+							// Payment succeeded: update registration status
+							const metadata = object.metadata as Record<string, string> | undefined;
+							if (!metadata) break;
+
+							const piEventId = metadata.eventId || "";
+							const email = metadata.email || "";
+
+							if (!piEventId || !email) {
+								ctx.log.warn("Missing metadata in payment_intent.succeeded");
+								break;
+							}
+
+							const regKey = `registration:${piEventId}:${emailToKvKey(email)}`;
+							const regJson = await ctx.kv.get<string>(regKey);
+							if (regJson) {
+								const registration = parseJSON<RegistrationRecord>(regJson, null);
+								if (registration) {
+									registration.paymentStatus = "paid";
+									await ctx.kv.set(regKey, JSON.stringify(registration));
+									ctx.log.info(`Payment confirmed for ${email} on event ${piEventId}`);
+								}
+							}
+							break;
+						}
+
+						case "charge.refunded": {
+							// Charge refunded: update registration and free up capacity
+							const metadata = object.metadata as Record<string, string> | undefined;
+							if (!metadata) break;
+
+							const chargeEventId = metadata.eventId || "";
+							const chargeEmail = metadata.email || "";
+							const ticketTypeName = metadata.ticketTypeName || "";
+
+							if (!chargeEventId || !chargeEmail) {
+								ctx.log.warn("Missing metadata in charge.refunded");
+								break;
+							}
+
+							const regKey = `registration:${chargeEventId}:${emailToKvKey(chargeEmail)}`;
+							const regJson = await ctx.kv.get<string>(regKey);
+							if (regJson) {
+								const registration = parseJSON<RegistrationRecord>(regJson, null);
+								if (registration) {
+									registration.paymentStatus = "refunded";
+									await ctx.kv.set(regKey, JSON.stringify(registration));
+
+									// Free up capacity
+									const eventJson = await ctx.kv.get<string>(`event:${chargeEventId}`);
+									const evt = parseJSON<EventRecord>(eventJson, null);
+									if (evt && evt.ticketTypes) {
+										const ticket = evt.ticketTypes.find((t) => t.name === ticketTypeName);
+										if (ticket && ticket.sold > 0) {
+											ticket.sold--;
+											await ctx.kv.set(`event:${chargeEventId}`, JSON.stringify(evt));
+										}
+									}
+
+									ctx.log.info(`Refund processed for ${chargeEmail} on event ${chargeEventId}`);
+								}
+							}
+							break;
+						}
+
+						default:
+							ctx.log.info(`Unhandled webhook type: ${eventType}`);
+					}
+
+					return { received: true };
+				} catch (error) {
+					ctx.log.error(`Webhook handler error: ${String(error)}`);
+					return { received: true };
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/events/:id/checkout/success
+		 * Stripe checkout success page handler.
+		 * Returns event and ticket confirmation data for display.
+		 *
+		 * Query params:
+		 *   - email: attendee email (to look up registration)
+		 *
+		 * Returns: { event: EventRecord, registration: RegistrationRecord, ticketType: TicketType }
+		 */
+		checkoutSuccess: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const eventId = String(rc.pathParams?.id ?? "").trim();
+					const input = rc.input as Record<string, unknown>;
+					const email = String(input.email ?? "").trim().toLowerCase();
+
+					if (!eventId || !email || !isValidEmail(email)) {
+						throw new Response(
+							JSON.stringify({ error: "Event ID and valid email required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get event
+					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+					if (!eventJson) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const event = parseJSON<EventRecord>(eventJson, null);
+					if (!event) {
+						throw new Response(
+							JSON.stringify({ error: "Event not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get registration
+					const regKey = `registration:${eventId}:${emailToKvKey(email)}`;
+					const regJson = await ctx.kv.get<string>(regKey);
+					if (!regJson) {
+						throw new Response(
+							JSON.stringify({ error: "Registration not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const registration = parseJSON<RegistrationRecord>(regJson, null);
+					if (!registration) {
+						throw new Response(
+							JSON.stringify({ error: "Registration not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Find ticket type
+					let ticketType: TicketType | undefined;
+					if (registration.ticketType && event.ticketTypes) {
+						ticketType = event.ticketTypes.find((t) => t.name === registration.ticketType);
+					}
+
+					return {
+						event,
+						registration,
+						ticketType: ticketType || null,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Checkout success error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to fetch confirmation" }),
 						{ status: 500, headers: { "Content-Type": "application/json" } }
 					);
 				}
