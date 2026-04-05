@@ -1,0 +1,1049 @@
+---
+/**
+ * AdminReporting.astro — Phase 5 Wave 1
+ *
+ * Admin reporting dashboard for membership analytics.
+ * - Revenue overview cards: MRR, total revenue, active members, churn rate
+ * - Revenue chart: daily bar chart (last 30 days) using lightweight SVG
+ * - Member table: searchable, filterable by plan/status, sortable, paginated
+ * - Fetches from /membership/reports/* endpoints
+ * - Mobile responsive: cards stack on small screens, table scrolls horizontally
+ *
+ * Usage (admin pages only):
+ * <AdminReporting />
+ */
+
+interface RevenueData {
+	totalRevenue: number;
+	mrr: number;
+	averageRevenuePerMember: number;
+	memberCount: number;
+	chartData: { date: string; amount: number }[];
+	period: string;
+}
+
+interface ChurnData {
+	churnRate: string;
+	cancelledMembers: number;
+	activeMembersAtStart: number;
+	period: string;
+	retentionRate: string;
+}
+
+interface MemberRow {
+	email: string;
+	plan: string;
+	status: string;
+	createdAt: string;
+	expiresAt: string | null;
+	planInterval: string;
+}
+
+interface MembersData {
+	members: MemberRow[];
+	total: number;
+	page: number;
+	perPage: number;
+	totalPages: number;
+	summary: {
+		total: number;
+		active: number;
+		pastDue: number;
+		cancelled: number;
+	};
+}
+
+// All data fetched server-side for initial render
+let revenueData: RevenueData | null = null;
+let churnData: ChurnData | null = null;
+let membersData: MembersData | null = null;
+let error: string | null = null;
+
+const baseUrl = Astro.url.origin;
+
+try {
+	const [revenueRes, churnRes, membersRes] = await Promise.all([
+		fetch(new URL("/_emdash/api/plugins/membership/reports/revenue?days=30", baseUrl), {
+			credentials: "include",
+			headers: { "Content-Type": "application/json" },
+		}),
+		fetch(new URL("/_emdash/api/plugins/membership/reports/churn?days=30", baseUrl), {
+			credentials: "include",
+			headers: { "Content-Type": "application/json" },
+		}),
+		fetch(new URL("/_emdash/api/plugins/membership/reports/members?page=1&perPage=20", baseUrl), {
+			credentials: "include",
+			headers: { "Content-Type": "application/json" },
+		}),
+	]);
+
+	if (revenueRes.ok) {
+		revenueData = (await revenueRes.json()) as RevenueData;
+	}
+	if (churnRes.ok) {
+		churnData = (await churnRes.json()) as ChurnData;
+	}
+	if (membersRes.ok) {
+		membersData = (await membersRes.json()) as MembersData;
+	}
+
+	if (!revenueData && !churnData && !membersData) {
+		error = "Unable to load reporting data. Please ensure you have admin access.";
+	}
+} catch (err) {
+	console.error("Admin reporting fetch error:", err);
+	error = "Failed to load reporting data. Please try again.";
+}
+
+// --- Helper functions ---
+
+function formatCurrency(amount: number): string {
+	return new Intl.NumberFormat("en-US", {
+		style: "currency",
+		currency: "USD",
+	}).format(amount);
+}
+
+function formatDate(dateStr: string): string {
+	try {
+		const date = new Date(dateStr);
+		return date.toLocaleDateString("en-US", {
+			year: "numeric",
+			month: "short",
+			day: "numeric",
+		});
+	} catch {
+		return dateStr;
+	}
+}
+
+function formatShortDate(dateStr: string): string {
+	try {
+		const date = new Date(dateStr);
+		return date.toLocaleDateString("en-US", {
+			month: "short",
+			day: "numeric",
+		});
+	} catch {
+		return dateStr;
+	}
+}
+
+// --- SVG chart data ---
+
+const chartData = revenueData?.chartData ?? [];
+
+// Fill in missing days for a complete 30-day view
+function buildFullChartData(data: { date: string; amount: number }[]): { date: string; amount: number }[] {
+	const result: { date: string; amount: number }[] = [];
+	const dataMap = new Map(data.map((d) => [d.date, d.amount]));
+	const now = new Date();
+
+	for (let i = 29; i >= 0; i--) {
+		const d = new Date(now);
+		d.setDate(d.getDate() - i);
+		const key = d.toISOString().split("T")[0];
+		result.push({ date: key, amount: dataMap.get(key) ?? 0 });
+	}
+	return result;
+}
+
+const fullChartData = buildFullChartData(chartData);
+const maxAmount = Math.max(...fullChartData.map((d) => d.amount), 1);
+const chartWidth = 720;
+const chartHeight = 200;
+const barGap = 2;
+const barWidth = (chartWidth - barGap * 30) / 30;
+
+// Compute active members count from either revenue or members data
+const activeMembers = membersData?.summary?.active ?? revenueData?.memberCount ?? 0;
+---
+
+<div class="admin-reporting" id="admin-reporting">
+	<style>
+		.admin-reporting {
+			font-family: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+			color: #2c2c2c;
+			line-height: 1.6;
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 2rem;
+		}
+
+		/* Header */
+		.admin-reporting__header {
+			margin-bottom: 2rem;
+			border-bottom: 2px solid #d4a853;
+			padding-bottom: 1rem;
+		}
+
+		.admin-reporting__title {
+			font-family: Lora, serif;
+			font-size: 2rem;
+			font-weight: 600;
+			margin: 0 0 0.25rem 0;
+			color: #2c2c2c;
+		}
+
+		.admin-reporting__subtitle {
+			margin: 0;
+			color: #666;
+			font-size: 0.95rem;
+		}
+
+		/* Error */
+		.admin-reporting__error {
+			background: #fecaca;
+			border: 1px solid #fca5a5;
+			border-radius: 6px;
+			padding: 1rem;
+			margin-bottom: 2rem;
+			color: #991b1b;
+			font-size: 0.95rem;
+		}
+
+		/* Overview Cards */
+		.admin-reporting__cards {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 1rem;
+			margin-bottom: 2rem;
+		}
+
+		.admin-reporting__card {
+			background: #faf8f5;
+			border: 1px solid #e5e5e5;
+			border-radius: 8px;
+			padding: 1.25rem;
+			transition: box-shadow 0.2s;
+		}
+
+		.admin-reporting__card:hover {
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+		}
+
+		.admin-reporting__card-label {
+			font-size: 0.8rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			color: #7a8b6f;
+			margin: 0 0 0.5rem 0;
+		}
+
+		.admin-reporting__card-value {
+			font-family: Lora, serif;
+			font-size: 1.75rem;
+			font-weight: 700;
+			color: #2c2c2c;
+			margin: 0;
+		}
+
+		.admin-reporting__card-detail {
+			font-size: 0.8rem;
+			color: #999;
+			margin: 0.25rem 0 0 0;
+		}
+
+		.admin-reporting__card--highlight .admin-reporting__card-value {
+			color: #c4704b;
+		}
+
+		/* Chart Section */
+		.admin-reporting__chart-section {
+			background: #faf8f5;
+			border: 1px solid #e5e5e5;
+			border-radius: 8px;
+			padding: 1.5rem;
+			margin-bottom: 2rem;
+		}
+
+		.admin-reporting__chart-title {
+			font-family: Lora, serif;
+			font-size: 1.25rem;
+			font-weight: 600;
+			margin: 0 0 1rem 0;
+			color: #2c2c2c;
+		}
+
+		.admin-reporting__chart-container {
+			width: 100%;
+			overflow-x: auto;
+		}
+
+		.admin-reporting__chart-container svg {
+			display: block;
+			width: 100%;
+			height: auto;
+			min-width: 500px;
+		}
+
+		.admin-reporting__chart-empty {
+			text-align: center;
+			color: #999;
+			font-style: italic;
+			padding: 2rem 0;
+		}
+
+		/* Table Section */
+		.admin-reporting__table-section {
+			background: #faf8f5;
+			border: 1px solid #e5e5e5;
+			border-radius: 8px;
+			padding: 1.5rem;
+			margin-bottom: 2rem;
+		}
+
+		.admin-reporting__table-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.admin-reporting__table-title {
+			font-family: Lora, serif;
+			font-size: 1.25rem;
+			font-weight: 600;
+			margin: 0;
+			color: #2c2c2c;
+		}
+
+		/* Filters */
+		.admin-reporting__filters {
+			display: flex;
+			gap: 0.75rem;
+			flex-wrap: wrap;
+			align-items: center;
+		}
+
+		.admin-reporting__search-input {
+			padding: 0.5rem 0.75rem;
+			border: 1px solid #d4c4b5;
+			border-radius: 4px;
+			font-size: 0.9rem;
+			font-family: inherit;
+			background: white;
+			min-width: 200px;
+			transition: border-color 0.2s;
+		}
+
+		.admin-reporting__search-input:focus {
+			outline: none;
+			border-color: #c4704b;
+			box-shadow: 0 0 0 2px rgba(196, 112, 75, 0.15);
+		}
+
+		.admin-reporting__filter-select {
+			padding: 0.5rem 0.75rem;
+			border: 1px solid #d4c4b5;
+			border-radius: 4px;
+			font-size: 0.9rem;
+			font-family: inherit;
+			background: white;
+			cursor: pointer;
+			transition: border-color 0.2s;
+		}
+
+		.admin-reporting__filter-select:focus {
+			outline: none;
+			border-color: #c4704b;
+			box-shadow: 0 0 0 2px rgba(196, 112, 75, 0.15);
+		}
+
+		/* Table */
+		.admin-reporting__table-wrap {
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		.admin-reporting__table {
+			width: 100%;
+			border-collapse: collapse;
+			min-width: 650px;
+		}
+
+		.admin-reporting__table th {
+			text-align: left;
+			padding: 0.75rem 1rem;
+			font-size: 0.8rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			color: #7a8b6f;
+			border-bottom: 2px solid #d4c4b5;
+			background: transparent;
+			cursor: pointer;
+			user-select: none;
+			white-space: nowrap;
+		}
+
+		.admin-reporting__table th:hover {
+			color: #c4704b;
+		}
+
+		.admin-reporting__table th .sort-arrow {
+			font-size: 0.7rem;
+			margin-left: 0.25rem;
+			opacity: 0.4;
+		}
+
+		.admin-reporting__table th .sort-arrow.active {
+			opacity: 1;
+			color: #c4704b;
+		}
+
+		.admin-reporting__table td {
+			padding: 0.75rem 1rem;
+			font-size: 0.9rem;
+			border-bottom: 1px solid #e5e5e5;
+			color: #2c2c2c;
+		}
+
+		.admin-reporting__table tr:hover td {
+			background: rgba(196, 112, 75, 0.04);
+		}
+
+		.admin-reporting__table-empty {
+			text-align: center;
+			color: #999;
+			font-style: italic;
+			padding: 2rem;
+		}
+
+		/* Status badges */
+		.admin-reporting__status {
+			display: inline-block;
+			padding: 0.2rem 0.6rem;
+			border-radius: 4px;
+			font-size: 0.75rem;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.03em;
+		}
+
+		.admin-reporting__status--active {
+			background: #e8f5e9;
+			color: #2e7d32;
+		}
+
+		.admin-reporting__status--past_due {
+			background: #fff3e0;
+			color: #e65100;
+		}
+
+		.admin-reporting__status--cancelled {
+			background: #ffebee;
+			color: #c62828;
+		}
+
+		.admin-reporting__status--pending {
+			background: #fff8e1;
+			color: #f9a825;
+		}
+
+		.admin-reporting__status--revoked {
+			background: #f5f5f5;
+			color: #616161;
+		}
+
+		/* Pagination */
+		.admin-reporting__pagination {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-top: 1rem;
+			padding-top: 1rem;
+			border-top: 1px solid #e5e5e5;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+		}
+
+		.admin-reporting__pagination-info {
+			font-size: 0.85rem;
+			color: #666;
+		}
+
+		.admin-reporting__pagination-controls {
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.admin-reporting__page-btn {
+			padding: 0.4rem 0.8rem;
+			border: 1px solid #d4c4b5;
+			border-radius: 4px;
+			background: white;
+			font-size: 0.85rem;
+			font-family: inherit;
+			cursor: pointer;
+			transition: all 0.2s;
+			color: #2c2c2c;
+		}
+
+		.admin-reporting__page-btn:hover:not(:disabled) {
+			background: #c4704b;
+			color: white;
+			border-color: #c4704b;
+		}
+
+		.admin-reporting__page-btn:disabled {
+			opacity: 0.4;
+			cursor: not-allowed;
+		}
+
+		.admin-reporting__page-btn--current {
+			background: #c4704b;
+			color: white;
+			border-color: #c4704b;
+		}
+
+		/* Mobile responsive */
+		@media (max-width: 900px) {
+			.admin-reporting__cards {
+				grid-template-columns: repeat(2, 1fr);
+			}
+		}
+
+		@media (max-width: 640px) {
+			.admin-reporting {
+				padding: 1rem;
+			}
+
+			.admin-reporting__title {
+				font-size: 1.5rem;
+			}
+
+			.admin-reporting__cards {
+				grid-template-columns: 1fr;
+			}
+
+			.admin-reporting__card-value {
+				font-size: 1.5rem;
+			}
+
+			.admin-reporting__table-header {
+				flex-direction: column;
+				align-items: stretch;
+			}
+
+			.admin-reporting__filters {
+				flex-direction: column;
+			}
+
+			.admin-reporting__search-input,
+			.admin-reporting__filter-select {
+				width: 100%;
+				min-width: 0;
+			}
+
+			.admin-reporting__chart-section {
+				padding: 1rem;
+			}
+
+			.admin-reporting__table-section {
+				padding: 1rem;
+			}
+
+			.admin-reporting__pagination {
+				flex-direction: column;
+				align-items: stretch;
+				text-align: center;
+			}
+
+			.admin-reporting__pagination-controls {
+				justify-content: center;
+			}
+		}
+	</style>
+
+	<!-- Header -->
+	<div class="admin-reporting__header">
+		<h1 class="admin-reporting__title">Membership Reporting</h1>
+		<p class="admin-reporting__subtitle">Revenue, member analytics, and growth metrics</p>
+	</div>
+
+	{error ? (
+		<div class="admin-reporting__error">
+			<strong>Error:</strong> {error}
+		</div>
+	) : (
+		<>
+			{/* Overview Cards */}
+			<div class="admin-reporting__cards">
+				<div class="admin-reporting__card admin-reporting__card--highlight">
+					<p class="admin-reporting__card-label">Monthly Recurring Revenue</p>
+					<p class="admin-reporting__card-value">{formatCurrency(revenueData?.mrr ?? 0)}</p>
+					<p class="admin-reporting__card-detail">Based on active monthly subscriptions</p>
+				</div>
+
+				<div class="admin-reporting__card">
+					<p class="admin-reporting__card-label">Total Revenue (30d)</p>
+					<p class="admin-reporting__card-value">{formatCurrency(revenueData?.totalRevenue ?? 0)}</p>
+					<p class="admin-reporting__card-detail">{revenueData?.period ?? "last 30 days"}</p>
+				</div>
+
+				<div class="admin-reporting__card">
+					<p class="admin-reporting__card-label">Active Members</p>
+					<p class="admin-reporting__card-value">{activeMembers}</p>
+					<p class="admin-reporting__card-detail">
+						{membersData?.summary ? `${membersData.summary.pastDue} past due` : ""}
+					</p>
+				</div>
+
+				<div class="admin-reporting__card">
+					<p class="admin-reporting__card-label">Churn Rate</p>
+					<p class="admin-reporting__card-value">{churnData?.churnRate ?? "0%"}</p>
+					<p class="admin-reporting__card-detail">
+						{churnData ? `Retention: ${churnData.retentionRate}` : ""}
+					</p>
+				</div>
+			</div>
+
+			{/* Revenue Chart */}
+			<div class="admin-reporting__chart-section">
+				<h2 class="admin-reporting__chart-title">Daily Revenue (Last 30 Days)</h2>
+				<div class="admin-reporting__chart-container">
+					{fullChartData.some((d) => d.amount > 0) ? (
+						<svg
+							viewBox={`0 0 ${chartWidth} ${chartHeight + 30}`}
+							preserveAspectRatio="xMidYMid meet"
+							role="img"
+							aria-label="Bar chart showing daily revenue over the last 30 days"
+						>
+							{/* Y-axis labels */}
+							<text x="0" y="12" fill="#999" font-size="10" font-family="Source Sans 3, sans-serif">
+								{formatCurrency(maxAmount / 100)}
+							</text>
+							<text x="0" y={chartHeight / 2 + 4} fill="#999" font-size="10" font-family="Source Sans 3, sans-serif">
+								{formatCurrency(maxAmount / 200)}
+							</text>
+							<text x="0" y={chartHeight} fill="#999" font-size="10" font-family="Source Sans 3, sans-serif">
+								$0
+							</text>
+
+							{/* Grid lines */}
+							<line x1="55" y1="0" x2={chartWidth} y2="0" stroke="#e5e5e5" stroke-width="1" />
+							<line x1="55" y1={chartHeight / 2} x2={chartWidth} y2={chartHeight / 2} stroke="#e5e5e5" stroke-width="1" stroke-dasharray="4,4" />
+							<line x1="55" y1={chartHeight} x2={chartWidth} y2={chartHeight} stroke="#e5e5e5" stroke-width="1" />
+
+							{/* Bars */}
+							{fullChartData.map((d, i) => {
+								const barHeight = (d.amount / maxAmount) * chartHeight;
+								const x = 60 + i * ((chartWidth - 60) / 30);
+								const y = chartHeight - barHeight;
+								const w = ((chartWidth - 60) / 30) - barGap;
+								return (
+									<g>
+										<rect
+											x={x}
+											y={y}
+											width={w}
+											height={Math.max(barHeight, 0)}
+											fill={d.amount > 0 ? "#c4704b" : "#e5e5e5"}
+											rx="2"
+											ry="2"
+										>
+											<title>{formatShortDate(d.date)}: {formatCurrency(d.amount / 100)}</title>
+										</rect>
+										{/* X-axis labels: every 5th day */}
+										{i % 5 === 0 && (
+											<text
+												x={x + w / 2}
+												y={chartHeight + 16}
+												fill="#999"
+												font-size="9"
+												font-family="Source Sans 3, sans-serif"
+												text-anchor="middle"
+											>
+												{formatShortDate(d.date)}
+											</text>
+										)}
+									</g>
+								);
+							})}
+						</svg>
+					) : (
+						<p class="admin-reporting__chart-empty">No revenue data for the last 30 days.</p>
+					)}
+				</div>
+			</div>
+
+			{/* Members Table */}
+			<div class="admin-reporting__table-section" id="members-table-section">
+				<div class="admin-reporting__table-header">
+					<h2 class="admin-reporting__table-title">
+						Members ({membersData?.total ?? 0})
+					</h2>
+					<div class="admin-reporting__filters">
+						<input
+							type="text"
+							class="admin-reporting__search-input"
+							id="reporting-search"
+							placeholder="Search by email..."
+							aria-label="Search members by email"
+						/>
+						<select
+							class="admin-reporting__filter-select"
+							id="reporting-plan-filter"
+							aria-label="Filter by plan"
+						>
+							<option value="">All Plans</option>
+						</select>
+						<select
+							class="admin-reporting__filter-select"
+							id="reporting-status-filter"
+							aria-label="Filter by status"
+						>
+							<option value="">All Statuses</option>
+							<option value="active">Active</option>
+							<option value="past_due">Past Due</option>
+							<option value="cancelled">Cancelled</option>
+							<option value="pending">Pending</option>
+							<option value="revoked">Revoked</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="admin-reporting__table-wrap">
+					<table class="admin-reporting__table" id="reporting-members-table">
+						<thead>
+							<tr>
+								<th data-sort="email">
+									Email <span class="sort-arrow" id="sort-email">&#9650;</span>
+								</th>
+								<th data-sort="plan">
+									Plan <span class="sort-arrow" id="sort-plan">&#9650;</span>
+								</th>
+								<th data-sort="status">
+									Status <span class="sort-arrow" id="sort-status">&#9650;</span>
+								</th>
+								<th data-sort="interval">
+									Interval <span class="sort-arrow" id="sort-interval">&#9650;</span>
+								</th>
+								<th data-sort="createdAt">
+									Joined <span class="sort-arrow active" id="sort-createdAt">&#9660;</span>
+								</th>
+							</tr>
+						</thead>
+						<tbody id="reporting-table-body">
+							{membersData?.members && membersData.members.length > 0 ? (
+								membersData.members.map((m) => (
+									<tr>
+										<td>{m.email}</td>
+										<td>{m.plan}</td>
+										<td>
+											<span class={`admin-reporting__status admin-reporting__status--${m.status}`}>
+												{m.status === "past_due" ? "Past Due" : m.status.charAt(0).toUpperCase() + m.status.slice(1)}
+											</span>
+										</td>
+										<td>{m.planInterval === "month" ? "Monthly" : m.planInterval === "year" ? "Yearly" : "One-time"}</td>
+										<td>{formatDate(m.createdAt)}</td>
+									</tr>
+								))
+							) : (
+								<tr>
+									<td colspan="5" class="admin-reporting__table-empty">
+										No members found.
+									</td>
+								</tr>
+							)}
+						</tbody>
+					</table>
+				</div>
+
+				{/* Pagination */}
+				{membersData && membersData.totalPages > 0 && (
+					<div class="admin-reporting__pagination">
+						<span class="admin-reporting__pagination-info">
+							Showing {((membersData.page - 1) * membersData.perPage) + 1}
+							-{Math.min(membersData.page * membersData.perPage, membersData.total)} of {membersData.total}
+						</span>
+						<div class="admin-reporting__pagination-controls" id="reporting-pagination">
+							<button
+								class="admin-reporting__page-btn"
+								data-page="prev"
+								disabled={membersData.page <= 1}
+								aria-label="Previous page"
+							>
+								Prev
+							</button>
+							{Array.from({ length: Math.min(membersData.totalPages, 5) }, (_, i) => {
+								const pageNum = i + 1;
+								return (
+									<button
+										class={`admin-reporting__page-btn ${pageNum === membersData.page ? "admin-reporting__page-btn--current" : ""}`}
+										data-page={pageNum}
+										aria-label={`Page ${pageNum}`}
+										aria-current={pageNum === membersData.page ? "page" : undefined}
+									>
+										{pageNum}
+									</button>
+								);
+							})}
+							<button
+								class="admin-reporting__page-btn"
+								data-page="next"
+								disabled={membersData.page >= membersData.totalPages}
+								aria-label="Next page"
+							>
+								Next
+							</button>
+						</div>
+					</div>
+				)}
+			</div>
+		</>
+	)}
+</div>
+
+<script>
+	/**
+	 * Client-side interactivity for the admin reporting dashboard.
+	 * Handles search, filtering, sorting, and pagination by re-fetching from API.
+	 */
+	(function () {
+		const searchInput = document.getElementById("reporting-search") as HTMLInputElement | null;
+		const planFilter = document.getElementById("reporting-plan-filter") as HTMLSelectElement | null;
+		const statusFilter = document.getElementById("reporting-status-filter") as HTMLSelectElement | null;
+		const tableBody = document.getElementById("reporting-table-body") as HTMLTableSectionElement | null;
+		const pagination = document.getElementById("reporting-pagination");
+		const tableSection = document.getElementById("members-table-section");
+
+		if (!searchInput || !planFilter || !statusFilter || !tableBody) return;
+
+		let currentPage = 1;
+		let currentSort = "createdAt";
+		let currentSortDir: "asc" | "desc" = "desc";
+		let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+		// Populate plan filter from initial data
+		const planSet = new Set<string>();
+		tableBody.querySelectorAll("tr").forEach((row) => {
+			const cells = row.querySelectorAll("td");
+			if (cells.length >= 2) {
+				const plan = cells[1]?.textContent?.trim();
+				if (plan) planSet.add(plan);
+			}
+		});
+		planSet.forEach((plan) => {
+			const opt = document.createElement("option");
+			opt.value = plan;
+			opt.textContent = plan;
+			planFilter.appendChild(opt);
+		});
+
+		function formatIntervalText(interval: string): string {
+			if (interval === "month") return "Monthly";
+			if (interval === "year") return "Yearly";
+			return "One-time";
+		}
+
+		function formatStatusText(status: string): string {
+			if (status === "past_due") return "Past Due";
+			return status.charAt(0).toUpperCase() + status.slice(1);
+		}
+
+		function formatDateClient(dateStr: string): string {
+			try {
+				const d = new Date(dateStr);
+				return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+			} catch {
+				return dateStr;
+			}
+		}
+
+		async function fetchMembers() {
+			const search = searchInput?.value.trim() ?? "";
+			const plan = planFilter?.value ?? "";
+			const status = statusFilter?.value ?? "";
+
+			const params = new URLSearchParams();
+			params.set("page", String(currentPage));
+			params.set("perPage", "20");
+			if (search) params.set("search", search);
+			if (plan) params.set("planId", plan);
+			if (status) params.set("status", status);
+
+			try {
+				const res = await fetch(`/_emdash/api/plugins/membership/reports/members?${params.toString()}`, {
+					credentials: "include",
+					headers: { "Content-Type": "application/json" },
+				});
+
+				if (!res.ok) return;
+
+				const data = await res.json() as {
+					members: { email: string; plan: string; status: string; createdAt: string; expiresAt: string | null; planInterval: string }[];
+					total: number;
+					page: number;
+					perPage: number;
+					totalPages: number;
+				};
+
+				// Sort client-side
+				data.members.sort((a: Record<string, string>, b: Record<string, string>) => {
+					const aVal = (a[currentSort] ?? "").toString();
+					const bVal = (b[currentSort] ?? "").toString();
+					const cmp = aVal.localeCompare(bVal);
+					return currentSortDir === "asc" ? cmp : -cmp;
+				});
+
+				renderTable(data);
+			} catch (err) {
+				console.error("Failed to fetch members:", err);
+			}
+		}
+
+		function renderTable(data: {
+			members: { email: string; plan: string; status: string; createdAt: string; expiresAt: string | null; planInterval: string }[];
+			total: number;
+			page: number;
+			perPage: number;
+			totalPages: number;
+		}) {
+			if (!tableBody) return;
+
+			if (data.members.length === 0) {
+				tableBody.innerHTML = '<tr><td colspan="5" class="admin-reporting__table-empty">No members found.</td></tr>';
+			} else {
+				tableBody.innerHTML = data.members.map((m) => `
+					<tr>
+						<td>${escapeHtml(m.email)}</td>
+						<td>${escapeHtml(m.plan)}</td>
+						<td><span class="admin-reporting__status admin-reporting__status--${escapeHtml(m.status)}">${formatStatusText(m.status)}</span></td>
+						<td>${formatIntervalText(m.planInterval)}</td>
+						<td>${formatDateClient(m.createdAt)}</td>
+					</tr>
+				`).join("");
+			}
+
+			// Update plan filter options
+			data.members.forEach((m) => {
+				if (m.plan && !planSet.has(m.plan)) {
+					planSet.add(m.plan);
+					const opt = document.createElement("option");
+					opt.value = m.plan;
+					opt.textContent = m.plan;
+					planFilter?.appendChild(opt);
+				}
+			});
+
+			// Update pagination
+			renderPagination(data.page, data.totalPages, data.total, data.perPage);
+		}
+
+		function renderPagination(page: number, totalPages: number, total: number, perPage: number) {
+			if (!pagination) return;
+			const parent = pagination.parentElement;
+			if (!parent) return;
+
+			// Update info text
+			const infoEl = parent.querySelector(".admin-reporting__pagination-info");
+			if (infoEl) {
+				const start = (page - 1) * perPage + 1;
+				const end = Math.min(page * perPage, total);
+				infoEl.textContent = `Showing ${start}-${end} of ${total}`;
+			}
+
+			// Rebuild buttons
+			const maxButtons = Math.min(totalPages, 5);
+			let startPage = Math.max(1, page - 2);
+			if (startPage + maxButtons - 1 > totalPages) {
+				startPage = Math.max(1, totalPages - maxButtons + 1);
+			}
+
+			let html = `<button class="admin-reporting__page-btn" data-page="prev" ${page <= 1 ? "disabled" : ""} aria-label="Previous page">Prev</button>`;
+			for (let i = startPage; i < startPage + maxButtons; i++) {
+				html += `<button class="admin-reporting__page-btn ${i === page ? "admin-reporting__page-btn--current" : ""}" data-page="${i}" aria-label="Page ${i}" ${i === page ? 'aria-current="page"' : ""}>${i}</button>`;
+			}
+			html += `<button class="admin-reporting__page-btn" data-page="next" ${page >= totalPages ? "disabled" : ""} aria-label="Next page">Next</button>`;
+			pagination.innerHTML = html;
+
+			// Re-bind pagination events
+			bindPaginationEvents(page, totalPages);
+		}
+
+		function bindPaginationEvents(currentPg: number, totalPages: number) {
+			if (!pagination) return;
+			pagination.querySelectorAll("button").forEach((btn) => {
+				btn.addEventListener("click", () => {
+					const pageVal = btn.getAttribute("data-page");
+					if (pageVal === "prev" && currentPg > 1) {
+						currentPage = currentPg - 1;
+					} else if (pageVal === "next" && currentPg < totalPages) {
+						currentPage = currentPg + 1;
+					} else if (pageVal && pageVal !== "prev" && pageVal !== "next") {
+						currentPage = parseInt(pageVal, 10);
+					}
+					fetchMembers();
+				});
+			});
+		}
+
+		function escapeHtml(str: string): string {
+			const div = document.createElement("div");
+			div.appendChild(document.createTextNode(str));
+			return div.innerHTML;
+		}
+
+		// Search with debounce
+		searchInput.addEventListener("input", () => {
+			if (debounceTimer) clearTimeout(debounceTimer);
+			debounceTimer = setTimeout(() => {
+				currentPage = 1;
+				fetchMembers();
+			}, 300);
+		});
+
+		// Filter changes
+		planFilter.addEventListener("change", () => {
+			currentPage = 1;
+			fetchMembers();
+		});
+
+		statusFilter.addEventListener("change", () => {
+			currentPage = 1;
+			fetchMembers();
+		});
+
+		// Sort headers
+		const table = document.getElementById("reporting-members-table");
+		if (table) {
+			table.querySelectorAll("th[data-sort]").forEach((th) => {
+				th.addEventListener("click", () => {
+					const sortKey = (th as HTMLElement).getAttribute("data-sort") ?? "";
+					if (currentSort === sortKey) {
+						currentSortDir = currentSortDir === "asc" ? "desc" : "asc";
+					} else {
+						currentSort = sortKey;
+						currentSortDir = "asc";
+					}
+
+					// Update sort arrows
+					table.querySelectorAll(".sort-arrow").forEach((arrow) => {
+						arrow.classList.remove("active");
+						arrow.innerHTML = "&#9650;";
+					});
+					const arrow = document.getElementById(`sort-${sortKey}`);
+					if (arrow) {
+						arrow.classList.add("active");
+						arrow.innerHTML = currentSortDir === "asc" ? "&#9650;" : "&#9660;";
+					}
+
+					fetchMembers();
+				});
+			});
+		}
+
+		// Bind initial pagination events
+		if (pagination) {
+			const initialPage = parseInt(pagination.querySelector(".admin-reporting__page-btn--current")?.getAttribute("data-page") ?? "1", 10);
+			const lastBtn = pagination.querySelector("button[data-page='next']");
+			const totalPagesGuess = lastBtn?.hasAttribute("disabled") ? initialPage : initialPage + 1;
+			bindPaginationEvents(initialPage, totalPagesGuess);
+		}
+	})();
+</script>
