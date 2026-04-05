@@ -1,0 +1,332 @@
+---
+/**
+ * MembershipPricingCards.astro
+ *
+ * Renders MemberShip plugin pricing cards with Stripe Checkout integration.
+ * Pulls plan data from the MemberShip plugin API and renders interactive
+ * signup cards with Stripe Payment Link buttons.
+ *
+ * This block is placed on the Pricing page after the static pricing comparison
+ * to provide the actual checkout flow for Monthly and Annual memberships.
+ */
+
+interface MembershipPlan {
+	id: string;
+	name: string;
+	price: number;
+	interval: "month" | "year";
+	features: string[];
+	stripePaymentLink?: string;
+	highlighted?: boolean;
+}
+
+// Fetch membership plans from the plugin API
+const apiBase = Astro.url.origin;
+let plans: MembershipPlan[] = [];
+
+try {
+	const response = await fetch(`${apiBase}/_emdash/api/plugins/membership/plans`);
+	if (response.ok) {
+		const data = await response.json();
+		plans = data.plans || [];
+	}
+} catch (error) {
+	console.error("Error fetching membership plans:", error);
+}
+
+// If no plans from API, use hardcoded defaults for the Sunrise Yoga Studio
+if (plans.length === 0) {
+	plans = [
+		{
+			id: "monthly-unlimited",
+			name: "Monthly Unlimited",
+			price: 99,
+			interval: "month",
+			features: [
+				"Unlimited classes all month",
+				"All class types included",
+				"Free mat rental",
+				"10% off workshops & retreats",
+				"Cancel or pause anytime",
+			],
+			highlighted: true,
+		},
+		{
+			id: "annual-unlimited",
+			name: "Annual Unlimited",
+			price: 899,
+			interval: "year",
+			features: [
+				"Unlimited classes all year",
+				"All class types included",
+				"Free mat rental",
+				"20% off workshops & retreats",
+				"1 free guest pass per month",
+				"Save $289 vs. monthly",
+			],
+		},
+	];
+}
+
+function formatPrice(price: number): string {
+	return `$${price}`;
+}
+
+function formatInterval(interval: string): string {
+	return interval === "year" ? "/year" : "/month";
+}
+---
+
+<section class="membership-signup section" id="membership-signup">
+	<div class="container">
+		<header class="membership-header">
+			<h2 class="membership-headline">Ready to commit to your practice?</h2>
+			<p class="membership-subheadline">
+				Choose a membership plan and start practicing today. Secure checkout powered by Stripe.
+			</p>
+		</header>
+
+		<div class="membership-grid">
+			{plans.map((plan) => (
+				<div class:list={["membership-card", { "membership-highlighted": plan.highlighted }]}>
+					{plan.highlighted && <div class="membership-badge">Most Popular</div>}
+
+					<div class="membership-plan-header">
+						<h3 class="membership-name">{plan.name}</h3>
+						<div class="membership-price">
+							<span class="membership-amount">{formatPrice(plan.price)}</span>
+							<span class="membership-interval">{formatInterval(plan.interval)}</span>
+						</div>
+					</div>
+
+					<ul class="membership-features">
+						{plan.features.map((feature) => (
+							<li>
+								<svg class="check-icon" viewBox="0 0 20 20" fill="currentColor">
+									<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+								</svg>
+								{feature}
+							</li>
+						))}
+					</ul>
+
+					{plan.stripePaymentLink ? (
+						<a
+							href={plan.stripePaymentLink}
+							class:list={["btn", "btn-lg", "membership-cta", { "btn-primary": plan.highlighted, "btn-secondary": !plan.highlighted }]}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							Start {plan.name}
+						</a>
+					) : (
+						<button
+							type="button"
+							class:list={["btn", "btn-lg", "membership-cta", { "btn-primary": plan.highlighted, "btn-secondary": !plan.highlighted }]}
+							data-plan-id={plan.id}
+							data-plan-name={plan.name}
+						>
+							Start {plan.name}
+						</button>
+					)}
+				</div>
+			))}
+		</div>
+
+		<p class="membership-note">
+			All memberships include a 7-day free trial. Cancel anytime during the trial with no charge.
+			Questions? <a href="/contact">Contact us</a>.
+		</p>
+	</div>
+</section>
+
+<script>
+	/**
+	 * Handle membership signup button clicks.
+	 * If Stripe Payment Links are configured, they open directly.
+	 * Otherwise, redirect to Stripe Checkout via the membership plugin API.
+	 */
+	document.addEventListener("click", async (e: Event) => {
+		const target = e.target as HTMLElement;
+		const button = target.closest("button[data-plan-id]") as HTMLButtonElement | null;
+
+		if (!button) return;
+
+		const planId = button.dataset.planId;
+		const planName = button.dataset.planName;
+
+		button.disabled = true;
+		button.textContent = "Redirecting...";
+
+		try {
+			const response = await fetch(
+				`/_emdash/api/plugins/membership/checkout?planId=${encodeURIComponent(planId || "")}`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						planId,
+						successUrl: `${window.location.origin}/pricing?success=true`,
+						cancelUrl: `${window.location.origin}/pricing?cancelled=true`,
+					}),
+				}
+			);
+
+			const data = await response.json();
+
+			if (data.checkoutUrl) {
+				window.location.href = data.checkoutUrl;
+			} else {
+				alert(`To sign up for ${planName}, please contact us at hello@sunriseyogastudio.com or call (503) 555-1234.`);
+			}
+		} catch (error) {
+			console.error("Checkout error:", error);
+			alert(`To sign up for ${planName}, please contact us at hello@sunriseyogastudio.com or call (503) 555-1234.`);
+		} finally {
+			button.disabled = false;
+			button.textContent = `Start ${planName}`;
+		}
+	});
+</script>
+
+<style>
+	.membership-signup {
+		background: var(--color-surface);
+	}
+
+	.membership-header {
+		text-align: center;
+		max-width: var(--max-width);
+		margin: 0 auto var(--spacing-3xl);
+	}
+
+	.membership-headline {
+		font-size: var(--font-size-3xl);
+		margin-bottom: var(--spacing-md);
+	}
+
+	.membership-subheadline {
+		font-size: var(--font-size-lg);
+		color: var(--color-muted);
+	}
+
+	.membership-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: var(--spacing-xl);
+		max-width: 800px;
+		margin: 0 auto;
+	}
+
+	.membership-card {
+		position: relative;
+		padding: var(--spacing-xl);
+		background: var(--color-bg);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-lg);
+	}
+
+	.membership-highlighted {
+		border-color: var(--color-primary);
+		box-shadow: var(--shadow-xl);
+		transform: scale(1.02);
+	}
+
+	.membership-badge {
+		position: absolute;
+		top: 0;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		padding: var(--spacing-xs) var(--spacing-md);
+		font-size: var(--font-size-xs);
+		font-weight: 600;
+		color: white;
+		background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+		border-radius: var(--radius-full);
+		white-space: nowrap;
+	}
+
+	.membership-plan-header {
+		text-align: center;
+		padding-bottom: var(--spacing-lg);
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.membership-name {
+		font-size: var(--font-size-lg);
+		margin-bottom: var(--spacing-sm);
+	}
+
+	.membership-price {
+		display: flex;
+		align-items: baseline;
+		justify-content: center;
+		gap: var(--spacing-xs);
+	}
+
+	.membership-amount {
+		font-size: var(--font-size-4xl);
+		font-weight: 700;
+		font-family: var(--font-heading);
+		letter-spacing: -0.03em;
+	}
+
+	.membership-interval {
+		font-size: var(--font-size-sm);
+		color: var(--color-muted);
+	}
+
+	.membership-features {
+		list-style: none;
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-sm);
+	}
+
+	.membership-features li {
+		display: flex;
+		align-items: flex-start;
+		gap: var(--spacing-sm);
+		font-size: var(--font-size-sm);
+	}
+
+	.check-icon {
+		width: 18px;
+		height: 18px;
+		flex-shrink: 0;
+		color: var(--color-success);
+		margin-top: 2px;
+	}
+
+	.membership-cta {
+		width: 100%;
+		text-align: center;
+	}
+
+	.membership-note {
+		text-align: center;
+		font-size: var(--font-size-sm);
+		color: var(--color-muted);
+		margin-top: var(--spacing-2xl);
+	}
+
+	.membership-note a {
+		color: var(--color-primary);
+		text-decoration: underline;
+	}
+
+	@media (max-width: 768px) {
+		.membership-grid {
+			grid-template-columns: 1fr;
+			max-width: 400px;
+		}
+
+		.membership-highlighted {
+			transform: none;
+		}
+	}
+</style>
