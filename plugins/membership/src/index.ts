@@ -21,6 +21,7 @@ export function membershipPlugin(): PluginDescriptor {
 		adminPages: [
 			{ path: "/members", label: "Members", icon: "users" },
 			{ path: "/plans", label: "Plans", icon: "settings" },
+			{ path: "/reporting", label: "Reporting", icon: "chart" },
 		],
 		adminWidgets: [
 			{ id: "active-members", title: "Active Members", size: "third" },

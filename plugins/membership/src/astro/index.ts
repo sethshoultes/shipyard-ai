@@ -3,7 +3,9 @@
  * Exported to the site for rendering gated-content blocks and member portals.
  */
 
+import AdminReporting from "./AdminReporting.astro";
 import GatedContent from "./GatedContent.astro";
+import GroupManagement from "./GroupManagement.astro";
 import MemberDashboard from "./MemberDashboard.astro";
 import MemberPortal from "./MemberPortal.astro";
 
@@ -12,4 +14,4 @@ export const blockComponents = {
 	"member-portal": MemberPortal,
 };
 
-export { MemberDashboard, MemberPortal };
+export { AdminReporting, GroupManagement, MemberDashboard, MemberPortal };
