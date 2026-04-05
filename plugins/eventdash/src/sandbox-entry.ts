@@ -62,6 +62,10 @@ interface RegistrationRecord {
 	ticketType?: string; // Which ticket type purchased
 	amountPaid?: number; // What they actually paid in cents
 	paymentStatus?: "pending" | "paid" | "refunded"; // Payment status (default: "paid" for backwards compatibility)
+	// Phase 3: Check-in fields
+	checkInCode?: string; // 6-char alphanumeric code for check-in
+	checkedIn?: boolean; // Whether attendee has checked in
+	checkedInAt?: string; // ISO timestamp when checked in
 }
 
 interface WaitlistRecord {
@@ -131,6 +135,18 @@ function parseJSON<T>(json: string | undefined | null, fallback: T): T {
  */
 function emailToKvKey(email: string): string {
 	return encodeURIComponent(email.toLowerCase().trim());
+}
+
+/**
+ * Utility: Generate 6-character alphanumeric check-in code
+ */
+function generateCheckInCode(): string {
+	const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	let code = "";
+	for (let i = 0; i < 6; i++) {
+		code += chars.charAt(Math.floor(Math.random() * chars.length));
+	}
+	return code;
 }
 
 /**
@@ -1891,6 +1907,207 @@ export default definePlugin({
 					ctx.log.error(`Delete ticket type error: ${String(error)}`);
 					throw new Response(
 						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/portal?email=user@example.com
+		 * Get attendee's portal data: registrations, upcoming events, past events
+		 *
+		 * Query params:
+		 *   - email: attendee email (required)
+		 *
+		 * Returns: { attendee: { email, name }, upcoming: EventRecord[], past: EventRecord[], registered: RegistrationRecord[] }
+		 */
+		portal: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const email = String(input.email ?? "").trim().toLowerCase();
+
+					if (!email || !isValidEmail(email)) {
+						return {
+							error: "Valid email required",
+						};
+					}
+
+					// Get all events
+					const allEvents = await getAllEventsWithDates(ctx);
+					const now = new Date();
+					const nowTimestamp = now.getTime();
+
+					// Split events into upcoming and past
+					const upcoming: EventRecord[] = [];
+					const past: EventRecord[] = [];
+
+					for (const event of allEvents) {
+						const eventTime = dateTimeToTimestamp(event.date, event.time);
+						if (eventTime > nowTimestamp) {
+							upcoming.push(event);
+						} else {
+							past.push(event);
+						}
+					}
+
+					// Get attendee's registrations for this email
+					const listJson = await ctx.kv.get<string>("events:list");
+					const eventIds = parseJSON<string[]>(listJson, []);
+
+					const registered: RegistrationRecord[] = [];
+					const encodedEmail = emailToKvKey(email);
+
+					for (const eventId of eventIds) {
+						const regKey = `registration:${eventId}:${encodedEmail}`;
+						const regJson = await ctx.kv.get<string>(regKey);
+						if (regJson) {
+							const reg = parseJSON<RegistrationRecord>(regJson, null);
+							if (reg && reg.status === "registered") {
+								registered.push(reg);
+							}
+						}
+					}
+
+					// Filter events to only those the attendee is registered for
+					const registeredEventIds = new Set(registered.map((r) => {
+						// Find event ID by looking up registrations
+						return Object.keys(eventIds).find((eid) => {
+							const regKey = `registration:${eid}:${encodedEmail}`;
+							return registered.some((reg) => reg.email === email);
+						});
+					}));
+
+					return {
+						attendee: {
+							email,
+						},
+						upcoming: upcoming.slice(0, 20), // Limit to 20 for perf
+						past: past.slice(0, 20),
+						registered,
+						upcomingCount: upcoming.length,
+						pastCount: past.length,
+					};
+				} catch (error) {
+					ctx.log.error(`Portal error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to fetch portal data" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/calendar/list?month=2026-04&view=list
+		 * Get events for a month as paginated list
+		 *
+		 * Query params:
+		 *   - month: YYYY-MM format (default: current month)
+		 *   - page: page number (default: 1)
+		 *   - limit: results per page (default: 20, max: 100)
+		 *
+		 * Returns: { events: EventRecord[], total: number, page: number, pages: number }
+		 */
+		calendarList: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const monthStr = String(input.month ?? "").trim() || new Date().toISOString().slice(0, 7);
+					const page = Math.max(1, parseInt(String(input.page ?? "1"), 10) || 1);
+					const limit = Math.min(Math.max(1, parseInt(String(input.limit ?? "20"), 10) || 20), 100);
+
+					// Parse month string (YYYY-MM)
+					const [year, month] = monthStr.split("-").map(Number);
+					if (!year || !month || month < 1 || month > 12) {
+						return { events: [], total: 0, page: 1, pages: 0, error: "Invalid month format" };
+					}
+
+					// Get all events
+					let events = await getAllEventsWithDates(ctx);
+
+					// Filter to events in the specified month
+					events = events.filter((e) => {
+						const eventDate = new Date(e.date);
+						return eventDate.getUTCFullYear() === year && (eventDate.getUTCMonth() + 1) === month;
+					});
+
+					const total = events.length;
+					const pages = Math.ceil(total / limit);
+					const start = (page - 1) * limit;
+					const paged = events.slice(start, start + limit);
+
+					return {
+						events: paged,
+						total,
+						page,
+						pages,
+					};
+				} catch (error) {
+					ctx.log.error(`Calendar list error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to fetch calendar events" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /eventdash/calendar/month?month=2026-04
+		 * Get events grouped by day for month view
+		 *
+		 * Query params:
+		 *   - month: YYYY-MM format (default: current month)
+		 *
+		 * Returns: { month: string, year: number, days: { [day: string]: EventRecord[] }, total: number }
+		 */
+		calendarMonth: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const monthStr = String(input.month ?? "").trim() || new Date().toISOString().slice(0, 7);
+
+					// Parse month string (YYYY-MM)
+					const [year, month] = monthStr.split("-").map(Number);
+					if (!year || !month || month < 1 || month > 12) {
+						return { days: {}, total: 0, error: "Invalid month format" };
+					}
+
+					// Get all events
+					let events = await getAllEventsWithDates(ctx);
+
+					// Filter to events in the specified month
+					events = events.filter((e) => {
+						const eventDate = new Date(e.date);
+						return eventDate.getUTCFullYear() === year && (eventDate.getUTCMonth() + 1) === month;
+					});
+
+					// Group by day
+					const days: Record<string, EventRecord[]> = {};
+					for (const event of events) {
+						const date = event.date; // YYYY-MM-DD
+						if (!days[date]) days[date] = [];
+						days[date].push(event);
+					}
+
+					return {
+						month: monthStr,
+						year,
+						days,
+						total: events.length,
+					};
+				} catch (error) {
+					ctx.log.error(`Calendar month error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to fetch calendar events" }),
 						{ status: 500, headers: { "Content-Type": "application/json" } }
 					);
 				}
