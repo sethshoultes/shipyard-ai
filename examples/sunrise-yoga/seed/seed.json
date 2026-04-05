@@ -1,0 +1,285 @@
+{
+  "$schema": "https://emdashcms.com/seed.schema.json",
+  "version": "1",
+  "meta": {
+    "name": "Sunrise Yoga Studio",
+    "description": "Sunrise Yoga Studio — built by Shipyard AI",
+    "author": "Shipyard AI"
+  },
+  "settings": {
+    "title": "Sunrise Yoga Studio",
+    "tagline": "Find your flow at Sunrise Yoga Studio",
+    "description": "Sunrise Yoga Studio in Portland, OR. Classes for all levels: vinyasa flow, yin & restorative, hot yoga, and more. Join our welcoming community."
+  },
+  "collections": [
+    {
+      "slug": "pages",
+      "label": "Pages",
+      "labelSingular": "Page",
+      "supports": [
+        "drafts",
+        "revisions",
+        "seo"
+      ],
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "content",
+          "label": "Content",
+          "type": "portableText"
+        }
+      ]
+    }
+  ],
+  "menus": [
+    {
+      "name": "primary",
+      "label": "Primary Navigation",
+      "items": [
+        {
+          "type": "custom",
+          "label": "About",
+          "url": "/#features"
+        },
+        {
+          "type": "custom",
+          "label": "Services",
+          "url": "/pricing"
+        },
+        {
+          "type": "custom",
+          "label": "Contact",
+          "url": "/contact"
+        }
+      ]
+    }
+  ],
+  "content": {
+    "pages": [
+      {
+        "id": "home",
+        "slug": "home",
+        "status": "published",
+        "data": {
+          "title": "Home",
+          "content": [
+            {
+              "_type": "marketing.hero",
+              "_key": "hero",
+              "headline": "Your practice starts here",
+              "subheadline": "Sunrise Yoga Studio in Portland, OR offers yoga for every body. Whether you're a first-timer or an advanced practitioner, our classes meet you where you are. Come breathe, move, and grow with us.",
+              "primaryCta": {
+                "label": "Get Started",
+                "url": "/contact"
+              },
+              "secondaryCta": {
+                "label": "Learn More",
+                "url": "/#features"
+              }
+            },
+            {
+              "_type": "marketing.features",
+              "_key": "features",
+              "headline": "Why choose Sunrise Yoga Studio",
+              "subheadline": "Expert instruction, inclusive community, and a practice tailored to your body and goals.",
+              "features": [
+                {
+                  "icon": "zap",
+                  "title": "Vinyasa Flow",
+                  "description": "Dynamic, breath-linked movement that builds strength and flexibility. All levels welcome."
+                },
+                {
+                  "icon": "shield",
+                  "title": "Yin & Restorative",
+                  "description": "Slow, deep stretches held for minutes. Perfect for recovery, stress relief, and finding stillness."
+                },
+                {
+                  "icon": "users",
+                  "title": "Hot Yoga",
+                  "description": "Practice in a heated room to deepen stretches, detoxify, and build endurance. Bring water and a towel."
+                },
+                {
+                  "icon": "chart",
+                  "title": "Community Classes",
+                  "description": "Weekly donation-based classes open to everyone. Yoga is for every body, every budget."
+                },
+                {
+                  "icon": "code",
+                  "title": "Private Sessions",
+                  "description": "One-on-one instruction tailored to your goals. Injury recovery, prenatal, or personal development."
+                },
+                {
+                  "icon": "globe",
+                  "title": "Workshops & Retreats",
+                  "description": "Weekend workshops and seasonal retreats to deepen your practice and connect with community."
+                }
+              ]
+            },
+            {
+              "_type": "marketing.testimonials",
+              "_key": "testimonials",
+              "headline": "What our guests say",
+              "testimonials": [
+                {
+                  "quote": "Sunrise Yoga Studio changed my relationship with my body. The instructors are warm, knowledgeable, and never make you feel like you're not enough.",
+                  "author": "Sarah M.",
+                  "role": "Member, 2 years",
+                  "company": "5 stars"
+                },
+                {
+                  "quote": "I came for the hot yoga and stayed for the community. This studio feels like home.",
+                  "author": "David L.",
+                  "role": "Member, 1 year",
+                  "company": "5 stars"
+                },
+                {
+                  "quote": "As a complete beginner, I was nervous. By the end of my first class, I was hooked. The vibe here is everything.",
+                  "author": "Priya K.",
+                  "role": "New Member",
+                  "company": "5 stars"
+                }
+              ]
+            },
+            {
+              "_type": "marketing.faq",
+              "_key": "faq",
+              "headline": "Good to know",
+              "items": [
+                {
+                  "question": "Do I need experience?",
+                  "answer": "Not at all. Every class offers modifications for all levels. Our instructors will help you find your edge without pushing past it."
+                },
+                {
+                  "question": "What should I bring?",
+                  "answer": "Just yourself and a water bottle. We provide mats, blocks, straps, and blankets. For hot yoga, bring a towel."
+                },
+                {
+                  "question": "How much does it cost?",
+                  "answer": "Drop-in classes are $20. Monthly unlimited is $99. We also offer a 10-class pack for $150. First class is always free."
+                },
+                {
+                  "question": "Do you offer teacher training?",
+                  "answer": "Yes! We run 200-hour and 500-hour teacher training programs. Check our workshops page for upcoming dates."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "pricing",
+        "slug": "pricing",
+        "status": "published",
+        "data": {
+          "title": "Pricing & Classes",
+          "content": [
+            {
+              "_type": "marketing.hero",
+              "_key": "pricing-hero",
+              "headline": "Pricing & Class Options",
+              "subheadline": "We believe yoga should be accessible to everyone. Choose the option that works best for your practice and your budget.",
+              "centered": true
+            },
+            {
+              "_type": "marketing.pricing",
+              "_key": "pricing-plans",
+              "plans": [
+                {
+                  "name": "Drop-In",
+                  "price": "$20",
+                  "description": "Pay as you go. Try a class anytime.",
+                  "features": [
+                    "Access to all class types",
+                    "Mats, blocks & props included",
+                    "No commitment",
+                    "Perfect for trying us out"
+                  ],
+                  "cta": {
+                    "label": "Schedule a Class",
+                    "url": "/contact"
+                  }
+                },
+                {
+                  "name": "10-Class Pack",
+                  "price": "$150",
+                  "description": "Save $50 compared to drop-in rates.",
+                  "features": [
+                    "10 classes to use at your pace",
+                    "Valid for 6 months",
+                    "Use any time, any class",
+                    "Better rate than drop-in"
+                  ],
+                  "cta": {
+                    "label": "Get Started",
+                    "url": "/contact"
+                  },
+                  "highlighted": true
+                },
+                {
+                  "name": "Monthly Unlimited",
+                  "price": "$99",
+                  "description": "Unlimited classes for one month.",
+                  "features": [
+                    "Unlimited classes all month",
+                    "Access to all class times",
+                    "Workshops included",
+                    "Community events"
+                  ],
+                  "cta": {
+                    "label": "Start Your Practice",
+                    "url": "/contact"
+                  }
+                }
+              ]
+            },
+            {
+              "_type": "marketing.faq",
+              "_key": "pricing-faq",
+              "headline": "Pricing questions",
+              "items": [
+                {
+                  "question": "Is there a first class free offer?",
+                  "answer": "Yes! Your first class is always free. Try us out, meet the instructors, and see if we're the right fit for you."
+                },
+                {
+                  "question": "Can I pause or cancel my membership?",
+                  "answer": "Absolutely. Monthly memberships can be paused or cancelled anytime with no penalties. We want you to practice because you love it, not because you're stuck."
+                },
+                {
+                  "question": "Do you offer student or senior discounts?",
+                  "answer": "Yes. Students and seniors get 15% off all packages. Just show your student ID or let us know during sign-up."
+                },
+                {
+                  "question": "What about private sessions?",
+                  "answer": "Private sessions are $75/hour and can be customized to your goals — injury recovery, prenatal prep, or deepening your practice. Book via our contact form."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "contact",
+        "slug": "contact",
+        "status": "published",
+        "data": {
+          "title": "Get in Touch",
+          "content": [
+            {
+              "_type": "marketing.hero",
+              "_key": "contact-hero",
+              "headline": "Get in Touch",
+              "subheadline": "Questions about classes, scheduling, or our studio? We'd love to hear from you. Reach out anytime — we'll get back to you within 24 hours.",
+              "centered": true
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
