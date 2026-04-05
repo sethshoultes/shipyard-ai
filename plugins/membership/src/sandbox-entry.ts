@@ -44,6 +44,86 @@ interface MemberRecord {
 	// Phase 3: Content gating fields
 	joinDate?: string; // ISO date — when subscription first created (for drip content)
 	contentAccess?: string[]; // Array of content/page IDs member can access
+	// Phase 4 Wave 2: Multi-gateway support
+	paymentMethod?: "stripe" | "paypal" | "manual"; // Default: "stripe"
+}
+
+/**
+ * Phase 4: Group memberships
+ */
+interface GroupRecord {
+	id: string; // UUID
+	orgName: string;
+	orgEmail: string;
+	adminEmail: string; // Original group creator
+	planId: string;
+	maxSeats: number;
+	members: string[]; // Array of member emails
+	stripeCustomerId?: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+interface GroupInviteCode {
+	code: string; // UUID
+	groupId: string;
+	email?: string; // Optional: pre-filled invite email
+	expiresAt: string; // ISO date
+	createdAt: string;
+	createdBy: string; // Admin email who sent invite
+}
+
+/**
+ * Phase 4: Developer webhooks
+ */
+interface WebhookEndpoint {
+	id: string; // UUID
+	url: string;
+	events: string[]; // e.g., ["member.created", "member.cancelled"]
+	secret: string; // HMAC secret for signing payloads
+	active: boolean;
+	createdAt: string;
+	lastFiredAt?: string;
+	failedCount: number;
+}
+
+interface WebhookLog {
+	id: string;
+	webhookId: string;
+	eventType: string;
+	payload: string; // JSON stringified
+	responseCode?: number;
+	responseBody?: string;
+	firedAt: string;
+	success: boolean;
+}
+
+/**
+ * Phase 4 Wave 2: Registration Forms
+ */
+interface FormFieldDefinition {
+	id: string;
+	type: "text" | "email" | "dropdown" | "checkbox" | "phone";
+	label: string;
+	required: boolean;
+	options?: string[]; // For dropdown type
+	placeholder?: string;
+}
+
+interface FormDefinition {
+	id: string;
+	name: string;
+	description?: string;
+	fields: FormFieldDefinition[];
+	createdAt: string;
+	updatedAt: string;
+}
+
+interface FormSubmission {
+	id: string;
+	formId: string;
+	data: Record<string, unknown>;
+	submittedAt: string;
 }
 
 interface PlanConfig {
@@ -96,6 +176,111 @@ function isValidEmail(email: string): boolean {
  */
 function generateId(): string {
 	return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+/**
+ * Utility: Generate UUID v4
+ */
+function generateUUID(): string {
+	if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+		return crypto.randomUUID();
+	}
+	return `${Date.now()}-${Math.random().toString(36).slice(2, 12)}-${Math.random().toString(36).slice(2, 12)}`;
+}
+
+/**
+ * Utility: Generate HMAC-SHA256 webhook signature
+ */
+async function generateWebhookSignature(payload: string, secret: string): Promise<string> {
+	const key = await crypto.subtle.importKey(
+		"raw",
+		new TextEncoder().encode(secret),
+		{ name: "HMAC", hash: "SHA-256" },
+		false,
+		["sign"]
+	);
+	const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload));
+	return Array.from(new Uint8Array(sig))
+		.map(b => b.toString(16).padStart(2, "0"))
+		.join("");
+}
+
+/**
+ * Utility: Fire webhook to registered endpoint
+ */
+async function fireWebhook(
+	endpoint: WebhookEndpoint,
+	eventType: string,
+	data: Record<string, any>,
+	ctx: PluginContext
+): Promise<WebhookLog> {
+	const payload = JSON.stringify({
+		event: eventType,
+		timestamp: new Date().toISOString(),
+		data,
+	});
+
+	const signature = await generateWebhookSignature(payload, endpoint.secret);
+
+	let responseCode: number | undefined;
+	let responseBody: string | undefined;
+	let success = false;
+
+	try {
+		const response = await fetch(endpoint.url, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"X-Shipyard-Signature": `sha256=${signature}`,
+				"X-Shipyard-Event": eventType,
+			},
+			body: payload,
+		});
+		responseCode = response.status;
+		success = response.ok;
+		try {
+			responseBody = await response.text();
+		} catch {
+			responseBody = "(response unreadable)";
+		}
+	} catch (error) {
+		responseCode = 0;
+		responseBody = String(error);
+		success = false;
+	}
+
+	const log: WebhookLog = {
+		id: generateUUID(),
+		webhookId: endpoint.id,
+		eventType,
+		payload,
+		responseCode,
+		responseBody,
+		firedAt: new Date().toISOString(),
+		success,
+	};
+
+	// Store webhook log
+	await ctx.kv.set(`webhook:log:${log.id}`, JSON.stringify(log));
+
+	// Add to webhook's log list
+	const logsJson = await ctx.kv.get<string>(`webhook:${endpoint.id}:logs`);
+	const logs = parseJSON<string[]>(logsJson, []);
+	logs.push(log.id);
+	// Keep last 100 logs
+	if (logs.length > 100) logs.shift();
+	await ctx.kv.set(`webhook:${endpoint.id}:logs`, JSON.stringify(logs));
+
+	// Update endpoint's last fired time
+	if (success) {
+		endpoint.lastFiredAt = log.firedAt;
+		endpoint.failedCount = 0;
+	} else {
+		endpoint.failedCount++;
+	}
+	await ctx.kv.set(`webhook:${endpoint.id}`, JSON.stringify(endpoint));
+
+	return log;
 }
 
 /**
@@ -225,6 +410,7 @@ async function handleSubscriptionCreated(
 		// Update member
 		member.stripeSubscriptionId = subscriptionId;
 		member.lastSyncAt = new Date().toISOString();
+		member.paymentMethod = "stripe"; // Tag payment method from Stripe webhook
 
 		// Set join date on first subscription (for drip content)
 		if (!member.joinDate) {
@@ -2550,6 +2736,107 @@ export default definePlugin({
 						};
 					}
 
+					/** PHASE 4 WAVE 2: Task 5 - Form Builder Admin Page */
+					if (interaction.type === "page_load" && interaction.page === "/forms") {
+						const listJson = await ctx.kv.get<string>("forms:list");
+						const formIds = parseJSON<string[]>(listJson, []);
+
+						const forms: FormDefinition[] = [];
+						for (const id of formIds) {
+							const formJson = await ctx.kv.get<string>(`form:${id}`);
+							if (formJson) {
+								const form = parseJSON<FormDefinition>(formJson, null);
+								if (form) forms.push(form);
+							}
+						}
+
+						forms.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+						return {
+							blocks: [
+								{
+									type: "header",
+									text: "Registration Forms",
+								},
+								{
+									type: "stats",
+									stats: [
+										{
+											label: "Total Forms",
+											value: forms.length.toString(),
+										},
+									],
+								},
+								{
+									type: "table",
+									blockId: "forms-table",
+									columns: [
+										{ key: "id", label: "ID", format: "text" as const },
+										{ key: "name", label: "Name", format: "text" as const },
+										{ key: "fields", label: "Fields", format: "text" as const },
+										{ key: "createdAt", label: "Created", format: "relative_time" as const },
+									],
+									rows: forms.map((f) => ({
+										id: f.id,
+										name: f.name,
+										fields: f.fields.length.toString(),
+										createdAt: f.createdAt,
+									})),
+								},
+								{
+									type: "section",
+									text: "Create New Form",
+								},
+								{
+									type: "form",
+									blockId: "create-form",
+									fields: [
+										{
+											type: "text_input",
+											action_id: "formName",
+											label: "Form Name",
+											placeholder: "e.g. Member Registration",
+										},
+										{
+											type: "text_input",
+											action_id: "formDescription",
+											label: "Description (optional)",
+											placeholder: "Form description",
+										},
+										{
+											type: "select",
+											action_id: "fieldType",
+											label: "First Field Type",
+											options: [
+												{ label: "Text", value: "text" },
+												{ label: "Email", value: "email" },
+												{ label: "Phone", value: "phone" },
+												{ label: "Dropdown", value: "dropdown" },
+												{ label: "Checkbox", value: "checkbox" },
+											],
+										},
+										{
+											type: "text_input",
+											action_id: "fieldLabel",
+											label: "First Field Label",
+											placeholder: "e.g. Full Name",
+										},
+										{
+											type: "select",
+											action_id: "fieldRequired",
+											label: "Required?",
+											options: [
+												{ label: "Yes", value: "true" },
+												{ label: "No", value: "false" },
+											],
+										},
+									],
+									submit: { label: "Create Form", action_id: "create_form" },
+								},
+							],
+						};
+					}
+
 					return { blocks: [] };
 				} catch (error) {
 					ctx.log.error(`Admin handler error: ${String(error)}`);
@@ -2989,6 +3276,1382 @@ export default definePlugin({
 						);
 					}
 				},
+			},
+		},
+
+		/**
+		 * PHASE 4 WAVE 1: Task 1 - MemberShip Reporting
+		 * GET /membership/reports/revenue
+		 * GET /membership/reports/churn
+		 * GET /membership/reports/members
+		 */
+		revenueReport: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const days = Number(input.days ?? 30);
+
+					// Get all members
+					const listJson = await ctx.kv.get<string>("members:list");
+					const memberEmails = parseJSON<string[]>(listJson, []);
+
+					const dateMap = new Map<string, number>();
+					let totalRevenue = 0;
+					let mrrAmount = 0;
+
+					// Aggregate revenue by date and calculate MRR
+					for (const encodedEmail of memberEmails) {
+						const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
+						if (!memberJson) continue;
+						const member = parseJSON<MemberRecord>(memberJson, null);
+						if (!member) continue;
+
+						// Get plan price
+						const plansJson = await ctx.kv.get<string>("plans");
+						const plans = parseJSON(plansJson, DEFAULT_PLANS);
+						const plan = plans.find((p: PlanConfig) => p.id === member.plan);
+						if (!plan) continue;
+
+						const createdDate = new Date(member.createdAt);
+						const now = new Date();
+						const daysDiff = Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+
+						// Only count members within the last N days
+						if (daysDiff <= days) {
+							const dateKey = createdDate.toISOString().split('T')[0];
+							dateMap.set(dateKey, (dateMap.get(dateKey) || 0) + plan.price);
+							totalRevenue += plan.price;
+						}
+
+						// Add to MRR if active monthly subscription
+						if (member.status === "active" && member.planInterval === "month") {
+							mrrAmount += plan.price / 100; // Convert from cents
+						}
+					}
+
+					// Convert map to sorted array
+					const chartData = Array.from(dateMap.entries())
+						.map(([date, amount]) => ({ date, amount }))
+						.sort((a, b) => a.date.localeCompare(b.date));
+
+					return {
+						totalRevenue: totalRevenue / 100,
+						mrr: Math.round(mrrAmount * 100) / 100,
+						averageRevenuePerMember: totalRevenue / Math.max(memberEmails.length, 1) / 100,
+						memberCount: memberEmails.length,
+						chartData,
+						period: `last ${days} days`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Revenue report error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		churnReport: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const days = Number(input.days ?? 30);
+
+					// Get all members
+					const listJson = await ctx.kv.get<string>("members:list");
+					const memberEmails = parseJSON<string[]>(listJson, []);
+
+					const now = new Date();
+					const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
+					let activeMembersAtStart = 0;
+					let cancelledInPeriod = 0;
+
+					for (const encodedEmail of memberEmails) {
+						const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
+						if (!memberJson) continue;
+						const member = parseJSON<MemberRecord>(memberJson, null);
+						if (!member) continue;
+
+						const createdDate = new Date(member.createdAt);
+
+						// Was active at start of period?
+						if (createdDate < cutoff && (member.status === "active" || member.status === "cancelled")) {
+							activeMembersAtStart++;
+						}
+
+						// Cancelled during period?
+						if (member.status === "cancelled" && createdDate >= cutoff) {
+							cancelledInPeriod++;
+						}
+					}
+
+					const churnRate = activeMembersAtStart > 0
+						? Math.round((cancelledInPeriod / activeMembersAtStart) * 10000) / 100
+						: 0;
+
+					return {
+						churnRate: `${churnRate}%`,
+						cancelledMembers: cancelledInPeriod,
+						activeMembersAtStart,
+						period: `last ${days} days`,
+						retentionRate: `${Math.round((100 - churnRate) * 100) / 100}%`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Churn report error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		membersReport: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const planId = input.planId ? String(input.planId).trim() : undefined;
+					const status = input.status ? String(input.status).trim() : undefined;
+					const search = input.search ? String(input.search).toLowerCase().trim() : undefined;
+					const page = Number(input.page ?? 1);
+					const perPage = Number(input.perPage ?? 20);
+
+					// Get all members
+					const listJson = await ctx.kv.get<string>("members:list");
+					const memberEmails = parseJSON<string[]>(listJson, []);
+
+					const members = [];
+					for (const encodedEmail of memberEmails) {
+						const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
+						if (!memberJson) continue;
+						const member = parseJSON<MemberRecord>(memberJson, null);
+						if (!member) continue;
+
+						// Apply filters
+						if (planId && member.plan !== planId) continue;
+						if (status && member.status !== status) continue;
+						if (search && !member.email.toLowerCase().includes(search)) continue;
+
+						members.push({
+							email: member.email,
+							plan: member.plan,
+							status: member.status,
+							createdAt: member.createdAt,
+							expiresAt: member.expiresAt || null,
+							planInterval: member.planInterval || "once",
+						});
+					}
+
+					// Sort by created date descending
+					members.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+					// Paginate
+					const start = (page - 1) * perPage;
+					const end = start + perPage;
+					const paginated = members.slice(start, end);
+
+					return {
+						members: paginated,
+						total: members.length,
+						page,
+						perPage,
+						totalPages: Math.ceil(members.length / perPage),
+						summary: {
+							total: members.length,
+							active: members.filter(m => m.status === "active").length,
+							pastDue: members.filter(m => m.status === "past_due").length,
+							cancelled: members.filter(m => m.status === "cancelled").length,
+						},
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Members report error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * PHASE 4 WAVE 1: Task 3 - Group Memberships
+		 * POST /membership/groups/create
+		 * POST /membership/groups/:id/invite
+		 * POST /membership/groups/:id/remove
+		 * GET /membership/groups/:id
+		 * POST /membership/groups/accept
+		 */
+		groupCreate: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const orgName = String(input.orgName ?? "").trim();
+					const orgEmail = String(input.orgEmail ?? "").trim().toLowerCase();
+					const planId = String(input.planId ?? "").trim();
+					const maxSeats = Number(input.maxSeats ?? 10);
+					const adminEmail = String(input.adminEmail ?? "").trim().toLowerCase();
+
+					// Validate
+					if (!orgName || !orgEmail || !planId || maxSeats < 1) {
+						throw new Response(
+							JSON.stringify({ error: "Missing required fields" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Create group
+					const groupId = generateUUID();
+					const group: GroupRecord = {
+						id: groupId,
+						orgName,
+						orgEmail,
+						adminEmail,
+						planId,
+						maxSeats,
+						members: [adminEmail],
+						createdAt: new Date().toISOString(),
+						updatedAt: new Date().toISOString(),
+					};
+
+					await ctx.kv.set(`group:${groupId}`, JSON.stringify(group));
+
+					// Add to groups list
+					const listJson = await ctx.kv.get<string>("groups:list");
+					const groups = parseJSON<string[]>(listJson, []);
+					groups.push(groupId);
+					await ctx.kv.set("groups:list", JSON.stringify(groups));
+
+					ctx.log.info(`Group created: ${groupId} (${orgName})`);
+
+					return {
+						success: true,
+						group,
+						message: `Group "${orgName}" created with max ${maxSeats} seats`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Group create error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		groupInvite: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const groupId = String(input.groupId ?? "").trim();
+					const email = String(input.email ?? "").trim().toLowerCase();
+
+					// Get group
+					const groupJson = await ctx.kv.get<string>(`group:${groupId}`);
+					if (!groupJson) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const group = parseJSON<GroupRecord>(groupJson, null);
+					if (!group) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Check seat availability
+					if (group.members.length >= group.maxSeats) {
+						throw new Response(
+							JSON.stringify({ error: "Group has reached maximum seats" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Generate invite code
+					const code = generateUUID();
+					const invite: GroupInviteCode = {
+						code,
+						groupId,
+						email,
+						expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+						createdAt: new Date().toISOString(),
+						createdBy: adminUser.email as string || "admin",
+					};
+
+					await ctx.kv.set(`group:invite:${code}`, JSON.stringify(invite));
+
+					// Add to group's invites list
+					const invitesJson = await ctx.kv.get<string>(`group:${groupId}:invites`);
+					const invites = parseJSON<string[]>(invitesJson, []);
+					invites.push(code);
+					await ctx.kv.set(`group:${groupId}:invites`, JSON.stringify(invites));
+
+					ctx.log.info(`Group invite created: ${groupId} -> ${email}`);
+
+					return {
+						success: true,
+						inviteCode: code,
+						inviteLink: `${(ctx as any).env?.APP_URL || 'https://app.shipyard.io'}/join-group?code=${code}`,
+						message: `Invite sent to ${email}`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Group invite error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		groupRemove: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const groupId = String(input.groupId ?? "").trim();
+					const email = String(input.email ?? "").trim().toLowerCase();
+
+					// Get group
+					const groupJson = await ctx.kv.get<string>(`group:${groupId}`);
+					if (!groupJson) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const group = parseJSON<GroupRecord>(groupJson, null);
+					if (!group) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Remove member
+					const idx = group.members.indexOf(email);
+					if (idx === -1) {
+						throw new Response(
+							JSON.stringify({ error: "Member not in group" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					group.members.splice(idx, 1);
+					group.updatedAt = new Date().toISOString();
+					await ctx.kv.set(`group:${groupId}`, JSON.stringify(group));
+
+					ctx.log.info(`Removed ${email} from group ${groupId}`);
+
+					return {
+						success: true,
+						message: `${email} removed from group`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Group remove error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		groupGet: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const groupId = String(input.groupId ?? "").trim();
+
+					const groupJson = await ctx.kv.get<string>(`group:${groupId}`);
+					if (!groupJson) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const group = parseJSON<GroupRecord>(groupJson, null);
+					if (!group) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					return {
+						group,
+						seatsUsed: group.members.length,
+						seatsAvailable: group.maxSeats - group.members.length,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Group get error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		groupAccept: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const code = String(input.code ?? "").trim();
+					const email = String(input.email ?? "").trim().toLowerCase();
+
+					// Get invite
+					const inviteJson = await ctx.kv.get<string>(`group:invite:${code}`);
+					if (!inviteJson) {
+						throw new Response(
+							JSON.stringify({ error: "Invite not found or expired" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const invite = parseJSON<GroupInviteCode>(inviteJson, null);
+					if (!invite) {
+						throw new Response(
+							JSON.stringify({ error: "Invite not found or expired" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Check expiry
+					if (new Date(invite.expiresAt) < new Date()) {
+						throw new Response(
+							JSON.stringify({ error: "Invite has expired" }),
+							{ status: 410, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get group
+					const groupJson = await ctx.kv.get<string>(`group:${invite.groupId}`);
+					if (!groupJson) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const group = parseJSON<GroupRecord>(groupJson, null);
+					if (!group) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Check seat availability
+					if (group.members.length >= group.maxSeats) {
+						throw new Response(
+							JSON.stringify({ error: "Group has reached maximum seats" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Add member to group
+					if (!group.members.includes(email)) {
+						group.members.push(email);
+						group.updatedAt = new Date().toISOString();
+						await ctx.kv.set(`group:${invite.groupId}`, JSON.stringify(group));
+					}
+
+					// Delete invite
+					await ctx.kv.delete(`group:invite:${code}`);
+
+					ctx.log.info(`Member ${email} joined group ${invite.groupId}`);
+
+					return {
+						success: true,
+						group,
+						message: `Welcome to ${group.orgName}!`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Group accept error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * PHASE 4 WAVE 1: Task 4 - Developer Webhooks
+		 * POST /membership/webhooks/register
+		 * DELETE /membership/webhooks/:id
+		 * GET /membership/webhooks
+		 */
+		webhookRegister: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const url = String(input.url ?? "").trim();
+					const events = input.events as string[] | undefined;
+
+					// Validate
+					if (!url || !events || events.length === 0) {
+						throw new Response(
+							JSON.stringify({ error: "URL and events required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Validate URL
+					try {
+						new URL(url);
+					} catch {
+						throw new Response(
+							JSON.stringify({ error: "Invalid URL" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Create webhook
+					const webhookId = generateUUID();
+					const secret = generateUUID();
+					const webhook: WebhookEndpoint = {
+						id: webhookId,
+						url,
+						events,
+						secret,
+						active: true,
+						createdAt: new Date().toISOString(),
+						failedCount: 0,
+					};
+
+					await ctx.kv.set(`webhook:${webhookId}`, JSON.stringify(webhook));
+
+					// Add to webhooks list
+					const listJson = await ctx.kv.get<string>("webhooks:list");
+					const webhooks = parseJSON<string[]>(listJson, []);
+					webhooks.push(webhookId);
+					await ctx.kv.set("webhooks:list", JSON.stringify(webhooks));
+
+					ctx.log.info(`Webhook registered: ${webhookId} for ${events.join(", ")}`);
+
+					return {
+						success: true,
+						webhook,
+						secret: webhook.secret,
+						message: "Webhook registered successfully",
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook register error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		webhookDelete: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const webhookId = String(input.webhookId ?? "").trim();
+
+					const webhookJson = await ctx.kv.get<string>(`webhook:${webhookId}`);
+					if (!webhookJson) {
+						throw new Response(
+							JSON.stringify({ error: "Webhook not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Delete webhook
+					await ctx.kv.delete(`webhook:${webhookId}`);
+
+					// Remove from list
+					const listJson = await ctx.kv.get<string>("webhooks:list");
+					const webhooks = parseJSON<string[]>(listJson, []);
+					const idx = webhooks.indexOf(webhookId);
+					if (idx !== -1) {
+						webhooks.splice(idx, 1);
+						await ctx.kv.set("webhooks:list", JSON.stringify(webhooks));
+					}
+
+					ctx.log.info(`Webhook deleted: ${webhookId}`);
+
+					return {
+						success: true,
+						message: "Webhook deleted",
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook delete error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		webhookList: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const listJson = await ctx.kv.get<string>("webhooks:list");
+					const webhookIds = parseJSON<string[]>(listJson, []);
+
+					const webhooks: WebhookEndpoint[] = [];
+					for (const id of webhookIds) {
+						const webhookJson = await ctx.kv.get<string>(`webhook:${id}`);
+						if (webhookJson) {
+							const webhook = parseJSON<WebhookEndpoint>(webhookJson, null);
+							if (webhook) {
+								webhooks.push(webhook);
+							}
+						}
+					}
+
+					return {
+						webhooks,
+						total: webhooks.length,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook list error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		webhookTest: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const webhookId = String(input.webhookId ?? "").trim();
+
+					const webhookJson = await ctx.kv.get<string>(`webhook:${webhookId}`);
+					if (!webhookJson) {
+						throw new Response(
+							JSON.stringify({ error: "Webhook not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const webhook = parseJSON<WebhookEndpoint>(webhookJson, null);
+					if (!webhook) {
+						throw new Response(
+							JSON.stringify({ error: "Webhook not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Fire test webhook
+					const testData = {
+						member_id: "test-123",
+						email: "test@example.com",
+						plan_id: "basic",
+						created_at: new Date().toISOString(),
+					};
+
+					const log = await fireWebhook(webhook, "member.created", testData, ctx);
+
+					return {
+						success: log.success,
+						log,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook test error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/** PHASE 4 WAVE 2: Task 5 - Registration Forms Builder */
+
+		/**
+		 * POST /membership/forms/create
+		 * Admin creates a custom registration form with configurable fields.
+		 *
+		 * Body: { name, description?, fields: Array<{ type, label, required, options?, placeholder? }> }
+		 * Returns: { success: true, form: FormDefinition }
+		 */
+		formCreate: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const name = String(input.name ?? "").trim();
+					const description = input.description ? String(input.description).trim() : undefined;
+					const fieldsInput = input.fields as Array<Record<string, unknown>> | undefined;
+
+					if (!name || name.length > 200) {
+						throw new Response(
+							JSON.stringify({ error: "Form name is required (max 200 chars)" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!fieldsInput || !Array.isArray(fieldsInput) || fieldsInput.length === 0) {
+						throw new Response(
+							JSON.stringify({ error: "At least one field is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (fieldsInput.length > 50) {
+						throw new Response(
+							JSON.stringify({ error: "Maximum 50 fields per form" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const validFieldTypes = ["text", "email", "dropdown", "checkbox", "phone"];
+					const fields: FormFieldDefinition[] = fieldsInput.map((f) => {
+						const type = String(f.type ?? "").trim();
+						const label = String(f.label ?? "").trim();
+						const required = Boolean(f.required ?? false);
+						const options = f.options as string[] | undefined;
+						const placeholder = f.placeholder ? String(f.placeholder).trim() : undefined;
+
+						if (!validFieldTypes.includes(type)) {
+							throw new Response(
+								JSON.stringify({ error: `Invalid field type: ${type}. Valid types: ${validFieldTypes.join(", ")}` }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+
+						if (!label || label.length > 200) {
+							throw new Response(
+								JSON.stringify({ error: "Field label is required (max 200 chars)" }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+
+						if (type === "dropdown" && (!options || !Array.isArray(options) || options.length === 0)) {
+							throw new Response(
+								JSON.stringify({ error: `Dropdown field "${label}" requires options array` }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+
+						return {
+							id: generateId(),
+							type: type as FormFieldDefinition["type"],
+							label,
+							required,
+							...(options && { options }),
+							...(placeholder && { placeholder }),
+						};
+					});
+
+					const formId = generateId();
+					const now = new Date().toISOString();
+					const form: FormDefinition = {
+						id: formId,
+						name,
+						fields,
+						createdAt: now,
+						updatedAt: now,
+					};
+					if (description) form.description = description;
+
+					await ctx.kv.set(`form:${formId}`, JSON.stringify(form));
+
+					// Add to forms list
+					const listJson = await ctx.kv.get<string>("forms:list");
+					const formIds = parseJSON<string[]>(listJson, []);
+					formIds.push(formId);
+					await ctx.kv.set("forms:list", JSON.stringify(formIds));
+
+					ctx.log.info(`Form created: ${formId} — ${name}`);
+
+					return { success: true, form };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Form create error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /membership/forms/:id
+		 * Get a form definition by ID.
+		 *
+		 * Returns: { form: FormDefinition }
+		 */
+		formDetail: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const formId = String((rc.pathParams as Record<string, unknown>)?.id ?? "").trim();
+
+					if (!formId) {
+						throw new Response(
+							JSON.stringify({ error: "Form ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const formJson = await ctx.kv.get<string>(`form:${formId}`);
+					if (!formJson) {
+						throw new Response(
+							JSON.stringify({ error: "Form not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const form = parseJSON<FormDefinition>(formJson, null);
+					if (!form) {
+						throw new Response(
+							JSON.stringify({ error: "Form not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					return { form };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Form detail error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /membership/forms
+		 * List all registration forms.
+		 *
+		 * Returns: { forms: FormDefinition[], total: number }
+		 */
+		formList: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const listJson = await ctx.kv.get<string>("forms:list");
+					const formIds = parseJSON<string[]>(listJson, []);
+
+					const forms: FormDefinition[] = [];
+					for (const id of formIds) {
+						const formJson = await ctx.kv.get<string>(`form:${id}`);
+						if (formJson) {
+							const form = parseJSON<FormDefinition>(formJson, null);
+							if (form) forms.push(form);
+						}
+					}
+
+					// Sort by creation date descending
+					forms.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+					return { forms, total: forms.length };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Form list error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /membership/forms/:id/submit
+		 * Public endpoint. Submit a form, validates against form definition.
+		 *
+		 * Body: { data: Record<string, unknown> }
+		 * Returns: { success: true, submissionId: string }
+		 */
+		formSubmit: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const formId = String((rc.pathParams as Record<string, unknown>)?.id ?? "").trim();
+					const input = rc.input as Record<string, unknown>;
+					const data = input.data as Record<string, unknown> | undefined;
+
+					if (!formId) {
+						throw new Response(
+							JSON.stringify({ error: "Form ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!data || typeof data !== "object") {
+						throw new Response(
+							JSON.stringify({ error: "Submission data is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get form definition
+					const formJson = await ctx.kv.get<string>(`form:${formId}`);
+					if (!formJson) {
+						throw new Response(
+							JSON.stringify({ error: "Form not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const form = parseJSON<FormDefinition>(formJson, null);
+					if (!form) {
+						throw new Response(
+							JSON.stringify({ error: "Form not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Validate against form definition
+					const errors: string[] = [];
+					const sanitizedData: Record<string, unknown> = {};
+
+					for (const field of form.fields) {
+						const value = data[field.id];
+
+						// Check required fields
+						if (field.required && (value === undefined || value === null || value === "")) {
+							errors.push(`${field.label} is required`);
+							continue;
+						}
+
+						if (value === undefined || value === null || value === "") {
+							continue; // Skip optional empty fields
+						}
+
+						// Validate by type
+						switch (field.type) {
+							case "email": {
+								const emailVal = String(value).trim().toLowerCase();
+								if (!isValidEmail(emailVal)) {
+									errors.push(`${field.label} must be a valid email`);
+								} else {
+									sanitizedData[field.id] = emailVal;
+								}
+								break;
+							}
+							case "phone": {
+								const phoneVal = String(value).trim().replace(/[^0-9+\-() ]/g, "");
+								if (phoneVal.length < 7 || phoneVal.length > 20) {
+									errors.push(`${field.label} must be a valid phone number`);
+								} else {
+									sanitizedData[field.id] = phoneVal;
+								}
+								break;
+							}
+							case "dropdown": {
+								const dropVal = String(value).trim();
+								if (field.options && !field.options.includes(dropVal)) {
+									errors.push(`${field.label} must be one of: ${field.options.join(", ")}`);
+								} else {
+									sanitizedData[field.id] = dropVal;
+								}
+								break;
+							}
+							case "checkbox": {
+								sanitizedData[field.id] = Boolean(value);
+								break;
+							}
+							case "text":
+							default: {
+								const textVal = String(value).trim();
+								if (textVal.length > 5000) {
+									errors.push(`${field.label} must be 5000 characters or less`);
+								} else {
+									sanitizedData[field.id] = textVal;
+								}
+								break;
+							}
+						}
+					}
+
+					if (errors.length > 0) {
+						throw new Response(
+							JSON.stringify({ error: "Validation failed", details: errors }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Store submission
+					const submissionId = generateId();
+					const submission: FormSubmission = {
+						id: submissionId,
+						formId,
+						data: sanitizedData,
+						submittedAt: new Date().toISOString(),
+					};
+
+					await ctx.kv.set(`form-submission:${formId}:${submissionId}`, JSON.stringify(submission));
+
+					// Add to form's submissions list
+					const subListJson = await ctx.kv.get<string>(`form-submissions:${formId}:list`);
+					const subIds = parseJSON<string[]>(subListJson, []);
+					subIds.push(submissionId);
+					await ctx.kv.set(`form-submissions:${formId}:list`, JSON.stringify(subIds));
+
+					ctx.log.info(`Form submission: ${submissionId} for form ${formId}`);
+
+					return { success: true, submissionId };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Form submit error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /membership/forms/:id/submissions
+		 * Admin lists submissions for a form.
+		 *
+		 * Returns: { submissions: FormSubmission[], total: number }
+		 */
+		formSubmissions: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const formId = String((rc.pathParams as Record<string, unknown>)?.id ?? "").trim();
+
+					if (!formId) {
+						throw new Response(
+							JSON.stringify({ error: "Form ID required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Verify form exists
+					const formJson = await ctx.kv.get<string>(`form:${formId}`);
+					if (!formJson) {
+						throw new Response(
+							JSON.stringify({ error: "Form not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const subListJson = await ctx.kv.get<string>(`form-submissions:${formId}:list`);
+					const subIds = parseJSON<string[]>(subListJson, []);
+
+					const submissions: FormSubmission[] = [];
+					for (const id of subIds) {
+						const subJson = await ctx.kv.get<string>(`form-submission:${formId}:${id}`);
+						if (subJson) {
+							const sub = parseJSON<FormSubmission>(subJson, null);
+							if (sub) submissions.push(sub);
+						}
+					}
+
+					// Sort by submission date descending
+					submissions.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
+
+					return { submissions, total: submissions.length };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Form submissions error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/** PHASE 4 WAVE 2: Task 9 - Multi-Gateway Schema Support */
+
+		/**
+		 * GET /membership/gateways
+		 * List supported payment gateways.
+		 *
+		 * Returns: { gateways: Array<{ id, name, status, description }> }
+		 */
+		gatewaysList: {
+			public: true,
+			handler: async (_routeCtx: unknown, _ctx: PluginContext) => {
+				return {
+					gateways: [
+						{
+							id: "stripe",
+							name: "Stripe",
+							status: "active",
+							description: "Credit/debit cards via Stripe. Fully integrated with webhooks and subscription management.",
+						},
+						{
+							id: "paypal",
+							name: "PayPal",
+							status: "planned",
+							description: "PayPal payments. Coming soon — webhook structure stubbed for future integration.",
+						},
+						{
+							id: "manual",
+							name: "Manual",
+							status: "active",
+							description: "Admin manually marks members as paid (check, cash, bank transfer, etc.).",
+						},
+					],
+				};
+			},
+		},
+
+		/**
+		 * POST /membership/admin/mark-paid
+		 * Admin manually marks a member as paid via a specific gateway.
+		 *
+		 * Body: { email, gateway?: "stripe" | "paypal" | "manual", notes?: string }
+		 * Returns: { success: true, member: MemberRecord }
+		 */
+		adminMarkPaid: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const email = String(input.email ?? "").trim().toLowerCase();
+					const gateway = String(input.gateway ?? "manual").trim() as "stripe" | "paypal" | "manual";
+					const notes = input.notes ? String(input.notes).trim() : undefined;
+
+					if (!email || !isValidEmail(email)) {
+						throw new Response(
+							JSON.stringify({ error: "Valid email is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const validGateways = ["stripe", "paypal", "manual"];
+					if (!validGateways.includes(gateway)) {
+						throw new Response(
+							JSON.stringify({ error: `Invalid gateway. Valid: ${validGateways.join(", ")}` }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const encodedEmail = emailToKvKey(email);
+					const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
+					if (!memberJson) {
+						throw new Response(
+							JSON.stringify({ error: "Member not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const member = parseJSON<MemberRecord>(memberJson, null);
+					if (!member) {
+						throw new Response(
+							JSON.stringify({ error: "Member not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Mark as active and tag payment method
+					member.status = "active";
+					member.paymentMethod = gateway;
+					member.approvedAt = new Date().toISOString();
+					member.lastSyncAt = new Date().toISOString();
+
+					// Store admin mark-paid log
+					if (notes) {
+						const logKey = `member:${encodedEmail}:payment-log`;
+						const logsJson = await ctx.kv.get<string>(logKey);
+						const logs = parseJSON<Array<{ gateway: string; notes: string; markedAt: string }>>(logsJson, []);
+						logs.push({ gateway, notes, markedAt: new Date().toISOString() });
+						await ctx.kv.set(logKey, JSON.stringify(logs));
+					}
+
+					await updateMember(member, ctx);
+					ctx.log.info(`Admin mark-paid: ${email} via ${gateway}`);
+
+					return { success: true, member };
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Admin mark-paid error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /membership/webhooks/paypal (stub)
+		 * PayPal webhook receiver — stubbed for future implementation.
+		 * Accepts and acknowledges PayPal IPN/webhook payloads.
+		 *
+		 * Returns: { received: true, status: "stub" }
+		 */
+		paypalWebhook: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const rawBody = rc.rawBody as string | undefined;
+
+					if (rawBody) {
+						// Log the payload for future implementation
+						ctx.log.info(`PayPal webhook received (stub): ${rawBody.substring(0, 500)}`);
+					}
+
+					// TODO: Future PayPal implementation will:
+					// 1. Verify PayPal webhook signature
+					// 2. Parse IPN/webhook event type
+					// 3. Handle PAYMENT.SALE.COMPLETED, BILLING.SUBSCRIPTION.CREATED, etc.
+					// 4. Update member records with paymentMethod: "paypal"
+
+					return { received: true, status: "stub", message: "PayPal webhook integration planned — payload logged." };
+				} catch (error) {
+					ctx.log.error(`PayPal webhook stub error: ${String(error)}`);
+					return { received: true, status: "stub" };
+				}
 			},
 		},
 	},
