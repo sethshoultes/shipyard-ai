@@ -1,0 +1,775 @@
+---
+/**
+ * AttendeePortal.astro — Task 8 (Phase 3 Wave 2)
+ *
+ * Attendee portal: my registrations and events.
+ * Shows upcoming registered events with details, past events with badges.
+ *
+ * Features:
+ * - "My Events" — upcoming registrations with event details
+ * - Show past events with "attended" badge
+ * - Show check-in code for upcoming events
+ * - Show ticket type + payment status
+ * - Clean, minimal design
+ * - Fetch from /eventdash/portal API endpoint
+ *
+ * Props from Portable Text block:
+ *   - showCheckInCodes?: boolean (default true)
+ *   - showPastEvents?: boolean (default true)
+ *   - title?: string (custom title, default "My Events")
+ */
+
+interface RegistrationRecord {
+	eventId: string;
+	eventTitle: string;
+	eventDate: string; // ISO date
+	eventTime: string; // HH:MM format
+	eventLocation: string;
+	ticketType?: string;
+	checkInCode?: string;
+	checkedIn?: boolean;
+	checkedInAt?: string; // ISO timestamp
+	paymentStatus?: "pending" | "paid" | "refunded";
+	amountPaid?: number; // In cents
+}
+
+interface PortalData {
+	attendee?: {
+		name?: string;
+		email?: string;
+	};
+	upcomingRegistrations: RegistrationRecord[];
+	pastRegistrations: RegistrationRecord[];
+	lastSync?: string; // ISO date
+}
+
+interface Props {
+	showCheckInCodes?: boolean;
+	showPastEvents?: boolean;
+	title?: string;
+}
+
+const {
+	showCheckInCodes = true,
+	showPastEvents = true,
+	title = "My Events",
+} = Astro.props;
+
+// Get attendee email from cookie
+const attendeeEmail = Astro.cookies.get("eventdash-email")?.value?.toLowerCase() || "";
+
+let portalData: PortalData = {
+	upcomingRegistrations: [],
+	pastRegistrations: [],
+};
+
+let error: string | null = null;
+
+// Fetch portal data from API
+if (attendeeEmail) {
+	try {
+		const response = await fetch(
+			new URL(
+				`/_emdash/api/plugins/eventdash/portal?email=${encodeURIComponent(attendeeEmail)}`,
+				Astro.url.origin
+			),
+			{ credentials: "include" }
+		);
+
+		if (response.ok) {
+			portalData = (await response.json()) as PortalData;
+		} else {
+			error = "Failed to load your events";
+		}
+	} catch (err) {
+		console.error("Portal data fetch error:", err);
+		error = "Error loading your event registrations";
+	}
+}
+
+/**
+ * Format date and time for display
+ */
+function formatDateTime(dateStr: string, timeStr: string): string {
+	try {
+		const [hours, minutes] = timeStr.split(":");
+		const dateObj = new Date(`${dateStr}T${hours}:${minutes}:00Z`);
+		return new Intl.DateTimeFormat("en-US", {
+			weekday: "short",
+			month: "short",
+			day: "numeric",
+			year: "numeric",
+			hour: "numeric",
+			minute: "2-digit",
+			hour12: true,
+		}).format(dateObj);
+	} catch {
+		return `${dateStr} at ${timeStr}`;
+	}
+}
+
+/**
+ * Check if event is in the past
+ */
+function isEventPast(dateStr: string, timeStr: string): boolean {
+	try {
+		const [hours, minutes] = timeStr.split(":");
+		const eventDate = new Date(`${dateStr}T${hours}:${minutes}:00Z`);
+		return eventDate < new Date();
+	} catch {
+		return false;
+	}
+}
+
+/**
+ * Format payment status
+ */
+function formatPaymentStatus(status?: string): string {
+	if (!status) return "Paid";
+	return status === "pending"
+		? "Pending"
+		: status === "refunded"
+			? "Refunded"
+			: "Paid";
+}
+
+/**
+ * Format currency
+ */
+function formatCurrency(cents?: number): string {
+	if (!cents) return "N/A";
+	return new Intl.NumberFormat("en-US", {
+		style: "currency",
+		currency: "USD",
+	}).format(cents / 100);
+}
+
+const upcomingCount = portalData.upcomingRegistrations.length;
+const pastCount = portalData.pastRegistrations.length;
+const totalCount = upcomingCount + pastCount;
+---
+
+<div class="attendee-portal">
+	<!-- Header -->
+	<div class="attendee-portal__header">
+		<h2 class="attendee-portal__title">{title}</h2>
+		{portalData.attendee?.name && (
+			<p class="attendee-portal__welcome">
+				Welcome back, <span class="attendee-portal__name">{portalData.attendee.name}</span>
+			</p>
+		)}
+		{totalCount > 0 && (
+			<p class="attendee-portal__count">
+				You have {totalCount} registered event{totalCount !== 1 ? "s" : ""}
+			</p>
+		)}
+	</div>
+
+	<!-- Error state -->
+	{error && (
+		<div class="attendee-portal__error">
+			<p>{error}</p>
+			<a href="#retry" class="attendee-portal__retry-btn">Retry</a>
+		</div>
+	)}
+
+	<!-- Upcoming events section -->
+	{upcomingCount > 0 ? (
+		<div class="attendee-portal__upcoming-section">
+			<h3 class="attendee-portal__section-title">
+				Upcoming Events ({upcomingCount})
+			</h3>
+			<div class="attendee-portal__events-list">
+				{portalData.upcomingRegistrations.map((reg) => (
+					<div class="attendee-portal__event-card">
+						<div class="attendee-portal__event-header">
+							<div class="attendee-portal__event-info">
+								<h4 class="attendee-portal__event-title">{reg.eventTitle}</h4>
+								<p class="attendee-portal__event-datetime">
+									{formatDateTime(reg.eventDate, reg.eventTime)}
+								</p>
+								<p class="attendee-portal__event-location">{reg.eventLocation}</p>
+							</div>
+
+							<div class="attendee-portal__event-meta">
+								{reg.ticketType && (
+									<span class="attendee-portal__ticket-type">{reg.ticketType}</span>
+								)}
+								{reg.paymentStatus && (
+									<span class={`attendee-portal__payment-status attendee-portal__payment-status--${reg.paymentStatus}`}>
+										{formatPaymentStatus(reg.paymentStatus)}
+									</span>
+								)}
+							</div>
+						</div>
+
+						<!-- Check-in code section -->
+						{showCheckInCodes && reg.checkInCode && (
+							<div class={`attendee-portal__check-in ${reg.checkedIn ? "attendee-portal__check-in--checked" : ""}`}>
+								{reg.checkedIn ? (
+									<>
+										<p class="attendee-portal__check-in-status">
+											✓ Checked in {reg.checkedInAt ? `on ${new Date(reg.checkedInAt).toLocaleDateString()}` : ""}
+										</p>
+									</>
+								) : (
+									<>
+										<p class="attendee-portal__check-in-label">Check-in Code:</p>
+										<code class="attendee-portal__check-in-code">{reg.checkInCode}</code>
+										<p class="attendee-portal__check-in-hint">Show this code at the entrance</p>
+									</>
+								)}
+							</div>
+						)}
+
+						<!-- Additional details -->
+						{reg.amountPaid && (
+							<p class="attendee-portal__event-amount">
+								Amount paid: {formatCurrency(reg.amountPaid)}
+							</p>
+						)}
+
+						<!-- Actions -->
+						<div class="attendee-portal__event-actions">
+							<a
+								href={`/events/${reg.eventId}`}
+								class="attendee-portal__event-link"
+							>
+								View Details →
+							</a>
+							{reg.ticketType && (
+								<button
+									class="attendee-portal__event-ical"
+									data-event-id={reg.eventId}
+									data-event-date={reg.eventDate}
+									data-event-time={reg.eventTime}
+									data-event-title={reg.eventTitle}
+									data-event-location={reg.eventLocation}
+								>
+									Add to Calendar
+								</button>
+							)}
+						</div>
+					</div>
+				))}
+			</div>
+		</div>
+	) : (
+		<div class="attendee-portal__empty">
+			<p>No upcoming events. <a href="/events">Browse events</a> to register.</p>
+		</div>
+	)}
+
+	<!-- Past events section -->
+	{showPastEvents && pastCount > 0 && (
+		<div class="attendee-portal__past-section">
+			<h3 class="attendee-portal__section-title">
+				Past Events ({pastCount})
+			</h3>
+			<div class="attendee-portal__past-list">
+				{portalData.pastRegistrations.map((reg) => (
+					<div class="attendee-portal__past-event">
+						<div class="attendee-portal__past-event-header">
+							<div>
+								<h4 class="attendee-portal__past-event-title">{reg.eventTitle}</h4>
+								<p class="attendee-portal__past-event-date">
+									{formatDateTime(reg.eventDate, reg.eventTime)}
+								</p>
+							</div>
+
+							{reg.checkedIn && (
+								<span class="attendee-portal__attended-badge">✓ Attended</span>
+							)}
+						</div>
+
+						{reg.eventLocation && (
+							<p class="attendee-portal__past-event-location">{reg.eventLocation}</p>
+						)}
+					</div>
+				))}
+			</div>
+		</div>
+	)}
+
+	<!-- Footer with last sync info -->
+	{portalData.lastSync && (
+		<div class="attendee-portal__footer">
+			<p class="attendee-portal__last-sync">
+				Last updated: {new Date(portalData.lastSync).toLocaleString()}
+			</p>
+		</div>
+	)}
+</div>
+
+<script>
+	/**
+	 * Handle "Add to Calendar" button clicks
+	 * Creates ICS file and triggers download
+	 */
+	document.addEventListener("click", (e: Event) => {
+		const target = e.target as HTMLElement;
+
+		if (target.classList.contains("attendee-portal__event-ical")) {
+			const eventId = target.dataset.eventId || "";
+			const eventDate = target.dataset.eventDate || "";
+			const eventTime = target.dataset.eventTime || "";
+			const eventTitle = target.dataset.eventTitle || "";
+			const eventLocation = target.dataset.eventLocation || "";
+
+			if (!eventDate || !eventTime || !eventTitle) return;
+
+			// Parse date and time
+			const [hours, minutes] = eventTime.split(":");
+			const eventDateTime = new Date(`${eventDate}T${hours}:${minutes}:00Z`);
+
+			// Create iCal event
+			const icsContent = createICS(eventDateTime, eventTitle, eventLocation);
+
+			// Create blob and download
+			const blob = new Blob([icsContent], { type: "text/calendar" });
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+			link.download = `${eventTitle.replace(/\s+/g, "-")}.ics`;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			URL.revokeObjectURL(url);
+		}
+	});
+
+	/**
+	 * Generate iCal (ICS) format string for an event
+	 */
+	function createICS(
+		eventDate: Date,
+		eventTitle: string,
+		eventLocation: string
+	): string {
+		const now = new Date();
+
+		// Format dates in iCal format (YYYYMMDDTHHMMSSZ)
+		const formatICSDate = (date: Date) => {
+			return (
+				date.getUTCFullYear() +
+				String(date.getUTCMonth() + 1).padStart(2, "0") +
+				String(date.getUTCDate()).padStart(2, "0") +
+				"T" +
+				String(date.getUTCHours()).padStart(2, "0") +
+				String(date.getUTCMinutes()).padStart(2, "0") +
+				String(date.getUTCSeconds()).padStart(2, "0") +
+				"Z"
+			);
+		};
+
+		const startTime = formatICSDate(eventDate);
+		const endTime = formatICSDate(new Date(eventDate.getTime() + 60 * 60 * 1000)); // +1 hour
+		const createdTime = formatICSDate(now);
+		const uid = `event-${Date.now()}@events.local`;
+
+		return (
+			`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Events//Events//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:${uid}
+DTSTAMP:${createdTime}
+DTSTART:${startTime}
+DTEND:${endTime}
+SUMMARY:${eventTitle}
+LOCATION:${eventLocation || "TBD"}
+STATUS:CONFIRMED
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR`.trim()
+		);
+	}
+</script>
+
+<style>
+	.attendee-portal {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+	}
+
+	/* Header */
+	.attendee-portal__header {
+		border-bottom: 2px solid #c4704b;
+		padding-bottom: 1rem;
+	}
+
+	.attendee-portal__title {
+		margin: 0 0 0.5rem 0;
+		font-size: 1.75rem;
+		color: #2c2c2c;
+		font-family: Lora, serif;
+		font-weight: 600;
+	}
+
+	.attendee-portal__welcome {
+		margin: 0 0 0.25rem 0;
+		font-size: 0.95rem;
+		color: #666;
+	}
+
+	.attendee-portal__name {
+		font-weight: 600;
+		color: #c4704b;
+	}
+
+	.attendee-portal__count {
+		margin: 0;
+		font-size: 0.85rem;
+		color: #999;
+	}
+
+	/* Error state */
+	.attendee-portal__error {
+		padding: 1.5rem;
+		background-color: #ffebee;
+		border: 1px solid #ef5350;
+		border-radius: 0.5rem;
+		text-align: center;
+	}
+
+	.attendee-portal__error p {
+		margin: 0 0 0.75rem 0;
+		color: #c62828;
+		font-weight: 500;
+	}
+
+	.attendee-portal__retry-btn {
+		display: inline-block;
+		padding: 0.5rem 1rem;
+		background-color: #c62828;
+		color: white;
+		text-decoration: none;
+		border-radius: 0.25rem;
+		font-weight: 500;
+		transition: background-color 0.2s;
+	}
+
+	.attendee-portal__retry-btn:hover {
+		background-color: #b71c1c;
+	}
+
+	/* Section title */
+	.attendee-portal__section-title {
+		margin: 0;
+		font-size: 1.2rem;
+		color: #2c2c2c;
+		font-family: Lora, serif;
+		font-weight: 600;
+	}
+
+	/* Events list */
+	.attendee-portal__events-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.attendee-portal__event-card {
+		padding: 1.5rem;
+		border: 1px solid #e0e0e0;
+		border-radius: 0.5rem;
+		background-color: white;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		transition: box-shadow 0.2s;
+	}
+
+	.attendee-portal__event-card:hover {
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.attendee-portal__event-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: start;
+		gap: 1rem;
+	}
+
+	.attendee-portal__event-info {
+		flex: 1;
+	}
+
+	.attendee-portal__event-title {
+		margin: 0 0 0.25rem 0;
+		font-size: 1.1rem;
+		color: #2c2c2c;
+		font-weight: 600;
+	}
+
+	.attendee-portal__event-datetime {
+		margin: 0 0 0.25rem 0;
+		font-size: 0.9rem;
+		color: #666;
+		font-weight: 500;
+	}
+
+	.attendee-portal__event-location {
+		margin: 0;
+		font-size: 0.85rem;
+		color: #999;
+	}
+
+	.attendee-portal__event-meta {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		align-items: flex-end;
+	}
+
+	.attendee-portal__ticket-type {
+		padding: 0.25rem 0.75rem;
+		background-color: #e8f5e9;
+		color: #2e7d32;
+		border-radius: 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.attendee-portal__payment-status {
+		padding: 0.25rem 0.75rem;
+		border-radius: 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.attendee-portal__payment-status--paid {
+		background-color: #e8f5e9;
+		color: #2e7d32;
+	}
+
+	.attendee-portal__payment-status--pending {
+		background-color: #fff3e0;
+		color: #f57c00;
+	}
+
+	.attendee-portal__payment-status--refunded {
+		background-color: #ffebee;
+		color: #c62828;
+	}
+
+	/* Check-in section */
+	.attendee-portal__check-in {
+		padding: 1rem;
+		background-color: #f5f5f5;
+		border-radius: 0.5rem;
+		text-align: center;
+	}
+
+	.attendee-portal__check-in--checked {
+		background-color: #e8f5e9;
+	}
+
+	.attendee-portal__check-in-label {
+		margin: 0 0 0.5rem 0;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: #666;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.attendee-portal__check-in-code {
+		display: block;
+		padding: 1rem;
+		background-color: white;
+		border: 2px solid #c4704b;
+		border-radius: 0.25rem;
+		font-family: monospace;
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: #c4704b;
+		letter-spacing: 0.1em;
+		margin: 0 0 0.5rem 0;
+	}
+
+	.attendee-portal__check-in-hint {
+		margin: 0;
+		font-size: 0.8rem;
+		color: #666;
+		font-style: italic;
+	}
+
+	.attendee-portal__check-in-status {
+		margin: 0;
+		font-size: 0.95rem;
+		color: #2e7d32;
+		font-weight: 600;
+	}
+
+	.attendee-portal__event-amount {
+		margin: 0;
+		font-size: 0.9rem;
+		color: #666;
+		font-weight: 500;
+	}
+
+	/* Event actions */
+	.attendee-portal__event-actions {
+		display: flex;
+		gap: 0.75rem;
+	}
+
+	.attendee-portal__event-link,
+	.attendee-portal__event-ical {
+		flex: 1;
+		padding: 0.5rem 0.75rem;
+		background-color: #c4704b;
+		color: white;
+		text-decoration: none;
+		border: none;
+		border-radius: 0.25rem;
+		font-weight: 500;
+		font-size: 0.85rem;
+		text-align: center;
+		cursor: pointer;
+		transition: background-color 0.2s;
+		font-family: inherit;
+	}
+
+	.attendee-portal__event-link:hover,
+	.attendee-portal__event-ical:hover {
+		background-color: #b55939;
+	}
+
+	.attendee-portal__event-ical {
+		background-color: #7a8b6f;
+	}
+
+	.attendee-portal__event-ical:hover {
+		background-color: #6a7a5f;
+	}
+
+	/* Past events section */
+	.attendee-portal__past-section {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding: 1.5rem;
+		background-color: #fafafa;
+		border-radius: 0.5rem;
+	}
+
+	.attendee-portal__past-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.attendee-portal__past-event {
+		padding: 1rem;
+		background-color: white;
+		border: 1px solid #e0e0e0;
+		border-radius: 0.25rem;
+	}
+
+	.attendee-portal__past-event-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: start;
+		gap: 1rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.attendee-portal__past-event-title {
+		margin: 0 0 0.25rem 0;
+		font-size: 1rem;
+		color: #2c2c2c;
+		font-weight: 600;
+	}
+
+	.attendee-portal__past-event-date {
+		margin: 0;
+		font-size: 0.85rem;
+		color: #999;
+	}
+
+	.attendee-portal__past-event-location {
+		margin: 0;
+		font-size: 0.85rem;
+		color: #999;
+	}
+
+	.attendee-portal__attended-badge {
+		padding: 0.25rem 0.75rem;
+		background-color: #e8f5e9;
+		color: #2e7d32;
+		border-radius: 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		white-space: nowrap;
+	}
+
+	/* Empty state */
+	.attendee-portal__empty {
+		text-align: center;
+		padding: 2rem;
+		color: #999;
+	}
+
+	.attendee-portal__empty a {
+		color: #c4704b;
+		text-decoration: none;
+		font-weight: 600;
+	}
+
+	.attendee-portal__empty a:hover {
+		text-decoration: underline;
+	}
+
+	/* Footer */
+	.attendee-portal__footer {
+		padding: 1rem 0;
+		border-top: 1px solid #e0e0e0;
+		text-align: center;
+	}
+
+	.attendee-portal__last-sync {
+		margin: 0;
+		font-size: 0.8rem;
+		color: #999;
+	}
+
+	/* Mobile responsive */
+	@media (max-width: 768px) {
+		.attendee-portal {
+			gap: 1.5rem;
+		}
+
+		.attendee-portal__title {
+			font-size: 1.5rem;
+		}
+
+		.attendee-portal__event-header {
+			flex-direction: column;
+		}
+
+		.attendee-portal__event-meta {
+			flex-direction: row;
+			align-items: center;
+		}
+
+		.attendee-portal__event-actions {
+			flex-direction: column;
+		}
+
+		.attendee-portal__past-event-header {
+			flex-direction: column;
+			align-items: start;
+		}
+	}
+</style>

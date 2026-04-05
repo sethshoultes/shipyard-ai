@@ -1,22 +1,31 @@
 ---
 /**
- * GatedContent.astro
+ * GatedContent.astro — Task 5 (Phase 3 Wave 2)
  *
- * Renders gated content visible only to active members.
- * Checks member status via email cookie and membership API.
+ * Content gating at the Portable Text block level.
+ * Uses the gating engine (src/gating.ts) to check member access.
+ *
+ * Features:
+ * - Membership plan checks (is member's plan in the required list?)
+ * - Drip content checks (is content unlocked yet?)
+ * - Visual badges ("Members Only" or "Premium")
+ * - Shows teaser + unlock date for locked drip content
+ * - Shows full content for members with access
  *
  * Props from Portable Text block:
- *   - requiredPlan?: string (optional plan ID requirement)
- *   - fallbackMessage?: string (message for non-members)
- *   - children?: any (content to render if access granted)
+ *   - gatingRuleId?: string (reference to gating rule in KV)
+ *   - badge?: "default" | "premium" | "members-only" (visual style)
+ *   - teaser?: string (preview text for locked content)
+ *   - children?: any (full content if access granted)
  */
 
 import { PortableText } from "emdash/ui";
 
 interface Props {
 	node: {
-		requiredPlan?: string;
-		fallbackMessage?: string;
+		gatingRuleId?: string;
+		badge?: "default" | "premium" | "members-only";
+		teaser?: string;
 		_rawChildren?: unknown;
 	};
 	children?: any;
@@ -26,71 +35,187 @@ const { node, children } = Astro.props;
 
 // Get member email from cookie
 const memberEmail = Astro.cookies.get("membership-email")?.value?.toLowerCase() || "";
+const memberId = Astro.cookies.get("membership-id")?.value || "";
 
-let hasAccess = false;
-let memberPlan: string | undefined;
+interface AccessCheckResult {
+	hasAccess: boolean;
+	reason?: string;
+	unlocksOn?: string; // ISO date string
+	daysRemaining?: number;
+	requiredPlan?: string;
+}
 
-// Check membership status via API if email is available
-if (memberEmail) {
+let accessResult: AccessCheckResult = { hasAccess: true }; // Default: public content
+let badgeText = "";
+let lockedMessage = "";
+
+// If gatingRuleId is provided, check access via API
+if (node.gatingRuleId && memberEmail && memberId) {
 	try {
 		const response = await fetch(
 			new URL(
-				`/_emdash/api/plugins/membership/status?email=${encodeURIComponent(memberEmail)}`,
+				`/_emdash/api/plugins/membership/check-access?email=${encodeURIComponent(memberEmail)}&gatingRuleId=${encodeURIComponent(node.gatingRuleId)}`,
 				Astro.url.origin
 			),
 			{ credentials: "include" }
 		);
 
 		if (response.ok) {
-			const data = (await response.json()) as {
-				active?: boolean;
-				plan?: string;
-			};
-			hasAccess = data.active === true;
-			memberPlan = data.plan;
+			accessResult = (await response.json()) as AccessCheckResult;
+		} else {
+			// API error — deny access for safety
+			accessResult = { hasAccess: false, reason: "Unable to verify access" };
 		}
 	} catch (error) {
-		// If API call fails, deny access for safety
-		console.error("Failed to check membership status:", error);
+		console.error("Failed to check gating access:", error);
+		accessResult = { hasAccess: false, reason: "Error checking access" };
 	}
 }
 
-// If a specific plan is required, check membership matches
-if (hasAccess && node.requiredPlan && memberPlan !== node.requiredPlan) {
-	hasAccess = false;
+// Determine badge text based on gating rule type
+if (!accessResult.hasAccess) {
+	if (accessResult.reason?.includes("unlocks in")) {
+		// Drip content locked
+		badgeText = "Coming Soon";
+		if (accessResult.daysRemaining && accessResult.daysRemaining > 0) {
+			lockedMessage = `Unlocks in ${accessResult.daysRemaining} day${accessResult.daysRemaining !== 1 ? "s" : ""}`;
+		} else if (accessResult.unlocksOn) {
+			const unlockDate = new Date(accessResult.unlocksOn);
+			lockedMessage = `Unlocks on ${unlockDate.toLocaleDateString()}`;
+		}
+	} else {
+		// Membership requirement
+		badgeText = node.badge === "premium" ? "Premium" : "Members Only";
+		lockedMessage = node.teaser || "This content is available to members. Subscribe to access.";
+	}
+} else {
+	// Show badge for premium/members-only content even when accessible
+	if (node.badge === "premium") {
+		badgeText = "Premium";
+	} else if (node.badge === "members-only") {
+		badgeText = "Members Only";
+	}
 }
 
-const fallbackMessage = node.fallbackMessage || "This content is for members only. Please subscribe to access.";
+const showBadge = badgeText.length > 0 && node.badge !== "default";
+const teaserText = node.teaser || "This content is exclusive to members. Upgrade to access.";
 ---
 
-{
-	hasAccess ? (
-		<div class="gated-content">
+<div class={`gated-content ${accessResult.hasAccess ? "gated-content--unlocked" : "gated-content--locked"}`}>
+	{showBadge && (
+		<div class={`gated-content__badge gated-content__badge--${node.badge}`}>
+			{badgeText}
+		</div>
+	)}
+
+	{accessResult.hasAccess ? (
+		<div class="gated-content__inner">
 			{children}
 		</div>
 	) : (
-		<div class="gated-content-fallback">
-			<p>{fallbackMessage}</p>
+		<div class="gated-content__fallback">
+			{node.teaser ? (
+				<p class="gated-content__teaser">{node.teaser}</p>
+			) : (
+				<p class="gated-content__message">{lockedMessage || teaserText}</p>
+			)}
+
+			{accessResult.unlocksOn && (
+				<p class="gated-content__unlock-date">
+					{lockedMessage}
+				</p>
+			)}
+
+			<a href="/members/portal#upgrade" class="gated-content__cta">
+				{accessResult.requiredPlan ? `Upgrade to access` : "View membership options"}
+			</a>
 		</div>
-	)
-}
+	)}
+</div>
 
 <style>
 	.gated-content {
-		/* Content is rendered normally */
+		position: relative;
 	}
 
-	.gated-content-fallback {
-		padding: 1rem;
-		border: 1px solid #ddd;
-		border-radius: 4px;
-		background-color: #f9f9f9;
-		color: #666;
+	.gated-content__inner {
+		/* Content rendered normally */
+	}
+
+	/* Locked state styling */
+	.gated-content--locked {
+		position: relative;
+	}
+
+	.gated-content__fallback {
+		padding: 1.5rem;
+		border: 1px solid #e0e0e0;
+		border-radius: 0.5rem;
+		background: linear-gradient(135deg, #f5f5f5 0%, #f9f9f9 100%);
 		text-align: center;
+		color: #555;
 	}
 
-	.gated-content-fallback p {
-		margin: 0;
+	.gated-content__message,
+	.gated-content__teaser {
+		margin: 0 0 1rem 0;
 		font-size: 0.95rem;
+		line-height: 1.5;
+	}
+
+	.gated-content__teaser {
+		color: #666;
+		font-style: italic;
+	}
+
+	.gated-content__unlock-date {
+		margin: 0.5rem 0 1rem 0;
+		font-size: 0.85rem;
+		color: #999;
+	}
+
+	.gated-content__cta {
+		display: inline-block;
+		padding: 0.75rem 1.5rem;
+		background-color: #c4704b; /* Terracotta primary */
+		color: white;
+		text-decoration: none;
+		border-radius: 0.25rem;
+		font-weight: 500;
+		transition: background-color 0.2s ease;
+	}
+
+	.gated-content__cta:hover {
+		background-color: #b55939;
+	}
+
+	/* Badge styling */
+	.gated-content__badge {
+		display: inline-block;
+		position: absolute;
+		top: -0.5rem;
+		right: 0;
+		padding: 0.25rem 0.75rem;
+		border-radius: 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		z-index: 10;
+	}
+
+	.gated-content__badge--premium {
+		background-color: #d4a853; /* Gold accent */
+		color: #2c2c2c;
+	}
+
+	.gated-content__badge--members-only {
+		background-color: #7a8b6f; /* Sage secondary */
+		color: white;
+	}
+
+	/* Unlocked state (show badge if present) */
+	.gated-content--unlocked .gated-content__badge {
+		top: 0;
 	}
 </style>
