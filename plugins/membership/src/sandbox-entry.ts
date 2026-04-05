@@ -1277,6 +1277,374 @@ export default definePlugin({
 		},
 
 		/**
+		 * POST /membership/checkout/create
+		 * Create a Stripe Checkout Session for a membership plan.
+		 *
+		 * Expects: { email: string, plan: string }
+		 * Returns: { checkoutUrl: string, sessionId: string }
+		 */
+		checkoutCreate: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const email = String(input.email ?? "").trim().toLowerCase();
+					const planId = String(input.plan ?? "").trim();
+					const stripeApiKey = (ctx as any).env?.STRIPE_API_SECRET as string | undefined;
+					const successUrl = String(input.successUrl ?? "").trim() || "http://localhost:3000/membership/checkout/success?session_id={CHECKOUT_SESSION_ID}";
+					const cancelUrl = String(input.cancelUrl ?? "").trim() || "http://localhost:3000/membership";
+
+					// Validate inputs
+					if (!email) {
+						throw new Response(
+							JSON.stringify({ error: "Email is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!isValidEmail(email)) {
+						throw new Response(
+							JSON.stringify({ error: "Invalid email format" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!planId) {
+						throw new Response(
+							JSON.stringify({ error: "Plan is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!stripeApiKey) {
+						ctx.log.error("Stripe API key not configured");
+						throw new Response(
+							JSON.stringify({ error: "Payment processing not available" }),
+							{ status: 500, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get plans
+					const plansJson = await ctx.kv.get<string>("plans");
+					const plans = parseJSON(plansJson, DEFAULT_PLANS);
+
+					const selectedPlan = plans.find(
+						(p: PlanConfig) => p.id === planId
+					);
+
+					if (!selectedPlan) {
+						throw new Response(
+							JSON.stringify({ error: "Plan not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Reject free plans
+					if (selectedPlan.price <= 0) {
+						throw new Response(
+							JSON.stringify({ error: "Free plans cannot be purchased" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Look up or create member first
+					const encodedEmail = emailToKvKey(email);
+					let member = parseJSON<MemberRecord | null>(
+						await ctx.kv.get<string>(`member:${encodedEmail}`),
+						null
+					);
+
+					if (!member) {
+						// Create new member
+						member = {
+							email,
+							plan: planId,
+							status: "pending",
+							createdAt: new Date().toISOString(),
+						};
+					}
+
+					// Create Stripe customer if not already created
+					let stripeCustomerId = member.stripeCustomerId;
+					if (!stripeCustomerId) {
+						// Create customer via Stripe API
+						const customerFormData = new URLSearchParams();
+						customerFormData.append("email", email);
+						customerFormData.append("metadata[email]", email);
+
+						const customerRes = await fetch(
+							"https://api.stripe.com/v1/customers",
+							{
+								method: "POST",
+								headers: {
+									"Authorization": `Bearer ${stripeApiKey}`,
+									"Content-Type": "application/x-www-form-urlencoded",
+								},
+								body: customerFormData.toString(),
+							}
+						);
+
+						if (!customerRes.ok) {
+							const errorData = await customerRes.text();
+							ctx.log.error(`Stripe customer creation failed: ${errorData}`);
+							throw new Response(
+								JSON.stringify({ error: "Failed to create Stripe customer" }),
+								{ status: 500, headers: { "Content-Type": "application/json" } }
+							);
+						}
+
+						const customerData = await customerRes.json() as Record<string, any>;
+						stripeCustomerId = String(customerData.id ?? "");
+
+						if (!stripeCustomerId) {
+							throw new Response(
+								JSON.stringify({ error: "Failed to get Stripe customer ID" }),
+								{ status: 500, headers: { "Content-Type": "application/json" } }
+							);
+						}
+
+						member.stripeCustomerId = stripeCustomerId;
+						await updateMember(member, ctx);
+					}
+
+					// Create Checkout Session via Stripe API
+					const checkoutFormData = new URLSearchParams();
+					checkoutFormData.append("mode", "subscription");
+					checkoutFormData.append("customer", stripeCustomerId);
+					checkoutFormData.append("customer_email", email);
+					checkoutFormData.append("line_items[0][price]", selectedPlan.id); // Assuming plan.id is the Stripe price ID
+					checkoutFormData.append("success_url", successUrl);
+					checkoutFormData.append("cancel_url", cancelUrl);
+
+					const checkoutRes = await fetch(
+						"https://api.stripe.com/v1/checkout/sessions",
+						{
+							method: "POST",
+							headers: {
+								"Authorization": `Bearer ${stripeApiKey}`,
+								"Content-Type": "application/x-www-form-urlencoded",
+							},
+							body: checkoutFormData.toString(),
+						}
+					);
+
+					if (!checkoutRes.ok) {
+						const errorData = await checkoutRes.text();
+						ctx.log.error(`Stripe checkout session creation failed: ${errorData}`);
+						throw new Response(
+							JSON.stringify({ error: "Failed to create checkout session" }),
+							{ status: 500, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const sessionData = await checkoutRes.json() as Record<string, any>;
+					const sessionId = String(sessionData.id ?? "");
+					const checkoutUrl = String(sessionData.url ?? "");
+
+					if (!sessionId || !checkoutUrl) {
+						throw new Response(
+							JSON.stringify({ error: "Invalid Stripe session response" }),
+							{ status: 500, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Store session ID in KV with 24h TTL for success route to retrieve
+					await (ctx.kv as any).set(
+						`checkout:${sessionId}`,
+						JSON.stringify({ email, planId, stripeCustomerId, createdAt: new Date().toISOString() }),
+						{ ex: 86400 }
+					);
+
+					return {
+						checkoutUrl,
+						sessionId,
+					};
+				} catch (error) {
+					if (error instanceof Response) {
+						throw error;
+					}
+					ctx.log.error(`Checkout create error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to create checkout session" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /membership/checkout/success
+		 * Handle successful Stripe Checkout Session completion.
+		 *
+		 * Query params: session_id (from Stripe redirect)
+		 * Returns: { success: true, redirectUrl: string }
+		 */
+		checkoutSuccess: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const query = (rc.query as Record<string, string>) || {};
+					const sessionId = String(query.session_id ?? "").trim();
+					const stripeApiKey = (ctx as any).env?.STRIPE_API_SECRET as string | undefined;
+					const jwtSecret = (ctx as any).env?.JWT_SECRET as string | undefined;
+
+					if (!sessionId) {
+						throw new Response(
+							JSON.stringify({ error: "Session ID is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!stripeApiKey) {
+						ctx.log.error("Stripe API key not configured");
+						throw new Response(
+							JSON.stringify({ error: "Payment processing not available" }),
+							{ status: 500, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Retrieve session from Stripe API (expand subscription)
+					const sessionRes = await fetch(
+						`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}?expand=subscription`,
+						{
+							method: "GET",
+							headers: {
+								"Authorization": `Bearer ${stripeApiKey}`,
+							},
+						}
+					);
+
+					if (!sessionRes.ok) {
+						const errorData = await sessionRes.text();
+						ctx.log.error(`Stripe session retrieval failed: ${errorData}`);
+						throw new Response(
+							JSON.stringify({ error: "Failed to retrieve checkout session" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const sessionData = await sessionRes.json() as Record<string, any>;
+					const customerEmail = String(sessionData.customer_email ?? "");
+					const subscription = sessionData.subscription as Record<string, any> | string | undefined;
+
+					if (!customerEmail) {
+						throw new Response(
+							JSON.stringify({ error: "Customer email not found in session" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!subscription) {
+						throw new Response(
+							JSON.stringify({ error: "Subscription not found in session" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Extract subscription ID
+					const subscriptionId = typeof subscription === "string"
+						? subscription
+						: String(subscription.id ?? "");
+
+					if (!subscriptionId) {
+						throw new Response(
+							JSON.stringify({ error: "Invalid subscription data" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get subscription details to extract period end
+					let currentPeriodEnd: string | undefined;
+					if (typeof subscription === "object" && subscription.current_period_end) {
+						currentPeriodEnd = new Date(
+							(subscription.current_period_end as number) * 1000
+						).toISOString();
+					}
+
+					// Update member in KV
+					const encodedEmail = emailToKvKey(customerEmail);
+					let member = parseJSON<MemberRecord | null>(
+						await ctx.kv.get<string>(`member:${encodedEmail}`),
+						null
+					);
+
+					if (!member) {
+						// Fallback: look up in checkout temp storage
+						const checkoutData = parseJSON<any>(
+							await ctx.kv.get<string>(`checkout:${sessionId}`),
+							null
+						);
+
+						if (checkoutData) {
+							member = {
+								email: customerEmail,
+								plan: checkoutData.planId,
+								status: "active",
+								createdAt: new Date().toISOString(),
+								stripeCustomerId: checkoutData.stripeCustomerId,
+							};
+						} else {
+							throw new Response(
+								JSON.stringify({ error: "Member not found" }),
+								{ status: 404, headers: { "Content-Type": "application/json" } }
+							);
+						}
+					}
+
+					// Update member with subscription info
+					member.stripeSubscriptionId = subscriptionId;
+					member.status = "active";
+					if (currentPeriodEnd) {
+						member.currentPeriodEnd = currentPeriodEnd;
+						member.expiresAt = currentPeriodEnd;
+					}
+					member.lastSyncAt = new Date().toISOString();
+
+					await updateMember(member, ctx);
+
+					// Create JWT token for authentication
+					let authCookie = "";
+					if (jwtSecret) {
+						try {
+							const token = await signJWT(
+								await createPayload(15 * 60, "access"),
+								jwtSecret
+							);
+							authCookie = `Authorization=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Strict`;
+						} catch (error) {
+							ctx.log.warn(`Failed to create JWT token: ${String(error)}`);
+						}
+					}
+
+					// Log success
+					ctx.log.info(
+						`Checkout success for ${customerEmail}: subscription ${subscriptionId}`
+					);
+
+					// Return redirect URL
+					const redirectUrl = "/membership/dashboard?status=subscribed";
+
+					return {
+						success: true,
+						redirectUrl,
+						...(authCookie && { cookie: authCookie }),
+					};
+				} catch (error) {
+					if (error instanceof Response) {
+						throw error;
+					}
+					ctx.log.error(`Checkout success error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to process checkout completion" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
 		 * GET /membership/dashboard
 		 * Get member dashboard data (subscription details).
 		 *
