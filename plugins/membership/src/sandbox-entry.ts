@@ -85,6 +85,363 @@ function emailToKvKey(email: string): string {
 }
 
 /**
+ * Utility: Verify Stripe webhook signature using HMAC-SHA256
+ */
+async function verifyStripeSignature(
+	payload: string,
+	signature: string,
+	secret: string
+): Promise<boolean> {
+	try {
+		const parts = signature.split(",");
+		const timestamp = parts.find((p) => p.startsWith("t="))?.slice(2);
+		const v1 = parts.find((p) => p.startsWith("v1="))?.slice(3);
+
+		if (!timestamp || !v1) return false;
+
+		const signedPayload = `${timestamp}.${payload}`;
+
+		// Import HMAC key
+		const key = await crypto.subtle.importKey(
+			"raw",
+			new TextEncoder().encode(secret),
+			{ name: "HMAC", hash: "SHA-256" },
+			false,
+			["sign"]
+		);
+
+		// Sign the payload
+		const sig = await crypto.subtle.sign(
+			"HMAC",
+			key,
+			new TextEncoder().encode(signedPayload)
+		);
+
+		// Convert signature to hex
+		const expected = Array.from(new Uint8Array(sig))
+			.map((b) => b.toString(16).padStart(2, "0"))
+			.join("");
+
+		return expected === v1;
+	} catch (error) {
+		return false;
+	}
+}
+
+/**
+ * Utility: Look up member by Stripe customer ID
+ */
+async function getMemberByStripeCustomerId(
+	customerId: string,
+	ctx: PluginContext
+): Promise<MemberRecord | null> {
+	try {
+		// Get members list and search
+		const listJson = await ctx.kv.get<string>("members:list");
+		const memberEmails = parseJSON<string[]>(listJson, []);
+
+		for (const encodedEmail of memberEmails) {
+			const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
+			if (memberJson) {
+				const member = parseJSON<MemberRecord>(memberJson, null);
+				if (member && member.stripeCustomerId === customerId) {
+					return member;
+				}
+			}
+		}
+		return null;
+	} catch (error) {
+		ctx.log.error(`Failed to lookup member by customerId: ${String(error)}`);
+		return null;
+	}
+}
+
+/**
+ * Utility: Update member record in KV
+ */
+async function updateMember(
+	member: MemberRecord,
+	ctx: PluginContext
+): Promise<void> {
+	const encodedEmail = emailToKvKey(member.email);
+	await ctx.kv.set(`member:${encodedEmail}`, JSON.stringify(member));
+}
+
+/**
+ * Webhook handler: customer.subscription.created
+ */
+async function handleSubscriptionCreated(
+	subscription: Record<string, unknown>,
+	ctx: PluginContext
+): Promise<void> {
+	try {
+		const customerId = String(subscription.customer ?? "");
+		const subscriptionId = String(subscription.id ?? "");
+		const status = String(subscription.status ?? "");
+		const currentPeriodEnd = subscription.current_period_end as number | undefined;
+
+		if (!customerId || !subscriptionId) return;
+
+		const member = await getMemberByStripeCustomerId(customerId, ctx);
+		if (!member) {
+			ctx.log.warn(`Member not found for customer ${customerId}`);
+			return;
+		}
+
+		// Update member
+		member.stripeSubscriptionId = subscriptionId;
+		member.lastSyncAt = new Date().toISOString();
+
+		if (status === "active" || status === "trialing") {
+			member.status = "active";
+		}
+
+		if (currentPeriodEnd) {
+			member.currentPeriodEnd = new Date(currentPeriodEnd * 1000).toISOString();
+			member.expiresAt = member.currentPeriodEnd;
+		}
+
+		await updateMember(member, ctx);
+		ctx.log.info(
+			`Subscription created for ${member.email}: ${subscriptionId}`
+		);
+
+		// Send welcome email (async, don't fail webhook)
+		sendWelcomeEmail(member, ctx).catch((err) =>
+			ctx.log.warn(`Email send failed: ${String(err)}`)
+		);
+	} catch (error) {
+		ctx.log.error(`handleSubscriptionCreated error: ${String(error)}`);
+	}
+}
+
+/**
+ * Webhook handler: customer.subscription.updated
+ */
+async function handleSubscriptionUpdated(
+	subscription: Record<string, unknown>,
+	ctx: PluginContext
+): Promise<void> {
+	try {
+		const customerId = String(subscription.customer ?? "");
+		const subscriptionId = String(subscription.id ?? "");
+		const currentPeriodEnd = subscription.current_period_end as number | undefined;
+
+		if (!customerId || !subscriptionId) return;
+
+		const member = await getMemberByStripeCustomerId(customerId, ctx);
+		if (!member) {
+			ctx.log.warn(`Member not found for customer ${customerId}`);
+			return;
+		}
+
+		// Update period end if changed
+		if (currentPeriodEnd) {
+			const newExpiryDate = new Date(currentPeriodEnd * 1000).toISOString();
+			if (newExpiryDate !== member.currentPeriodEnd) {
+				member.currentPeriodEnd = newExpiryDate;
+				member.expiresAt = newExpiryDate;
+				member.lastSyncAt = new Date().toISOString();
+
+				await updateMember(member, ctx);
+				ctx.log.info(
+					`Subscription updated for ${member.email}: renewal ${newExpiryDate}`
+				);
+
+				// Send update email
+				sendUpdateEmail(member, ctx).catch((err) =>
+					ctx.log.warn(`Email send failed: ${String(err)}`)
+				);
+			}
+		}
+	} catch (error) {
+		ctx.log.error(`handleSubscriptionUpdated error: ${String(error)}`);
+	}
+}
+
+/**
+ * Webhook handler: customer.subscription.deleted
+ */
+async function handleSubscriptionDeleted(
+	subscription: Record<string, unknown>,
+	ctx: PluginContext
+): Promise<void> {
+	try {
+		const customerId = String(subscription.customer ?? "");
+		const subscriptionId = String(subscription.id ?? "");
+
+		if (!customerId) return;
+
+		const member = await getMemberByStripeCustomerId(customerId, ctx);
+		if (!member) {
+			ctx.log.warn(`Member not found for customer ${customerId}`);
+			return;
+		}
+
+		member.status = "cancelled";
+		member.stripeSubscriptionId = undefined;
+		member.lastSyncAt = new Date().toISOString();
+
+		await updateMember(member, ctx);
+		ctx.log.info(`Subscription cancelled for ${member.email}: ${subscriptionId}`);
+
+		// Send farewell email
+		sendCancelledEmail(member, ctx).catch((err) =>
+			ctx.log.warn(`Email send failed: ${String(err)}`)
+		);
+	} catch (error) {
+		ctx.log.error(`handleSubscriptionDeleted error: ${String(error)}`);
+	}
+}
+
+/**
+ * Webhook handler: invoice.payment_succeeded
+ */
+async function handlePaymentSucceeded(
+	invoice: Record<string, unknown>,
+	ctx: PluginContext
+): Promise<void> {
+	try {
+		const customerId = invoice.customer as string | undefined;
+		const subscriptionId = invoice.subscription as string | undefined;
+
+		if (!customerId) return;
+
+		const member = await getMemberByStripeCustomerId(customerId, ctx);
+		if (!member) {
+			ctx.log.warn(`Member not found for customer ${customerId}`);
+			return;
+		}
+
+		// If member was past due, restore to active
+		if (member.status === "past_due") {
+			member.status = "active";
+			member.lastSyncAt = new Date().toISOString();
+			await updateMember(member, ctx);
+			ctx.log.info(`Payment recovered for ${member.email}`);
+
+			// Send payment received email
+			sendPaymentReceivedEmail(member, ctx).catch((err) =>
+				ctx.log.warn(`Email send failed: ${String(err)}`)
+			);
+		}
+	} catch (error) {
+		ctx.log.error(`handlePaymentSucceeded error: ${String(error)}`);
+	}
+}
+
+/**
+ * Webhook handler: invoice.payment_failed
+ */
+async function handlePaymentFailed(
+	invoice: Record<string, unknown>,
+	ctx: PluginContext
+): Promise<void> {
+	try {
+		const customerId = invoice.customer as string | undefined;
+		const subscriptionId = invoice.subscription as string | undefined;
+
+		if (!customerId) return;
+
+		const member = await getMemberByStripeCustomerId(customerId, ctx);
+		if (!member) {
+			ctx.log.warn(`Member not found for customer ${customerId}`);
+			return;
+		}
+
+		member.status = "past_due";
+		member.lastSyncAt = new Date().toISOString();
+
+		await updateMember(member, ctx);
+		ctx.log.info(`Payment failed for ${member.email}`);
+
+		// Send payment failed alert email
+		sendPaymentFailedEmail(member, ctx).catch((err) =>
+			ctx.log.warn(`Email send failed: ${String(err)}`)
+		);
+	} catch (error) {
+		ctx.log.error(`handlePaymentFailed error: ${String(error)}`);
+	}
+}
+
+/**
+ * Webhook handler: checkout.session.completed
+ */
+async function handleCheckoutCompleted(
+	session: Record<string, unknown>,
+	ctx: PluginContext
+): Promise<void> {
+	try {
+		const customerId = session.customer as string | undefined;
+		const subscriptionId = session.subscription as string | undefined;
+
+		if (!customerId) return;
+
+		const member = await getMemberByStripeCustomerId(customerId, ctx);
+		if (!member) {
+			ctx.log.warn(`Member not found for customer ${customerId}`);
+			return;
+		}
+
+		// Checkout completion confirms subscription
+		if (subscriptionId && !member.stripeSubscriptionId) {
+			member.stripeSubscriptionId = String(subscriptionId);
+			member.status = "active";
+			member.lastSyncAt = new Date().toISOString();
+
+			await updateMember(member, ctx);
+			ctx.log.info(`Checkout completed for ${member.email}: ${subscriptionId}`);
+
+			// Send welcome email if first subscription
+			sendWelcomeEmail(member, ctx).catch((err) =>
+				ctx.log.warn(`Email send failed: ${String(err)}`)
+			);
+		}
+	} catch (error) {
+		ctx.log.error(`handleCheckoutCompleted error: ${String(error)}`);
+	}
+}
+
+/**
+ * Email helpers (async, non-blocking)
+ */
+async function sendWelcomeEmail(
+	member: MemberRecord,
+	ctx: PluginContext
+): Promise<void> {
+	// Log for now; in production would integrate with Resend
+	ctx.log.info(`[EMAIL] Welcome email to ${member.email} for ${member.plan}`);
+}
+
+async function sendUpdateEmail(
+	member: MemberRecord,
+	ctx: PluginContext
+): Promise<void> {
+	ctx.log.info(`[EMAIL] Update email to ${member.email}: renewal ${member.expiresAt}`);
+}
+
+async function sendCancelledEmail(
+	member: MemberRecord,
+	ctx: PluginContext
+): Promise<void> {
+	ctx.log.info(`[EMAIL] Cancellation email to ${member.email}`);
+}
+
+async function sendPaymentFailedEmail(
+	member: MemberRecord,
+	ctx: PluginContext
+): Promise<void> {
+	ctx.log.info(`[EMAIL] Payment failed alert to ${member.email}`);
+}
+
+async function sendPaymentReceivedEmail(
+	member: MemberRecord,
+	ctx: PluginContext
+): Promise<void> {
+	ctx.log.info(`[EMAIL] Payment received email to ${member.email}`);
+}
+
+/**
  * Utility: Get default plans
  */
 const DEFAULT_PLANS: PlanConfig[] = [
@@ -516,6 +873,403 @@ export default definePlugin({
 					ctx.log.error(`Revoke error: ${String(error)}`);
 					throw new Response(
 						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /membership/webhook
+		 * Handle Stripe webhook events with signature verification and idempotency.
+		 *
+		 * Expects raw request body + stripe-signature header
+		 * Returns: { received: true } immediately (processes async)
+		 */
+		webhook: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const stripeSecret = ctx.env?.STRIPE_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET;
+
+					if (!stripeSecret) {
+						ctx.log.warn("Stripe webhook secret not configured");
+						return { received: true }; // Still return 200 to avoid retries
+					}
+
+					// Get raw body and signature
+					const rawBody = rc.rawBody as string | undefined;
+					const signature = rc.headers?.["stripe-signature"] as string | undefined;
+
+					if (!rawBody || !signature) {
+						ctx.log.warn("Missing webhook payload or signature");
+						return { received: true };
+					}
+
+					// Verify Stripe signature
+					const isValid = await verifyStripeSignature(rawBody, signature, stripeSecret);
+					if (!isValid) {
+						ctx.log.warn("Invalid Stripe signature");
+						return { received: true };
+					}
+
+					// Parse event
+					let event: Record<string, unknown>;
+					try {
+						event = JSON.parse(rawBody) as Record<string, unknown>;
+					} catch {
+						ctx.log.error("Failed to parse webhook payload");
+						return { received: true };
+					}
+
+					const eventId = String(event.id ?? "");
+					const eventType = String(event.type ?? "");
+
+					if (!eventId || !eventType) {
+						ctx.log.warn("Missing event id or type");
+						return { received: true };
+					}
+
+					// Idempotency check
+					const idempotencyKey = `stripe:webhook:${eventId}`;
+					const processed = await ctx.kv.get<string>(idempotencyKey);
+					if (processed) {
+						ctx.log.info(`Webhook already processed: ${eventId}`);
+						return { received: true };
+					}
+
+					// Mark as processing
+					await ctx.kv.set(idempotencyKey, "1", { ex: 86400 }); // 24h TTL
+
+					// Handle specific event types
+					const eventData = event.data as Record<string, unknown> | undefined;
+					const object = eventData?.object as Record<string, unknown> | undefined;
+
+					if (!object) {
+						ctx.log.warn(`Webhook ${eventType}: missing data.object`);
+						return { received: true };
+					}
+
+					switch (eventType) {
+						case "customer.subscription.created":
+							await handleSubscriptionCreated(object, ctx);
+							break;
+
+						case "customer.subscription.updated":
+							await handleSubscriptionUpdated(object, ctx);
+							break;
+
+						case "customer.subscription.deleted":
+							await handleSubscriptionDeleted(object, ctx);
+							break;
+
+						case "invoice.payment_succeeded":
+							await handlePaymentSucceeded(object, ctx);
+							break;
+
+						case "invoice.payment_failed":
+							await handlePaymentFailed(object, ctx);
+							break;
+
+						case "checkout.session.completed":
+							await handleCheckoutCompleted(object, ctx);
+							break;
+
+						default:
+							ctx.log.info(`Unhandled webhook type: ${eventType}`);
+					}
+
+					return { received: true };
+				} catch (error) {
+					ctx.log.error(`Webhook handler error: ${String(error)}`);
+					return { received: true };
+				}
+			},
+		},
+
+		/**
+		 * POST /membership/checkout
+		 * Create a Stripe Checkout Session for a paid plan.
+		 *
+		 * Requires JWT authentication (member email in token).
+		 * Expects: { email: string, plan: string }
+		 * Returns: { checkoutUrl: string, sessionId: string } | error
+		 */
+		checkout: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const email = String(input.email ?? "").trim().toLowerCase();
+					const planId = String(input.plan ?? "").trim();
+
+					// Validate input
+					if (!email || !isValidEmail(email)) {
+						throw new Response(
+							JSON.stringify({ error: "Invalid email" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!planId) {
+						throw new Response(
+							JSON.stringify({ error: "Plan is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get plans and validate plan exists
+					const plansJson = await ctx.kv.get<string>("plans");
+					const plans = parseJSON(plansJson, DEFAULT_PLANS);
+					const plan = plans.find((p: PlanConfig) => p.id === planId);
+
+					if (!plan) {
+						throw new Response(
+							JSON.stringify({ error: "Plan not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Free plans cannot use checkout
+					if (plan.price === 0) {
+						throw new Response(
+							JSON.stringify({ error: "Free plans do not require payment" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get Stripe configuration
+					const stripeSecretKey = ctx.env?.STRIPE_SECRET_KEY as string | undefined;
+					const stripePriceId = ctx.env?.[`STRIPE_PRICE_${planId.toUpperCase()}`] as string | undefined;
+					const siteUrl = ctx.env?.SITE_URL as string | undefined;
+
+					if (!stripeSecretKey) {
+						ctx.log.error("STRIPE_SECRET_KEY not configured");
+						throw new Response(
+							JSON.stringify({ error: "Payment service not configured" }),
+							{ status: 502, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!stripePriceId) {
+						ctx.log.error(`STRIPE_PRICE_${planId.toUpperCase()} not configured`);
+						throw new Response(
+							JSON.stringify({ error: "Plan pricing not configured" }),
+							{ status: 502, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const baseUrl = siteUrl || "https://example.com";
+
+					// Create checkout session via Stripe API
+					const checkoutParams = new URLSearchParams({
+						mode: "subscription",
+						customer_email: email,
+						"line_items[0][price]": stripePriceId,
+						"line_items[0][quantity]": "1",
+						success_url: `${baseUrl}/membership/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+						cancel_url: `${baseUrl}/membership/plans`,
+					});
+
+					const stripeResponse = await fetch(
+						"https://api.stripe.com/v1/checkout/sessions",
+						{
+							method: "POST",
+							headers: {
+								Authorization: `Bearer ${stripeSecretKey}`,
+								"Content-Type": "application/x-www-form-urlencoded",
+							},
+							body: checkoutParams.toString(),
+						}
+					);
+
+					if (!stripeResponse.ok) {
+						const stripeError = await stripeResponse.text();
+						ctx.log.error(`Stripe API error: ${stripeError}`);
+						throw new Response(
+							JSON.stringify({ error: "Payment processing failed. Please try again." }),
+							{ status: 502, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const session = (await stripeResponse.json()) as Record<string, unknown>;
+					const sessionId = String(session.id ?? "");
+					const checkoutUrl = String(session.url ?? "");
+
+					if (!sessionId || !checkoutUrl) {
+						ctx.log.error("Stripe session missing id or url");
+						throw new Response(
+							JSON.stringify({ error: "Payment session creation failed" }),
+							{ status: 502, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Store session in KV for verification (24h TTL)
+					await ctx.kv.set(
+						`stripe:checkout:${sessionId}`,
+						JSON.stringify({
+							email,
+							planId,
+							createdAt: new Date().toISOString(),
+						}),
+						{ ex: 86400 }
+					);
+
+					ctx.log.info(`Checkout session created: ${sessionId} for ${email} (plan: ${planId})`);
+
+					return {
+						checkoutUrl,
+						sessionId,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Checkout error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /membership/checkout/success?session_id=cs_live_xxx
+		 * Handle return from Stripe Checkout after successful payment.
+		 *
+		 * Retrieves the session, verifies subscription was created, updates member status.
+		 * Returns: redirect to dashboard or homepage with status
+		 */
+		"checkout/success": {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const sessionId = String(input.session_id ?? "").trim();
+
+					if (!sessionId) {
+						throw new Response(
+							JSON.stringify({ error: "Session ID is required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get Stripe configuration
+					const stripeSecretKey = ctx.env?.STRIPE_SECRET_KEY as string | undefined;
+
+					if (!stripeSecretKey) {
+						ctx.log.error("STRIPE_SECRET_KEY not configured");
+						throw new Response(
+							JSON.stringify({ error: "Payment service not configured" }),
+							{ status: 502, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Retrieve session from Stripe
+					const sessionParams = new URLSearchParams({
+						expand: "subscription",
+					});
+
+					const stripeResponse = await fetch(
+						`https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}?${sessionParams}`,
+						{
+							method: "GET",
+							headers: {
+								Authorization: `Bearer ${stripeSecretKey}`,
+							},
+						}
+					);
+
+					if (!stripeResponse.ok) {
+						ctx.log.error(`Failed to retrieve session: ${stripeResponse.statusText}`);
+						throw new Response(
+							JSON.stringify({ error: "Session not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const session = (await stripeResponse.json()) as Record<string, unknown>;
+					const customerEmail = String(session.customer_email ?? "");
+					const subscription = session.subscription as Record<string, unknown> | undefined;
+					const subscriptionId = subscription?.id ? String(subscription.id) : "";
+
+					if (!customerEmail) {
+						ctx.log.error("Session missing customer_email");
+						throw new Response(
+							JSON.stringify({ error: "Invalid session" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!subscriptionId) {
+						ctx.log.warn(`Checkout completed but no subscription: ${sessionId}`);
+						// This can happen if subscription is still pending, let frontend handle it
+						return {
+							success: false,
+							message: "Payment processing. Please wait a moment and refresh.",
+							email: customerEmail,
+						};
+					}
+
+					// Update member record with Stripe subscription ID
+					const encodedEmail = emailToKvKey(customerEmail);
+					const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
+					const member = parseJSON<MemberRecord>(memberJson, null);
+
+					if (!member) {
+						// This shouldn't happen, but handle gracefully
+						ctx.log.warn(`Member not found for email: ${customerEmail}`);
+						return {
+							success: false,
+							message: "Member record not found. Please contact support.",
+							email: customerEmail,
+						};
+					}
+
+					// Update member with Stripe subscription info
+					member.status = "active";
+					member.stripeSubscriptionId = subscriptionId;
+					member.approvedAt = new Date().toISOString();
+
+					// Extract subscription details from expanded subscription object
+					if (subscription) {
+						const status = String(subscription.status ?? "");
+						const currentPeriodEnd = subscription.current_period_end
+							? new Date((subscription.current_period_end as number) * 1000).toISOString()
+							: undefined;
+
+						member.currentPeriodEnd = currentPeriodEnd;
+
+						// Set status based on subscription status
+						if (status === "active" || status === "trialing") {
+							member.status = "active";
+						} else if (status === "past_due") {
+							member.status = "pending";
+						}
+					}
+
+					await ctx.kv.set(`member:${encodedEmail}`, JSON.stringify(member));
+
+					// Clear the checkout session from KV
+					await ctx.kv.delete(`stripe:checkout:${sessionId}`);
+
+					ctx.log.info(
+						`Checkout success: subscription ${subscriptionId} for ${customerEmail}`
+					);
+
+					return {
+						success: true,
+						message: "Payment successful! Welcome to your membership.",
+						email: customerEmail,
+						subscriptionId,
+						redirectUrl: "/membership/dashboard",
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Checkout success error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Failed to process checkout completion" }),
 						{ status: 500, headers: { "Content-Type": "application/json" } }
 					);
 				}
