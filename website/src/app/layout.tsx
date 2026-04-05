@@ -39,8 +39,8 @@ function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
-          <img src="/logo.png" alt="Shipyard AI" className="h-8 w-8 rounded" width={32} height={32} /> Shipyard AI
+        <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
+          <img src="/logo.png" alt="Shipyard AI" className="h-12 w-12 rounded" width={48} height={48} /> Shipyard AI
         </Link>
         <div className="hidden items-center gap-8 text-sm font-medium text-muted sm:flex">
           <Link href="/services" className="transition hover:text-foreground">

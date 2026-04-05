@@ -441,6 +441,139 @@ function adminpulse_output_styles() {
 	<?php
 }
 
+/**
+ * Enqueue JavaScript and pass configuration via wp_localize_script
+ *
+ * Enqueues the adminpulse.js script only on the dashboard page and passes
+ * configuration (AJAX URL and nonce) to enable secure frontend-backend communication.
+ *
+ * @param string $hook_suffix The current admin page hook suffix
+ */
+function adminpulse_enqueue_assets( $hook_suffix ) {
+	// Step 2: Check if on dashboard - only enqueue on index.php
+	if ( 'index.php' !== $hook_suffix ) {
+		return;
+	}
+
+	// Step 3: Check if widget should display (capability check)
+	if ( ! current_user_can( 'view_site_health' ) && ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
+	// Step 4: Enqueue JavaScript with defer loading
+	wp_enqueue_script(
+		'adminpulse-js',
+		ADMINPULSE_URL . 'assets/js/adminpulse.js',
+		array(),              // no dependencies
+		ADMINPULSE_VERSION,
+		true                  // in footer (defer)
+	);
+
+	// Step 5: Localize script with config
+	wp_localize_script(
+		'adminpulse-js',
+		'adminpulseConfig',
+		array(
+			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+			'nonce'   => wp_create_nonce( 'adminpulse_nonce' ),
+		)
+	);
+}
+
+/**
+ * AJAX endpoint to get health data as JSON
+ *
+ * Handles AJAX requests to fetch health data. Includes nonce verification,
+ * capability checks, and proper JSON responses. Supports both cache-hit
+ * fast path and refresh (cache-clear) mode.
+ *
+ * Step 1: Create adminpulse_ajax_get_health() function
+ * Step 2: Verify nonce
+ * Step 3: Check capability
+ * Step 4: Check for refresh flag
+ * Step 5: If refresh, clear cache first
+ * Step 6: Get health data
+ * Step 7: Check for WP_Error
+ * Step 8: Build response HTML
+ * Step 9: Return success
+ */
+function adminpulse_ajax_get_health() {
+	// Step 2: Verify nonce
+	check_ajax_referer( 'adminpulse_nonce', 'nonce' );
+
+	// Step 3: Check capability
+	if ( ! current_user_can( 'view_site_health' ) && ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( __( 'Unauthorized', 'adminpulse' ), 403 );
+	}
+
+	// Step 4: Check for refresh flag
+	$refresh = isset( $_POST['refresh'] ) && $_POST['refresh'] === 'true'; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+	// Step 5: If refresh, clear cache first
+	if ( $refresh ) {
+		adminpulse_clear_cache();
+	}
+
+	// Step 6: Get health data
+	$issues = adminpulse_get_cached_health();
+
+	// Step 7: Check for WP_Error
+	if ( is_wp_error( $issues ) ) {
+		wp_send_json_error( $issues->get_error_message() );
+	}
+
+	// Step 8: Build response HTML for each issue
+	$html = '';
+
+	foreach ( $issues as $issue ) {
+		$severity_class = adminpulse_get_severity_class( $issue['status'] );
+		$severity_label = adminpulse_get_severity_label( $issue['status'] );
+
+		// Build issue container with severity class
+		$html .= '<div class="adminpulse-issue ' . esc_attr( $severity_class ) . '">';
+
+		// Badge with severity label
+		$html .= '<span class="adminpulse-badge ' . esc_attr( 'adminpulse-badge-' . $issue['status'] ) . '">';
+		$html .= esc_html( $severity_label );
+		$html .= '</span>';
+
+		// Issue label
+		$html .= '<strong>';
+		$html .= esc_html( $issue['label'] );
+		$html .= '</strong>';
+
+		// Issue description
+		if ( ! empty( $issue['description'] ) ) {
+			$html .= '<p>';
+			$html .= wp_kses_post( $issue['description'] );
+			$html .= '</p>';
+		}
+
+		// Action links
+		if ( ! empty( $issue['actions'] ) ) {
+			$html .= '<div class="adminpulse-actions">';
+			foreach ( $issue['actions'] as $action ) {
+				if ( isset( $action['label'] ) && isset( $action['url'] ) ) {
+					$html .= '<a href="' . esc_url( $action['url'] ) . '" class="adminpulse-action-link" target="_blank" rel="noopener noreferrer">';
+					$html .= esc_html( $action['label'] );
+					$html .= '</a> ';
+				}
+			}
+			$html .= '</div>';
+		}
+
+		$html .= '</div>';
+	}
+
+	// Step 9: Return success with HTML and count
+	wp_send_json_success(
+		array(
+			'html'  => $html,
+			'count' => count( $issues ),
+		)
+	);
+}
+
 // Register activation and deactivation hooks
 register_activation_hook( __FILE__, 'adminpulse_activate' );
 register_deactivation_hook( __FILE__, 'adminpulse_deactivate' );
@@ -450,3 +583,9 @@ add_action( 'plugins_loaded', 'adminpulse_boot' );
 
 // Register styles hook for admin dashboard
 add_action( 'admin_head', 'adminpulse_output_styles' );
+
+// Step 6: Hook to admin_enqueue_scripts
+add_action( 'admin_enqueue_scripts', 'adminpulse_enqueue_assets' );
+
+// Step 10: Register AJAX action for health data endpoint
+add_action( 'wp_ajax_adminpulse_get_health', 'adminpulse_ajax_get_health' );
