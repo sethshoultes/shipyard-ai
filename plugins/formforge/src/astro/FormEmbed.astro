@@ -1,0 +1,1484 @@
+---
+/**
+ * FormEmbed.astro — FormForge Wave 1
+ *
+ * Universal form embed component that renders dynamic form definitions
+ * fetched by form ID from the FormForge API.
+ *
+ * Features:
+ * - 10 field types: text, email, textarea, number, phone, date, dropdown, radio, checkbox, hidden
+ * - Client-side validation: required, email format, phone format, number range
+ * - Conditional logic: showWhen rules — show/hide fields based on other field values
+ * - Honeypot: hidden _hp field rejects bots server-side
+ * - Multi-step wizard: progress indicator, back/next, per-step validation
+ * - Submit via fetch: POST JSON to /_emdash/api/plugins/formforge/submit
+ * - Success/error states with confirmation or field-level errors
+ * - Mobile responsive: single column, full-width controls
+ * - Theme inheritance: CSS custom properties with brand palette fallbacks
+ * - Accessible: labels, aria-required, aria-invalid, aria-describedby, aria-live, focus management
+ *
+ * Props:
+ *   - formId: string (required) — ID of the form definition to render
+ *   - heading?: string — optional heading above the form
+ *   - submitLabel?: string — custom submit button text (default: "Submit")
+ *   - successMessage?: string — custom success message
+ *   - compact?: boolean — compact mode for embedded contexts (smaller spacing)
+ */
+
+interface ConditionalRule {
+	fieldId: string;
+	operator: "equals" | "not_equals" | "contains" | "not_empty";
+	value?: string;
+}
+
+interface FormFieldDefinition {
+	id: string;
+	type: "text" | "email" | "textarea" | "number" | "phone" | "date" | "dropdown" | "radio" | "checkbox" | "hidden";
+	label: string;
+	required: boolean;
+	options?: string[];
+	placeholder?: string;
+	min?: number;
+	max?: number;
+	rows?: number;
+	defaultValue?: string;
+	showWhen?: ConditionalRule;
+}
+
+interface FormStep {
+	label: string;
+	fieldIds: string[];
+}
+
+interface FormDefinition {
+	id: string;
+	name: string;
+	description?: string;
+	fields: FormFieldDefinition[];
+	steps?: FormStep[];
+	createdAt: string;
+	updatedAt: string;
+}
+
+interface Props {
+	formId: string;
+	heading?: string;
+	submitLabel?: string;
+	successMessage?: string;
+	compact?: boolean;
+}
+
+const {
+	formId,
+	heading,
+	submitLabel = "Submit",
+	successMessage = "Thank you! Your submission has been received.",
+	compact = false,
+} = Astro.props;
+
+let form: FormDefinition | null = null;
+let error: string | null = null;
+
+// Fetch form definition from API
+if (formId) {
+	try {
+		const response = await fetch(
+			new URL(
+				`/_emdash/api/plugins/formforge/forms/${encodeURIComponent(formId)}`,
+				Astro.url.origin
+			),
+			{ credentials: "include" }
+		);
+
+		if (response.ok) {
+			const data = (await response.json()) as { form: FormDefinition };
+			form = data.form;
+		} else if (response.status === 404) {
+			error = "This form is no longer available.";
+		} else {
+			error = "Unable to load the form. Please try again later.";
+		}
+	} catch (err) {
+		console.error("FormForge form fetch error:", err);
+		error = "Error loading the form. Please try again later.";
+	}
+} else {
+	error = "No form ID provided.";
+}
+
+const formTitle = heading || form?.name || "Form";
+const formDescription = form?.description;
+// Unique identifier for this form instance (supports multiple forms on one page)
+const instanceId = `ff-form-${formId}`;
+
+// Multi-step wizard support
+const hasSteps = !!(form?.steps && form.steps.length > 1);
+const steps = form?.steps || [];
+const totalSteps = steps.length;
+
+// Build a lookup: fieldId -> stepIndex (for wizard mode)
+const fieldStepMap: Record<string, number> = {};
+if (hasSteps) {
+	steps.forEach((step, idx) => {
+		step.fieldIds.forEach((fid) => {
+			fieldStepMap[fid] = idx;
+		});
+	});
+}
+
+// Build conditional logic metadata for client-side JS
+const conditionalRules: Record<string, ConditionalRule> = {};
+if (form) {
+	for (const field of form.fields) {
+		if (field.showWhen) {
+			conditionalRules[field.id] = field.showWhen;
+		}
+	}
+}
+---
+
+<div
+	class={`ff-form ${compact ? "ff-form--compact" : ""}`}
+	data-form-id={formId}
+	id={instanceId}
+>
+	{error ? (
+		<div class="ff-form__error-banner" role="alert" aria-live="polite">
+			<p>{error}</p>
+		</div>
+	) : form ? (
+		<>
+			<div class="ff-form__header">
+				<h2 class="ff-form__title">{formTitle}</h2>
+				{formDescription && !compact && (
+					<p class="ff-form__description">{formDescription}</p>
+				)}
+			</div>
+
+			<form
+				class="ff-form__form"
+				data-form-id={formId}
+				data-submit-url={`/_emdash/api/plugins/formforge/submit`}
+				data-has-steps={hasSteps ? "true" : "false"}
+				data-total-steps={totalSteps.toString()}
+				data-steps-json={hasSteps ? JSON.stringify(steps) : ""}
+				data-conditional-rules={Object.keys(conditionalRules).length > 0 ? JSON.stringify(conditionalRules) : ""}
+				novalidate
+				aria-label={formTitle}
+			>
+				{/* Honeypot field — hidden from humans, traps bots */}
+				<div class="ff-form__hp" aria-hidden="true">
+					<label for={`${instanceId}-_hp`}>Leave this empty</label>
+					<input
+						type="text"
+						id={`${instanceId}-_hp`}
+						name="_hp"
+						tabindex={-1}
+						autocomplete="off"
+					/>
+				</div>
+
+				{/* Progress indicator for multi-step forms */}
+				{hasSteps && (
+					<div class="ff-form__progress" role="navigation" aria-label="Form progress">
+						<p class="ff-form__progress-text">
+							Step <span data-current-step>1</span> of {totalSteps}
+						</p>
+						<div class="ff-form__progress-bar">
+							<div
+								class="ff-form__progress-fill"
+								style={`width: ${(1 / totalSteps) * 100}%`}
+								role="progressbar"
+								aria-valuenow={1}
+								aria-valuemin={1}
+								aria-valuemax={totalSteps}
+							></div>
+						</div>
+						<p class="ff-form__step-label" aria-live="polite">
+							{steps[0].label}
+						</p>
+					</div>
+				)}
+
+				<div class="ff-form__fields">
+					{form.fields.map((field) => (
+						<div
+							class={`ff-form__field ff-form__field--${field.type}`}
+							data-field-id={field.id}
+							data-field-type={field.type}
+							data-field-required={field.required ? "true" : "false"}
+							data-step-index={hasSteps && fieldStepMap[field.id] !== undefined ? fieldStepMap[field.id].toString() : undefined}
+							data-show-when={field.showWhen ? JSON.stringify(field.showWhen) : undefined}
+						>
+							{/* Hidden fields: no label, just a hidden input */}
+							{field.type === "hidden" && (
+								<input
+									type="hidden"
+									id={`${instanceId}-${field.id}`}
+									name={field.id}
+									value={field.defaultValue || ""}
+								/>
+							)}
+
+							{/* Checkbox: label wraps the input */}
+							{field.type === "checkbox" && (
+								<div class="ff-form__checkbox-wrapper">
+									<input
+										type="checkbox"
+										id={`${instanceId}-${field.id}`}
+										name={field.id}
+										class="ff-form__checkbox"
+										aria-required={field.required ? "true" : undefined}
+										aria-describedby={`${instanceId}-${field.id}-error`}
+									/>
+									<label
+										for={`${instanceId}-${field.id}`}
+										class="ff-form__checkbox-label"
+									>
+										{field.label}
+										{field.required && (
+											<span class="ff-form__required" aria-hidden="true">*</span>
+										)}
+									</label>
+								</div>
+							)}
+
+							{/* Radio: fieldset with legend */}
+							{field.type === "radio" && field.options && (
+								<fieldset class="ff-form__radio-fieldset">
+									<legend class="ff-form__label">
+										{field.label}
+										{field.required && (
+											<span class="ff-form__required" aria-hidden="true">*</span>
+										)}
+									</legend>
+									<div class="ff-form__radio-group" role="radiogroup" aria-required={field.required ? "true" : undefined}>
+										{field.options.map((opt, idx) => (
+											<div class="ff-form__radio-option">
+												<input
+													type="radio"
+													id={`${instanceId}-${field.id}-${idx}`}
+													name={field.id}
+													value={opt}
+													class="ff-form__radio"
+													aria-describedby={`${instanceId}-${field.id}-error`}
+												/>
+												<label
+													for={`${instanceId}-${field.id}-${idx}`}
+													class="ff-form__radio-label"
+												>
+													{opt}
+												</label>
+											</div>
+										))}
+									</div>
+								</fieldset>
+							)}
+
+							{/* All other field types: standard label above input */}
+							{field.type !== "checkbox" && field.type !== "radio" && field.type !== "hidden" && (
+								<label
+									for={`${instanceId}-${field.id}`}
+									class="ff-form__label"
+								>
+									{field.label}
+									{field.required && (
+										<span class="ff-form__required" aria-hidden="true">*</span>
+									)}
+								</label>
+							)}
+
+							{field.type === "text" && (
+								<input
+									type="text"
+									id={`${instanceId}-${field.id}`}
+									name={field.id}
+									class="ff-form__input"
+									placeholder={field.placeholder || ""}
+									aria-required={field.required ? "true" : undefined}
+									aria-describedby={`${instanceId}-${field.id}-error`}
+								/>
+							)}
+
+							{field.type === "email" && (
+								<input
+									type="email"
+									id={`${instanceId}-${field.id}`}
+									name={field.id}
+									class="ff-form__input"
+									placeholder={field.placeholder || "you@example.com"}
+									autocomplete="email"
+									aria-required={field.required ? "true" : undefined}
+									aria-describedby={`${instanceId}-${field.id}-error`}
+								/>
+							)}
+
+							{field.type === "phone" && (
+								<input
+									type="tel"
+									id={`${instanceId}-${field.id}`}
+									name={field.id}
+									class="ff-form__input"
+									placeholder={field.placeholder || "(555) 123-4567"}
+									autocomplete="tel"
+									aria-required={field.required ? "true" : undefined}
+									aria-describedby={`${instanceId}-${field.id}-error`}
+								/>
+							)}
+
+							{field.type === "number" && (
+								<input
+									type="number"
+									id={`${instanceId}-${field.id}`}
+									name={field.id}
+									class="ff-form__input"
+									placeholder={field.placeholder || ""}
+									min={field.min !== undefined ? field.min.toString() : undefined}
+									max={field.max !== undefined ? field.max.toString() : undefined}
+									aria-required={field.required ? "true" : undefined}
+									aria-describedby={`${instanceId}-${field.id}-error`}
+								/>
+							)}
+
+							{field.type === "date" && (
+								<input
+									type="date"
+									id={`${instanceId}-${field.id}`}
+									name={field.id}
+									class="ff-form__input"
+									aria-required={field.required ? "true" : undefined}
+									aria-describedby={`${instanceId}-${field.id}-error`}
+								/>
+							)}
+
+							{field.type === "textarea" && (
+								<textarea
+									id={`${instanceId}-${field.id}`}
+									name={field.id}
+									class="ff-form__textarea"
+									placeholder={field.placeholder || ""}
+									rows={field.rows || 4}
+									aria-required={field.required ? "true" : undefined}
+									aria-describedby={`${instanceId}-${field.id}-error`}
+								></textarea>
+							)}
+
+							{field.type === "dropdown" && field.options && (
+								<select
+									id={`${instanceId}-${field.id}`}
+									name={field.id}
+									class="ff-form__select"
+									aria-required={field.required ? "true" : undefined}
+									aria-describedby={`${instanceId}-${field.id}-error`}
+								>
+									<option value="">{field.placeholder || `Select ${field.label.toLowerCase()}...`}</option>
+									{field.options.map((opt) => (
+										<option value={opt}>{opt}</option>
+									))}
+								</select>
+							)}
+
+							{/* Field error — not rendered for hidden fields */}
+							{field.type !== "hidden" && (
+								<p
+									class="ff-form__field-error"
+									id={`${instanceId}-${field.id}-error`}
+									role="alert"
+									aria-live="polite"
+								></p>
+							)}
+						</div>
+					))}
+				</div>
+
+				<div class="ff-form__actions">
+					{hasSteps && (
+						<button
+							type="button"
+							class="ff-form__back"
+							style="display: none;"
+							aria-label="Go to previous step"
+						>
+							Back
+						</button>
+					)}
+					{hasSteps && (
+						<button
+							type="button"
+							class="ff-form__next"
+							aria-label="Go to next step"
+						>
+							Next
+						</button>
+					)}
+					<button
+						type="submit"
+						class="ff-form__submit"
+						style={hasSteps ? "display: none;" : undefined}
+					>
+						{submitLabel}
+					</button>
+				</div>
+
+				<div
+					class="ff-form__status"
+					role="status"
+					aria-live="polite"
+					style="display: none;"
+				></div>
+			</form>
+
+			<div
+				class="ff-form__success"
+				role="status"
+				aria-live="polite"
+				style="display: none;"
+			>
+				<div class="ff-form__success-icon" aria-hidden="true">&#10003;</div>
+				<p class="ff-form__success-message">{successMessage}</p>
+			</div>
+		</>
+	) : (
+		<div class="ff-form__loading" role="status" aria-live="polite">
+			<p>Loading form...</p>
+		</div>
+	)}
+</div>
+
+<script define:vars={{ instanceId, formId }}>
+	document.addEventListener("DOMContentLoaded", () => {
+		const container = document.getElementById(instanceId);
+		if (!container) return;
+
+		const formEl = container.querySelector("form[data-form-id]");
+		if (!formEl) return;
+
+		const submitUrl = formEl.getAttribute("data-submit-url");
+		const successEl = container.querySelector(".ff-form__success");
+		const statusEl = container.querySelector(".ff-form__status");
+		const submitBtn = formEl.querySelector(".ff-form__submit");
+
+		// Multi-step wizard state
+		const hasSteps = formEl.getAttribute("data-has-steps") === "true";
+		const totalSteps = parseInt(formEl.getAttribute("data-total-steps") || "0", 10);
+		const stepsJson = formEl.getAttribute("data-steps-json");
+		const stepsConfig = stepsJson ? JSON.parse(stepsJson) : [];
+		let currentStep = 0;
+
+		const backBtn = formEl.querySelector(".ff-form__back");
+		const nextBtn = formEl.querySelector(".ff-form__next");
+		const progressText = formEl.querySelector("[data-current-step]");
+		const progressFill = formEl.querySelector(".ff-form__progress-fill");
+		const stepLabel = formEl.querySelector(".ff-form__step-label");
+
+		// Conditional logic rules
+		const rulesJson = formEl.getAttribute("data-conditional-rules");
+		const conditionalRules = rulesJson ? JSON.parse(rulesJson) : {};
+		const hasConditionalLogic = Object.keys(conditionalRules).length > 0;
+
+		/**
+		 * Evaluate a conditional rule against current form state.
+		 * Returns true if the field should be visible.
+		 */
+		function evaluateCondition(rule) {
+			const sourceField = formEl.querySelector('[data-field-id="' + rule.fieldId + '"]');
+			if (!sourceField) return true;
+
+			const sourceType = sourceField.getAttribute("data-field-type");
+			let sourceValue = "";
+
+			if (sourceType === "checkbox") {
+				const cb = sourceField.querySelector('input[type="checkbox"]');
+				sourceValue = cb && cb.checked ? "true" : "false";
+			} else if (sourceType === "radio") {
+				const checked = sourceField.querySelector('input[type="radio"]:checked');
+				sourceValue = checked ? checked.value : "";
+			} else {
+				const input = sourceField.querySelector("input, select, textarea");
+				sourceValue = input ? input.value.trim() : "";
+			}
+
+			switch (rule.operator) {
+				case "equals":
+					return sourceValue === rule.value;
+				case "not_equals":
+					return sourceValue !== rule.value;
+				case "contains":
+					return sourceValue.toLowerCase().includes((rule.value || "").toLowerCase());
+				case "not_empty":
+					return sourceValue !== "" && sourceValue !== "false";
+				default:
+					return true;
+			}
+		}
+
+		/**
+		 * Update visibility of all conditional fields.
+		 * Hidden conditional fields are excluded from validation.
+		 */
+		function updateConditionalVisibility() {
+			if (!hasConditionalLogic) return;
+
+			for (const [fieldId, rule] of Object.entries(conditionalRules)) {
+				const fieldWrapper = formEl.querySelector('[data-field-id="' + fieldId + '"]');
+				if (!fieldWrapper) continue;
+
+				const visible = evaluateCondition(rule);
+				fieldWrapper.style.display = visible ? "" : "none";
+				fieldWrapper.setAttribute("data-conditionally-hidden", visible ? "false" : "true");
+
+				// Clear errors on hidden fields
+				if (!visible) {
+					clearFieldError(fieldId);
+				}
+			}
+		}
+
+		/**
+		 * Check if a field is conditionally hidden
+		 */
+		function isConditionallyHidden(fieldWrapper) {
+			return fieldWrapper.getAttribute("data-conditionally-hidden") === "true";
+		}
+
+		/**
+		 * Validate email format
+		 */
+		function isValidEmail(email) {
+			return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+		}
+
+		/**
+		 * Validate phone format (7-20 chars of digits, +, -, parens, spaces)
+		 */
+		function isValidPhone(phone) {
+			const cleaned = phone.replace(/[^0-9+\-() ]/g, "");
+			return cleaned.length >= 7 && cleaned.length <= 20;
+		}
+
+		/**
+		 * Show field-level error
+		 */
+		function showFieldError(fieldId, message) {
+			const errorEl = document.getElementById(instanceId + "-" + fieldId + "-error");
+			if (errorEl) {
+				errorEl.textContent = message;
+				errorEl.style.display = "block";
+			}
+			const inputEl = document.getElementById(instanceId + "-" + fieldId);
+			if (inputEl) {
+				inputEl.setAttribute("aria-invalid", "true");
+				inputEl.classList.add("ff-form__input--error");
+			}
+		}
+
+		/**
+		 * Clear field-level error
+		 */
+		function clearFieldError(fieldId) {
+			const errorEl = document.getElementById(instanceId + "-" + fieldId + "-error");
+			if (errorEl) {
+				errorEl.textContent = "";
+				errorEl.style.display = "none";
+			}
+			const inputEl = document.getElementById(instanceId + "-" + fieldId);
+			if (inputEl) {
+				inputEl.removeAttribute("aria-invalid");
+				inputEl.classList.remove("ff-form__input--error");
+			}
+		}
+
+		/**
+		 * Clear all field errors
+		 */
+		function clearAllErrors() {
+			const fields = formEl.querySelectorAll("[data-field-id]");
+			fields.forEach((field) => {
+				clearFieldError(field.getAttribute("data-field-id"));
+			});
+		}
+
+		/**
+		 * Show form-level status message
+		 */
+		function showStatus(message, isError) {
+			if (statusEl) {
+				statusEl.textContent = message;
+				statusEl.className = "ff-form__status" +
+					(isError ? " ff-form__status--error" : "");
+				statusEl.style.display = "block";
+			}
+		}
+
+		/**
+		 * Hide form-level status
+		 */
+		function hideStatus() {
+			if (statusEl) {
+				statusEl.textContent = "";
+				statusEl.style.display = "none";
+			}
+		}
+
+		/**
+		 * Validate a single field wrapper, return true if valid.
+		 * Skips conditionally hidden fields.
+		 */
+		function validateField(fieldWrapper) {
+			// Skip conditionally hidden fields — they are not required
+			if (isConditionallyHidden(fieldWrapper)) return true;
+
+			const fieldId = fieldWrapper.getAttribute("data-field-id");
+			const fieldType = fieldWrapper.getAttribute("data-field-type");
+			const isRequired = fieldWrapper.getAttribute("data-field-required") === "true";
+
+			// Hidden fields are never validated client-side
+			if (fieldType === "hidden") return true;
+
+			clearFieldError(fieldId);
+
+			let value;
+			if (fieldType === "checkbox") {
+				const cb = document.getElementById(instanceId + "-" + fieldId);
+				value = cb ? cb.checked : false;
+			} else if (fieldType === "radio") {
+				const checked = fieldWrapper.querySelector('input[type="radio"]:checked');
+				value = checked ? checked.value : "";
+			} else {
+				const inputEl = document.getElementById(instanceId + "-" + fieldId);
+				value = inputEl ? inputEl.value.trim() : "";
+			}
+
+			const label = fieldWrapper.querySelector("label, legend")?.textContent?.replace("*", "").trim() || "This field";
+
+			// Required check
+			if (isRequired) {
+				if (fieldType === "checkbox" && !value) {
+					showFieldError(fieldId, label + " is required");
+					return false;
+				} else if (fieldType !== "checkbox" && (value === "" || value === undefined)) {
+					showFieldError(fieldId, label + " is required");
+					return false;
+				}
+			}
+
+			// Skip format validation if empty and not required
+			if (fieldType !== "checkbox" && (value === "" || value === undefined)) {
+				return true;
+			}
+
+			// Email format
+			if (fieldType === "email" && !isValidEmail(value)) {
+				showFieldError(fieldId, "Please enter a valid email address");
+				return false;
+			}
+
+			// Phone format
+			if (fieldType === "phone" && !isValidPhone(value)) {
+				showFieldError(fieldId, "Please enter a valid phone number");
+				return false;
+			}
+
+			// Number range
+			if (fieldType === "number") {
+				const num = parseFloat(value);
+				if (isNaN(num)) {
+					showFieldError(fieldId, "Please enter a valid number");
+					return false;
+				}
+				const inputEl = document.getElementById(instanceId + "-" + fieldId);
+				const min = inputEl?.getAttribute("min");
+				const max = inputEl?.getAttribute("max");
+				if (min !== null && min !== "" && num < parseFloat(min)) {
+					showFieldError(fieldId, "Value must be at least " + min);
+					return false;
+				}
+				if (max !== null && max !== "" && num > parseFloat(max)) {
+					showFieldError(fieldId, "Value must be at most " + max);
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		/**
+		 * Validate fields for a specific wizard step.
+		 * Returns { valid, firstInvalidId }
+		 */
+		function validateStep(stepIndex) {
+			const stepFieldIds = stepsConfig[stepIndex]?.fieldIds || [];
+			let firstInvalidId = null;
+			let allValid = true;
+
+			for (const fid of stepFieldIds) {
+				const fieldWrapper = formEl.querySelector('[data-field-id="' + fid + '"]');
+				if (!fieldWrapper) continue;
+
+				const isValid = validateField(fieldWrapper);
+				if (!isValid) {
+					if (!firstInvalidId) firstInvalidId = fid;
+					allValid = false;
+				}
+			}
+
+			return { valid: allValid, firstInvalidId };
+		}
+
+		/**
+		 * Validate all fields, return { valid, data, firstInvalidId }
+		 */
+		function validateForm() {
+			const fields = formEl.querySelectorAll("[data-field-id]");
+			const errors = [];
+			const data = {};
+			let firstInvalidId = null;
+
+			fields.forEach((fieldWrapper) => {
+				const fieldId = fieldWrapper.getAttribute("data-field-id");
+				const fieldType = fieldWrapper.getAttribute("data-field-type");
+
+				// Skip conditionally hidden fields entirely
+				if (isConditionallyHidden(fieldWrapper)) return;
+
+				const isValid = validateField(fieldWrapper);
+				if (!isValid) {
+					errors.push(fieldId);
+					if (!firstInvalidId) firstInvalidId = fieldId;
+					return;
+				}
+
+				// Collect value
+				let value;
+				if (fieldType === "checkbox") {
+					const cb = document.getElementById(instanceId + "-" + fieldId);
+					value = cb ? cb.checked : false;
+				} else if (fieldType === "radio") {
+					const checked = fieldWrapper.querySelector('input[type="radio"]:checked');
+					value = checked ? checked.value : "";
+				} else if (fieldType === "hidden") {
+					const input = document.getElementById(instanceId + "-" + fieldId);
+					value = input ? input.value : "";
+				} else {
+					const inputEl = document.getElementById(instanceId + "-" + fieldId);
+					value = inputEl ? inputEl.value.trim() : "";
+				}
+
+				if (fieldType === "checkbox" || fieldType === "hidden" || (value !== "" && value !== undefined)) {
+					data[fieldId] = value;
+				}
+			});
+
+			return { valid: errors.length === 0, data, firstInvalidId };
+		}
+
+		/**
+		 * Multi-step wizard: show/hide fields for current step.
+		 * Data is preserved because we toggle visibility, not destroy elements.
+		 */
+		function updateStepVisibility() {
+			if (!hasSteps) return;
+
+			const allFields = formEl.querySelectorAll("[data-field-id]");
+			allFields.forEach((field) => {
+				const stepIdx = field.getAttribute("data-step-index");
+				if (stepIdx !== null) {
+					const isCurrentStep = parseInt(stepIdx, 10) === currentStep;
+					// Respect conditional logic: only show if both step matches and condition passes
+					if (!isCurrentStep) {
+						field.style.display = "none";
+					} else {
+						const showWhen = field.getAttribute("data-show-when");
+						if (showWhen) {
+							const rule = JSON.parse(showWhen);
+							field.style.display = evaluateCondition(rule) ? "" : "none";
+							field.setAttribute("data-conditionally-hidden", evaluateCondition(rule) ? "false" : "true");
+						} else {
+							field.style.display = "";
+						}
+					}
+				}
+			});
+
+			// Update progress indicator
+			if (progressText) progressText.textContent = (currentStep + 1).toString();
+			if (progressFill) {
+				progressFill.style.width = ((currentStep + 1) / totalSteps * 100) + "%";
+				progressFill.setAttribute("aria-valuenow", (currentStep + 1).toString());
+			}
+			if (stepLabel && stepsConfig[currentStep]) {
+				stepLabel.textContent = stepsConfig[currentStep].label;
+			}
+
+			// Update button visibility
+			if (backBtn) backBtn.style.display = currentStep > 0 ? "" : "none";
+			if (nextBtn) nextBtn.style.display = currentStep < totalSteps - 1 ? "" : "none";
+			if (submitBtn) submitBtn.style.display = currentStep === totalSteps - 1 ? "" : "none";
+		}
+
+		// Initialize conditional visibility
+		if (hasConditionalLogic) {
+			updateConditionalVisibility();
+		}
+
+		// Initialize step visibility on load
+		if (hasSteps) {
+			updateStepVisibility();
+		}
+
+		// Listen for input/change events to update conditional visibility
+		if (hasConditionalLogic) {
+			formEl.addEventListener("input", () => {
+				if (hasSteps) {
+					updateStepVisibility();
+				} else {
+					updateConditionalVisibility();
+				}
+			});
+			formEl.addEventListener("change", () => {
+				if (hasSteps) {
+					updateStepVisibility();
+				} else {
+					updateConditionalVisibility();
+				}
+			});
+		}
+
+		// Next button: validate current step, then advance
+		if (nextBtn) {
+			nextBtn.addEventListener("click", () => {
+				hideStatus();
+				const { valid, firstInvalidId } = validateStep(currentStep);
+
+				if (!valid) {
+					if (firstInvalidId) {
+						const el = document.getElementById(instanceId + "-" + firstInvalidId);
+						if (el) el.focus();
+					}
+					return;
+				}
+
+				currentStep++;
+				updateStepVisibility();
+
+				// Focus first visible input of new step for keyboard accessibility
+				const newStepFields = stepsConfig[currentStep]?.fieldIds || [];
+				if (newStepFields.length > 0) {
+					const firstInput = document.getElementById(instanceId + "-" + newStepFields[0]);
+					if (firstInput) firstInput.focus();
+				}
+			});
+		}
+
+		// Back button: go to previous step (no validation, data preserved)
+		if (backBtn) {
+			backBtn.addEventListener("click", () => {
+				hideStatus();
+				clearAllErrors();
+				if (currentStep > 0) {
+					currentStep--;
+					updateStepVisibility();
+				}
+			});
+		}
+
+		// Clear field error on input
+		formEl.addEventListener("input", (e) => {
+			const fieldWrapper = e.target.closest("[data-field-id]");
+			if (fieldWrapper) {
+				clearFieldError(fieldWrapper.getAttribute("data-field-id"));
+			}
+		});
+
+		// Clear field error on change (for selects, checkboxes, radios)
+		formEl.addEventListener("change", (e) => {
+			const fieldWrapper = e.target.closest("[data-field-id]");
+			if (fieldWrapper) {
+				clearFieldError(fieldWrapper.getAttribute("data-field-id"));
+			}
+		});
+
+		// Form submission
+		formEl.addEventListener("submit", async (e) => {
+			e.preventDefault();
+
+			clearAllErrors();
+			hideStatus();
+
+			// For wizard forms, validate current (final) step first
+			if (hasSteps) {
+				const { valid: stepValid, firstInvalidId: stepInvalidId } = validateStep(currentStep);
+				if (!stepValid) {
+					if (stepInvalidId) {
+						const el = document.getElementById(instanceId + "-" + stepInvalidId);
+						if (el) el.focus();
+					}
+					return;
+				}
+			}
+
+			// Full form validation (all steps)
+			const { valid, data, firstInvalidId } = validateForm();
+
+			if (!valid) {
+				if (firstInvalidId) {
+					// If wizard mode, navigate to the step with the invalid field
+					if (hasSteps) {
+						const fieldWrapper = formEl.querySelector('[data-field-id="' + firstInvalidId + '"]');
+						if (fieldWrapper) {
+							const stepIdx = parseInt(fieldWrapper.getAttribute("data-step-index") || "0", 10);
+							currentStep = stepIdx;
+							updateStepVisibility();
+						}
+					}
+					const firstInvalid = document.getElementById(instanceId + "-" + firstInvalidId);
+					if (firstInvalid) firstInvalid.focus();
+				}
+				return;
+			}
+
+			// Include honeypot value for server-side rejection
+			const hpInput = formEl.querySelector('input[name="_hp"]');
+			const honeypot = hpInput ? hpInput.value : "";
+
+			// Disable submit button
+			if (submitBtn) {
+				submitBtn.disabled = true;
+				submitBtn.textContent = "Submitting...";
+			}
+
+			try {
+				const response = await fetch(submitUrl, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					credentials: "include",
+					body: JSON.stringify({
+						formId: formId,
+						data: data,
+						_hp: honeypot,
+					}),
+				});
+
+				const result = await response.json();
+
+				if (response.ok && result.success) {
+					formEl.style.display = "none";
+					if (successEl) {
+						successEl.style.display = "block";
+					}
+				} else {
+					// Handle field-level errors from server
+					if (result.fieldErrors && typeof result.fieldErrors === "object") {
+						let firstErrorField = null;
+						for (const [fid, msg] of Object.entries(result.fieldErrors)) {
+							showFieldError(fid, msg);
+							if (!firstErrorField) firstErrorField = fid;
+						}
+						if (firstErrorField) {
+							const el = document.getElementById(instanceId + "-" + firstErrorField);
+							if (el) el.focus();
+						}
+					} else if (result.details && Array.isArray(result.details)) {
+						showStatus(result.details.join(". "), true);
+					} else {
+						showStatus(result.error || "Submission failed. Please try again.", true);
+					}
+				}
+			} catch (err) {
+				showStatus("Network error. Please check your connection and try again.", true);
+			} finally {
+				if (submitBtn) {
+					submitBtn.disabled = false;
+					submitBtn.textContent = submitBtn.getAttribute("data-original-label") || "Submit";
+				}
+			}
+		});
+
+		// Store original submit label for restoration after error
+		if (submitBtn) {
+			submitBtn.setAttribute("data-original-label", submitBtn.textContent);
+		}
+	});
+</script>
+
+<style>
+	/* ===================================================================
+	   FormForge FormEmbed — Styles
+	   Uses CSS custom properties with brand palette fallbacks.
+	   =================================================================== */
+
+	.ff-form {
+		font-family: var(--ff-font-body, "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+		color: var(--ff-color-text, #2c2c2c);
+		line-height: 1.6;
+	}
+
+	/* Header */
+	.ff-form__header {
+		margin-bottom: 1.5rem;
+	}
+
+	.ff-form__title {
+		margin: 0 0 0.5rem 0;
+		font-size: 1.5rem;
+		color: var(--ff-color-text, #2c2c2c);
+		font-family: var(--ff-font-heading, Lora, serif);
+		font-weight: 600;
+	}
+
+	.ff-form__description {
+		margin: 0;
+		font-size: 0.95rem;
+		color: var(--ff-color-muted, #666);
+	}
+
+	/* Honeypot — visually hidden, traps bots */
+	.ff-form__hp {
+		display: none !important;
+		position: absolute;
+		left: -9999px;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+	}
+
+	/* Fields container */
+	.ff-form__fields {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	.ff-form__field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+	}
+
+	/* Labels */
+	.ff-form__label {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--ff-color-text, #2c2c2c);
+	}
+
+	.ff-form__required {
+		color: #c62828;
+		margin-left: 0.25rem;
+	}
+
+	/* Inputs, selects, textareas */
+	.ff-form__input,
+	.ff-form__select,
+	.ff-form__textarea {
+		padding: 0.75rem;
+		min-height: 44px;
+		border: 1px solid var(--ff-color-border, #d4c4b5);
+		border-radius: 0.25rem;
+		font-size: 0.95rem;
+		font-family: inherit;
+		color: var(--ff-color-text, #2c2c2c);
+		background-color: var(--ff-color-input-bg, white);
+		transition: border-color 0.2s ease, box-shadow 0.2s ease;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.ff-form__textarea {
+		resize: vertical;
+		min-height: 88px;
+	}
+
+	.ff-form__input:focus,
+	.ff-form__select:focus,
+	.ff-form__textarea:focus {
+		outline: none;
+		border-color: var(--ff-color-primary, #c4704b);
+		box-shadow: 0 0 0 3px rgba(196, 112, 75, 0.15);
+	}
+
+	.ff-form__input:focus-visible,
+	.ff-form__select:focus-visible,
+	.ff-form__textarea:focus-visible {
+		outline: 3px solid var(--ff-color-accent, #d4a853);
+		outline-offset: 2px;
+	}
+
+	.ff-form__input--error,
+	.ff-form__select--error,
+	.ff-form__textarea--error {
+		border-color: #c62828;
+	}
+
+	.ff-form__input--error:focus,
+	.ff-form__select--error:focus,
+	.ff-form__textarea--error:focus {
+		box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.15);
+	}
+
+	.ff-form__input[aria-invalid="true"],
+	.ff-form__select[aria-invalid="true"],
+	.ff-form__textarea[aria-invalid="true"] {
+		border-color: #c62828;
+	}
+
+	/* Checkbox */
+	.ff-form__checkbox-wrapper {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-height: 44px;
+	}
+
+	.ff-form__checkbox {
+		width: 1.125rem;
+		height: 1.125rem;
+		accent-color: var(--ff-color-primary, #c4704b);
+		cursor: pointer;
+		flex-shrink: 0;
+	}
+
+	.ff-form__checkbox:focus-visible {
+		outline: 3px solid var(--ff-color-accent, #d4a853);
+		outline-offset: 2px;
+	}
+
+	.ff-form__checkbox-label {
+		font-size: 0.9rem;
+		font-weight: 500;
+		color: var(--ff-color-text, #2c2c2c);
+		cursor: pointer;
+	}
+
+	/* Radio */
+	.ff-form__radio-fieldset {
+		border: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.ff-form__radio-group {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		margin-top: 0.35rem;
+	}
+
+	.ff-form__radio-option {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-height: 44px;
+	}
+
+	.ff-form__radio {
+		width: 1.125rem;
+		height: 1.125rem;
+		accent-color: var(--ff-color-primary, #c4704b);
+		cursor: pointer;
+		flex-shrink: 0;
+	}
+
+	.ff-form__radio:focus-visible {
+		outline: 3px solid var(--ff-color-accent, #d4a853);
+		outline-offset: 2px;
+	}
+
+	.ff-form__radio-label {
+		font-size: 0.9rem;
+		font-weight: 500;
+		color: var(--ff-color-text, #2c2c2c);
+		cursor: pointer;
+	}
+
+	/* Select dropdown */
+	.ff-form__select {
+		appearance: none;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: right 0.75rem center;
+		padding-right: 2.5rem;
+	}
+
+	/* Field errors */
+	.ff-form__field-error {
+		margin: 0;
+		font-size: 0.8rem;
+		color: #c62828;
+		display: none;
+		min-height: 0;
+	}
+
+	/* Progress indicator (multi-step wizard) */
+	.ff-form__progress {
+		margin-bottom: 1.5rem;
+		padding-bottom: 1.25rem;
+		border-bottom: 1px solid var(--ff-color-divider, #e8e0d8);
+	}
+
+	.ff-form__progress-text {
+		margin: 0 0 0.5rem 0;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--ff-color-muted, #666);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.ff-form__progress-bar {
+		width: 100%;
+		height: 6px;
+		background-color: var(--ff-color-divider, #e8e0d8);
+		border-radius: 3px;
+		overflow: hidden;
+	}
+
+	.ff-form__progress-fill {
+		height: 100%;
+		background-color: var(--ff-color-primary, #c4704b);
+		border-radius: 3px;
+		transition: width 0.3s ease;
+	}
+
+	.ff-form__step-label {
+		margin: 0.5rem 0 0 0;
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--ff-color-text, #2c2c2c);
+	}
+
+	/* Actions */
+	.ff-form__actions {
+		margin-top: 1.5rem;
+		display: flex;
+		gap: 0.75rem;
+		align-items: center;
+	}
+
+	.ff-form__back {
+		display: inline-block;
+		padding: 0.75rem 1.5rem;
+		min-height: 44px;
+		background-color: transparent;
+		color: var(--ff-color-muted, #666);
+		border: 1px solid var(--ff-color-border, #d4c4b5);
+		border-radius: 0.25rem;
+		font-size: 1rem;
+		font-weight: 600;
+		font-family: inherit;
+		cursor: pointer;
+		transition: background-color 0.2s ease, border-color 0.2s ease;
+		line-height: 1.5;
+		text-align: center;
+	}
+
+	.ff-form__back:hover {
+		background-color: var(--ff-color-bg-hover, #f5f0eb);
+		border-color: var(--ff-color-primary, #c4704b);
+		color: var(--ff-color-text, #2c2c2c);
+	}
+
+	.ff-form__back:focus-visible {
+		outline: 3px solid var(--ff-color-accent, #d4a853);
+		outline-offset: 2px;
+	}
+
+	.ff-form__next {
+		display: inline-block;
+		padding: 0.75rem 2rem;
+		min-height: 44px;
+		background-color: var(--ff-color-secondary, #7a8b6f);
+		color: white;
+		border: none;
+		border-radius: 0.25rem;
+		font-size: 1rem;
+		font-weight: 600;
+		font-family: inherit;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+		line-height: 1.5;
+		text-align: center;
+	}
+
+	.ff-form__next:hover {
+		background-color: var(--ff-color-secondary-hover, #6a7a60);
+	}
+
+	.ff-form__next:focus-visible {
+		outline: 3px solid var(--ff-color-accent, #d4a853);
+		outline-offset: 2px;
+	}
+
+	.ff-form__submit {
+		display: inline-block;
+		padding: 0.75rem 2rem;
+		min-height: 44px;
+		background-color: var(--ff-color-primary, #c4704b);
+		color: white;
+		border: none;
+		border-radius: 0.25rem;
+		font-size: 1rem;
+		font-weight: 600;
+		font-family: inherit;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+		line-height: 1.5;
+		text-align: center;
+	}
+
+	.ff-form__submit:hover {
+		background-color: var(--ff-color-primary-hover, #b55939);
+	}
+
+	.ff-form__submit:focus-visible {
+		outline: 3px solid var(--ff-color-accent, #d4a853);
+		outline-offset: 2px;
+	}
+
+	.ff-form__submit:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	/* Status messages */
+	.ff-form__status {
+		margin-top: 1rem;
+		padding: 0.75rem 1rem;
+		border-radius: 0.25rem;
+		font-size: 0.9rem;
+	}
+
+	.ff-form__status--error {
+		background-color: #ffebee;
+		border: 1px solid #ef5350;
+		color: #c62828;
+	}
+
+	/* Error banner (form load errors) */
+	.ff-form__error-banner {
+		padding: 1.5rem;
+		background-color: #ffebee;
+		border: 1px solid #ef5350;
+		border-radius: 0.5rem;
+		text-align: center;
+	}
+
+	.ff-form__error-banner p {
+		margin: 0;
+		color: #c62828;
+		font-weight: 500;
+	}
+
+	/* Success state */
+	.ff-form__success {
+		text-align: center;
+		padding: 2rem 1.5rem;
+		border: 1px solid #c8e6c9;
+		border-radius: 0.5rem;
+		background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+	}
+
+	.ff-form__success-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 3rem;
+		height: 3rem;
+		border-radius: 50%;
+		background-color: #4caf50;
+		color: white;
+		font-size: 1.5rem;
+		font-weight: 700;
+		margin-bottom: 1rem;
+	}
+
+	.ff-form__success-message {
+		margin: 0;
+		font-size: 1.1rem;
+		color: #2e7d32;
+		font-weight: 600;
+	}
+
+	/* Loading state */
+	.ff-form__loading {
+		text-align: center;
+		padding: 2rem;
+		color: #999;
+		font-style: italic;
+	}
+
+	/* Compact mode */
+	.ff-form--compact .ff-form__header {
+		margin-bottom: 1rem;
+	}
+
+	.ff-form--compact .ff-form__title {
+		font-size: 1.15rem;
+	}
+
+	.ff-form--compact .ff-form__fields {
+		gap: 0.75rem;
+	}
+
+	.ff-form--compact .ff-form__input,
+	.ff-form--compact .ff-form__select,
+	.ff-form--compact .ff-form__textarea {
+		padding: 0.5rem 0.75rem;
+	}
+
+	.ff-form--compact .ff-form__progress {
+		margin-bottom: 1rem;
+		padding-bottom: 0.75rem;
+	}
+
+	.ff-form--compact .ff-form__actions {
+		margin-top: 1rem;
+	}
+
+	.ff-form--compact .ff-form__submit,
+	.ff-form--compact .ff-form__next {
+		flex: 1;
+		padding: 0.75rem 1.5rem;
+	}
+
+	.ff-form--compact .ff-form__back {
+		flex: 0 0 auto;
+	}
+
+	.ff-form--compact .ff-form__success {
+		padding: 1.5rem 1rem;
+	}
+
+	/* Mobile responsive */
+	@media (max-width: 768px) {
+		.ff-form__title {
+			font-size: 1.25rem;
+		}
+
+		.ff-form__actions {
+			flex-direction: column;
+		}
+
+		.ff-form__submit,
+		.ff-form__next,
+		.ff-form__back {
+			width: 100%;
+		}
+	}
+
+	@media (max-width: 375px) {
+		.ff-form__input,
+		.ff-form__select,
+		.ff-form__textarea {
+			font-size: 1rem; /* Prevent iOS zoom */
+		}
+
+		.ff-form__submit,
+		.ff-form__next,
+		.ff-form__back {
+			width: 100%;
+			min-height: 44px;
+			padding: 0.75rem 1rem;
+		}
+	}
+</style>
