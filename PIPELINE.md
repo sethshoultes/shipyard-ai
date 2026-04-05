@@ -73,3 +73,27 @@ PRD → /agency-debate → /agency-plan → /agency-execute → /agency-verify �
 ## Reference
 
 Full skill definitions: /home/agent/great-minds-plugin/skills/
+
+## GSD Verification (Required — Never Skip)
+
+### After Each Wave
+1. Check every task's verification criteria from the XML plan
+2. Write `projects/{project}/build/wave-{N}-execution.md` documenting:
+   - What each agent built
+   - Which verification checks passed/failed
+   - Files changed
+3. If any check fails → spawn targeted debug agents for the specific failure
+4. Do NOT advance to next wave until current wave passes
+
+### After All Waves (/agency-verify)
+1. Run UAT against every requirement in the plan
+2. Verify Rick Rubin's 3 essentials are met
+3. Write `projects/{project}/build/phase-{N}-verification.md`
+4. Recommendation: SHIP / FIX FIRST / BLOCK
+5. If FIX FIRST → spawn fix agents → re-verify
+6. If BLOCK → stop and engage human
+
+### On Ship (/agency-ship)
+1. Save learnings to memory (what worked, what broke, patterns discovered)
+2. Write ship report with metrics (tasks completed, tokens used, time, revisions)
+3. Update PARITY.md with newly completed features
