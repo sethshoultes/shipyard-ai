@@ -40,6 +40,9 @@ interface MemberRecord {
 	currentPeriodEnd?: string; // ISO date — when current billing period ends
 	cancelAtPeriodEnd?: boolean; // True if scheduled to cancel
 	lastSyncAt?: string; // Last webhook sync timestamp
+	// Phase 3: Content gating fields
+	joinDate?: string; // ISO date — when subscription first created (for drip content)
+	contentAccess?: string[]; // Array of content/page IDs member can access
 }
 
 interface PlanConfig {
@@ -50,6 +53,11 @@ interface PlanConfig {
 	description: string;
 	paymentLink?: string;
 	features: string[];
+	// Phase 3: Drip content schedule
+	dripSchedule?: Array<{
+		contentId: string;
+		daysAfterJoin: number; // Unlock after N days
+	}>;
 }
 
 interface AdminInteraction {
@@ -216,6 +224,11 @@ async function handleSubscriptionCreated(
 		// Update member
 		member.stripeSubscriptionId = subscriptionId;
 		member.lastSyncAt = new Date().toISOString();
+
+		// Set join date on first subscription (for drip content)
+		if (!member.joinDate) {
+			member.joinDate = new Date().toISOString();
+		}
 
 		if (status === "active" || status === "trialing") {
 			member.status = "active";
@@ -2550,6 +2563,277 @@ export default definePlugin({
 						],
 					};
 				}
+			},
+
+			/**
+			 * GET /membership/portal
+			 * Get member's portal data: accessible content, current plan, billing
+			 *
+			 * Query params:
+			 *   - email: member email (required)
+			 *
+			 * Returns: { member: MemberRecord, plan: PlanConfig, accessibleContent: string[], nextBillingDate?: string }
+			 */
+			portal: {
+				public: true,
+				handler: async (routeCtx: unknown, ctx: PluginContext) => {
+					try {
+						const rc = routeCtx as Record<string, unknown>;
+						const input = rc.input as Record<string, unknown>;
+						const email = String(input.email ?? "").trim().toLowerCase();
+
+						if (!email || !isValidEmail(email)) {
+							return {
+								hasAccess: false,
+								reason: "Valid email required",
+							};
+						}
+
+						// Load member
+						const encodedEmail = emailToKvKey(email);
+						const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
+						const member = parseJSON<MemberRecord>(memberJson, null);
+
+						if (!member || member.status !== "active") {
+							return {
+								hasAccess: false,
+								reason: "No active membership",
+							};
+						}
+
+						// Load member's plan
+						const plansJson = await ctx.kv.get<string>("plans");
+						const plans = parseJSON<PlanConfig[]>(plansJson, DEFAULT_PLANS);
+						const plan = plans.find((p) => p.id === member.plan);
+
+						// Get accessible content IDs
+						const listJson = await ctx.kv.get<string>("gating-rules:list");
+						const ruleIds = parseJSON<string[]>(listJson, []);
+						const accessibleIds: string[] = [];
+
+						for (const ruleId of ruleIds) {
+							const ruleJson = await ctx.kv.get<string>(`gating-rule:${ruleId}`);
+							const rule = parseJSON<any>(ruleJson, null);
+
+							if (rule && rule.planIds && Array.isArray(rule.planIds) && rule.planIds.includes(member.plan)) {
+								// Check drip status if applicable
+								if (rule.type === "drip" && rule.dripDays !== undefined) {
+									if (member.joinDate) {
+										const joinDate = new Date(member.joinDate);
+										const daysElapsed = Math.floor((Date.now() - joinDate.getTime()) / (24 * 60 * 60 * 1000));
+										if (daysElapsed >= rule.dripDays) {
+											accessibleIds.push(rule.contentId);
+										}
+									}
+								} else {
+									accessibleIds.push(rule.contentId);
+								}
+							}
+						}
+
+						return {
+							hasAccess: true,
+							member: {
+								email: member.email,
+								plan: member.plan,
+								status: member.status,
+								joinDate: member.joinDate,
+								currentPeriodEnd: member.currentPeriodEnd,
+								stripePaymentMethod: member.stripePaymentMethod,
+							},
+							plan,
+							accessibleContent: accessibleIds,
+							nextBillingDate: member.currentPeriodEnd,
+						};
+					} catch (error) {
+						ctx.log.error(`Portal error: ${String(error)}`);
+						return {
+							hasAccess: false,
+							reason: "Portal access failed",
+						};
+					}
+				},
+			},
+
+			/**
+			 * POST /membership/gating/rules
+			 * Create a content gating rule (admin only)
+			 *
+			 * Expects: { contentId: string, targetType: "page"|"block", planIds: string[], type: "membership"|"drip", dripDays?: number, previewText?: string }
+			 * Returns: { ruleId: string, success: boolean }
+			 */
+			createGatingRule: {
+				handler: async (routeCtx: unknown, ctx: PluginContext) => {
+					try {
+						const rc = routeCtx as Record<string, unknown>;
+						const input = rc.input as Record<string, unknown>;
+						const contentId = String(input.contentId ?? "").trim();
+						const targetType = String(input.targetType ?? "page").trim();
+						const planIds = Array.isArray(input.planIds) ? input.planIds.map(String) : [];
+						const ruleType = String(input.type ?? "membership").trim();
+						const dripDays = input.dripDays ? parseInt(String(input.dripDays), 10) : undefined;
+						const previewText = input.previewText ? String(input.previewText).trim() : undefined;
+
+						if (!contentId) {
+							throw new Response(
+								JSON.stringify({ error: "contentId is required" }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+
+						if (planIds.length === 0) {
+							throw new Response(
+								JSON.stringify({ error: "At least one plan ID is required" }),
+								{ status: 400, headers: { "Content-Type": "application/json" } }
+							);
+						}
+
+						const ruleId = generateId();
+						const rule = {
+							id: ruleId,
+							contentId,
+							targetType,
+							planIds,
+							type: ruleType,
+							dripDays,
+							previewText,
+							createdAt: new Date().toISOString(),
+						};
+
+						// Save rule to KV
+						await ctx.kv.set(`gating-rule:${ruleId}`, JSON.stringify(rule));
+
+						// Add to rules list
+						const listJson = await ctx.kv.get<string>("gating-rules:list");
+						const ruleIds = parseJSON<string[]>(listJson, []);
+						ruleIds.push(ruleId);
+						await ctx.kv.set("gating-rules:list", JSON.stringify(ruleIds));
+
+						ctx.log.info(`Gating rule created: ${ruleId} for ${contentId}`);
+
+						return { ruleId, success: true };
+					} catch (error) {
+						if (error instanceof Response) throw error;
+						ctx.log.error(`Create gating rule error: ${String(error)}`);
+						throw new Response(
+							JSON.stringify({ error: "Internal server error" }),
+							{ status: 500, headers: { "Content-Type": "application/json" } }
+						);
+					}
+				},
+			},
+
+			/**
+			 * GET /membership/gating/rules
+			 * List all gating rules (admin only)
+			 *
+			 * Returns: { rules: GatingRule[] }
+			 */
+			listGatingRules: {
+				handler: async (_routeCtx: unknown, ctx: PluginContext) => {
+					try {
+						const listJson = await ctx.kv.get<string>("gating-rules:list");
+						const ruleIds = parseJSON<string[]>(listJson, []);
+
+						const rules = [];
+						for (const ruleId of ruleIds) {
+							const ruleJson = await ctx.kv.get<string>(`gating-rule:${ruleId}`);
+							if (ruleJson) {
+								const rule = parseJSON(ruleJson, null);
+								if (rule) rules.push(rule);
+							}
+						}
+
+						return { rules };
+					} catch (error) {
+						ctx.log.error(`List gating rules error: ${String(error)}`);
+						throw new Response(
+							JSON.stringify({ error: "Internal server error" }),
+							{ status: 500, headers: { "Content-Type": "application/json" } }
+						);
+					}
+				},
+			},
+
+			/**
+			 * GET /membership/gating/check?targetType=page&targetId=page-id&email=user@example.com
+			 * Check if a user has access to gated content
+			 *
+			 * Returns: { hasAccess: boolean, reason?: string, unlocksOn?: string }
+			 */
+			checkGatingAccess: {
+				public: true,
+				handler: async (routeCtx: unknown, ctx: PluginContext) => {
+					try {
+						const rc = routeCtx as Record<string, unknown>;
+						const input = rc.input as Record<string, unknown>;
+						const targetType = String(input.targetType ?? "page").trim();
+						const targetId = String(input.targetId ?? "").trim();
+						const email = String(input.email ?? "").trim().toLowerCase();
+
+						if (!targetId) {
+							return {
+								hasAccess: false,
+								reason: "targetId is required",
+							};
+						}
+
+						if (!email || !isValidEmail(email)) {
+							return {
+								hasAccess: false,
+								reason: "Valid email is required",
+							};
+						}
+
+						// Find gating rule for this content
+						const listJson = await ctx.kv.get<string>("gating-rules:list");
+						const ruleIds = parseJSON<string[]>(listJson, []);
+
+						let rule = null;
+						for (const ruleId of ruleIds) {
+							const ruleJson = await ctx.kv.get<string>(`gating-rule:${ruleId}`);
+							if (ruleJson) {
+								const r = parseJSON(ruleJson, null);
+								if (r && r.contentId === targetId && r.targetType === targetType) {
+									rule = r;
+									break;
+								}
+							}
+						}
+
+						// If no rule exists, content is public
+						if (!rule) {
+							return { hasAccess: true };
+						}
+
+						// Check access using gating utility
+						const { canAccessContent } = await import("./gating");
+						const encodedEmail = emailToKvKey(email);
+						const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
+						const member = parseJSON<MemberRecord>(memberJson, null);
+
+						if (!member) {
+							return {
+								hasAccess: false,
+								reason: "Member not found",
+							};
+						}
+
+						const result = await canAccessContent(member.email, email, rule, ctx);
+
+						return {
+							hasAccess: result.hasAccess,
+							reason: result.reason,
+							unlocksOn: result.unlocksOn?.toISOString(),
+						};
+					} catch (error) {
+						ctx.log.error(`Check gating access error: ${String(error)}`);
+						return {
+							hasAccess: false,
+							reason: "Access check failed",
+						};
+					}
+				},
 			},
 		},
 	},
