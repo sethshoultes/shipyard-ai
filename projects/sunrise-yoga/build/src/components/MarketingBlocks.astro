@@ -1,0 +1,37 @@
+---
+/**
+ * Custom Portable Text renderer for marketing blocks.
+ *
+ * Maps custom block types (marketing.*, eventdash.*, membership.*)
+ * to their corresponding Astro components.
+ */
+import type { PortableTextBlock } from "emdash";
+import { PortableText } from "emdash/ui";
+import Hero from "./blocks/Hero.astro";
+import Features from "./blocks/Features.astro";
+import Testimonials from "./blocks/Testimonials.astro";
+import Pricing from "./blocks/Pricing.astro";
+import FAQ from "./blocks/FAQ.astro";
+import { EventListing, EventCalendarMonth } from "@shipyard/eventdash/astro";
+import MembershipPricingCards from "./blocks/MembershipPricingCards.astro";
+
+interface Props {
+	value: PortableTextBlock[];
+}
+
+const { value } = Astro.props;
+
+// Custom block type components
+const blockTypes = {
+	"marketing.hero": Hero,
+	"marketing.features": Features,
+	"marketing.testimonials": Testimonials,
+	"marketing.pricing": Pricing,
+	"marketing.faq": FAQ,
+	"eventdash.event-listing": EventListing,
+	"eventdash.event-calendar-month": EventCalendarMonth,
+	"membership.pricing-cards": MembershipPricingCards,
+};
+---
+
+<PortableText value={value} components={{ type: blockTypes }} />

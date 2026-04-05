@@ -1,0 +1,47 @@
+{
+  "description": "MemberShip seed data for Sunrise Yoga Studio. Apply via admin API after site is running.",
+  "plans": [
+    {
+      "id": "monthly-unlimited",
+      "name": "Monthly Unlimited",
+      "price": 9900,
+      "interval": "month",
+      "currency": "usd",
+      "features": [
+        "Unlimited classes all month",
+        "All class types included",
+        "Free mat rental",
+        "10% off workshops & retreats",
+        "Cancel or pause anytime"
+      ],
+      "trialDays": 7,
+      "stripePaymentLink": "",
+      "highlighted": true
+    },
+    {
+      "id": "annual-unlimited",
+      "name": "Annual Unlimited",
+      "price": 89900,
+      "interval": "year",
+      "currency": "usd",
+      "features": [
+        "Unlimited classes all year",
+        "All class types included",
+        "Free mat rental",
+        "20% off workshops & retreats",
+        "1 free guest pass per month",
+        "Save $289 vs. monthly"
+      ],
+      "trialDays": 7,
+      "stripePaymentLink": "",
+      "highlighted": false
+    }
+  ],
+  "settings": {
+    "businessName": "Sunrise Yoga Studio",
+    "supportEmail": "hello@sunriseyogastudio.com",
+    "memberBenefits": "Active members skip the $20 per-class drop-in fee. Just register for any class and your membership covers it.",
+    "cancellationPolicy": "Monthly: cancel anytime, no penalties. Annual: cancel after first 30 days, non-refundable."
+  },
+  "notes": "Configure Stripe Payment Links in the admin after connecting your Stripe account. Set STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET in environment variables."
+}
