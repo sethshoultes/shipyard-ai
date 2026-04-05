@@ -63,6 +63,14 @@ function parseJSON<T>(json: string | undefined | null, fallback: T): T {
 }
 
 /**
+ * Utility: Encode email for safe KV key usage
+ * URL-encodes the email to prevent key injection/traversal attacks
+ */
+function emailToKvKey(email: string): string {
+	return encodeURIComponent(email.toLowerCase().trim());
+}
+
+/**
  * Utility: Get default plans
  */
 const DEFAULT_PLANS: PlanConfig[] = [
@@ -169,7 +177,8 @@ export default definePlugin({
 					}
 
 					// Check existing member
-					const existingKey = await ctx.kv.get<string>(`member:${email}`);
+					const encodedEmail = emailToKvKey(email);
+					const existingKey = await ctx.kv.get<string>(`member:${encodedEmail}`);
 					if (existingKey) {
 						const existingMember = parseJSON<MemberRecord>(
 							existingKey,
@@ -186,7 +195,20 @@ export default definePlugin({
 						}
 					}
 
-					// Create new member
+					// Acquire lock to prevent race condition on duplicate registrations
+					const lockKey = `member-lock:${encodedEmail}`;
+					const existingLock = await ctx.kv.get<string>(lockKey);
+					if (existingLock) {
+						// Another registration is in progress
+						throw new Response(
+							JSON.stringify({ error: "Registration in progress, please try again" }),
+							{ status: 429, headers: { "Content-Type": "application/json" } }
+						);
+					}
+					await ctx.kv.set(lockKey, "1", { ex: 5 }); // 5 second lock
+
+					try {
+						// Create new member
 					const now = new Date().toISOString();
 					let status: "pending" | "active" = "pending";
 
@@ -220,26 +242,30 @@ export default definePlugin({
 						member.expiresAt = expiry.toISOString();
 					}
 
-					await ctx.kv.set(`member:${email}`, JSON.stringify(member));
+						await ctx.kv.set(`member:${encodedEmail}`, JSON.stringify(member));
 
-					// Add to members list for admin
-					const listKey = `members:list`;
-					const listJson = await ctx.kv.get<string>(listKey);
-					const membersList = parseJSON<string[]>(listJson, []);
-					if (!membersList.includes(email)) {
-						membersList.push(email);
-						await ctx.kv.set(listKey, JSON.stringify(membersList));
+						// Add to members list for admin
+						const listKey = `members:list`;
+						const listJson = await ctx.kv.get<string>(listKey);
+						const membersList = parseJSON<string[]>(listJson, []);
+						if (!membersList.includes(encodedEmail)) {
+							membersList.push(encodedEmail);
+							await ctx.kv.set(listKey, JSON.stringify(membersList));
+						}
+
+						ctx.log.info(`Member registered: ${email} for plan ${planId}`);
+
+						return {
+							memberId: email,
+							status,
+							plan: selectedPlan.id,
+							paymentLink:
+								selectedPlan.price > 0 ? selectedPlan.paymentLink : undefined,
+						};
+					} finally {
+						// Release the lock
+						await ctx.kv.delete(lockKey);
 					}
-
-					ctx.log.info(`Member registered: ${email} for plan ${planId}`);
-
-					return {
-						memberId: email,
-						status,
-						plan: selectedPlan.id,
-						paymentLink:
-							selectedPlan.price > 0 ? selectedPlan.paymentLink : undefined,
-					};
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Register error: ${String(error)}`);
@@ -279,7 +305,8 @@ export default definePlugin({
 						};
 					}
 
-					const memberJson = await ctx.kv.get<string>(`member:${email}`);
+					const encodedEmail = emailToKvKey(email);
+					const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
 					if (!memberJson) {
 						return {
 							email,
@@ -365,7 +392,8 @@ export default definePlugin({
 						);
 					}
 
-					const memberJson = await ctx.kv.get<string>(`member:${email}`);
+					const encodedEmail = emailToKvKey(email);
+					const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
 					if (!memberJson) {
 						throw new Response(
 							JSON.stringify({ error: "Member not found" }),
@@ -384,7 +412,7 @@ export default definePlugin({
 					member.status = "active";
 					member.approvedAt = new Date().toISOString();
 
-					await ctx.kv.set(`member:${email}`, JSON.stringify(member));
+					await ctx.kv.set(`member:${encodedEmail}`, JSON.stringify(member));
 					ctx.log.info(`Member approved: ${email}`);
 
 					return { success: true };
@@ -420,7 +448,8 @@ export default definePlugin({
 						);
 					}
 
-					const memberJson = await ctx.kv.get<string>(`member:${email}`);
+					const encodedEmail = emailToKvKey(email);
+					const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
 					if (!memberJson) {
 						throw new Response(
 							JSON.stringify({ error: "Member not found" }),
@@ -438,7 +467,7 @@ export default definePlugin({
 
 					member.status = "revoked";
 
-					await ctx.kv.set(`member:${email}`, JSON.stringify(member));
+					await ctx.kv.set(`member:${encodedEmail}`, JSON.stringify(member));
 					ctx.log.info(`Member revoked: ${email}`);
 
 					return { success: true };
@@ -462,14 +491,23 @@ export default definePlugin({
 					const rc = routeCtx as Record<string, unknown>;
 					const interaction = rc.input as AdminInteraction;
 
+					// EmDash admin routes are behind admin authentication by default.
+					// The admin handler is not marked public: true, so only authenticated admin users can reach it.
+					if (!ctx.user?.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
 					// Members page
 					if (interaction.type === "page_load" && interaction.page === "/members") {
 						const listJson = await ctx.kv.get<string>("members:list");
 						const memberEmails = parseJSON<string[]>(listJson, []);
 
 						const members = [];
-						for (const email of memberEmails) {
-							const memberJson = await ctx.kv.get<string>(`member:${email}`);
+						for (const encodedEmail of memberEmails) {
+							const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
 							if (memberJson) {
 								const member = parseJSON<MemberRecord>(memberJson, null);
 								if (member) {
@@ -578,13 +616,14 @@ export default definePlugin({
 							};
 						}
 
+						const encodedEmail = emailToKvKey(email);
 						try {
 							if (action === "approve") {
 								await ctx.kv.set(
-									`member:${email}`,
+									`member:${encodedEmail}`,
 									JSON.stringify({
 										...(parseJSON<MemberRecord>(
-											await ctx.kv.get<string>(`member:${email}`),
+											await ctx.kv.get<string>(`member:${encodedEmail}`),
 											null
 										) || { email, plan: "", createdAt: new Date().toISOString() }),
 										status: "active",
@@ -597,10 +636,10 @@ export default definePlugin({
 								};
 							} else if (action === "revoke") {
 								await ctx.kv.set(
-									`member:${email}`,
+									`member:${encodedEmail}`,
 									JSON.stringify({
 										...(parseJSON<MemberRecord>(
-											await ctx.kv.get<string>(`member:${email}`),
+											await ctx.kv.get<string>(`member:${encodedEmail}`),
 											null
 										) || { email, plan: "", createdAt: new Date().toISOString() }),
 										status: "revoked",
@@ -657,7 +696,7 @@ export default definePlugin({
 									],
 									rows: plans.map((p: PlanConfig) => ({
 										name: p.name,
-										price: `$${p.price}`,
+										price: `$${(p.price / 100).toFixed(2)}`,
 										interval: p.interval,
 										paymentLink: p.paymentLink || "(not set)",
 									})),
@@ -676,8 +715,8 @@ export default definePlugin({
 						const memberEmails = parseJSON<string[]>(listJson, []);
 
 						let activeCount = 0;
-						for (const email of memberEmails) {
-							const memberJson = await ctx.kv.get<string>(`member:${email}`);
+						for (const encodedEmail of memberEmails) {
+							const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
 							if (memberJson) {
 								const member = parseJSON<MemberRecord>(memberJson, null);
 								if (
@@ -713,8 +752,8 @@ export default definePlugin({
 						const plans = parseJSON(plansJson, DEFAULT_PLANS);
 
 						let mrr = 0;
-						for (const email of memberEmails) {
-							const memberJson = await ctx.kv.get<string>(`member:${email}`);
+						for (const encodedEmail of memberEmails) {
+							const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
 							if (memberJson) {
 								const member = parseJSON<MemberRecord>(memberJson, null);
 								if (
@@ -723,8 +762,13 @@ export default definePlugin({
 									(!member.expiresAt || new Date(member.expiresAt) > new Date())
 								) {
 									const plan = plans.find((p: PlanConfig) => p.id === member.plan);
-									if (plan && plan.interval === "month") {
-										mrr += plan.price;
+									if (plan) {
+										if (plan.interval === "month") {
+											mrr += plan.price;
+										} else if (plan.interval === "year") {
+											mrr += Math.round(plan.price / 12);
+										}
+										// "once" plans contribute $0 to MRR
 									}
 								}
 							}
