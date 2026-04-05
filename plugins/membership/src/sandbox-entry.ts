@@ -62,6 +62,18 @@ interface AdminInteraction {
 	planId?: string;
 }
 
+interface CouponRecord {
+	code: string;
+	discountType: "percent" | "fixed";
+	discountAmount: number; // Percentage (1-100) or cents (e.g., 500 for $5)
+	expiresAt?: string; // ISO date string
+	maxUses?: number; // Unlimited if not set
+	usedCount: number;
+	applicablePlans?: string[]; // Restrict to specific plans; empty = all plans
+	createdAt: string;
+	description?: string; // Admin notes
+}
+
 /**
  * Utility: Validate email format
  */
@@ -1964,6 +1976,238 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Dashboard upgrade error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /membership/coupons/create
+		 * Admin-only endpoint to create a new coupon code.
+		 *
+		 * Expects: { code, discountType, discountAmount, expiresAt?, maxUses?, applicablePlans?, description? }
+		 * Returns: { success: true, coupon: CouponRecord }
+		 */
+		couponCreate: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const code = String(input.code ?? "").trim().toUpperCase();
+					const discountType = String(input.discountType ?? "") as "percent" | "fixed";
+					const discountAmount = Number(input.discountAmount ?? 0);
+					const expiresAt = input.expiresAt ? String(input.expiresAt).trim() : undefined;
+					const maxUses = input.maxUses ? Number(input.maxUses) : undefined;
+					const applicablePlans = input.applicablePlans as string[] | undefined;
+					const description = input.description ? String(input.description).trim() : undefined;
+
+					// Validate input
+					if (!code || code.length < 2) {
+						throw new Response(
+							JSON.stringify({ error: "Coupon code must be at least 2 characters" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (!discountType || !["percent", "fixed"].includes(discountType)) {
+						throw new Response(
+							JSON.stringify({ error: "Discount type must be 'percent' or 'fixed'" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					if (discountAmount <= 0) {
+						throw new Response(
+							JSON.stringify({ error: "Discount amount must be greater than 0" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Check if coupon already exists
+					const existing = await ctx.kv.get<string>(`coupon:${code}`);
+					if (existing) {
+						throw new Response(
+							JSON.stringify({ error: "Coupon code already exists" }),
+							{ status: 409, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const coupon: CouponRecord = {
+						code,
+						discountType,
+						discountAmount,
+						usedCount: 0,
+						createdAt: new Date().toISOString(),
+					};
+
+					if (expiresAt) coupon.expiresAt = expiresAt;
+					if (maxUses) coupon.maxUses = maxUses;
+					if (applicablePlans && applicablePlans.length > 0) coupon.applicablePlans = applicablePlans;
+					if (description) coupon.description = description;
+
+					// Store coupon
+					await ctx.kv.set(`coupon:${code}`, JSON.stringify(coupon));
+
+					// Add to coupons list
+					const listJson = await ctx.kv.get<string>("coupons:list");
+					const coupons = parseJSON<string[]>(listJson, []);
+					if (!coupons.includes(code)) {
+						coupons.push(code);
+						await ctx.kv.set("coupons:list", JSON.stringify(coupons));
+					}
+
+					ctx.log.info(`Coupon created: ${code}`);
+
+					return {
+						success: true,
+						coupon,
+						message: `Coupon ${code} created successfully`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Coupon create error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * GET /membership/coupons
+		 * Admin-only endpoint to list all coupons with usage stats.
+		 *
+		 * Returns: { coupons: CouponRecord[] }
+		 */
+		couponList: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const listJson = await ctx.kv.get<string>("coupons:list");
+					const couponCodes = parseJSON<string[]>(listJson, []);
+
+					const coupons: CouponRecord[] = [];
+					for (const code of couponCodes) {
+						const couponJson = await ctx.kv.get<string>(`coupon:${code}`);
+						if (couponJson) {
+							const coupon = parseJSON<CouponRecord>(couponJson, null);
+							if (coupon) {
+								coupons.push(coupon);
+							}
+						}
+					}
+
+					return {
+						coupons,
+						total: coupons.length,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Coupon list error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * POST /membership/coupons/validate
+		 * Public endpoint to validate a coupon code in real-time.
+		 *
+		 * Expects: { code, planId? }
+		 * Returns: { valid: true, discountType: string, discountAmount: number } or { valid: false, reason: string }
+		 */
+		couponValidate: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const code = String(input.code ?? "").trim().toUpperCase();
+					const planId = input.planId ? String(input.planId).trim() : undefined;
+
+					if (!code) {
+						return {
+							valid: false,
+							reason: "Coupon code required",
+						};
+					}
+
+					const couponJson = await ctx.kv.get<string>(`coupon:${code}`);
+					if (!couponJson) {
+						return {
+							valid: false,
+							reason: "Coupon not found",
+						};
+					}
+
+					const coupon = parseJSON<CouponRecord>(couponJson, null);
+					if (!coupon) {
+						return {
+							valid: false,
+							reason: "Coupon not found",
+						};
+					}
+
+					// Check expiry
+					if (coupon.expiresAt && new Date(coupon.expiresAt) < new Date()) {
+						return {
+							valid: false,
+							reason: "Coupon has expired",
+						};
+					}
+
+					// Check max uses
+					if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) {
+						return {
+							valid: false,
+							reason: "Coupon usage limit reached",
+						};
+					}
+
+					// Check plan restriction
+					if (coupon.applicablePlans && coupon.applicablePlans.length > 0) {
+						if (!planId || !coupon.applicablePlans.includes(planId)) {
+							return {
+								valid: false,
+								reason: "This coupon is not valid for your selected plan",
+							};
+						}
+					}
+
+					return {
+						valid: true,
+						discountType: coupon.discountType,
+						discountAmount: coupon.discountAmount,
+						message: coupon.discountType === "percent"
+							? `Save ${coupon.discountAmount}% with this code!`
+							: `Save $${(coupon.discountAmount / 100).toFixed(2)} with this code!`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Coupon validate error: ${String(error)}`);
 					throw new Response(
 						JSON.stringify({ error: "Internal server error" }),
 						{ status: 500, headers: { "Content-Type": "application/json" } }
