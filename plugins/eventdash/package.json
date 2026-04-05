@@ -1,0 +1,15 @@
+{
+	"name": "@shipyard/eventdash",
+	"version": "0.1.0",
+	"description": "Events & ticketing plugin for EmDash CMS",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./sandbox": "./src/sandbox-entry.ts"
+	},
+	"keywords": ["emdash", "plugin", "events", "ticketing"],
+	"license": "MIT",
+	"peerDependencies": {
+		"emdash": "^0.1.0"
+	}
+}
