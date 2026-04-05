@@ -46,6 +46,56 @@ interface MemberRecord {
 	contentAccess?: string[]; // Array of content/page IDs member can access
 }
 
+/**
+ * Phase 4: Group memberships
+ */
+interface GroupRecord {
+	id: string; // UUID
+	orgName: string;
+	orgEmail: string;
+	adminEmail: string; // Original group creator
+	planId: string;
+	maxSeats: number;
+	members: string[]; // Array of member emails
+	stripeCustomerId?: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+interface GroupInviteCode {
+	code: string; // UUID
+	groupId: string;
+	email?: string; // Optional: pre-filled invite email
+	expiresAt: string; // ISO date
+	createdAt: string;
+	createdBy: string; // Admin email who sent invite
+}
+
+/**
+ * Phase 4: Developer webhooks
+ */
+interface WebhookEndpoint {
+	id: string; // UUID
+	url: string;
+	events: string[]; // e.g., ["member.created", "member.cancelled"]
+	secret: string; // HMAC secret for signing payloads
+	active: boolean;
+	createdAt: string;
+	lastFiredAt?: string;
+	failedCount: number;
+}
+
+interface WebhookLog {
+	id: string;
+	webhookId: string;
+	eventType: string;
+	payload: string; // JSON stringified
+	responseCode?: number;
+	responseBody?: string;
+	firedAt: string;
+	success: boolean;
+}
+
 interface PlanConfig {
 	id: string;
 	name: string;
@@ -96,6 +146,111 @@ function isValidEmail(email: string): boolean {
  */
 function generateId(): string {
 	return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+/**
+ * Utility: Generate UUID v4
+ */
+function generateUUID(): string {
+	if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+		return crypto.randomUUID();
+	}
+	return `${Date.now()}-${Math.random().toString(36).slice(2, 12)}-${Math.random().toString(36).slice(2, 12)}`;
+}
+
+/**
+ * Utility: Generate HMAC-SHA256 webhook signature
+ */
+async function generateWebhookSignature(payload: string, secret: string): Promise<string> {
+	const key = await crypto.subtle.importKey(
+		"raw",
+		new TextEncoder().encode(secret),
+		{ name: "HMAC", hash: "SHA-256" },
+		false,
+		["sign"]
+	);
+	const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payload));
+	return Array.from(new Uint8Array(sig))
+		.map(b => b.toString(16).padStart(2, "0"))
+		.join("");
+}
+
+/**
+ * Utility: Fire webhook to registered endpoint
+ */
+async function fireWebhook(
+	endpoint: WebhookEndpoint,
+	eventType: string,
+	data: Record<string, any>,
+	ctx: PluginContext
+): Promise<WebhookLog> {
+	const payload = JSON.stringify({
+		event: eventType,
+		timestamp: new Date().toISOString(),
+		data,
+	});
+
+	const signature = await generateWebhookSignature(payload, endpoint.secret);
+
+	let responseCode: number | undefined;
+	let responseBody: string | undefined;
+	let success = false;
+
+	try {
+		const response = await fetch(endpoint.url, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"X-Shipyard-Signature": `sha256=${signature}`,
+				"X-Shipyard-Event": eventType,
+			},
+			body: payload,
+		});
+		responseCode = response.status;
+		success = response.ok;
+		try {
+			responseBody = await response.text();
+		} catch {
+			responseBody = "(response unreadable)";
+		}
+	} catch (error) {
+		responseCode = 0;
+		responseBody = String(error);
+		success = false;
+	}
+
+	const log: WebhookLog = {
+		id: generateUUID(),
+		webhookId: endpoint.id,
+		eventType,
+		payload,
+		responseCode,
+		responseBody,
+		firedAt: new Date().toISOString(),
+		success,
+	};
+
+	// Store webhook log
+	await ctx.kv.set(`webhook:log:${log.id}`, JSON.stringify(log));
+
+	// Add to webhook's log list
+	const logsJson = await ctx.kv.get<string>(`webhook:${endpoint.id}:logs`);
+	const logs = parseJSON<string[]>(logsJson, []);
+	logs.push(log.id);
+	// Keep last 100 logs
+	if (logs.length > 100) logs.shift();
+	await ctx.kv.set(`webhook:${endpoint.id}:logs`, JSON.stringify(logs));
+
+	// Update endpoint's last fired time
+	if (success) {
+		endpoint.lastFiredAt = log.firedAt;
+		endpoint.failedCount = 0;
+	} else {
+		endpoint.failedCount++;
+	}
+	await ctx.kv.set(`webhook:${endpoint.id}`, JSON.stringify(endpoint));
+
+	return log;
 }
 
 /**
@@ -2989,6 +3144,812 @@ export default definePlugin({
 						);
 					}
 				},
+			},
+		},
+
+		/**
+		 * PHASE 4 WAVE 1: Task 1 - MemberShip Reporting
+		 * GET /membership/reports/revenue
+		 * GET /membership/reports/churn
+		 * GET /membership/reports/members
+		 */
+		revenueReport: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const days = Number(input.days ?? 30);
+
+					// Get all members
+					const listJson = await ctx.kv.get<string>("members:list");
+					const memberEmails = parseJSON<string[]>(listJson, []);
+
+					const dateMap = new Map<string, number>();
+					let totalRevenue = 0;
+					let mrrAmount = 0;
+
+					// Aggregate revenue by date and calculate MRR
+					for (const encodedEmail of memberEmails) {
+						const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
+						if (!memberJson) continue;
+						const member = parseJSON<MemberRecord>(memberJson, null);
+						if (!member) continue;
+
+						// Get plan price
+						const plansJson = await ctx.kv.get<string>("plans");
+						const plans = parseJSON(plansJson, DEFAULT_PLANS);
+						const plan = plans.find((p: PlanConfig) => p.id === member.plan);
+						if (!plan) continue;
+
+						const createdDate = new Date(member.createdAt);
+						const now = new Date();
+						const daysDiff = Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+
+						// Only count members within the last N days
+						if (daysDiff <= days) {
+							const dateKey = createdDate.toISOString().split('T')[0];
+							dateMap.set(dateKey, (dateMap.get(dateKey) || 0) + plan.price);
+							totalRevenue += plan.price;
+						}
+
+						// Add to MRR if active monthly subscription
+						if (member.status === "active" && member.planInterval === "month") {
+							mrrAmount += plan.price / 100; // Convert from cents
+						}
+					}
+
+					// Convert map to sorted array
+					const chartData = Array.from(dateMap.entries())
+						.map(([date, amount]) => ({ date, amount }))
+						.sort((a, b) => a.date.localeCompare(b.date));
+
+					return {
+						totalRevenue: totalRevenue / 100,
+						mrr: Math.round(mrrAmount * 100) / 100,
+						averageRevenuePerMember: totalRevenue / Math.max(memberEmails.length, 1) / 100,
+						memberCount: memberEmails.length,
+						chartData,
+						period: `last ${days} days`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Revenue report error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		churnReport: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const days = Number(input.days ?? 30);
+
+					// Get all members
+					const listJson = await ctx.kv.get<string>("members:list");
+					const memberEmails = parseJSON<string[]>(listJson, []);
+
+					const now = new Date();
+					const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
+					let activeMembersAtStart = 0;
+					let cancelledInPeriod = 0;
+
+					for (const encodedEmail of memberEmails) {
+						const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
+						if (!memberJson) continue;
+						const member = parseJSON<MemberRecord>(memberJson, null);
+						if (!member) continue;
+
+						const createdDate = new Date(member.createdAt);
+
+						// Was active at start of period?
+						if (createdDate < cutoff && (member.status === "active" || member.status === "cancelled")) {
+							activeMembersAtStart++;
+						}
+
+						// Cancelled during period?
+						if (member.status === "cancelled" && createdDate >= cutoff) {
+							cancelledInPeriod++;
+						}
+					}
+
+					const churnRate = activeMembersAtStart > 0
+						? Math.round((cancelledInPeriod / activeMembersAtStart) * 10000) / 100
+						: 0;
+
+					return {
+						churnRate: `${churnRate}%`,
+						cancelledMembers: cancelledInPeriod,
+						activeMembersAtStart,
+						period: `last ${days} days`,
+						retentionRate: `${Math.round((100 - churnRate) * 100) / 100}%`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Churn report error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		membersReport: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const planId = input.planId ? String(input.planId).trim() : undefined;
+					const status = input.status ? String(input.status).trim() : undefined;
+					const search = input.search ? String(input.search).toLowerCase().trim() : undefined;
+					const page = Number(input.page ?? 1);
+					const perPage = Number(input.perPage ?? 20);
+
+					// Get all members
+					const listJson = await ctx.kv.get<string>("members:list");
+					const memberEmails = parseJSON<string[]>(listJson, []);
+
+					const members = [];
+					for (const encodedEmail of memberEmails) {
+						const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
+						if (!memberJson) continue;
+						const member = parseJSON<MemberRecord>(memberJson, null);
+						if (!member) continue;
+
+						// Apply filters
+						if (planId && member.plan !== planId) continue;
+						if (status && member.status !== status) continue;
+						if (search && !member.email.toLowerCase().includes(search)) continue;
+
+						members.push({
+							email: member.email,
+							plan: member.plan,
+							status: member.status,
+							createdAt: member.createdAt,
+							expiresAt: member.expiresAt || null,
+							planInterval: member.planInterval || "once",
+						});
+					}
+
+					// Sort by created date descending
+					members.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+					// Paginate
+					const start = (page - 1) * perPage;
+					const end = start + perPage;
+					const paginated = members.slice(start, end);
+
+					return {
+						members: paginated,
+						total: members.length,
+						page,
+						perPage,
+						totalPages: Math.ceil(members.length / perPage),
+						summary: {
+							total: members.length,
+							active: members.filter(m => m.status === "active").length,
+							pastDue: members.filter(m => m.status === "past_due").length,
+							cancelled: members.filter(m => m.status === "cancelled").length,
+						},
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Members report error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * PHASE 4 WAVE 1: Task 3 - Group Memberships
+		 * POST /membership/groups/create
+		 * POST /membership/groups/:id/invite
+		 * POST /membership/groups/:id/remove
+		 * GET /membership/groups/:id
+		 * POST /membership/groups/accept
+		 */
+		groupCreate: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const orgName = String(input.orgName ?? "").trim();
+					const orgEmail = String(input.orgEmail ?? "").trim().toLowerCase();
+					const planId = String(input.planId ?? "").trim();
+					const maxSeats = Number(input.maxSeats ?? 10);
+					const adminEmail = String(input.adminEmail ?? "").trim().toLowerCase();
+
+					// Validate
+					if (!orgName || !orgEmail || !planId || maxSeats < 1) {
+						throw new Response(
+							JSON.stringify({ error: "Missing required fields" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Create group
+					const groupId = generateUUID();
+					const group: GroupRecord = {
+						id: groupId,
+						orgName,
+						orgEmail,
+						adminEmail,
+						planId,
+						maxSeats,
+						members: [adminEmail],
+						createdAt: new Date().toISOString(),
+						updatedAt: new Date().toISOString(),
+					};
+
+					await ctx.kv.set(`group:${groupId}`, JSON.stringify(group));
+
+					// Add to groups list
+					const listJson = await ctx.kv.get<string>("groups:list");
+					const groups = parseJSON<string[]>(listJson, []);
+					groups.push(groupId);
+					await ctx.kv.set("groups:list", JSON.stringify(groups));
+
+					ctx.log.info(`Group created: ${groupId} (${orgName})`);
+
+					return {
+						success: true,
+						group,
+						message: `Group "${orgName}" created with max ${maxSeats} seats`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Group create error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		groupInvite: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const groupId = String(input.groupId ?? "").trim();
+					const email = String(input.email ?? "").trim().toLowerCase();
+
+					// Get group
+					const groupJson = await ctx.kv.get<string>(`group:${groupId}`);
+					if (!groupJson) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const group = parseJSON<GroupRecord>(groupJson, null);
+					if (!group) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Check seat availability
+					if (group.members.length >= group.maxSeats) {
+						throw new Response(
+							JSON.stringify({ error: "Group has reached maximum seats" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Generate invite code
+					const code = generateUUID();
+					const invite: GroupInviteCode = {
+						code,
+						groupId,
+						email,
+						expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+						createdAt: new Date().toISOString(),
+						createdBy: adminUser.email as string || "admin",
+					};
+
+					await ctx.kv.set(`group:invite:${code}`, JSON.stringify(invite));
+
+					// Add to group's invites list
+					const invitesJson = await ctx.kv.get<string>(`group:${groupId}:invites`);
+					const invites = parseJSON<string[]>(invitesJson, []);
+					invites.push(code);
+					await ctx.kv.set(`group:${groupId}:invites`, JSON.stringify(invites));
+
+					ctx.log.info(`Group invite created: ${groupId} -> ${email}`);
+
+					return {
+						success: true,
+						inviteCode: code,
+						inviteLink: `${(ctx as any).env?.APP_URL || 'https://app.shipyard.io'}/join-group?code=${code}`,
+						message: `Invite sent to ${email}`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Group invite error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		groupRemove: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const groupId = String(input.groupId ?? "").trim();
+					const email = String(input.email ?? "").trim().toLowerCase();
+
+					// Get group
+					const groupJson = await ctx.kv.get<string>(`group:${groupId}`);
+					if (!groupJson) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const group = parseJSON<GroupRecord>(groupJson, null);
+					if (!group) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Remove member
+					const idx = group.members.indexOf(email);
+					if (idx === -1) {
+						throw new Response(
+							JSON.stringify({ error: "Member not in group" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					group.members.splice(idx, 1);
+					group.updatedAt = new Date().toISOString();
+					await ctx.kv.set(`group:${groupId}`, JSON.stringify(group));
+
+					ctx.log.info(`Removed ${email} from group ${groupId}`);
+
+					return {
+						success: true,
+						message: `${email} removed from group`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Group remove error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		groupGet: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const groupId = String(input.groupId ?? "").trim();
+
+					const groupJson = await ctx.kv.get<string>(`group:${groupId}`);
+					if (!groupJson) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const group = parseJSON<GroupRecord>(groupJson, null);
+					if (!group) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					return {
+						group,
+						seatsUsed: group.members.length,
+						seatsAvailable: group.maxSeats - group.members.length,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Group get error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		groupAccept: {
+			public: true,
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const input = rc.input as Record<string, unknown>;
+					const code = String(input.code ?? "").trim();
+					const email = String(input.email ?? "").trim().toLowerCase();
+
+					// Get invite
+					const inviteJson = await ctx.kv.get<string>(`group:invite:${code}`);
+					if (!inviteJson) {
+						throw new Response(
+							JSON.stringify({ error: "Invite not found or expired" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const invite = parseJSON<GroupInviteCode>(inviteJson, null);
+					if (!invite) {
+						throw new Response(
+							JSON.stringify({ error: "Invite not found or expired" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Check expiry
+					if (new Date(invite.expiresAt) < new Date()) {
+						throw new Response(
+							JSON.stringify({ error: "Invite has expired" }),
+							{ status: 410, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Get group
+					const groupJson = await ctx.kv.get<string>(`group:${invite.groupId}`);
+					if (!groupJson) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const group = parseJSON<GroupRecord>(groupJson, null);
+					if (!group) {
+						throw new Response(
+							JSON.stringify({ error: "Group not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Check seat availability
+					if (group.members.length >= group.maxSeats) {
+						throw new Response(
+							JSON.stringify({ error: "Group has reached maximum seats" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Add member to group
+					if (!group.members.includes(email)) {
+						group.members.push(email);
+						group.updatedAt = new Date().toISOString();
+						await ctx.kv.set(`group:${invite.groupId}`, JSON.stringify(group));
+					}
+
+					// Delete invite
+					await ctx.kv.delete(`group:invite:${code}`);
+
+					ctx.log.info(`Member ${email} joined group ${invite.groupId}`);
+
+					return {
+						success: true,
+						group,
+						message: `Welcome to ${group.orgName}!`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Group accept error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		/**
+		 * PHASE 4 WAVE 1: Task 4 - Developer Webhooks
+		 * POST /membership/webhooks/register
+		 * DELETE /membership/webhooks/:id
+		 * GET /membership/webhooks
+		 */
+		webhookRegister: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const url = String(input.url ?? "").trim();
+					const events = input.events as string[] | undefined;
+
+					// Validate
+					if (!url || !events || events.length === 0) {
+						throw new Response(
+							JSON.stringify({ error: "URL and events required" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Validate URL
+					try {
+						new URL(url);
+					} catch {
+						throw new Response(
+							JSON.stringify({ error: "Invalid URL" }),
+							{ status: 400, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Create webhook
+					const webhookId = generateUUID();
+					const secret = generateUUID();
+					const webhook: WebhookEndpoint = {
+						id: webhookId,
+						url,
+						events,
+						secret,
+						active: true,
+						createdAt: new Date().toISOString(),
+						failedCount: 0,
+					};
+
+					await ctx.kv.set(`webhook:${webhookId}`, JSON.stringify(webhook));
+
+					// Add to webhooks list
+					const listJson = await ctx.kv.get<string>("webhooks:list");
+					const webhooks = parseJSON<string[]>(listJson, []);
+					webhooks.push(webhookId);
+					await ctx.kv.set("webhooks:list", JSON.stringify(webhooks));
+
+					ctx.log.info(`Webhook registered: ${webhookId} for ${events.join(", ")}`);
+
+					return {
+						success: true,
+						webhook,
+						secret: webhook.secret,
+						message: "Webhook registered successfully",
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook register error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		webhookDelete: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const webhookId = String(input.webhookId ?? "").trim();
+
+					const webhookJson = await ctx.kv.get<string>(`webhook:${webhookId}`);
+					if (!webhookJson) {
+						throw new Response(
+							JSON.stringify({ error: "Webhook not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Delete webhook
+					await ctx.kv.delete(`webhook:${webhookId}`);
+
+					// Remove from list
+					const listJson = await ctx.kv.get<string>("webhooks:list");
+					const webhooks = parseJSON<string[]>(listJson, []);
+					const idx = webhooks.indexOf(webhookId);
+					if (idx !== -1) {
+						webhooks.splice(idx, 1);
+						await ctx.kv.set("webhooks:list", JSON.stringify(webhooks));
+					}
+
+					ctx.log.info(`Webhook deleted: ${webhookId}`);
+
+					return {
+						success: true,
+						message: "Webhook deleted",
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook delete error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		webhookList: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const listJson = await ctx.kv.get<string>("webhooks:list");
+					const webhookIds = parseJSON<string[]>(listJson, []);
+
+					const webhooks: WebhookEndpoint[] = [];
+					for (const id of webhookIds) {
+						const webhookJson = await ctx.kv.get<string>(`webhook:${id}`);
+						if (webhookJson) {
+							const webhook = parseJSON<WebhookEndpoint>(webhookJson, null);
+							if (webhook) {
+								webhooks.push(webhook);
+							}
+						}
+					}
+
+					return {
+						webhooks,
+						total: webhooks.length,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook list error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		webhookTest: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const webhookId = String(input.webhookId ?? "").trim();
+
+					const webhookJson = await ctx.kv.get<string>(`webhook:${webhookId}`);
+					if (!webhookJson) {
+						throw new Response(
+							JSON.stringify({ error: "Webhook not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const webhook = parseJSON<WebhookEndpoint>(webhookJson, null);
+					if (!webhook) {
+						throw new Response(
+							JSON.stringify({ error: "Webhook not found" }),
+							{ status: 404, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					// Fire test webhook
+					const testData = {
+						member_id: "test-123",
+						email: "test@example.com",
+						plan_id: "basic",
+						created_at: new Date().toISOString(),
+					};
+
+					const log = await fireWebhook(webhook, "member.created", testData, ctx);
+
+					return {
+						success: log.success,
+						log,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Webhook test error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
 			},
 		},
 	},

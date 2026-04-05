@@ -3285,5 +3285,316 @@ END:VCALENDAR`;
 				}
 			},
 		},
+
+		/**
+		 * PHASE 4 WAVE 1: Task 2 - EventDash Reporting
+		 * GET /eventdash/reports/performance
+		 * GET /eventdash/reports/trends
+		 * GET /eventdash/reports/revenue
+		 */
+		performanceReport: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const days = Number(input.days ?? 90);
+
+					// Get all events
+					const eventsListJson = await ctx.kv.get<string>("events:list");
+					const eventIds = parseJSON<string[]>(eventsListJson, []);
+
+					const now = new Date();
+					const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
+					const events = [];
+
+					for (const eventId of eventIds) {
+						const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+						if (!eventJson) continue;
+
+						const event = parseJSON<EventRecord>(eventJson, null);
+						if (!event) continue;
+
+						const eventDate = new Date(event.date);
+						if (eventDate < cutoff) continue;
+
+						// Get registrations
+						const regsListJson = await ctx.kv.get<string>(`event:${eventId}:registrations`);
+						const regEmails = parseJSON<string[]>(regsListJson, []);
+
+						let registrationCount = 0;
+						let checkedInCount = 0;
+						let totalRevenue = 0;
+
+						for (const encodedEmail of regEmails) {
+							const regJson = await ctx.kv.get<string>(`event:${eventId}:registration:${encodedEmail}`);
+							if (!regJson) continue;
+
+							const reg = parseJSON<RegistrationRecord>(regJson, null);
+							if (!reg || reg.status !== "registered") continue;
+
+							registrationCount++;
+
+							if (reg.checkedIn) {
+								checkedInCount++;
+							}
+
+							if (reg.amountPaid) {
+								totalRevenue += reg.amountPaid;
+							}
+						}
+
+						const showRate = registrationCount > 0
+							? Math.round((checkedInCount / registrationCount) * 10000) / 100
+							: 0;
+						const attendanceRate = registrationCount > 0
+							? Math.round((checkedInCount / event.capacity) * 10000) / 100
+							: 0;
+
+						events.push({
+							id: eventId,
+							title: event.title,
+							date: event.date,
+							time: event.time,
+							registrations: registrationCount,
+							capacity: event.capacity,
+							checkedIn: checkedInCount,
+							showRate: `${showRate}%`,
+							attendanceRate: `${attendanceRate}%`,
+							revenue: totalRevenue / 100,
+						});
+					}
+
+					// Sort by date descending
+					events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+					return {
+						events,
+						total: events.length,
+						period: `last ${days} days`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Performance report error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		trendsReport: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const days = Number(input.days ?? 30);
+
+					// Get all events
+					const eventsListJson = await ctx.kv.get<string>("events:list");
+					const eventIds = parseJSON<string[]>(eventsListJson, []);
+
+					const now = new Date();
+					const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
+					const registrationsByDate = new Map<string, number>();
+					const registrationsByDayOfWeek = new Map<number, number>();
+					const registrationsByHour = new Map<number, number>();
+					const repeatAttendees = new Map<string, number>();
+
+					for (const eventId of eventIds) {
+						const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+						if (!eventJson) continue;
+
+						const event = parseJSON<EventRecord>(eventJson, null);
+						if (!event) continue;
+
+						const eventDate = new Date(event.date);
+						if (eventDate < cutoff) continue;
+
+						// Get registrations
+						const regsListJson = await ctx.kv.get<string>(`event:${eventId}:registrations`);
+						const regEmails = parseJSON<string[]>(regsListJson, []);
+
+						for (const encodedEmail of regEmails) {
+							const regJson = await ctx.kv.get<string>(`event:${eventId}:registration:${encodedEmail}`);
+							if (!regJson) continue;
+
+							const reg = parseJSON<RegistrationRecord>(regJson, null);
+							if (!reg || reg.status !== "registered") continue;
+
+							// Track by created date
+							const regDate = new Date(reg.createdAt);
+							const dateKey = regDate.toISOString().split('T')[0];
+							registrationsByDate.set(dateKey, (registrationsByDate.get(dateKey) || 0) + 1);
+
+							// Track by day of week (0 = Sunday)
+							const dayOfWeek = eventDate.getDay();
+							registrationsByDayOfWeek.set(dayOfWeek, (registrationsByDayOfWeek.get(dayOfWeek) || 0) + 1);
+
+							// Track by hour
+							const [hours] = event.time.split(':').map(Number);
+							registrationsByHour.set(hours, (registrationsByHour.get(hours) || 0) + 1);
+
+							// Track repeat attendees
+							repeatAttendees.set(encodedEmail, (repeatAttendees.get(encodedEmail) || 0) + 1);
+						}
+					}
+
+					// Convert maps to arrays
+					const registrationTrend = Array.from(registrationsByDate.entries())
+						.map(([date, count]) => ({ date, registrations: count }))
+						.sort((a, b) => a.date.localeCompare(b.date));
+
+					const dayOfWeekNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+					const popularDays = Array.from(registrationsByDayOfWeek.entries())
+						.map(([day, count]) => ({ day: dayOfWeekNames[day], registrations: count }))
+						.sort((a, b) => b.registrations - a.registrations);
+
+					const popularHours = Array.from(registrationsByHour.entries())
+						.map(([hour, count]) => ({ hour: `${String(hour).padStart(2, '0')}:00`, registrations: count }))
+						.sort((a, b) => b.registrations - a.registrations);
+
+					const repeatAttendeeCount = Array.from(repeatAttendees.values()).filter(count => count > 1).length;
+
+					return {
+						registrationTrend,
+						popularDays: popularDays.slice(0, 3),
+						popularHours: popularHours.slice(0, 5),
+						repeatAttendees: repeatAttendeeCount,
+						totalUniqueRegistrants: repeatAttendees.size,
+						period: `last ${days} days`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Trends report error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
+
+		revenueReport: {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+				try {
+					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+						throw new Response(
+							JSON.stringify({ error: "Admin access required" }),
+							{ status: 403, headers: { "Content-Type": "application/json" } }
+						);
+					}
+
+					const input = rc.input as Record<string, unknown>;
+					const days = Number(input.days ?? 90);
+
+					// Get all events
+					const eventsListJson = await ctx.kv.get<string>("events:list");
+					const eventIds = parseJSON<string[]>(eventsListJson, []);
+
+					const now = new Date();
+					const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
+					let totalRevenue = 0;
+					const revenueByEvent = new Map<string, { title: string; revenue: number }>();
+					const revenueByTicketType = new Map<string, number>();
+
+					for (const eventId of eventIds) {
+						const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
+						if (!eventJson) continue;
+
+						const event = parseJSON<EventRecord>(eventJson, null);
+						if (!event) continue;
+
+						const eventDate = new Date(event.date);
+						if (eventDate < cutoff) continue;
+
+						// Get registrations
+						const regsListJson = await ctx.kv.get<string>(`event:${eventId}:registrations`);
+						const regEmails = parseJSON<string[]>(regsListJson, []);
+
+						let eventRevenue = 0;
+
+						for (const encodedEmail of regEmails) {
+							const regJson = await ctx.kv.get<string>(`event:${eventId}:registration:${encodedEmail}`);
+							if (!regJson) continue;
+
+							const reg = parseJSON<RegistrationRecord>(regJson, null);
+							if (!reg || reg.status !== "registered" || reg.paymentStatus !== "paid") continue;
+
+							const amount = reg.amountPaid || 0;
+							eventRevenue += amount;
+							totalRevenue += amount;
+
+							if (reg.ticketType) {
+								revenueByTicketType.set(
+									reg.ticketType,
+									(revenueByTicketType.get(reg.ticketType) || 0) + amount
+								);
+							}
+						}
+
+						if (eventRevenue > 0) {
+							revenueByEvent.set(eventId, {
+								title: event.title,
+								revenue: eventRevenue,
+							});
+						}
+					}
+
+					const eventRevenues = Array.from(revenueByEvent.entries())
+						.map(([id, data]) => ({
+							eventId: id,
+							title: data.title,
+							revenue: data.revenue / 100,
+						}))
+						.sort((a, b) => b.revenue - a.revenue);
+
+					const ticketTypeRevenues = Array.from(revenueByTicketType.entries())
+						.map(([type, revenue]) => ({
+							ticketType: type,
+							revenue: revenue / 100,
+						}))
+						.sort((a, b) => b.revenue - a.revenue);
+
+					return {
+						totalRevenue: totalRevenue / 100,
+						eventRevenues,
+						ticketTypeRevenues,
+						averageRevenuePerEvent: eventRevenues.length > 0
+							? Math.round((totalRevenue / eventRevenues.length) * 100) / 100 / 100
+							: 0,
+						period: `last ${days} days`,
+					};
+				} catch (error) {
+					if (error instanceof Response) throw error;
+					ctx.log.error(`Revenue report error: ${String(error)}`);
+					throw new Response(
+						JSON.stringify({ error: "Internal server error" }),
+						{ status: 500, headers: { "Content-Type": "application/json" } }
+					);
+				}
+			},
+		},
 	},
 });
