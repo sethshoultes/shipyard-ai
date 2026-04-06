@@ -1,121 +1,198 @@
-# Requirements — EmDash Plugins v1 (MemberShip + Convene)
+# Shipyard Pulse — Phase 1 Requirements
 
-**Project:** 003-emdash-plugins
-**Generated:** 2026-04-05
-**Source:** PRD + Decisions (rounds/003-emdash-plugins/decisions.md)
-**Status:** Verified — 46 atomic requirements extracted
-
----
-
-## MemberShip Plugin Requirements (13)
-
-| ID | Requirement | Source | Priority |
-|----|-------------|--------|----------|
-| REQ-MS-001 | Implement `definePlugin` registration function for MemberShip plugin to register with EmDash | PRD | P0 |
-| REQ-MS-002 | Build member registration flow with single form for new users to sign up | Decisions (MVP) | P0 |
-| REQ-MS-003 | Integrate Stripe Checkout for membership plan subscription creation | Decisions (MVP) | P0 |
-| REQ-MS-004 | Implement Stripe webhook handler to process subscription lifecycle events (subscribe, cancel, payment failed) | Decisions (MVP) | P0 |
-| REQ-MS-005 | Create access check endpoint (`GET /check-access`) to verify member subscription status | Decisions (MVP) | P0 |
-| REQ-MS-006 | Build member dashboard page allowing users to view their own subscription status | Decisions (MVP) | P0 |
-| REQ-MS-007 | Build member dashboard cancel functionality allowing users to cancel their subscription | Decisions (MVP) | P0 |
-| REQ-MS-008 | Create admin member list UI with cursor-based pagination via Block Kit | Decisions (MVP) | P0 |
-| REQ-MS-009 | Create admin UI for creating new membership plans via Block Kit | Decisions (MVP) | P0 |
-| REQ-MS-010 | Create admin UI for editing existing membership plans via Block Kit | Decisions (MVP) | P0 |
-| REQ-MS-011 | Create admin settings UI for Stripe connection configuration via Block Kit | Decisions (MVP) | P0 |
-| REQ-MS-012 | Implement registration confirmation email template with beautiful default styling (no WYSIWYG) | Decisions (#8) | P0 |
-| REQ-MS-013 | Create empty state UI with copy "Your first member is one link away" when no members exist | Decisions (MVP) | P1 |
+**Generated**: 2026-04-06
+**Project Slug**: shipyard-care
+**Source**: rounds/shipyard-care/decisions.md, prds/shipyard-care.md
+**Phase**: 1 — Core Infrastructure
+**Status**: Verified — 15 atomic requirements extracted
 
 ---
 
-## Convene Plugin Requirements (10)
+## Requirements Traceability Matrix
 
-| ID | Requirement | Source | Priority |
-|----|-------------|--------|----------|
-| REQ-CV-001 | Implement `definePlugin` registration function for Convene plugin to register with EmDash | PRD | P0 |
-| REQ-CV-002 | Build event creation form for single-form event setup (title, date, time, description, capacity, price) | Decisions (MVP) | P0 |
-| REQ-CV-003 | Build event registration flow for attendees to sign up for events | Decisions (MVP) | P0 |
-| REQ-CV-004 | Integrate Stripe Checkout for one-time event registration payment | Decisions (MVP) | P0 |
-| REQ-CV-005 | Implement Stripe webhook handler to process payment events | Decisions (MVP) | P0 |
-| REQ-CV-006 | Create attendee list per event with member visibility | Decisions (MVP) | P0 |
-| REQ-CV-007 | Create admin event list UI with cursor-based pagination via Block Kit | Decisions (MVP) | P0 |
-| REQ-CV-008 | Create admin settings UI for Stripe connection configuration via Block Kit | Decisions (MVP) | P0 |
-| REQ-CV-009 | Implement registration confirmation email template with beautiful default styling (no WYSIWYG) | Decisions (#8) | P0 |
-| REQ-CV-010 | Create empty state UI with copy "Your first event is 60 seconds away" when no events exist | Decisions (MVP) | P1 |
-
----
-
-## Shared/Infrastructure Requirements (23)
-
-| ID | Requirement | Source | Priority |
-|----|-------------|--------|----------|
-| REQ-SHARED-001 | Use Stripe as single source of truth for all subscription state | Decisions (#2) | P0 |
-| REQ-SHARED-002 | Query Stripe for subscription state and cache briefly in KV with 60-second TTL for display | Decisions (#2) | P0 |
-| REQ-SHARED-003 | Use D1 (SQLite) for all entities requiring filter, sort, or pagination operations | Decisions (#3) | P0 |
-| REQ-SHARED-004 | Implement cursor-based pagination for all admin list endpoints from v1 | Decisions (#4) | P0 |
-| REQ-SHARED-005 | Achieve installation-to-first-success (event published or plan created) within 60 seconds | Decisions (#5) | P0 |
-| REQ-SHARED-006 | Use conversational language (not technical jargon) in all UI copy and email templates | Decisions (#6) | P1 |
-| REQ-SHARED-007 | Never persist subscription state in KV storage; only use KV for auth tokens and session cache | Decisions (#2) | P0 |
-| REQ-SHARED-008 | Display "Syncing..." visual indicator when Stripe request exceeds 2 seconds | Decisions (Open Q1) | P1 |
-| REQ-SHARED-009 | Implement E2E test coverage for all payment workflows | Decisions (#9) | P0 |
-| REQ-SHARED-010 | Implement E2E tests for subscription lifecycle events and payment event handling | Decisions (#9) | P0 |
-| REQ-SHARED-011 | Implement unit tests for all API routes in both plugins | PRD (Quality) | P0 |
-| REQ-SHARED-012 | Implement TypeScript strict mode with zero 'any' types in all code | PRD (Quality) | P0 |
-| REQ-SHARED-013 | Provide comprehensive README documentation with installation and usage instructions | PRD (Quality) | P0 |
-| REQ-SHARED-014 | Use idempotency keys on all Stripe payment operations to prevent duplicate charges | Decisions (Risk) | P0 |
-| REQ-SHARED-015 | Implement alert mechanism for webhook signature validation failures | Decisions (Risk) | P1 |
-| REQ-SHARED-016 | Use Resend for email delivery with proper SPF/DKIM configuration | Decisions (Risk) | P0 |
-| REQ-SHARED-017 | Implement email send queue for handling >10 emails/second | Decisions (Risk) | P2 |
-| REQ-SHARED-018 | Log all email send failures for monitoring and debugging | Decisions (Risk) | P1 |
-| REQ-SHARED-019 | Load test admin dashboards at 10,000+ records before launch | Decisions (Risk) | P1 |
-| REQ-SHARED-020 | Ensure access control decisions for content gating always verify with Stripe (never rely on stale cache) | Decisions (#2) | P0 |
-| REQ-SHARED-021 | Version D1 schema to support future migrations | Decisions (Risk) | P1 |
-| REQ-SHARED-022 | Never delete columns in v1.x D1 schema to maintain backward compatibility | Decisions (Risk) | P1 |
-| REQ-SHARED-023 | Create migration scripts for any D1 schema changes | Decisions (Risk) | P1 |
+| REQ ID | Requirement | Source | Priority | Task(s) |
+|--------|-------------|--------|----------|---------|
+| REQ-001 | Create Stripe API integration wrapper with error handling | decisions.md: Must Have - Stripe Integration | P0 | phase-1-task-1 |
+| REQ-002 | Build Stripe checkout flow for subscription creation | decisions.md: Must Have - Stripe Integration | P0 | phase-1-task-2 |
+| REQ-003 | Implement Stripe webhook endpoint with signature verification and idempotency | decisions.md: Must Have - Stripe Integration | P0 | phase-1-task-3 |
+| REQ-004 | Create PostgreSQL database schema for sites table | PRD: Phase 1 - Database schema | P0 | phase-1-task-4 |
+| REQ-005 | Create PostgreSQL database table for metrics (PageSpeed scores, uptime results) | decisions.md: Must Have - PageSpeed/Uptime | P0 | phase-1-task-5 |
+| REQ-006 | Create PostgreSQL database table for subscriptions (Stripe sync) | decisions.md: Must Have - Stripe Integration | P0 | phase-1-task-6 |
+| REQ-007 | Setup database connection with connection pooling | PRD: Phase 1 - Database schema | P0 | phase-1-task-7 |
+| REQ-008 | Implement session-based authentication middleware (httpOnly cookies) | PRD: Phase 1 - Basic dashboard auth | P0 | phase-1-task-8 |
+| REQ-009 | Create login/logout authentication endpoints | PRD: Phase 1 - Basic dashboard auth | P0 | phase-1-task-9 |
+| REQ-010 | Implement route protection for dashboard endpoints | PRD: Phase 1 - Basic dashboard auth | P0 | phase-1-task-10 |
+| REQ-011 | Design Health Score calculation algorithm | decisions.md: Must Have - Single-screen Dashboard | P0 | phase-1-task-11 |
+| REQ-012 | Build PageSpeed Insights API client | decisions.md: Must Have - PageSpeed Integration | P0 | phase-1-task-12 |
+| REQ-013 | Create uptime monitoring ping check mechanism | decisions.md: Must Have - Uptime Monitoring | P0 | phase-1-task-13 |
+| REQ-014 | Create database indexes for performance (<100ms p95) | PRD: Phase 1 - One-second load time | P0 | phase-1-task-14 |
+| REQ-015 | Implement database migration framework | PRD: Phase 1 - Database schema | P0 | phase-1-task-15 |
 
 ---
 
-## Explicitly NOT in v1 (Cut Scope)
+## Locked Decisions (Non-Negotiable Constraints)
 
-Per Decision #7, the following are explicitly excluded:
+### Product Constraints (from decisions.md)
 
-- Event series / recurring events
-- Event categories / tags
-- Venue management
-- Group/corporate memberships
-- Multi-step registration wizards
-- Cohort analysis / LTV / conversion funnels
-- PayPal or any non-Stripe payment processor
-- CSV import/export
-- Developer webhooks with HMAC signing
-- WYSIWYG email editor
-- Attendee comments / discussion threads
-- iCal export (deprioritized from original PRD)
-- Calendar view component (deprioritized from original PRD)
+| Constraint | Decision | Winner |
+|------------|----------|--------|
+| Product Name | "Shipyard Pulse" | Steve Jobs |
+| Dashboard Scope | Single screen only, not 5 pages | Compromise (Steve's principle, Elon's scope) |
+| Performance API | PageSpeed Insights API (not self-hosted Lighthouse) | Elon Musk |
+| Distribution | Default-on trial for all new Shipyard customers | Elon Musk |
+| Support Model | Email replies only, no ticket system | Both (unanimous) |
+| Brand Voice | Confident, warm, no exclamation points, no "just" or "simply" | Steve Jobs |
+| Animations | No animations in v1 (static Health Score) | Elon Musk |
+
+### Technical Constraints
+
+| Constraint | Decision | Rationale |
+|------------|----------|-----------|
+| Data Storage | PostgreSQL | Score storage requirement, existing patterns |
+| Payment Processing | Stripe Checkout + Webhooks | Must Have requirement |
+| Subscription Tiers | Basic ($99), Pro ($249), Enterprise ($499) | PRD tier structure |
+| Email Provider | Sendgrid or Resend | Existing plugin patterns |
+| Dashboard Load | < 1 second | decisions.md - Hard requirement |
+| Health Score | Static display with context (trend or grade) | decisions.md - Open Question #4 |
+
+### Kill List (Explicitly NOT in v1)
+
+Per decisions.md, the following are excluded:
+
+- Multi-page dashboard
+- Real-time data
+- Agency white-label features
+- Google Analytics integration
+- Competitor monitoring
+- Pulsing animations / heartbeat effect
+- Dark mode
+- Support ticket system
+- Slack notifications
+- Benchmark comparison to competitors
+- Complex AI recommendation engine (10 static recommendations if time permits)
+- Quarterly strategy calls
 
 ---
 
-## Locked Decisions Summary
+## Phase 1 Scope Boundaries
 
-| # | Decision | Winner |
-|---|----------|--------|
-| 1 | Keep "MemberShip", rename EventDash to "Convene" | Steve |
-| 2 | Stripe is source of truth for subscription state | Elon |
-| 3 | D1 (SQLite) for all list operations | Elon |
-| 4 | Cursor pagination required from v1 | Consensus |
-| 5 | 60-second first-run benchmark | Steve |
-| 6 | Conversational UI copy, not technical jargon | Steve |
-| 7 | Cut Phase 5 entirely | Elon |
-| 8 | Beautiful email templates, no WYSIWYG | Steve |
-| 9 | E2E test coverage required for payment software | Consensus |
+### IN Scope (Core Infrastructure - Week 1-2)
+
+1. **Stripe Integration**
+   - API wrapper with error handling
+   - Checkout session creation for three tiers
+   - Webhook endpoint with signature verification
+   - Idempotency protection for all operations
+
+2. **Database Schema**
+   - Sites table: id, url, name, subscription_id, tier, status, created_at, updated_at
+   - Metrics table: id, site_id, health_score, load_time, uptime_percent, lighthouse_score, created_at
+   - Subscriptions table: id, site_id, stripe_subscription_id, stripe_customer_id, status, tier, trial_ends_at, current_period_end
+   - Proper indexes for performance (<100ms p95 queries)
+
+3. **Authentication**
+   - Session-based auth with httpOnly cookies
+   - Login/logout endpoints
+   - Route protection middleware
+   - Token refresh mechanism
+
+4. **External API Clients**
+   - PageSpeed Insights API integration with caching
+   - Uptime ping check mechanism with response time tracking
+   - Health Score calculation algorithm
+
+### OUT of Scope (Phase 2+)
+
+- Dashboard UI implementation (Phase 3)
+- Monthly email system (Phase 4)
+- Landing page (Phase 5)
+- Static recommendations (v1 if time permits)
+- Cron job for monthly data collection
+- Email templates
 
 ---
 
-## Open Questions (Pending Resolution)
+## Acceptance Criteria
 
-1. **Caching Strategy**: 60-second TTL for Stripe cache; "Syncing..." indicator when >2s. Needs UX design.
-2. **D1 Migration Path**: Fresh start (no existing production data to migrate).
-3. **Shared Stripe Integration**: Leaning toward shared connection (aligns with 60-second benchmark).
-4. **Empty State Copy**: Approved as stated in MVP.
+### Stripe Integration
+- [ ] Can create checkout session for Basic tier ($99/mo)
+- [ ] Can create checkout session for Pro tier ($249/mo)
+- [ ] Can create checkout session for Enterprise tier ($499/mo)
+- [ ] Webhook endpoint validates Stripe signature
+- [ ] Duplicate webhook events are handled idempotently (same event ID = no reprocessing)
+- [ ] Subscription status updates correctly on webhook receipt
+- [ ] Idempotency keys included on all Stripe API calls
+
+### Database
+- [ ] Sites table accepts new records with all required fields
+- [ ] Metrics table stores PageSpeed scores with timestamps
+- [ ] Metrics table stores uptime check results
+- [ ] Subscriptions table syncs with Stripe subscription state
+- [ ] Queries return in < 100ms at p95
+- [ ] Indexes exist on (site_id, created_at DESC) for common queries
+- [ ] Migration framework supports versioned, idempotent migrations
+
+### Authentication
+- [ ] Login endpoint returns session in httpOnly, Secure, SameSite=Strict cookie
+- [ ] Session tokens are NOT stored in localStorage or sessionStorage
+- [ ] Protected routes reject unauthenticated requests with 401
+- [ ] Logout invalidates session and clears cookie
+- [ ] Token refresh works before expiry (15-minute access tokens)
+
+### External APIs
+- [ ] PageSpeed API returns performance score for given URL
+- [ ] PageSpeed results are cached (5-minute TTL) to avoid rate limits
+- [ ] Uptime check returns response time and status
+- [ ] Health Score calculated from load time + uptime + lighthouse score
+
+---
+
+## Risk Mitigations Required
+
+### Critical Risks (Must address before development)
+
+| Risk | Mitigation | Task |
+|------|------------|------|
+| Stripe webhook security not implemented | Verify signatures using stripe.webhooks.constructEvent | phase-1-task-3 |
+| Missing idempotency protection | Store processed event IDs, check before processing | phase-1-task-3 |
+| Database indexes missing | Add indexes on (site_id, created_at DESC) | phase-1-task-14 |
+| Session tokens in localStorage | Use httpOnly cookies exclusively | phase-1-task-8 |
+
+### High Risks (Address during development)
+
+| Risk | Mitigation | Task |
+|------|------------|------|
+| Test/Live mode Stripe key confusion | Environment variable validation at startup | phase-1-task-1 |
+| Database migration chaos | Backwards-compatible, idempotent migrations | phase-1-task-15 |
+| Cold start latency (Neon) | Connection pooling, keep-alive pings | phase-1-task-7 |
+| PageSpeed API rate limits | Cache results with 5-minute TTL | phase-1-task-12 |
+
+---
+
+## Token Budget Estimate (from decisions.md)
+
+| Component | Estimated Tokens |
+|-----------|------------------|
+| Dashboard (single screen) | 60K |
+| Email template + cron | 40K |
+| Stripe integration | 50K |
+| PageSpeed integration | 25K |
+| Uptime monitoring | 25K |
+| **Total estimate** | 200K |
+
+Phase 1 (Core Infrastructure) represents approximately 60-70K tokens of this budget.
+
+---
+
+## Success Metrics (from PRD)
+
+| Metric | Target | Timeframe |
+|--------|--------|-----------|
+| Care tier adoption (new customers) | 40% | 90 days post-launch |
+| Care tier adoption (existing customers) | 20% | 90 days post-launch |
+| Monthly email open rate | >50% | Ongoing |
+| Dashboard monthly active users | >60% of subscribers | Ongoing |
+| Churn rate | <5%/month | Ongoing |
 
 ---
 
@@ -124,4 +201,9 @@ Per Decision #7, the following are explicitly excluded:
 Every task in `phase-1-plan.md` traces back to at least one requirement in this document.
 Every requirement in this document is covered by at least one task.
 
-**Coverage Status:** 46/46 requirements mapped (100%)
+**Coverage Status:** 15/15 requirements mapped (100%)
+
+---
+
+*Generated by Great Minds Agency — Phase Planning Skill*
+*Source: rounds/shipyard-care/decisions.md, prds/shipyard-care.md*

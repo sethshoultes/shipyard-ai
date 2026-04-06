@@ -1,9 +1,10 @@
-# Phase 1 Plan — EmDash Plugins v1 (MemberShip + Convene)
+# Phase 1 Plan — Shipyard Pulse Core Infrastructure
 
-**Generated:** 2026-04-05
-**Requirements:** `.planning/REQUIREMENTS.md`, `prds/completed/003-emdash-plugins.md`, `rounds/003-emdash-plugins/decisions.md`
-**Total Tasks:** 24
-**Waves:** 5
+**Generated:** 2026-04-06
+**Project Slug:** shipyard-care
+**Requirements:** `.planning/REQUIREMENTS.md`, `prds/shipyard-care.md`, `rounds/shipyard-care/decisions.md`
+**Total Tasks:** 15
+**Waves:** 4
 
 ---
 
@@ -11,270 +12,329 @@
 
 | Requirement | Task(s) | Wave |
 |-------------|---------|------|
-| REQ-SHARED-003, REQ-SHARED-021, REQ-SHARED-022 | phase-1-task-1 | 1 |
-| REQ-MS-001, REQ-SHARED-012 | phase-1-task-2 | 1 |
-| REQ-CV-001, REQ-SHARED-012 | phase-1-task-3 | 1 |
-| REQ-SHARED-016, REQ-SHARED-017, REQ-SHARED-018 | phase-1-task-4 | 1 |
-| REQ-SHARED-001, REQ-SHARED-002, REQ-SHARED-007, REQ-SHARED-008, REQ-SHARED-014 | phase-1-task-5 | 2 |
-| REQ-SHARED-004 | phase-1-task-6 | 2 |
-| REQ-MS-002, REQ-MS-003 | phase-1-task-7 | 2 |
-| REQ-CV-002 | phase-1-task-8 | 2 |
-| REQ-MS-004, REQ-SHARED-015 | phase-1-task-9 | 3 |
-| REQ-MS-005, REQ-SHARED-020 | phase-1-task-10 | 3 |
-| REQ-MS-006, REQ-MS-007 | phase-1-task-11 | 3 |
-| REQ-CV-003, REQ-CV-004 | phase-1-task-12 | 3 |
-| REQ-CV-005 | phase-1-task-13 | 3 |
-| REQ-MS-012, REQ-SHARED-006 | phase-1-task-14 | 3 |
-| REQ-CV-009, REQ-SHARED-006 | phase-1-task-15 | 3 |
-| REQ-MS-008, REQ-MS-013 | phase-1-task-16 | 4 |
-| REQ-MS-009, REQ-MS-010 | phase-1-task-17 | 4 |
-| REQ-MS-011 | phase-1-task-18 | 4 |
-| REQ-CV-006 | phase-1-task-19 | 4 |
-| REQ-CV-007, REQ-CV-010 | phase-1-task-20 | 4 |
-| REQ-CV-008 | phase-1-task-21 | 4 |
-| REQ-SHARED-009, REQ-SHARED-010 | phase-1-task-22 | 5 |
-| REQ-SHARED-011 | phase-1-task-23 | 5 |
-| REQ-SHARED-013, REQ-SHARED-005, REQ-SHARED-019, REQ-SHARED-023 | phase-1-task-24 | 5 |
+| REQ-001: Stripe API wrapper | phase-1-task-1 | 1 |
+| REQ-002: Stripe checkout flow | phase-1-task-2 | 2 |
+| REQ-003: Stripe webhook handler | phase-1-task-3 | 2 |
+| REQ-004: Sites database schema | phase-1-task-4 | 1 |
+| REQ-005: Metrics database schema | phase-1-task-5 | 1 |
+| REQ-006: Subscriptions database schema | phase-1-task-6 | 1 |
+| REQ-007: Database connection pooling | phase-1-task-7 | 1 |
+| REQ-008: Auth middleware | phase-1-task-8 | 2 |
+| REQ-009: Login/logout endpoints | phase-1-task-9 | 3 |
+| REQ-010: Route protection | phase-1-task-10 | 3 |
+| REQ-011: Health Score algorithm | phase-1-task-11 | 3 |
+| REQ-012: PageSpeed API client | phase-1-task-12 | 3 |
+| REQ-013: Uptime monitoring | phase-1-task-13 | 3 |
+| REQ-014: Database indexes | phase-1-task-14 | 4 |
+| REQ-015: Migration framework | phase-1-task-15 | 4 |
 
 ---
 
 ## Wave Execution Order
 
-### Wave 1 (Parallel) — Infrastructure Foundation
+### Wave 1 (Parallel) — Foundation
 
-These tasks have no dependencies and establish the foundation for both plugins.
+These tasks have no dependencies and establish the foundation for Phase 1.
 
 ```xml
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Create D1 Database Schema</title>
-  <requirement>REQ-SHARED-003, REQ-SHARED-021, REQ-SHARED-022: D1 for filter/sort/pagination, schema versioning</requirement>
+  <title>Create Stripe API Integration Wrapper</title>
+  <requirement>REQ-001: Create Stripe API integration wrapper with error handling</requirement>
   <description>
-    Define the D1 (SQLite) database schema for both MemberShip and Convene plugins.
-    This replaces KV for all entities that require list operations. Schema must be
-    versioned for future migrations and follow the no-delete-columns rule.
+    Build the core Stripe API wrapper that all payment operations will use.
+    Includes proper error handling, environment validation (test vs live mode),
+    and idempotency key generation for all API calls.
   </description>
 
   <context>
-    <file path="plugins/membership/src/db/" reason="Target for MemberShip schema" />
-    <file path="plugins/convene/src/db/" reason="Target for Convene schema" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="D1 decision and file structure" />
+    <file path="apps/pulse/lib/stripe.ts" reason="Target file for Stripe wrapper" />
+    <file path="plugins/membership/src/sandbox-entry.ts" reason="Reference existing Stripe patterns" />
+    <file path="rounds/shipyard-care/decisions.md" reason="Stripe is locked as payment provider" />
   </context>
 
   <steps>
-    <step order="1">Create packages/plugin-membership/src/db/schema.ts with D1 schema:
-      - members table: id, email, name, stripe_customer_id, created_at, updated_at
-      - plans table: id, name, description, price_cents, interval (month/year), stripe_price_id, is_active, created_at
-      - Add schema_version metadata table with version column
+    <step order="1">Create apps/pulse/lib/stripe.ts with Stripe client initialization:
+      - Import Stripe SDK
+      - Initialize with STRIPE_SECRET_KEY from environment
+      - Add startup validation: log which mode (test/live) is active
+      - Throw error if STRIPE_SECRET_KEY is missing
     </step>
-    <step order="2">Create packages/plugin-convene/src/db/schema.ts with D1 schema:
-      - events table: id, title, description, date, time, capacity, price_cents, stripe_price_id, is_published, created_at, updated_at
-      - registrations table: id, event_id, email, name, stripe_payment_intent_id, status (confirmed/cancelled), created_at
-      - Add schema_version metadata table
+    <step order="2">Implement idempotency key generator:
+      - generateIdempotencyKey(): string using crypto.randomUUID()
+      - Document: "All Stripe calls must include idempotency key"
     </step>
-    <step order="3">Create packages/plugin-membership/src/db/queries.ts with typed query functions:
-      - getMemberByEmail(db, email): Promise&lt;Member | null&gt;
-      - listMembers(db, cursor, limit): Promise&lt;{ members: Member[], nextCursor: string | null }&gt;
-      - createMember(db, data): Promise&lt;Member&gt;
-      - getActivePlans(db): Promise&lt;Plan[]&gt;
+    <step order="3">Create error handling wrapper:
+      - handleStripeError(error: unknown): StripError
+      - Parse Stripe error types (card_error, validation_error, api_error)
+      - Return user-friendly error messages
     </step>
-    <step order="4">Create packages/plugin-convene/src/db/queries.ts with typed query functions:
-      - getEventById(db, id): Promise&lt;Event | null&gt;
-      - listEvents(db, cursor, limit): Promise&lt;{ events: Event[], nextCursor: string | null }&gt;
-      - createEvent(db, data): Promise&lt;Event&gt;
-      - listRegistrations(db, eventId): Promise&lt;Registration[]&gt;
+    <step order="4">Add TypeScript types:
+      - StripeError type
+      - CheckoutSessionParams type
+      - SubscriptionStatus enum
     </step>
-    <step order="5">Add TypeScript types in packages/plugin-membership/src/types.ts and packages/plugin-convene/src/types.ts</step>
-    <step order="6">Create shared migration utilities in packages/shared/src/db/migrate.ts</step>
+    <step order="5">Export functions:
+      - getStripeClient(): Stripe
+      - generateIdempotencyKey(): string
+      - handleStripeError(error): StripeError
+    </step>
   </steps>
 
   <verification>
-    <check type="build">cd packages/plugin-membership &amp;&amp; npm run build</check>
-    <check type="build">cd packages/plugin-convene &amp;&amp; npm run build</check>
-    <check type="manual">Schema files contain proper TypeScript types</check>
-    <check type="manual">All query functions have cursor-based pagination</check>
+    <check type="build">npm run build</check>
+    <check type="test">npm test -- --grep "stripe"</check>
+    <check type="manual">Startup logs show test/live mode</check>
+    <check type="manual">Missing STRIPE_SECRET_KEY throws clear error</check>
   </verification>
 
   <dependencies>
     <!-- None - Wave 1 foundation task -->
   </dependencies>
 
-  <commit-message>feat(db): create D1 schemas for MemberShip and Convene plugins</commit-message>
-</task-plan>
-```
+  <commit-message>feat(pulse): create Stripe API integration wrapper with error handling
 
-```xml
-<task-plan id="phase-1-task-2" wave="1">
-  <title>Scaffold MemberShip Plugin</title>
-  <requirement>REQ-MS-001, REQ-SHARED-012: definePlugin registration, TypeScript strict</requirement>
-  <description>
-    Create the MemberShip plugin package structure with definePlugin registration,
-    TypeScript strict mode configuration, and plugin descriptor. This establishes
-    the plugin entry point that EmDash will load.
-  </description>
-
-  <context>
-    <file path="plugins/membership/src/index.ts" reason="Reference existing pattern" />
-    <file path="plugins/membership/src/sandbox-entry.ts" reason="Reference definePlugin pattern" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="File structure specification" />
-  </context>
-
-  <steps>
-    <step order="1">Create packages/plugin-membership/ directory structure:
-      - src/index.ts (plugin descriptor)
-      - src/sandbox-entry.ts (definePlugin entry)
-      - src/routes/ (API route handlers)
-      - src/admin/ (Block Kit admin pages)
-      - src/stripe/ (Stripe integration)
-      - src/email/ (email templates)
-      - tests/e2e/
-      - tests/unit/
-    </step>
-    <step order="2">Create package.json with:
-      - name: "@shipyard/plugin-membership"
-      - version: "1.0.0"
-      - main: "dist/index.js"
-      - peerDependencies: { "emdash": "^0.1.0" }
-      - devDependencies: { "emdash": "^0.1.0", "typescript": "^5.5", "vitest": "^4.1.2" }
-    </step>
-    <step order="3">Create tsconfig.json with strict: true, noImplicitAny: true, strictNullChecks: true</step>
-    <step order="4">Create src/index.ts with PluginDescriptor:
-      - id: "membership"
-      - version: "1.0.0"
-      - format: "standard"
-      - entrypoint: "@shipyard/plugin-membership/sandbox"
-      - capabilities: ["email:send"]
-      - adminPages: [{ path: "/members", label: "Members", icon: "users" }, { path: "/plans", label: "Plans", icon: "settings" }]
-    </step>
-    <step order="5">Create src/sandbox-entry.ts with empty definePlugin({ routes: {}, hooks: {} })</step>
-    <step order="6">Create vitest.config.ts for test configuration</step>
-  </steps>
-
-  <verification>
-    <check type="build">cd packages/plugin-membership &amp;&amp; npm install &amp;&amp; npm run build</check>
-    <check type="manual">TypeScript compiles with zero errors</check>
-    <check type="manual">No 'any' types in codebase</check>
-  </verification>
-
-  <dependencies>
-    <!-- None - Wave 1 foundation task -->
-  </dependencies>
-
-  <commit-message>feat(membership): scaffold MemberShip plugin with definePlugin</commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-3" wave="1">
-  <title>Scaffold Convene Plugin</title>
-  <requirement>REQ-CV-001, REQ-SHARED-012: definePlugin registration, TypeScript strict</requirement>
-  <description>
-    Create the Convene plugin package structure (renamed from EventDash per Decision #1).
-    Follows same pattern as MemberShip with definePlugin registration and TypeScript strict mode.
-  </description>
-
-  <context>
-    <file path="plugins/eventdash/src/index.ts" reason="Reference existing pattern" />
-    <file path="plugins/eventdash/src/sandbox-entry.ts" reason="Reference definePlugin pattern" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Rename to Convene, file structure" />
-  </context>
-
-  <steps>
-    <step order="1">Create packages/plugin-convene/ directory structure:
-      - src/index.ts (plugin descriptor)
-      - src/sandbox-entry.ts (definePlugin entry)
-      - src/routes/ (API route handlers)
-      - src/admin/ (Block Kit admin pages)
-      - src/stripe/ (Stripe integration)
-      - src/email/ (email templates)
-      - tests/e2e/
-      - tests/unit/
-    </step>
-    <step order="2">Create package.json with:
-      - name: "@shipyard/plugin-convene"
-      - version: "1.0.0"
-      - main: "dist/index.js"
-      - peerDependencies: { "emdash": "^0.1.0" }
-    </step>
-    <step order="3">Create tsconfig.json with strict: true, noImplicitAny: true</step>
-    <step order="4">Create src/index.ts with PluginDescriptor:
-      - id: "convene"
-      - version: "1.0.0"
-      - format: "standard"
-      - entrypoint: "@shipyard/plugin-convene/sandbox"
-      - capabilities: ["email:send"]
-      - adminPages: [{ path: "/events", label: "Events", icon: "calendar" }]
-    </step>
-    <step order="5">Create src/sandbox-entry.ts with empty definePlugin({ routes: {}, hooks: {} })</step>
-    <step order="6">Create vitest.config.ts for test configuration</step>
-  </steps>
-
-  <verification>
-    <check type="build">cd packages/plugin-convene &amp;&amp; npm install &amp;&amp; npm run build</check>
-    <check type="manual">TypeScript compiles with zero errors</check>
-    <check type="manual">Plugin ID is "convene" not "eventdash"</check>
-  </verification>
-
-  <dependencies>
-    <!-- None - Wave 1 foundation task -->
-  </dependencies>
-
-  <commit-message>feat(convene): scaffold Convene plugin with definePlugin</commit-message>
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
 ```xml
 <task-plan id="phase-1-task-4" wave="1">
-  <title>Create Email Infrastructure</title>
-  <requirement>REQ-SHARED-016, REQ-SHARED-017, REQ-SHARED-018: Resend integration, queue, logging</requirement>
+  <title>Create Sites Database Schema</title>
+  <requirement>REQ-004: Create PostgreSQL database schema for sites table</requirement>
   <description>
-    Create shared email infrastructure using Resend API. Includes rate limiting,
-    queue for high-volume sends, and comprehensive failure logging. This is used
-    by both MemberShip and Convene plugins.
+    Define the sites table schema for storing customer website records.
+    Each site represents a Shipyard customer's website being monitored by Pulse.
   </description>
 
   <context>
-    <file path="plugins/membership/src/email.ts" reason="Reference existing email patterns" />
-    <file path="plugins/eventdash/src/email.ts" reason="Reference existing email patterns" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Email requirements" />
+    <file path="packages/db/schema/sites.ts" reason="Target for sites schema" />
+    <file path="rounds/shipyard-care/decisions.md" reason="File structure specification" />
+    <file path="plugins/seodash/src/sandbox-entry.ts" reason="Reference existing schema patterns" />
   </context>
 
   <steps>
-    <step order="1">Create packages/shared/src/email/client.ts:
-      - sendEmail(ctx, { to, subject, html, text }): Promise&lt;boolean&gt;
-      - Use fetch() to call Resend API
-      - Include proper error handling and retry logic (3 retries, exponential backoff)
+    <step order="1">Create packages/db/schema/sites.ts with Drizzle ORM schema:
+      - id: serial primary key
+      - url: varchar(255) not null unique
+      - name: varchar(255) not null
+      - subscription_id: integer (foreign key to subscriptions, nullable)
+      - tier: varchar(50) (basic, pro, enterprise, or null for trial)
+      - status: varchar(50) default 'active' (active, paused, cancelled)
+      - created_at: timestamp default now()
+      - updated_at: timestamp default now()
     </step>
-    <step order="2">Create packages/shared/src/email/queue.ts:
-      - queueEmail(ctx, email): Promise&lt;void&gt;
-      - processQueue(ctx): Promise&lt;void&gt;
-      - Use KV with timestamp keys for FIFO ordering
-      - Process up to 10 emails per batch
+    <step order="2">Add TypeScript types:
+      - Site type matching schema
+      - NewSite type for inserts (omit id, timestamps)
+      - SiteStatus type union ('active' | 'paused' | 'cancelled')
+      - SiteTier type union ('basic' | 'pro' | 'enterprise' | null)
     </step>
-    <step order="3">Create packages/shared/src/email/logger.ts:
-      - logEmailSuccess(ctx, { to, subject, timestamp }): Promise&lt;void&gt;
-      - logEmailFailure(ctx, { to, subject, error, timestamp }): Promise&lt;void&gt;
-      - Store in KV with 7-day TTL for debugging
+    <step order="3">Create query helpers in packages/db/queries/sites.ts:
+      - getSiteById(db, id): Promise&lt;Site | null&gt;
+      - getSiteByUrl(db, url): Promise&lt;Site | null&gt;
+      - createSite(db, data: NewSite): Promise&lt;Site&gt;
+      - updateSite(db, id, data: Partial&lt;Site&gt;): Promise&lt;Site&gt;
+      - listSites(db, options?: { status?, tier? }): Promise&lt;Site[]&gt;
     </step>
-    <step order="4">Create packages/shared/src/email/rate-limit.ts:
-      - checkRateLimit(ctx, email, eventType): Promise&lt;boolean&gt;
-      - Store in KV: email:sent:{email}:{eventType}:last_sent_at
-      - Default: 1 email per event type per 24 hours
-    </step>
-    <step order="5">Export all from packages/shared/src/email/index.ts</step>
-    <step order="6">Add environment variable types for RESEND_API_KEY, EMAIL_FROM</step>
+    <step order="4">Export from packages/db/index.ts</step>
   </steps>
 
   <verification>
-    <check type="build">cd packages/shared &amp;&amp; npm run build</check>
-    <check type="test">cd packages/shared &amp;&amp; npm test -- --grep "email"</check>
-    <check type="manual">All failures are logged with full context</check>
+    <check type="build">npm run build</check>
+    <check type="manual">Schema generates valid SQL via drizzle-kit generate</check>
+    <check type="manual">All query functions are type-safe</check>
   </verification>
 
   <dependencies>
     <!-- None - Wave 1 foundation task -->
   </dependencies>
 
-  <commit-message>feat(shared): create email infrastructure with Resend integration</commit-message>
+  <commit-message>feat(db): create sites table schema with query helpers
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-5" wave="1">
+  <title>Create Metrics Database Schema</title>
+  <requirement>REQ-005: Create PostgreSQL database table for metrics</requirement>
+  <description>
+    Define the metrics table for storing PageSpeed scores, uptime results,
+    and calculated Health Scores. This is time-series data that powers
+    the dashboard and monthly email.
+  </description>
+
+  <context>
+    <file path="packages/db/schema/metrics.ts" reason="Target for metrics schema" />
+    <file path="rounds/shipyard-care/decisions.md" reason="Metrics requirements" />
+  </context>
+
+  <steps>
+    <step order="1">Create packages/db/schema/metrics.ts with Drizzle ORM schema:
+      - id: serial primary key
+      - site_id: integer not null (foreign key to sites)
+      - health_score: integer (0-100, calculated)
+      - lighthouse_score: integer (0-100, from PageSpeed API)
+      - load_time_ms: integer (milliseconds)
+      - uptime_percent: decimal(5,2) (e.g., 99.95)
+      - response_time_ms: integer (from uptime check)
+      - metric_type: varchar(50) ('pagespeed' | 'uptime' | 'daily_aggregate')
+      - created_at: timestamp default now()
+    </step>
+    <step order="2">Add TypeScript types:
+      - Metric type matching schema
+      - NewMetric type for inserts
+      - MetricType union ('pagespeed' | 'uptime' | 'daily_aggregate')
+    </step>
+    <step order="3">Create query helpers in packages/db/queries/metrics.ts:
+      - getLatestMetrics(db, siteId): Promise&lt;Metric | null&gt;
+      - getMetricsHistory(db, siteId, days: number): Promise&lt;Metric[]&gt;
+      - createMetric(db, data: NewMetric): Promise&lt;Metric&gt;
+      - getAverageMetrics(db, siteId, startDate, endDate): Promise&lt;AverageMetrics&gt;
+    </step>
+    <step order="4">Export from packages/db/index.ts</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run build</check>
+    <check type="manual">Schema generates valid SQL</check>
+    <check type="manual">Query functions handle time ranges correctly</check>
+  </verification>
+
+  <dependencies>
+    <!-- None - Wave 1 foundation task -->
+  </dependencies>
+
+  <commit-message>feat(db): create metrics table schema for site performance data
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-6" wave="1">
+  <title>Create Subscriptions Database Schema</title>
+  <requirement>REQ-006: Create PostgreSQL database table for subscriptions</requirement>
+  <description>
+    Define the subscriptions table that mirrors Stripe subscription state.
+    Per decisions.md, Stripe is the source of truth; this table caches
+    subscription data for display purposes only (60-second TTL for access checks).
+  </description>
+
+  <context>
+    <file path="packages/db/schema/subscriptions.ts" reason="Target for subscriptions schema" />
+    <file path="rounds/shipyard-care/decisions.md" reason="Stripe as source of truth" />
+    <file path="plugins/membership/src/sandbox-entry.ts" reason="Reference subscription patterns" />
+  </context>
+
+  <steps>
+    <step order="1">Create packages/db/schema/subscriptions.ts with Drizzle ORM schema:
+      - id: serial primary key
+      - site_id: integer not null (foreign key to sites)
+      - stripe_subscription_id: varchar(255) unique
+      - stripe_customer_id: varchar(255)
+      - stripe_price_id: varchar(255)
+      - status: varchar(50) (active, trialing, past_due, canceled, unpaid)
+      - tier: varchar(50) not null (basic, pro, enterprise)
+      - trial_ends_at: timestamp nullable
+      - current_period_start: timestamp
+      - current_period_end: timestamp
+      - canceled_at: timestamp nullable
+      - created_at: timestamp default now()
+      - updated_at: timestamp default now()
+    </step>
+    <step order="2">Add comment: "CRITICAL: This table caches Stripe data. Always verify with Stripe for access decisions."</step>
+    <step order="3">Add TypeScript types:
+      - Subscription type matching schema
+      - NewSubscription type for inserts
+      - SubscriptionStatus union ('active' | 'trialing' | 'past_due' | 'canceled' | 'unpaid')
+    </step>
+    <step order="4">Create query helpers in packages/db/queries/subscriptions.ts:
+      - getSubscriptionBySiteId(db, siteId): Promise&lt;Subscription | null&gt;
+      - getSubscriptionByStripeId(db, stripeId): Promise&lt;Subscription | null&gt;
+      - createSubscription(db, data: NewSubscription): Promise&lt;Subscription&gt;
+      - updateSubscription(db, id, data: Partial&lt;Subscription&gt;): Promise&lt;Subscription&gt;
+      - getActiveSubscriptions(db): Promise&lt;Subscription[]&gt;
+    </step>
+    <step order="5">Export from packages/db/index.ts</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run build</check>
+    <check type="manual">Schema generates valid SQL</check>
+    <check type="manual">Critical comment is present in code</check>
+  </verification>
+
+  <dependencies>
+    <!-- None - Wave 1 foundation task -->
+  </dependencies>
+
+  <commit-message>feat(db): create subscriptions table schema with Stripe sync
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-7" wave="1">
+  <title>Setup Database Connection with Pooling</title>
+  <requirement>REQ-007: Setup database connection with connection pooling</requirement>
+  <description>
+    Configure PostgreSQL database connection with proper connection pooling
+    to handle cold starts and concurrent requests. Use Neon's connection
+    pooler for serverless environments.
+  </description>
+
+  <context>
+    <file path="packages/db/client.ts" reason="Target for database client" />
+    <file path="memory-store/package.json" reason="Reference existing DB patterns" />
+    <file path="rounds/shipyard-care/decisions.md" reason="PostgreSQL decision" />
+  </context>
+
+  <steps>
+    <step order="1">Create packages/db/client.ts with connection configuration:
+      - Import drizzle from drizzle-orm/neon-http (for serverless)
+      - Import @neondatabase/serverless for HTTP driver
+      - Accept DATABASE_URL from environment
+      - Throw clear error if DATABASE_URL missing
+    </step>
+    <step order="2">Implement lazy initialization pattern:
+      - let db: ReturnType&lt;typeof drizzle&gt; | null = null
+      - getDb(): returns singleton, creates on first call
+      - This prevents cold start issues with eager initialization
+    </step>
+    <step order="3">Add connection health check:
+      - checkConnection(): Promise&lt;boolean&gt;
+      - Execute simple query (SELECT 1)
+      - Return true if successful, false on error
+      - Log connection errors for debugging
+    </step>
+    <step order="4">Configure for Neon pooling:
+      - Use pooled connection string (with -pooler suffix)
+      - Set connection timeout: 10 seconds
+      - Log "Database connected" on successful first query
+    </step>
+    <step order="5">Export:
+      - getDb(): drizzle instance
+      - checkConnection(): Promise&lt;boolean&gt;
+    </step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run build</check>
+    <check type="test">npm test -- --grep "database"</check>
+    <check type="manual">Missing DATABASE_URL throws clear error</check>
+    <check type="manual">Connection succeeds with valid credentials</check>
+  </verification>
+
+  <dependencies>
+    <!-- None - Wave 1 foundation task -->
+  </dependencies>
+
+  <commit-message>feat(db): setup database connection with Neon pooling
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
@@ -282,1157 +342,690 @@ These tasks have no dependencies and establish the foundation for both plugins.
 
 ### Wave 2 (Parallel, after Wave 1) — Core Integrations
 
-These tasks depend on Wave 1 infrastructure and implement core integration points.
+These tasks depend on Wave 1 foundation and implement core integration points.
 
 ```xml
-<task-plan id="phase-1-task-5" wave="2">
-  <title>Create Stripe Integration Module</title>
-  <requirement>REQ-SHARED-001, REQ-SHARED-002, REQ-SHARED-007, REQ-SHARED-008, REQ-SHARED-014: Stripe as source of truth, caching, idempotency</requirement>
+<task-plan id="phase-1-task-2" wave="2">
+  <title>Build Stripe Checkout Flow</title>
+  <requirement>REQ-002: Build Stripe checkout flow for subscription creation</requirement>
   <description>
-    Create shared Stripe integration module that enforces Stripe as the source of truth
-    for subscription state. Includes KV caching with 60-second TTL for display purposes
-    and "Syncing..." indicator support. All payment operations use idempotency keys.
+    Implement Stripe Checkout session creation for all three subscription tiers.
+    Customers select a tier, we create a checkout session, and redirect them
+    to Stripe's hosted checkout page.
   </description>
 
   <context>
-    <file path="plugins/membership/src/sandbox-entry.ts" reason="Reference existing Stripe patterns" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Stripe as source of truth decision" />
+    <file path="apps/pulse/pages/api/stripe/checkout.ts" reason="Target for checkout API" />
+    <file path="apps/pulse/lib/stripe.ts" reason="Stripe wrapper from task-1" />
+    <file path="rounds/shipyard-care/decisions.md" reason="Tier pricing" />
   </context>
 
   <steps>
-    <step order="1">Create packages/shared/src/stripe/client.ts:
-      - createCheckoutSession(ctx, params): Promise&lt;{ sessionId: string, url: string }&gt;
-      - getSubscription(ctx, subscriptionId): Promise&lt;Subscription&gt;
-      - cancelSubscription(ctx, subscriptionId): Promise&lt;void&gt;
-      - All calls include idempotency keys via crypto.randomUUID()
+    <step order="1">Create apps/pulse/pages/api/stripe/checkout.ts:
+      - POST handler for creating checkout sessions
+      - Accept: { tier: 'basic' | 'pro' | 'enterprise', siteId: string, email?: string }
+      - Validate tier is valid
     </step>
-    <step order="2">Create packages/shared/src/stripe/cache.ts:
-      - getSubscriptionWithCache(ctx, customerId): Promise&lt;{ subscription: Subscription, fromCache: boolean }&gt;
-      - Cache key: stripe:subscription:{customerId}
-      - TTL: 60 seconds (NEVER longer)
-      - Return fromCache flag for "Syncing..." indicator
+    <step order="2">Define tier pricing configuration:
+      - TIER_PRICES = {
+          basic: { priceId: env.STRIPE_BASIC_PRICE_ID, amount: 9900 },
+          pro: { priceId: env.STRIPE_PRO_PRICE_ID, amount: 24900 },
+          enterprise: { priceId: env.STRIPE_ENTERPRISE_PRICE_ID, amount: 49900 }
+        }
     </step>
-    <step order="3">Create packages/shared/src/stripe/webhook.ts:
-      - verifyWebhookSignature(payload, signature, secret): boolean
-      - parseWebhookEvent(payload): StripeEvent
-      - Throw on invalid signature (trigger alert per REQ-SHARED-015)
+    <step order="3">Create Stripe Checkout session:
+      - mode: 'subscription'
+      - line_items: [{ price: priceId, quantity: 1 }]
+      - success_url: /dashboard/{siteId}?session_id={CHECKOUT_SESSION_ID}
+      - cancel_url: /pricing?canceled=true
+      - metadata: { siteId, tier }
+      - Include idempotency key
     </step>
-    <step order="4">Create packages/shared/src/stripe/types.ts:
-      - Subscription, CheckoutSession, PaymentIntent types
-      - WebhookEvent union type for all handled events
+    <step order="4">Return checkout URL:
+      - { sessionId: session.id, url: session.url }
     </step>
-    <step order="5">Add documentation comment: "CRITICAL: Never persist subscription state in KV. Always verify with Stripe for access decisions."</step>
-    <step order="6">Export all from packages/shared/src/stripe/index.ts</step>
+    <step order="5">Handle errors gracefully:
+      - Invalid tier: 400 with message
+      - Stripe error: 500 with user-friendly message
+    </step>
   </steps>
 
   <verification>
-    <check type="build">cd packages/shared &amp;&amp; npm run build</check>
-    <check type="test">cd packages/shared &amp;&amp; npm test -- --grep "stripe"</check>
-    <check type="manual">All Stripe calls include idempotency key</check>
-    <check type="manual">Cache TTL is exactly 60 seconds, no more</check>
+    <check type="build">npm run build</check>
+    <check type="test">npm test -- --grep "checkout"</check>
+    <check type="manual">Can create checkout session for Basic tier</check>
+    <check type="manual">Can create checkout session for Pro tier</check>
+    <check type="manual">Can create checkout session for Enterprise tier</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Requires plugin structure for integration" />
-    <depends-on task-id="phase-1-task-3" reason="Requires plugin structure for integration" />
+    <depends-on task-id="phase-1-task-1" reason="Requires Stripe wrapper" />
+    <depends-on task-id="phase-1-task-4" reason="Requires sites schema for siteId validation" />
   </dependencies>
 
-  <commit-message>feat(shared): create Stripe integration with caching and idempotency</commit-message>
+  <commit-message>feat(pulse): implement Stripe checkout flow for subscription tiers
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
 ```xml
-<task-plan id="phase-1-task-6" wave="2">
-  <title>Implement Cursor Pagination Utility</title>
-  <requirement>REQ-SHARED-004: Cursor-based pagination for all admin lists</requirement>
+<task-plan id="phase-1-task-3" wave="2">
+  <title>Implement Stripe Webhook Handler</title>
+  <requirement>REQ-003: Implement Stripe webhook endpoint with signature verification and idempotency</requirement>
   <description>
-    Create shared cursor pagination utility that all admin list endpoints will use.
-    This ensures consistent pagination behavior across MemberShip and Convene plugins
-    and prevents the 1,001 KV reads problem identified in decisions.
+    Create webhook endpoint to handle Stripe subscription events. CRITICAL:
+    Must verify webhook signatures and handle events idempotently to prevent
+    duplicate processing and security issues.
   </description>
 
   <context>
-    <file path="plugins/membership/src/sandbox-entry.ts" reason="Reference existing pagination patterns" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Cursor pagination requirement" />
+    <file path="apps/pulse/pages/api/stripe/webhook.ts" reason="Target for webhook handler" />
+    <file path="apps/pulse/lib/stripe.ts" reason="Stripe wrapper" />
+    <file path="packages/db/queries/subscriptions.ts" reason="Subscription updates" />
+    <file path="rounds/shipyard-care/decisions.md" reason="Webhook requirements" />
   </context>
 
   <steps>
-    <step order="1">Create packages/shared/src/pagination/cursor.ts:
-      - encodeCursor(id: string, timestamp: number): string (base64 encode)
-      - decodeCursor(cursor: string): { id: string, timestamp: number }
-      - buildPaginatedQuery(table, cursor, limit, orderBy): SQL
+    <step order="1">Create apps/pulse/pages/api/stripe/webhook.ts:
+      - POST handler for Stripe webhooks
+      - Disable body parsing (need raw body for signature verification)
+      - export const config = { api: { bodyParser: false } }
     </step>
-    <step order="2">Create packages/shared/src/pagination/types.ts:
-      - PaginatedResult&lt;T&gt; = { items: T[], nextCursor: string | null, hasMore: boolean }
-      - PaginationParams = { cursor?: string, limit?: number }
+    <step order="2">Implement signature verification:
+      - Get raw body from request
+      - Get stripe-signature header
+      - Call stripe.webhooks.constructEvent(body, sig, STRIPE_WEBHOOK_SECRET)
+      - On invalid signature: return 400, log [ALERT] for monitoring
     </step>
-    <step order="3">Create packages/shared/src/pagination/d1.ts:
-      - paginate&lt;T&gt;(db, table, params): Promise&lt;PaginatedResult&lt;T&gt;&gt;
-      - Use cursor-based pagination with id + created_at
-      - Default limit: 50, max limit: 100
+    <step order="3">Implement idempotency check:
+      - Store processed event IDs in database or KV
+      - Check if event.id already exists before processing
+      - If exists: return 200 (tell Stripe success, skip processing)
+      - If new: process event, then store event.id
     </step>
-    <step order="4">Add helper for Block Kit admin table rendering:
-      - formatPaginationControls(result): BlockKitElement
+    <step order="4">Handle subscription events:
+      - customer.subscription.created: Create subscription record, update site tier
+      - customer.subscription.updated: Update subscription status, sync tier
+      - customer.subscription.deleted: Mark subscription canceled, update site
+      - invoice.payment_succeeded: Log success
+      - invoice.payment_failed: Log failure, consider alerting
     </step>
-    <step order="5">Export from packages/shared/src/pagination/index.ts</step>
+    <step order="5">Always return 200 on successful processing:
+      - Stripe retries on non-2xx
+      - Even on errors, log and return 200 to prevent retry storms
+    </step>
   </steps>
 
   <verification>
-    <check type="build">cd packages/shared &amp;&amp; npm run build</check>
-    <check type="test">cd packages/shared &amp;&amp; npm test -- --grep "pagination"</check>
-    <check type="manual">Cursor encodes both id and timestamp</check>
-    <check type="manual">Large result sets don't load all records</check>
+    <check type="build">npm run build</check>
+    <check type="test">npm test -- --grep "webhook"</check>
+    <check type="manual">Valid webhook updates subscription</check>
+    <check type="manual">Invalid signature returns 400 and logs alert</check>
+    <check type="manual">Duplicate event ID is skipped (idempotent)</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Requires D1 schema for query building" />
+    <depends-on task-id="phase-1-task-1" reason="Requires Stripe wrapper" />
+    <depends-on task-id="phase-1-task-6" reason="Requires subscriptions schema" />
+    <depends-on task-id="phase-1-task-7" reason="Requires database connection" />
   </dependencies>
 
-  <commit-message>feat(shared): implement cursor-based pagination utility</commit-message>
-</task-plan>
-```
+  <commit-message>feat(pulse): implement Stripe webhook handler with signature verification
 
-```xml
-<task-plan id="phase-1-task-7" wave="2">
-  <title>Implement MemberShip Registration + Checkout</title>
-  <requirement>REQ-MS-002, REQ-MS-003: Member registration flow, Stripe Checkout for subscriptions</requirement>
-  <description>
-    Implement the member registration flow with a single form and Stripe Checkout
-    integration for subscription creation. This is the core user-facing flow for
-    the MemberShip plugin.
-  </description>
+CRITICAL: Includes idempotency protection to prevent duplicate processing.
+All webhook events are verified using STRIPE_WEBHOOK_SECRET.
 
-  <context>
-    <file path="packages/plugin-membership/src/sandbox-entry.ts" reason="Add routes" />
-    <file path="packages/shared/src/stripe/client.ts" reason="Use Stripe integration" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Registration flow requirements" />
-  </context>
-
-  <steps>
-    <step order="1">Create packages/plugin-membership/src/routes/register.ts:
-      - POST /register handler
-      - Accept: { email, name, planId }
-      - Validate email format and plan existence
-      - Create or retrieve Stripe customer
-      - Create Stripe Checkout session for subscription
-      - Return: { sessionId, checkoutUrl }
-    </step>
-    <step order="2">Create packages/plugin-membership/src/routes/checkout-success.ts:
-      - GET /checkout/success handler
-      - Accept: { session_id } query param
-      - Verify session with Stripe
-      - Create member record in D1
-      - Return success page/redirect
-    </step>
-    <step order="3">Add routes to sandbox-entry.ts definePlugin:
-      - "/register": { public: true, handler: registerHandler }
-      - "/checkout/success": { public: true, handler: checkoutSuccessHandler }
-    </step>
-    <step order="4">Create simple Astro registration form component:
-      - packages/plugin-membership/src/astro/RegistrationForm.astro
-      - Single form: email, name, plan selection dropdown
-      - Submit to /register endpoint
-    </step>
-    <step order="5">Add input validation with helpful error messages (conversational tone per Decision #6)</step>
-  </steps>
-
-  <verification>
-    <check type="build">cd packages/plugin-membership &amp;&amp; npm run build</check>
-    <check type="manual">Registration form submits successfully</check>
-    <check type="manual">Stripe Checkout session is created</check>
-    <check type="manual">Member record created in D1 after successful checkout</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Requires D1 schema and queries" />
-    <depends-on task-id="phase-1-task-2" reason="Requires plugin structure" />
-    <depends-on task-id="phase-1-task-5" reason="Requires Stripe integration" />
-  </dependencies>
-
-  <commit-message>feat(membership): implement registration flow with Stripe Checkout</commit-message>
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
 ```xml
 <task-plan id="phase-1-task-8" wave="2">
-  <title>Implement Convene Event Creation</title>
-  <requirement>REQ-CV-002: Event creation form (title, date, time, description, capacity, price)</requirement>
+  <title>Implement Session-Based Authentication Middleware</title>
+  <requirement>REQ-008: Implement session-based authentication middleware (httpOnly cookies)</requirement>
   <description>
-    Implement the event creation form as a single-form experience. Admin can create
-    events with all essential fields. Paid events create a Stripe price for checkout.
+    Create authentication middleware that uses httpOnly cookies for session
+    management. CRITICAL: Tokens must NEVER be stored in localStorage or
+    sessionStorage to prevent XSS attacks.
   </description>
 
   <context>
-    <file path="packages/plugin-convene/src/sandbox-entry.ts" reason="Add routes" />
-    <file path="packages/plugin-convene/src/db/schema.ts" reason="Events table" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Event creation requirements" />
+    <file path="apps/pulse/lib/auth.ts" reason="Target for auth utilities" />
+    <file path="apps/pulse/middleware.ts" reason="Next.js middleware" />
+    <file path="rounds/shipyard-care/decisions.md" reason="Auth requirements" />
   </context>
 
   <steps>
-    <step order="1">Create packages/plugin-convene/src/routes/events.ts:
-      - POST /admin/events handler (create event)
-      - Accept: { title, description, date, time, capacity, price }
-      - Validate all required fields
-      - If price > 0, create Stripe price
-      - Store event in D1
-      - Return: { event }
+    <step order="1">Create apps/pulse/lib/auth.ts with session utilities:
+      - generateSessionToken(): string (crypto.randomUUID())
+      - hashToken(token: string): string (SHA-256 hash for storage)
+      - SESSION_COOKIE_NAME = 'pulse_session'
+      - SESSION_EXPIRY_MS = 15 * 60 * 1000 (15 minutes for access tokens)
     </step>
-    <step order="2">Create packages/plugin-convene/src/routes/events.ts:
-      - GET /events handler (list public events)
-      - GET /events/:id handler (single event)
-      - Use cursor pagination for list
+    <step order="2">Implement cookie configuration:
+      - createSessionCookie(token: string): cookie string
+      - Options: httpOnly: true, secure: true, sameSite: 'strict', path: '/'
+      - Set maxAge based on SESSION_EXPIRY_MS
+      - CRITICAL comment: "NEVER store tokens in localStorage"
     </step>
-    <step order="3">Add routes to sandbox-entry.ts definePlugin:
-      - "/admin/events": { handler: createEventHandler }
-      - "/events": { public: true, handler: listEventsHandler }
-      - "/events/:id": { public: true, handler: getEventHandler }
+    <step order="3">Create session validation:
+      - validateSession(request: Request): Promise&lt;Session | null&gt;
+      - Parse cookie from request
+      - Look up session in database/KV
+      - Check expiry
+      - Return session data or null
     </step>
-    <step order="4">Create Block Kit admin form:
-      - packages/plugin-convene/src/admin/EventForm.ts
-      - Single form with all fields
-      - Date/time picker, capacity number input, price in dollars
+    <step order="4">Create Next.js middleware (apps/pulse/middleware.ts):
+      - Check for session cookie on protected routes
+      - Protected routes: /dashboard/*, /api/pulse/*
+      - If no valid session: redirect to /login
+      - If valid: continue to handler
     </step>
-    <step order="5">Ensure 60-second benchmark: form should be submittable within 60 seconds of plugin install</step>
+    <step order="5">Export utilities:
+      - createSession(userId, siteId): Promise&lt;{ token, expiresAt }&gt;
+      - validateSession(request): Promise&lt;Session | null&gt;
+      - destroySession(token): Promise&lt;void&gt;
+    </step>
   </steps>
 
   <verification>
-    <check type="build">cd packages/plugin-convene &amp;&amp; npm run build</check>
-    <check type="manual">Event creation form works end-to-end</check>
-    <check type="manual">Events stored in D1 with all fields</check>
-    <check type="manual">Paid events have Stripe price ID</check>
+    <check type="build">npm run build</check>
+    <check type="test">npm test -- --grep "auth"</check>
+    <check type="manual">Session cookie has httpOnly, Secure, SameSite flags</check>
+    <check type="manual">Protected routes redirect without valid session</check>
+    <check type="manual">NO localStorage or sessionStorage usage</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Requires D1 schema and queries" />
-    <depends-on task-id="phase-1-task-3" reason="Requires plugin structure" />
-    <depends-on task-id="phase-1-task-5" reason="Requires Stripe integration for paid events" />
+    <depends-on task-id="phase-1-task-7" reason="Requires database for session storage" />
   </dependencies>
 
-  <commit-message>feat(convene): implement event creation form</commit-message>
+  <commit-message>feat(pulse): implement session-based auth with httpOnly cookies
+
+SECURITY: Tokens are ONLY stored in httpOnly cookies, never localStorage.
+Session expiry: 15 minutes, requires refresh for continued access.
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
 ---
 
-### Wave 3 (Parallel, after Wave 2) — Feature Completion
+### Wave 3 (Parallel, after Wave 2) — Feature Implementation
 
-These tasks complete the core features for both plugins.
+These tasks implement the core features that depend on integration points.
 
 ```xml
 <task-plan id="phase-1-task-9" wave="3">
-  <title>Implement MemberShip Webhook Handler</title>
-  <requirement>REQ-MS-004, REQ-SHARED-015: Stripe webhook handler, alert on signature failures</requirement>
+  <title>Create Login/Logout Authentication Endpoints</title>
+  <requirement>REQ-009: Create login/logout authentication endpoints</requirement>
   <description>
-    Implement Stripe webhook handler for subscription lifecycle events. Handles
-    subscribe, cancel, payment failed events. Invalid signatures trigger alerts
-    per security requirements.
+    Build the login and logout API endpoints. Login validates credentials
+    and creates a session; logout destroys the session and clears the cookie.
   </description>
 
   <context>
-    <file path="packages/plugin-membership/src/sandbox-entry.ts" reason="Add webhook route" />
-    <file path="packages/shared/src/stripe/webhook.ts" reason="Webhook verification" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Webhook requirements" />
+    <file path="apps/pulse/pages/api/auth/login.ts" reason="Target for login endpoint" />
+    <file path="apps/pulse/pages/api/auth/logout.ts" reason="Target for logout endpoint" />
+    <file path="apps/pulse/lib/auth.ts" reason="Auth utilities from task-8" />
   </context>
 
   <steps>
-    <step order="1">Create packages/plugin-membership/src/routes/webhook.ts:
-      - POST /webhook handler
-      - Verify signature using shared webhook module
-      - On signature failure: log alert, return 400
+    <step order="1">Create apps/pulse/pages/api/auth/login.ts:
+      - POST handler
+      - Accept: { email: string, siteUrl?: string }
+      - Validate email format
     </step>
-    <step order="2">Handle subscription events:
-      - customer.subscription.created: Update member status to active
-      - customer.subscription.updated: Sync plan changes
-      - customer.subscription.deleted: Mark member as cancelled
-      - invoice.payment_failed: Log failure, optionally notify member
+    <step order="2">Implement login flow:
+      - Look up site by email or URL
+      - Verify subscription exists and is active (check Stripe)
+      - If valid: create session, set cookie
+      - Return: { success: true, redirectUrl: '/dashboard/{siteId}' }
     </step>
-    <step order="3">Add idempotency handling:
-      - Store processed event IDs in KV with 24-hour TTL
-      - Skip already-processed events
+    <step order="3">Create apps/pulse/pages/api/auth/logout.ts:
+      - POST handler
+      - Get session token from cookie
+      - Destroy session in database
+      - Clear cookie (set maxAge: 0)
+      - Return: { success: true }
     </step>
-    <step order="4">Create alert function for signature failures:
-      - Log to console with [ALERT] prefix
-      - Store in KV for monitoring
+    <step order="4">Handle errors:
+      - Invalid email: 400 with friendly message
+      - No subscription: 403 with "No active subscription found"
+      - Server error: 500 with generic message
     </step>
-    <step order="5">Add route to sandbox-entry.ts:
-      - "/webhook": { public: true, handler: webhookHandler }
+    <step order="5">Add rate limiting:
+      - Track login attempts by IP
+      - After 5 failed attempts: require 5-minute cooldown
     </step>
   </steps>
 
   <verification>
-    <check type="build">cd packages/plugin-membership &amp;&amp; npm run build</check>
-    <check type="test">npm test -- --grep "webhook"</check>
-    <check type="manual">Valid webhook updates member status</check>
-    <check type="manual">Invalid signature returns 400 and logs alert</check>
+    <check type="build">npm run build</check>
+    <check type="test">npm test -- --grep "login|logout"</check>
+    <check type="manual">Login creates session cookie</check>
+    <check type="manual">Logout clears session cookie</check>
+    <check type="manual">Invalid credentials rejected</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="Requires Stripe webhook module" />
-    <depends-on task-id="phase-1-task-7" reason="Requires member records to update" />
+    <depends-on task-id="phase-1-task-8" reason="Requires auth middleware" />
+    <depends-on task-id="phase-1-task-6" reason="Requires subscriptions for validation" />
   </dependencies>
 
-  <commit-message>feat(membership): implement Stripe webhook handler with alerts</commit-message>
+  <commit-message>feat(pulse): create login/logout authentication endpoints
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
 ```xml
 <task-plan id="phase-1-task-10" wave="3">
-  <title>Implement MemberShip Access Check</title>
-  <requirement>REQ-MS-005, REQ-SHARED-020: Access check endpoint, verify with Stripe for gating</requirement>
+  <title>Implement Route Protection</title>
+  <requirement>REQ-010: Implement route protection for dashboard endpoints</requirement>
   <description>
-    Create the access check endpoint that verifies member subscription status.
-    CRITICAL: Always verify with Stripe for access decisions, never rely on
-    stale cache per Decision #2.
+    Configure route protection to require authentication for dashboard
+    and API endpoints. Unauthenticated requests return 401 or redirect to login.
   </description>
 
   <context>
-    <file path="packages/plugin-membership/src/sandbox-entry.ts" reason="Add check-access route" />
-    <file path="packages/shared/src/stripe/client.ts" reason="Subscription verification" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Stripe as source of truth" />
+    <file path="apps/pulse/middleware.ts" reason="Next.js middleware from task-8" />
+    <file path="apps/pulse/lib/auth.ts" reason="Auth utilities" />
   </context>
 
   <steps>
-    <step order="1">Create packages/plugin-membership/src/routes/check-access.ts:
-      - GET /check-access handler
-      - Accept: { email } or Authorization header with JWT
-      - Look up member by email
-      - Get Stripe customer ID from member record
+    <step order="1">Update apps/pulse/middleware.ts with route matching:
+      - Protected routes: /dashboard/*, /api/pulse/*, /api/auth/logout
+      - Public routes: /api/auth/login, /api/stripe/webhook, /api/health
     </step>
-    <step order="2">Implement Stripe verification:
-      - Call Stripe API to get current subscription status
-      - DO NOT use cache for access decisions
-      - Return: { hasAccess: boolean, plan: string | null, expiresAt: string | null }
+    <step order="2">Implement protection logic:
+      - For protected routes: validate session
+      - If invalid: redirect to /login for pages, return 401 for APIs
+      - If valid: add session data to request headers for handlers
     </step>
-    <step order="3">Add comment in code: "CRITICAL: Access decisions MUST query Stripe directly. Cached data may be stale."</step>
-    <step order="4">Handle edge cases:
-      - No member found: { hasAccess: false }
-      - No subscription: { hasAccess: false }
-      - Subscription cancelled: { hasAccess: false }
-      - Subscription past_due: { hasAccess: true } (grace period)
+    <step order="3">Add session refresh logic:
+      - If session expires within 5 minutes: auto-refresh
+      - Set new cookie with extended expiry
+      - This prevents logout during active use
     </step>
-    <step order="5">Add route to sandbox-entry.ts:
-      - "/check-access": { public: true, handler: checkAccessHandler }
+    <step order="4">Create wrapper for API handlers:
+      - withAuth(handler): protected handler that requires valid session
+      - Extracts session from middleware headers
+      - Provides typed session object to handler
+    </step>
+    <step order="5">Export route config:
+      - Define PROTECTED_ROUTES array for documentation
+      - Define PUBLIC_ROUTES array
     </step>
   </steps>
 
   <verification>
-    <check type="build">cd packages/plugin-membership &amp;&amp; npm run build</check>
-    <check type="test">npm test -- --grep "access"</check>
-    <check type="manual">Active subscription returns hasAccess: true</check>
-    <check type="manual">Cancelled subscription returns hasAccess: false</check>
-    <check type="manual">Endpoint queries Stripe, not cache</check>
+    <check type="build">npm run build</check>
+    <check type="test">npm test -- --grep "route protection"</check>
+    <check type="manual">Protected routes return 401 without session</check>
+    <check type="manual">Protected routes work with valid session</check>
+    <check type="manual">Session auto-refreshes before expiry</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="Requires Stripe client" />
-    <depends-on task-id="phase-1-task-7" reason="Requires member records" />
+    <depends-on task-id="phase-1-task-8" reason="Requires auth middleware" />
+    <depends-on task-id="phase-1-task-9" reason="Requires login endpoint" />
   </dependencies>
 
-  <commit-message>feat(membership): implement access check endpoint with Stripe verification</commit-message>
+  <commit-message>feat(pulse): implement route protection for dashboard endpoints
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
 ```xml
 <task-plan id="phase-1-task-11" wave="3">
-  <title>Implement Member Dashboard</title>
-  <requirement>REQ-MS-006, REQ-MS-007: Member dashboard view and cancel functionality</requirement>
+  <title>Design Health Score Calculation Algorithm</title>
+  <requirement>REQ-011: Design Health Score calculation algorithm</requirement>
   <description>
-    Build the member dashboard where users can view their subscription status
-    and cancel their subscription. Uses conversational language per Decision #6.
+    Create the Health Score algorithm that combines PageSpeed, uptime, and
+    load time into a single 0-100 score. This is the central metric displayed
+    on the dashboard and in the monthly email.
   </description>
 
   <context>
-    <file path="packages/plugin-membership/src/sandbox-entry.ts" reason="Add dashboard routes" />
-    <file path="plugins/membership/src/astro/MemberPortal.astro" reason="Reference existing pattern" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Member dashboard requirements" />
+    <file path="apps/pulse/lib/health-score.ts" reason="Target for algorithm" />
+    <file path="rounds/shipyard-care/decisions.md" reason="Health Score with context" />
   </context>
 
   <steps>
-    <step order="1">Create packages/plugin-membership/src/routes/dashboard.ts:
-      - GET /dashboard handler
-      - Require authentication (JWT in cookie)
-      - Fetch member data from D1
-      - Fetch subscription from Stripe (with cache for display)
-      - Return member and subscription data
+    <step order="1">Create apps/pulse/lib/health-score.ts with calculation:
+      - calculateHealthScore(metrics: MetricInput): HealthScoreResult
+      - Input: { lighthouseScore, loadTimeMs, uptimePercent }
+      - Output: { score: number, grade: string, trend: string | null }
     </step>
-    <step order="2">Create packages/plugin-membership/src/routes/cancel.ts:
-      - POST /cancel handler
-      - Require authentication
-      - Call Stripe to cancel subscription at period end
-      - Return confirmation
+    <step order="2">Define weighted formula:
+      - Lighthouse score: 40% weight (performance is key)
+      - Uptime: 35% weight (reliability is critical)
+      - Load time: 25% weight (user experience)
+      - Formula: (lighthouse * 0.4) + (uptime * 0.35) + (loadTimeScore * 0.25)
     </step>
-    <step order="3">Create Astro component:
-      - packages/plugin-membership/src/astro/MemberDashboard.astro
-      - Show: current plan, next billing date, payment method (last 4)
-      - Cancel button with confirmation dialog
-      - Use conversational copy: "You're on the {plan} plan" not "Current subscription: {plan}"
+    <step order="3">Convert load time to 0-100 score:
+      - &lt;1000ms = 100 (excellent)
+      - 1000-2000ms = 80 (good)
+      - 2000-3000ms = 60 (needs work)
+      - 3000-5000ms = 40 (poor)
+      - &gt;5000ms = 20 (critical)
     </step>
-    <step order="4">Add routes to sandbox-entry.ts:
-      - "/dashboard": { handler: dashboardHandler }
-      - "/cancel": { handler: cancelHandler }
+    <step order="4">Implement grade mapping (per open question #4):
+      - 90-100: A (Excellent)
+      - 80-89: B (Good)
+      - 70-79: C (Needs Attention)
+      - 60-69: D (Poor)
+      - 0-59: F (Critical)
     </step>
-    <step order="5">Show "Syncing..." indicator if Stripe data is from cache</step>
+    <step order="5">Calculate trend (compared to last month):
+      - getHealthScoreTrend(currentScore, previousScore): TrendResult
+      - Return: { direction: 'up' | 'down' | 'stable', points: number }
+      - Threshold: +/- 5 points = stable
+    </step>
+    <step order="6">Document formula in code comments for transparency</step>
   </steps>
 
   <verification>
-    <check type="build">cd packages/plugin-membership &amp;&amp; npm run build</check>
-    <check type="manual">Dashboard shows current subscription</check>
-    <check type="manual">Cancel button cancels subscription</check>
-    <check type="manual">Copy uses conversational language</check>
+    <check type="build">npm run build</check>
+    <check type="test">npm test -- --grep "health score"</check>
+    <check type="manual">Score 90-100 returns grade A</check>
+    <check type="manual">Fast load time increases score</check>
+    <check type="manual">Formula is documented in code</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="Requires Stripe integration" />
-    <depends-on task-id="phase-1-task-7" reason="Requires member authentication" />
+    <depends-on task-id="phase-1-task-5" reason="Requires metrics schema" />
   </dependencies>
 
-  <commit-message>feat(membership): implement member dashboard with cancel</commit-message>
+  <commit-message>feat(pulse): implement Health Score calculation algorithm
+
+Weighted formula: Lighthouse (40%) + Uptime (35%) + Load Time (25%)
+Includes grade mapping (A-F) and trend calculation.
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
 ```xml
 <task-plan id="phase-1-task-12" wave="3">
-  <title>Implement Convene Event Registration</title>
-  <requirement>REQ-CV-003, REQ-CV-004: Event registration flow, Stripe Checkout for tickets</requirement>
+  <title>Build PageSpeed Insights API Client</title>
+  <requirement>REQ-012: Build PageSpeed Insights API client</requirement>
   <description>
-    Implement the event registration flow for attendees. Free events register
-    immediately, paid events go through Stripe Checkout for one-time payment.
+    Create client for Google PageSpeed Insights API. This fetches performance
+    metrics for customer sites. Per decisions.md, we use this instead of
+    self-hosted Lighthouse to save compute costs.
   </description>
 
   <context>
-    <file path="packages/plugin-convene/src/sandbox-entry.ts" reason="Add registration routes" />
-    <file path="packages/shared/src/stripe/client.ts" reason="Stripe Checkout" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Registration requirements" />
+    <file path="apps/pulse/lib/pagespeed.ts" reason="Target for API client" />
+    <file path="rounds/shipyard-care/decisions.md" reason="PageSpeed API decision" />
   </context>
 
   <steps>
-    <step order="1">Create packages/plugin-convene/src/routes/register.ts:
-      - POST /events/:id/register handler
-      - Accept: { email, name }
-      - Validate event exists and has capacity
-      - If free: create registration immediately
-      - If paid: create Stripe Checkout session
+    <step order="1">Create apps/pulse/lib/pagespeed.ts with API client:
+      - fetchPageSpeedMetrics(url: string): Promise&lt;PageSpeedResult&gt;
+      - API URL: https://www.googleapis.com/pagespeedonline/v5/runPagespeed
+      - Parameters: url, key (PAGESPEED_API_KEY), strategy='mobile'
     </step>
-    <step order="2">Create packages/plugin-convene/src/routes/checkout-success.ts:
-      - GET /checkout/success handler
-      - Verify Stripe session
-      - Create registration record in D1
-      - Return success page
+    <step order="2">Parse response for relevant metrics:
+      - lighthouseResult.categories.performance.score (0-1, convert to 0-100)
+      - lighthouseResult.audits['server-response-time'].numericValue (TTFB in ms)
+      - lighthouseResult.audits['speed-index'].numericValue
+      - lighthouseResult.audits['largest-contentful-paint'].numericValue
     </step>
-    <step order="3">Add capacity management:
-      - Check current registration count vs capacity
-      - Reject if at capacity with friendly message
-      - Consider atomic increment to prevent race conditions
+    <step order="3">Implement caching (5-minute TTL):
+      - Cache key: `pagespeed:${url}`
+      - Check cache before API call
+      - Store result with timestamp
+      - Return cached result if within TTL
     </step>
-    <step order="4">Create Astro registration form:
-      - packages/plugin-convene/src/astro/RegistrationForm.astro
-      - Simple form: name, email
-      - Show event details and price
+    <step order="4">Handle errors and rate limits:
+      - On 429 (rate limit): return cached data if available, log warning
+      - On API error: return null, log error
+      - Implement exponential backoff for retries
     </step>
-    <step order="5">Add routes to sandbox-entry.ts:
-      - "/events/:id/register": { public: true, handler: registerHandler }
-      - "/checkout/success": { public: true, handler: checkoutSuccessHandler }
+    <step order="5">Return typed result:
+      - PageSpeedResult = { score, loadTimeMs, ttfb, lcp, fetchedAt }
     </step>
   </steps>
 
   <verification>
-    <check type="build">cd packages/plugin-convene &amp;&amp; npm run build</check>
-    <check type="manual">Free event registration works</check>
-    <check type="manual">Paid event creates Stripe Checkout</check>
-    <check type="manual">Capacity limit is enforced</check>
+    <check type="build">npm run build</check>
+    <check type="test">npm test -- --grep "pagespeed"</check>
+    <check type="manual">API returns valid score for known URL</check>
+    <check type="manual">Second request within 5 min returns cached data</check>
+    <check type="manual">Rate limit handled gracefully</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="Requires Stripe integration" />
-    <depends-on task-id="phase-1-task-8" reason="Requires events to register for" />
+    <depends-on task-id="phase-1-task-5" reason="Stores results in metrics table" />
+    <depends-on task-id="phase-1-task-7" reason="Requires database for caching" />
   </dependencies>
 
-  <commit-message>feat(convene): implement event registration with Stripe Checkout</commit-message>
+  <commit-message>feat(pulse): implement PageSpeed Insights API client with caching
+
+Uses Google's free API per locked decision.
+5-minute cache TTL to avoid rate limits.
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
 ```xml
 <task-plan id="phase-1-task-13" wave="3">
-  <title>Implement Convene Webhook Handler</title>
-  <requirement>REQ-CV-005: Stripe webhook handler for payment events</requirement>
+  <title>Create Uptime Monitoring Mechanism</title>
+  <requirement>REQ-013: Create uptime monitoring ping check mechanism</requirement>
   <description>
-    Implement Stripe webhook handler for Convene payment events. Handles successful
-    payments and refunds for event registrations.
+    Build the uptime monitoring system that performs health checks on customer
+    sites. Tracks response time and availability for uptime percentage calculation.
   </description>
 
   <context>
-    <file path="packages/plugin-convene/src/sandbox-entry.ts" reason="Add webhook route" />
-    <file path="packages/shared/src/stripe/webhook.ts" reason="Webhook verification" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Webhook requirements" />
+    <file path="apps/pulse/lib/uptime.ts" reason="Target for uptime client" />
+    <file path="rounds/shipyard-care/decisions.md" reason="Uptime requirements" />
   </context>
 
   <steps>
-    <step order="1">Create packages/plugin-convene/src/routes/webhook.ts:
-      - POST /webhook handler
-      - Verify signature using shared webhook module
-      - On signature failure: log alert, return 400
+    <step order="1">Create apps/pulse/lib/uptime.ts with ping function:
+      - checkUptime(url: string): Promise&lt;UptimeResult&gt;
+      - Use fetch() with HEAD request (minimal data)
+      - Set timeout: 10 seconds
     </step>
-    <step order="2">Handle payment events:
-      - checkout.session.completed: Confirm registration
-      - charge.refunded: Cancel registration, free up capacity
+    <step order="2">Measure response time:
+      - startTime = Date.now()
+      - await fetch(url, { method: 'HEAD' })
+      - responseTimeMs = Date.now() - startTime
     </step>
-    <step order="3">Add idempotency handling:
-      - Store processed event IDs in KV with 24-hour TTL
-      - Skip already-processed events
+    <step order="3">Determine status:
+      - isUp: boolean based on response.ok (2xx status)
+      - statusCode: number
+      - Handle timeouts: isUp = false, statusCode = null
     </step>
-    <step order="4">Update registration status:
-      - On payment success: status = 'confirmed'
-      - On refund: status = 'cancelled', increment available capacity
+    <step order="4">Calculate uptime percentage:
+      - calculateUptimePercent(checks: UptimeCheck[]): number
+      - Formula: (successfulChecks / totalChecks) * 100
+      - Round to 2 decimal places (e.g., 99.95%)
     </step>
-    <step order="5">Add route to sandbox-entry.ts:
-      - "/webhook": { public: true, handler: webhookHandler }
+    <step order="5">Return typed result:
+      - UptimeResult = { isUp, statusCode, responseTimeMs, checkedAt }
+    </step>
+    <step order="6">Add error categorization:
+      - Timeout: 'TIMEOUT'
+      - DNS error: 'DNS_FAILURE'
+      - SSL error: 'SSL_ERROR'
+      - Connection refused: 'CONNECTION_REFUSED'
     </step>
   </steps>
 
   <verification>
-    <check type="build">cd packages/plugin-convene &amp;&amp; npm run build</check>
-    <check type="test">npm test -- --grep "webhook"</check>
-    <check type="manual">Payment success confirms registration</check>
-    <check type="manual">Refund cancels registration and frees capacity</check>
+    <check type="build">npm run build</check>
+    <check type="test">npm test -- --grep "uptime"</check>
+    <check type="manual">Returns isUp: true for valid URL</check>
+    <check type="manual">Returns responseTimeMs for successful check</check>
+    <check type="manual">Handles timeout gracefully</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="Requires Stripe webhook module" />
-    <depends-on task-id="phase-1-task-12" reason="Requires registrations to update" />
+    <depends-on task-id="phase-1-task-5" reason="Stores results in metrics table" />
+    <depends-on task-id="phase-1-task-7" reason="Requires database connection" />
   </dependencies>
 
-  <commit-message>feat(convene): implement Stripe webhook handler</commit-message>
-</task-plan>
-```
+  <commit-message>feat(pulse): create uptime monitoring ping check mechanism
 
-```xml
-<task-plan id="phase-1-task-14" wave="3">
-  <title>Create MemberShip Email Templates</title>
-  <requirement>REQ-MS-012, REQ-SHARED-006: Registration confirmation email, conversational language</requirement>
-  <description>
-    Create beautiful default email templates for MemberShip. Templates use
-    conversational language and are HTML-only (no WYSIWYG per Decision #8).
-  </description>
+HEAD requests for minimal overhead.
+10-second timeout with error categorization.
 
-  <context>
-    <file path="plugins/membership/src/email.ts" reason="Reference existing templates" />
-    <file path="packages/shared/src/email/client.ts" reason="Email sending" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Email requirements" />
-  </context>
-
-  <steps>
-    <step order="1">Create packages/plugin-membership/src/email/templates.ts:
-      - registrationConfirmation({ memberName, planName, email }): EmailContent
-      - Returns { subject, html, text }
-    </step>
-    <step order="2">Design beautiful HTML template:
-      - Clean, modern design
-      - Mobile-responsive
-      - Use conversational copy: "Welcome to {site}!" not "Registration Confirmation"
-      - Include: plan name, next steps, support contact
-    </step>
-    <step order="3">Add plain text fallback:
-      - Same content without HTML formatting
-      - Proper line breaks and spacing
-    </step>
-    <step order="4">Create sendRegistrationEmail(ctx, member, plan) function:
-      - Build template with member data
-      - Call shared email client
-      - Log success/failure
-    </step>
-    <step order="5">Integrate with registration flow:
-      - Call sendRegistrationEmail after successful checkout
-    </step>
-  </steps>
-
-  <verification>
-    <check type="build">cd packages/plugin-membership &amp;&amp; npm run build</check>
-    <check type="manual">Email renders correctly in email client</check>
-    <check type="manual">Copy is conversational, not technical</check>
-    <check type="manual">Plain text version is readable</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-4" reason="Requires email infrastructure" />
-    <depends-on task-id="phase-1-task-7" reason="Integrates with registration flow" />
-  </dependencies>
-
-  <commit-message>feat(membership): create registration confirmation email template</commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-15" wave="3">
-  <title>Create Convene Email Templates</title>
-  <requirement>REQ-CV-009, REQ-SHARED-006: Registration confirmation email, conversational language</requirement>
-  <description>
-    Create beautiful default email templates for Convene event registration.
-    Templates use conversational language and are HTML-only.
-  </description>
-
-  <context>
-    <file path="plugins/eventdash/src/email.ts" reason="Reference existing templates" />
-    <file path="packages/shared/src/email/client.ts" reason="Email sending" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Email requirements" />
-  </context>
-
-  <steps>
-    <step order="1">Create packages/plugin-convene/src/email/templates.ts:
-      - registrationConfirmation({ attendeeName, eventTitle, date, time, location }): EmailContent
-      - Returns { subject, html, text }
-    </step>
-    <step order="2">Design beautiful HTML template:
-      - Clean, modern design
-      - Mobile-responsive
-      - Use conversational copy: "You're going to {event}!" not "Event Registration Confirmation"
-      - Include: event details, date/time, location (if any), add to calendar link
-    </step>
-    <step order="3">Add plain text fallback:
-      - Same content without HTML formatting
-    </step>
-    <step order="4">Create sendRegistrationEmail(ctx, registration, event) function:
-      - Build template with event and attendee data
-      - Call shared email client
-      - Log success/failure
-    </step>
-    <step order="5">Integrate with registration flow:
-      - Call sendRegistrationEmail after successful registration/payment
-    </step>
-  </steps>
-
-  <verification>
-    <check type="build">cd packages/plugin-convene &amp;&amp; npm run build</check>
-    <check type="manual">Email renders correctly</check>
-    <check type="manual">Event details are clearly visible</check>
-    <check type="manual">Copy is friendly and conversational</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-4" reason="Requires email infrastructure" />
-    <depends-on task-id="phase-1-task-12" reason="Integrates with registration flow" />
-  </dependencies>
-
-  <commit-message>feat(convene): create registration confirmation email template</commit-message>
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
 ---
 
-### Wave 4 (Parallel, after Wave 3) — Admin UI
+### Wave 4 (Parallel, after Wave 3) — Optimization & Finalization
 
-These tasks build the admin interfaces for both plugins.
+Final tasks for database optimization and migration framework.
 
 ```xml
-<task-plan id="phase-1-task-16" wave="4">
-  <title>Build MemberShip Admin Member List</title>
-  <requirement>REQ-MS-008, REQ-MS-013: Admin member list with pagination, empty state</requirement>
+<task-plan id="phase-1-task-14" wave="4">
+  <title>Create Database Indexes for Performance</title>
+  <requirement>REQ-014: Create database indexes for performance (&lt;100ms p95)</requirement>
   <description>
-    Build the admin member list page with cursor-based pagination via Block Kit.
-    Includes the empty state with copy "Your first member is one link away".
+    Add database indexes to ensure all dashboard queries meet the &lt;100ms
+    p95 latency requirement. Focus on the most common query patterns.
   </description>
 
   <context>
-    <file path="packages/plugin-membership/src/admin/" reason="Admin page location" />
-    <file path="packages/shared/src/pagination/" reason="Pagination utility" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Pagination and empty state requirements" />
+    <file path="packages/db/schema/" reason="Schema files to add indexes" />
+    <file path="rounds/shipyard-care/decisions.md" reason="Performance requirements" />
   </context>
 
   <steps>
-    <step order="1">Create packages/plugin-membership/src/admin/members.ts:
-      - Export Block Kit page definition
-      - Fetch paginated members from D1
-      - Use shared pagination utility
+    <step order="1">Identify common query patterns:
+      - Get latest metrics by site_id
+      - Get metrics history by site_id + date range
+      - Get subscription by site_id
+      - Get subscription by stripe_subscription_id
+      - List active subscriptions
     </step>
-    <step order="2">Build member list table:
-      - Columns: Name, Email, Plan, Status, Joined
-      - Each row links to member detail
-      - Pagination controls (Previous/Next with cursors)
+    <step order="2">Add indexes to metrics table:
+      - CREATE INDEX idx_metrics_site_created ON metrics(site_id, created_at DESC)
+      - CREATE INDEX idx_metrics_type_created ON metrics(metric_type, created_at DESC)
     </step>
-    <step order="3">Create empty state:
-      - Show when member count is 0
-      - Copy: "Your first member is one link away"
-      - Include link to share registration page
+    <step order="3">Add indexes to subscriptions table:
+      - CREATE INDEX idx_subscriptions_site ON subscriptions(site_id)
+      - CREATE INDEX idx_subscriptions_stripe ON subscriptions(stripe_subscription_id)
+      - CREATE INDEX idx_subscriptions_status ON subscriptions(status)
     </step>
-    <step order="4">Add search/filter (optional):
-      - Filter by plan
-      - Filter by status (active, cancelled)
+    <step order="4">Add indexes to sites table:
+      - CREATE UNIQUE INDEX idx_sites_url ON sites(url)
+      - CREATE INDEX idx_sites_status ON sites(status)
     </step>
-    <step order="5">Add route to sandbox-entry.ts:
-      - "/admin/members": { handler: membersPageHandler }
+    <step order="5">Create migration file:
+      - packages/db/migrations/002_add_indexes.sql
+      - Make idempotent: IF NOT EXISTS
+    </step>
+    <step order="6">Verify with EXPLAIN ANALYZE:
+      - Run common queries with EXPLAIN ANALYZE
+      - Document expected query times in comments
     </step>
   </steps>
 
   <verification>
-    <check type="build">cd packages/plugin-membership &amp;&amp; npm run build</check>
-    <check type="manual">Member list displays with pagination</check>
-    <check type="manual">Empty state shows correct copy</check>
-    <check type="manual">Pagination works correctly at 50+ members</check>
+    <check type="build">npm run build</check>
+    <check type="manual">Indexes created successfully</check>
+    <check type="manual">Common queries use indexes (check EXPLAIN)</check>
+    <check type="manual">Query latency &lt;100ms</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-6" reason="Requires pagination utility" />
-    <depends-on task-id="phase-1-task-9" reason="Requires member data from webhooks" />
+    <depends-on task-id="phase-1-task-4" reason="Requires sites schema" />
+    <depends-on task-id="phase-1-task-5" reason="Requires metrics schema" />
+    <depends-on task-id="phase-1-task-6" reason="Requires subscriptions schema" />
   </dependencies>
 
-  <commit-message>feat(membership): build admin member list with pagination</commit-message>
+  <commit-message>perf(db): add indexes for &lt;100ms p95 query latency
+
+Indexes on common query patterns: site_id, created_at, stripe_subscription_id.
+Verified with EXPLAIN ANALYZE.
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
 ```xml
-<task-plan id="phase-1-task-17" wave="4">
-  <title>Build MemberShip Admin Plan Management</title>
-  <requirement>REQ-MS-009, REQ-MS-010: Admin create and edit membership plans</requirement>
+<task-plan id="phase-1-task-15" wave="4">
+  <title>Implement Database Migration Framework</title>
+  <requirement>REQ-015: Implement database migration framework</requirement>
   <description>
-    Build admin interface for creating and editing membership plans via Block Kit.
-    Plans sync with Stripe products/prices.
+    Create a migration framework for versioned, idempotent database schema
+    changes. Per risk mitigation, all migrations must be backwards-compatible.
   </description>
 
   <context>
-    <file path="packages/plugin-membership/src/admin/" reason="Admin page location" />
-    <file path="packages/shared/src/stripe/client.ts" reason="Stripe product/price creation" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Plan management requirements" />
+    <file path="packages/db/migrations/" reason="Target for migrations" />
+    <file path="packages/db/migrate.ts" reason="Migration runner" />
+    <file path="rounds/shipyard-care/decisions.md" reason="Migration requirements" />
   </context>
 
   <steps>
-    <step order="1">Create packages/plugin-membership/src/admin/plans.ts:
-      - Export Block Kit page definition
-      - List existing plans
-      - Create/edit plan forms
+    <step order="1">Create migration tracking table:
+      - CREATE TABLE IF NOT EXISTS _migrations (
+          id serial PRIMARY KEY,
+          name varchar(255) UNIQUE NOT NULL,
+          applied_at timestamp DEFAULT now()
+        )
     </step>
-    <step order="2">Build plan creation form:
-      - Fields: Name, Description, Price, Interval (monthly/yearly)
-      - On submit: Create Stripe product + price, then store in D1
+    <step order="2">Create packages/db/migrate.ts runner:
+      - runMigrations(db): Promise&lt;MigrationResult[]&gt;
+      - Get list of .sql files in migrations/ directory
+      - Check which are already applied (query _migrations)
+      - Run pending migrations in order
+      - Record each migration in _migrations table
     </step>
-    <step order="3">Build plan edit form:
-      - Load existing plan data
-      - Allow editing name, description
-      - Price changes create new Stripe price (existing subscriptions keep old price)
+    <step order="3">Create initial migration:
+      - packages/db/migrations/001_initial_schema.sql
+      - Combine all schema definitions from tasks 4, 5, 6
+      - Make idempotent: IF NOT EXISTS on all CREATE statements
     </step>
-    <step order="4">Add plan activation toggle:
-      - Active plans appear in registration form
-      - Inactive plans are hidden but existing subscriptions continue
+    <step order="4">Add migration CLI command:
+      - npm run db:migrate - runs all pending migrations
+      - npm run db:migrate:status - shows migration status
+      - npm run db:migrate:rollback - NOT SUPPORTED (document why)
     </step>
-    <step order="5">Add routes to sandbox-entry.ts:
-      - "/admin/plans": { handler: plansPageHandler }
-      - "/admin/plans/:id": { handler: planDetailHandler }
+    <step order="5">Document migration rules:
+      - Never delete columns in v1.x
+      - Always add default values for new columns
+      - Test migrations in staging before production
+    </step>
+    <step order="6">Add pre-deployment check:
+      - Verify database connectivity
+      - Show pending migrations count
+      - Require confirmation for production
     </step>
   </steps>
 
   <verification>
-    <check type="build">cd packages/plugin-membership &amp;&amp; npm run build</check>
-    <check type="manual">Can create new plan</check>
-    <check type="manual">Can edit existing plan</check>
-    <check type="manual">Stripe product/price created on plan creation</check>
+    <check type="build">npm run build</check>
+    <check type="test">npm run db:migrate:status</check>
+    <check type="manual">Fresh database: all migrations apply successfully</check>
+    <check type="manual">Re-run: no duplicate migrations applied</check>
+    <check type="manual">Migration rules documented in README</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="Requires Stripe integration" />
-    <depends-on task-id="phase-1-task-7" reason="Plans used in registration" />
+    <depends-on task-id="phase-1-task-7" reason="Requires database connection" />
+    <depends-on task-id="phase-1-task-14" reason="Indexes should be included in migrations" />
   </dependencies>
 
-  <commit-message>feat(membership): build admin plan management UI</commit-message>
-</task-plan>
-```
+  <commit-message>feat(db): implement versioned migration framework
 
-```xml
-<task-plan id="phase-1-task-18" wave="4">
-  <title>Build MemberShip Admin Settings</title>
-  <requirement>REQ-MS-011: Admin Stripe connection settings</requirement>
-  <description>
-    Build admin settings page for Stripe connection configuration.
-    Guides user through connecting their Stripe account.
-  </description>
+Idempotent migrations with tracking table.
+Rules: no column deletions, always add defaults.
 
-  <context>
-    <file path="packages/plugin-membership/src/admin/" reason="Admin page location" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="60-second onboarding benchmark" />
-  </context>
-
-  <steps>
-    <step order="1">Create packages/plugin-membership/src/admin/settings.ts:
-      - Export Block Kit page definition
-      - Show Stripe connection status
-    </step>
-    <step order="2">Build Stripe connection UI:
-      - If not connected: Show "Connect Stripe" button (conversational copy)
-      - If connected: Show connected account info, "Disconnect" option
-    </step>
-    <step order="3">Store Stripe credentials:
-      - Use environment variables for API keys
-      - Store connection status in KV
-    </step>
-    <step order="4">Add webhook configuration helper:
-      - Display webhook URL to configure in Stripe dashboard
-      - Show which events to enable
-    </step>
-    <step order="5">Add route to sandbox-entry.ts:
-      - "/admin/settings": { handler: settingsPageHandler }
-    </step>
-  </steps>
-
-  <verification>
-    <check type="build">cd packages/plugin-membership &amp;&amp; npm run build</check>
-    <check type="manual">Settings page loads</check>
-    <check type="manual">Stripe connection status displays correctly</check>
-    <check type="manual">Webhook URL is clearly visible</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="Requires Stripe integration" />
-  </dependencies>
-
-  <commit-message>feat(membership): build admin Stripe settings UI</commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-19" wave="4">
-  <title>Build Convene Attendee List</title>
-  <requirement>REQ-CV-006: Attendee list per event</requirement>
-  <description>
-    Build attendee list view for each event showing registered attendees.
-    Includes status (confirmed, cancelled) and payment info for paid events.
-  </description>
-
-  <context>
-    <file path="packages/plugin-convene/src/admin/" reason="Admin page location" />
-    <file path="packages/plugin-convene/src/db/queries.ts" reason="Registration queries" />
-  </context>
-
-  <steps>
-    <step order="1">Create packages/plugin-convene/src/admin/attendees.ts:
-      - Export Block Kit page definition
-      - Accept eventId parameter
-      - Fetch registrations for event
-    </step>
-    <step order="2">Build attendee table:
-      - Columns: Name, Email, Status, Registered At
-      - For paid events: add Payment Status column
-    </step>
-    <step order="3">Add summary stats:
-      - Total registered: X
-      - Capacity: X/Y
-      - Revenue (for paid events): $X
-    </step>
-    <step order="4">Add export functionality (basic):
-      - Copy emails to clipboard button
-    </step>
-    <step order="5">Add route to sandbox-entry.ts:
-      - "/admin/events/:id/attendees": { handler: attendeesPageHandler }
-    </step>
-  </steps>
-
-  <verification>
-    <check type="build">cd packages/plugin-convene &amp;&amp; npm run build</check>
-    <check type="manual">Attendee list shows for each event</check>
-    <check type="manual">Status displays correctly</check>
-    <check type="manual">Summary stats are accurate</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-12" reason="Requires registration data" />
-    <depends-on task-id="phase-1-task-13" reason="Requires webhook-confirmed registrations" />
-  </dependencies>
-
-  <commit-message>feat(convene): build attendee list UI</commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-20" wave="4">
-  <title>Build Convene Admin Event List</title>
-  <requirement>REQ-CV-007, REQ-CV-010: Admin event list with pagination, empty state</requirement>
-  <description>
-    Build the admin event list page with cursor-based pagination.
-    Includes empty state with copy "Your first event is 60 seconds away".
-  </description>
-
-  <context>
-    <file path="packages/plugin-convene/src/admin/" reason="Admin page location" />
-    <file path="packages/shared/src/pagination/" reason="Pagination utility" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Pagination and empty state requirements" />
-  </context>
-
-  <steps>
-    <step order="1">Create packages/plugin-convene/src/admin/events.ts:
-      - Export Block Kit page definition
-      - Fetch paginated events from D1
-      - Use shared pagination utility
-    </step>
-    <step order="2">Build event list table:
-      - Columns: Title, Date, Registrations, Capacity, Price
-      - Each row links to event detail/attendee list
-      - Pagination controls
-    </step>
-    <step order="3">Create empty state:
-      - Show when event count is 0
-      - Copy: "Your first event is 60 seconds away"
-      - Include "Create Event" button
-    </step>
-    <step order="4">Add filter options:
-      - Filter: Upcoming, Past, All
-      - Sort: Date (default), Title
-    </step>
-    <step order="5">Link to attendee list from each row</step>
-  </steps>
-
-  <verification>
-    <check type="build">cd packages/plugin-convene &amp;&amp; npm run build</check>
-    <check type="manual">Event list displays with pagination</check>
-    <check type="manual">Empty state shows correct copy</check>
-    <check type="manual">Can navigate to attendee list</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-6" reason="Requires pagination utility" />
-    <depends-on task-id="phase-1-task-8" reason="Requires events to list" />
-  </dependencies>
-
-  <commit-message>feat(convene): build admin event list with pagination</commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-21" wave="4">
-  <title>Build Convene Admin Settings</title>
-  <requirement>REQ-CV-008: Admin Stripe connection settings</requirement>
-  <description>
-    Build admin settings page for Convene Stripe connection.
-    May share connection with MemberShip per open question #3.
-  </description>
-
-  <context>
-    <file path="packages/plugin-convene/src/admin/" reason="Admin page location" />
-    <file path="packages/plugin-membership/src/admin/settings.ts" reason="Reference MemberShip settings" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="Shared Stripe question" />
-  </context>
-
-  <steps>
-    <step order="1">Create packages/plugin-convene/src/admin/settings.ts:
-      - Export Block Kit page definition
-      - Show Stripe connection status
-    </step>
-    <step order="2">Check for shared Stripe connection:
-      - If MemberShip is installed and connected, offer to use same connection
-      - Otherwise, show independent connection UI
-    </step>
-    <step order="3">Build connection UI (similar to MemberShip):
-      - "Connect Stripe" button with conversational copy
-      - Display webhook URL for Convene
-    </step>
-    <step order="4">Add webhook configuration helper:
-      - Webhook URL specific to Convene
-      - Events to enable: checkout.session.completed, charge.refunded
-    </step>
-    <step order="5">Add route to sandbox-entry.ts:
-      - "/admin/settings": { handler: settingsPageHandler }
-    </step>
-  </steps>
-
-  <verification>
-    <check type="build">cd packages/plugin-convene &amp;&amp; npm run build</check>
-    <check type="manual">Settings page loads</check>
-    <check type="manual">Can connect Stripe independently or share</check>
-    <check type="manual">Webhook URL displays correctly</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="Requires Stripe integration" />
-    <depends-on task-id="phase-1-task-18" reason="May share connection with MemberShip" />
-  </dependencies>
-
-  <commit-message>feat(convene): build admin Stripe settings UI</commit-message>
-</task-plan>
-```
-
----
-
-### Wave 5 (Sequential, after Wave 4) — Testing & Documentation
-
-Final tasks for testing, documentation, and launch readiness.
-
-```xml
-<task-plan id="phase-1-task-22" wave="5">
-  <title>Implement E2E Tests for Payment Flows</title>
-  <requirement>REQ-SHARED-009, REQ-SHARED-010: E2E tests for payment workflows and subscription lifecycle</requirement>
-  <description>
-    Create comprehensive E2E tests for all payment workflows. This is NON-NEGOTIABLE
-    per Decision #9: "You cannot ship payment software on vibes."
-  </description>
-
-  <context>
-    <file path="packages/plugin-membership/tests/e2e/" reason="MemberShip E2E tests" />
-    <file path="packages/plugin-convene/tests/e2e/" reason="Convene E2E tests" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="E2E testing requirement" />
-  </context>
-
-  <steps>
-    <step order="1">Create packages/plugin-membership/tests/e2e/registration.test.ts:
-      - Test: Full registration flow (form → Stripe → webhook → member created)
-      - Test: Registration with invalid email fails gracefully
-      - Test: Registration for non-existent plan fails
-    </step>
-    <step order="2">Create packages/plugin-membership/tests/e2e/webhooks.test.ts:
-      - Test: Subscription created webhook creates member
-      - Test: Subscription cancelled webhook updates member
-      - Test: Payment failed webhook handles gracefully
-      - Test: Invalid webhook signature returns 400
-      - Test: Duplicate webhook is idempotent
-    </step>
-    <step order="3">Create packages/plugin-convene/tests/e2e/registration.test.ts:
-      - Test: Free event registration flow
-      - Test: Paid event registration (form → Stripe → webhook → confirmed)
-      - Test: Registration at capacity fails with friendly message
-    </step>
-    <step order="4">Create packages/plugin-convene/tests/e2e/webhooks.test.ts:
-      - Test: Payment success confirms registration
-      - Test: Refund cancels registration and frees capacity
-      - Test: Invalid signature returns 400
-    </step>
-    <step order="5">Set up Stripe test mode fixtures:
-      - Mock Stripe API responses
-      - Test webhook signature generation
-    </step>
-  </steps>
-
-  <verification>
-    <check type="test">cd packages/plugin-membership &amp;&amp; npm run test:e2e</check>
-    <check type="test">cd packages/plugin-convene &amp;&amp; npm run test:e2e</check>
-    <check type="manual">All payment paths covered</check>
-    <check type="manual">Webhook edge cases tested</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-9" reason="Tests MemberShip webhooks" />
-    <depends-on task-id="phase-1-task-13" reason="Tests Convene webhooks" />
-    <depends-on task-id="phase-1-task-16" reason="Tests require full feature implementation" />
-    <depends-on task-id="phase-1-task-20" reason="Tests require full feature implementation" />
-  </dependencies>
-
-  <commit-message>test: add E2E tests for payment flows and webhooks</commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-23" wave="5">
-  <title>Implement Unit Tests for API Routes</title>
-  <requirement>REQ-SHARED-011: Unit tests for all API routes</requirement>
-  <description>
-    Create unit tests for all API routes in both plugins. Each route handler
-    should have tests for success and error cases.
-  </description>
-
-  <context>
-    <file path="packages/plugin-membership/tests/unit/" reason="MemberShip unit tests" />
-    <file path="packages/plugin-convene/tests/unit/" reason="Convene unit tests" />
-    <file path="prds/completed/003-emdash-plugins.md" reason="Quality bar requirement" />
-  </context>
-
-  <steps>
-    <step order="1">Create packages/plugin-membership/tests/unit/routes.test.ts:
-      - Test: /register route validation
-      - Test: /check-access with valid/invalid member
-      - Test: /dashboard returns correct data
-      - Test: /cancel calls Stripe correctly
-    </step>
-    <step order="2">Create packages/plugin-membership/tests/unit/queries.test.ts:
-      - Test: getMemberByEmail returns null for non-existent
-      - Test: listMembers pagination works correctly
-      - Test: createMember validates required fields
-    </step>
-    <step order="3">Create packages/plugin-convene/tests/unit/routes.test.ts:
-      - Test: POST /admin/events validates required fields
-      - Test: GET /events returns paginated list
-      - Test: POST /events/:id/register checks capacity
-    </step>
-    <step order="4">Create packages/plugin-convene/tests/unit/queries.test.ts:
-      - Test: getEventById returns null for non-existent
-      - Test: listEvents pagination
-      - Test: listRegistrations filters by event
-    </step>
-    <step order="5">Create shared tests:
-      - packages/shared/tests/pagination.test.ts
-      - packages/shared/tests/stripe.test.ts
-      - packages/shared/tests/email.test.ts
-    </step>
-  </steps>
-
-  <verification>
-    <check type="test">cd packages/plugin-membership &amp;&amp; npm test</check>
-    <check type="test">cd packages/plugin-convene &amp;&amp; npm test</check>
-    <check type="test">cd packages/shared &amp;&amp; npm test</check>
-    <check type="manual">All routes have unit tests</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-22" reason="E2E tests should pass first" />
-  </dependencies>
-
-  <commit-message>test: add unit tests for all API routes</commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-24" wave="5">
-  <title>Create README and Verify Benchmarks</title>
-  <requirement>REQ-SHARED-013, REQ-SHARED-005, REQ-SHARED-019, REQ-SHARED-023: README docs, 60-second benchmark, load testing, migration scripts</requirement>
-  <description>
-    Create comprehensive README documentation, verify the 60-second first-run
-    benchmark, run load tests at 10,000 records, and finalize migration scripts.
-  </description>
-
-  <context>
-    <file path="packages/plugin-membership/" reason="MemberShip README" />
-    <file path="packages/plugin-convene/" reason="Convene README" />
-    <file path="rounds/003-emdash-plugins/decisions.md" reason="60-second benchmark, load testing" />
-  </context>
-
-  <steps>
-    <step order="1">Create packages/plugin-membership/README.md:
-      - Installation instructions
-      - Quick start (connect Stripe, create plan, share registration link)
-      - API reference for all routes
-      - Environment variables
-      - Troubleshooting
-    </step>
-    <step order="2">Create packages/plugin-convene/README.md:
-      - Installation instructions
-      - Quick start (connect Stripe, create event)
-      - API reference for all routes
-      - Environment variables
-    </step>
-    <step order="3">Verify 60-second benchmark:
-      - Time from npm install to first plan created (MemberShip)
-      - Time from npm install to first event published (Convene)
-      - Document any steps that slow this down
-    </step>
-    <step order="4">Run load tests:
-      - Seed D1 with 10,000 member records
-      - Test admin member list pagination performance
-      - Seed with 10,000 events
-      - Test admin event list pagination performance
-      - Document response times
-    </step>
-    <step order="5">Create migration scripts:
-      - packages/shared/src/db/migrations/001-initial.sql
-      - Include schema version tracking
-      - Document migration process in README
-    </step>
-  </steps>
-
-  <verification>
-    <check type="manual">README covers installation and usage</check>
-    <check type="manual">60-second benchmark achieved</check>
-    <check type="manual">Load test passes at 10,000 records</check>
-    <check type="manual">Migration scripts work correctly</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-22" reason="All features must be complete" />
-    <depends-on task-id="phase-1-task-23" reason="All tests must pass" />
-  </dependencies>
-
-  <commit-message>docs: create README and verify launch benchmarks</commit-message>
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
@@ -1444,38 +1037,42 @@ From Risk Scanner analysis:
 
 | Risk | Severity | Mitigation in Plan |
 |------|----------|-------------------|
-| Webhook signature validation failures | Critical | Task 9, 13 implement signature verification with alerts |
-| Stripe data becomes stale | High | Task 5 enforces 60-second cache TTL, Task 10 always queries Stripe for access |
-| D1 schema migrations break deployments | High | Task 1 includes versioning, Task 24 creates migration scripts |
-| 60-second benchmark not achieved | High | Task 24 verifies benchmark, design prioritizes simplicity |
-| KV used for subscription state | Medium | Task 5 explicitly documents "never persist subscription state" |
-| Admin dashboard slow at scale | Medium | Task 6 implements cursor pagination, Task 24 load tests at 10,000 |
-| Email delivery failures silent | Medium | Task 4 implements logging and retry |
-| Payment flows untested | Critical | Task 22 implements comprehensive E2E tests |
+| Stripe webhook signature not verified | Critical | Task 3: signature verification with constructEvent |
+| Duplicate webhook processing | Critical | Task 3: idempotency with event ID storage |
+| Session tokens in localStorage | Critical | Task 8: httpOnly cookies only, explicit ban |
+| Database indexes missing | High | Task 14: indexes on common query patterns |
+| Test/Live mode confusion | High | Task 1: startup validation, log active mode |
+| Database migration failures | High | Task 15: idempotent migrations, staging first |
+| PageSpeed API rate limits | Medium | Task 12: 5-minute cache TTL |
+| Cold start database latency | Medium | Task 7: connection pooling, lazy init |
 
 ---
 
 ## Execution Summary
 
-| Wave | Tasks | Parallel? | Est. Time |
-|------|-------|-----------|-----------|
-| 1 | task-1, task-2, task-3, task-4 | Yes | 4-6 hours |
-| 2 | task-5, task-6, task-7, task-8 | Yes | 6-8 hours |
-| 3 | task-9, task-10, task-11, task-12, task-13, task-14, task-15 | Yes | 8-10 hours |
-| 4 | task-16, task-17, task-18, task-19, task-20, task-21 | Yes | 6-8 hours |
-| 5 | task-22, task-23, task-24 | Sequential | 6-8 hours |
+| Wave | Tasks | Parallel? | Description | Est. Time |
+|------|-------|-----------|-------------|-----------|
+| 1 | task-1, task-4, task-5, task-6, task-7 | Yes | Foundation: Stripe wrapper, DB schemas, connection | 4-6 hours |
+| 2 | task-2, task-3, task-8 | Yes | Integrations: Checkout, webhooks, auth middleware | 4-6 hours |
+| 3 | task-9, task-10, task-11, task-12, task-13 | Yes | Features: Login/logout, routes, Health Score, APIs | 6-8 hours |
+| 4 | task-14, task-15 | Yes | Optimization: Indexes, migrations | 2-3 hours |
 
-**Total Estimated Time:** 30-40 hours
-**Parallel Efficiency:** 5 waves instead of 24 sequential tasks
+**Total Estimated Time:** 16-23 hours
+**Parallel Efficiency:** 4 waves instead of 15 sequential tasks
 
 ---
 
 ## Post-Plan Checklist
 
-- [x] All 46 requirements in REQUIREMENTS.md have task coverage
+- [x] All 15 requirements in REQUIREMENTS.md have task coverage
 - [x] Each task has clear verification criteria
 - [x] Dependencies form valid DAG (no cycles)
 - [x] Each task can be committed independently
 - [x] Risk mitigations addressed in relevant tasks
-- [x] 60-second benchmark explicitly verified in Task 24
-- [x] E2E tests for payment flows in Task 22 (non-negotiable)
+- [x] Critical security requirements (webhook sig, httpOnly) explicitly called out
+- [x] Performance requirement (<100ms p95) addressed in Task 14
+
+---
+
+*Generated by Great Minds Agency — Phase Planning Skill*
+*Source: rounds/shipyard-care/decisions.md, prds/shipyard-care.md*
