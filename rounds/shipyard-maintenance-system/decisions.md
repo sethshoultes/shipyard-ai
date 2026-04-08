@@ -1,138 +1,134 @@
-# PULSE — Locked Decisions
+# HARBOR — Locked Decisions
 
 *Consolidated by Phil Jackson, The Zen Master*
 
 ---
 
-## Decision Summary
+## Decision Log
 
 | # | Decision | Proposed By | Winner | Rationale |
 |---|----------|-------------|--------|-----------|
-| 1 | **Product Name: PULSE** | Steve | Steve | "One word. One syllable. Says everything." Steve originally proposed ANCHOR; refined to PULSE. Elon conceded: "Take it." Brand > description. |
-| 2 | **One Tier at Launch: $99/month** | Both | Consensus | No Basic/Pro/Enterprise paralysis. Both agreed independently. Ship simple. |
-| 3 | **No Token Visibility for Clients** | Steve | Steve (framing) | Elon agreed: "Same destination, your framing is better." Clients see "3 updates remaining," not token counts. Tokens create anxiety; outcomes create trust. |
-| 4 | **Fixed Request Pricing for Internal Ops** | Elon | Elon | Zero historical data makes token estimation a "6-month rabbit hole." Fixed prices ($25 logo, $50 blog post, $150 new page) are debuggable, explainable, shippable. |
-| 5 | **Cut White-Labeling** | Elon | Consensus | Steve conceded: "Own the brand. He's right." V2 feature at earliest. |
-| 6 | **Cut Geographic Metrics** | Elon | Consensus | Steve conceded: "Vanity metric." Nobody needs geographic distribution. Cut. |
-| 7 | **Cut Enterprise Tier** | Elon | Consensus | Steve conceded: "Build for Sarah, not imaginary enterprise buyers." Zero Pro customers exist. |
-| 8 | **Cut Suggestions Engine** | Elon | Elon | "Your blog hasn't been updated" requires content analysis that doesn't exist. V2 feature. |
-| 9 | **Cut Triggered Performance Alerts** | Elon | Elon | Requires baseline establishment and anomaly detection. Complex, rarely useful. V2 feature. |
-| 10 | **Weekly Lighthouse, Not Daily** | Elon | Consensus | Steve conceded: "Nobody needs daily. Save the compute." 100 sites daily = compute cost + rate limits. |
-| 11 | **Warm Human Voice in All Copy** | Steve | Steve | Elon conceded: "This costs nothing and adds everything." Copy examples: "We noticed something — already fixed" not "Alert: Issue detected." |
-| 12 | **One-Second Clarity Dashboard** | Steve | Steve | Non-negotiable. Green/Yellow/Red status visible in ONE glance. The first 30 seconds = Shipyard's only mindshare. |
-| 13 | **Dashboard Ships With Launch** | Steve | Steve | Elon wanted email + Stripe first, dashboard in "Session 2." Steve: "The dashboard IS the product. Without it, you're selling invisible work." Dashboard ships day one. |
-| 14 | **No Password Protection** | Both | Consensus | Unique URLs sufficient. "Add a login and you've killed 40% of engagement on day one." — Steve |
-| 15 | **Magic Link Access** | Steve | Consensus | Zero friction. No signup. No forms. |
-| 16 | **Kill Overage Pricing at Launch** | Steve | Consensus | Hard caps instead of $0.15/1K overages. "Upgrade or wait." — Elon. No utility metering. |
-| 17 | **Hand-Sell First 10 Contracts** | Elon | Elon | Zero clients have ever bought maintenance. This is a cold-start problem. First 10 are human sales, not automation. |
-| 18 | **"Built by Shipyard AI" Footer** | Elon | Consensus | Every deployed site is a billboard. Free impressions. Own the brand. |
+| 1 | **Product Name: HARBOR** | Steve (R1) | Steve | "Ships leave the shipyard — where do they return? The harbor." One word. Nautical. Emotional. Elon conceded in R2: "I love 'Harbor.' Genuinely. One word, memorable, evocative. Sold." |
+| 2 | **Dashboard Ships Day One** | Steve (R1, R2) | Steve | Elon wanted email + Stripe first, dashboard later ("No dashboard v1"). Steve's non-negotiable: "The dashboard IS the product... over my dead body." Phil arbitrated: Dashboard ships, but static architecture. |
+| 3 | **One Tier at Launch: $79/month** | Elon (R2) | Elon | Elon: "Two tiers maximum at launch." But with zero customers, even two is premature. Test whether anyone pays before testing whether they upgrade. Steve conceded Basic + Pro can wait. |
+| 4 | **No Token Visibility for Clients** | Steve (R1) | Consensus | Both rounds aligned. Steve: "42,000 of 50,000 tokens remaining is anxiety, not service." Elon R2: "Hide token complexity from clients... We track tokens internally; clients see human units." |
+| 5 | **Fixed Request Pricing (Internal)** | Elon (R1) | Elon | "Zero historical data makes token estimation impossible." Fixed prices ($25 logo swap, $50 blog post, $150 new page) are debuggable. Steve didn't contest. |
+| 6 | **No Password Protection** | Steve (R1) | Consensus | Steve: "A password kills 40% of engagement." Elon raised security concern in R2 ("first client forwards their dashboard link to a competitor") but magic links + unique URLs accepted for v1. |
+| 7 | **Static Architecture** | Elon (R1, R2) | Elon | Static HTML per client, rebuilt nightly. "2008 technology that works." Steve R2 concession: "Static dashboards don't scale... One app with client auth is correct at 100+ clients. I was wrong to resist." |
+| 8 | **First 10 Contracts Hand-Sold** | Elon (R1) | Consensus | "Zero clients have ever bought maintenance. This is a cold-start problem." Steve R2: "Distribution strategy is missing — Guilty." Both agree: automation amplifies success; it can't create it. |
+| 9 | **Cut White-Labeling** | Elon (R1) | Consensus | "Zero clients have asked for this." Steve didn't contest. V2 at earliest. |
+| 10 | **Cut Geographic Metrics** | Elon (R1) | Consensus | Steve conceded: "Nobody wakes up excited about user distribution by country." Vanity metric. Cut. |
+| 11 | **Cut Enterprise Tier** | Both (R1, R2) | Consensus | Elon R1: "You have zero enterprise clients." Steve R1: "Enterprise is a conversation, not a checkbox." Steve R2: "Enterprise tier — Cut. Zero clients asking." |
+| 12 | **Cut Triggered Performance Alerts** | Elon (R1) | Elon | "Requires monitoring infra. V2." Requires baseline establishment and anomaly detection. Complex, rarely useful at scale. |
+| 13 | **Weekly Lighthouse, Not Daily** | Elon (R1) | Consensus | "100 sites daily = compute cost + rate limits." Steve didn't contest. Weekly batch is sufficient. |
+| 14 | **No Overage Pricing at Launch** | Both (R1, R2) | Consensus | Steve R1: "Handle overages gracefully." Elon R2: "Hard caps." Both agreed: no utility metering, no $0.15/1K token overages. Hard caps with human escalation path. |
+| 15 | **Warm Human Voice in All Copy** | Steve (R1) | Steve | "Every notification should feel like a smart friend texting you." Elon R2 conceded: "First email should celebrate, not sell... The dopamine hit matters." |
+| 16 | **"Built by Shipyard" Footer** | Elon (R1) | Consensus | "Every deployed site is a billboard. Free impressions." Steve R2: "Immediately actionable." Distribution strategy at zero cost. |
+| 17 | **Client-Facing "Updates" Not "Tokens"** | Elon (R2) | Consensus | "3 updates/month" or "8 updates/month." Clear. Measurable. Steve R2: "Accept '3 updates/month' client-facing, even if tokens run underneath." |
+| 18 | **Explicit Overage Path** | Elon (R2) | Elon | "Overages are $35/update or upgrade prompt — not free relationship-building." Steve wanted phone calls; Elon wants clarity at scale. |
 
 ---
 
-## Phil's Arbitration: Previously Unresolved Items
+## Phil's Arbitration: Contested Items
 
 ### Timeline: 5 Weeks
 
-**Elon's position:** 4 weeks. "Week 8 is when we should be iterating on real user feedback."
+**Elon:** 72 hours for MVP (R1), 2 weeks (R2). Ship embarrassingly simple. Learn fast.
 
-**Steve's position:** 6 weeks. "The extra two weeks aren't perfectionism. They're the difference between forgettable and remarkable."
+**Steve:** Quality requires time. 8 weeks original PRD. Conceded to 3-4 weeks in R2.
 
-**Phil's ruling:** 5 weeks. Split the difference. Elon is right that speed matters — sitting in dev for 2 months is death. Steve is right that first impressions define the relationship. Five weeks gives enough time for the "warm pulse" without wallowing in polish.
+**Ruling:** 5 weeks. Speed matters (no 2-month dev cycles), but so does craft. Five weeks delivers "warm pulse" without perfectionism paralysis.
 
-- Week 1: Core architecture + database + Stripe integration
-- Week 2: Dashboard template + health indicator logic
-- Week 3: Email templates + Cloudflare analytics integration
-- Week 4: Lighthouse CI setup + cron jobs
-- Week 5: Copy refinement + QA + deployment
+| Week | Focus |
+|------|-------|
+| 1 | Core architecture + Stripe integration |
+| 2 | Dashboard template + health indicator logic |
+| 3 | Email templates + Cloudflare analytics integration |
+| 4 | Lighthouse CI setup + cron jobs |
+| 5 | Copy refinement + QA + deployment |
 
-### Architecture: Static HTML, Rebuilt Nightly
+### Dashboard: Real-Time vs Static
 
-**Elon's position:** Static HTML per client, rebuilt via cron. "2008 technology that works."
+**Elon:** Static HTML, rebuilt nightly. Simplicity wins.
 
-**Steve's position:** "Build once, update reactively. Real-time beats stale every time."
+**Steve:** "Real-time beats stale every time." (R1 implication)
 
-**Phil's ruling:** Static wins. Elon is right — at <100 clients, daily rebuilds are sufficient. Nobody checks their dashboard at 2am. The data doesn't need to be real-time; it needs to feel *current*. A "Last updated: Today at 6:00 AM" timestamp with yesterday's numbers is perfectly acceptable for v1.
+**Ruling:** Static wins. At <100 clients, daily rebuilds are sufficient. "Last updated: Today at 6:00 AM" is acceptable for v1. Steve gets the experience; Elon gets the architecture. Steve R2 conceded: "Static dashboards don't scale — One app with client auth is correct at 100+ clients. I was wrong to resist."
 
-Reactive architecture is a v2 concern when scaling demands it.
+### Health Score: Composite vs Breakdown
 
-### Health Score: Composite with Drill-Down
+**Steve:** One beautiful composite number. One-second clarity. "The first glance — one second to feel cared for or abandoned."
 
-**Steve's position:** One beautiful composite number. "Your site's health score." Simple, intuitive, one-second clarity.
+**Elon:** Black box problem. When something breaks, clients have zero diagnostic info.
 
-**Elon's position:** Black box problem. "When something breaks, Sarah has zero diagnostic information. She calls support."
+**Ruling:** Both. A single Green/Yellow/Red indicator dominates the viewport (Steve). Click it, and diagnostic detail appears: Lighthouse score, uptime, traffic trend (Elon). Composite is the default. Components are one tap away.
 
-**Phil's ruling:** Both. Steve gets the one-second clarity — a single Green/Yellow/Red indicator dominates the viewport. But click it, and Elon's diagnostic detail appears: Lighthouse score, uptime percentage, traffic trend. The composite is the default. The components are one tap away.
+### Overage Handling: Graceful vs Hard Cap
 
-This reduces support burden (Elon's concern) while preserving emotional simplicity (Steve's vision).
+**Steve R1:** "NO to overage pricing on Day 1. Handle it gracefully. Call them. Upgrade them."
 
-### Internal Request Tracking: Fixed Prices Per Type
+**Elon R2:** "That's a luxury for a company with 50 clients and time to spare. At 500 clients, that's a full-time employee doing customer success theater."
 
-**Decision:** Elon's fixed pricing model. No time tracking for v1.
-
-```
-{
-  "logo_swap": 25,
-  "image_replacement": 25,
-  "text_update": 25,
-  "blog_post": 50,
-  "new_section": 75,
-  "new_page": 150
-}
-```
-
-Clients see: "3 updates remaining this month"
-Internal logs: Request type + timestamp + completion status
+**Ruling:** Hard caps with human escalation path. System defaults to "Upgrade or wait" — with a clear button to request a conversation. Automation first, human override available.
 
 ---
 
 ## MVP Feature Set (What Ships in V1)
 
 ### Core Dashboard
-- **Product name:** PULSE
+- **Product name:** HARBOR
 - **One-second status:** Green/Yellow/Red health indicator (visible instantly)
 - **One sentence summary:** "1,247 people visited your site this week. Everything looks great."
 - **Three metrics only:** Traffic, Health Score, Last Updated
 - **Warm human voice:** All copy speaks like a trusted friend
-- **Click-through:** Tap health indicator for component breakdown
+- **Click-through detail:** Tap health indicator for component breakdown (Lighthouse, uptime, traffic)
 
 ### Client-Facing
 - **Magic link access:** No login, no password, no friction
-- **One tier:** $99/month — unlimited small updates
+- **One tier:** $79/month
 - **Request visibility:** "3 updates remaining this month" (no token exposure)
 - **Stripe checkout:** Standard integration
-- **Unique dashboard URL:** Per client, unguessable
+- **Unique dashboard URL:** Per client, unguessable (UUIDv4)
 
 ### Technical Backend
-- **One dashboard per client:** Static HTML, rebuilt nightly via cron
-- **Database:** 2 tables max (clients, requests) — Stripe handles subscription state
+- **Static HTML dashboards:** One per client, rebuilt nightly via cron
+- **Data storage:** JSON file until 500 clients — Stripe handles subscription state
 - **Cloudflare Analytics API:** Traffic data integration
-- **Lighthouse CI:** Weekly batch runs (not daily)
+- **Lighthouse CI:** Weekly batch runs
 - **Email system:** 5 templates via cron trigger
 
 ### Email Touchpoints (5 Total)
-1. **Welcome / Dashboard Ready** — "Your site is live. 52 people visited in the first hour. Here's your dashboard."
+1. **Welcome / Dashboard Ready** — "Your site is live. Here's your dashboard."
 2. **Weekly/Monthly Status Summary** — "Your site had a great week."
 3. **Request Completed Confirmation** — "We noticed something — already fixed."
 4. **Usage Threshold Warning** — "1 update remaining this month"
 5. **Anniversary Email (Day 365)** — "We're still here. We still care."
 
-### What's NOT in V1
-- White-labeling
-- Geographic distribution metrics
-- Suggestions engine ("Your blog hasn't been updated...")
-- Triggered performance alerts
-- Enterprise tier
-- Overage handling at $0.15/1K (hard caps only)
-- Password protection (unique URLs sufficient)
-- Real-time/reactive dashboards
-- Multi-tier pricing
+### Explicitly NOT in V1
+
+| Feature | Reason | Who Cut It | Revisit At |
+|---------|--------|------------|------------|
+| White-labeling | Zero demand | Elon (consensus) | 1,000 clients |
+| Geographic distribution metrics | Vanity metric | Elon (Steve conceded) | Never |
+| Suggestions engine | Scope creep | Elon | V2 |
+| Triggered performance alerts | Complex infrastructure | Elon | V2 |
+| Enterprise tier | No Pro customers yet | Both | 100 clients |
+| Overage pricing ($0.15/1K) | Utility metering kills trust | Both | Never |
+| Password protection | Friction kills engagement | Steve (consensus) | Never |
+| Real-time dashboards | Overkill at scale | Elon (Steve conceded R2) | 500 clients |
+| Multi-tier pricing | Test single price first | Elon | 50 clients |
+| Token visibility to clients | Anxiety inducing | Steve (consensus) | Never |
+| Dedicated database | JSON suffices | Elon | 500 clients |
+| Token complexity estimator | No historical data | Both | Never |
+| Trend charts | Complexity for zero conversion lift | Elon | V2 |
+| AI-powered upsell (Suggestions) | That's v3 | Elon | V3 |
 
 ---
 
 ## File Structure (What Gets Built)
 
 ```
-pulse/
+harbor/
 ├── dashboard/
 │   ├── index.html                  # Dashboard template
 │   ├── styles.css                  # Design system (warm, not cold)
@@ -147,12 +143,13 @@ pulse/
 │   ├── lighthouse-runner.js        # Weekly batch Lighthouse
 │   └── stripe-webhook.js           # Subscription events
 │
-├── database/
-│   └── schema.sql                  # 2 tables
-│       # clients: client_id, dashboard_url, stripe_customer_id,
-│       #          requests_remaining, created_at, last_updated
-│       # requests: request_id, client_id, type, price, status,
-│       #           created_at, completed_at
+├── data/
+│   ├── clients.json                # Client records
+│   │   # Schema: { client_id, dashboard_url, stripe_customer_id,
+│   │   #           requests_remaining, created_at, last_updated }
+│   └── requests.json               # Request records
+│       # Schema: { request_id, client_id, type, price, status,
+│       #           created_at, completed_at }
 │
 ├── emails/
 │   ├── welcome.html                # Dashboard ready
@@ -168,55 +165,109 @@ pulse/
 │
 ├── static/
 │   └── clients/                    # Generated per-client dashboards
-│       ├── {client-uuid}/
-│       │   └── index.html
-│       └── ...
+│       └── {client-uuid}/
+│           └── index.html
 │
 └── config/
     ├── pricing.json                # Fixed request prices
-    │   # { "logo_swap": 25, "blog_post": 50, "new_page": 150 }
+    │   # { logo_swap: 25, image_replacement: 25, text_update: 25,
+    │   #   blog_post: 50, new_section: 75, new_page: 150 }
     └── copy.json                   # Human voice templates
-        # { "status_great": "Your site had a great week.",
-        #   "status_warning": "Your site got a little sluggish. Want us to speed it up?" }
+        # { status_great: "Your site had a great week.",
+        #   issue_fixed: "We noticed something — already fixed." }
 ```
 
 ---
 
-## Open Questions (Remaining)
+## Open Questions (What Still Needs Resolution)
 
-### 1. "Unlimited Small Updates" Definition
-**Problem:** What qualifies as "small"?
-**Proposed boundary:** Under 30 minutes of work = included. Over 30 minutes = counts against monthly allowance.
-**Needs:** Clear examples in terms of service and client onboarding.
+### 1. Monthly Request Allowance
+**Decision needed:** How many "updates" are included in $79/month?
 
-### 2. Request Dispute Resolution
-**Problem:** Client disagrees with categorization (e.g., "That wasn't a new page, it was a text update").
-**Mitigation:** Fixed prices + clear definitions published. "Logo swap = single image replacement." "New page = new URL with original content."
-**Needs:** Written policy before first client signs.
+| Option | Pros | Cons |
+|--------|------|------|
+| 3 updates/month | Conservative, sustainable margins | May feel stingy |
+| 5 updates/month | Generous, competitive | Risk of abuse |
+| Unlimited small + 1 large | Flexible | Definitional disputes |
 
-### 3. Monthly Request Allowance
-**Problem:** How many "updates" are included in $99/month?
-**Options:**
-- 3 updates/month (conservative)
-- 5 updates/month (generous)
-- Unlimited small, 1 large (hybrid)
-**Needs:** Decision from Shipyard based on capacity and margin targets.
+**Context:** Elon R2 proposed "3 updates/month" or "8 updates/month" as clear options.
+
+**Owner:** Shipyard leadership
+**Deadline:** Before first client signs
+
+### 2. "Small Update" Definition
+**Proposed boundary:** Under 30 minutes of work = "small" = included
+
+| Update Type | Classification |
+|-------------|----------------|
+| Logo swap | Small (included) |
+| Text typo fix | Small (included) |
+| Image replacement | Small (included) |
+| New page | Billable |
+| Blog post formatting | Billable |
+| New section | Billable |
+
+**Context:** Elon R2: "Constraints clarify... Ambiguity feels generous; it's actually a support ticket waiting to happen."
+
+**Owner:** Shipyard leadership
+**Deadline:** Document in terms of service before launch
+
+### 3. Request Dispute Resolution
+**Problem:** Client disagrees with categorization ("That wasn't a new page, it was a text update")
+
+**Context:** Elon R2: "Every request requires work. MRR looks great until margins compress."
+
+**Needed:** Written policy with examples. Fixed prices help, but edge cases will occur.
+
+**Owner:** Shipyard leadership
+**Deadline:** Before first client signs
 
 ### 4. Lighthouse Threshold Logic
-**Problem:** What score = Green/Yellow/Red?
-**Proposed:**
-- Green: Performance ≥ 90, Accessibility ≥ 90
-- Yellow: Performance 70-89, or Accessibility 70-89
-- Red: Performance < 70, or Accessibility < 70, or site down
-**Needs:** Confirmation or adjustment.
+**Proposed thresholds:**
 
-### 5. First 10 Clients: Selection Criteria
-**Problem:** Which existing clients get approached first?
-**Criteria suggestions:**
+| Status | Criteria |
+|--------|----------|
+| Green | Performance >= 90 AND Accessibility >= 90 |
+| Yellow | Performance 70-89 OR Accessibility 70-89 |
+| Red | Performance < 70 OR Accessibility < 70 OR site down |
+
+**Owner:** Engineering
+**Deadline:** Before dashboard build (Week 2)
+
+### 5. First 10 Client Selection
+**Suggested criteria:**
 - Launched within last 6 months (still warm)
 - Project value > $20K (invested in quality)
 - Responsive communication (likely to engage)
-**Needs:** Client list review and prioritization.
+
+**Context:** Elon R1: "How many projects does Shipyard complete per month? If it's <5, the maintenance funnel is a rounding error."
+
+**Owner:** Shipyard sales
+**Deadline:** Client list review needed before Week 5
+
+### 6. Welcome Email Content
+| Option | Description | Complexity |
+|--------|-------------|------------|
+| A | "Your site is live. Here's your dashboard." | Ships fast |
+| B | "Your site is live. 52 people visited today." | Requires analytics pipeline |
+
+**Context:** Elon R2 conceded: "First email should celebrate, not sell. '1,247 visitors in week one' beats 'Welcome to your maintenance portal.'"
+
+**Recommendation:** Option A for v1 welcome email. Let the dashboard deliver the numbers. Weekly status email (email #2) delivers the visitor count.
+
+**Owner:** Steve (copy) + Engineering (implementation)
+**Deadline:** Week 3
+
+### 7. Security Model for Dashboard URLs
+**Problem:** Elon R2 raised concern: "The 'no password' stance will last until the first client forwards their dashboard link to a competitor."
+
+**Options:**
+- Accept risk (UUIDv4 is unguessable)
+- Add optional PIN protection (client choice)
+- Implement magic link expiry + refresh
+
+**Owner:** Engineering
+**Deadline:** Before launch (Week 5)
 
 ---
 
@@ -224,47 +275,50 @@ pulse/
 
 ### Technical Risks
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| **Lighthouse at scale** — 100 sites weekly = compute cost + rate limits | Medium | Medium | Batch runs, sampling strategy, caching. Budget for compute. |
-| **Cron job collisions** — Sequential Lighthouse runs = 100+ minutes | High at scale | Medium | Parallelization or queue system before 50 clients |
-| **CDN cache invalidation** — Static dashboard rebuilds at scale | Medium | Low | Stagger rebuilds, smart cache headers, purge on rebuild |
-| **Cloudflare API rate limits** — Traffic data fetching | Low | Medium | Caching layer, graceful degradation, batch requests |
-| **Dashboard URL guessing** — UUID collision or brute force | Very Low | High | Use UUIDv4 (122 bits entropy). Monitor for access anomalies. |
+| Risk | Likelihood | Impact | Mitigation | Source |
+|------|------------|--------|------------|--------|
+| **Lighthouse at scale** — 100 sites weekly = compute cost + rate limits | Medium | Medium | Batch runs, sampling strategy, caching. Budget for compute. | Elon R1 |
+| **Cron job collisions** — Sequential Lighthouse runs = 100+ minutes | High at scale | Medium | Parallelization or queue system before 50 clients | Elon R1 |
+| **Cloudflare API rate limits** — Traffic data fetching | Low | Medium | Caching layer, graceful degradation, batch requests | Elon R1 |
+| **Dashboard URL guessing** — UUID collision or brute force | Very Low | High | UUIDv4 (122 bits entropy). Monitor for access anomalies. | Elon R2 |
+| **JSON file corruption** — No database = no ACID guarantees | Medium | High | Backup on every write. Graduate to SQLite at 200 clients. | Elon R1 |
+| **Integration surface area** — Cloudflare API, Lighthouse CI, Stripe, Resend, custom DB, token logic | Medium | High | Limit integrations in v1. Elon R1: "Can one agent session build the 8-week plan? No." | Elon R1 |
 
 ### Business Risks
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| **"Unlimited small updates" abuse** — Client exploits ambiguity | High | High | Define clear boundaries: "Under 30 minutes of work." Document examples. |
-| **Request disputes** — Client disagrees with categorization | Medium | Medium | Fixed prices + clear definitions. "Logo swap = single image replacement." |
-| **Low attach rate** — Less than 30% of clients subscribe | Medium | High | Nail the welcome email. First impression = conversion. Hand-sell first 10. |
-| **Support burden from opacity** — "Why did my score drop?" | Medium | Medium | Health indicator drill-down shows components. Reduces black-box anxiety. |
-| **Churn at month 3** — Clients don't see value | Medium | High | Anniversary touchpoints. Status summaries. Make invisible work visible. |
+| Risk | Likelihood | Impact | Mitigation | Source |
+|------|------------|--------|------------|--------|
+| **Zero attach rate** — No existing client buys | Medium | Critical | Hand-sell first 10. Human learning before automation. | Elon R1 |
+| **"Small updates" abuse** — Client exploits ambiguity | High | High | Define clear boundaries in writing. 30-minute threshold. | Elon R2 |
+| **Request disputes** — Client disagrees with categorization | Medium | Medium | Fixed prices + published definitions before launch. | Elon R1/R2 |
+| **Churn at month 3** — Clients don't see value | Medium | High | Make invisible work visible. Status summaries. Anniversary emails. | Steve R1 |
+| **$79 price point wrong** — Too high or too low | Medium | Medium | Start at $79. Adjust based on first 10 conversations. | Elon R1 |
+| **This is a services business wearing SaaS clothes** — Every request requires work | Medium | High | Clear update limits. Fixed pricing. Don't promise automation you can't deliver. | Elon R1 |
+| **Acquisition bottleneck** — Not enough clients to make maintenance math work | High | Critical | "Fix acquisition first." (Elon R1) Maintenance is downstream of project volume. | Elon R1 |
 
 ### Operational Risks
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| **One-person bottleneck** — All requests flow through one human | High at scale | Critical | At 30+ active contracts (120 requests/month), need team or AI execution |
-| **No historical data for estimation** | Certain | Medium | Fixed pricing eliminates this — Elon's solution adopted |
-| **Scope creep** — V2 features sneaking into V1 | Medium | High | **This document is the contract.** No white-labeling. No suggestions engine. No enterprise tier. |
-| **Dashboard feels like afterthought** — Rushed to meet deadline | Medium | High | Week 5 is exclusively for polish and copy. Not feature cramming. |
+| Risk | Likelihood | Impact | Mitigation | Source |
+|------|------------|--------|------------|--------|
+| **One-person bottleneck** — All requests flow through single human | High at scale | Critical | At 30+ contracts, need team expansion or AI execution | Elon R1 |
+| **Scope creep** — V2 features sneaking into V1 | Medium | High | **This document is the contract.** No exceptions. | Both |
+| **Dashboard feels rushed** — Shipped fast, looks abandoned | Medium | High | Week 5 is exclusively polish. Not feature cramming. | Steve R2 |
+| **Overage handling at scale** — "Call them. Upgrade them" doesn't scale | High at 500+ | Medium | Hard caps with escalation button. Automation first. | Elon R2 |
 
-### Emotional Risks
+### Emotional Risks (The Soul)
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| **Dashboard feels cold/transactional** — Opposite of "warm pulse" | Medium | High | Invest in copy. Every word matters. "Your site got a little sluggish. Want us to speed it up?" |
-| **Clients feel nickel-and-dimed** — Despite hiding tokens | Low | High | "Unlimited small updates" framing. Subscription = access, not allowance. |
-| **Launch feels forgettable** — Shipped fast but nobody talks about it | Medium | Medium | Steve's point. Design matters. The 30 seconds on dashboard = Shipyard's only mindshare. |
-| **Client feels surveilled** — Dashboard feels like monitoring, not caring | Low | Medium | Copy framing: "We're watching *out for* you" not "We're watching you." |
+| Risk | Likelihood | Impact | Mitigation | Source |
+|------|------------|--------|------------|--------|
+| **Dashboard feels cold** — Opposite of "warm pulse" | Medium | High | Copy investment. Every word matters. Steve's voice, not developer defaults. | Steve R1 |
+| **Clients feel nickel-and-dimed** — Despite hiding tokens | Low | High | "Updates remaining" not "credits consumed." Frame as abundance, not scarcity. | Steve R1 |
+| **Client feels surveilled** — Dashboard = monitoring, not caring | Low | Medium | Copy framing: "We're watching *out for* you" not "We're watching you." | Steve R1 |
+| **PDF emails = emotional death** — Elon's fallback feels cold | N/A (rejected) | High | Dashboard ships in v1. Not a PDF. Not "later." | Steve R2 |
 
 ---
 
-## The Essence (Guiding Principles)
+## The Essence (Guiding Star)
 
-From essence.md — the soul of the product:
+From essence.md — the soul that survives every cut:
 
 > **What is this product REALLY about?**
 > Proving to clients they haven't been forgotten after the check clears.
@@ -282,34 +336,59 @@ From essence.md — the soul of the product:
 
 ## Build Phase Directives
 
-1. **This document is the contract.** Any feature not listed here is a V2 discussion.
+1. **This document is the contract.** Any feature not listed here is V2.
 
-2. **Steve's soul, Elon's spine.** Warm copy everywhere. Static architecture. Fixed pricing. No scope creep.
+2. **Steve's soul, Elon's spine.** Warm copy everywhere. Static architecture. JSON storage. Fixed pricing. No scope creep.
 
-3. **First 10 are hand-sold.** No automation substitutes for human learning. Sales before systems.
+3. **First 10 are hand-sold.** No automation substitutes for human learning.
 
 4. **The dashboard ships day one.** It's not a nice-to-have. It's the product.
 
 5. **Week 5 is for polish, not panic.** If you're adding features in week 5, you've failed.
 
-6. **Timeline: 5 weeks.** Not negotiable. Ship on schedule or cut scope, never extend.
+6. **Timeline: 5 weeks.** Ship on schedule or cut scope. Never extend.
+
+7. **Earn complexity through traction.** JSON until 500. SQLite at 500. Postgres at 5,000.
+
+8. **Two competing truths, resolved:** Steve R2: "The fastest path to revenue is not the fastest path to a business worth having." Elon R2: "Ship ugly. Learn fast. Earn the right to be beautiful." **Resolution:** Ship something beautiful enough to prove the concept, simple enough to ship in 5 weeks.
 
 ---
 
-## Post-Launch Success Metrics
+## Success Metrics (Post-Launch)
 
 | Metric | Target | Measurement |
 |--------|--------|-------------|
 | First 10 contracts | Within 30 days of launch | Stripe subscriptions |
 | Attach rate | 30% of eligible clients | Subscriptions / Total clients |
-| Churn rate | < 10% monthly | Cancellations / Active |
+| Monthly churn | < 10% | Cancellations / Active |
 | Dashboard engagement | 2+ views/month per client | Analytics |
 | Support tickets | < 1 per client per month | Ticket count |
 
+**Note:** Elon R1 warned attach rate benchmarks are optimistic: "30% attach rate is optimistic. Industry upsell benchmarks: 10-15%. Plan for 15%." Measure against both targets.
+
 ---
 
-*The triangle has spoken. Steve brought the soul. Elon brought the spine. What emerges is PULSE — a product that proves you haven't been forgotten.*
+## Summary: Who Won What
+
+| Domain | Winner | Key Concession |
+|--------|--------|----------------|
+| **Brand & Name** | Steve | Elon: "I love 'Harbor.' Sold." |
+| **Dashboard v1** | Steve | Elon wanted email-only MVP; Steve's non-negotiable won |
+| **Architecture** | Elon | Steve conceded static is correct for <100 clients |
+| **Timeline** | Phil (arbitrated) | 5 weeks — faster than Steve's 8, slower than Elon's 2 |
+| **Pricing Model** | Elon | Fixed prices, clear limits, no token complexity |
+| **Copy & Voice** | Steve | Elon: "This costs zero engineering time and changes everything" |
+| **Distribution** | Elon | Steve: "Distribution strategy is missing — Guilty" |
+| **Token Visibility** | Consensus | Both agreed: show outcomes, not machinery |
+
+---
+
+*The triangle has spoken. Steve brought the soul. Elon brought the spine. What emerges is HARBOR — a product that proves to clients they haven't been forgotten.*
+
+*Ships return to harbor. So do clients.*
 
 *Now we build.*
 
-*— Phil Jackson*
+---
+
+*— Phil Jackson, The Zen Master*

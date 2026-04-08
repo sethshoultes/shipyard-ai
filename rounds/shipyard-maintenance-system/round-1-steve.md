@@ -1,81 +1,88 @@
-# Steve Jobs — Round 1 Review
+# Steve Jobs — Chief Design & Brand Officer
+## Shipyard Maintenance System: Round 1 Review
+
+---
 
 ## Product Naming
 
-**ANCHOR.**
+**HARBOR.**
 
-Not "Shipyard Maintenance System." That's what you'd find on a government form, not a product people remember. ANCHOR. One word. It tells you what it does — keeps your client relationship from drifting into the void. It's nautical, it fits the Shipyard brand, and it sounds like something you *want* rather than something you're *obligated to pay for*.
+Not "Shipyard Maintenance System." That's something you'd find on an invoice, not something you'd tell a friend about. Ships leave the shipyard — where do they return? *The harbor.* It's home. It's safety. It's where you dock when you need care.
 
-"We're on Anchor." That's a thing people will say. "We're on the Shipyard Post-Delivery Maintenance System." Nobody. Ever.
+"Your site is in Harbor" tells the whole story in four words. "Your site is enrolled in the Shipyard Post-Delivery Maintenance and Engagement System" is a corporate death rattle.
+
+One word. One concept. Unforgettable.
 
 ---
 
 ## Design Philosophy
 
-Here's what makes this insanely great: **it transforms absence into presence**.
+This PRD describes three systems: dashboard, contracts, emails. That's *engineering* thinking. Three features bolted together. Wrong.
 
-Right now, Shipyard vanishes after launch. Poof. Like a contractor who finishes your kitchen and you never hear from again. ANCHOR makes Shipyard feel like a permanent fixture in the client's digital life — not through nagging, but through *value you can see*.
+**Harbor is ONE thing: the feeling that someone's watching over your investment.**
 
-The dashboard isn't a dashboard. It's a **window**. A window into how their investment performs every single day. When they glance at it and see "1,247 visitors this week (+18%)" — that's not data. That's *validation*. That's "I made the right decision."
+The client doesn't wake up thinking "I need to check my Site Health Dashboard." They think: "Is my website okay?" Every email, every metric, every interaction answers that single question.
 
-The brilliance is making the invisible visible. Every site sits there working 24/7 and the client has no idea. ANCHOR makes that work *felt*.
+What makes this insanely great? **We're making the invisible visible.** A website works 24/7 in silence. The client has no idea if it's thriving or dying. Harbor is the heartbeat monitor. It takes something abstract — "my website" — and makes it *feel alive*.
+
+That's not a dashboard. That's a window into proof that their money was well spent.
 
 ---
 
-## User Experience: The First 30 Seconds
+## First 30 Seconds
 
-The moment the site launches, the client gets ONE email. Not a wall of text. A single beautiful message:
+The PRD says clients get a "unique dashboard URL." Functional. Forgettable.
 
-> "Your site is live. 52 people visited in the last hour. Here's your dashboard."
+Here's what must happen in 30 seconds:
 
-One button. One click. They land on a page showing their site's heartbeat: visitors, speed, health. No login. No password. Just *their creation*, performing.
+Email lands: **"Your site's first week: 1,247 visitors."**
 
-The feeling? Pride. Ownership. "This is mine, and it's *working*."
+One number. One moment of pride. One button: "See your dashboard."
 
-That's the hook. Everything else — maintenance tiers, tokens, upgrades — comes later. First, give them the dopamine hit of seeing their creation breathe.
+They click. They see their site's heartbeat — visitors, speed score, health status. No login. No password. No friction. Just their creation, *breathing*.
+
+The feeling? "I made the right choice." That's the dopamine hit. Everything else — tiers, tokens, upsells — comes *after* they trust us. Week 4, not Day 0.
 
 ---
 
 ## Brand Voice
 
-ANCHOR doesn't sell maintenance. ANCHOR sells **peace of mind**.
+Harbor speaks like a trusted advisor who happens to know everything about your website. Not corporate. Not cutesy. Confident and warm.
 
-The voice is calm, confident, slightly protective. Like a concierge who anticipates what you need before you ask:
+- "Your site had a great week" — not "Performance metrics aggregated successfully"
+- "We noticed something — already fixed" — not "Alert: Anomaly detected. Action required."
+- "Ready for a refresh?" — not "Your quarterly maintenance proposal is available for review"
 
-- "Your site had a great week." (Not: "Weekly metrics report attached.")
-- "We noticed something — already fixed." (Not: "Alert: Issue detected. Action required.")
-- "Ready for a refresh? We have ideas." (Not: "Your quarterly maintenance proposal is ready for review.")
-
-Never technical. Never corporate. Always human, always helpful, always one step ahead.
+Every notification should feel like a smart friend texting you. The moment it sounds like software, we've failed.
 
 ---
 
 ## What to Say NO To
 
-**Kill token visibility for most clients.** Nobody wants to see "42,000 of 50,000 tokens remaining." That's anxiety, not service. They should see: "3 updates included this month. You've used 1." Simple. Human. Done.
+**NO to token visibility.** "42,000 of 50,000 tokens remaining" is anxiety, not service. Clients should see: "3 updates this month. You've used 1." Human. Simple. Done. Save the token mechanics for the internal dashboard.
 
-**Kill overage pricing at launch.** If someone goes over, handle it gracefully. Have a conversation about upgrading. We're not a utility company metering drops of water.
+**NO to three tiers at launch.** Basic. Pro. That's it. Enterprise is a *conversation*, not a checkbox. Two choices means they pick one. Three choices means they pick "later."
 
-**Kill password-protected dashboards.** No friction. Unique URLs are enough. Add a login and you've killed 40% of engagement on day one.
+**NO to overage pricing on Day 1.** If someone goes slightly over, handle it gracefully. Call them. Upgrade them. We're building relationships, not billing for bandwidth like a 2005 cellular carrier.
 
-**Kill "quarterly refresh proposal" language.** Nobody wants a proposal. Say: "Hey, your About page could use a facelift. Want us to try something?" That's a conversation, not a contract negotiation.
+**NO to the "complexity estimator."** Clients don't care how hard their request is. They care if it gets done. We estimate internally. We say yes or no.
 
-**Kill three tiers at launch.** Basic/Pro/Enterprise is decision paralysis. Launch with ONE plan. $99. Simple. Add tiers when you have data.
+**NO to password-protected dashboards.** The URL is already unguessable. A password kills 40% of engagement before they even see the value.
 
 ---
 
 ## The Emotional Hook
 
-Here's why people will LOVE this:
+Here's why people will *love* this:
 
-**Because it makes them feel taken care of — without lifting a finger.**
+**Because it transforms abandonment into belonging.**
 
-Most business owners have low-grade anxiety about their website. Is it working? Is it slow? Is it broken? They don't check because they're terrified of what they'll find.
+Right now, Shipyard clients feel forgotten. They paid thousands. They got a website. Then... silence. That silence breeds doubt. "Is it still good? Did they move on? Should I have picked someone else?"
 
-ANCHOR is the antidote. It's the monthly email that says "Everything's good. 2,300 people visited. Speed is excellent." It's the dashboard with green checkmarks. It's knowing that if something breaks, *someone is watching*.
+Harbor replaces that silence with a continuous pulse of reassurance. Monthly check-ins. Gentle alerts. Performance proof. The message isn't "here's your metrics." The message is: *We're still here. We're still watching. You made the right choice.*
 
-The emotional hook isn't "peace of mind about performance." It's deeper: **"You're not alone."**
+That's not a maintenance contract. That's a relationship. And relationships — the real ones, the ones people tell their friends about — are worth more than any MRR target.
 
-That's not a maintenance contract. That's a relationship. And relationships are what people pay for, renew, and tell their friends about.
+The goal isn't recurring revenue. The goal is becoming indispensable.
 
-The goal isn't recurring revenue. The goal is becoming indispensable. Revenue follows.
+Revenue follows.

@@ -1,128 +1,90 @@
-# Round 1: Elon Musk — First-Principles Review
-
-**PRD:** Shipyard Maintenance & Post-Delivery System
-**Date:** 2026-04-08
-
----
+# Round 1: Elon Musk — Chief Product & Growth Officer
 
 ## Architecture: What's the Simplest System That Could Work?
 
-The PRD describes a 4-component system. It should be 2.
+The PRD describes **4 systems pretending to be 1**: dashboards, Stripe billing, email automation, AND token tracking. First principles: what's the minimum viable system that proves demand exists?
 
-**Cut:**
-- Separate "Client Dashboard" is unnecessary. Embed 3 metrics in a status page generated at build time. No API calls. Static HTML with Cloudflare's built-in analytics iframe.
-- Dedicated database is overkill for <100 clients. Use a JSON file in the repo. Graduate to SQLite when you hit 500 clients. Postgres at 5,000.
+**Answer:** A Google Form and a Stripe payment link. That's it. You don't need dashboards to sell $79/month.
 
-**Keep:**
-- Email automation (this IS the product)
-- Stripe for payments (don't reinvent billing)
+The "static site per client" dashboard architecture is insane overhead. At 50 clients, you're managing 50 mini-sites. At 500, you're dead. If you need dashboards at all, build ONE dashboard app with client auth. This is web dev 101.
 
-Simplest MVP: An email sequence + a Stripe checkout link. Ship in 3 days, not 8 weeks.
+**Simplest MVP:** 5 email templates + Stripe link. Ship in 72 hours, not 8 weeks.
 
 ---
 
-## Performance: Bottlenecks & 10x Path
+## Performance: Token Math is Fiction
 
-**Bottleneck isn't technical—it's sales.**
+Let's run the numbers. Basic tier: 50K tokens for $79/month. Claude costs ~$3/1M input, $15/1M output. Say 25K each = **$0.45 in actual AI cost**. Gross margin: 99.4%.
 
-The system depends on 30% "attach rate" for maintenance contracts. Zero clients have ever bought maintenance from Shipyard. This is a cold-start problem.
+But hold on — who's DOING the work? If tokens include agent execution time, tool calls, file reads... "50K tokens" is meaningless. A single non-trivial edit burns 100K+ tokens easily.
 
-**10x path:**
-1. First 10 contracts must be hand-sold by a human. No automation until PMF is proven.
-2. Once 10 clients pay, THEN build the dashboard. Not before.
-3. Token tracking is premature optimization. Just log time manually for 6 months.
+**The question nobody answered:** What's the labor cost per update request? If it requires human review, your margins collapse. If it's fully automated, say that explicitly and prove it.
 
-You're optimizing the wrong thing. The bottleneck is convincing ANY client to pay $79/month. Build the invoice, not the token tracker.
+**10x path:** Prove unit economics on 10 manual contracts before building anything.
 
 ---
 
-## Distribution: How to Reach 10,000 Users Without Paid Ads
+## Distribution: Zero Strategy
 
-This PRD doesn't address distribution at all. Critical oversight.
+"How does this reach 10,000 users without paid ads?" — It doesn't. This PRD has ZERO distribution strategy.
 
-**Reality check:** Shipyard's current client base is <50. Getting to 10,000 requires 200x growth.
+You're selling to existing clients. How many do you have? 10? 20? Even at 100% attach rate: $79 × 20 = $1,580 MRR. The $3K MRR target requires ~38 clients on Basic.
 
-**Actual distribution strategy:**
-1. Every deployed site is a billboard. Add "Built by Shipyard" footer with link. Free impressions.
-2. Public dashboards as marketing. "See how this site performs" generates leads.
-3. Case studies with real metrics. Not "we built a site," but "97 Lighthouse score, 40% conversion lift."
-4. Client referral discount: 1 month free for every referral that converts.
+**The real question:** How many projects does Shipyard complete per month? If it's <5, the maintenance funnel is a rounding error. Fix acquisition first.
 
-Email sequences to existing clients ≠ distribution. It's retention. Don't confuse them.
+30% attach rate is optimistic. Industry upsell benchmarks: 10-15%. Plan for 15%.
+
+**Actual levers:** "Built by Shipyard" footer on every site. Public dashboards as lead gen. Referral program. Case studies with real numbers.
 
 ---
 
-## What to CUT: Scope Creep & v2 Features
+## What to CUT (v2 Masquerading as v1)
 
-**Immediate cuts:**
-- "Geographic distribution" metric — Who cares? Cut.
-- "Triggered alerts" for performance drops — Complex, rarely useful. Cut.
-- "White-labeling options" — Zero clients have asked for this. Cut.
-- "Password protection for dashboards" — YAGNI. Cut.
-- "Enterprise tier" — You have zero Pro customers. Don't build Enterprise.
-- "Quarterly refresh proposal" — This is a human sales motion, not a feature.
-- Overage handling at $0.15/1K — Hard caps instead. "Upgrade or wait."
+1. **Site Health Dashboard** — Cut entirely for v1. Send a monthly PDF email with Lighthouse scores. Done.
+2. **Geographic distribution metrics** — Nobody cares. Cut.
+3. **Trend charts** — Complexity for zero conversion lift. Cut.
+4. **Dashboard "Suggestions"** — AI-powered upsell engine. That's v3.
+5. **Triggered performance alerts** — Requires monitoring infra. v2.
+6. **White-labeling** — Zero customers asking. Cut.
+7. **Enterprise tier** — You have zero enterprise clients. Add when demanded.
+8. **Token complexity estimator** — No historical data. It'll be wrong.
 
-**Phase 4 (Polish & Scale) should not exist.** Ship 3 phases, then wait for feedback.
-
----
-
-## Technical Feasibility: Can One Agent Session Build This?
-
-**Yes, but only if you cut 60% of the scope.**
-
-One agent can build:
-- Email templates (5 emails × 30 min = 2.5 hours)
-- Stripe checkout integration (2 hours)
-- Static dashboard template (3 hours)
-- Cloudflare analytics embed (1 hour)
-
-One agent CANNOT build in one session:
-- Real-time token tracking with overage calculations
-- Lighthouse CI pipeline integration
-- Triggered email system with webhooks
-- Multi-tier subscription management
-
-**Recommendation:** Ship email + Stripe in Session 1. Dashboard in Session 2. Tokens in Session 5.
+**v1 is:** Email sequence + Stripe subscription + Update request form. 2 weeks, not 8.
 
 ---
 
-## Scaling: What Breaks at 100x Usage
+## Technical Feasibility: Yes, With 60% Cuts
 
-At 100x (5,000 clients instead of 50):
+Can one agent session build the 8-week plan? No. Integration surface area is too high: Cloudflare API, Lighthouse CI, Stripe, Resend, custom DB, token logic.
 
-| Component | Breaks At | Solution |
-|-----------|-----------|----------|
-| JSON file DB | 500 clients | SQLite |
-| Manual token tracking | 50 contracts | Automate logging |
-| Single dashboard template | 200 clients | Static site generator |
-| Manual email sends | 100 clients | ESP automation |
-| Lighthouse CI daily | 100 sites | Weekly batch, sample |
-
-**The real scaling problem:** Token estimation. Zero historical data. You'll guess for 12+ months. Accept this. Price in margin.
+Can one agent session build the REAL v1? Yes.
+- Email templates + Stripe link + Airtable for request tracking = single session.
 
 ---
 
-## Final Verdict
+## Scaling: What Breaks at 100x
 
-**This PRD solves the right problem (no recurring revenue) with 3x too much system.**
+At 2,000 maintenance clients:
 
-**Ship this week:**
-1. Maintenance offer email → Stripe checkout → Manual fulfillment
-2. 5-email drip sequence (Resend, 4 hours setup)
-3. Static dashboard per client (no APIs, just numbers)
+| Component | Breaks At | Fix |
+|-----------|-----------|-----|
+| Email sending | Never | ESPs scale fine |
+| Token tracking | 500 clients | Index properly, use real DB |
+| Update queue | 50 clients | 2K clients × 1 req/mo = 67/day. Need automation. |
+| Static dashboards | 100 clients | DOA architecture. One app. |
 
-**Ship in 90 days if traction:**
-- Token tracking
-- Automated usage reports
+The token model also breaks: "unused tokens don't roll over" creates perverse incentive. Clients burn tokens on garbage requests to avoid waste. You'll hate this at 1,000 clients.
 
-**Never ship (until 1,000 paying clients):**
-- Enterprise tier
-- White-labeling
-- Geographic analytics
-
-The goal is one signed contract, not a perfect system. Optimize for learning speed.
+**Real problem:** This is a services business wearing SaaS clothes. Every request requires work. MRR looks great until margins compress.
 
 ---
+
+## Bottom Line
+
+**Right problem. 3x too much system.**
+
+Ship in 2 weeks: Kill the dashboard. Kill token complexity. Sell "3 updates per month" retainers. Iterate.
+
+The PRD solves problems you don't have yet while ignoring the one you do: not enough clients to make maintenance math work.
 
 *— Elon*

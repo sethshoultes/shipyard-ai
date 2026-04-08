@@ -1,24 +1,28 @@
-# Phase 1 Plan — Palette Themes
+# Phase 1 Plan — HARBOR (Shipyard Maintenance System)
 
-**Generated**: 2025
-**Project Slug**: emdash-themes
-**Product Name**: Palette
-**Requirements**: .planning/REQUIREMENTS.md
-**Total Tasks**: 16
-**Waves**: 3
+**Generated:** 2026-04-08
+**Project Slug:** shipyard-maintenance-system
+**Product Name:** HARBOR
+**Requirements:** .planning/REQUIREMENTS.md
+**Total Tasks:** 18
+**Waves:** 4
+**Timeline:** 5 weeks (per decisions.md)
 
 ---
 
 ## The Essence
 
-> **What is this product really about?**
-> Helping people stop being embarrassed by their website.
->
-> **What feeling should it evoke?**
-> Recognition. "This is me."
->
-> **What must be perfect?**
-> The first three seconds.
+> **What is this product REALLY about?**
+> Proving to clients they haven't been forgotten after the check clears.
+
+> **What's the feeling it should evoke?**
+> "You're not alone."
+
+> **What's the one thing that must be perfect?**
+> The first glance — one second to feel cared for or abandoned.
+
+> **Creative direction:**
+> Warm pulse, not cold dashboard.
 
 ---
 
@@ -26,69 +30,79 @@
 
 | Requirement | Task(s) | Wave |
 |-------------|---------|------|
-| REQ-001: Palette One independent codebase | phase-1-task-1 | 1 |
-| REQ-002: Palette Two independent codebase | phase-1-task-2 | 1 |
-| REQ-003: Single index.html per theme | phase-1-task-5, phase-1-task-9 | 2 |
-| REQ-004: CSS files (style.css, variables.css) | phase-1-task-3, phase-1-task-4, phase-1-task-7, phase-1-task-8 | 1-2 |
-| REQ-005-006: Fonts and images directories | phase-1-task-1, phase-1-task-2 | 1 |
-| REQ-007: docs/customization.md | phase-1-task-14 | 3 |
-| REQ-008: README.md | phase-1-task-15 | 3 |
-| REQ-009: Palette One warm color palette | phase-1-task-3, phase-1-task-5 | 1-2 |
-| REQ-010: Palette Two dark color palette | phase-1-task-7, phase-1-task-9 | 1-2 |
-| REQ-011-012: Light/dark mode commitment | phase-1-task-3, phase-1-task-7 | 1 |
-| REQ-013: Emotional resonance in 3 seconds | phase-1-task-5, phase-1-task-9 | 2 |
-| REQ-014-016: CSS-only animations, no parallax | phase-1-task-6, phase-1-task-10 | 2 |
-| REQ-017: Scroll-snap CSS | phase-1-task-6, phase-1-task-10 | 2 |
-| REQ-018: Mobile-responsive design | phase-1-task-6, phase-1-task-10 | 2 |
-| REQ-019-020: Theme-specific imagery | phase-1-task-11, phase-1-task-12 | 2 |
-| REQ-021-026: Font performance requirements | phase-1-task-4, phase-1-task-8 | 1 |
-| REQ-027-030: Accessibility basics | phase-1-task-5, phase-1-task-9 | 2 |
-| REQ-031-033: Image sourcing | phase-1-task-11, phase-1-task-12 | 2 |
-| REQ-034-041: Documentation | phase-1-task-14, phase-1-task-15 | 3 |
+| REQ-ARCH-001 to REQ-ARCH-007: Core architecture, JSON storage | phase-1-task-1, phase-1-task-2 | 1 |
+| REQ-BACKEND-004: Stripe webhook integration | phase-1-task-3 | 1 |
+| REQ-CLIENT-001: UUIDv4 dashboard URLs | phase-1-task-1 | 1 |
+| REQ-BACKEND-003: Cloudflare Analytics API | phase-1-task-4 | 2 |
+| REQ-BACKEND-004: Lighthouse CI weekly batch | phase-1-task-5 | 2 |
+| REQ-BACKEND-006: Health score threshold logic | phase-1-task-6 | 2 |
+| REQ-DASH-001 to REQ-DASH-006: Dashboard template | phase-1-task-7 | 2 |
+| REQ-EMAIL-001 to REQ-EMAIL-005: Email templates | phase-1-task-8 | 2 |
+| REQ-BACKEND-001: Nightly dashboard generator | phase-1-task-9 | 3 |
+| REQ-CLIENT-002: Magic link access | phase-1-task-10 | 3 |
+| REQ-DESIGN-001 to REQ-DESIGN-005: Visual design, CSS | phase-1-task-11 | 3 |
+| REQ-DASH-005, REQ-DESIGN-004: Copy voice audit | phase-1-task-12 | 3 |
+| Cron job orchestration | phase-1-task-13 | 4 |
+| End-to-end testing | phase-1-task-14 | 4 |
+| Deployment and QA | phase-1-task-15 | 4 |
+| Launch checklist | phase-1-task-16 | 4 |
+| Sara Blakely customer gut-check | phase-1-task-17 | 4 |
+| First 10 client prep | phase-1-task-18 | 4 |
 
 ---
 
 ## Wave Execution Order
 
-### Wave 1 (Parallel) — Foundation & CSS Variables
+### Wave 1 (Parallel) — Foundation: Project Setup, Data Schema, Stripe
 
-Eight independent tasks creating project structure and CSS foundations.
+Three independent foundational tasks setting up project structure, data storage, and payment integration.
 
 ```xml
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Create Palette One project structure</title>
-  <requirement>REQ-001: Create independent codebase for Palette One; REQ-005-006: Create fonts/ and images/ directories</requirement>
+  <title>Project structure and JSON data schema</title>
+  <requirement>REQ-ARCH-001, REQ-ARCH-002, REQ-CLIENT-001: Static HTML, JSON storage, UUIDv4 URLs</requirement>
   <description>
-    Create the complete folder structure for Palette One theme.
-    This establishes the independent codebase per Steve Jobs' decision
-    that "each theme gets its own structural decisions."
+    Create the HARBOR project structure and define JSON schemas.
+    Per Elon (D-7): "Static architecture. 2008 technology that works."
+    Per decision: JSON file storage until 500 clients.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/emdash-themes/decisions.md" reason="File structure specification in §File Structure" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-maintenance-system/decisions.md" reason="Locked decisions and file structure" />
+    <file path="/home/agent/shipyard-ai/examples/peak-dental/seed/seed.json" reason="JSON schema pattern reference" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-themes/palette/palette-one/" reason="Static HTML pattern" />
   </context>
 
   <steps>
-    <step order="1">Create palette/ root directory in /home/agent/shipyard-ai/</step>
-    <step order="2">Create palette/palette-one/ directory</step>
-    <step order="3">Create palette/palette-one/css/ directory</step>
-    <step order="4">Create palette/palette-one/fonts/ directory</step>
-    <step order="5">Create palette/palette-one/images/ directory</step>
-    <step order="6">Create empty placeholder files: index.html, css/style.css, css/variables.css</step>
-    <step order="7">Add .gitkeep to fonts/ and images/ directories</step>
+    <step order="1">Create harbor/ directory in deliverables/</step>
+    <step order="2">Create directory structure per decisions.md: dashboard/, api/, data/, emails/, cron/, static/, config/</step>
+    <step order="3">Create data/clients.json with schema: { clients: [ { client_id, name, email, dashboard_url, stripe_customer_id, requests_remaining, created_at, last_updated } ] }</step>
+    <step order="4">Create data/requests.json with schema: { requests: [ { request_id, client_id, type, price, status, created_at, completed_at } ] }</step>
+    <step order="5">Create config/pricing.json with fixed prices: { logo_swap: 25, image_replacement: 25, text_update: 25, blog_post: 50, new_section: 75, new_page: 150 }</step>
+    <step order="6">Create config/copy.json with warm voice templates</step>
+    <step order="7">Implement generateClientUUID() function using UUIDv4</step>
+    <step order="8">Create lib/data.ts with CRUD functions for clients.json and requests.json</step>
+    <step order="9">Implement atomic write with backup on every mutation</step>
+    <step order="10">Create static/clients/ directory for generated dashboards</step>
   </steps>
 
   <verification>
-    <check type="bash">ls -la /home/agent/shipyard-ai/palette/palette-one/</check>
-    <check type="bash">ls -la /home/agent/shipyard-ai/palette/palette-one/css/</check>
-    <check type="manual">Directory structure matches decisions.md specification</check>
+    <check type="bash">ls -la /home/agent/shipyard-ai/deliverables/harbor/</check>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/data/clients.json</check>
+    <check type="manual">JSON schemas match decisions.md specification</check>
+    <check type="manual">UUIDv4 generation produces valid, unguessable IDs</check>
+    <check type="manual">Backup created on data mutation</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies - Wave 1 task -->
+    <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>feat(palette): create Palette One project structure
+  <commit-message>feat(harbor): add project structure and JSON data schemas
+
+Per D-7: Static architecture with JSON storage.
+Schema: clients.json, requests.json, pricing.json.
+UUIDv4 for unguessable dashboard URLs.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -96,39 +110,51 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-2" wave="1">
-  <title>Create Palette Two project structure</title>
-  <requirement>REQ-002: Create independent codebase for Palette Two; REQ-005-006: Create fonts/ and images/ directories</requirement>
+  <title>Configuration constants and threshold definitions</title>
+  <requirement>REQ-BACKEND-006, REQ-DOMAIN-003, REQ-DOMAIN-004: Health thresholds, hard caps, fixed pricing</requirement>
   <description>
-    Create the complete folder structure for Palette Two theme.
-    This establishes the independent codebase per Steve Jobs' decision
-    that "each theme gets its own structural decisions."
+    Define all configuration constants for HARBOR.
+    Per Phil's arbitration: Green/Yellow/Red thresholds defined.
+    Per Elon: Hard caps with human escalation path.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/emdash-themes/decisions.md" reason="File structure specification in §File Structure" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-maintenance-system/decisions.md" reason="Threshold definitions in Open Questions #4" />
+    <file path="/home/agent/shipyard-ai/deliverables/shipyard-care/lib/health-score.ts" reason="Existing health score pattern" />
   </context>
 
   <steps>
-    <step order="1">Create palette/palette-two/ directory</step>
-    <step order="2">Create palette/palette-two/css/ directory</step>
-    <step order="3">Create palette/palette-two/fonts/ directory</step>
-    <step order="4">Create palette/palette-two/images/ directory</step>
-    <step order="5">Create empty placeholder files: index.html, css/style.css, css/variables.css</step>
-    <step order="6">Add .gitkeep to fonts/ and images/ directories</step>
-    <step order="7">Create palette/docs/ directory for shared documentation</step>
+    <step order="1">Create harbor/config/thresholds.ts</step>
+    <step order="2">Define HEALTH_GREEN: Performance >= 90 AND Accessibility >= 90</step>
+    <step order="3">Define HEALTH_YELLOW: Performance 70-89 OR Accessibility 70-89</step>
+    <step order="4">Define HEALTH_RED: Performance less than 70 OR Accessibility less than 70 OR site down</step>
+    <step order="5">Create harbor/config/subscription.ts</step>
+    <step order="6">Define MONTHLY_PRICE = 79</step>
+    <step order="7">Define UPDATES_PER_MONTH = 3 (pending final decision, use conservative)</step>
+    <step order="8">Define OVERAGE_PRICE = 35 per update</step>
+    <step order="9">Create harbor/config/schedule.ts</step>
+    <step order="10">Define DASHBOARD_REBUILD_HOUR = 6 (6:00 AM)</step>
+    <step order="11">Define LIGHTHOUSE_DAY = 'SUNDAY' (weekly)</step>
+    <step order="12">Define EMAIL_SUMMARY_DAY = 'MONDAY'</step>
+    <step order="13">Export all configs from harbor/config/index.ts</step>
   </steps>
 
   <verification>
-    <check type="bash">ls -la /home/agent/shipyard-ai/palette/palette-two/</check>
-    <check type="bash">ls -la /home/agent/shipyard-ai/palette/palette-two/css/</check>
-    <check type="manual">Directory structure matches decisions.md specification</check>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/config/thresholds.ts</check>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/config/subscription.ts</check>
+    <check type="manual">Health thresholds match decisions.md Open Question #4</check>
+    <check type="manual">All constants typed and documented</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies - Wave 1 task -->
+    <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>feat(palette): create Palette Two project structure
+  <commit-message>feat(harbor): add configuration constants and thresholds
+
+Health thresholds: Green (>=90), Yellow (70-89), Red (<70).
+Subscription: $79/month, 3 updates, $35 overage.
+Schedule: 6am rebuild, Sunday Lighthouse, Monday email.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -136,179 +162,53 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-3" wave="1">
-  <title>Create Palette One CSS variables (warm/light)</title>
-  <requirement>REQ-009: Warm color palette for restaurant; REQ-011: Light mode only; REQ-034-035: Documented CSS custom properties</requirement>
+  <title>Stripe subscription integration with webhook handler</title>
+  <requirement>REQ-CLIENT-004, REQ-CLIENT-005, REQ-ARCH-007: Stripe checkout, single tier, webhooks</requirement>
   <description>
-    Create the CSS custom properties for Palette One with warm, restaurant-appropriate
-    colors. Light mode only per "commit, don't toggle" decision. Variables must be
-    documented for customization per Elon's requirement.
+    Implement Stripe integration for $79/month subscription.
+    Per Elon: One tier at launch. Test whether anyone pays before testing upgrades.
+    Handle subscription.created, subscription.cancelled, subscription.updated events.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/emdash-themes/decisions.md" reason="Palette One identity: warm, restaurant, light" />
-    <file path="/home/agent/shipyard-ai/examples/emdash-templates/blog/src/styles/theme.css" reason="CSS variable naming patterns reference" />
+    <file path="/home/agent/shipyard-ai/apps/pulse/lib/stripe.ts" reason="Existing Stripe pattern with idempotency" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-maintenance-system/decisions.md" reason="D-3: One tier at launch, $79/month" />
   </context>
 
   <steps>
-    <step order="1">Create palette/palette-one/css/variables.css</step>
-    <step order="2">Define :root selector with all CSS custom properties</step>
-    <step order="3">Add color variables: --color-bg (#fdfaf6 warm white), --color-text (#2d2a26 warm black), --color-primary (#c45c26 terracotta), --color-accent (#8b6914 gold), --color-surface (#f5efe6 cream)</step>
-    <step order="4">Add typography variables: --font-heading (serif), --font-body (clean sans-serif), --font-size-base (1rem)</step>
-    <step order="5">Add type scale: --font-size-xs through --font-size-5xl (9 sizes)</step>
-    <step order="6">Add spacing variables: --spacing-1 through --spacing-24</step>
-    <step order="7">Add layout variables: --content-width (680px), --wide-width (1200px), --radius (4px), --radius-lg (8px)</step>
-    <step order="8">Add transition variables: --transition-fast (120ms), --transition-base (180ms)</step>
-    <step order="9">Add CSS comments documenting each variable group</step>
+    <step order="1">Create harbor/api/stripe-webhook.ts</step>
+    <step order="2">Import Stripe SDK and configure with API key from env</step>
+    <step order="3">Implement webhook signature verification</step>
+    <step order="4">Handle checkout.session.completed: create client in clients.json</step>
+    <step order="5">Generate UUIDv4 dashboard URL on subscription creation</step>
+    <step order="6">Initialize requests_remaining to UPDATES_PER_MONTH</step>
+    <step order="7">Handle customer.subscription.deleted: mark client inactive</step>
+    <step order="8">Handle customer.subscription.updated: sync status</step>
+    <step order="9">Handle invoice.payment_succeeded: reset requests_remaining monthly</step>
+    <step order="10">Implement idempotency using Stripe event ID</step>
+    <step order="11">Log all webhook events: "[HARBOR] Stripe: {event_type} for {customer_id}"</step>
+    <step order="12">Create harbor/api/create-checkout.ts for initiating checkout</step>
+    <step order="13">Configure single product: HARBOR Monthly ($79/month)</step>
+    <step order="14">Include success_url and cancel_url</step>
   </steps>
 
   <verification>
-    <check type="bash">cat /home/agent/shipyard-ai/palette/palette-one/css/variables.css</check>
-    <check type="manual">Variables use warm color palette (terracotta, cream, gold)</check>
-    <check type="manual">No dark mode media queries or .dark class (light-only)</check>
-    <check type="manual">All variables have descriptive comments</check>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/api/stripe-webhook.ts</check>
+    <check type="manual">Webhook signature verified before processing</check>
+    <check type="manual">All three subscription events handled</check>
+    <check type="manual">Idempotency prevents duplicate processing</check>
+    <check type="manual">Single tier ($79) configured</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Directory structure must exist" />
+    <depends-on task-id="phase-1-task-1" reason="Needs clients.json schema" />
   </dependencies>
 
-  <commit-message>feat(palette-one): add CSS variables with warm color palette
+  <commit-message>feat(harbor): add Stripe subscription with webhook handler
 
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-4" wave="1">
-  <title>Add self-hosted fonts for Palette One</title>
-  <requirement>REQ-021: Fonts under 100KB; REQ-022: Latin subset; REQ-023: font-display: swap; REQ-026: No Google Fonts; REQ-032: License compliance</requirement>
-  <description>
-    Add self-hosted, subsetted fonts for Palette One. Must be under 100KB total.
-    Use serif for headings (editorial feel) and clean sans for body.
-    Google Fonts CDN blocked per performance decision.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/rounds/emdash-themes/decisions.md" reason="Font strategy: self-hosted, subsetted, &lt;100KB" />
-    <file path="/home/agent/shipyard-ai/palette/palette-one/css/variables.css" reason="Font family variables to update" />
-  </context>
-
-  <steps>
-    <step order="1">Download Libre Baskerville (serif, OFL license) Regular and Bold weights</step>
-    <step order="2">Download Inter (sans-serif, OFL license) Regular, Medium, SemiBold weights</step>
-    <step order="3">Subset fonts to Latin characters only using pyftsubset or fontsource</step>
-    <step order="4">Convert to WOFF2 format for optimal compression</step>
-    <step order="5">Save to palette/palette-one/fonts/ directory</step>
-    <step order="6">Verify total font size is under 100KB</step>
-    <step order="7">Create @font-face declarations in style.css with font-display: swap</step>
-    <step order="8">Update variables.css with actual font family names</step>
-    <step order="9">Add LICENSE.txt documenting font licenses (OFL for both)</step>
-  </steps>
-
-  <verification>
-    <check type="bash">ls -la /home/agent/shipyard-ai/palette/palette-one/fonts/</check>
-    <check type="bash">du -sh /home/agent/shipyard-ai/palette/palette-one/fonts/</check>
-    <check type="manual">Total font size is under 100KB</check>
-    <check type="bash">grep "font-display: swap" /home/agent/shipyard-ai/palette/palette-one/css/style.css</check>
-    <check type="manual">@font-face declarations exist for all weights</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="fonts/ directory must exist" />
-    <depends-on task-id="phase-1-task-3" reason="variables.css must exist for font family updates" />
-  </dependencies>
-
-  <commit-message>feat(palette-one): add self-hosted fonts (Libre Baskerville + Inter, &lt;100KB)
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-7" wave="1">
-  <title>Create Palette Two CSS variables (dark/terminal)</title>
-  <requirement>REQ-010: Dark color palette for developer tools; REQ-012: Dark mode only; REQ-034-035: Documented CSS custom properties</requirement>
-  <description>
-    Create the CSS custom properties for Palette Two with dark, terminal-inspired
-    colors. Dark mode only per "commit, don't toggle" decision. Neon accents
-    on near-black background for developer aesthetic.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/rounds/emdash-themes/decisions.md" reason="Palette Two identity: dark, terminal, developer" />
-    <file path="/home/agent/shipyard-ai/prds/emdash-themes.md" reason="Forge theme spec: neon green on #0a0a0a" />
-    <file path="/home/agent/shipyard-ai/examples/emdash-templates/blog/src/styles/theme.css" reason="CSS variable naming patterns" />
-  </context>
-
-  <steps>
-    <step order="1">Create palette/palette-two/css/variables.css</step>
-    <step order="2">Define :root selector with dark-mode CSS custom properties</step>
-    <step order="3">Add color variables: --color-bg (#0d0d0d near-black), --color-text (#ededed light gray), --color-primary (#00ff88 neon green), --color-accent (#00d4ff cyan), --color-surface (#1a1a1a dark gray)</step>
-    <step order="4">Add terminal accent colors: --color-warning (#ffcc00 yellow), --color-error (#ff5555 red), --color-comment (#6b7280 muted)</step>
-    <step order="5">Add typography variables: --font-heading (monospace), --font-body (monospace), --font-size-base (1rem)</step>
-    <step order="6">Add type scale: --font-size-xs through --font-size-5xl (9 sizes)</step>
-    <step order="7">Add spacing variables: --spacing-1 through --spacing-24</step>
-    <step order="8">Add layout variables: --content-width (800px), --wide-width (1280px), --radius (2px), --radius-lg (4px)</step>
-    <step order="9">Add transition variables and CSS comments documenting each variable group</step>
-  </steps>
-
-  <verification>
-    <check type="bash">cat /home/agent/shipyard-ai/palette/palette-two/css/variables.css</check>
-    <check type="manual">Variables use dark background (#0d0d0d) with neon accents</check>
-    <check type="manual">No light mode media queries or .light class (dark-only)</check>
-    <check type="manual">All variables have descriptive comments</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Directory structure must exist" />
-  </dependencies>
-
-  <commit-message>feat(palette-two): add CSS variables with dark terminal palette
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-8" wave="1">
-  <title>Add self-hosted fonts for Palette Two</title>
-  <requirement>REQ-021: Fonts under 100KB; REQ-022: Latin subset; REQ-023: font-display: swap; REQ-026: No Google Fonts; REQ-032: License compliance</requirement>
-  <description>
-    Add self-hosted, subsetted monospace fonts for Palette Two. Must be under 100KB total.
-    Use monospace typography throughout for terminal/developer aesthetic.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/rounds/emdash-themes/decisions.md" reason="Font strategy: self-hosted, subsetted, &lt;100KB" />
-    <file path="/home/agent/shipyard-ai/prds/emdash-themes.md" reason="Forge theme: JetBrains Mono" />
-    <file path="/home/agent/shipyard-ai/palette/palette-two/css/variables.css" reason="Font family variables to update" />
-  </context>
-
-  <steps>
-    <step order="1">Download JetBrains Mono (monospace, OFL license) Regular, Medium, Bold weights</step>
-    <step order="2">Subset fonts to Latin characters only using pyftsubset or fontsource</step>
-    <step order="3">Convert to WOFF2 format for optimal compression</step>
-    <step order="4">Save to palette/palette-two/fonts/ directory</step>
-    <step order="5">Verify total font size is under 100KB</step>
-    <step order="6">Create @font-face declarations in style.css with font-display: swap</step>
-    <step order="7">Update variables.css with actual font family name (JetBrains Mono)</step>
-    <step order="8">Add LICENSE.txt documenting font license (OFL)</step>
-  </steps>
-
-  <verification>
-    <check type="bash">ls -la /home/agent/shipyard-ai/palette/palette-two/fonts/</check>
-    <check type="bash">du -sh /home/agent/shipyard-ai/palette/palette-two/fonts/</check>
-    <check type="manual">Total font size is under 100KB</check>
-    <check type="bash">grep "font-display: swap" /home/agent/shipyard-ai/palette/palette-two/css/style.css</check>
-    <check type="manual">@font-face declarations exist for all weights</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="fonts/ directory must exist" />
-    <depends-on task-id="phase-1-task-7" reason="variables.css must exist for font family updates" />
-  </dependencies>
-
-  <commit-message>feat(palette-two): add self-hosted fonts (JetBrains Mono, &lt;100KB)
+Per D-3: Single tier $79/month.
+Handles: checkout.session.completed, subscription.deleted, subscription.updated.
+Idempotent webhook processing.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -316,53 +216,107 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 2 (Parallel, after Wave 1) — HTML & Styling
+### Wave 2 (Parallel, after Wave 1) — Core Integrations: APIs, Dashboard Template, Emails
 
-Six tasks building the actual theme pages and visual styling.
+Five tasks building the core functionality: Cloudflare API, Lighthouse, health logic, dashboard template, emails.
 
 ```xml
-<task-plan id="phase-1-task-5" wave="2">
-  <title>Build Palette One index.html (THE page)</title>
-  <requirement>REQ-003: Single index.html; REQ-013: Emotional resonance in 3 seconds; REQ-027-030: Accessibility basics; REQ-030: Semantic HTML5</requirement>
+<task-plan id="phase-1-task-4" wave="2">
+  <title>Cloudflare Analytics API integration</title>
+  <requirement>REQ-BACKEND-003, REQ-ARCH-003: Cloudflare traffic data integration</requirement>
   <description>
-    Create THE single perfect page for Palette One. Restaurant/hospitality theme
-    with warm, editorial feel. Must evoke recognition in first 3 seconds per
-    "Sacred First 3 Seconds" decision. Semantic HTML5 with accessibility basics.
+    Integrate Cloudflare Analytics API for traffic metrics.
+    Per decisions.md: Weekly traffic data integration.
+    Graceful degradation if API unavailable.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/emdash-themes/decisions.md" reason="One perfect page mandate; emotional resonance" />
-    <file path="/home/agent/shipyard-ai/palette/palette-one/css/variables.css" reason="CSS custom properties to use" />
-    <file path="/home/agent/shipyard-ai/prds/emdash-themes.md" reason="Ember theme: magazine-style, large images, pull quotes" />
+    <file path="/home/agent/shipyard-ai/workers/contact-form/src/index.ts" reason="Cloudflare worker pattern" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-maintenance-system/decisions.md" reason="Traffic metrics specification" />
   </context>
 
   <steps>
-    <step order="1">Create palette/palette-one/index.html with HTML5 doctype</step>
-    <step order="2">Add semantic structure: header, nav, main, sections, footer</step>
-    <step order="3">Create hero section with large featured image area and tagline</step>
-    <step order="4">Add restaurant-appropriate sections: About, Menu highlights, Reservations, Contact</step>
-    <step order="5">Include pull quotes and editorial typography elements</step>
-    <step order="6">Link CSS files: variables.css, then style.css</step>
-    <step order="7">Add proper meta tags: viewport, description, charset</step>
-    <step order="8">Ensure all images have alt text placeholders</step>
-    <step order="9">Add skip-to-content link for keyboard accessibility</step>
-    <step order="10">Ensure heading hierarchy (h1 > h2 > h3) is logical</step>
+    <step order="1">Create harbor/api/cloudflare-analytics.ts</step>
+    <step order="2">Configure Cloudflare API token from environment</step>
+    <step order="3">Implement fetchSiteAnalytics(zoneId, dateRange)</step>
+    <step order="4">Return: { visitors, pageviews, period_start, period_end }</step>
+    <step order="5">Implement 24-hour caching layer</step>
+    <step order="6">If API fails, return cached data with stale flag</step>
+    <step order="7">Implement exponential backoff: 1s, 2s, 4s, max 3 retries</step>
+    <step order="8">Format visitor count for human display: "1,247 visitors"</step>
+    <step order="9">Calculate week-over-week change percentage</step>
+    <step order="10">Store cached results in data/analytics-cache.json</step>
+    <step order="11">Log API calls: "[HARBOR] Cloudflare: fetched analytics for {zone_id}"</step>
   </steps>
 
   <verification>
-    <check type="bash">cat /home/agent/shipyard-ai/palette/palette-one/index.html</check>
-    <check type="manual">HTML uses semantic elements: header, nav, main, section, footer</check>
-    <check type="manual">Hero section is prominent and immediately visible</check>
-    <check type="manual">All images have alt attributes</check>
-    <check type="manual">Heading hierarchy is correct (single h1, logical h2/h3)</check>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/api/cloudflare-analytics.ts</check>
+    <check type="manual">API token read from environment</check>
+    <check type="manual">24-hour cache implemented</check>
+    <check type="manual">Graceful degradation on failure</check>
+    <check type="manual">Exponential backoff on retries</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="CSS variables must exist" />
-    <depends-on task-id="phase-1-task-4" reason="Fonts must be available" />
+    <depends-on task-id="phase-1-task-1" reason="Needs data directory structure" />
   </dependencies>
 
-  <commit-message>feat(palette-one): build index.html with semantic structure
+  <commit-message>feat(harbor): add Cloudflare Analytics API integration
+
+Weekly traffic data fetch with 24-hour cache.
+Graceful degradation on API failure.
+Exponential backoff: 1s, 2s, 4s retries.
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-5" wave="2">
+  <title>Lighthouse CI weekly batch runner</title>
+  <requirement>REQ-BACKEND-004, REQ-ARCH-004: Lighthouse CI weekly, not daily</requirement>
+  <description>
+    Implement Lighthouse CI batch runner for performance scoring.
+    Per Elon (D-13): "Weekly Lighthouse, not daily. 100 sites daily = compute cost + rate limits."
+    Store Performance and Accessibility scores.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/deliverables/shipyard-care/lib/pagespeed.ts" reason="Existing PageSpeed API pattern" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-maintenance-system/decisions.md" reason="D-13: Weekly batch" />
+  </context>
+
+  <steps>
+    <step order="1">Create harbor/api/lighthouse-runner.ts</step>
+    <step order="2">Use PageSpeed Insights API (or Lighthouse CI)</step>
+    <step order="3">Implement runLighthouseAudit(url): returns { performance, accessibility, seo, best_practices }</step>
+    <step order="4">Store results in data/lighthouse-results.json keyed by client_id</step>
+    <step order="5">Create harbor/cron/lighthouse-batch.ts</step>
+    <step order="6">Schedule weekly on Sunday (per config)</step>
+    <step order="7">Process all active clients in batch</step>
+    <step order="8">Add 2-second delay between requests to avoid rate limits</step>
+    <step order="9">Handle failures gracefully: preserve previous score, flag as stale</step>
+    <step order="10">Log batch progress: "[HARBOR] Lighthouse: {n}/{total} complete"</step>
+    <step order="11">Calculate estimated completion time for monitoring</step>
+  </steps>
+
+  <verification>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/api/lighthouse-runner.ts</check>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/cron/lighthouse-batch.ts</check>
+    <check type="manual">Weekly schedule (not daily)</check>
+    <check type="manual">Rate limiting with 2s delay</check>
+    <check type="manual">Graceful failure handling</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-1" reason="Needs data directory and client list" />
+  </dependencies>
+
+  <commit-message>feat(harbor): add Lighthouse CI weekly batch runner
+
+Per D-13: Weekly, not daily (cost/rate limit management).
+PageSpeed API with 2s delay between requests.
+Results stored per client in lighthouse-results.json.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -370,233 +324,173 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-6" wave="2">
-  <title>Create Palette One style.css (main styles)</title>
-  <requirement>REQ-014: CSS-only animations; REQ-015: GPU-composited transforms; REQ-016: No horizontal scroll; REQ-017: Scroll-snap; REQ-018: Mobile-responsive</requirement>
+  <title>Health score calculation with Green/Yellow/Red logic</title>
+  <requirement>REQ-BACKEND-006, REQ-DASH-001: Health indicator threshold logic</requirement>
   <description>
-    Create the main stylesheet for Palette One. Warm, editorial aesthetic with
-    serif headings and asymmetric layouts. CSS-only animations, no JavaScript.
-    Must be mobile-responsive (375px to 1440px).
+    Implement health score calculation per Phil's arbitration.
+    Green: Performance >= 90 AND Accessibility >= 90
+    Yellow: Either 70-89
+    Red: Either less than 70 OR site down
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/palette/palette-one/index.html" reason="HTML structure to style" />
-    <file path="/home/agent/shipyard-ai/palette/palette-one/css/variables.css" reason="CSS variables to consume" />
-    <file path="/home/agent/shipyard-ai/examples/emdash-templates/blog/src/styles/theme.css" reason="Responsive patterns reference" />
+    <file path="/home/agent/shipyard-ai/deliverables/shipyard-care/lib/health-score.ts" reason="Existing health score pattern" />
+    <file path="/home/agent/shipyard-ai/deliverables/harbor/config/thresholds.ts" reason="Threshold constants" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-maintenance-system/decisions.md" reason="Phil's arbitration on composite vs breakdown" />
   </context>
 
   <steps>
-    <step order="1">Add CSS reset (box-sizing, margin reset)</step>
-    <step order="2">Create @font-face declarations for self-hosted fonts</step>
-    <step order="3">Add base styles using CSS variables (body, typography)</step>
-    <step order="4">Style header/nav with warm color palette</step>
-    <step order="5">Style hero section: large imagery, editorial typography</step>
-    <step order="6">Create asymmetric grid layouts for content sections</step>
-    <step order="7">Add CSS-only hover effects (transform: scale, opacity transitions)</step>
-    <step order="8">Add scroll-snap-type for smooth section scrolling</step>
-    <step order="9">Create responsive breakpoints: @media (max-width: 900px), @media (max-width: 640px)</step>
-    <step order="10">Ensure no horizontal overflow at any viewport size</step>
-    <step order="11">Add focus states with visible outlines for accessibility</step>
+    <step order="1">Create harbor/lib/health-score.ts</step>
+    <step order="2">Import threshold constants from config</step>
+    <step order="3">Implement calculateHealthStatus(lighthouseScores, uptimeStatus)</step>
+    <step order="4">Return: { status: 'green' | 'yellow' | 'red', reason: string }</step>
+    <step order="5">Check site down first: if uptimeStatus === 'down', return red</step>
+    <step order="6">Check green: performance >= 90 AND accessibility >= 90</step>
+    <step order="7">Check red: performance less than 70 OR accessibility less than 70</step>
+    <step order="8">Otherwise yellow with reason describing which metric</step>
+    <step order="9">Implement getHealthDetails(lighthouseScores, uptimeStatus, trafficData)</step>
+    <step order="10">Return component breakdown for detail view click-through</step>
+    <step order="11">Include: lighthouse scores, uptime %, traffic trend</step>
+    <step order="12">Export both functions for dashboard use</step>
   </steps>
 
   <verification>
-    <check type="bash">cat /home/agent/shipyard-ai/palette/palette-one/css/style.css</check>
-    <check type="bash">grep "transform\|transition" /home/agent/shipyard-ai/palette/palette-one/css/style.css</check>
-    <check type="manual">Animations use CSS only (no @keyframes with JS triggers)</check>
-    <check type="manual">Responsive breakpoints exist for tablet (900px) and mobile (640px)</check>
-    <check type="bash">grep ":focus" /home/agent/shipyard-ai/palette/palette-one/css/style.css</check>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/lib/health-score.ts</check>
+    <check type="test">Test: performance=95, accessibility=92 returns green</check>
+    <check type="test">Test: performance=85, accessibility=95 returns yellow</check>
+    <check type="test">Test: performance=65, accessibility=90 returns red</check>
+    <check type="test">Test: site down returns red regardless of scores</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="HTML must exist to style" />
+    <depends-on task-id="phase-1-task-2" reason="Needs threshold constants" />
+    <depends-on task-id="phase-1-task-5" reason="Needs Lighthouse scores" />
   </dependencies>
 
-  <commit-message>feat(palette-one): add style.css with warm editorial styling
+  <commit-message>feat(harbor): add health score calculation with threshold logic
+
+Per Phil's arbitration: Both composite and breakdown.
+Green: Perf>=90 AND Access>=90
+Yellow: Either 70-89
+Red: Either <70 OR site down
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
 ```xml
-<task-plan id="phase-1-task-9" wave="2">
-  <title>Build Palette Two index.html (THE page)</title>
-  <requirement>REQ-003: Single index.html; REQ-013: Emotional resonance in 3 seconds; REQ-027-030: Accessibility basics; REQ-030: Semantic HTML5</requirement>
+<task-plan id="phase-1-task-7" wave="2">
+  <title>Dashboard HTML template with components</title>
+  <requirement>REQ-DASH-001 to REQ-DASH-006: Health indicator, traffic summary, three metrics</requirement>
   <description>
-    Create THE single perfect page for Palette Two. Developer tools/terminal theme
-    with dark, technical aesthetic. Must evoke recognition in first 3 seconds.
-    Semantic HTML5 with accessibility basics.
+    Create the HARBOR dashboard HTML template.
+    Per Steve: "The dashboard IS the product."
+    Per essence: "Warm pulse, not cold dashboard."
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/emdash-themes/decisions.md" reason="One perfect page mandate; emotional resonance" />
-    <file path="/home/agent/shipyard-ai/palette/palette-two/css/variables.css" reason="CSS custom properties to use" />
-    <file path="/home/agent/shipyard-ai/prds/emdash-themes.md" reason="Forge theme: terminal UI, code-block styling, grid-heavy" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-themes/palette/palette-one/index.html" reason="Semantic HTML pattern" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-maintenance-system/decisions.md" reason="Dashboard specifications" />
   </context>
 
   <steps>
-    <step order="1">Create palette/palette-two/index.html with HTML5 doctype</step>
-    <step order="2">Add semantic structure: header, nav, main, sections, footer</step>
-    <step order="3">Create hero section with terminal/code snippet motif</step>
-    <step order="4">Add developer-appropriate sections: Features, Code examples, API docs, Pricing</step>
-    <step order="5">Include code blocks and terminal-style UI elements</step>
-    <step order="6">Link CSS files: variables.css, then style.css</step>
-    <step order="7">Add proper meta tags: viewport, description, charset</step>
-    <step order="8">Ensure all images have alt text placeholders</step>
-    <step order="9">Add skip-to-content link for keyboard accessibility</step>
-    <step order="10">Ensure heading hierarchy (h1 > h2 > h3) is logical</step>
+    <step order="1">Create harbor/dashboard/index.html template</step>
+    <step order="2">Semantic HTML5 structure with accessibility attributes</step>
+    <step order="3">Create harbor/dashboard/components/health-indicator.html</step>
+    <step order="4">Large Green/Yellow/Red circle dominating viewport</step>
+    <step order="5">Clickable to expand detail view</step>
+    <step order="6">Create harbor/dashboard/components/health-details.html</step>
+    <step order="7">Shows: Lighthouse score, uptime %, traffic trend on click</step>
+    <step order="8">Create harbor/dashboard/components/traffic-summary.html</step>
+    <step order="9">One sentence: "{N} people visited your site this week. Everything looks great."</step>
+    <step order="10">Create harbor/dashboard/components/last-updated.html</step>
+    <step order="11">Format: "Last updated: Today at 6:00 AM"</step>
+    <step order="12">Add "Built by Shipyard" footer with link</step>
+    <step order="13">Add placeholder tokens for data injection: {{client_name}}, {{health_status}}, {{visitor_count}}, etc.</step>
+    <step order="14">Include minimal vanilla JS for click-to-expand interaction</step>
+    <step order="15">Total page size target: less than 50KB including CSS</step>
   </steps>
 
   <verification>
-    <check type="bash">cat /home/agent/shipyard-ai/palette/palette-two/index.html</check>
-    <check type="manual">HTML uses semantic elements: header, nav, main, section, footer</check>
-    <check type="manual">Hero section has terminal/code aesthetic</check>
-    <check type="manual">All images have alt attributes</check>
-    <check type="manual">Heading hierarchy is correct (single h1, logical h2/h3)</check>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/dashboard/index.html</check>
+    <check type="manual">Health indicator dominates viewport</check>
+    <check type="manual">Exactly three metrics visible: Traffic, Health, Last Updated</check>
+    <check type="manual">One-sentence traffic summary</check>
+    <check type="manual">"Built by Shipyard" footer present</check>
+    <check type="manual">Page size less than 50KB</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-7" reason="CSS variables must exist" />
-    <depends-on task-id="phase-1-task-8" reason="Fonts must be available" />
+    <depends-on task-id="phase-1-task-1" reason="Needs directory structure" />
+    <depends-on task-id="phase-1-task-6" reason="Needs health status format" />
   </dependencies>
 
-  <commit-message>feat(palette-two): build index.html with semantic structure
+  <commit-message>feat(harbor): add dashboard HTML template with components
+
+Per Steve: Dashboard IS the product.
+Health indicator dominant, one-sentence summary.
+Three metrics only: Traffic, Health, Last Updated.
+"Built by Shipyard" footer.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
 ```xml
-<task-plan id="phase-1-task-10" wave="2">
-  <title>Create Palette Two style.css (main styles)</title>
-  <requirement>REQ-014: CSS-only animations; REQ-015: GPU-composited transforms; REQ-016: No horizontal scroll; REQ-017: Scroll-snap; REQ-018: Mobile-responsive</requirement>
+<task-plan id="phase-1-task-8" wave="2">
+  <title>Email templates for 5 touchpoints</title>
+  <requirement>REQ-EMAIL-001 to REQ-EMAIL-005: Welcome, status, completed, warning, anniversary</requirement>
   <description>
-    Create the main stylesheet for Palette Two. Dark, terminal aesthetic with
-    monospace typography and neon accents. CSS-only animations, no JavaScript.
-    Must be mobile-responsive (375px to 1440px).
+    Create all 5 email templates with warm human voice.
+    Per Steve (D-15): "Every notification should feel like a smart friend texting you."
+    Per Elon (D-15 concession): "The dopamine hit matters."
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/palette/palette-two/index.html" reason="HTML structure to style" />
-    <file path="/home/agent/shipyard-ai/palette/palette-two/css/variables.css" reason="CSS variables to consume" />
-    <file path="/home/agent/shipyard-ai/examples/emdash-templates/blog/src/styles/theme.css" reason="Responsive patterns reference" />
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/email.ts" reason="Email template pattern with escapeHtml" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-maintenance-system/decisions.md" reason="5 email touchpoints specification" />
   </context>
 
   <steps>
-    <step order="1">Add CSS reset (box-sizing, margin reset)</step>
-    <step order="2">Create @font-face declarations for JetBrains Mono</step>
-    <step order="3">Add base styles using CSS variables (body, typography)</step>
-    <step order="4">Style header/nav with dark palette and neon accents</step>
-    <step order="5">Style hero section: terminal window motif, code syntax highlighting</step>
-    <step order="6">Create grid-heavy layouts for feature sections</step>
-    <step order="7">Style code blocks with syntax highlighting colors</step>
-    <step order="8">Add CSS-only hover effects (glow, color transitions)</step>
-    <step order="9">Add scroll-snap-type for smooth section scrolling</step>
-    <step order="10">Create responsive breakpoints: @media (max-width: 900px), @media (max-width: 640px)</step>
-    <step order="11">Ensure no horizontal overflow at any viewport size</step>
-    <step order="12">Add focus states with neon glow for accessibility</step>
+    <step order="1">Create harbor/emails/welcome.html</step>
+    <step order="2">Subject: "Your site is live. Here's your dashboard."</step>
+    <step order="3">Body: Celebration tone, dashboard link, what to expect</step>
+    <step order="4">Create harbor/emails/status-summary.html</step>
+    <step order="5">Subject: "Your site had a great week"</step>
+    <step order="6">Body: Visitor count, health status, trends</step>
+    <step order="7">Create harbor/emails/request-completed.html</step>
+    <step order="8">Subject: "We noticed something - already fixed"</step>
+    <step order="9">Body: What was done, proactive care messaging</step>
+    <step order="10">Create harbor/emails/usage-warning.html</step>
+    <step order="11">Subject: "1 update remaining this month"</step>
+    <step order="12">Body: Current usage, upgrade CTA, escalation button</step>
+    <step order="13">Create harbor/emails/anniversary.html</step>
+    <step order="14">Subject: "We're still here. We still care."</step>
+    <step order="15">Body: Year-in-review stats, celebration, renewal value</step>
+    <step order="16">All emails: inline CSS, mobile responsive, max-width 600px</step>
+    <step order="17">All emails: unsubscribe link, HARBOR branding</step>
+    <step order="18">Create harbor/lib/email.ts with Resend integration</step>
+    <step order="19">Implement escapeHtml() for XSS prevention</step>
   </steps>
 
   <verification>
-    <check type="bash">cat /home/agent/shipyard-ai/palette/palette-two/css/style.css</check>
-    <check type="bash">grep "transform\|transition" /home/agent/shipyard-ai/palette/palette-two/css/style.css</check>
-    <check type="manual">Animations use CSS only (no @keyframes with JS triggers)</check>
-    <check type="manual">Responsive breakpoints exist for tablet (900px) and mobile (640px)</check>
-    <check type="bash">grep ":focus" /home/agent/shipyard-ai/palette/palette-two/css/style.css</check>
+    <check type="bash">ls -la /home/agent/shipyard-ai/deliverables/harbor/emails/</check>
+    <check type="manual">All 5 templates created</check>
+    <check type="manual">Warm human voice in all copy</check>
+    <check type="manual">Inline CSS (no external stylesheets)</check>
+    <check type="manual">Unsubscribe link in footer</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-9" reason="HTML must exist to style" />
+    <depends-on task-id="phase-1-task-1" reason="Needs directory structure" />
+    <depends-on task-id="phase-1-task-2" reason="Needs copy.json templates" />
   </dependencies>
 
-  <commit-message>feat(palette-two): add style.css with dark terminal styling
+  <commit-message>feat(harbor): add 5 email templates with warm voice
 
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-11" wave="2">
-  <title>Source and add images for Palette One</title>
-  <requirement>REQ-019: Real food photography; REQ-031: Unsplash/Pexels with attribution; REQ-033: Theme-specific imagery</requirement>
-  <description>
-    Source and add high-quality food photography for Palette One.
-    Use Unsplash/Pexels with proper attribution. Images must be
-    theme-specific (restaurant/hospitality), not generic stock.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/rounds/emdash-themes/decisions.md" reason="Real food photography requirement" />
-    <file path="/home/agent/shipyard-ai/palette/palette-one/index.html" reason="Image placeholders to fill" />
-  </context>
-
-  <steps>
-    <step order="1">Search Unsplash/Pexels for high-quality restaurant/food images</step>
-    <step order="2">Select 4-6 images: hero image, food dishes (2-3), interior/ambiance (1-2)</step>
-    <step order="3">Download images at appropriate resolution (1920px max width)</step>
-    <step order="4">Optimize images for web (compress to &lt;500KB each for hero, &lt;200KB for thumbnails)</step>
-    <step order="5">Save to palette/palette-one/images/ with descriptive names</step>
-    <step order="6">Create ATTRIBUTION.md documenting photographer credits and licenses</step>
-    <step order="7">Update index.html img src attributes with actual image paths</step>
-    <step order="8">Add descriptive alt text for each image</step>
-  </steps>
-
-  <verification>
-    <check type="bash">ls -la /home/agent/shipyard-ai/palette/palette-one/images/</check>
-    <check type="bash">cat /home/agent/shipyard-ai/palette/palette-one/images/ATTRIBUTION.md</check>
-    <check type="manual">Images are restaurant/food themed, not generic</check>
-    <check type="manual">All images have attribution documented</check>
-    <check type="bash">grep -o 'alt="[^"]*"' /home/agent/shipyard-ai/palette/palette-one/index.html</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="HTML with image placeholders must exist" />
-  </dependencies>
-
-  <commit-message>feat(palette-one): add food photography with proper attribution
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-12" wave="2">
-  <title>Source and add images for Palette Two</title>
-  <requirement>REQ-020: Real code screenshots; REQ-031: Unsplash/Pexels with attribution; REQ-033: Theme-specific imagery</requirement>
-  <description>
-    Source and add developer-appropriate imagery for Palette Two.
-    Use code screenshots, terminal windows, and tech-themed images.
-    Create original code screenshots for authenticity.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/rounds/emdash-themes/decisions.md" reason="Real code screenshots requirement" />
-    <file path="/home/agent/shipyard-ai/palette/palette-two/index.html" reason="Image placeholders to fill" />
-  </context>
-
-  <steps>
-    <step order="1">Create code screenshots from VS Code or terminal with theme-appropriate syntax</step>
-    <step order="2">Search Unsplash/Pexels for developer workspace/tech images (1-2)</step>
-    <step order="3">Create 3-4 code snippet screenshots with syntax highlighting</step>
-    <step order="4">Create terminal window mockup for hero section</step>
-    <step order="5">Optimize images for web (compress, use PNG for screenshots, JPG for photos)</step>
-    <step order="6">Save to palette/palette-two/images/ with descriptive names</step>
-    <step order="7">Create ATTRIBUTION.md (credit any sourced photos, note original screenshots)</step>
-    <step order="8">Update index.html img src attributes with actual image paths</step>
-    <step order="9">Add descriptive alt text for each image</step>
-  </steps>
-
-  <verification>
-    <check type="bash">ls -la /home/agent/shipyard-ai/palette/palette-two/images/</check>
-    <check type="bash">cat /home/agent/shipyard-ai/palette/palette-two/images/ATTRIBUTION.md</check>
-    <check type="manual">Images are developer/code themed, not generic</check>
-    <check type="manual">Code screenshots are readable and professionally styled</check>
-    <check type="bash">grep -o 'alt="[^"]*"' /home/agent/shipyard-ai/palette/palette-two/index.html</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-9" reason="HTML with image placeholders must exist" />
-  </dependencies>
-
-  <commit-message>feat(palette-two): add code screenshots and developer imagery
+Per D-15: "Smart friend texting you" tone.
+Templates: welcome, status-summary, request-completed, usage-warning, anniversary.
+Resend integration with XSS prevention.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -604,200 +498,564 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 3 (After Wave 2) — Documentation & Verification
+### Wave 3 (Parallel, after Wave 2) — Generation & Access: Nightly Build, Magic Links, CSS, Copy
 
-Four tasks for documentation and final QA.
+Four tasks for dashboard generation, access control, visual design, and copy polish.
 
 ```xml
-<task-plan id="phase-1-task-13" wave="3">
-  <title>Verify accessibility requirements</title>
-  <requirement>REQ-027: Color contrast; REQ-028: Focus states; REQ-029: Alt text; REQ-030: Semantic HTML</requirement>
+<task-plan id="phase-1-task-9" wave="3">
+  <title>Nightly dashboard generator cron job</title>
+  <requirement>REQ-BACKEND-001: Static HTML dashboards rebuilt nightly via cron</requirement>
   <description>
-    Verify both themes meet basic accessibility requirements.
-    Check color contrast ratios, focus state visibility, alt text
-    completeness, and semantic HTML structure.
+    Implement the nightly dashboard generation job.
+    Per Elon (D-7): "Static HTML per client, rebuilt nightly."
+    Output: One index.html per client at /static/clients/{uuid}/index.html
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/palette/palette-one/index.html" reason="Theme 1 to verify" />
-    <file path="/home/agent/shipyard-ai/palette/palette-two/index.html" reason="Theme 2 to verify" />
-    <file path="/home/agent/shipyard-ai/rounds/emdash-themes/decisions.md" reason="Basic accessibility scope" />
+    <file path="/home/agent/shipyard-ai/pipeline/auto/parse-prd.mjs" reason="Node script pattern" />
+    <file path="/home/agent/shipyard-ai/deliverables/harbor/dashboard/index.html" reason="Template to populate" />
   </context>
 
   <steps>
-    <step order="1">Check Palette One color contrast: text on background (minimum 4.5:1 for normal text)</step>
-    <step order="2">Check Palette Two color contrast: text on background (minimum 4.5:1)</step>
-    <step order="3">Verify focus states are visible on both themes (tab through all links/buttons)</step>
-    <step order="4">Verify all images have descriptive alt text</step>
-    <step order="5">Verify heading hierarchy (h1 > h2 > h3) is logical on both themes</step>
-    <step order="6">Verify semantic landmarks are present (header, nav, main, footer)</step>
-    <step order="7">Test keyboard navigation works (can reach all interactive elements)</step>
-    <step order="8">Document any issues found in QA-NOTES.md</step>
-    <step order="9">Fix any critical accessibility failures</step>
+    <step order="1">Create harbor/cron/dashboard-generator.ts</step>
+    <step order="2">Import template from dashboard/index.html</step>
+    <step order="3">Load all active clients from clients.json</step>
+    <step order="4">For each client:</step>
+    <step order="5">  - Fetch latest Cloudflare analytics (from cache)</step>
+    <step order="6">  - Fetch latest Lighthouse results (from cache)</step>
+    <step order="7">  - Calculate health status using health-score.ts</step>
+    <step order="8">  - Replace template tokens with client data</step>
+    <step order="9">  - Write to static/clients/{client_uuid}/index.html</step>
+    <step order="10">Set "Last updated: Today at 6:00 AM" timestamp</step>
+    <step order="11">Schedule cron for 6:00 AM daily (per config)</step>
+    <step order="12">Log generation: "[HARBOR] Dashboard: generated {n} dashboards"</step>
+    <step order="13">Handle errors gracefully: skip failed client, log error, continue</step>
+    <step order="14">Create static/clients/.htaccess or equivalent for clean URLs</step>
   </steps>
 
   <verification>
-    <check type="manual">Color contrast meets WCAG 2.1 Level A (4.5:1 minimum)</check>
-    <check type="manual">Focus states are visible without mouse</check>
-    <check type="manual">All images have alt text</check>
-    <check type="manual">Keyboard navigation reaches all elements</check>
-    <check type="bash">cat /home/agent/shipyard-ai/palette/QA-NOTES.md 2>/dev/null || echo "No issues documented"</check>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/cron/dashboard-generator.ts</check>
+    <check type="manual">Template tokens replaced with real data</check>
+    <check type="manual">Output path: static/clients/{uuid}/index.html</check>
+    <check type="manual">Scheduled for 6:00 AM daily</check>
+    <check type="manual">Error handling doesn't abort batch</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-6" reason="Palette One must be complete" />
-    <depends-on task-id="phase-1-task-10" reason="Palette Two must be complete" />
-    <depends-on task-id="phase-1-task-11" reason="Images with alt text must exist" />
-    <depends-on task-id="phase-1-task-12" reason="Images with alt text must exist" />
+    <depends-on task-id="phase-1-task-4" reason="Needs Cloudflare analytics data" />
+    <depends-on task-id="phase-1-task-5" reason="Needs Lighthouse results" />
+    <depends-on task-id="phase-1-task-6" reason="Needs health score calculation" />
+    <depends-on task-id="phase-1-task-7" reason="Needs dashboard template" />
   </dependencies>
 
-  <commit-message>chore(palette): verify accessibility requirements
+  <commit-message>feat(harbor): add nightly dashboard generator cron
+
+Per D-7: Static HTML per client, rebuilt nightly at 6am.
+Populates template with Cloudflare + Lighthouse data.
+Output: static/clients/{uuid}/index.html
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
 ```xml
-<task-plan id="phase-1-task-14" wave="3">
-  <title>Create docs/customization.md</title>
-  <requirement>REQ-007: docs/customization.md; REQ-034-035: Document CSS custom properties</requirement>
+<task-plan id="phase-1-task-10" wave="3">
+  <title>Magic link access system</title>
+  <requirement>REQ-CLIENT-002, REQ-ARCH-005: Magic link access, no password</requirement>
   <description>
-    Create comprehensive documentation for CSS custom properties.
-    Document all variables for both themes with examples of
-    how to customize colors, typography, and spacing.
+    Implement magic link access for dashboards.
+    Per Steve (D-6): "A password kills 40% of engagement."
+    UUIDv4 URLs are unguessable; magic links add email verification layer.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/palette/palette-one/css/variables.css" reason="Palette One variables to document" />
-    <file path="/home/agent/shipyard-ai/palette/palette-two/css/variables.css" reason="Palette Two variables to document" />
-    <file path="/home/agent/shipyard-ai/rounds/emdash-themes/decisions.md" reason="CSS variable documentation requirement" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-maintenance-system/decisions.md" reason="D-6: No password protection, magic links" />
   </context>
 
   <steps>
-    <step order="1">Create palette/docs/customization.md</step>
-    <step order="2">Add overview section explaining CSS custom properties</step>
-    <step order="3">Document Palette One variables: colors, typography, spacing, layout</step>
-    <step order="4">Document Palette Two variables: colors, typography, spacing, layout</step>
-    <step order="5">Add examples: changing --primary color, swapping font families</step>
-    <step order="6">Include code snippets showing how to override variables</step>
-    <step order="7">Add table of all variables with default values</step>
-    <step order="8">Include common customization recipes (brand color swap, font swap)</step>
-    <step order="9">Add FAQ section for common customization questions</step>
+    <step order="1">Create harbor/api/magic-link.ts</step>
+    <step order="2">Implement generateMagicLink(clientId, email)</step>
+    <step order="3">Create short-lived token (24 hour expiry) tied to client_id + email</step>
+    <step order="4">Store token in data/magic-tokens.json</step>
+    <step order="5">Return magic link URL: /dashboard/verify?token={token}</step>
+    <step order="6">Create harbor/api/verify-magic-link.ts</step>
+    <step order="7">Validate token exists and not expired</step>
+    <step order="8">Validate email matches client record</step>
+    <step order="9">On success: redirect to dashboard/{client_uuid}</step>
+    <step order="10">On failure: show friendly error with "Request new link" button</step>
+    <step order="11">Implement sendMagicLinkEmail(clientId)</step>
+    <step order="12">Use welcome email template with magic link</step>
+    <step order="13">For v1: dashboard URLs work directly (UUIDv4 is security)</step>
+    <step order="14">Magic link adds optional email verification layer</step>
   </steps>
 
   <verification>
-    <check type="bash">cat /home/agent/shipyard-ai/palette/docs/customization.md</check>
-    <check type="manual">All CSS variables from both themes are documented</check>
-    <check type="manual">Examples show how to customize colors and fonts</check>
-    <check type="manual">Documentation is clear for non-technical users</check>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/api/magic-link.ts</check>
+    <check type="manual">Token expires after 24 hours</check>
+    <check type="manual">Email validation on verify</check>
+    <check type="manual">No password anywhere in flow</check>
+    <check type="manual">Friendly error on invalid token</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="Palette One variables must exist" />
-    <depends-on task-id="phase-1-task-7" reason="Palette Two variables must exist" />
+    <depends-on task-id="phase-1-task-1" reason="Needs client data" />
+    <depends-on task-id="phase-1-task-8" reason="Needs email sending capability" />
   </dependencies>
 
-  <commit-message>docs(palette): add CSS customization guide
+  <commit-message>feat(harbor): add magic link access system
+
+Per D-6: No password - magic links + UUIDv4.
+24-hour token expiry, email verification.
+Friendly error with "Request new link" on failure.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
 ```xml
-<task-plan id="phase-1-task-15" wave="3">
-  <title>Create README.md with install/deploy instructions</title>
-  <requirement>REQ-008: README with install, customize, deploy; REQ-036-039: Documentation requirements</requirement>
+<task-plan id="phase-1-task-11" wave="3">
+  <title>CSS design system with warm visual direction</title>
+  <requirement>REQ-DESIGN-001 to REQ-DESIGN-003, REQ-DESIGN-005: Warm pulse, health colors, one-second clarity</requirement>
   <description>
-    Create the main README with installation instructions, customization
-    guide overview, and deployment options. Include deploy buttons for
-    Vercel and Netlify per distribution decision.
+    Create the CSS design system for HARBOR.
+    Per essence: "Warm pulse, not cold dashboard."
+    Health indicator colors: Green, Yellow (amber), Red.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/emdash-themes/decisions.md" reason="README requirements, deploy buttons" />
-    <file path="/home/agent/shipyard-ai/palette/docs/customization.md" reason="Link to detailed customization docs" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-themes/palette/palette-one/css/variables.css" reason="CSS variables pattern" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-themes/palette/palette-one/css/style.css" reason="Component styles pattern" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-maintenance-system/decisions.md" reason="Emotional Risks - dashboard feels cold" />
   </context>
 
   <steps>
-    <step order="1">Create palette/README.md</step>
-    <step order="2">Add project title: "Palette - Two Themes, Done Right"</step>
-    <step order="3">Add description explaining the product essence</step>
-    <step order="4">Add theme previews section with screenshots</step>
-    <step order="5">Add installation instructions (download, clone)</step>
-    <step order="6">Add quick start guide for each theme</step>
-    <step order="7">Link to docs/customization.md for detailed customization</step>
-    <step order="8">Add deploy buttons: Vercel, Netlify, Cloudflare Pages</step>
-    <step order="9">Add tech specs: file sizes, font sizes, browser support</step>
-    <step order="10">Add credits and license section</step>
+    <step order="1">Create harbor/dashboard/css/variables.css</step>
+    <step order="2">Define warm color palette (no harsh grays or blues)</step>
+    <step order="3">Define --color-green: warm green for healthy status</step>
+    <step order="4">Define --color-yellow: warm amber for warning</step>
+    <step order="5">Define --color-red: warm red for critical (not harsh)</step>
+    <step order="6">Define font stack: Inter or similar warm, readable font</step>
+    <step order="7">Define spacing scale for consistent rhythm</step>
+    <step order="8">Create harbor/dashboard/css/style.css</step>
+    <step order="9">Health indicator: large circle (200px+), centered, dominant</step>
+    <step order="10">One-second clarity: high contrast, clear visual hierarchy</step>
+    <step order="11">Traffic summary: friendly, readable, not data-dense</step>
+    <step order="12">"Built by Shipyard" footer: subtle but visible</step>
+    <step order="13">Mobile responsive: single column below 480px</step>
+    <step order="14">Click state for health indicator expansion</step>
+    <step order="15">Self-host fonts (or use system fonts for performance)</step>
+    <step order="16">Total CSS target: less than 10KB</step>
   </steps>
 
   <verification>
-    <check type="bash">cat /home/agent/shipyard-ai/palette/README.md</check>
-    <check type="manual">README includes installation instructions</check>
-    <check type="manual">README includes deploy button badges</check>
-    <check type="manual">README links to customization guide</check>
-    <check type="bash">grep -i "vercel\|netlify" /home/agent/shipyard-ai/palette/README.md</check>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/dashboard/css/variables.css</check>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/dashboard/css/style.css</check>
+    <check type="manual">Warm color palette (no cold grays)</check>
+    <check type="manual">Health indicator large and dominant</check>
+    <check type="manual">Mobile responsive at 480px</check>
+    <check type="manual">CSS under 10KB</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-14" reason="Customization docs to link to" />
-    <depends-on task-id="phase-1-task-13" reason="Accessibility verification complete" />
+    <depends-on task-id="phase-1-task-7" reason="Needs dashboard HTML structure" />
   </dependencies>
 
-  <commit-message>docs(palette): add README with install and deploy instructions
+  <commit-message>style(harbor): add warm CSS design system
+
+Per essence: "Warm pulse, not cold dashboard."
+Health colors: warm green/amber/red.
+One-second clarity with dominant indicator.
+Mobile responsive, under 10KB total.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
 ```xml
-<task-plan id="phase-1-task-16" wave="3">
-  <title>Final verification: responsive and "first 3 seconds" test</title>
-  <requirement>REQ-013: Emotional resonance in 3 seconds; REQ-018: Mobile-responsive; REQ-025: No loading spinners</requirement>
+<task-plan id="phase-1-task-12" wave="3">
+  <title>Copy voice audit and warm language review</title>
+  <requirement>REQ-DASH-005, REQ-DESIGN-004: Human voice, trusted friend tone</requirement>
   <description>
-    Final verification that both themes pass the "first 3 seconds" test
-    and are fully responsive. Test at 375px (mobile) and 1440px (desktop).
-    Verify no blocking content or popups.
+    Comprehensive copy review ensuring warm human voice.
+    Per Steve (D-15): "Every notification should feel like a smart friend texting you."
+    Per essence: "You're not alone."
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/palette/palette-one/index.html" reason="Theme 1 to test" />
-    <file path="/home/agent/shipyard-ai/palette/palette-two/index.html" reason="Theme 2 to test" />
-    <file path="/home/agent/shipyard-ai/rounds/emdash-themes/decisions.md" reason="Sacred first 3 seconds requirement" />
+    <file path="/home/agent/shipyard-ai/deliverables/harbor/dashboard/index.html" reason="Dashboard copy to audit" />
+    <file path="/home/agent/shipyard-ai/deliverables/harbor/emails/" reason="Email copy to audit" />
+    <file path="/home/agent/shipyard-ai/deliverables/harbor/config/copy.json" reason="Copy templates" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-maintenance-system/decisions.md" reason="D-15: Warm human voice" />
   </context>
 
   <steps>
-    <step order="1">Test Palette One at 375px width (mobile): verify no horizontal overflow</step>
-    <step order="2">Test Palette One at 1440px width (desktop): verify layout is correct</step>
-    <step order="3">Test Palette Two at 375px width (mobile): verify no horizontal overflow</step>
-    <step order="4">Test Palette Two at 1440px width (desktop): verify layout is correct</step>
-    <step order="5">Verify no loading spinners on initial load (both themes)</step>
-    <step order="6">Verify no cookie banners or popups (both themes)</step>
-    <step order="7">Verify personality/identity hits in 3 seconds (warm feel for One, tech feel for Two)</step>
-    <step order="8">Verify hero section is above the fold on both mobile and desktop</step>
-    <step order="9">Document any issues in QA-NOTES.md</step>
-    <step order="10">Create SHIP-REPORT.md with completion status</step>
+    <step order="1">Create harbor/COPY-AUDIT.md checklist</step>
+    <step order="2">Audit dashboard copy:</step>
+    <step order="3">  - Traffic summary uses conversational tone</step>
+    <step order="4">  - "Everything looks great" vs "Status: Normal"</step>
+    <step order="5">  - "{N} people visited" vs "{N} unique visitors recorded"</step>
+    <step order="6">Audit email copy:</step>
+    <step order="7">  - Welcome: celebratory, not transactional</step>
+    <step order="8">  - Status: proud parent sharing news</step>
+    <step order="9">  - Warning: helpful friend, not bill collector</step>
+    <step order="10">  - Anniversary: genuine care, not upsell disguised</step>
+    <step order="11">Review config/copy.json templates</step>
+    <step order="12">Ensure "updates remaining" never says "tokens" or "credits"</step>
+    <step order="13">Verify HARBOR branding (not "Shipyard Maintenance System")</step>
+    <step order="14">Remove any passive voice</step>
+    <step order="15">Remove any corporate jargon</step>
+    <step order="16">Document voice guidelines for future copy</step>
   </steps>
 
   <verification>
-    <check type="manual">Both themes render correctly at 375px (mobile)</check>
-    <check type="manual">Both themes render correctly at 1440px (desktop)</check>
-    <check type="manual">No horizontal scrollbar at any tested viewport</check>
-    <check type="manual">Personality hits in first 3 seconds (warm/editorial or dark/technical)</check>
-    <check type="manual">No loading spinners, banners, or popups</check>
-    <check type="bash">cat /home/agent/shipyard-ai/palette/SHIP-REPORT.md</check>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/COPY-AUDIT.md</check>
+    <check type="manual">No passive voice in any copy</check>
+    <check type="manual">No "tokens" or "credits" terminology</check>
+    <check type="manual">Conversational tone throughout</check>
+    <check type="manual">HARBOR branding consistent</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-6" reason="Palette One styling complete" />
-    <depends-on task-id="phase-1-task-10" reason="Palette Two styling complete" />
-    <depends-on task-id="phase-1-task-11" reason="Palette One images added" />
-    <depends-on task-id="phase-1-task-12" reason="Palette Two images added" />
-    <depends-on task-id="phase-1-task-13" reason="Accessibility verified" />
-    <depends-on task-id="phase-1-task-15" reason="README complete" />
+    <depends-on task-id="phase-1-task-7" reason="Needs dashboard copy" />
+    <depends-on task-id="phase-1-task-8" reason="Needs email copy" />
   </dependencies>
 
-  <commit-message>test(palette): verify responsive layout and first 3 seconds test
+  <commit-message>docs(harbor): complete copy voice audit
+
+Per D-15: "Smart friend texting you" tone.
+No passive voice, no tokens/credits terminology.
+Conversational throughout, HARBOR branding.
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+---
+
+### Wave 4 (Sequential, after Wave 3) — Polish: Cron Orchestration, Testing, Launch
+
+Six tasks for final integration, testing, and launch readiness.
+
+```xml
+<task-plan id="phase-1-task-13" wave="4">
+  <title>Cron job orchestration and email scheduler</title>
+  <requirement>REQ-BACKEND-005: Email templates via cron/webhook triggers</requirement>
+  <description>
+    Orchestrate all cron jobs: dashboard rebuild, Lighthouse batch, email scheduler.
+    Ensure jobs don't collide and run in correct order.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/deliverables/harbor/cron/" reason="Cron jobs to orchestrate" />
+    <file path="/home/agent/shipyard-ai/deliverables/harbor/config/schedule.ts" reason="Schedule constants" />
+  </context>
+
+  <steps>
+    <step order="1">Create harbor/cron/email-scheduler.ts</step>
+    <step order="2">Implement checkAnniversaries(): send anniversary emails on Day 365</step>
+    <step order="3">Implement checkUsageWarnings(): send warning when requests_remaining == 1</step>
+    <step order="4">Implement sendWeeklySummaries(): send status summary emails</step>
+    <step order="5">Create harbor/cron/orchestrator.ts</step>
+    <step order="6">Define cron schedule:</step>
+    <step order="7">  - Sunday 2am: Lighthouse batch</step>
+    <step order="8">  - Daily 6am: Dashboard rebuild</step>
+    <step order="9">  - Monday 8am: Weekly summary emails</step>
+    <step order="10">  - Daily 9am: Anniversary and usage warning checks</step>
+    <step order="11">Implement job locking to prevent overlapping runs</step>
+    <step order="12">Log job start/end: "[HARBOR] Cron: {job_name} started/completed"</step>
+    <step order="13">Alert on job failure (log + email to admin)</step>
+    <step order="14">Create health check endpoint for monitoring cron status</step>
+  </steps>
+
+  <verification>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/cron/orchestrator.ts</check>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/cron/email-scheduler.ts</check>
+    <check type="manual">All cron jobs scheduled correctly</check>
+    <check type="manual">No schedule collisions</check>
+    <check type="manual">Job locking implemented</check>
+    <check type="manual">Failure alerts configured</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-5" reason="Needs Lighthouse batch job" />
+    <depends-on task-id="phase-1-task-8" reason="Needs email templates" />
+    <depends-on task-id="phase-1-task-9" reason="Needs dashboard generator" />
+  </dependencies>
+
+  <commit-message>feat(harbor): add cron orchestration and email scheduler
+
+Schedule: Sunday Lighthouse, daily dashboard, Monday emails.
+Job locking prevents overlaps.
+Anniversary and usage warning checks daily.
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-14" wave="4">
+  <title>End-to-end testing suite</title>
+  <requirement>System verification before launch</requirement>
+  <description>
+    Comprehensive testing of all HARBOR functionality.
+    Test full flow: subscription -> dashboard generation -> email delivery.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/deliverables/harbor/" reason="All components to test" />
+  </context>
+
+  <steps>
+    <step order="1">Create harbor/tests/ directory</step>
+    <step order="2">Create harbor/tests/health-score.test.ts</step>
+    <step order="3">Test all threshold combinations: green, yellow, red, site down</step>
+    <step order="4">Create harbor/tests/data-layer.test.ts</step>
+    <step order="5">Test CRUD operations on clients.json, requests.json</step>
+    <step order="6">Test backup creation on write</step>
+    <step order="7">Create harbor/tests/stripe-webhook.test.ts</step>
+    <step order="8">Test subscription.created, subscription.deleted events</step>
+    <step order="9">Test idempotency (same event twice)</step>
+    <step order="10">Create harbor/tests/dashboard-generator.test.ts</step>
+    <step order="11">Test template token replacement</step>
+    <step order="12">Test output file creation</step>
+    <step order="13">Create harbor/tests/e2e.test.ts</step>
+    <step order="14">Full flow: create client -> generate dashboard -> verify output</step>
+    <step order="15">Verify dashboard loads in browser</step>
+    <step order="16">Verify health indicator displays correctly</step>
+  </steps>
+
+  <verification>
+    <check type="bash">npm run test -- harbor/tests/</check>
+    <check type="manual">All tests pass</check>
+    <check type="manual">Health score edge cases covered</check>
+    <check type="manual">E2E flow verified</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-9" reason="Needs dashboard generator" />
+    <depends-on task-id="phase-1-task-13" reason="Needs cron orchestration" />
+  </dependencies>
+
+  <commit-message>test(harbor): add comprehensive testing suite
+
+Health score thresholds, data layer, Stripe webhooks.
+E2E: subscription -> dashboard -> verification.
+All edge cases covered.
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-15" wave="4">
+  <title>Deployment configuration and QA</title>
+  <requirement>Production deployment readiness</requirement>
+  <description>
+    Prepare HARBOR for production deployment.
+    Configure Cloudflare Pages, environment variables, monitoring.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/pipeline/deploy/deploy.sh" reason="Existing deploy pattern" />
+    <file path="/home/agent/shipyard-ai/.github/workflows/auto-pipeline.yml" reason="GitHub Actions pattern" />
+  </context>
+
+  <steps>
+    <step order="1">Create harbor/wrangler.toml for Cloudflare Pages</step>
+    <step order="2">Configure static asset serving from static/clients/</step>
+    <step order="3">Create harbor/.env.example with required variables</step>
+    <step order="4">Document: STRIPE_API_KEY, STRIPE_WEBHOOK_SECRET</step>
+    <step order="5">Document: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ZONE_ID</step>
+    <step order="6">Document: RESEND_API_KEY, FROM_EMAIL</step>
+    <step order="7">Create harbor/README.md with setup instructions</step>
+    <step order="8">Create .github/workflows/harbor-deploy.yml</step>
+    <step order="9">Deploy on push to main (harbor/ directory)</step>
+    <step order="10">Run tests before deploy</step>
+    <step order="11">QA checklist:</step>
+    <step order="12">  - Dashboard loads in less than 2 seconds</step>
+    <step order="13">  - Health indicator visible above fold</step>
+    <step order="14">  - Mobile responsive (test at 375px)</step>
+    <step order="15">  - Click-through to details works</step>
+    <step order="16">  - Emails render correctly in Gmail, Outlook</step>
+  </steps>
+
+  <verification>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/wrangler.toml</check>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/.env.example</check>
+    <check type="manual">All environment variables documented</check>
+    <check type="manual">Deployment workflow configured</check>
+    <check type="manual">QA checklist passed</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-14" reason="Tests must pass before deploy" />
+  </dependencies>
+
+  <commit-message>chore(harbor): add deployment config and QA checklist
+
+Cloudflare Pages deployment via wrangler.
+Environment variables documented.
+QA: load time, mobile, email rendering.
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-16" wave="4">
+  <title>Launch readiness checklist</title>
+  <requirement>Final verification before launch</requirement>
+  <description>
+    Verify all requirements met and HARBOR ready for first 10 clients.
+    Per decisions.md: "This document is the contract."
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="All requirements" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-maintenance-system/decisions.md" reason="18 locked decisions" />
+  </context>
+
+  <steps>
+    <step order="1">Create harbor/LAUNCH-CHECKLIST.md</step>
+    <step order="2">Verify all requirements from REQUIREMENTS.md</step>
+    <step order="3">Verify all 18 locked decisions implemented</step>
+    <step order="4">Verify "NOT in V1" features absent:</step>
+    <step order="5">  - No white-labeling</step>
+    <step order="6">  - No geographic metrics</step>
+    <step order="7">  - No suggestions engine</step>
+    <step order="8">  - No triggered alerts</step>
+    <step order="9">  - No multi-tier pricing</step>
+    <step order="10">  - No token visibility</step>
+    <step order="11">Verify environment setup:</step>
+    <step order="12">  - Stripe product configured ($79/month)</step>
+    <step order="13">  - Cloudflare API access</step>
+    <step order="14">  - Resend email configured</step>
+    <step order="15">Run ship test: "One second to feel cared for or abandoned"</step>
+    <step order="16">Document known limitations for V1</step>
+    <step order="17">Get stakeholder sign-off</step>
+  </steps>
+
+  <verification>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/LAUNCH-CHECKLIST.md</check>
+    <check type="manual">All requirements verified</check>
+    <check type="manual">All 18 decisions implemented</check>
+    <check type="manual">Ship test passed</check>
+    <check type="manual">Stakeholder sign-off received</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-15" reason="Deployment must be ready" />
+  </dependencies>
+
+  <commit-message>docs(harbor): add launch readiness checklist
+
+All requirements, 18 decisions verified.
+Ship test: "One second to feel cared for."
+Ready for first 10 clients.
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-17" wave="4">
+  <title>Sara Blakely customer gut-check</title>
+  <requirement>SKILL.md Step 7: Customer value validation</requirement>
+  <description>
+    Per skill instructions: Spawn Sara Blakely agent to gut-check from real customer perspective.
+    "Would a real customer pay for this? What feels like engineering vanity vs. customer value?"
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/.planning/phase-1-plan.md" reason="This phase plan" />
+    <file path="/home/agent/shipyard-ai/prds/failed/shipyard-maintenance-system.md" reason="Original PRD" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-maintenance-system/decisions.md" reason="Build decisions" />
+  </context>
+
+  <steps>
+    <step order="1">Spawn haiku sub-agent as Sara Blakely (growth-mindset entrepreneur)</step>
+    <step order="2">Prompt: Read phase plan and PRD</step>
+    <step order="3">Answer: Would Sarah (marketing manager from PRD persona) actually use HARBOR?</step>
+    <step order="4">Answer: What would make her say "shut up and take my money"?</step>
+    <step order="5">Answer: What feels like engineering vanity vs. customer value?</step>
+    <step order="6">Answer: Is $79/month the right price for perceived value?</step>
+    <step order="7">Answer: Does the warm voice feel authentic or corporate trying too hard?</step>
+    <step order="8">Write findings to .planning/sara-blakely-review.md</step>
+    <step order="9">Review and address major gaps before launch</step>
+  </steps>
+
+  <verification>
+    <check type="bash">cat /home/agent/shipyard-ai/.planning/sara-blakely-review.md</check>
+    <check type="manual">Customer perspective review complete</check>
+    <check type="manual">Major gaps addressed if any</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-16" reason="Review after launch checklist" />
+  </dependencies>
+
+  <commit-message>docs(harbor): add Sara Blakely customer gut-check
+
+Per SKILL.md: Validate customer value.
+Would Sarah pay $79/month?
+Engineering vanity vs. customer value analysis.
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-18" wave="4">
+  <title>First 10 client preparation</title>
+  <requirement>D-8: First 10 contracts hand-sold</requirement>
+  <description>
+    Prepare for hand-selling first 10 clients.
+    Per Elon (D-8): "Zero clients have ever bought maintenance. This is a cold-start problem."
+    Automation amplifies success; it can't create it.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-maintenance-system/decisions.md" reason="D-8: Hand-sell first 10, Open Question #5: Selection criteria" />
+  </context>
+
+  <steps>
+    <step order="1">Create harbor/SALES-PLAYBOOK.md</step>
+    <step order="2">Document selection criteria for first 10:</step>
+    <step order="3">  - Launched within last 6 months (still warm)</step>
+    <step order="4">  - Project value greater than $20K (invested in quality)</step>
+    <step order="5">  - Responsive communication (likely to engage)</step>
+    <step order="6">Create outreach email template (warm, not salesy)</step>
+    <step order="7">Create demo script showing dashboard value</step>
+    <step order="8">Document objection handling:</step>
+    <step order="9">  - "I don't need maintenance" -> Show invisible work made visible</step>
+    <step order="10">  - "Too expensive" -> Compare to agency retainers ($1000+/mo)</step>
+    <step order="11">  - "I can do it myself" -> Time value, peace of mind</step>
+    <step order="12">Create feedback collection template for first 10</step>
+    <step order="13">Document what to learn from first 10:</step>
+    <step order="14">  - Which features matter most?</step>
+    <step order="15">  - What's missing?</step>
+    <step order="16">  - Is $79 right?</step>
+    <step order="17">Schedule client review sessions at week 2 and week 4</step>
+  </steps>
+
+  <verification>
+    <check type="bash">cat /home/agent/shipyard-ai/deliverables/harbor/SALES-PLAYBOOK.md</check>
+    <check type="manual">Selection criteria documented</check>
+    <check type="manual">Outreach template ready</step>
+    <check type="manual">Objection handling prepared</check>
+    <check type="manual">Feedback collection planned</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-16" reason="Product must be ready before sales" />
+  </dependencies>
+
+  <commit-message>docs(harbor): add sales playbook for first 10 clients
+
+Per D-8: Hand-sell first 10, automation amplifies later.
+Selection criteria, outreach templates, objection handling.
+Feedback collection for product learning.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -809,80 +1067,133 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 | Wave | Tasks | Description | Parallelism |
 |------|-------|-------------|-------------|
-| 1 | 6 | Foundation: project structure, CSS variables, fonts | 4 parallel + 2 dependent |
-| 2 | 6 | HTML & Styling: index.html, style.css, images | 4 parallel + 2 dependent |
-| 3 | 4 | Documentation & QA: accessibility, docs, README, final test | 2 parallel + 2 dependent |
+| 1 | 3 | Foundation: Project setup, config, Stripe | 3 parallel |
+| 2 | 5 | Core Integrations: Cloudflare, Lighthouse, health, template, emails | 5 parallel (after Wave 1) |
+| 3 | 4 | Generation & Access: Nightly build, magic links, CSS, copy | 4 parallel (after Wave 2) |
+| 4 | 6 | Polish: Cron, testing, deploy, launch, review, sales | Sequential (after Wave 3) |
 
-**Total Tasks**: 16
-**Maximum Parallelism**: Wave 1 & 2 (4 concurrent tasks each)
-**Estimated Duration**: 2-3 sessions (per agent context limits)
-
----
-
-## Risk Notes
-
-### Critical (Address before Wave 1)
-
-1. **Font Selection Unresolved**: This plan assumes Libre Baskerville + Inter for Palette One and JetBrains Mono for Palette Two. If different fonts are chosen, tasks 4 and 8 need updates.
-
-2. **Image Sourcing Unresolved**: Tasks 11-12 assume Unsplash/Pexels. If commissioned photography is required, timeline extends significantly.
-
-### High (Monitor during execution)
-
-3. **"One Perfect Page" Scope Creep**: Steve Jobs' perfectionism could extend design iteration indefinitely. Hard deadline required per decisions.md.
-
-4. **Font Size Budget**: 100KB per theme is tight for serif + sans-serif. May need aggressive subsetting or weight reduction.
-
-### Medium (Acceptable risk)
-
-5. **EmDash Compatibility**: Themes are standalone HTML/CSS, not EmDash templates. If EmDash integration is expected, additional tasks needed.
-
-6. **Browser Testing**: Plan assumes modern browsers. No IE11 support per modern CSS approach.
+**Total Tasks:** 18
+**Maximum Parallelism:** Wave 2 (5 concurrent tasks)
+**Timeline:** 5 weeks per decisions.md
 
 ---
 
 ## Dependencies Diagram
 
 ```
-Wave 1:  [task-1]  [task-2]
-              |        |
-              v        v
-         [task-3]  [task-7]
-              |        |
-              v        v
-         [task-4]  [task-8]
+Wave 1:  [task-1: Project] ───────────────────────────────────────────────────>
+         [task-2: Config]  ───────────────────────────────────────────────────>
+         [task-3: Stripe]  ───> (depends on task-1) ──────────────────────────>
 
-Wave 2:  [task-5] ---> [task-6] ---> [task-11]
-         [task-9] ---> [task-10] --> [task-12]
+Wave 2:  [task-4: Cloudflare] ───> (depends on task-1) ───────────────────────>
+         [task-5: Lighthouse] ───> (depends on task-1) ───────────────────────>
+         [task-6: Health]     ───> (depends on task-2, task-5) ───────────────>
+         [task-7: Template]   ───> (depends on task-1, task-6) ───────────────>
+         [task-8: Emails]     ───> (depends on task-1, task-2) ───────────────>
 
-Wave 3:  [task-13] ---> [task-14] ---> [task-15] ---> [task-16]
+Wave 3:  [task-9: Generator]  ───> (depends on task-4,5,6,7) ─────────────────>
+         [task-10: Magic Link] ───> (depends on task-1, task-8) ──────────────>
+         [task-11: CSS]       ───> (depends on task-7) ───────────────────────>
+         [task-12: Copy]      ───> (depends on task-7, task-8) ───────────────>
+
+Wave 4:  [task-13: Cron]      ───> (depends on task-5,8,9) ───────────────────>
+         [task-14: Testing]   ───> (depends on task-9, task-13) ──────────────>
+         [task-15: Deploy]    ───> (depends on task-14) ──────────────────────>
+         [task-16: Launch]    ───> (depends on task-15) ──────────────────────>
+         [task-17: Sara]      ───> (depends on task-16) ──────────────────────>
+         [task-18: Sales]     ───> (depends on task-16) ──────────────────────>
 ```
 
 ---
 
-## Open Items for Founder
+## Risk Notes
 
-Before execution begins, founder must confirm:
+### Critical (Address Before Wave 1)
 
-1. **Font Choices**: Libre Baskerville + Inter for One, JetBrains Mono for Two?
-2. **Image Strategy**: Unsplash/Pexels or commissioned?
-3. **Accessibility Level**: WCAG 2.1 Level A confirmed?
+1. **Cloudflare API Access** — Ensure API credentials available
+   - API token with Analytics read scope
+   - Zone IDs for client sites
+   - Test with real site first
+
+2. **Stripe Configuration** — Payment processing
+   - Product created: "HARBOR Monthly" $79/month
+   - Webhook endpoint configured
+   - Test mode validation
+
+3. **Resend/Email Setup** — Email delivery
+   - API key obtained
+   - Domain verified for sending
+   - Test email delivery
+
+### High (Monitor During Execution)
+
+4. **Lighthouse Rate Limits** — 100 sites weekly
+   - 2-second delay between requests
+   - Cache results for 7 days
+   - Monitor API costs
+
+5. **JSON File Corruption** — No ACID guarantees
+   - Backup on every write
+   - Plan for SQLite migration at 200 clients
+
+6. **Dashboard URL Security** — UUID-only access
+   - UUIDv4 is unguessable (122 bits)
+   - Monitor for access anomalies
+   - Magic link adds email verification layer
+
+### Medium (Acceptable Risk)
+
+7. **First 10 Attach Rate** — Cold start risk
+   - Hand-sell with personal touch
+   - Learn from rejections
+   - Iterate based on feedback
+
+8. **"Small Update" Disputes** — Ambiguity risk
+   - Document clear boundaries before launch
+   - 30-minute threshold rule
+   - Fixed prices help clarity
 
 ---
 
-## Post-Plan Checklist
+## Blocking Issues
 
-- [x] All 41 requirements in REQUIREMENTS.md have task coverage
+### Open Questions Requiring Resolution
+
+| # | Question | Owner | Deadline |
+|---|----------|-------|----------|
+| 1 | Monthly request allowance: 3 or 5 updates? | Shipyard leadership | Before first client |
+| 2 | "Small update" definition document | Shipyard leadership | Before launch |
+| 3 | Request dispute resolution policy | Shipyard leadership | Before first client |
+
+**Recommendation:** Use 3 updates/month (conservative) for v1. Document "small = under 30 min" with examples. Create simple dispute policy: client can escalate, human decides.
+
+---
+
+## Verification Checklist
+
+- [x] All requirements from decisions.md have task coverage
 - [x] Each task has clear verification criteria
 - [x] Dependencies form valid DAG (no cycles)
 - [x] Each task can be committed independently
 - [x] Risk mitigations addressed in relevant tasks
-- [x] Locked decisions respected (independent codebases, CSS-only animations, no toggles)
-- [x] Cut features NOT included (no multi-page, no Palette 3-5, no theme switcher)
-- [x] "Sacred first 3 seconds" threaded through verification tasks
-- [x] Font budget (<100KB) tracked in verification
+- [x] All 18 locked decisions respected
+- [x] Cut features NOT included (white-labeling, geographic metrics, etc.)
+- [x] "Warm pulse, not cold dashboard" philosophy threaded through all tasks
+- [x] 5-week timeline achievable with parallel execution
+- [x] Ship test defined: "One second to feel cared for or abandoned"
+- [x] Sara Blakely customer gut-check scheduled (task-17)
+- [x] First 10 client preparation included (task-18)
 
 ---
 
-*Generated by Great Minds Agency - Phase Planning Skill*
-*Source: rounds/emdash-themes/decisions.md, prds/emdash-themes.md*
+## Ship Test
+
+> Does the client open their HARBOR dashboard and in one second feel cared for — not abandoned?
+>
+> **If yes, ship it.**
+
+---
+
+*Generated by Great Minds Agency — Phase Planning Skill*
+*Source: rounds/shipyard-maintenance-system/decisions.md, prds/failed/shipyard-maintenance-system.md*
+*Project Slug: shipyard-maintenance-system*

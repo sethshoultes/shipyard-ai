@@ -1,29 +1,20 @@
-import node from "@astrojs/node";
+import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import { defineConfig } from "astro/config";
-import emdash, { local } from "emdash/astro";
-import { sqlite } from "emdash/db";
+import emdash from "emdash/astro";
+import { d1, r2 } from "@emdash-cms/cloudflare";
 
 export default defineConfig({
-	site: "https://dental.shipyard.company",
-	output: "server",
-	adapter: node({
-		mode: "standalone",
-	}),
-	image: {
-		layout: "constrained",
-		responsiveStyles: true,
-	},
-	integrations: [
-		react(),
-		emdash({
-			database: sqlite({ url: "file:./data.db" }),
-			storage: local({
-				directory: "./uploads",
-				baseUrl: "/_emdash/api/media/file",
-			}),
-		}),
-	],
-	devToolbar: { enabled: false },
+  site: "https://dental.shipyard.company",
+  output: "server",
+  adapter: cloudflare(),
+  integrations: [
+    react(),
+    emdash({
+      database: d1({ binding: "DB" }),
+      storage: r2({ binding: "MEDIA" }),
+    }),
+  ],
+  devToolbar: { enabled: false },
 	vite: { server: { allowedHosts: true } },
 });

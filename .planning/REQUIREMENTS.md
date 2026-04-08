@@ -1,241 +1,852 @@
-# Palette v1 Requirements Specification
+# HARBOR: Atomic Requirements Specification
 
-> Extracted from decisions.md and emdash-themes.md
-> Generated: 2025
-> Project Slug: emdash-themes
-> Product Name: Palette (2 HTML/CSS themes for v1)
-
----
-
-## Executive Summary
-
-| Metric | Value |
-|--------|-------|
-| Total Requirements | 41 |
-| Must-Have (Critical/High) | 37 |
-| Should-Have (Medium) | 4 |
-| Nice-to-Have | 0 |
-| Deferred to v2 | 10+ features |
+**Generated:** 2026-04-08
+**Project Slug:** shipyard-maintenance-system
+**Product Name:** HARBOR
+**Source PRD:** `/prds/failed/shipyard-maintenance-system.md`
+**Source Decisions:** `/rounds/shipyard-maintenance-system/decisions.md`
+**Status:** Ready for Implementation
+**Total Requirements:** 52
 
 ---
 
-## The Essence (from decisions.md)
+## The Essence
 
-> **What is this product really about?**
-> Helping people stop being embarrassed by their website.
->
-> **What feeling should it evoke?**
-> Recognition. "This is me."
->
-> **What must be perfect?**
-> The first three seconds.
->
+> **What is this product REALLY about?**
+> Proving to clients they haven't been forgotten after the check clears.
+
+> **What's the feeling it should evoke?**
+> "You're not alone."
+
+> **What's the one thing that must be perfect?**
+> The first glance — one second to feel cared for or abandoned.
+
 > **Creative direction:**
-> Identity, not decoration.
+> Warm pulse, not cold dashboard.
 
 ---
 
-## Requirements by Category
+## Critical Overrides (Decisions.md > PRD)
 
-### STRUCTURE (File/Folder Requirements)
-
-| REQ-ID | Requirement | Source Quote | Applies To | Priority |
-|--------|-------------|--------------|------------|----------|
-| REQ-001 | Create independent codebase for Palette One with separate HTML/CSS files | "Each theme gets its own structural decisions" | One | Must |
-| REQ-002 | Create independent codebase for Palette Two with separate HTML/CSS files | "Each theme gets its own structural decisions" | Two | Must |
-| REQ-003 | Deliver single index.html file per theme (no multi-page templates) | "ONE page per theme... One index.html per theme that nails the first 3 seconds" | Both | Must |
-| REQ-004 | Organize CSS files into style.css and variables.css per theme | File structure: "css/style.css" and "css/variables.css" | Both | Must |
-| REQ-005 | Create fonts/ directory with self-hosted, subsetted font files per theme | "Self-Hosted, Subsetted" + "fonts/" folder structure | Both | Must |
-| REQ-006 | Create images/ directory containing theme-specific imagery per theme | "Theme-specific imagery (no generic stock)" | Both | Must |
-| REQ-007 | Create root-level docs/ folder with customization.md documentation | "docs/customization.md" + "CSS variable reference" | Both | Must |
-| REQ-008 | Create root-level README.md with install, customization, and deploy instructions | "README.md - Install, customize, deploy" | Both | Must |
-
-### DESIGN (Visual/UI Requirements)
-
-| REQ-ID | Requirement | Source Quote | Applies To | Priority |
-|--------|-------------|--------------|------------|----------|
-| REQ-009 | Design Palette One with warm color palette suitable for restaurant/hospitality | "Palette One - Warm, restaurant, hospitality - Light" | One | Must |
-| REQ-010 | Design Palette Two with dark color palette suitable for developer tools | "Palette Two - Dark, terminal, developer tools - Dark" | Two | Must |
-| REQ-011 | Implement Palette One in light mode only (no dark mode variant) | "Palette One ships light-only. No toggles." | One | Must |
-| REQ-012 | Implement Palette Two in dark mode only (no light mode variant) | "Palette Two ships dark-only. No toggles." | Two | Must |
-| REQ-013 | Design homepage to evoke recognition and emotional resonance within 3 seconds | "Personality hits in 3 seconds" + "Your website finally feels like you" | Both | Must |
-| REQ-014 | Implement CSS-only animations and motion effects (no JavaScript-driven animations) | "CSS-Only Effects" + "No JS for visual effects" | Both | Must |
-| REQ-015 | Use GPU-composited CSS transforms (no parallax effects on any device) | "GPU-composited transforms, no parallax on mobile" | Both | Must |
-| REQ-016 | Prohibit horizontal scroll sections in design | "NO to horizontal scroll sections. Clever gimmicks that frustrate users." | Both | Must |
-| REQ-017 | Use scroll-snap CSS for smooth scrolling behavior where applicable | "CSS scroll-snap, GPU-composited transforms" | Both | Should |
-| REQ-018 | Ensure mobile-responsive design across all viewport sizes | "Mobile-responsive" in MVP Feature Set | Both | Must |
-| REQ-019 | Use real food photography for Palette One (no generic stock images) | "Theme-specific imagery (no generic stock)" | One | Must |
-| REQ-020 | Use real code screenshots/developer-appropriate imagery for Palette Two | "Theme-specific imagery (no generic stock)" | Two | Must |
-
-### PERFORMANCE (Speed/Size Requirements)
-
-| REQ-ID | Requirement | Source Quote | Applies To | Priority |
-|--------|-------------|--------------|------------|----------|
-| REQ-021 | Keep self-hosted fonts under 100KB total per theme | "Self-hosted, subsetted" + "Budget: <100KB per theme" | Both | Must |
-| REQ-022 | Use Latin character subset for self-hosted fonts | "Self-host with Latin subset" | Both | Must |
-| REQ-023 | Implement font-display: swap for self-hosted fonts | "font-display: swap" | Both | Must |
-| REQ-024 | Eliminate JavaScript-based visual effects to maintain performance | "No JS for visual effects" + "JS scroll listeners = perf disaster" | Both | Must |
-| REQ-025 | Deliver zero loading spinners or blocking content on initial load | "No loading spinners, no cookie banners, no newsletter pop-ups" | Both | Must |
-| REQ-026 | Avoid Google Fonts integration (blocks performance with 400-800KB requests) | "Google Fonts = 400-800KB blocking requests" | Both | Must |
-
-### ACCESSIBILITY (A11y Requirements)
-
-| REQ-ID | Requirement | Source Quote | Applies To | Priority |
-|--------|-------------|--------------|------------|----------|
-| REQ-027 | Implement sufficient color contrast throughout the design | "Basic accessibility (contrast, focus states, alt text)" | Both | Must |
-| REQ-028 | Provide visible and keyboard-accessible focus states for all interactive elements | "Basic accessibility (contrast, focus states, alt text)" | Both | Must |
-| REQ-029 | Include descriptive alt text for all images | "Basic accessibility (contrast, focus states, alt text)" | Both | Must |
-| REQ-030 | Use semantic HTML5 structure (header, nav, main, section, footer) | Implied by accessibility requirements | Both | Must |
-
-### CONTENT (Copy/Imagery Requirements)
-
-| REQ-ID | Requirement | Source Quote | Applies To | Priority |
-|--------|-------------|--------------|------------|----------|
-| REQ-031 | Source imagery from Unsplash/Pexels with proper attribution or commission original | "Source from Unsplash/Pexels with attribution, or commission original" | Both | Must |
-| REQ-032 | Verify font licensing compliance before implementation | "Verify licenses before build. Self-hosting requires proper license terms." | Both | Must |
-| REQ-033 | Source authentic, theme-specific imagery (not generic stock photos) | "Theme-specific imagery (no generic stock)" | Both | Must |
-
-### DOCUMENTATION (Docs Requirements)
-
-| REQ-ID | Requirement | Source Quote | Applies To | Priority |
-|--------|-------------|--------------|------------|----------|
-| REQ-034 | Document all CSS custom properties with clear naming conventions | "Documented CSS Custom Properties" | Both | Must |
-| REQ-035 | Provide CSS variable reference for --primary, --accent, --font-heading, --radius | "Variables (--primary, --accent, --font-heading, --radius)" | Both | Must |
-| REQ-036 | Document installation instructions in README.md | "README.md - Install, customize, deploy" | Both | Must |
-| REQ-037 | Document customization guide in README.md | "README.md - Install, customize, deploy" | Both | Must |
-| REQ-038 | Document deployment options in README.md | "README.md - Install, customize, deploy" | Both | Must |
-| REQ-039 | Include deploy buttons (Vercel/Netlify/Cloudflare) in documentation or README | "Minimum: deploy buttons + clear README install path in v1" | Both | Should |
-| REQ-040 | Document target EmDash version compatibility | "Document which EmDash version themes target" | Both | Should |
-| REQ-041 | Share and document design patterns across independent codebases | "Document shared patterns" | Both | Should |
+| Topic | PRD Says | Decisions.md Says (LOCKED) |
+|-------|----------|---------------------------|
+| Product Name | Shipyard Maintenance System | **HARBOR** |
+| Pricing Tiers | Basic $79, Pro $199, Enterprise custom | **One tier: $79/month** |
+| Architecture | Database with tables | **JSON file storage until 500 clients** |
+| Dashboard | Real-time rendering | **Static HTML, rebuilt nightly** |
+| Token Visibility | Show token balance | **Never show tokens; show "X updates remaining"** |
+| Password Protection | Optional | **No passwords; magic links + UUIDv4** |
+| Lighthouse Schedule | Daily | **Weekly batch only** |
+| Features | Trend charts, suggestions, alerts | **Cut for V1** |
 
 ---
 
-## Explicitly Excluded from v1
+## Locked Decisions Summary
 
-Per decisions.md "What Does NOT Ship in v1":
-
-| Item | Reason | Who Cut It |
-|------|--------|------------|
-| Palette Three/Four/Five | Focus over breadth | Both |
-| Multi-page templates (About, Services, Contact) | ONE page per theme mandate | Steve |
-| Blog templates | Content, not theme | Elon |
-| Dark mode toggles | "Commit, don't toggle" decision | Both |
-| Parallax effects | JS complexity, mobile perf | Both |
-| Horizontal scroll sections | Clever gimmicks that frustrate | Steve |
-| JS-driven animations | Performance disaster | Elon |
-| Charts or complex components | Massive scope addition | Elon |
-| Full WCAG 2.1 AA audit | Scope creep; basics first | Both |
-| Theme comparison/switcher UI | Unresolved | - |
-| Existing site redesigns | Separate PRD | Both |
-
----
-
-## Open Questions Requiring Resolution
-
-| # | Question | Impact | Blocking? | Recommendation |
-|---|----------|--------|-----------|----------------|
-| 1 | Specific fonts per theme? | **BLOCKING** - cannot design without typefaces | **YES** | Lock before build: Palette One (serif display + clean sans), Palette Two (monospace) |
-| 2 | Image sourcing strategy? | Medium - affects asset gathering | No | Use Unsplash/Pexels with attribution for v1 |
-| 3 | WCAG accessibility baseline? | **BLOCKING** - defines QA scope | **YES** | Lock to WCAG 2.1 Level A minimum |
-| 4 | Distribution strategy? | Critical - affects launch plan | No | Include README + deploy buttons in v1, defer SEO pages |
-| 5 | Deploy mechanism timing? | Low-Medium | No | Deploy button code in README for v1 |
-| 6 | Theme comparison UI? | Medium | No | Defer to v2 |
+| # | Decision | Winner | Build Implication |
+|---|----------|--------|-------------------|
+| 1 | Product Name: HARBOR | Steve | All UI/emails use "HARBOR" branding |
+| 2 | Dashboard Ships Day One | Steve | Dashboard IS the product |
+| 3 | One Tier at Launch: $79/month | Elon | No tier selector; single Stripe product |
+| 4 | No Token Visibility for Clients | Consensus | Show "updates remaining" not tokens |
+| 5 | Fixed Request Pricing (Internal) | Elon | $25 logo, $50 blog, $150 page |
+| 6 | No Password Protection | Consensus | Magic links + UUIDv4 only |
+| 7 | Static Architecture | Elon | HTML rebuilt nightly via cron |
+| 8 | First 10 Contracts Hand-Sold | Consensus | No automation until validated |
+| 9 | Cut White-Labeling | Consensus | Shipyard branding visible |
+| 10 | Cut Geographic Metrics | Consensus | Not in V1 |
+| 11 | Cut Enterprise Tier | Consensus | Not in V1 |
+| 12 | Cut Triggered Performance Alerts | Elon | Not in V1 |
+| 13 | Weekly Lighthouse, Not Daily | Consensus | Cost/rate limit management |
+| 14 | No Overage Pricing at Launch | Consensus | Hard caps with escalation |
+| 15 | Warm Human Voice in All Copy | Steve | "Smart friend texting you" |
+| 16 | "Built by Shipyard" Footer | Consensus | Distribution billboard |
+| 17 | Client-Facing "Updates" Not "Tokens" | Consensus | Human units only |
+| 18 | Explicit Overage Path | Elon | $35/update or upgrade prompt |
 
 ---
 
-## Design Constraints (Locked)
+## Requirements Index
 
-| ID | Constraint | Source |
-|----|------------|--------|
-| DC-001 | Product named "Palette" (not "EmDash Themes") | Steve Jobs won - Round 1 |
-| DC-002 | Theme names: Palette One, Palette Two (numbered, not named) | Steve Jobs won - design speaks |
-| DC-003 | ONE page per theme (not multi-page) | Steve Jobs won - Round 2 |
-| DC-004 | Independent codebases per theme (not shared templates) | Steve Jobs won - emotional differentiation |
-| DC-005 | Self-hosted fonts <100KB per theme | Elon Musk won - performance IS design |
-| DC-006 | CSS-only animations (no JS motion) | Both agreed |
-| DC-007 | No dark mode toggle (commit to light or dark) | Both agreed |
-| DC-008 | CSS custom properties documented | Elon Musk won - customization requirement |
-| DC-009 | Sacred first 3 seconds (no popups, no banners) | Both agreed |
+| Category | Count | Wave |
+|----------|-------|------|
+| Dashboard | 6 | 2-3 |
+| Client-Facing | 5 | 1-3 |
+| Backend | 6 | 1-2 |
+| Email | 5 | 2 |
+| Design | 5 | 3 |
+| Architecture | 7 | 1-2 |
+| Domain Logic | 5 | 1-2 |
+| Cuts | 14 | N/A |
+| **TOTAL** | **52** | - |
 
 ---
 
-## Target File Structure
+## Detailed Requirements
+
+### DASHBOARD REQUIREMENTS
+
+#### REQ-DASH-001: Green/Yellow/Red Health Indicator
+**Category:** Dashboard
+**Priority:** P0 — Blocker
+**Source:** Decisions.md Phil's Arbitration
+
+**Description:**
+Display one-second visible status using Green/Yellow/Red health indicator on initial dashboard load, dominating viewport position.
+
+**Acceptance Criteria:**
+- [ ] Color indicator renders above fold
+- [ ] Visible before any other element loads
+- [ ] Large enough to see from arm's length
+
+---
+
+#### REQ-DASH-002: One-Sentence Traffic Summary
+**Category:** Dashboard
+**Priority:** P0 — Blocker
+**Source:** Decisions.md MVP Feature Set
+
+**Description:**
+Show one-sentence traffic summary on dashboard: "{N} people visited your site this week. Everything looks great."
+
+**Acceptance Criteria:**
+- [ ] Exactly one sentence
+- [ ] Shows actual visitor count from Cloudflare
+- [ ] Warm, conversational tone
+
+---
+
+#### REQ-DASH-003: Three Metrics Only
+**Category:** Dashboard
+**Priority:** P0 — Blocker
+**Source:** Decisions.md MVP Feature Set
+
+**Description:**
+Display exactly three metrics and no more: Traffic (visitor count), Health Score (composite), Last Updated (timestamp).
+
+**Acceptance Criteria:**
+- [ ] Count visible metric cards = 3
+- [ ] No trend charts visible
+- [ ] No geographic data visible
+
+---
+
+#### REQ-DASH-004: Click-Through Health Details
+**Category:** Dashboard
+**Priority:** P1 — High
+**Source:** Decisions.md Phil's Arbitration
+
+**Description:**
+Implement click-through from health indicator to diagnostic detail view showing Lighthouse score, uptime percentage, and traffic trend.
+
+**Acceptance Criteria:**
+- [ ] Click/tap on indicator opens detail pane
+- [ ] Shows three sub-metrics: Lighthouse, uptime, traffic
+- [ ] Collapsible back to summary
+
+---
+
+#### REQ-DASH-005: Warm Human Voice Copy
+**Category:** Dashboard
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-15
+
+**Description:**
+All dashboard copy uses warm, human voice consistent with "trusted friend" tone, not corporate default language.
+
+**Acceptance Criteria:**
+- [ ] No passive voice
+- [ ] No "system" terminology
+- [ ] No jargon
+
+---
+
+#### REQ-DASH-006: Last Updated Timestamp
+**Category:** Dashboard
+**Priority:** P1 — High
+**Source:** Decisions.md MVP Feature Set
+
+**Description:**
+Display last updated timestamp in format: "Last updated: Today at 6:00 AM"
+
+**Acceptance Criteria:**
+- [ ] Shows dashboard rebuild time
+- [ ] Updates once per day
+- [ ] Format exactly as specified
+
+---
+
+### CLIENT-FACING REQUIREMENTS
+
+#### REQ-CLIENT-001: UUIDv4 Dashboard URLs
+**Category:** Client-Facing
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-6
+
+**Description:**
+Generate unique, unguessable dashboard URL per client using UUIDv4 standard.
+
+**Acceptance Criteria:**
+- [ ] URL format: `{domain}/{uuid}`
+- [ ] UUID is valid UUIDv4 (122 bits entropy)
+- [ ] Different clients get different UUIDs
+
+---
+
+#### REQ-CLIENT-002: Magic Link Access
+**Category:** Client-Facing
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-6
+
+**Description:**
+Implement magic link access — no password login required; access via email-sent link only.
+
+**Acceptance Criteria:**
+- [ ] No password field anywhere
+- [ ] Client receives email with unique link
+- [ ] Clicking link grants access without credentials
+
+---
+
+#### REQ-CLIENT-003: Updates Remaining Display
+**Category:** Client-Facing
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-4, D-17
+
+**Description:**
+Display "X updates remaining this month" in client-facing copy; never show tokens, token counts, or token mechanics.
+
+**Acceptance Criteria:**
+- [ ] All client text shows "updates remaining"
+- [ ] No "tokens" or "credits" terminology
+- [ ] No internal mechanics exposed
+
+---
+
+#### REQ-CLIENT-004: Stripe Checkout
+**Category:** Client-Facing
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-3
+
+**Description:**
+Implement Stripe checkout integration for $79/month subscription initiation.
+
+**Acceptance Criteria:**
+- [ ] "Subscribe" button works
+- [ ] Redirects to Stripe checkout
+- [ ] Subscription created on confirmation
+
+---
+
+#### REQ-CLIENT-005: Single Pricing Tier
+**Category:** Client-Facing
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-3
+
+**Description:**
+Accept only one pricing tier at launch: $79/month (no Basic/Pro/Enterprise tiers).
+
+**Acceptance Criteria:**
+- [ ] Single option displayed
+- [ ] No tier selector
+- [ ] Stripe product configured as single tier
+
+---
+
+### BACKEND REQUIREMENTS
+
+#### REQ-BACKEND-001: Static HTML Dashboards
+**Category:** Backend
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-7
+
+**Description:**
+Generate static HTML dashboards per client, rebuilt nightly via cron job (no real-time rendering).
+
+**Acceptance Criteria:**
+- [ ] Dashboard snapshot generated at 6:00 AM daily
+- [ ] HTML file per client: `static/clients/{uuid}/index.html`
+- [ ] No server-side rendering on page request
+
+---
+
+#### REQ-BACKEND-002: JSON File Storage
+**Category:** Backend
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-7
+
+**Description:**
+Store all data in JSON files (no relational database), with backup strategy on every write.
+
+**Acceptance Criteria:**
+- [ ] clients.json and requests.json exist
+- [ ] Every data mutation triggers backup
+- [ ] No database connections in codebase
+
+---
+
+#### REQ-BACKEND-003: Cloudflare Analytics Integration
+**Category:** Backend
+**Priority:** P0 — Blocker
+**Source:** Decisions.md MVP Feature Set
+
+**Description:**
+Integrate Cloudflare Analytics API for weekly traffic data (visitors, pageviews, trends).
+
+**Acceptance Criteria:**
+- [ ] Dashboard displays traffic counts from Cloudflare
+- [ ] Data refreshes weekly
+- [ ] Graceful degradation if API unavailable
+
+---
+
+#### REQ-BACKEND-004: Lighthouse CI Weekly Batch
+**Category:** Backend
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-13
+
+**Description:**
+Run Lighthouse CI weekly (not daily) in batch mode for performance scoring.
+
+**Acceptance Criteria:**
+- [ ] Lighthouse audit runs once per week
+- [ ] Performance and Accessibility scores stored
+- [ ] No daily runs
+
+---
+
+#### REQ-BACKEND-005: Five Email Templates
+**Category:** Backend
+**Priority:** P0 — Blocker
+**Source:** Decisions.md MVP Feature Set
+
+**Description:**
+Implement five automated email templates triggered via cron and webhooks.
+
+**Acceptance Criteria:**
+- [ ] All five emails dispatch at correct times
+- [ ] Templates use warm voice
+- [ ] No cold corporate language
+
+---
+
+#### REQ-BACKEND-006: Health Score Thresholds
+**Category:** Backend
+**Priority:** P0 — Blocker
+**Source:** Decisions.md Open Question #4
+
+**Description:**
+Determine and enforce Health Score thresholds: Green (Perf>=90 AND Access>=90), Yellow (either 70-89), Red (either <70 OR site down).
+
+**Acceptance Criteria:**
+- [ ] Input Lighthouse scores produce correct color
+- [ ] Site down always returns red
+- [ ] Threshold logic documented
+
+---
+
+### EMAIL REQUIREMENTS
+
+#### REQ-EMAIL-001: Welcome Email
+**Category:** Email
+**Priority:** P0 — Blocker
+**Source:** Decisions.md Email Touchpoints
+
+**Description:**
+Send Welcome/Dashboard Ready email upon subscription: "Your site is live. Here's your dashboard."
+
+**Acceptance Criteria:**
+- [ ] Dispatches after Stripe confirmation
+- [ ] Contains dashboard link
+- [ ] Uses warm, celebratory tone
+
+---
+
+#### REQ-EMAIL-002: Status Summary Email
+**Category:** Email
+**Priority:** P0 — Blocker
+**Source:** Decisions.md Email Touchpoints
+
+**Description:**
+Send Weekly/Monthly Status Summary email: "Your site had a great week. [X visitors]"
+
+**Acceptance Criteria:**
+- [ ] Sends on schedule (weekly or monthly)
+- [ ] Includes actual traffic data
+- [ ] Warm, proud-parent tone
+
+---
+
+#### REQ-EMAIL-003: Request Completed Email
+**Category:** Email
+**Priority:** P1 — High
+**Source:** Decisions.md Email Touchpoints
+
+**Description:**
+Send Request Completed Confirmation email: "We noticed something — already fixed."
+
+**Acceptance Criteria:**
+- [ ] Sends when request marked complete
+- [ ] Shows what was done
+- [ ] Proactive care messaging
+
+---
+
+#### REQ-EMAIL-004: Usage Warning Email
+**Category:** Email
+**Priority:** P0 — Blocker
+**Source:** Decisions.md Email Touchpoints
+
+**Description:**
+Send Usage Threshold Warning email when 1 update remains: "1 update remaining this month."
+
+**Acceptance Criteria:**
+- [ ] Triggers when requests_remaining == 1
+- [ ] Shows current month window
+- [ ] Includes escalation path
+
+---
+
+#### REQ-EMAIL-005: Anniversary Email
+**Category:** Email
+**Priority:** P1 — High
+**Source:** Decisions.md Email Touchpoints
+
+**Description:**
+Send Anniversary Email (Day 365): "We're still here. We still care."
+
+**Acceptance Criteria:**
+- [ ] Sends exactly one year after subscription start
+- [ ] Includes year-in-review stats
+- [ ] Genuine care, not upsell
+
+---
+
+### DESIGN REQUIREMENTS
+
+#### REQ-DESIGN-001: Warm Pulse Visual Direction
+**Category:** Design
+**Priority:** P0 — Blocker
+**Source:** Decisions.md Essence
+
+**Description:**
+Implement "warm pulse, not cold dashboard" visual direction across all UI elements.
+
+**Acceptance Criteria:**
+- [ ] Warm color palette (no cold grays)
+- [ ] Soft, welcoming spacing
+- [ ] No harsh metrics presentation
+
+---
+
+#### REQ-DESIGN-002: Health Color Indicator
+**Category:** Design
+**Priority:** P0 — Blocker
+**Source:** Decisions.md Phil's Arbitration
+
+**Description:**
+Health indicator uses Green/Yellow/Red status colors only; no numerical score visible by default.
+
+**Acceptance Criteria:**
+- [ ] Primary shows color, not number
+- [ ] Number only visible in detail pane
+- [ ] Colors are warm, not harsh
+
+---
+
+#### REQ-DESIGN-003: One-Second Clarity
+**Category:** Design
+**Priority:** P0 — Blocker
+**Source:** Decisions.md Essence
+
+**Description:**
+Achieve one-second status clarity — human can glance at dashboard and immediately understand site health status.
+
+**Acceptance Criteria:**
+- [ ] Large visible indicator
+- [ ] High contrast
+- [ ] Position above fold
+
+---
+
+#### REQ-DESIGN-004: Human Conversational Copy
+**Category:** Design
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-15
+
+**Description:**
+All customer-visible copy uses human, conversational voice ("trusted friend" tone, not corporate).
+
+**Acceptance Criteria:**
+- [ ] No passive voice
+- [ ] No jargon
+- [ ] Aligns with "smart friend texting you"
+
+---
+
+#### REQ-DESIGN-005: Shipyard Footer
+**Category:** Design
+**Priority:** P1 — High
+**Source:** Decisions.md D-16
+
+**Description:**
+Include "Built by Shipyard" footer on every dashboard as distribution billboard.
+
+**Acceptance Criteria:**
+- [ ] Footer visible on every dashboard
+- [ ] Links to Shipyard site
+- [ ] Consistent placement
+
+---
+
+### ARCHITECTURE REQUIREMENTS
+
+#### REQ-ARCH-001: Static HTML Generation
+**Category:** Architecture
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-7
+
+**Description:**
+Static HTML generation per client instead of server-side rendering; one index.html file per `{client-uuid}/index.html`.
+
+**Acceptance Criteria:**
+- [ ] All dashboards are static files
+- [ ] No server-side processing on request
+- [ ] Pages served from disk
+
+---
+
+#### REQ-ARCH-002: JSON Data Layer
+**Category:** Architecture
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-7
+
+**Description:**
+No relational database; use JSON file storage with atomic write + backup strategy.
+
+**Acceptance Criteria:**
+- [ ] clients.json schema defined
+- [ ] requests.json schema defined
+- [ ] Backups created on mutations
+
+---
+
+#### REQ-ARCH-003: Cloudflare API Client
+**Category:** Architecture
+**Priority:** P0 — Blocker
+**Source:** Decisions.md MVP Feature Set
+
+**Description:**
+Integrate Cloudflare Analytics API for real traffic data (not synthetic metrics).
+
+**Acceptance Criteria:**
+- [ ] Traffic counts match Cloudflare dashboard
+- [ ] API authentication works
+- [ ] Fallback if API down
+
+---
+
+#### REQ-ARCH-004: Weekly Lighthouse Batch
+**Category:** Architecture
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-13
+
+**Description:**
+Run Lighthouse CI weekly in batch (not daily) for cost/rate-limit management.
+
+**Acceptance Criteria:**
+- [ ] Once per week only
+- [ ] Results cached
+- [ ] No daily runs
+
+---
+
+#### REQ-ARCH-005: Magic Link Authentication
+**Category:** Architecture
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-6
+
+**Description:**
+Magic link authentication — session tied to UUID + email; no password stored or required.
+
+**Acceptance Criteria:**
+- [ ] No password field in system
+- [ ] Email link grants session
+- [ ] No password hashing logic
+
+---
+
+#### REQ-ARCH-006: UUIDv4 URLs
+**Category:** Architecture
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-6
+
+**Description:**
+Dashboard URLs use UUIDv4 format (122 bits entropy); unguessable, no sequential IDs.
+
+**Acceptance Criteria:**
+- [ ] Valid UUIDv4 format
+- [ ] No discernible patterns
+- [ ] Entropy verified
+
+---
+
+#### REQ-ARCH-007: Stripe Webhook Handler
+**Category:** Architecture
+**Priority:** P0 — Blocker
+**Source:** Decisions.md MVP Feature Set
+
+**Description:**
+Stripe webhook integration for subscription events (creation, cancellation, renewal).
+
+**Acceptance Criteria:**
+- [ ] Events trigger database updates
+- [ ] Subscription state synchronized
+- [ ] Idempotent processing
+
+---
+
+### DOMAIN LOGIC REQUIREMENTS
+
+#### REQ-DOMAIN-001: Monthly Update Allowance
+**Category:** Domain Logic
+**Priority:** P0 — Blocker
+**Source:** Decisions.md Open Question #1
+**Status:** PENDING DECISION
+
+**Description:**
+Determine monthly update allowance for $79/month tier.
+
+**Options:**
+- 3 updates/month (conservative, sustainable)
+- 5 updates/month (generous, competitive)
+
+**Acceptance Criteria:**
+- [ ] requests_remaining initialized correctly
+- [ ] Decrements on completion
+- [ ] Resets monthly
+
+---
+
+#### REQ-DOMAIN-002: Small Update Definition
+**Category:** Domain Logic
+**Priority:** P0 — Blocker
+**Source:** Decisions.md Open Question #2
+**Status:** PENDING DECISION
+
+**Description:**
+Define "small update" boundary at <=30 minutes of work.
+
+**Classification:**
+- Small (included): Logo swap, text fix, image replacement
+- Billable: New page, blog post, new section
+
+**Acceptance Criteria:**
+- [ ] Documented in terms of service
+- [ ] Examples published before launch
+
+---
+
+#### REQ-DOMAIN-003: Hard Cap Enforcement
+**Category:** Domain Logic
+**Priority:** P0 — Blocker
+**Source:** Decisions.md D-14, D-18
+
+**Description:**
+Hard cap on updates (no overage pricing); when limit reached, show "Upgrade or wait" prompt with escalation button.
+
+**Acceptance Criteria:**
+- [ ] Client at 0 sees upgrade CTA
+- [ ] Escalation button sends email
+- [ ] No automatic billing for overages
+
+---
+
+#### REQ-DOMAIN-004: Fixed Internal Pricing
+**Category:** Domain Logic
+**Priority:** P1 — High
+**Source:** Decisions.md D-5
+
+**Description:**
+Fixed request pricing structure (internal, not client-facing): Logo $25, Text $25, Image $25, Blog $50, Section $75, Page $150.
+
+**Acceptance Criteria:**
+- [ ] pricing.json configured
+- [ ] Consistent cost estimation
+
+---
+
+#### REQ-DOMAIN-005: Request Dispute Policy
+**Category:** Domain Logic
+**Priority:** P1 — High
+**Source:** Decisions.md Open Question #3
+**Status:** PENDING DECISION
+
+**Description:**
+Document request dispute resolution policy before launch with concrete examples.
+
+**Acceptance Criteria:**
+- [ ] Written policy exists
+- [ ] Specific examples included
+- [ ] Accessible to clients
+
+---
+
+## Explicitly NOT in V1 (Scope Fence)
+
+These features are explicitly CUT. Do NOT build:
+
+| ID | Feature | Reason | Revisit At |
+|----|---------|--------|------------|
+| REQ-CUT-001 | White-labeling | Zero demand | 1,000 clients |
+| REQ-CUT-002 | Geographic distribution metrics | Vanity metric | Never |
+| REQ-CUT-003 | Suggestions engine | Scope creep | V2 |
+| REQ-CUT-004 | Triggered performance alerts | Complex infrastructure | V2 |
+| REQ-CUT-005 | Enterprise tier | No enterprise clients | 100 clients |
+| REQ-CUT-006 | Overage pricing ($0.15/1K) | Kills trust | Never |
+| REQ-CUT-007 | Password protection | Friction kills engagement | Never |
+| REQ-CUT-008 | Real-time dashboards | Static sufficient for <100 | 500 clients |
+| REQ-CUT-009 | Multi-tier pricing | Test single price first | 50 clients |
+| REQ-CUT-010 | Token visibility to clients | Anxiety inducing | Never |
+| REQ-CUT-011 | Dedicated SQL database | JSON suffices | 500 clients |
+| REQ-CUT-012 | Token complexity estimator | No historical data | Never |
+| REQ-CUT-013 | Trend charts | Zero conversion lift | V2 |
+| REQ-CUT-014 | AI-powered suggestions | V3 feature | V3 |
+
+---
+
+## File Structure (Per Decisions.md)
 
 ```
-palette/
-├── README.md                           # Install, customize, deploy
-├── docs/
-│   └── customization.md               # CSS variable reference
+harbor/
+├── dashboard/
+│   ├── index.html                  # Dashboard template
+│   ├── styles.css                  # Design system (warm, not cold)
+│   └── components/
+│       ├── health-indicator.html   # Green/Yellow/Red status
+│       ├── health-details.html     # Drill-down (Lighthouse, uptime, traffic)
+│       ├── traffic-summary.html    # One sentence traffic
+│       └── last-updated.html       # Timestamp display
 │
-├── palette-one/                       # Warm, restaurant, light theme
-│   ├── index.html                     # THE page (single, perfect)
-│   ├── css/
-│   │   ├── style.css                 # Main stylesheet
-│   │   └── variables.css             # CSS custom properties
-│   ├── fonts/
-│   │   └── [font-files].woff2        # Self-hosted, subsetted (<100KB)
-│   └── images/
-│       └── [food-photography]        # Real food imagery
+├── api/
+│   ├── cloudflare-analytics.js     # Traffic data fetcher
+│   ├── lighthouse-runner.js        # Weekly batch Lighthouse
+│   └── stripe-webhook.js           # Subscription events
 │
-└── palette-two/                       # Dark, developer, terminal theme
-    ├── index.html                     # THE page (single, perfect)
-    ├── css/
-    │   ├── style.css
-    │   └── variables.css
-    ├── fonts/
-    │   └── [monospace-font].woff2
-    └── images/
-        └── [code-screenshots]        # Real developer imagery
+├── data/
+│   ├── clients.json                # Client records
+│   │   # Schema: { client_id, dashboard_url, stripe_customer_id,
+│   │   #           requests_remaining, created_at, last_updated }
+│   └── requests.json               # Request records
+│       # Schema: { request_id, client_id, type, price, status,
+│       #           created_at, completed_at }
+│
+├── emails/
+│   ├── welcome.html                # Dashboard ready
+│   ├── status-summary.html         # Weekly/monthly digest
+│   ├── request-completed.html      # Update confirmation
+│   ├── usage-warning.html          # Threshold alert
+│   └── anniversary.html            # Day 365 touchpoint
+│
+├── cron/
+│   ├── lighthouse-batch.js         # Weekly Lighthouse runs
+│   ├── email-scheduler.js          # Trigger email sends
+│   └── dashboard-generator.js      # Nightly static dashboard rebuilds
+│
+├── static/
+│   └── clients/                    # Generated per-client dashboards
+│       └── {client-uuid}/
+│           └── index.html
+│
+└── config/
+    ├── pricing.json                # Fixed request prices
+    │   # { logo_swap: 25, image_replacement: 25, text_update: 25,
+    │   #   blog_post: 50, new_section: 75, new_page: 150 }
+    └── copy.json                   # Human voice templates
+        # { status_great: "Your site had a great week.",
+        #   issue_fixed: "We noticed something — already fixed." }
 ```
 
-**Total Deliverables:** 2 HTML files, 4 CSS files, fonts, images, documentation.
-
 ---
 
-## Requirements Traceability Matrix
+## Risk Summary
 
-| Category | Requirements | Must | Should | Total |
-|----------|-------------|------|--------|-------|
-| Structure | REQ-001 to REQ-008 | 8 | 0 | 8 |
-| Design | REQ-009 to REQ-020 | 11 | 1 | 12 |
-| Performance | REQ-021 to REQ-026 | 6 | 0 | 6 |
-| Accessibility | REQ-027 to REQ-030 | 4 | 0 | 4 |
-| Content | REQ-031 to REQ-033 | 3 | 0 | 3 |
-| Documentation | REQ-034 to REQ-041 | 5 | 3 | 8 |
-| **TOTAL** | **41** | **37** | **4** | **41** |
-
----
-
-## Risk Register (from decisions.md)
+### Technical Risks
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|------------|--------|------------|
-| Scope creep from "one perfect page" | High | High | Hard deadline required. "Perfect is shipped, not tweaked." |
-| Independent codebases = maintenance burden | High | Medium | Accepted tradeoff. Document shared patterns. |
-| No distribution = no users | High | Critical | Minimum: deploy buttons + clear README install path in v1. |
-| Font licensing surprises | Medium | Medium | Verify licenses before build. |
-| Demo imagery legal issues | Low | High | Source from Unsplash/Pexels with attribution. Zero unlicensed images. |
-| EmDash version incompatibility | Medium | Medium | Version-lock compatibility. Document which EmDash version themes target. |
-| "Customization hell" support | Medium | Medium | CSS variables + docs mitigate. |
-| 2 themes feels incomplete | Low | Medium | Launch messaging: "Two themes, done right." |
-| Steve's perfectionism delays shipping | Medium | High | Timeboxed build phases. Hard ship date. |
+| Lighthouse at scale | Medium | Medium | Weekly batch, sampling |
+| Cron job collisions | High at scale | Medium | Queue system at 50 clients |
+| Cloudflare API limits | Low | Medium | Caching, graceful degradation |
+| JSON file corruption | Medium | High | Backup on every write |
+| Dashboard URL guessing | Very Low | High | UUIDv4 (122 bits entropy) |
+
+### Business Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| Zero attach rate | Medium | Critical | Hand-sell first 10 |
+| "Small updates" abuse | High | High | Clear definitions in writing |
+| Request disputes | Medium | Medium | Fixed prices + published definitions |
+| Churn at month 3 | Medium | High | Make invisible work visible |
+| $79 price point wrong | Medium | Medium | Adjust based on first 10 |
+
+### Operational Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| One-person bottleneck | High at scale | Critical | Team expansion at 30 clients |
+| Scope creep | Medium | High | This document is the contract |
+| Dashboard feels rushed | Medium | High | Week 5 is polish only |
 
 ---
 
-## Success Criteria for v1
+## Open Questions (Blocking Launch)
 
-- [ ] Both themes ship (Palette One + Palette Two)
-- [ ] Each theme is ONE perfect page (index.html)
-- [ ] Mobile-responsive (375px and 1440px)
-- [ ] <100KB fonts per theme (self-hosted)
-- [ ] CSS-only animations (no JavaScript for visual effects)
-- [ ] Basic accessibility (contrast, focus states, alt text)
-- [ ] CSS custom properties documented
-- [ ] README with install/customize/deploy instructions
-- [ ] Deploy buttons for Vercel/Netlify
-- [ ] "First 3 seconds" test passes (instant recognition, no blocking content)
+| # | Question | Owner | Deadline |
+|---|----------|-------|----------|
+| 1 | Monthly request allowance: 3 or 5 updates? | Shipyard leadership | Before first client |
+| 2 | "Small update" definition document | Shipyard leadership | Before launch (ToS) |
+| 3 | Request dispute resolution policy | Shipyard leadership | Before first client |
+| 4 | Lighthouse threshold refinement | Engineering | Week 2 |
+| 5 | First 10 client selection criteria | Shipyard sales | Week 5 |
+| 6 | Welcome email content approach | Steve + Engineering | Week 3 |
+| 7 | Security model: UUID-only vs magic link expiry | Engineering | Week 5 |
 
 ---
 
-*Generated by Great Minds Agency - Requirements Analyst*
-*Source: rounds/emdash-themes/decisions.md, prds/emdash-themes.md*
+## Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| First 10 contracts | Within 30 days of launch | Stripe subscriptions |
+| Attach rate | 30% of eligible clients | Subscriptions / Total clients |
+| Monthly churn | < 10% | Cancellations / Active |
+| Dashboard engagement | 2+ views/month per client | Analytics |
+| Support tickets | < 1 per client per month | Ticket count |
+
+---
+
+## Timeline (5 Weeks)
+
+| Week | Focus | Key Deliverables |
+|------|-------|------------------|
+| 1 | Core architecture + Stripe | Project setup, JSON schemas, Stripe webhook |
+| 2 | Dashboard template + health logic | HTML template, CSS, health indicator, thresholds |
+| 3 | Email templates + Cloudflare integration | 5 email templates, Cloudflare API client |
+| 4 | Lighthouse CI + cron jobs | Weekly batch runner, nightly generator |
+| 5 | Copy refinement + QA + deployment | Polish, voice audit, production deploy |
+
+---
+
+## Ship Test
+
+> Does the client open their HARBOR dashboard and in one second feel cared for — not abandoned?
+>
+> **If yes, ship it.**
+
+---
+
+*Generated by Great Minds Agency — Phase Planning Skill*
+*Source: rounds/shipyard-maintenance-system/decisions.md, prds/failed/shipyard-maintenance-system.md*
+*Project Slug: shipyard-maintenance-system*

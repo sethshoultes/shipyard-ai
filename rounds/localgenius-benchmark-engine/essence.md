@@ -1,13 +1,17 @@
-# Essence
+# PULSE — The Essence
 
 **What is this product REALLY about?**
-Turning invisible small business owners into competitors with something to prove.
+One number that tells her if she's winning.
 
 **What's the feeling it should evoke?**
-The stomach-tightening moment you see your number and realize you're in the game.
+The gut-punch of truth. Then fire.
 
 **What's the one thing that must be perfect?**
-The first glance. One number. Undeniable truth.
+The first glance. Before she thinks, she knows.
 
 **Creative direction:**
-Scoreboard, not spreadsheet.
+Scoreboard. Not spreadsheet.
+
+---
+
+*Less interface. More answer.*
