@@ -1,0 +1,42 @@
+---
+import { getSiteSettings, getMenu } from "emdash";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const settings = await getSiteSettings();
+const siteTitle = settings?.title || "Ember";
+const siteDescription = settings?.tagline || "Bold. Editorial. For people with something to say.";
+
+const menu = await getMenu("primary");
+---
+
+<BaseLayout title={siteTitle} description={siteDescription}>
+	<div class="hero">
+		<div class="hero-content">
+			<h1 class="hero-title">{siteTitle}</h1>
+			<p class="hero-tagline">{siteDescription}</p>
+			<a href="/contact" class="hero-cta">Get Started</a>
+		</div>
+		<div class="hero-accent"></div>
+	</div>
+
+	<section class="features">
+		<div class="features-grid">
+			<article class="feature-card">
+				<h3>Bold Design</h3>
+				<p>Magazine-style layouts with serif headings that command attention. Asymmetric grids create visual tension and intrigue.</p>
+			</article>
+			<article class="feature-card">
+				<h3>Editorial Voice</h3>
+				<p>Dark navy and burnt orange palette. Typography that speaks. Every detail matters to the story you're telling.</p>
+			</article>
+			<article class="feature-card">
+				<h3>Your Content</h3>
+				<p>Install Ember and your content is already there. No migration, no loss. Just a new skin that fits better.</p>
+			</article>
+		</div>
+	</section>
+
+	<style is:global>
+		@import "../styles/theme.css";
+	</style>
+</BaseLayout>

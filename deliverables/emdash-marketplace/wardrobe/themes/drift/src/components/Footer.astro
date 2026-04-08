@@ -1,0 +1,82 @@
+---
+interface Props {
+	brand?: string;
+	tagline?: string;
+	links?: Array<{ label: string; url: string }>;
+}
+
+const { brand, tagline, links } = Astro.props;
+---
+
+<footer class="custom-footer">
+	<div class="footer-wrapper">
+		{brand && (
+			<div class="footer-brand">
+				<h3>{brand}</h3>
+				{tagline && <p>{tagline}</p>}
+			</div>
+		)}
+		{links && links.length > 0 && (
+			<div class="footer-links">
+				{links.map((link) => (
+					<a href={link.url}>{link.label}</a>
+				))}
+			</div>
+		)}
+	</div>
+</footer>
+
+<style>
+	.custom-footer {
+		margin-top: var(--spacing-5xl);
+		padding: var(--spacing-3xl) var(--spacing-lg);
+		border-top: 1px solid var(--color-border);
+	}
+
+	.footer-wrapper {
+		max-width: var(--wide-width);
+		margin: 0 auto;
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: var(--spacing-3xl);
+	}
+
+	.footer-brand h3 {
+		font-size: var(--font-size-base);
+		font-weight: 400;
+		margin-bottom: var(--spacing-sm);
+		letter-spacing: 0.5px;
+		text-transform: uppercase;
+	}
+
+	.footer-brand p {
+		font-size: var(--font-size-sm);
+		color: var(--color-muted);
+		font-weight: 300;
+		margin: 0;
+	}
+
+	.footer-links {
+		display: flex;
+		gap: var(--spacing-xl);
+		flex-wrap: wrap;
+	}
+
+	.footer-links a {
+		font-size: var(--font-size-sm);
+		color: var(--color-text);
+		transition: color var(--transition-fast);
+	}
+
+	.footer-links a:hover {
+		color: var(--color-accent);
+	}
+
+	@media (max-width: 768px) {
+		.footer-wrapper {
+			flex-direction: column;
+			gap: var(--spacing-2xl);
+		}
+	}
+</style>

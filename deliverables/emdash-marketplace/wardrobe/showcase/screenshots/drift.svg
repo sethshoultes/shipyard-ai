@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <!-- Background: Whitespace heavy -->
+  <rect width="400" height="400" fill="#f8f8f8"/>
+
+  <!-- Sage green accent -->
+  <rect x="0" y="0" width="400" height="40" fill="#9cad7f"/>
+
+  <!-- Lots of whitespace -->
+  <rect x="30" y="80" width="340" height="280" fill="#ffffff" stroke="#e8e8e8" stroke-width="1"/>
+
+  <!-- Theme title: Minimal -->
+  <text x="50" y="130" font-family="'Helvetica Neue', Arial, sans-serif" font-size="40" font-weight="300" fill="#555">
+    Drift
+  </text>
+
+  <!-- Subtle description -->
+  <text x="50" y="170" font-family="'Helvetica Neue', Arial, sans-serif" font-size="14" fill="#999">
+    Minimal and airy.
+  </text>
+
+  <!-- Plenty of breathing room -->
+  <line x1="50" y1="190" x2="350" y2="190" stroke="#9cad7f" stroke-width="1"/>
+
+  <!-- Content with lots of whitespace -->
+  <text x="50" y="230" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13" fill="#666">
+    Let your content breathe.
+  </text>
+
+  <text x="50" y="270" font-family="'Helvetica Neue', Arial, sans-serif" font-size="13" fill="#999">
+    Clean. Calm. Thoughtful.
+  </text>
+
+  <!-- Sage green accent dot -->
+  <circle cx="365" cy="320" r="6" fill="#9cad7f"/>
+</svg>
