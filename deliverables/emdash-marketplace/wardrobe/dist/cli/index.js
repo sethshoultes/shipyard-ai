@@ -9,6 +9,8 @@
  */
 import { Command } from 'commander';
 import { fetchThemesRegistry } from './utils/fetch-registry.js';
+import { installTheme } from './commands/install.js';
+import { previewCommand } from './commands/preview.js';
 // ── CLI ────────────────────────────────────────────────────────────────────
 const program = new Command();
 program
@@ -39,6 +41,21 @@ program
         console.error('Failed to fetch themes. Please check your internet connection and try again.');
         process.exit(1);
     }
+});
+// ── install ──────────────────────────────────────────────────────────────────
+program
+    .command('install <theme>')
+    .option('-v, --verbose', 'Show detailed output')
+    .description('Install a theme')
+    .action(async (theme, options) => {
+    await installTheme(theme, options);
+});
+// ── preview ──────────────────────────────────────────────────────────────────
+program
+    .command('preview <theme>')
+    .description('Open theme preview in browser')
+    .action(async (theme) => {
+    await previewCommand(theme);
 });
 // ── run ────────────────────────────────────────────────────────────────────
 program.parse();

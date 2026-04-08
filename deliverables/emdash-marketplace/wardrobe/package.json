@@ -11,10 +11,12 @@
     "build": "tsc"
   },
   "dependencies": {
-    "commander": "^13.1.0"
+    "commander": "^13.1.0",
+    "tar": "^7.5.13"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
+    "@types/tar": "^6.1.13",
     "tsx": "^4.19.0",
     "typescript": "^5.7.0"
   }

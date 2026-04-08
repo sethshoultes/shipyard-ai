@@ -6,6 +6,7 @@ export interface Theme {
     description: string;
     version: string;
     url?: string;
+    tarballUrl?: string;
 }
 /**
  * Fetch themes.json registry from CDN

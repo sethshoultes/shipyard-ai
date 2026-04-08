@@ -7,6 +7,7 @@ export interface Theme {
   description: string;
   version: string;
   url?: string;
+  tarballUrl?: string;
 }
 
 /**
@@ -21,26 +22,31 @@ export async function fetchThemesRegistry(): Promise<Theme[]> {
       name: 'ember',
       description: 'Bold. Editorial. For people with something to say.',
       version: '1.0.0',
+      tarballUrl: 'https://cdn.emdash.dev/themes/ember@1.0.0.tar.gz',
     },
     {
       name: 'forge',
       description: 'Dark. Technical. Aggressive, cutting-edge.',
       version: '1.0.0',
+      tarballUrl: 'https://cdn.emdash.dev/themes/forge@1.0.0.tar.gz',
     },
     {
       name: 'slate',
       description: 'Clean. Corporate. Professional, trustworthy.',
       version: '1.0.0',
+      tarballUrl: 'https://cdn.emdash.dev/themes/slate@1.0.0.tar.gz',
     },
     {
       name: 'drift',
       description: 'Minimal. Airy. Contemplative, calm.',
       version: '1.0.0',
+      tarballUrl: 'https://cdn.emdash.dev/themes/drift@1.0.0.tar.gz',
     },
     {
       name: 'bloom',
       description: 'Warm. Organic. Optimistic, inviting.',
       version: '1.0.0',
+      tarballUrl: 'https://cdn.emdash.dev/themes/bloom@1.0.0.tar.gz',
     },
   ];
 

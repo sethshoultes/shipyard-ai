@@ -10,6 +10,8 @@
 
 import { Command } from 'commander';
 import { fetchThemesRegistry } from './utils/fetch-registry.js';
+import { installTheme } from './commands/install.js';
+import { previewCommand } from './commands/preview.js';
 
 // ── CLI ────────────────────────────────────────────────────────────────────
 
@@ -50,6 +52,25 @@ program
       );
       process.exit(1);
     }
+  });
+
+// ── install ──────────────────────────────────────────────────────────────────
+
+program
+  .command('install <theme>')
+  .option('-v, --verbose', 'Show detailed output')
+  .description('Install a theme')
+  .action(async (theme: string, options: { verbose?: boolean }) => {
+    await installTheme(theme, options);
+  });
+
+// ── preview ──────────────────────────────────────────────────────────────────
+
+program
+  .command('preview <theme>')
+  .description('Open theme preview in browser')
+  .action(async (theme: string) => {
+    await previewCommand(theme);
   });
 
 // ── run ────────────────────────────────────────────────────────────────────
