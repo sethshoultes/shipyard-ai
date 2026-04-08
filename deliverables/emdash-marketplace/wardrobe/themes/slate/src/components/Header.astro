@@ -1,0 +1,45 @@
+---
+/**
+ * Header Component
+ * Displays the main site header with navigation
+ */
+interface Props {
+	title?: string;
+	subtitle?: string;
+}
+
+const { title = "Slate", subtitle } = Astro.props;
+---
+
+<header class="slate-header">
+	<div class="slate-header-content">
+		<h2 class="slate-header-title">{title}</h2>
+		{subtitle && <p class="slate-header-subtitle">{subtitle}</p>}
+	</div>
+</header>
+
+<style>
+	.slate-header {
+		background: var(--color-surface);
+		border-bottom: 1px solid var(--color-border);
+		padding: var(--spacing-12) var(--spacing-6);
+		margin-bottom: var(--spacing-12);
+	}
+
+	.slate-header-content {
+		max-width: var(--content-width);
+		margin: 0 auto;
+	}
+
+	.slate-header-title {
+		margin: 0 0 var(--spacing-2) 0;
+		font-size: var(--font-size-2xl);
+		color: var(--color-primary);
+	}
+
+	.slate-header-subtitle {
+		margin: 0;
+		font-size: var(--font-size-base);
+		color: var(--color-text-secondary);
+	}
+</style>

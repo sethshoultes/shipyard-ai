@@ -1,0 +1,53 @@
+---
+import { getSiteSettings, getMenu } from "emdash";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const settings = await getSiteSettings();
+const siteTitle = settings?.title || "Slate";
+const siteDescription = settings?.tagline || "Gray palette, blue accents, system fonts, structured";
+
+const menu = await getMenu("primary");
+---
+
+<BaseLayout title={siteTitle} description={siteDescription}>
+	<div class="hero">
+		<div class="hero-content">
+			<h1 class="hero-title">{siteTitle}</h1>
+			<p class="hero-tagline">{siteDescription}</p>
+			<a href="/contact" class="hero-cta">Get Started</a>
+		</div>
+	</div>
+
+	<section class="features">
+		<div class="features-grid">
+			<article class="feature-card">
+				<h3>Professional Design</h3>
+				<p>Clean lines. Structured layouts. The look of a company that knows what it's doing.</p>
+			</article>
+			<article class="feature-card">
+				<h3>Slate Gray Palette</h3>
+				<p>Sophisticated neutrals with corporate blue. Easy to read, easy to trust.</p>
+			</article>
+			<article class="feature-card">
+				<h3>System Fonts</h3>
+				<p>Fast loading, globally optimized. No custom fonts slowing things down.</p>
+			</article>
+			<article class="feature-card">
+				<h3>Structured Layout</h3>
+				<p>Organized grids. Clear information hierarchy. Everything in its place.</p>
+			</article>
+			<article class="feature-card">
+				<h3>Sidebar Navigation</h3>
+				<p>Natural flow from top nav to content. Easy discovery. Intuitive organization.</p>
+			</article>
+			<article class="feature-card">
+				<h3>Your Content</h3>
+				<p>Install Slate and your content stays. Your brand becomes trustworthy overnight.</p>
+			</article>
+		</div>
+	</section>
+
+	<style is:global>
+		@import "../styles/theme.css";
+	</style>
+</BaseLayout>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Wardrobe - Instant dignity for your Emdash site. Choose from 5 carefully curated themes.">
+    <title>Wardrobe - Emdash Themes</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>Wardrobe</h1>
+                <p class="tagline">Instant dignity for your Emdash site</p>
+            </div>
+            <nav class="nav" aria-label="Main navigation">
+                <a href="#themes">Themes</a>
+                <a href="#install">Install</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h2 class="hero-title">Transform Your Site in One Command</h2>
+                <p class="hero-subtitle">Try it on. If it doesn't fit, try another. Your content stays untouched.</p>
+                <div class="hero-cta">
+                    <code class="code-block">npx wardrobe install [theme]</code>
+                </div>
+            </div>
+        </section>
+
+        <!-- Themes Section -->
+        <section id="themes" class="themes-section">
+            <div class="container">
+                <h2 class="section-title">Five Themes. One Command.</h2>
+                <p class="section-subtitle">Each with distinct personality. Choose the one that fits your voice.</p>
+
+                <div class="themes-grid">
+                    <!-- Ember Theme -->
+                    <article class="theme-card" data-theme="ember">
+                        <div class="theme-image">
+                            <img src="screenshots/ember.svg" alt="Ember theme preview - Bold, editorial design" loading="lazy">
+                        </div>
+                        <div class="theme-content">
+                            <h3 class="theme-name">Ember</h3>
+                            <p class="theme-description">Bold. Editorial. For people with something to say.</p>
+                            <p class="theme-personality">Magazine-style, serif headings, dark navy + burnt orange</p>
+                            <div class="theme-install">
+                                <code class="install-command">npx wardrobe install ember</code>
+                                <button class="copy-btn" aria-label="Copy ember install command">Copy</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Forge Theme -->
+                    <article class="theme-card" data-theme="forge">
+                        <div class="theme-image">
+                            <img src="screenshots/forge.svg" alt="Forge theme preview - Dark technical design" loading="lazy">
+                        </div>
+                        <div class="theme-content">
+                            <h3 class="theme-name">Forge</h3>
+                            <p class="theme-description">Dark and technical. Built for builders.</p>
+                            <p class="theme-personality">Dark mode, monospace, neon green accents, terminal-inspired</p>
+                            <div class="theme-install">
+                                <code class="install-command">npx wardrobe install forge</code>
+                                <button class="copy-btn" aria-label="Copy forge install command">Copy</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Slate Theme -->
+                    <article class="theme-card" data-theme="slate">
+                        <div class="theme-image">
+                            <img src="screenshots/slate.svg" alt="Slate theme preview - Clean professional design" loading="lazy">
+                        </div>
+                        <div class="theme-content">
+                            <h3 class="theme-name">Slate</h3>
+                            <p class="theme-description">Clean and professional. Trust at first glance.</p>
+                            <p class="theme-personality">Gray palette, blue accents, system fonts, structured</p>
+                            <div class="theme-install">
+                                <code class="install-command">npx wardrobe install slate</code>
+                                <button class="copy-btn" aria-label="Copy slate install command">Copy</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Drift Theme -->
+                    <article class="theme-card" data-theme="drift">
+                        <div class="theme-image">
+                            <img src="screenshots/drift.svg" alt="Drift theme preview - Minimal airy design" loading="lazy">
+                        </div>
+                        <div class="theme-content">
+                            <h3 class="theme-name">Drift</h3>
+                            <p class="theme-description">Minimal and airy. Let your content breathe.</p>
+                            <p class="theme-personality">Whitespace, thin sans-serif, sage green accent</p>
+                            <div class="theme-install">
+                                <code class="install-command">npx wardrobe install drift</code>
+                                <button class="copy-btn" aria-label="Copy drift install command">Copy</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Bloom Theme -->
+                    <article class="theme-card" data-theme="bloom">
+                        <div class="theme-image">
+                            <img src="screenshots/bloom.svg" alt="Bloom theme preview - Warm inviting design" loading="lazy">
+                        </div>
+                        <div class="theme-content">
+                            <h3 class="theme-name">Bloom</h3>
+                            <p class="theme-description">Warm and inviting. Where community feels at home.</p>
+                            <p class="theme-personality">Rounded corners, cream background, terracotta accents</p>
+                            <div class="theme-install">
+                                <code class="install-command">npx wardrobe install bloom</code>
+                                <button class="copy-btn" aria-label="Copy bloom install command">Copy</button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Install Guide Section -->
+        <section id="install" class="install-section">
+            <div class="container">
+                <h2 class="section-title">Installation is Simple</h2>
+                <div class="install-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Choose Your Theme</h3>
+                        <p>Browse the themes above and pick one that resonates.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Copy the Command</h3>
+                        <p>Click the copy button or manually type the install command.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Run in Your Project</h3>
+                        <p>Your theme installs in under 3 seconds. Your content stays exactly the same.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Wardrobe. Part of the Emdash ecosystem.</p>
+            <p class="footer-note">Pick a theme. Change your life. (At least your website's.)</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

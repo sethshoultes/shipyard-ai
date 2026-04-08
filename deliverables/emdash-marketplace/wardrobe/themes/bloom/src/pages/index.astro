@@ -1,0 +1,82 @@
+---
+import { getEmDashEntry } from "emdash";
+import Base from "../layouts/Base.astro";
+
+const { entry: page, cacheHint } = await getEmDashEntry("pages", "home");
+
+try {
+	Astro.cache.set(cacheHint);
+} catch {}
+
+const pageTitle = page?.data.title;
+const pageContent = page?.data.content;
+---
+
+<Base title={pageTitle !== "Home" ? pageTitle : undefined}>
+	{
+		pageContent ? (
+			<div class="content-wrapper">
+				<div class="content-cards" set:html={pageContent} />
+			</div>
+		) : (
+			<div class="empty-state">
+				<div class="empty-card">
+					<h1>Welcome to Bloom</h1>
+					<p>A warm and inviting space for your story. Rounded corners, terracotta warmth, organic beauty.</p>
+					<a href="/_emdash/admin" class="btn btn-primary btn-rounded">
+						Edit Your Story
+					</a>
+				</div>
+			</div>
+		)
+	}
+</Base>
+
+<style>
+	.content-wrapper {
+		max-width: var(--max-width);
+		margin: 0 auto;
+		padding: 0 var(--spacing-lg);
+	}
+
+	.content-cards {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-2xl);
+	}
+
+	.empty-state {
+		padding: var(--spacing-3xl) var(--spacing-lg);
+		max-width: var(--max-width);
+		margin: 0 auto;
+	}
+
+	.empty-card {
+		background: var(--color-surface);
+		padding: var(--spacing-4xl);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--shadow);
+		text-align: center;
+	}
+
+	.empty-card h1 {
+		margin-bottom: var(--spacing-md);
+		color: var(--color-accent);
+	}
+
+	.empty-card p {
+		color: var(--color-muted);
+		margin-bottom: var(--spacing-xl);
+		font-size: var(--font-size-lg);
+	}
+
+	@media (max-width: 768px) {
+		.content-wrapper {
+			padding: 0 var(--spacing-md);
+		}
+
+		.empty-card {
+			padding: var(--spacing-2xl);
+		}
+	}
+</style>
