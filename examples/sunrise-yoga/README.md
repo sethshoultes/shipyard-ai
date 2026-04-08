@@ -1,60 +1,35 @@
-# EmDash Marketing Template
+# Sunrise Yoga Studio
 
-A conversion-focused landing page template built with [EmDash](https://github.com/emdash-cms/emdash). Runs on any Node.js server with SQLite and local file storage. Modular content blocks let you assemble pages from reusable sections without touching code.
+Your practice starts here. A yoga studio website built with [Emdash CMS](https://github.com/emdash-cms/emdash) and deployed to Cloudflare Workers.
 
-![Marketing template homepage](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/marketing/latest/homepage-light-desktop.jpg)
+![Sunrise Yoga Studio](screenshot.png)
 
-## What's Included
+**Live site:** [yoga.shipyard.company](https://yoga.shipyard.company)
 
-- Hero section with CTAs
-- Feature grid
-- Testimonials
-- Pricing cards
-- FAQ accordion
-- Contact form with validation
-- SEO metadata and JSON-LD
-- Dark/light mode
+## About
+
+A wellness-focused website featuring a dark navy theme with warm purple-orange gradient accents, designed for approachability and community. Built autonomously by the Shipyard AI pipeline from a PRD.
+
+## Tech Stack
+
+- **CMS:** Emdash (Astro-based)
+- **Database:** Cloudflare D1
+- **Storage:** Cloudflare R2
+- **Runtime:** Cloudflare Workers
+- **Template:** Marketing
 
 ## Pages
 
 | Page | Route |
-|---|---|
-| Homepage | `/` |
-| Pricing | `/pricing` |
+|------|-------|
+| Home | `/` |
+| About | `/about` |
+| Services | `/services` |
 | Contact | `/contact` |
-| 404 | fallback |
 
-## Screenshots
-
-| | Desktop | Mobile |
-|---|---|---|
-| Light | ![homepage light desktop](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/marketing/latest/homepage-light-desktop.jpg) | ![homepage light mobile](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/marketing/latest/homepage-light-mobile.jpg) |
-| Dark | ![homepage dark desktop](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/marketing/latest/homepage-dark-desktop.jpg) | ![homepage dark mobile](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/marketing/latest/homepage-dark-mobile.jpg) |
-
-## Infrastructure
-
-- **Runtime:** Node.js
-- **Database:** SQLite (local file)
-- **Storage:** Local filesystem
-- **Framework:** Astro with `@astrojs/node`
-
-## Getting Started
+## Running Locally
 
 ```bash
-pnpm install
-pnpm bootstrap
-pnpm dev
+npm install
+npx wrangler dev
 ```
-
-Open http://localhost:4321 for the site and http://localhost:4321/_emdash/admin for the CMS.
-
-## Want Cloudflare Instead?
-
-See the [Cloudflare variant](../marketing-cloudflare) for a version that deploys to Cloudflare Workers with D1 and R2.
-
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/emdash-cms/templates/tree/main/marketing-cloudflare)
-
-## See Also
-
-- [All templates](../)
-- [EmDash documentation](https://github.com/emdash-cms/emdash/tree/main/docs)
