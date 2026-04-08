@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Character encoding and viewport -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Page metadata for SEO and description -->
+  <meta name="description" content="Palette One: A warm, welcoming restaurant experience with editorial elegance and hospitality at its heart.">
+  <meta name="theme-color" content="#c45c26">
+
+  <!-- Title -->
+  <title>Palette One | Warm Hospitality & Editorial Elegance</title>
+
+  <!-- CSS: Load design system variables first, then styles -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Fonts are loaded via @font-face in style.css -->
+  <style>
+    /* Quick accessibility defaults */
+    body {
+      font-family: var(--font-body);
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip to content link for keyboard accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Page header with navigation -->
+  <header role="banner">
+    <nav role="navigation" aria-label="Main navigation">
+      <div class="nav-container">
+        <!-- Logo/Brand -->
+        <div class="nav-brand">
+          <h1 class="site-title">Palette One</h1>
+          <p class="site-tagline">Warm Hospitality & Editorial Elegance</p>
+        </div>
+
+        <!-- Navigation menu -->
+        <ul class="nav-menu">
+          <li><a href="#about">Our Story</a></li>
+          <li><a href="#menu">Menu</a></li>
+          <li><a href="#reservations">Reservations</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main content area -->
+  <main id="main-content">
+    <!-- Hero section: First impression, emotional resonance in 3 seconds -->
+    <section class="hero" role="region" aria-label="Hero section">
+      <div class="hero-content">
+        <div class="hero-image-area">
+          <img src="images/hero-featured.jpg" alt="A beautifully plated dish in warm, inviting lighting at Palette One restaurant">
+        </div>
+
+        <div class="hero-text">
+          <h2 class="hero-headline">A Culinary Journey Rooted in Warmth</h2>
+          <p class="hero-tagline">Where editorial elegance meets genuine hospitality</p>
+          <p class="hero-description">Step into a space designed to celebrate the art of dining, where every detail—from the plating to the ambiance—tells a story of care and craftsmanship.</p>
+          <a href="#reservations" class="cta-button">Reserve Your Table</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- About section: Our story -->
+    <section id="about" class="about-section" role="region" aria-label="About our restaurant">
+      <div class="section-container">
+        <h2>Our Story</h2>
+
+        <div class="about-content">
+          <div class="about-text">
+            <p>Palette One was born from a simple belief: that dining is more than nourishment—it's an experience, a moment to savor and share.</p>
+
+            <blockquote class="pull-quote">
+              <p>"Great food begins with great ingredients and genuine care for those who will enjoy it."</p>
+            </blockquote>
+
+            <p>Our kitchen is guided by a passion for seasonal ingredients, traditional techniques, and bold creativity. Our service philosophy is built on warmth, attentiveness, and a deep respect for your time.</p>
+
+            <p>Whether you're here for a special occasion, a quiet evening out, or a gathering with loved ones, you'll find yourself in a space that feels both editorial and intimate—a place where details matter.</p>
+          </div>
+
+          <div class="about-image">
+            <img src="images/about-kitchen.jpg" alt="View of the warm, welcoming kitchen at Palette One with carefully arranged plating stations">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Menu highlights section -->
+    <section id="menu" class="menu-section" role="region" aria-label="Featured menu items">
+      <div class="section-container">
+        <h2>Seasonal Highlights</h2>
+        <p class="section-intro">A carefully curated selection from our current offerings</p>
+
+        <div class="menu-grid">
+          <!-- Menu item 1 -->
+          <article class="menu-item">
+            <div class="menu-item-image">
+              <img src="images/dish-1.jpg" alt="Roasted seasonal vegetables with herb oil and crispy breadcrumbs">
+            </div>
+            <h3>Seasonal Harvest</h3>
+            <p class="menu-description">Roasted seasonal vegetables with herb oil, crispy breadcrumbs, and a touch of gold leaf</p>
+            <p class="menu-price">$18</p>
+          </article>
+
+          <!-- Menu item 2 -->
+          <article class="menu-item">
+            <div class="menu-item-image">
+              <img src="images/dish-2.jpg" alt="Perfectly seared protein with silky purée and seasonal garnish">
+            </div>
+            <h3>Chef's Featured Protein</h3>
+            <p class="menu-description">Seared to perfection with silky root vegetable purée and seasonal green accent</p>
+            <p class="menu-price">$32</p>
+          </article>
+
+          <!-- Menu item 3 -->
+          <article class="menu-item">
+            <div class="menu-item-image">
+              <img src="images/dish-3.jpg" alt="Delicate dessert with warm chocolate, cool cream, and toasted elements">
+            </div>
+            <h3>Warm & Cold</h3>
+            <p class="menu-description">A play of temperatures and textures: warm chocolate, cool cream, toasted nuts</p>
+            <p class="menu-price">$12</p>
+          </article>
+        </div>
+
+        <blockquote class="pull-quote pull-quote-centered">
+          <p>"Every plate is a moment of intention."</p>
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- Reservations section -->
+    <section id="reservations" class="reservations-section" role="region" aria-label="Make a reservation">
+      <div class="section-container">
+        <h2>Reserve Your Experience</h2>
+
+        <div class="reservation-content">
+          <div class="reservation-info">
+            <h3>Hours & Information</h3>
+            <dl>
+              <dt>Tuesday – Thursday</dt>
+              <dd>5:00 PM – 11:00 PM</dd>
+              <dt>Friday – Saturday</dt>
+              <dd>5:00 PM – 12:00 AM</dd>
+              <dt>Sunday</dt>
+              <dd>5:00 PM – 10:00 PM</dd>
+              <dt>Monday</dt>
+              <dd>Closed</dd>
+            </dl>
+            <p>We accommodate groups of 2–12. For larger parties, please contact us directly.</p>
+          </div>
+
+          <form class="reservation-form" action="/reserve" method="POST">
+            <fieldset>
+              <legend>Request a Reservation</legend>
+
+              <div class="form-group">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" name="name" required aria-required="true">
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required aria-required="true">
+              </div>
+
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone">
+              </div>
+
+              <div class="form-group">
+                <label for="date">Preferred Date</label>
+                <input type="date" id="date" name="date" required aria-required="true">
+              </div>
+
+              <div class="form-group">
+                <label for="time">Preferred Time</label>
+                <select id="time" name="time" required aria-required="true">
+                  <option value="">Select a time</option>
+                  <option value="5:00pm">5:00 PM</option>
+                  <option value="5:30pm">5:30 PM</option>
+                  <option value="6:00pm">6:00 PM</option>
+                  <option value="6:30pm">6:30 PM</option>
+                  <option value="7:00pm">7:00 PM</option>
+                  <option value="7:30pm">7:30 PM</option>
+                  <option value="8:00pm">8:00 PM</option>
+                  <option value="8:30pm">8:30 PM</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="guests">Number of Guests</label>
+                <select id="guests" name="guests" required aria-required="true">
+                  <option value="">Select number</option>
+                  <option value="2">2 guests</option>
+                  <option value="3">3 guests</option>
+                  <option value="4">4 guests</option>
+                  <option value="5">5 guests</option>
+                  <option value="6">6 guests</option>
+                  <option value="7">7 guests</option>
+                  <option value="8">8 guests</option>
+                  <option value="9">9 guests</option>
+                  <option value="10">10 guests</option>
+                  <option value="11">11 guests</option>
+                  <option value="12">12 guests</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="notes">Special Requests</label>
+                <textarea id="notes" name="notes" rows="4" placeholder="Any dietary restrictions or special occasions?"></textarea>
+              </div>
+
+              <button type="submit" class="submit-button">Complete Reservation Request</button>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact section -->
+    <section id="contact" class="contact-section" role="region" aria-label="Contact information">
+      <div class="section-container">
+        <h2>Get in Touch</h2>
+
+        <div class="contact-grid">
+          <div class="contact-card">
+            <h3>Address</h3>
+            <p>123 Editorial Lane<br>Culinary District<br>City, State 12345</p>
+          </div>
+
+          <div class="contact-card">
+            <h3>Phone</h3>
+            <p><a href="tel:+15551234567">(555) 123-4567</a></p>
+          </div>
+
+          <div class="contact-card">
+            <h3>Email</h3>
+            <p><a href="mailto:hello@paletteone.com">hello@paletteone.com</a></p>
+          </div>
+
+          <div class="contact-card">
+            <h3>Social</h3>
+            <p>
+              <a href="https://instagram.com" aria-label="Visit us on Instagram">Instagram</a><br>
+              <a href="https://facebook.com" aria-label="Visit us on Facebook">Facebook</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Page footer -->
+  <footer role="contentinfo">
+    <div class="footer-content">
+      <p>&copy; 2024 Palette One. All rights reserved.</p>
+      <p>Crafted with care and warm intentions.</p>
+      <ul class="footer-links">
+        <li><a href="/privacy">Privacy Policy</a></li>
+        <li><a href="/terms">Terms of Service</a></li>
+        <li><a href="/accessibility">Accessibility</a></li>
+      </ul>
+    </div>
+  </footer>
+
+</body>
+</html>

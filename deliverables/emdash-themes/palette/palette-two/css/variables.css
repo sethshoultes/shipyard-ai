@@ -1,0 +1,151 @@
+/* Palette Two CSS Variables - Dark Terminal Theme */
+
+/* Dark Mode Only - No Light Mode Variants */
+/* This palette is designed for developer tools with neon accents on near-black background */
+
+:root {
+  /* ============================================
+     COLOR VARIABLES - Dark Terminal Palette
+     ============================================ */
+
+  /* Primary background and text colors */
+  --color-bg: #0d0d0d;           /* Near-black background for terminal aesthetic */
+  --color-text: #ededed;         /* Light gray text for high contrast on dark bg */
+
+  /* Primary and accent brand colors */
+  --color-primary: #00ff88;      /* Neon green - primary accent for developer tools */
+  --color-accent: #00d4ff;       /* Cyan - secondary accent for interactive elements */
+
+  /* Surface and container colors */
+  --color-surface: #1a1a1a;      /* Dark gray for elevated surfaces */
+
+  /* Terminal accent colors for semantic messaging */
+  --color-warning: #ffcc00;      /* Yellow - warning/caution states */
+  --color-error: #ff5555;        /* Red - error/destructive states */
+  --color-comment: #6b7280;      /* Muted gray - comments/secondary text */
+
+  /* Additional semantic colors derived from terminal palette */
+  --color-success: #00ff88;      /* Green - success states (mirrors primary) */
+  --color-info: #00d4ff;         /* Cyan - informational states (mirrors accent) */
+  --color-border: #2a2a2a;       /* Dark border color for separation */
+  --color-disabled: #4a4a4a;     /* Dimmed text for disabled elements */
+
+  /* ============================================
+     TYPOGRAPHY VARIABLES
+     ============================================ */
+
+  /* Font families - monospace for developer aesthetic */
+  --font-heading: 'JetBrains Mono', 'Fira Code', monospace;    /* Monospace for headings */
+  --font-body: 'JetBrains Mono', 'Fira Code', monospace;       /* Monospace for body text */
+  --font-code: 'JetBrains Mono', 'Fira Code', monospace;       /* Code blocks */
+
+  /* Base font size */
+  --font-size-base: 1rem;        /* 16px base */
+
+  /* Type scale - 9 sizes from xs to 5xl */
+  --font-size-xs: 0.75rem;       /* 12px */
+  --font-size-sm: 0.875rem;      /* 14px */
+  --font-size-md: 1rem;          /* 16px (base) */
+  --font-size-lg: 1.125rem;      /* 18px */
+  --font-size-xl: 1.25rem;       /* 20px */
+  --font-size-2xl: 1.5rem;       /* 24px */
+  --font-size-3xl: 1.875rem;     /* 30px */
+  --font-size-4xl: 2.25rem;      /* 36px */
+  --font-size-5xl: 3rem;         /* 48px */
+
+  /* Font weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+
+  /* Line heights */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* ============================================
+     SPACING VARIABLES
+     ============================================ */
+
+  /* Spacing scale - 1 through 24 (0.25rem to 6rem) */
+  --spacing-1: 0.25rem;          /* 4px */
+  --spacing-2: 0.5rem;           /* 8px */
+  --spacing-3: 0.75rem;          /* 12px */
+  --spacing-4: 1rem;             /* 16px */
+  --spacing-5: 1.25rem;          /* 20px */
+  --spacing-6: 1.5rem;           /* 24px */
+  --spacing-7: 1.75rem;          /* 28px */
+  --spacing-8: 2rem;             /* 32px */
+  --spacing-9: 2.25rem;          /* 36px */
+  --spacing-10: 2.5rem;          /* 40px */
+  --spacing-11: 2.75rem;         /* 44px */
+  --spacing-12: 3rem;            /* 48px */
+  --spacing-13: 3.25rem;         /* 52px */
+  --spacing-14: 3.5rem;          /* 56px */
+  --spacing-15: 3.75rem;         /* 60px */
+  --spacing-16: 4rem;            /* 64px */
+  --spacing-17: 4.25rem;         /* 68px */
+  --spacing-18: 4.5rem;          /* 72px */
+  --spacing-19: 4.75rem;         /* 76px */
+  --spacing-20: 5rem;            /* 80px */
+  --spacing-21: 5.25rem;         /* 84px */
+  --spacing-22: 5.5rem;          /* 88px */
+  --spacing-23: 5.75rem;         /* 92px */
+  --spacing-24: 6rem;            /* 96px */
+
+  /* ============================================
+     LAYOUT VARIABLES
+     ============================================ */
+
+  /* Content widths for responsive design */
+  --content-width: 800px;        /* Standard content max-width */
+  --wide-width: 1280px;          /* Wide layout max-width */
+
+  /* Border radius - minimal for terminal aesthetic */
+  --radius: 2px;                 /* Subtle rounded corners */
+  --radius-lg: 4px;              /* Larger rounded corners */
+  --radius-xl: 8px;              /* Extra large rounded corners */
+  --radius-full: 9999px;         /* Fully rounded (pills) */
+
+  /* Z-index scale for layering */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-tooltip: 600;
+
+  /* ============================================
+     TRANSITION AND ANIMATION VARIABLES
+     ============================================ */
+
+  /* Transition durations */
+  --transition-fast: 150ms;      /* Fast transitions */
+  --transition-normal: 300ms;    /* Standard transitions */
+  --transition-slow: 500ms;      /* Slow transitions */
+
+  /* Transition timing functions */
+  --easing-linear: linear;
+  --easing-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --easing-ease-out: cubic-bezier(0, 0, 0.2, 1);
+
+  /* ============================================
+     SHADOW AND DEPTH VARIABLES
+     ============================================ */
+
+  /* Box shadows for depth and elevation */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+
+  /* Glow effects for neon accent style */
+  --glow-primary: 0 0 10px rgba(0, 255, 136, 0.3);
+  --glow-accent: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+/* Note: This palette is intentionally dark-only per product requirements */
+/* No @media (prefers-color-scheme: light) or .light class variants needed */
+/* Customization: Override variables above in your own CSS or HTML inline styles */

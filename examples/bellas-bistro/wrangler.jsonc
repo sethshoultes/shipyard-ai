@@ -1,10 +1,8 @@
 {
   "name": "bellas-bistro",
-  "main": "./src/worker.ts",
   "compatibility_date": "2026-03-29",
   "compatibility_flags": ["nodejs_compat"],
-  "d1_databases": [{ "binding": "DB", "database_name": "bellas-bistro", "database_id": "9eac689d-5d78-4c9b-8064-2bcb881ba759" }],
-  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "bellas-bistro-media" }],
-  "observability": { "enabled": true },
-  "worker_loaders": [{ "binding": "LOADER" }]
+  "d1_databases": [{"binding": "DB", "database_name": "bellas-bistro", "database_id": "9eac689d-5d78-4c9b-8064-2bcb881ba759"}],
+  "r2_buckets": [{"binding": "MEDIA", "bucket_name": "bellas-bistro-media"}],
+  "observability": {"enabled": true}
 }

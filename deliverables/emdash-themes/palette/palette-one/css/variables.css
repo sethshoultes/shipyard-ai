@@ -1,0 +1,91 @@
+/* ========================================
+   Palette One: Warm & Light CSS Variables
+   ======================================== */
+
+:root {
+  /* ----------------------------------------
+     Color Variables
+     Warm, restaurant-appropriate palette
+     Light mode only
+     ---------------------------------------- */
+
+  /* Background colors */
+  --color-bg: #fdfaf6;        /* Warm white - primary background */
+  --color-surface: #f5efe6;   /* Cream - secondary surface */
+
+  /* Text colors */
+  --color-text: #2d2a26;      /* Warm black - primary text */
+
+  /* Brand colors */
+  --color-primary: #c45c26;   /* Terracotta - primary action/brand */
+  --color-accent: #8b6914;    /* Gold - accent/highlights */
+
+  /* ----------------------------------------
+     Typography Variables
+     Font family and base size configuration
+     ---------------------------------------- */
+
+  --font-heading: 'Libre Baskerville', Georgia, 'Times New Roman', serif;     /* Serif for headings - editorial feel */
+  --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;  /* Clean sans-serif for body */
+  --font-size-base: 1rem;     /* Base font size (16px at 1rem = 16px) */
+
+  /* ----------------------------------------
+     Type Scale
+     9 predefined font sizes for consistency
+     ---------------------------------------- */
+
+  --font-size-xs: 0.75rem;    /* 12px - small labels, captions */
+  --font-size-sm: 0.875rem;   /* 14px - small text, metadata */
+  --font-size-md: 1rem;       /* 16px - body text (base) */
+  --font-size-lg: 1.125rem;   /* 18px - large body text */
+  --font-size-xl: 1.25rem;    /* 20px - subheadings */
+  --font-size-2xl: 1.5rem;    /* 24px - medium headings */
+  --font-size-3xl: 1.875rem;  /* 30px - large headings */
+  --font-size-4xl: 2.25rem;   /* 36px - extra large headings */
+  --font-size-5xl: 3rem;      /* 48px - hero/display text */
+
+  /* ----------------------------------------
+     Spacing Variables
+     Consistent spacing scale (4px base unit)
+     ---------------------------------------- */
+
+  --spacing-1: 0.25rem;       /* 4px */
+  --spacing-2: 0.5rem;        /* 8px */
+  --spacing-3: 0.75rem;       /* 12px */
+  --spacing-4: 1rem;          /* 16px */
+  --spacing-5: 1.25rem;       /* 20px */
+  --spacing-6: 1.5rem;        /* 24px */
+  --spacing-7: 1.75rem;       /* 28px */
+  --spacing-8: 2rem;          /* 32px */
+  --spacing-9: 2.25rem;       /* 36px */
+  --spacing-10: 2.5rem;       /* 40px */
+  --spacing-11: 2.75rem;      /* 44px */
+  --spacing-12: 3rem;         /* 48px */
+  --spacing-16: 4rem;         /* 64px */
+  --spacing-20: 5rem;         /* 80px */
+  --spacing-24: 6rem;         /* 96px */
+
+  /* ----------------------------------------
+     Layout Variables
+     Content width and responsive constraints
+     ---------------------------------------- */
+
+  --content-width: 680px;     /* Standard content width for articles/narrower layouts */
+  --wide-width: 1200px;       /* Wide layout for full-width content */
+
+  /* ----------------------------------------
+     Border Radius
+     Corner radius for components
+     ---------------------------------------- */
+
+  --radius: 4px;              /* Small radius - subtle rounded corners */
+  --radius-lg: 8px;           /* Large radius - more pronounced rounding */
+
+  /* ----------------------------------------
+     Transition Variables
+     Animation timing for interactions
+     ---------------------------------------- */
+
+  --transition-fast: 120ms;   /* Quick feedback animations */
+  --transition-base: 180ms;   /* Standard transition duration */
+}
