@@ -1,0 +1,60 @@
+Font Licenses - Palette One
+============================
+
+LIBRE BASKERVILLE
+-----------------
+License: Open Font License (OFL)
+Source: https://fonts.google.com/specimen/Libre+Baskerville
+Copyright: (c) 2012-2015 by Pablo Impallari (www.impallari.com impallari@gmail.com)
+
+The Libre Baskerville font files included in this directory are licensed under
+the SIL Open Font License, Version 1.1. This license is available with a FAQ
+at: https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL
+
+Font files included:
+- libre-baskerville-regular.woff2 (400 weight)
+- libre-baskerville-regular.woff (400 weight)
+- libre-baskerville-bold.woff2 (700 weight)
+- libre-baskerville-bold.woff (700 weight)
+
+These fonts have been subsetted to include Latin characters only, reducing
+file size while maintaining full Latin support.
+
+
+INTER
+-----
+License: Open Font License (OFL)
+Source: https://github.com/rsms/inter
+Copyright: (c) 2016-2024 Rasmus Andersson (http://rsms.me/)
+
+The Inter font files included in this directory are licensed under the
+SIL Open Font License, Version 1.1. This license is available with a FAQ
+at: https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL
+
+Font files included:
+- inter-regular.woff2 (400 weight)
+- inter-regular.woff (400 weight)
+- inter-medium.woff2 (500 weight)
+- inter-medium.woff (500 weight)
+- inter-semibold.woff2 (600 weight)
+- inter-semibold.woff (600 weight)
+
+These fonts have been subsetted to include Latin characters only, reducing
+file size while maintaining full Latin support.
+
+
+LICENSE SUMMARY
+---------------
+Both fonts are licensed under the SIL Open Font License (OFL), which permits:
+- Free use and distribution (commercial and non-commercial)
+- Modification for personal and commercial purposes
+- Bundling with applications
+- Redistribution
+
+With the requirement that:
+- The font name must be changed when modified
+- The license must be included with any distribution
+- Font files cannot be sold on their own
+
+For the complete OFL license text, visit:
+https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL
