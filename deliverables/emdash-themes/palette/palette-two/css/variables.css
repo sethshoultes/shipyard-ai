@@ -35,9 +35,9 @@
      ============================================ */
 
   /* Font families - monospace for developer aesthetic */
-  --font-heading: 'Courier New', 'Courier', monospace;    /* Monospace for headings */
-  --font-body: 'Courier New', 'Courier', monospace;       /* Monospace for body text */
-  --font-code: 'Courier New', 'Courier', monospace;       /* Code blocks */
+  --font-heading: 'JetBrains Mono', 'Fira Code', monospace;    /* Monospace for headings */
+  --font-body: 'JetBrains Mono', 'Fira Code', monospace;       /* Monospace for body text */
+  --font-code: 'JetBrains Mono', 'Fira Code', monospace;       /* Code blocks */
 
   /* Base font size */
   --font-size-base: 1rem;        /* 16px base */

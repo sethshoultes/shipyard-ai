@@ -1,6 +1,40 @@
 /* Palette Two Stylesheet */
 @import url('variables.css');
 
+/* ============================================
+   FONT FACES - Self-hosted Fonts
+   ============================================ */
+
+/* JetBrains Mono Regular (400) */
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../fonts/jetbrains-mono-regular.woff2') format('woff2'),
+       url('../fonts/jetbrains-mono-regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* JetBrains Mono Medium (500) */
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../fonts/jetbrains-mono-medium.woff2') format('woff2'),
+       url('../fonts/jetbrains-mono-medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* JetBrains Mono Bold (700) */
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../fonts/jetbrains-mono-bold.woff2') format('woff2'),
+       url('../fonts/jetbrains-mono-bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Base Styles */
 body {
 }
