@@ -3,11 +3,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Palette Two Theme</title>
+    <meta name="description" content="Palette Two: A dark terminal-inspired developer theme with neon accents. Modern, technical, powerful.">
+    <title>Palette Two | Developer Theme</title>
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <p>Palette Two Theme</p>
+    <!-- Skip to Content Link for Keyboard Accessibility -->
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+
+    <!-- Header with Navigation -->
+    <header role="banner">
+        <nav role="navigation" aria-label="Main navigation">
+            <div class="nav-container">
+                <div class="logo">
+                    <span class="logo-icon">◆</span>
+                    <span class="logo-text">Palette Two</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#examples">Examples</a></li>
+                    <li><a href="#api">API</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Hero Section with Terminal Aesthetic -->
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="hero-content">
+                <h1 id="hero-title">Developer Theme Built For Power</h1>
+                <p class="hero-subtitle">Dark. Terminal. Technical. Designed for those who build.</p>
+
+                <!-- Terminal Window Motif -->
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <span class="terminal-title">$ palette-two --init</span>
+                        <span class="terminal-controls">
+                            <button aria-label="Minimize terminal" class="terminal-btn">−</button>
+                            <button aria-label="Maximize terminal" class="terminal-btn">□</button>
+                            <button aria-label="Close terminal" class="terminal-btn">×</button>
+                        </span>
+                    </div>
+                    <div class="terminal-content">
+                        <div class="code-line">
+                            <span class="code-prompt">$</span>
+                            <span class="code-command">npm install palette-two</span>
+                        </div>
+                        <div class="code-line success">
+                            <span class="code-symbol">✓</span>
+                            <span class="code-text">Setup complete. Theme activated.</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-prompt">$</span>
+                            <span class="code-command">start building</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-cta">
+                    <button class="btn btn-primary" aria-label="Get started with Palette Two">Get Started</button>
+                    <button class="btn btn-secondary" aria-label="View documentation">Documentation</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" aria-labelledby="features-title">
+            <h2 id="features-title">Features</h2>
+            <div class="features-grid">
+                <article class="feature-card">
+                    <h3>Dark Terminal Aesthetic</h3>
+                    <p>Near-black background with neon accents. True dark mode for developers who live in the terminal.</p>
+                </article>
+                <article class="feature-card">
+                    <h3>Monospace Typography</h3>
+                    <p>JetBrains Mono throughout. Every character counts when you're reading code.</p>
+                </article>
+                <article class="feature-card">
+                    <h3>High Contrast Colors</h3>
+                    <p>Neon green and cyan accents ensure visibility. Semantic colors for all UI states.</p>
+                </article>
+                <article class="feature-card">
+                    <h3>Grid-Heavy Layout</h3>
+                    <p>Responsive grid system. Clean alignment. Technical precision in every pixel.</p>
+                </article>
+                <article class="feature-card">
+                    <h3>Semantic HTML5</h3>
+                    <p>Built on modern web standards. Accessible by design. Ready for the future.</p>
+                </article>
+                <article class="feature-card">
+                    <h3>Developer-Friendly</h3>
+                    <p>CSS variables for everything. Easy customization. Make it your own.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- Code Examples Section -->
+        <section id="examples" aria-labelledby="examples-title">
+            <h2 id="examples-title">Code Examples</h2>
+            <p class="section-intro">See Palette Two in action:</p>
+
+            <article class="code-example">
+                <h3>HTML Structure</h3>
+                <div class="code-block">
+                    <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;link rel="stylesheet" href="css/style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;Navigation&lt;/header&gt;
+    &lt;main&gt;Content&lt;/main&gt;
+    &lt;footer&gt;Footer&lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                </div>
+            </article>
+
+            <article class="code-example">
+                <h3>CSS Variables</h3>
+                <div class="code-block">
+                    <pre><code>:root {
+    --color-bg: #0d0d0d;
+    --color-primary: #00ff88;
+    --color-accent: #00d4ff;
+    --font-family: 'JetBrains Mono';
+    --spacing-4: 1rem;
+}
+
+body {
+    background-color: var(--color-bg);
+    font-family: var(--font-family);
+}</code></pre>
+                </div>
+            </article>
+
+            <article class="code-example">
+                <h3>Interactive Components</h3>
+                <div class="code-block">
+                    <pre><code>.button {
+    background: transparent;
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+    padding: var(--spacing-4);
+    transition: all var(--transition-fast);
+}
+
+.button:hover {
+    background: var(--color-primary);
+    color: var(--color-bg);
+    box-shadow: var(--glow-primary);
+}</code></pre>
+                </div>
+            </article>
+        </section>
+
+        <!-- API Documentation Preview Section -->
+        <section id="api" aria-labelledby="api-title">
+            <h2 id="api-title">API Documentation Preview</h2>
+            <p class="section-intro">Quick reference for common properties:</p>
+
+            <div class="api-grid">
+                <article class="api-card">
+                    <h3><code>--color-primary</code></h3>
+                    <p>Neon green accent color. Use for primary actions and highlights.</p>
+                    <div class="color-swatch" style="background-color: var(--color-primary);" aria-label="Neon green color swatch"></div>
+                    <code class="value">#00ff88</code>
+                </article>
+
+                <article class="api-card">
+                    <h3><code>--color-accent</code></h3>
+                    <p>Cyan secondary accent. Use for secondary actions and interactive states.</p>
+                    <div class="color-swatch" style="background-color: var(--color-accent);" aria-label="Cyan color swatch"></div>
+                    <code class="value">#00d4ff</code>
+                </article>
+
+                <article class="api-card">
+                    <h3><code>--color-bg</code></h3>
+                    <p>Near-black background. The foundation of the dark theme.</p>
+                    <div class="color-swatch" style="background-color: var(--color-bg); border: 1px solid var(--color-border);" aria-label="Near-black background color swatch"></div>
+                    <code class="value">#0d0d0d</code>
+                </article>
+
+                <article class="api-card">
+                    <h3><code>--font-family</code></h3>
+                    <p>JetBrains Mono monospace font. Default for all text elements.</p>
+                    <div class="font-preview">
+                        <span style="font-family: var(--font-family);">Palette Two</span>
+                    </div>
+                    <code class="value">'JetBrains Mono'</code>
+                </article>
+
+                <article class="api-card">
+                    <h3><code>--spacing-4</code></h3>
+                    <p>Standard spacing unit. Base unit for padding and margins.</p>
+                    <div class="spacing-demo" style="width: var(--spacing-4); height: var(--spacing-4); background: var(--color-primary);"></div>
+                    <code class="value">1rem (16px)</code>
+                </article>
+
+                <article class="api-card">
+                    <h3><code>--shadow-md</code></h3>
+                    <p>Medium shadow for depth. Creates visual hierarchy.</p>
+                    <div class="shadow-demo" style="box-shadow: var(--shadow-md);"></div>
+                    <code class="value">0 4px 6px -1px rgba(0,0,0,0.5)</code>
+                </article>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" aria-labelledby="pricing-title">
+            <h2 id="pricing-title">Pricing</h2>
+            <p class="section-intro">Choose the plan that fits your workflow:</p>
+
+            <div class="pricing-grid">
+                <article class="pricing-card">
+                    <h3>Free</h3>
+                    <p class="price">$0</p>
+                    <p class="period">Forever</p>
+                    <ul class="features-list">
+                        <li>Dark theme included</li>
+                        <li>CSS variables</li>
+                        <li>Basic components</li>
+                        <li>Community support</li>
+                    </ul>
+                    <button class="btn btn-secondary">Get Started</button>
+                </article>
+
+                <article class="pricing-card featured">
+                    <div class="badge">Popular</div>
+                    <h3>Professional</h3>
+                    <p class="price">$29</p>
+                    <p class="period">Per month</p>
+                    <ul class="features-list">
+                        <li>Everything in Free</li>
+                        <li>Premium components</li>
+                        <li>Priority support</li>
+                        <li>Theme customization</li>
+                        <li>Early access features</li>
+                    </ul>
+                    <button class="btn btn-primary">Start Trial</button>
+                </article>
+
+                <article class="pricing-card">
+                    <h3>Enterprise</h3>
+                    <p class="price">Custom</p>
+                    <p class="period">Contact us</p>
+                    <ul class="features-list">
+                        <li>Everything in Professional</li>
+                        <li>Dedicated support</li>
+                        <li>Custom branding</li>
+                        <li>SLA guarantee</li>
+                        <li>On-site training</li>
+                    </ul>
+                    <button class="btn btn-secondary">Contact Sales</button>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#changelog">Changelog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#docs">Documentation</a></li>
+                    <li><a href="#api">API Reference</a></li>
+                    <li><a href="#examples">Examples</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#privacy">Privacy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Connect</h4>
+                <ul>
+                    <li><a href="#github">GitHub</a></li>
+                    <li><a href="#twitter">Twitter</a></li>
+                    <li><a href="#discord">Discord</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Palette Two. Built with precision.</p>
+        </div>
+    </footer>
 </body>
 </html>
