@@ -1,39 +1,28 @@
-# Sara Blakely Gut-Check: Phase 1 Plan
-
-**Reviewed:** 2026-04-06
-
----
+# Sara Blakely Gut-Check: Palette Themes
 
 ## Would a real customer pay for this?
 
-No. Not yet. This plan builds plumbing—Stripe, databases, auth. A customer pays for a **dashboard showing their Health Score and a monthly email**. Neither exists in Phase 1. You're 15 tasks deep and the customer still sees nothing. That's backwards.
-
----
+**Maybe.** But not because of "CSS variables" or "semantic HTML5." They'd pay because they're embarrassed by their current site and want something that looks like *them* in 10 minutes. Problem: your plan requires command line knowledge, Vercel accounts, and CSS editing. That's not a restaurant owner's Tuesday night. You're building for engineers who want to launch a restaurant site, not restaurant owners who want to stop cringing.
 
 ## What's confusing? What would make someone bounce?
 
-- **"Health Score"** — sounds like a doctor visit. What IS it? The formula's buried in task-11. Lead with it. Make it the hero.
-- **Login requires active subscription** — so how do prospects even see what they're buying? No trial flow. No "try before you buy." Instant bounce.
-- **Three tiers ($99/$249/$499)** — but no clarity on what you GET at each level. Enterprise sounds scary. Basic sounds cheap. Names matter.
-
----
+- "Palette One" and "Palette Two" mean nothing. Call them Ember and Forge. Give me personality.
+- No pricing anywhere. No "how do I actually get this on the internet?"
+- Where's the before/after? Show me the transformation, not the code structure.
+- 16 tasks, zero customer conversations. That's a red flag.
 
 ## 30-Second Elevator Pitch
 
-*"Most small business owners have no idea if their website is fast, up, or costing them customers. Shipyard Pulse gives you one number—your Health Score—plus a monthly report card that tells you exactly what's broken and what to fix first. $99/month. No dashboards to learn. We do the watching, you get the wins."*
+*"You know that website you're embarrassed to send people to? Palette fixes that in one afternoon. Two themes—one warm and editorial for restaurants, one dark and clean for developers. No coding required. Just swap colors, drop in your photos, hit deploy. Looks like you hired a designer. You didn't."*
 
----
+## What would I test first with $0?
 
-## What would you test first with $0 budget?
-
-Email 50 existing Shipyard customers: *"If we told you your site's Health Score was 67/100 and here's why, would you pay $99/month for that?"* Attach a mock email. See if they reply asking to buy. If yes, build it. If silence, pivot.
-
----
+Post the warm theme in 3 restaurant owner Facebook groups. Ask: "Would you pay $49 for this? What's missing?" If they don't immediately want it, you've learned something valuable. If they ask "can someone just set this up for me?"—that's your real product.
 
 ## What's the retention hook?
 
-**There isn't one.** A monthly email is easy to ignore. The real hook: **"Your score dropped 12 points—here's why."** Proactive alerts on degradation. Otherwise you're a report people forget they subscribed to.
+**There isn't one.** They download, customize once, never return. One-time sale, not a business. Consider: monthly "seasonal refresh" images, or a "site health check" that brings them back.
 
 ---
 
-**Bottom line:** Ship the email and score first. Make someone *feel* something. The Stripe webhooks can wait.
+**Bottom line:** Solid craft. Missing soul. You're optimizing for engineering rigor when you should be optimizing for "my customers finally take me seriously."

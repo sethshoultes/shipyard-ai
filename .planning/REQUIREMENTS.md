@@ -1,209 +1,241 @@
-# Shipyard Pulse — Phase 1 Requirements
+# Palette v1 Requirements Specification
 
-**Generated**: 2026-04-06
-**Project Slug**: shipyard-care
-**Source**: rounds/shipyard-care/decisions.md, prds/shipyard-care.md
-**Phase**: 1 — Core Infrastructure
-**Status**: Verified — 15 atomic requirements extracted
+> Extracted from decisions.md and emdash-themes.md
+> Generated: 2025
+> Project Slug: emdash-themes
+> Product Name: Palette (2 HTML/CSS themes for v1)
+
+---
+
+## Executive Summary
+
+| Metric | Value |
+|--------|-------|
+| Total Requirements | 41 |
+| Must-Have (Critical/High) | 37 |
+| Should-Have (Medium) | 4 |
+| Nice-to-Have | 0 |
+| Deferred to v2 | 10+ features |
+
+---
+
+## The Essence (from decisions.md)
+
+> **What is this product really about?**
+> Helping people stop being embarrassed by their website.
+>
+> **What feeling should it evoke?**
+> Recognition. "This is me."
+>
+> **What must be perfect?**
+> The first three seconds.
+>
+> **Creative direction:**
+> Identity, not decoration.
+
+---
+
+## Requirements by Category
+
+### STRUCTURE (File/Folder Requirements)
+
+| REQ-ID | Requirement | Source Quote | Applies To | Priority |
+|--------|-------------|--------------|------------|----------|
+| REQ-001 | Create independent codebase for Palette One with separate HTML/CSS files | "Each theme gets its own structural decisions" | One | Must |
+| REQ-002 | Create independent codebase for Palette Two with separate HTML/CSS files | "Each theme gets its own structural decisions" | Two | Must |
+| REQ-003 | Deliver single index.html file per theme (no multi-page templates) | "ONE page per theme... One index.html per theme that nails the first 3 seconds" | Both | Must |
+| REQ-004 | Organize CSS files into style.css and variables.css per theme | File structure: "css/style.css" and "css/variables.css" | Both | Must |
+| REQ-005 | Create fonts/ directory with self-hosted, subsetted font files per theme | "Self-Hosted, Subsetted" + "fonts/" folder structure | Both | Must |
+| REQ-006 | Create images/ directory containing theme-specific imagery per theme | "Theme-specific imagery (no generic stock)" | Both | Must |
+| REQ-007 | Create root-level docs/ folder with customization.md documentation | "docs/customization.md" + "CSS variable reference" | Both | Must |
+| REQ-008 | Create root-level README.md with install, customization, and deploy instructions | "README.md - Install, customize, deploy" | Both | Must |
+
+### DESIGN (Visual/UI Requirements)
+
+| REQ-ID | Requirement | Source Quote | Applies To | Priority |
+|--------|-------------|--------------|------------|----------|
+| REQ-009 | Design Palette One with warm color palette suitable for restaurant/hospitality | "Palette One - Warm, restaurant, hospitality - Light" | One | Must |
+| REQ-010 | Design Palette Two with dark color palette suitable for developer tools | "Palette Two - Dark, terminal, developer tools - Dark" | Two | Must |
+| REQ-011 | Implement Palette One in light mode only (no dark mode variant) | "Palette One ships light-only. No toggles." | One | Must |
+| REQ-012 | Implement Palette Two in dark mode only (no light mode variant) | "Palette Two ships dark-only. No toggles." | Two | Must |
+| REQ-013 | Design homepage to evoke recognition and emotional resonance within 3 seconds | "Personality hits in 3 seconds" + "Your website finally feels like you" | Both | Must |
+| REQ-014 | Implement CSS-only animations and motion effects (no JavaScript-driven animations) | "CSS-Only Effects" + "No JS for visual effects" | Both | Must |
+| REQ-015 | Use GPU-composited CSS transforms (no parallax effects on any device) | "GPU-composited transforms, no parallax on mobile" | Both | Must |
+| REQ-016 | Prohibit horizontal scroll sections in design | "NO to horizontal scroll sections. Clever gimmicks that frustrate users." | Both | Must |
+| REQ-017 | Use scroll-snap CSS for smooth scrolling behavior where applicable | "CSS scroll-snap, GPU-composited transforms" | Both | Should |
+| REQ-018 | Ensure mobile-responsive design across all viewport sizes | "Mobile-responsive" in MVP Feature Set | Both | Must |
+| REQ-019 | Use real food photography for Palette One (no generic stock images) | "Theme-specific imagery (no generic stock)" | One | Must |
+| REQ-020 | Use real code screenshots/developer-appropriate imagery for Palette Two | "Theme-specific imagery (no generic stock)" | Two | Must |
+
+### PERFORMANCE (Speed/Size Requirements)
+
+| REQ-ID | Requirement | Source Quote | Applies To | Priority |
+|--------|-------------|--------------|------------|----------|
+| REQ-021 | Keep self-hosted fonts under 100KB total per theme | "Self-hosted, subsetted" + "Budget: <100KB per theme" | Both | Must |
+| REQ-022 | Use Latin character subset for self-hosted fonts | "Self-host with Latin subset" | Both | Must |
+| REQ-023 | Implement font-display: swap for self-hosted fonts | "font-display: swap" | Both | Must |
+| REQ-024 | Eliminate JavaScript-based visual effects to maintain performance | "No JS for visual effects" + "JS scroll listeners = perf disaster" | Both | Must |
+| REQ-025 | Deliver zero loading spinners or blocking content on initial load | "No loading spinners, no cookie banners, no newsletter pop-ups" | Both | Must |
+| REQ-026 | Avoid Google Fonts integration (blocks performance with 400-800KB requests) | "Google Fonts = 400-800KB blocking requests" | Both | Must |
+
+### ACCESSIBILITY (A11y Requirements)
+
+| REQ-ID | Requirement | Source Quote | Applies To | Priority |
+|--------|-------------|--------------|------------|----------|
+| REQ-027 | Implement sufficient color contrast throughout the design | "Basic accessibility (contrast, focus states, alt text)" | Both | Must |
+| REQ-028 | Provide visible and keyboard-accessible focus states for all interactive elements | "Basic accessibility (contrast, focus states, alt text)" | Both | Must |
+| REQ-029 | Include descriptive alt text for all images | "Basic accessibility (contrast, focus states, alt text)" | Both | Must |
+| REQ-030 | Use semantic HTML5 structure (header, nav, main, section, footer) | Implied by accessibility requirements | Both | Must |
+
+### CONTENT (Copy/Imagery Requirements)
+
+| REQ-ID | Requirement | Source Quote | Applies To | Priority |
+|--------|-------------|--------------|------------|----------|
+| REQ-031 | Source imagery from Unsplash/Pexels with proper attribution or commission original | "Source from Unsplash/Pexels with attribution, or commission original" | Both | Must |
+| REQ-032 | Verify font licensing compliance before implementation | "Verify licenses before build. Self-hosting requires proper license terms." | Both | Must |
+| REQ-033 | Source authentic, theme-specific imagery (not generic stock photos) | "Theme-specific imagery (no generic stock)" | Both | Must |
+
+### DOCUMENTATION (Docs Requirements)
+
+| REQ-ID | Requirement | Source Quote | Applies To | Priority |
+|--------|-------------|--------------|------------|----------|
+| REQ-034 | Document all CSS custom properties with clear naming conventions | "Documented CSS Custom Properties" | Both | Must |
+| REQ-035 | Provide CSS variable reference for --primary, --accent, --font-heading, --radius | "Variables (--primary, --accent, --font-heading, --radius)" | Both | Must |
+| REQ-036 | Document installation instructions in README.md | "README.md - Install, customize, deploy" | Both | Must |
+| REQ-037 | Document customization guide in README.md | "README.md - Install, customize, deploy" | Both | Must |
+| REQ-038 | Document deployment options in README.md | "README.md - Install, customize, deploy" | Both | Must |
+| REQ-039 | Include deploy buttons (Vercel/Netlify/Cloudflare) in documentation or README | "Minimum: deploy buttons + clear README install path in v1" | Both | Should |
+| REQ-040 | Document target EmDash version compatibility | "Document which EmDash version themes target" | Both | Should |
+| REQ-041 | Share and document design patterns across independent codebases | "Document shared patterns" | Both | Should |
+
+---
+
+## Explicitly Excluded from v1
+
+Per decisions.md "What Does NOT Ship in v1":
+
+| Item | Reason | Who Cut It |
+|------|--------|------------|
+| Palette Three/Four/Five | Focus over breadth | Both |
+| Multi-page templates (About, Services, Contact) | ONE page per theme mandate | Steve |
+| Blog templates | Content, not theme | Elon |
+| Dark mode toggles | "Commit, don't toggle" decision | Both |
+| Parallax effects | JS complexity, mobile perf | Both |
+| Horizontal scroll sections | Clever gimmicks that frustrate | Steve |
+| JS-driven animations | Performance disaster | Elon |
+| Charts or complex components | Massive scope addition | Elon |
+| Full WCAG 2.1 AA audit | Scope creep; basics first | Both |
+| Theme comparison/switcher UI | Unresolved | - |
+| Existing site redesigns | Separate PRD | Both |
+
+---
+
+## Open Questions Requiring Resolution
+
+| # | Question | Impact | Blocking? | Recommendation |
+|---|----------|--------|-----------|----------------|
+| 1 | Specific fonts per theme? | **BLOCKING** - cannot design without typefaces | **YES** | Lock before build: Palette One (serif display + clean sans), Palette Two (monospace) |
+| 2 | Image sourcing strategy? | Medium - affects asset gathering | No | Use Unsplash/Pexels with attribution for v1 |
+| 3 | WCAG accessibility baseline? | **BLOCKING** - defines QA scope | **YES** | Lock to WCAG 2.1 Level A minimum |
+| 4 | Distribution strategy? | Critical - affects launch plan | No | Include README + deploy buttons in v1, defer SEO pages |
+| 5 | Deploy mechanism timing? | Low-Medium | No | Deploy button code in README for v1 |
+| 6 | Theme comparison UI? | Medium | No | Defer to v2 |
+
+---
+
+## Design Constraints (Locked)
+
+| ID | Constraint | Source |
+|----|------------|--------|
+| DC-001 | Product named "Palette" (not "EmDash Themes") | Steve Jobs won - Round 1 |
+| DC-002 | Theme names: Palette One, Palette Two (numbered, not named) | Steve Jobs won - design speaks |
+| DC-003 | ONE page per theme (not multi-page) | Steve Jobs won - Round 2 |
+| DC-004 | Independent codebases per theme (not shared templates) | Steve Jobs won - emotional differentiation |
+| DC-005 | Self-hosted fonts <100KB per theme | Elon Musk won - performance IS design |
+| DC-006 | CSS-only animations (no JS motion) | Both agreed |
+| DC-007 | No dark mode toggle (commit to light or dark) | Both agreed |
+| DC-008 | CSS custom properties documented | Elon Musk won - customization requirement |
+| DC-009 | Sacred first 3 seconds (no popups, no banners) | Both agreed |
+
+---
+
+## Target File Structure
+
+```
+palette/
+├── README.md                           # Install, customize, deploy
+├── docs/
+│   └── customization.md               # CSS variable reference
+│
+├── palette-one/                       # Warm, restaurant, light theme
+│   ├── index.html                     # THE page (single, perfect)
+│   ├── css/
+│   │   ├── style.css                 # Main stylesheet
+│   │   └── variables.css             # CSS custom properties
+│   ├── fonts/
+│   │   └── [font-files].woff2        # Self-hosted, subsetted (<100KB)
+│   └── images/
+│       └── [food-photography]        # Real food imagery
+│
+└── palette-two/                       # Dark, developer, terminal theme
+    ├── index.html                     # THE page (single, perfect)
+    ├── css/
+    │   ├── style.css
+    │   └── variables.css
+    ├── fonts/
+    │   └── [monospace-font].woff2
+    └── images/
+        └── [code-screenshots]        # Real developer imagery
+```
+
+**Total Deliverables:** 2 HTML files, 4 CSS files, fonts, images, documentation.
 
 ---
 
 ## Requirements Traceability Matrix
 
-| REQ ID | Requirement | Source | Priority | Task(s) |
-|--------|-------------|--------|----------|---------|
-| REQ-001 | Create Stripe API integration wrapper with error handling | decisions.md: Must Have - Stripe Integration | P0 | phase-1-task-1 |
-| REQ-002 | Build Stripe checkout flow for subscription creation | decisions.md: Must Have - Stripe Integration | P0 | phase-1-task-2 |
-| REQ-003 | Implement Stripe webhook endpoint with signature verification and idempotency | decisions.md: Must Have - Stripe Integration | P0 | phase-1-task-3 |
-| REQ-004 | Create PostgreSQL database schema for sites table | PRD: Phase 1 - Database schema | P0 | phase-1-task-4 |
-| REQ-005 | Create PostgreSQL database table for metrics (PageSpeed scores, uptime results) | decisions.md: Must Have - PageSpeed/Uptime | P0 | phase-1-task-5 |
-| REQ-006 | Create PostgreSQL database table for subscriptions (Stripe sync) | decisions.md: Must Have - Stripe Integration | P0 | phase-1-task-6 |
-| REQ-007 | Setup database connection with connection pooling | PRD: Phase 1 - Database schema | P0 | phase-1-task-7 |
-| REQ-008 | Implement session-based authentication middleware (httpOnly cookies) | PRD: Phase 1 - Basic dashboard auth | P0 | phase-1-task-8 |
-| REQ-009 | Create login/logout authentication endpoints | PRD: Phase 1 - Basic dashboard auth | P0 | phase-1-task-9 |
-| REQ-010 | Implement route protection for dashboard endpoints | PRD: Phase 1 - Basic dashboard auth | P0 | phase-1-task-10 |
-| REQ-011 | Design Health Score calculation algorithm | decisions.md: Must Have - Single-screen Dashboard | P0 | phase-1-task-11 |
-| REQ-012 | Build PageSpeed Insights API client | decisions.md: Must Have - PageSpeed Integration | P0 | phase-1-task-12 |
-| REQ-013 | Create uptime monitoring ping check mechanism | decisions.md: Must Have - Uptime Monitoring | P0 | phase-1-task-13 |
-| REQ-014 | Create database indexes for performance (<100ms p95) | PRD: Phase 1 - One-second load time | P0 | phase-1-task-14 |
-| REQ-015 | Implement database migration framework | PRD: Phase 1 - Database schema | P0 | phase-1-task-15 |
+| Category | Requirements | Must | Should | Total |
+|----------|-------------|------|--------|-------|
+| Structure | REQ-001 to REQ-008 | 8 | 0 | 8 |
+| Design | REQ-009 to REQ-020 | 11 | 1 | 12 |
+| Performance | REQ-021 to REQ-026 | 6 | 0 | 6 |
+| Accessibility | REQ-027 to REQ-030 | 4 | 0 | 4 |
+| Content | REQ-031 to REQ-033 | 3 | 0 | 3 |
+| Documentation | REQ-034 to REQ-041 | 5 | 3 | 8 |
+| **TOTAL** | **41** | **37** | **4** | **41** |
 
 ---
 
-## Locked Decisions (Non-Negotiable Constraints)
+## Risk Register (from decisions.md)
 
-### Product Constraints (from decisions.md)
-
-| Constraint | Decision | Winner |
-|------------|----------|--------|
-| Product Name | "Shipyard Pulse" | Steve Jobs |
-| Dashboard Scope | Single screen only, not 5 pages | Compromise (Steve's principle, Elon's scope) |
-| Performance API | PageSpeed Insights API (not self-hosted Lighthouse) | Elon Musk |
-| Distribution | Default-on trial for all new Shipyard customers | Elon Musk |
-| Support Model | Email replies only, no ticket system | Both (unanimous) |
-| Brand Voice | Confident, warm, no exclamation points, no "just" or "simply" | Steve Jobs |
-| Animations | No animations in v1 (static Health Score) | Elon Musk |
-
-### Technical Constraints
-
-| Constraint | Decision | Rationale |
-|------------|----------|-----------|
-| Data Storage | PostgreSQL | Score storage requirement, existing patterns |
-| Payment Processing | Stripe Checkout + Webhooks | Must Have requirement |
-| Subscription Tiers | Basic ($99), Pro ($249), Enterprise ($499) | PRD tier structure |
-| Email Provider | Sendgrid or Resend | Existing plugin patterns |
-| Dashboard Load | < 1 second | decisions.md - Hard requirement |
-| Health Score | Static display with context (trend or grade) | decisions.md - Open Question #4 |
-
-### Kill List (Explicitly NOT in v1)
-
-Per decisions.md, the following are excluded:
-
-- Multi-page dashboard
-- Real-time data
-- Agency white-label features
-- Google Analytics integration
-- Competitor monitoring
-- Pulsing animations / heartbeat effect
-- Dark mode
-- Support ticket system
-- Slack notifications
-- Benchmark comparison to competitors
-- Complex AI recommendation engine (10 static recommendations if time permits)
-- Quarterly strategy calls
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| Scope creep from "one perfect page" | High | High | Hard deadline required. "Perfect is shipped, not tweaked." |
+| Independent codebases = maintenance burden | High | Medium | Accepted tradeoff. Document shared patterns. |
+| No distribution = no users | High | Critical | Minimum: deploy buttons + clear README install path in v1. |
+| Font licensing surprises | Medium | Medium | Verify licenses before build. |
+| Demo imagery legal issues | Low | High | Source from Unsplash/Pexels with attribution. Zero unlicensed images. |
+| EmDash version incompatibility | Medium | Medium | Version-lock compatibility. Document which EmDash version themes target. |
+| "Customization hell" support | Medium | Medium | CSS variables + docs mitigate. |
+| 2 themes feels incomplete | Low | Medium | Launch messaging: "Two themes, done right." |
+| Steve's perfectionism delays shipping | Medium | High | Timeboxed build phases. Hard ship date. |
 
 ---
 
-## Phase 1 Scope Boundaries
+## Success Criteria for v1
 
-### IN Scope (Core Infrastructure - Week 1-2)
-
-1. **Stripe Integration**
-   - API wrapper with error handling
-   - Checkout session creation for three tiers
-   - Webhook endpoint with signature verification
-   - Idempotency protection for all operations
-
-2. **Database Schema**
-   - Sites table: id, url, name, subscription_id, tier, status, created_at, updated_at
-   - Metrics table: id, site_id, health_score, load_time, uptime_percent, lighthouse_score, created_at
-   - Subscriptions table: id, site_id, stripe_subscription_id, stripe_customer_id, status, tier, trial_ends_at, current_period_end
-   - Proper indexes for performance (<100ms p95 queries)
-
-3. **Authentication**
-   - Session-based auth with httpOnly cookies
-   - Login/logout endpoints
-   - Route protection middleware
-   - Token refresh mechanism
-
-4. **External API Clients**
-   - PageSpeed Insights API integration with caching
-   - Uptime ping check mechanism with response time tracking
-   - Health Score calculation algorithm
-
-### OUT of Scope (Phase 2+)
-
-- Dashboard UI implementation (Phase 3)
-- Monthly email system (Phase 4)
-- Landing page (Phase 5)
-- Static recommendations (v1 if time permits)
-- Cron job for monthly data collection
-- Email templates
+- [ ] Both themes ship (Palette One + Palette Two)
+- [ ] Each theme is ONE perfect page (index.html)
+- [ ] Mobile-responsive (375px and 1440px)
+- [ ] <100KB fonts per theme (self-hosted)
+- [ ] CSS-only animations (no JavaScript for visual effects)
+- [ ] Basic accessibility (contrast, focus states, alt text)
+- [ ] CSS custom properties documented
+- [ ] README with install/customize/deploy instructions
+- [ ] Deploy buttons for Vercel/Netlify
+- [ ] "First 3 seconds" test passes (instant recognition, no blocking content)
 
 ---
 
-## Acceptance Criteria
-
-### Stripe Integration
-- [ ] Can create checkout session for Basic tier ($99/mo)
-- [ ] Can create checkout session for Pro tier ($249/mo)
-- [ ] Can create checkout session for Enterprise tier ($499/mo)
-- [ ] Webhook endpoint validates Stripe signature
-- [ ] Duplicate webhook events are handled idempotently (same event ID = no reprocessing)
-- [ ] Subscription status updates correctly on webhook receipt
-- [ ] Idempotency keys included on all Stripe API calls
-
-### Database
-- [ ] Sites table accepts new records with all required fields
-- [ ] Metrics table stores PageSpeed scores with timestamps
-- [ ] Metrics table stores uptime check results
-- [ ] Subscriptions table syncs with Stripe subscription state
-- [ ] Queries return in < 100ms at p95
-- [ ] Indexes exist on (site_id, created_at DESC) for common queries
-- [ ] Migration framework supports versioned, idempotent migrations
-
-### Authentication
-- [ ] Login endpoint returns session in httpOnly, Secure, SameSite=Strict cookie
-- [ ] Session tokens are NOT stored in localStorage or sessionStorage
-- [ ] Protected routes reject unauthenticated requests with 401
-- [ ] Logout invalidates session and clears cookie
-- [ ] Token refresh works before expiry (15-minute access tokens)
-
-### External APIs
-- [ ] PageSpeed API returns performance score for given URL
-- [ ] PageSpeed results are cached (5-minute TTL) to avoid rate limits
-- [ ] Uptime check returns response time and status
-- [ ] Health Score calculated from load time + uptime + lighthouse score
-
----
-
-## Risk Mitigations Required
-
-### Critical Risks (Must address before development)
-
-| Risk | Mitigation | Task |
-|------|------------|------|
-| Stripe webhook security not implemented | Verify signatures using stripe.webhooks.constructEvent | phase-1-task-3 |
-| Missing idempotency protection | Store processed event IDs, check before processing | phase-1-task-3 |
-| Database indexes missing | Add indexes on (site_id, created_at DESC) | phase-1-task-14 |
-| Session tokens in localStorage | Use httpOnly cookies exclusively | phase-1-task-8 |
-
-### High Risks (Address during development)
-
-| Risk | Mitigation | Task |
-|------|------------|------|
-| Test/Live mode Stripe key confusion | Environment variable validation at startup | phase-1-task-1 |
-| Database migration chaos | Backwards-compatible, idempotent migrations | phase-1-task-15 |
-| Cold start latency (Neon) | Connection pooling, keep-alive pings | phase-1-task-7 |
-| PageSpeed API rate limits | Cache results with 5-minute TTL | phase-1-task-12 |
-
----
-
-## Token Budget Estimate (from decisions.md)
-
-| Component | Estimated Tokens |
-|-----------|------------------|
-| Dashboard (single screen) | 60K |
-| Email template + cron | 40K |
-| Stripe integration | 50K |
-| PageSpeed integration | 25K |
-| Uptime monitoring | 25K |
-| **Total estimate** | 200K |
-
-Phase 1 (Core Infrastructure) represents approximately 60-70K tokens of this budget.
-
----
-
-## Success Metrics (from PRD)
-
-| Metric | Target | Timeframe |
-|--------|--------|-----------|
-| Care tier adoption (new customers) | 40% | 90 days post-launch |
-| Care tier adoption (existing customers) | 20% | 90 days post-launch |
-| Monthly email open rate | >50% | Ongoing |
-| Dashboard monthly active users | >60% of subscribers | Ongoing |
-| Churn rate | <5%/month | Ongoing |
-
----
-
-## Traceability
-
-Every task in `phase-1-plan.md` traces back to at least one requirement in this document.
-Every requirement in this document is covered by at least one task.
-
-**Coverage Status:** 15/15 requirements mapped (100%)
-
----
-
-*Generated by Great Minds Agency — Phase Planning Skill*
-*Source: rounds/shipyard-care/decisions.md, prds/shipyard-care.md*
+*Generated by Great Minds Agency - Requirements Analyst*
+*Source: rounds/emdash-themes/decisions.md, prds/emdash-themes.md*
