@@ -1,0 +1,44 @@
+{
+  "themes": [
+    {
+      "name": "ember",
+      "description": "Bold. Editorial. For people with something to say.",
+      "personality": "Magazine-style, serif headings, dark navy + burnt orange",
+      "version": "1.0.0",
+      "tarballUrl": "https://cdn.emdash.dev/themes/ember@1.0.0.tar.gz",
+      "previewUrl": "https://wardrobe.emdash.dev#ember"
+    },
+    {
+      "name": "forge",
+      "description": "Dark and technical. Built for builders.",
+      "personality": "Dark mode, monospace, neon green accents, terminal-inspired",
+      "version": "1.0.0",
+      "tarballUrl": "https://cdn.emdash.dev/themes/forge@1.0.0.tar.gz",
+      "previewUrl": "https://wardrobe.emdash.dev#forge"
+    },
+    {
+      "name": "slate",
+      "description": "Clean and professional. Trust at first glance.",
+      "personality": "Gray palette, blue accents, system fonts, structured",
+      "version": "1.0.0",
+      "tarballUrl": "https://cdn.emdash.dev/themes/slate@1.0.0.tar.gz",
+      "previewUrl": "https://wardrobe.emdash.dev#slate"
+    },
+    {
+      "name": "drift",
+      "description": "Minimal and airy. Let your content breathe.",
+      "personality": "Whitespace, thin sans-serif, sage green accent",
+      "version": "1.0.0",
+      "tarballUrl": "https://cdn.emdash.dev/themes/drift@1.0.0.tar.gz",
+      "previewUrl": "https://wardrobe.emdash.dev#drift"
+    },
+    {
+      "name": "bloom",
+      "description": "Warm and inviting. Where community feels at home.",
+      "personality": "Rounded corners, cream background, terracotta accents",
+      "version": "1.0.0",
+      "tarballUrl": "https://cdn.emdash.dev/themes/bloom@1.0.0.tar.gz",
+      "previewUrl": "https://wardrobe.emdash.dev#bloom"
+    }
+  ]
+}

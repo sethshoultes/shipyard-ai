@@ -1,0 +1,21 @@
+{
+  "name": "wardrobe",
+  "version": "1.0.0",
+  "description": "Theme marketplace CLI for Emdash — install themes instantly",
+  "type": "module",
+  "bin": {
+    "wardrobe": "./bin/wardrobe"
+  },
+  "scripts": {
+    "cli": "tsx cli/index.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "commander": "^13.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
