@@ -26,20 +26,41 @@ PRD → Debate → Plan → Build → QA → Creative Review → Board Review �
 | **Board Review** | Ship/no-ship vote with written justifications | Jensen Huang, Oprah, Warren Buffett, Shonda Rhimes |
 | **Ship** | Commit, push, merge to main, retrospective | Shipper, Marcus Aurelius |
 
-## The Team
+## The Team (14 Agents)
 
-| Agent | Role | Style |
-|-------|------|-------|
-| **Phil Jackson** | Orchestrator | Triangle offense — find the open player, trust the system |
-| **Steve Jobs** | Creative Director | Direct, passionate, challenges mediocrity |
-| **Elon Musk** | Engineering Director | First principles, ship fast, iterate |
-| **Margaret Hamilton** | QA Director | Zero-defect mindset, blocks ship on P0s |
-| **Jensen Huang** | Strategic Advisor | Moat analysis, compounding advantages |
-| **Jony Ive** | Visual Design | Less but better, every pixel matters |
-| **Maya Angelou** | Copywriter | Words that land, copy that converts |
-| **Sara Blakely** | Growth Strategy | Gut-check the plan, find the blind spots |
+### Leadership
 
-Plus **Rick Rubin** (essence distillation), **Aaron Sorkin** (demo scripts), **Oprah** (user empathy), **Warren Buffett** (investability), **Shonda Rhimes** (retention hooks), and **Marcus Aurelius** (retrospectives).
+| Agent | Role | Pipeline Phase | Style |
+|-------|------|---------------|-------|
+| **Phil Jackson** | Orchestrator | Debate (consolidation) | Triangle offense — find the open player, trust the system |
+| **Steve Jobs** | Creative Director | Debate (R1, R2) | Direct, passionate, challenges mediocrity |
+| **Elon Musk** | Engineering Director | Debate (R1, R2) | First principles, ship fast, iterate |
+| **Margaret Hamilton** | QA Director | QA (2 passes) | Zero-defect mindset, blocks ship on P0s |
+
+### Creative Team
+
+| Agent | Role | Pipeline Phase | Style |
+|-------|------|---------------|-------|
+| **Jony Ive** | Visual Design | Creative Review | Less but better, every pixel matters |
+| **Maya Angelou** | Copywriter | Creative Review | Words that land, copy that converts |
+| **Aaron Sorkin** | Demo Scriptwriter | Creative Review | Sharp dialogue, dramatic structure |
+| **Rick Rubin** | Essence Distiller | Debate (essence) | Strip away everything that isn't essential |
+
+### Board of Directors
+
+| Agent | Role | Pipeline Phase | Lens |
+|-------|------|---------------|------|
+| **Jensen Huang** | Board Member | Board Review | Moat gaps, compounding advantages |
+| **Oprah Winfrey** | Board Member | Board Review | New user confusion, first-5-minutes experience |
+| **Warren Buffett** | Board Member | Board Review | Revenue opportunities, investability |
+| **Shonda Rhimes** | Board Member | Board Review | Retention hooks, what brings people back |
+
+### Strategy & Operations
+
+| Agent | Role | Pipeline Phase | Style |
+|-------|------|---------------|-------|
+| **Sara Blakely** | Growth Strategy | Plan (gut check) | Find the blind spots, validate the approach |
+| **Marcus Aurelius** | Retrospectives | Ship | Stoic reflection, lessons for next build |
 
 ## What We've Built
 
