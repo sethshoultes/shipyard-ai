@@ -1636,6 +1636,110 @@ import { emdashLoader } from "emdash/runtime";
 
 ---
 
+## AI-Managed Content (API Tokens + MCP)
+
+Emdash is designed for AI-native content management. Agents can create, edit, and manage all site content programmatically via Personal Access Tokens (PATs) and the MCP protocol.
+
+### Creating an API Token
+
+1. Log into the Emdash admin panel (`/_emdash/admin`)
+2. Go to **Settings** → **API Tokens**
+3. Click **Create Token**
+4. Set a name (e.g., "AI Agent - Content Creator")
+5. Choose scopes: `content:read`, `content:write`, `media:read`, `media:write`, `schema:read`
+6. Copy the token (starts with `ec_pat_`) — it's only shown once
+
+### Using the REST API
+
+All Emdash API endpoints accept Bearer token authentication:
+
+```bash
+# List all posts
+curl -H "Authorization: Bearer ec_pat_xxxxx" \
+  https://your-site.workers.dev/_emdash/api/content/posts
+
+# Create a post
+curl -X POST \
+  -H "Authorization: Bearer ec_pat_xxxxx" \
+  -H "Content-Type: application/json" \
+  https://your-site.workers.dev/_emdash/api/content/posts \
+  -d '{"data":{"short_text":"Post Title","long_text":"Post content here"},"status":"published"}'
+
+# Update a post
+curl -X PUT \
+  -H "Authorization: Bearer ec_pat_xxxxx" \
+  -H "Content-Type: application/json" \
+  https://your-site.workers.dev/_emdash/api/content/posts/POST_ID \
+  -d '{"data":{"short_text":"Updated Title"}}'
+
+# Delete a post
+curl -X DELETE \
+  -H "Authorization: Bearer ec_pat_xxxxx" \
+  https://your-site.workers.dev/_emdash/api/content/posts/POST_ID
+
+# Upload media
+curl -X POST \
+  -H "Authorization: Bearer ec_pat_xxxxx" \
+  -F "file=@image.jpg" \
+  https://your-site.workers.dev/_emdash/api/media
+```
+
+### Available API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/_emdash/api/content/{collection}` | GET | List items in a collection |
+| `/_emdash/api/content/{collection}` | POST | Create new item |
+| `/_emdash/api/content/{collection}/{id}` | GET | Get single item |
+| `/_emdash/api/content/{collection}/{id}` | PUT | Update item |
+| `/_emdash/api/content/{collection}/{id}` | DELETE | Delete item |
+| `/_emdash/api/content/{collection}/{id}/publish` | POST | Publish item |
+| `/_emdash/api/content/{collection}/{id}/unpublish` | POST | Unpublish item |
+| `/_emdash/api/media` | GET | List media files |
+| `/_emdash/api/media` | POST | Upload media |
+| `/_emdash/api/media/{id}` | PUT | Update media metadata |
+| `/_emdash/api/media/{id}` | DELETE | Delete media |
+| `/_emdash/api/admin/plugins/{pluginId}/{route}` | POST | Call plugin route |
+| `/_emdash/api/admin/api-tokens` | GET | List API tokens |
+| `/_emdash/api/admin/api-tokens` | POST | Create API token |
+| `/_emdash/api/mcp` | POST | MCP protocol endpoint |
+
+### MCP Server (AI-Native)
+
+Emdash exposes a Model Context Protocol (MCP) server for direct AI agent integration:
+
+```
+MCP Endpoint: https://your-site.workers.dev/_emdash/api/mcp
+Authentication: Bearer ec_pat_xxxxx
+```
+
+MCP tools available:
+- Create/read/update/delete content across all collections
+- Upload and manage media files
+- Read schema definitions and content types
+- Manage taxonomies, menus, and settings
+- Full-text search across collections
+- Publish, schedule, and version content
+
+### Token Security
+
+- Tokens are **SHA-256 hashed** in the database — raw tokens are never stored
+- Tokens support **granular scopes** — only grant what the agent needs
+- Tokens track **last_used_at** for security auditing
+- Tokens can have **expiration dates** and **usage limits**
+- All token comparisons use **constant-time comparison** to prevent timing attacks
+
+### Verified Working Example (Sunrise Yoga)
+
+```bash
+# This was tested and confirmed working on 2026-04-08
+curl -H "Authorization: Bearer ec_pat_z3IdW-q-nG4w1bDadqTdGSkUxgNI-FGehCIgRjc2o8Q" \
+  https://sunrise-yoga.seth-a02.workers.dev/_emdash/api/content/posts
+# Returns: { data: { items: [...] } }
+```
+
+---
+
 ## Further Resources
 
 - **Emdash GitHub**: https://github.com/emdash-cms/emdash
