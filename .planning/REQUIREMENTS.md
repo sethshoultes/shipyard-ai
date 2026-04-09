@@ -1,28 +1,37 @@
-# HARBOR: Atomic Requirements Specification
+# WARDROBE - Atomic Requirements Specification
 
-**Generated:** 2026-04-08
-**Project Slug:** shipyard-maintenance-system
-**Product Name:** HARBOR
-**Source PRD:** `/prds/failed/shipyard-maintenance-system.md`
-**Source Decisions:** `/rounds/shipyard-maintenance-system/decisions.md`
-**Status:** Ready for Implementation
-**Total Requirements:** 52
+**Product:** Theme Marketplace for Emdash CMS
+**Project Slug:** emdash-marketplace
+**Generated:** April 9, 2026
+**Sources:** PRD (emdash-marketplace.md), Decisions (decisions.md), Board Verdict
 
 ---
 
 ## The Essence
 
 > **What is this product REALLY about?**
-> Proving to clients they haven't been forgotten after the check clears.
+> One command transforms your site into something beautiful — your content stays, only the skin changes.
 
 > **What's the feeling it should evoke?**
-> "You're not alone."
+> "I can't believe I just did that."
 
 > **What's the one thing that must be perfect?**
-> The first glance — one second to feel cared for or abandoned.
+> Seeing YOUR content wearing a new theme.
 
 > **Creative direction:**
-> Warm pulse, not cold dashboard.
+> Instant dignity.
+
+---
+
+## Requirements Summary
+
+| Priority | Count | Description |
+|----------|-------|-------------|
+| P0-Blocker | 3 | Board conditions - must complete before launch |
+| P1-Must | 48 | Core MVP functionality |
+| P2-Should | 10 | Strong recommendations |
+| P3-Nice | 5 | Future phases (V2+) |
+| **Total** | **66** | |
 
 ---
 
@@ -30,14 +39,13 @@
 
 | Topic | PRD Says | Decisions.md Says (LOCKED) |
 |-------|----------|---------------------------|
-| Product Name | Shipyard Maintenance System | **HARBOR** |
-| Pricing Tiers | Basic $79, Pro $199, Enterprise custom | **One tier: $79/month** |
-| Architecture | Database with tables | **JSON file storage until 500 clients** |
-| Dashboard | Real-time rendering | **Static HTML, rebuilt nightly** |
-| Token Visibility | Show token balance | **Never show tokens; show "X updates remaining"** |
-| Password Protection | Optional | **No passwords; magic links + UUIDv4** |
-| Lighthouse Schedule | Daily | **Weekly batch only** |
-| Features | Trend charts, suggestions, alerts | **Cut for V1** |
+| Product Name | emdash-themes | **Wardrobe** |
+| CLI Command | npx emdash-themes install | **npx wardrobe install** |
+| Preview Method | Live preview server | **Screenshots only (V1)** |
+| Demo Sites | Live demo per theme | **CUT - Screenshots instead** |
+| Architecture | Next.js marketplace | **Static HTML showcase** |
+| Install Speed | Under 30 seconds | **Under 3 seconds** |
+| Distribution | npm packages | **R2 tarballs (recommended)** |
 
 ---
 
@@ -45,650 +53,973 @@
 
 | # | Decision | Winner | Build Implication |
 |---|----------|--------|-------------------|
-| 1 | Product Name: HARBOR | Steve | All UI/emails use "HARBOR" branding |
-| 2 | Dashboard Ships Day One | Steve | Dashboard IS the product |
-| 3 | One Tier at Launch: $79/month | Elon | No tier selector; single Stripe product |
-| 4 | No Token Visibility for Clients | Consensus | Show "updates remaining" not tokens |
-| 5 | Fixed Request Pricing (Internal) | Elon | $25 logo, $50 blog, $150 page |
-| 6 | No Password Protection | Consensus | Magic links + UUIDv4 only |
-| 7 | Static Architecture | Elon | HTML rebuilt nightly via cron |
-| 8 | First 10 Contracts Hand-Sold | Consensus | No automation until validated |
-| 9 | Cut White-Labeling | Consensus | Shipyard branding visible |
-| 10 | Cut Geographic Metrics | Consensus | Not in V1 |
-| 11 | Cut Enterprise Tier | Consensus | Not in V1 |
-| 12 | Cut Triggered Performance Alerts | Elon | Not in V1 |
-| 13 | Weekly Lighthouse, Not Daily | Consensus | Cost/rate limit management |
-| 14 | No Overage Pricing at Launch | Consensus | Hard caps with escalation |
-| 15 | Warm Human Voice in All Copy | Steve | "Smart friend texting you" |
-| 16 | "Built by Shipyard" Footer | Consensus | Distribution billboard |
-| 17 | Client-Facing "Updates" Not "Tokens" | Consensus | Human units only |
-| 18 | Explicit Overage Path | Elon | $35/update or upgrade prompt |
+| 1 | Product Name: Wardrobe | Steve | CLI is `npx wardrobe install`, not emdash-themes |
+| 2 | Theme Count: 5 | Steve | Ember, Forge, Slate, Drift, Bloom |
+| 3 | Preview: Screenshots | Elon | No live preview infrastructure in V1 |
+| 4 | Architecture: CLI-first | Elon | Static HTML showcase, CLI downloads tarballs |
+| 5 | Install Speed: <3 seconds | Elon | Aggressive caching, small tarballs |
+| 6 | Brand Voice | Steve | Confident friend, zero jargon |
+| 7 | Distribution: Themes in Core | Elon | `emdash create --theme [name]` |
+| 8 | Showcase: Static HTML | Compromise | Deploy to Cloudflare Pages |
 
 ---
 
-## Requirements Index
+## P0-BLOCKER (Board Conditions - Must Complete Before Launch)
 
-| Category | Count | Wave |
-|----------|-------|------|
-| Dashboard | 6 | 2-3 |
-| Client-Facing | 5 | 1-3 |
-| Backend | 6 | 1-2 |
-| Email | 5 | 2 |
-| Design | 5 | 3 |
-| Architecture | 7 | 1-2 |
-| Domain Logic | 5 | 1-2 |
-| Cuts | 14 | N/A |
-| **TOTAL** | **52** | - |
-
----
-
-## Detailed Requirements
-
-### DASHBOARD REQUIREMENTS
-
-#### REQ-DASH-001: Green/Yellow/Red Health Indicator
-**Category:** Dashboard
-**Priority:** P0 — Blocker
-**Source:** Decisions.md Phil's Arbitration
+### REQ-001: Marketplace Showcase Website (Deployed)
+- **Category:** Board-Blocker
+- **Priority:** P0
+- **Source:** Board Verdict (Buffett, Rhimes)
 
 **Description:**
-Display one-second visible status using Green/Yellow/Red health indicator on initial dashboard load, dominating viewport position.
+Build and deploy a visual marketplace website displaying all 5 themes with screenshots, descriptions, personality taglines, and one-click copy buttons for install commands. Must be mobile-responsive and SEO-optimized.
 
 **Acceptance Criteria:**
-- [ ] Color indicator renders above fold
-- [ ] Visible before any other element loads
-- [ ] Large enough to see from arm's length
+- [ ] Static HTML page deployed to Cloudflare Pages
+- [ ] 5 theme cards with screenshots/GIFs
+- [ ] One-click copy for install commands
+- [ ] Mobile-responsive design
+- [ ] SEO meta tags and Open Graph
 
 ---
 
-#### REQ-DASH-002: One-Sentence Traffic Summary
-**Category:** Dashboard
-**Priority:** P0 — Blocker
-**Source:** Decisions.md MVP Feature Set
+### REQ-002: Basic Anonymous Install Analytics
+- **Category:** Board-Blocker
+- **Priority:** P0
+- **Source:** Board Verdict (Buffett)
 
 **Description:**
-Show one-sentence traffic summary on dashboard: "{N} people visited your site this week. Everything looks great."
+Implement telemetry to track which themes are installed, from what geographic regions, and frequency. No PII required. Data aggregated and anonymous.
 
 **Acceptance Criteria:**
-- [ ] Exactly one sentence
-- [ ] Shows actual visitor count from Cloudflare
-- [ ] Warm, conversational tone
+- [ ] CLI sends anonymous telemetry on install
+- [ ] Theme name, timestamp, OS logged
+- [ ] No user identity or PII collected
+- [ ] Analytics endpoint operational
+- [ ] Basic dashboard showing install counts
 
 ---
 
-#### REQ-DASH-003: Three Metrics Only
-**Category:** Dashboard
-**Priority:** P0 — Blocker
-**Source:** Decisions.md MVP Feature Set
+### REQ-003: Coming Soon Themes (3+ Teased)
+- **Category:** Board-Blocker
+- **Priority:** P0
+- **Source:** Board Verdict (Rhimes)
 
 **Description:**
-Display exactly three metrics and no more: Traffic (visitor count), Health Score (composite), Last Updated (timestamp).
+Showcase at least 3 future themes in "Coming Soon" status within registry and marketplace. Create open loops to drive repeat visits and anticipation.
 
 **Acceptance Criteria:**
-- [ ] Count visible metric cards = 3
-- [ ] No trend charts visible
-- [ ] No geographic data visible
+- [ ] 3+ "Coming Soon" themes in registry
+- [ ] Coming Soon section on showcase website
+- [ ] Email capture for notifications
+- [ ] Teased personalities and estimated dates
 
 ---
 
-#### REQ-DASH-004: Click-Through Health Details
-**Category:** Dashboard
-**Priority:** P1 — High
-**Source:** Decisions.md Phil's Arbitration
+## P1-MUST (Critical MVP Features)
+
+### CLI Requirements
+
+#### REQ-004: Product Name: "Wardrobe"
+- **Category:** CLI
+- **Priority:** P1
+- **Source:** Decisions #1
 
 **Description:**
-Implement click-through from health indicator to diagnostic detail view showing Lighthouse score, uptime percentage, and traffic trend.
+All references to the product, CLI, package names, and marketing materials must use "Wardrobe" (not "emdash-themes").
 
 **Acceptance Criteria:**
-- [ ] Click/tap on indicator opens detail pane
-- [ ] Shows three sub-metrics: Lighthouse, uptime, traffic
-- [ ] Collapsible back to summary
+- [ ] Package name is "wardrobe"
+- [ ] All CLI output uses Wardrobe branding
+- [ ] Documentation references Wardrobe
 
 ---
 
-#### REQ-DASH-005: Warm Human Voice Copy
-**Category:** Dashboard
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-15
+#### REQ-005: CLI Command: npx wardrobe list
+- **Category:** CLI
+- **Priority:** P1
+- **Source:** Decisions MVP Feature Set
 
 **Description:**
-All dashboard copy uses warm, human voice consistent with "trusted friend" tone, not corporate default language.
+CLI command that fetches themes.json registry and displays all available themes with descriptions, personality tags, and version.
+
+**Acceptance Criteria:**
+- [ ] Fetches registry from CDN
+- [ ] Displays theme name, description, personality
+- [ ] Shows version and install command
+
+---
+
+#### REQ-006: CLI Command: npx wardrobe install [theme]
+- **Category:** CLI
+- **Priority:** P1
+- **Source:** Decisions MVP Feature Set
+
+**Description:**
+CLI command that downloads a theme tarball, extracts it, backs up existing src/ directory, and swaps in the new theme's src/.
+
+**Acceptance Criteria:**
+- [ ] Downloads tarball from R2/CDN
+- [ ] Creates backup of existing src/
+- [ ] Extracts and validates theme
+- [ ] Swaps src/ directory
+- [ ] Success message: "Your site is now wearing [theme-name]."
+
+---
+
+#### REQ-007: CLI Command: npx wardrobe preview [theme]
+- **Category:** CLI
+- **Priority:** P1
+- **Source:** Decisions MVP Feature Set
+
+**Description:**
+CLI command that opens a browser to display theme screenshots/GIFs and description.
+
+**Acceptance Criteria:**
+- [ ] Opens default browser
+- [ ] Shows theme preview page or images
+- [ ] Cross-platform support (Win/Mac/Linux)
+
+---
+
+#### REQ-008: Install Speed Target: Under 3 Seconds
+- **Category:** CLI
+- **Priority:** P1
+- **Source:** Decisions #5
+
+**Description:**
+The wardrobe install command must complete (download + extract + swap) in under 3 seconds.
+
+**Acceptance Criteria:**
+- [ ] Benchmarked install time < 3 seconds
+- [ ] Network latency minimized
+- [ ] Tarball size optimized (<10KB each)
+
+---
+
+#### REQ-009: Content Preservation on Install
+- **Category:** CLI
+- **Priority:** P1
+- **Source:** PRD, Decisions
+
+**Description:**
+When swapping theme's src/ directory, all user content in D1 database must remain untouched and accessible.
+
+**Acceptance Criteria:**
+- [ ] D1 data unchanged after install
+- [ ] Only presentation layer changes
+- [ ] Rollback available via backup
+
+---
+
+### Theme Requirements
+
+#### REQ-010: Five Launch Themes
+- **Category:** Themes
+- **Priority:** P1
+- **Source:** PRD, Decisions #2
+
+**Description:**
+Ship exactly 5 themes with distinct personalities: Ember, Forge, Slate, Drift, Bloom.
+
+**Acceptance Criteria:**
+- [ ] All 5 themes complete with full src/ directory
+- [ ] Each theme has layouts, components, pages, CSS
+- [ ] Each theme builds successfully with Astro
+
+---
+
+#### REQ-011: Theme: Ember (Bold, Editorial)
+- **Category:** Themes
+- **Priority:** P1
+- **Source:** PRD
+
+**Description:**
+Magazine-style theme with serif headings, dark navy + burnt orange, asymmetric grids.
+
+**Tagline:** "Ember is bold. Editorial. For people with something to say."
+**Target Users:** Restaurants, creative studios, magazines
+
+**Acceptance Criteria:**
+- [ ] Serif typography
+- [ ] Dark navy + burnt orange color palette
+- [ ] Asymmetric grid layout
+- [ ] Editorial magazine aesthetic
+
+---
+
+#### REQ-012: Theme: Forge (Dark, Technical)
+- **Category:** Themes
+- **Priority:** P1
+- **Source:** PRD
+
+**Description:**
+Industrial theme with monospace fonts, neon green accents, terminal-inspired design.
+
+**Tagline:** "Built for builders."
+**Target Users:** SaaS, developer tools, tech companies
+
+**Acceptance Criteria:**
+- [ ] Monospace typography
+- [ ] Dark mode with neon green accents
+- [ ] Terminal-inspired aesthetic
+- [ ] Data-dense layout
+
+---
+
+#### REQ-013: Theme: Slate (Clean, Professional)
+- **Category:** Themes
+- **Priority:** P1
+- **Source:** PRD
+
+**Description:**
+Corporate theme with gray palette, blue accents, system fonts, sidebar navigation.
+
+**Tagline:** "Slate is for people who need to be trusted. Clean. Steady. The kind of design that lets the work speak first."
+**Target Users:** Law firms, consulting, finance
+
+**Acceptance Criteria:**
+- [ ] Gray color palette with blue accents
+- [ ] System fonts
+- [ ] Sidebar navigation
+- [ ] Structured hierarchy
+
+---
+
+#### REQ-014: Theme: Drift (Minimal, Airy)
+- **Category:** Themes
+- **Priority:** P1
+- **Source:** PRD
+
+**Description:**
+Minimal theme with whitespace, thin sans-serif, sage green accents.
+
+**Tagline:** "Let your content breathe."
+**Target Users:** Spas, yoga studios, wellness brands
+
+**Acceptance Criteria:**
+- [ ] Abundant whitespace
+- [ ] Thin sans-serif typography
+- [ ] Sage green accent color
+- [ ] Floating, airy layout
+
+---
+
+#### REQ-015: Theme: Bloom (Warm, Organic)
+- **Category:** Themes
+- **Priority:** P1
+- **Source:** PRD
+
+**Description:**
+Warm theme with rounded corners, cream background, terracotta accents.
+
+**Tagline:** "Where community feels at home."
+**Target Users:** Bakeries, florists, local shops
+
+**Acceptance Criteria:**
+- [ ] Rounded corners
+- [ ] Cream background
+- [ ] Terracotta accents
+- [ ] Playful typography
+
+---
+
+### Distribution Requirements
+
+#### REQ-016: Theme Format: Tarball Distribution (R2)
+- **Category:** Distribution
+- **Priority:** P1
+- **Source:** Decisions #4
+
+**Description:**
+Each theme distributed as compressed tarball (.tar.gz) stored on Cloudflare R2 bucket.
+
+**Acceptance Criteria:**
+- [ ] Tarballs hosted on R2
+- [ ] CDN caching configured
+- [ ] Public read access
+- [ ] Tarball size < 10KB each
+
+---
+
+#### REQ-017: Theme Registry: themes.json on CDN
+- **Category:** Distribution
+- **Priority:** P1
+- **Source:** Decisions #4
+
+**Description:**
+Centralized registry file (themes.json) on CDN containing metadata for all available themes.
+
+**Schema:**
+```json
+{
+  "name": "string",
+  "slug": "string",
+  "description": "string",
+  "personality": "string",
+  "version": "string",
+  "tarballUrl": "string",
+  "previewUrl": "string",
+  "comingSoon": "boolean"
+}
+```
+
+---
+
+#### REQ-018: R2 Bucket Configuration
+- **Category:** Distribution
+- **Priority:** P1
+- **Source:** Decisions
+
+**Description:**
+Set up Cloudflare R2 bucket for theme tarball hosting with CDN caching.
+
+**Acceptance Criteria:**
+- [ ] R2 bucket created
+- [ ] Public read access configured
+- [ ] CDN caching enabled
+- [ ] Upload script for tarballs
+
+---
+
+#### REQ-019: NPM Package Publishing
+- **Category:** Distribution
+- **Priority:** P1
+- **Source:** PRD, Decisions
+
+**Description:**
+Publish Wardrobe CLI as npm package. Must be installable via `npx wardrobe [command]`.
+
+**Acceptance Criteria:**
+- [ ] Package name "wardrobe" available (check first!)
+- [ ] Published to npm registry
+- [ ] `npx wardrobe` works without prior install
+
+---
+
+### Showcase Requirements
+
+#### REQ-020: Static Showcase Page
+- **Category:** Showcase
+- **Priority:** P1
+- **Source:** Decisions #8
+
+**Description:**
+Static HTML page with 5 theme cards showing screenshots, descriptions, and copy-paste install commands.
+
+**Acceptance Criteria:**
+- [ ] Single HTML page with embedded CSS/JS
+- [ ] 5 theme cards visible
+- [ ] Each card has screenshot, description, install command
+- [ ] Responsive grid layout
+
+---
+
+#### REQ-021: Theme Preview Screenshots/GIFs
+- **Category:** Showcase
+- **Priority:** P1
+- **Source:** PRD, Decisions
+
+**Description:**
+Each theme must have preview screenshot or GIF showing the design. GIFs preferred to capture transformation.
+
+**Acceptance Criteria:**
+- [ ] High-quality screenshot for each theme
+- [ ] Consistent dimensions and format
+- [ ] Shows actual theme with demo content
+- [ ] GIFs showing transformation (optional but preferred)
+
+---
+
+#### REQ-022: One-Click Copy for Install Commands
+- **Category:** Showcase
+- **Priority:** P1
+- **Source:** Decisions
+
+**Description:**
+Showcase page must include copy-to-clipboard buttons for each theme's install command.
+
+**Acceptance Criteria:**
+- [ ] Copy button for each theme card
+- [ ] Copies `npx wardrobe install [theme]`
+- [ ] Visual feedback on copy success
+
+---
+
+#### REQ-023: Mobile-Responsive Showcase
+- **Category:** Showcase
+- **Priority:** P1
+- **Source:** Board Verdict
+
+**Description:**
+Showcase website must be responsive on mobile devices.
+
+**Acceptance Criteria:**
+- [ ] Works on phones and tablets
+- [ ] Touch-friendly interactions
+- [ ] Readable at all screen sizes
+
+---
+
+#### REQ-024: SEO Optimization for Showcase
+- **Category:** Showcase
+- **Priority:** P1
+- **Source:** Board Verdict
+
+**Description:**
+Showcase website must include proper meta tags, Open Graph tags, semantic HTML, fast load times (<2 seconds).
+
+**Acceptance Criteria:**
+- [ ] Title and description meta tags
+- [ ] Open Graph tags for social sharing
+- [ ] Semantic HTML structure
+- [ ] Page load < 2 seconds
+
+---
+
+#### REQ-025: Cloudflare Pages Deployment
+- **Category:** Showcase
+- **Priority:** P1
+- **Source:** PRD, Decisions
+
+**Description:**
+Deploy showcase website to Cloudflare Pages.
+
+**Acceptance Criteria:**
+- [ ] Deployed and accessible via public URL
+- [ ] SSL certificate active
+- [ ] Fast global CDN delivery
+
+---
+
+### Brand & Copy Requirements
+
+#### REQ-026: Brand Voice & Copy Style
+- **Category:** Copy
+- **Priority:** P1
+- **Source:** Decisions #6
+
+**Description:**
+All copy must use Steve Jobs' voice: confident friend, zero jargon, short sentences, active verbs.
 
 **Acceptance Criteria:**
 - [ ] No passive voice
-- [ ] No "system" terminology
-- [ ] No jargon
+- [ ] No technical jargon
+- [ ] Short, punchy sentences
+- [ ] Human and evocative
 
 ---
 
-#### REQ-DASH-006: Last Updated Timestamp
-**Category:** Dashboard
-**Priority:** P1 — High
-**Source:** Decisions.md MVP Feature Set
+#### REQ-027: Ember Tagline
+- **Category:** Copy
+- **Priority:** P1
+- **Source:** Decisions (Copy Review)
 
-**Description:**
-Display last updated timestamp in format: "Last updated: Today at 6:00 AM"
-
-**Acceptance Criteria:**
-- [ ] Shows dashboard rebuild time
-- [ ] Updates once per day
-- [ ] Format exactly as specified
+**Copy:** "Ember is bold. Editorial. For people with something to say."
 
 ---
 
-### CLIENT-FACING REQUIREMENTS
+#### REQ-028: Forge Tagline
+- **Category:** Copy
+- **Priority:** P1
+- **Source:** Decisions
 
-#### REQ-CLIENT-001: UUIDv4 Dashboard URLs
-**Category:** Client-Facing
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-6
-
-**Description:**
-Generate unique, unguessable dashboard URL per client using UUIDv4 standard.
-
-**Acceptance Criteria:**
-- [ ] URL format: `{domain}/{uuid}`
-- [ ] UUID is valid UUIDv4 (122 bits entropy)
-- [ ] Different clients get different UUIDs
+**Copy:** "Forge is dark, technical. Built for builders."
 
 ---
 
-#### REQ-CLIENT-002: Magic Link Access
-**Category:** Client-Facing
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-6
+#### REQ-029: Slate Tagline
+- **Category:** Copy
+- **Priority:** P1
+- **Source:** Decisions (Copy Review - Maya Angelou)
 
-**Description:**
-Implement magic link access — no password login required; access via email-sent link only.
-
-**Acceptance Criteria:**
-- [ ] No password field anywhere
-- [ ] Client receives email with unique link
-- [ ] Clicking link grants access without credentials
+**Copy:** "Slate is for people who need to be trusted. Clean. Steady. The kind of design that lets the work speak first."
 
 ---
 
-#### REQ-CLIENT-003: Updates Remaining Display
-**Category:** Client-Facing
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-4, D-17
+#### REQ-030: Drift Tagline
+- **Category:** Copy
+- **Priority:** P1
+- **Source:** Decisions
 
-**Description:**
-Display "X updates remaining this month" in client-facing copy; never show tokens, token counts, or token mechanics.
-
-**Acceptance Criteria:**
-- [ ] All client text shows "updates remaining"
-- [ ] No "tokens" or "credits" terminology
-- [ ] No internal mechanics exposed
+**Copy:** "Let your content breathe."
 
 ---
 
-#### REQ-CLIENT-004: Stripe Checkout
-**Category:** Client-Facing
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-3
+#### REQ-031: Bloom Tagline
+- **Category:** Copy
+- **Priority:** P1
+- **Source:** Decisions
 
-**Description:**
-Implement Stripe checkout integration for $79/month subscription initiation.
-
-**Acceptance Criteria:**
-- [ ] "Subscribe" button works
-- [ ] Redirects to Stripe checkout
-- [ ] Subscription created on confirmation
+**Copy:** "Where community feels at home."
 
 ---
 
-#### REQ-CLIENT-005: Single Pricing Tier
-**Category:** Client-Facing
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-3
+#### REQ-032: Install Success Message
+- **Category:** Copy
+- **Priority:** P1
+- **Source:** Decisions
 
 **Description:**
-Accept only one pricing tier at launch: $79/month (no Basic/Pro/Enterprise tiers).
+When install completes, CLI must output branded success message.
 
-**Acceptance Criteria:**
-- [ ] Single option displayed
-- [ ] No tier selector
-- [ ] Stripe product configured as single tier
+**Copy:** "Your site is now wearing [theme-name]."
 
 ---
 
-### BACKEND REQUIREMENTS
-
-#### REQ-BACKEND-001: Static HTML Dashboards
-**Category:** Backend
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-7
+#### REQ-033: Core Value Proposition Copy
+- **Category:** Copy
+- **Priority:** P1
+- **Source:** Decisions (Maya Angelou Review)
 
 **Description:**
-Generate static HTML dashboards per client, rebuilt nightly via cron job (no real-time rendering).
-
-**Acceptance Criteria:**
-- [ ] Dashboard snapshot generated at 6:00 AM daily
-- [ ] HTML file per client: `static/clients/{uuid}/index.html`
-- [ ] No server-side rendering on page request
+Lead with one of these approved value propositions:
+- "Install in one command. Your content stays untouched."
+- "Pick a theme. Watch your site remember what it was meant to be."
+- "Copy the command. Paste it. You're done before you finish your coffee."
 
 ---
 
-#### REQ-BACKEND-002: JSON File Storage
-**Category:** Backend
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-7
+### Technical Requirements
+
+#### REQ-034: Backup Strategy Before Install
+- **Category:** Technical
+- **Priority:** P1
+- **Source:** Implied
 
 **Description:**
-Store all data in JSON files (no relational database), with backup strategy on every write.
+CLI must create automatic backup of existing src/ directory before swap.
 
 **Acceptance Criteria:**
-- [ ] clients.json and requests.json exist
-- [ ] Every data mutation triggers backup
-- [ ] No database connections in codebase
+- [ ] Backup created with timestamp
+- [ ] Backup stored locally (e.g., src.backup.TIMESTAMP/)
+- [ ] Restore possible if install fails
 
 ---
 
-#### REQ-BACKEND-003: Cloudflare Analytics Integration
-**Category:** Backend
-**Priority:** P0 — Blocker
-**Source:** Decisions.md MVP Feature Set
+#### REQ-035: Error Handling & Rollback
+- **Category:** Technical
+- **Priority:** P1
+- **Source:** Reliability
 
 **Description:**
-Integrate Cloudflare Analytics API for weekly traffic data (visitors, pageviews, trends).
+CLI must handle download failures, extraction errors gracefully. If any step fails, rollback to previous state.
 
 **Acceptance Criteria:**
-- [ ] Dashboard displays traffic counts from Cloudflare
-- [ ] Data refreshes weekly
-- [ ] Graceful degradation if API unavailable
+- [ ] Download errors caught and reported
+- [ ] Extraction errors trigger rollback
+- [ ] Original src/ restored on failure
+- [ ] Clear error messages
 
 ---
 
-#### REQ-BACKEND-004: Lighthouse CI Weekly Batch
-**Category:** Backend
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-13
+#### REQ-036: Theme Structure Contract
+- **Category:** Technical
+- **Priority:** P1
+- **Source:** Decisions (Open Question #4)
 
 **Description:**
-Run Lighthouse CI weekly (not daily) in batch mode for performance scoring.
+Define and document the exact structure of theme src/ directories.
+
+**Required Files:**
+- `live.config.ts` - Emdash collection configuration
+- `pages/index.astro` - Home page
+- `layouts/Base.astro` - Base layout wrapper
 
 **Acceptance Criteria:**
-- [ ] Lighthouse audit runs once per week
-- [ ] Performance and Accessibility scores stored
-- [ ] No daily runs
+- [ ] Contract documented in THEME_SPEC.md
+- [ ] All 5 themes conform to contract
+- [ ] Validation on install
 
 ---
 
-#### REQ-BACKEND-005: Five Email Templates
-**Category:** Backend
-**Priority:** P0 — Blocker
-**Source:** Decisions.md MVP Feature Set
+#### REQ-037: Automated Screenshot Generation
+- **Category:** Technical
+- **Priority:** P1
+- **Source:** Decisions (Recommended)
 
 **Description:**
-Implement five automated email templates triggered via cron and webhooks.
+Use Playwright or Puppeteer to automatically generate screenshots of each theme with standardized demo content.
 
 **Acceptance Criteria:**
-- [ ] All five emails dispatch at correct times
-- [ ] Templates use warm voice
-- [ ] No cold corporate language
+- [ ] Screenshot script using Playwright
+- [ ] Consistent demo content for all themes
+- [ ] Multiple breakpoints (desktop, mobile)
+- [ ] Reproducible generation
 
 ---
 
-#### REQ-BACKEND-006: Health Score Thresholds
-**Category:** Backend
-**Priority:** P0 — Blocker
-**Source:** Decisions.md Open Question #4
+#### REQ-038: Documentation (README.md)
+- **Category:** Technical
+- **Priority:** P1
+- **Source:** Decisions
 
 **Description:**
-Determine and enforce Health Score thresholds: Green (Perf>=90 AND Access>=90), Yellow (either 70-89), Red (either <70 OR site down).
+Comprehensive README documenting: overview, CLI commands, install instructions, theme structure, troubleshooting.
 
 **Acceptance Criteria:**
-- [ ] Input Lighthouse scores produce correct color
-- [ ] Site down always returns red
-- [ ] Threshold logic documented
+- [ ] Clear getting started section
+- [ ] All CLI commands documented
+- [ ] Theme structure explained
+- [ ] Troubleshooting FAQ
 
 ---
 
-### EMAIL REQUIREMENTS
-
-#### REQ-EMAIL-001: Welcome Email
-**Category:** Email
-**Priority:** P0 — Blocker
-**Source:** Decisions.md Email Touchpoints
+#### REQ-039: CI/CD Pipeline
+- **Category:** Technical
+- **Priority:** P1
+- **Source:** Risk mitigation
 
 **Description:**
-Send Welcome/Dashboard Ready email upon subscription: "Your site is live. Here's your dashboard."
+Automated testing that each theme's src/ compiles successfully with Astro build.
 
 **Acceptance Criteria:**
-- [ ] Dispatches after Stripe confirmation
-- [ ] Contains dashboard link
-- [ ] Uses warm, celebratory tone
+- [ ] GitHub Actions workflow
+- [ ] Each theme builds without errors
+- [ ] Tests run on every push
+- [ ] Build failures block merge
 
 ---
 
-#### REQ-EMAIL-002: Status Summary Email
-**Category:** Email
-**Priority:** P0 — Blocker
-**Source:** Decisions.md Email Touchpoints
+#### REQ-040: Version Strategy (V1)
+- **Category:** Technical
+- **Priority:** P1
+- **Source:** Decisions (Open Question #5)
 
 **Description:**
-Send Weekly/Monthly Status Summary email: "Your site had a great week. [X visitors]"
+For V1, `wardrobe install` always fetches latest theme version. No lockfile required.
 
 **Acceptance Criteria:**
-- [ ] Sends on schedule (weekly or monthly)
-- [ ] Includes actual traffic data
-- [ ] Warm, proud-parent tone
+- [ ] Always downloads latest
+- [ ] Version displayed in list command
+- [ ] No lockfile needed
 
 ---
 
-#### REQ-EMAIL-003: Request Completed Email
-**Category:** Email
-**Priority:** P1 — High
-**Source:** Decisions.md Email Touchpoints
+#### REQ-041: Tarball Build System
+- **Category:** Technical
+- **Priority:** P1
+- **Source:** PRD
 
 **Description:**
-Send Request Completed Confirmation email: "We noticed something — already fixed."
+Automated build pipeline to generate theme tarballs (src/ directory only).
 
 **Acceptance Criteria:**
-- [ ] Sends when request marked complete
-- [ ] Shows what was done
-- [ ] Proactive care messaging
+- [ ] Build script for all themes
+- [ ] Tarballs include only src/ contents
+- [ ] Compression level optimized
+- [ ] Output to dist/themes/
 
 ---
 
-#### REQ-EMAIL-004: Usage Warning Email
-**Category:** Email
-**Priority:** P0 — Blocker
-**Source:** Decisions.md Email Touchpoints
+#### REQ-042: Theme Validation on Install
+- **Category:** Technical
+- **Priority:** P1
+- **Source:** Reliability
 
 **Description:**
-Send Usage Threshold Warning email when 1 update remains: "1 update remaining this month."
+Verify critical files exist after extraction before swapping.
 
 **Acceptance Criteria:**
-- [ ] Triggers when requests_remaining == 1
-- [ ] Shows current month window
-- [ ] Includes escalation path
+- [ ] Check live.config.ts exists
+- [ ] Check pages/index.astro exists
+- [ ] Fail fast with clear error if missing
 
 ---
 
-#### REQ-EMAIL-005: Anniversary Email
-**Category:** Email
-**Priority:** P1 — High
-**Source:** Decisions.md Email Touchpoints
+#### REQ-043: Tarball Integrity Verification
+- **Category:** Technical
+- **Priority:** P1
+- **Source:** Security
 
 **Description:**
-Send Anniversary Email (Day 365): "We're still here. We still care."
+Add sha256 hash to registry, verify downloaded tarball before extraction.
 
 **Acceptance Criteria:**
-- [ ] Sends exactly one year after subscription start
-- [ ] Includes year-in-review stats
-- [ ] Genuine care, not upsell
+- [ ] sha256 hash in themes.json
+- [ ] Hash verified after download
+- [ ] Mismatch fails with error
 
 ---
 
-### DESIGN REQUIREMENTS
+### Integration Requirements
 
-#### REQ-DESIGN-001: Warm Pulse Visual Direction
-**Category:** Design
-**Priority:** P0 — Blocker
-**Source:** Decisions.md Essence
+#### REQ-044: Core Integration: emdash create --theme
+- **Category:** Integration
+- **Priority:** P1
+- **Source:** Decisions #7
 
 **Description:**
-Implement "warm pulse, not cold dashboard" visual direction across all UI elements.
+Emdash core CLI must support --theme flag to scaffold new sites with chosen theme.
 
 **Acceptance Criteria:**
-- [ ] Warm color palette (no cold grays)
-- [ ] Soft, welcoming spacing
-- [ ] No harsh metrics presentation
+- [ ] Integration spec defined with Emdash team
+- [ ] `emdash create --theme ember` works
+- [ ] Theme pre-installed in new project
+
+**Status:** Pending Emdash core team decision
 
 ---
 
-#### REQ-DESIGN-002: Health Color Indicator
-**Category:** Design
-**Priority:** P0 — Blocker
-**Source:** Decisions.md Phil's Arbitration
+### Analytics Requirements
+
+#### REQ-045: Anonymous Telemetry (CLI)
+- **Category:** Analytics
+- **Priority:** P1
+- **Source:** Board-Blocker
 
 **Description:**
-Health indicator uses Green/Yellow/Red status colors only; no numerical score visible by default.
+Log install events (theme name, timestamp, OS) to analytics endpoint. No PII.
 
 **Acceptance Criteria:**
-- [ ] Primary shows color, not number
-- [ ] Number only visible in detail pane
-- [ ] Colors are warm, not harsh
+- [ ] POST to analytics endpoint on install
+- [ ] Data: theme, timestamp, OS, country (from IP)
+- [ ] No user identity
+- [ ] Opt-out possible
 
 ---
 
-#### REQ-DESIGN-003: One-Second Clarity
-**Category:** Design
-**Priority:** P0 — Blocker
-**Source:** Decisions.md Essence
+#### REQ-046: Theme Popularity Metrics
+- **Category:** Analytics
+- **Priority:** P1
+- **Source:** Analytics
 
 **Description:**
-Achieve one-second status clarity — human can glance at dashboard and immediately understand site health status.
+Dashboard showing install count per theme, ranked by popularity.
 
 **Acceptance Criteria:**
-- [ ] Large visible indicator
-- [ ] High contrast
-- [ ] Position above fold
+- [ ] Install counts per theme
+- [ ] Weekly/monthly trends
+- [ ] Internal dashboard or report
 
 ---
 
-#### REQ-DESIGN-004: Human Conversational Copy
-**Category:** Design
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-15
+#### REQ-047: No PII Collection
+- **Category:** Analytics
+- **Priority:** P1
+- **Source:** Board Verdict
 
 **Description:**
-All customer-visible copy uses human, conversational voice ("trusted friend" tone, not corporate).
+Analytics must not collect personally identifiable information.
 
 **Acceptance Criteria:**
-- [ ] No passive voice
-- [ ] No jargon
-- [ ] Aligns with "smart friend texting you"
+- [ ] No email, username, or user identity
+- [ ] Anonymous telemetry only
+- [ ] Privacy policy compliant
 
 ---
 
-#### REQ-DESIGN-005: Shipyard Footer
-**Category:** Design
-**Priority:** P1 — High
-**Source:** Decisions.md D-16
+### Success Metrics
+
+#### REQ-048: Showcase Load Time Target
+- **Category:** Metrics
+- **Priority:** P1
+- **Source:** PRD
 
 **Description:**
-Include "Built by Shipyard" footer on every dashboard as distribution billboard.
+Showcase page must load in under 2 seconds (first contentful paint).
 
 **Acceptance Criteria:**
-- [ ] Footer visible on every dashboard
-- [ ] Links to Shipyard site
-- [ ] Consistent placement
+- [ ] FCP < 2 seconds on 3G
+- [ ] Lighthouse Performance > 90
 
 ---
 
-### ARCHITECTURE REQUIREMENTS
-
-#### REQ-ARCH-001: Static HTML Generation
-**Category:** Architecture
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-7
+#### REQ-049: CLI Install Time Target
+- **Category:** Metrics
+- **Priority:** P1
+- **Source:** PRD, Decisions
 
 **Description:**
-Static HTML generation per client instead of server-side rendering; one index.html file per `{client-uuid}/index.html`.
+Install command must complete in under 3 seconds.
 
 **Acceptance Criteria:**
-- [ ] All dashboards are static files
-- [ ] No server-side processing on request
-- [ ] Pages served from disk
+- [ ] End-to-end install < 3 seconds
+- [ ] Benchmarked before launch
 
 ---
 
-#### REQ-ARCH-002: JSON Data Layer
-**Category:** Architecture
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-7
+#### REQ-050: Content Preservation Validation
+- **Category:** Metrics
+- **Priority:** P1
+- **Source:** PRD
 
 **Description:**
-No relational database; use JSON file storage with atomic write + backup strategy.
+Test suite must verify content remains accessible after theme install.
 
 **Acceptance Criteria:**
-- [ ] clients.json schema defined
-- [ ] requests.json schema defined
-- [ ] Backups created on mutations
+- [ ] Integration test with sample content
+- [ ] D1 data unchanged
+- [ ] Pages render correctly after swap
 
 ---
 
-#### REQ-ARCH-003: Cloudflare API Client
-**Category:** Architecture
-**Priority:** P0 — Blocker
-**Source:** Decisions.md MVP Feature Set
+#### REQ-051: Theme Availability Target
+- **Category:** Metrics
+- **Priority:** P1
+- **Source:** PRD
 
 **Description:**
-Integrate Cloudflare Analytics API for real traffic data (not synthetic metrics).
+All 5 launch themes must be live and installable via CLI at launch.
 
 **Acceptance Criteria:**
-- [ ] Traffic counts match Cloudflare dashboard
-- [ ] API authentication works
-- [ ] Fallback if API down
+- [ ] All themes in registry
+- [ ] All tarballs on R2
+- [ ] All themes install successfully
 
 ---
 
-#### REQ-ARCH-004: Weekly Lighthouse Batch
-**Category:** Architecture
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-13
+## P2-SHOULD (Strong Recommendations)
+
+#### REQ-052: Pricing Page / Premium Theme Rails
+- **Category:** Monetization
+- **Priority:** P2
+- **Source:** Board (Buffett)
 
 **Description:**
-Run Lighthouse CI weekly in batch (not daily) for cost/rate-limit management.
-
-**Acceptance Criteria:**
-- [ ] Once per week only
-- [ ] Results cached
-- [ ] No daily runs
+Build pricing page indicating premium themes coming Q3 2026. Establish payment infrastructure.
 
 ---
 
-#### REQ-ARCH-005: Magic Link Authentication
-**Category:** Architecture
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-6
+#### REQ-053: Theme Submission Intake Form
+- **Category:** Growth
+- **Priority:** P2
+- **Source:** Board
 
 **Description:**
-Magic link authentication — session tied to UUID + email; no password stored or required.
-
-**Acceptance Criteria:**
-- [ ] No password field in system
-- [ ] Email link grants session
-- [ ] No password hashing logic
+Web form for third-party designers to submit themes for curation.
 
 ---
 
-#### REQ-ARCH-006: UUIDv4 URLs
-**Category:** Architecture
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-6
+#### REQ-054: Email Capture Mechanism
+- **Category:** Retention
+- **Priority:** P2
+- **Source:** Board (Shonda)
 
 **Description:**
-Dashboard URLs use UUIDv4 format (122 bits entropy); unguessable, no sequential IDs.
-
-**Acceptance Criteria:**
-- [ ] Valid UUIDv4 format
-- [ ] No discernible patterns
-- [ ] Entropy verified
+"Get notified when new themes drop" email signup form on showcase page.
 
 ---
 
-#### REQ-ARCH-007: Stripe Webhook Handler
-**Category:** Architecture
-**Priority:** P0 — Blocker
-**Source:** Decisions.md MVP Feature Set
+#### REQ-055: Theme Update Notifications
+- **Category:** Retention
+- **Priority:** P2
+- **Source:** Shonda's Retention Roadmap
 
 **Description:**
-Stripe webhook integration for subscription events (creation, cancellation, renewal).
-
-**Acceptance Criteria:**
-- [ ] Events trigger database updates
-- [ ] Subscription state synchronized
-- [ ] Idempotent processing
+Mechanism to notify users when installed themes have updates.
 
 ---
 
-### DOMAIN LOGIC REQUIREMENTS
-
-#### REQ-DOMAIN-001: Monthly Update Allowance
-**Category:** Domain Logic
-**Priority:** P0 — Blocker
-**Source:** Decisions.md Open Question #1
-**Status:** PENDING DECISION
+#### REQ-056: Geographic Install Distribution
+- **Category:** Analytics
+- **Priority:** P2
+- **Source:** Analytics
 
 **Description:**
-Determine monthly update allowance for $79/month tier.
-
-**Options:**
-- 3 updates/month (conservative, sustainable)
-- 5 updates/month (generous, competitive)
-
-**Acceptance Criteria:**
-- [ ] requests_remaining initialized correctly
-- [ ] Decrements on completion
-- [ ] Resets monthly
+Analytics showing which themes are popular in different regions.
 
 ---
 
-#### REQ-DOMAIN-002: Small Update Definition
-**Category:** Domain Logic
-**Priority:** P0 — Blocker
-**Source:** Decisions.md Open Question #2
-**Status:** PENDING DECISION
+#### REQ-057: Cost Monitoring
+- **Category:** Operations
+- **Priority:** P2
+- **Source:** Unit economics
 
 **Description:**
-Define "small update" boundary at <=30 minutes of work.
-
-**Classification:**
-- Small (included): Logo swap, text fix, image replacement
-- Billable: New page, blog post, new section
-
-**Acceptance Criteria:**
-- [ ] Documented in terms of service
-- [ ] Examples published before launch
+Track monthly costs for CDN, R2, hosting.
 
 ---
 
-#### REQ-DOMAIN-003: Hard Cap Enforcement
-**Category:** Domain Logic
-**Priority:** P0 — Blocker
-**Source:** Decisions.md D-14, D-18
+#### REQ-058: Monitoring & Alerts
+- **Category:** Operations
+- **Priority:** P2
+- **Source:** Operations
 
 **Description:**
-Hard cap on updates (no overage pricing); when limit reached, show "Upgrade or wait" prompt with escalation button.
-
-**Acceptance Criteria:**
-- [ ] Client at 0 sees upgrade CTA
-- [ ] Escalation button sends email
-- [ ] No automatic billing for overages
+Set up monitoring for showcase uptime, R2 availability, install success rates.
 
 ---
 
-#### REQ-DOMAIN-004: Fixed Internal Pricing
-**Category:** Domain Logic
-**Priority:** P1 — High
-**Source:** Decisions.md D-5
+#### REQ-059: Domain Setup
+- **Category:** Operations
+- **Priority:** P2
+- **Source:** PRD
 
 **Description:**
-Fixed request pricing structure (internal, not client-facing): Logo $25, Text $25, Image $25, Blog $50, Section $75, Page $150.
-
-**Acceptance Criteria:**
-- [ ] pricing.json configured
-- [ ] Consistent cost estimation
+Secure domain for showcase website (e.g., wardrobe.shipyard.company).
 
 ---
 
-#### REQ-DOMAIN-005: Request Dispute Policy
-**Category:** Domain Logic
-**Priority:** P1 — High
-**Source:** Decisions.md Open Question #3
-**Status:** PENDING DECISION
+#### REQ-060: Privacy Compliance
+- **Category:** Legal
+- **Priority:** P2
+- **Source:** Legal
 
 **Description:**
-Document request dispute resolution policy before launch with concrete examples.
+Ensure analytics comply with GDPR, CCPA. Include privacy policy.
 
-**Acceptance Criteria:**
-- [ ] Written policy exists
-- [ ] Specific examples included
-- [ ] Accessible to clients
+---
+
+#### REQ-061: Install Confirmation Prompt
+- **Category:** UX
+- **Priority:** P2
+- **Source:** UX
+
+**Description:**
+Add confirmation prompt before install: "This will replace src/. Continue?"
+
+---
+
+## P3-NICE-TO-HAVE (V2 / Future Phases)
+
+#### REQ-062: Live Preview with User Content
+- **Category:** V2
+- **Priority:** P3
+- **Source:** Decisions (Cut from V1)
+
+**Description:**
+Authenticated D1 access to render live previews with user's actual content.
+
+---
+
+#### REQ-063: User Accounts
+- **Category:** V2
+- **Priority:** P3
+- **Source:** Decisions (Cut from V1)
+
+**Description:**
+User authentication, theme favoriting, installation history.
+
+---
+
+#### REQ-064: Theme Ratings & Reviews
+- **Category:** V2
+- **Priority:** P3
+- **Source:** Decisions (Cut from V1)
+
+**Description:**
+User-submitted ratings, reviews, and comments on themes.
+
+---
+
+#### REQ-065: Search & Filtering
+- **Category:** V2
+- **Priority:** P3
+- **Source:** Decisions (Cut from V1)
+
+**Description:**
+Search themes by name/keyword, filter by industry/personality/color.
+
+---
+
+#### REQ-066: Version Pinning
+- **Category:** V2
+- **Priority:** P3
+- **Source:** Decisions
+
+**Description:**
+Optional version pinning: `wardrobe install ember@1.0.0` and wardrobe.lock file.
 
 ---
 
@@ -698,106 +1029,71 @@ These features are explicitly CUT. Do NOT build:
 
 | ID | Feature | Reason | Revisit At |
 |----|---------|--------|------------|
-| REQ-CUT-001 | White-labeling | Zero demand | 1,000 clients |
-| REQ-CUT-002 | Geographic distribution metrics | Vanity metric | Never |
-| REQ-CUT-003 | Suggestions engine | Scope creep | V2 |
-| REQ-CUT-004 | Triggered performance alerts | Complex infrastructure | V2 |
-| REQ-CUT-005 | Enterprise tier | No enterprise clients | 100 clients |
-| REQ-CUT-006 | Overage pricing ($0.15/1K) | Kills trust | Never |
-| REQ-CUT-007 | Password protection | Friction kills engagement | Never |
-| REQ-CUT-008 | Real-time dashboards | Static sufficient for <100 | 500 clients |
-| REQ-CUT-009 | Multi-tier pricing | Test single price first | 50 clients |
-| REQ-CUT-010 | Token visibility to clients | Anxiety inducing | Never |
-| REQ-CUT-011 | Dedicated SQL database | JSON suffices | 500 clients |
-| REQ-CUT-012 | Token complexity estimator | No historical data | Never |
-| REQ-CUT-013 | Trend charts | Zero conversion lift | V2 |
-| REQ-CUT-014 | AI-powered suggestions | V3 feature | V3 |
+| CUT-001 | Live preview server | 30 days engineering, 0 users | V2 with users |
+| CUT-002 | Live demo sites per theme | 5x maintenance burden | V2 |
+| CUT-003 | User accounts | Zero value for CLI install | V2 |
+| CUT-004 | Theme ratings/reviews | Curation IS quality signal | V2 |
+| CUT-005 | Search/filtering | 5 themes visible at glance | V2 |
+| CUT-006 | Submit Your Theme | Curate ruthlessly first | V2 |
+| CUT-007 | Pricing tiers | Free. Adoption is metric. | V2 |
+
+---
+
+## Risk Register
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| NPM name collision (wardrobe) | Low | Medium | Check availability before publish |
+| CDN URLs hardcoded, no fallback | High | Critical | Deploy R2 before launch, add retry logic |
+| Sub-3s install unverified | High | Medium | Add performance benchmarks |
+| Theme contract not formalized | Medium | High | Document in THEME_SPEC.md |
+| Tarball zip slip vulnerability | Low | Critical | Add path validation |
+| Emdash core integration undefined | High | Critical | Define integration spec |
+| R2 bucket not provisioned | High | Critical | Provision before launch |
+| Showcase not deployed | Certain | Critical | Deploy to Cloudflare Pages |
+| Screenshot automation missing | High | Medium | Implement Playwright script |
+| 5 themes overreach | High | Medium | Phase rollout: Ember, Forge, Slate first |
 
 ---
 
 ## File Structure (Per Decisions.md)
 
 ```
-harbor/
-├── dashboard/
-│   ├── index.html                  # Dashboard template
-│   ├── styles.css                  # Design system (warm, not cold)
-│   └── components/
-│       ├── health-indicator.html   # Green/Yellow/Red status
-│       ├── health-details.html     # Drill-down (Lighthouse, uptime, traffic)
-│       ├── traffic-summary.html    # One sentence traffic
-│       └── last-updated.html       # Timestamp display
+wardrobe/
+├── cli/
+│   ├── index.ts              # CLI entry point
+│   ├── commands/
+│   │   ├── list.ts           # List available themes
+│   │   ├── install.ts        # Download and swap src/
+│   │   └── preview.ts        # Open theme preview
+│   └── utils/
+│       ├── fetch-registry.ts # Fetch themes.json
+│       ├── download.ts       # Download tarball
+│       ├── extract.ts        # Tarball extraction
+│       └── fs-utils.ts       # Backup, restore, replace
 │
-├── api/
-│   ├── cloudflare-analytics.js     # Traffic data fetcher
-│   ├── lighthouse-runner.js        # Weekly batch Lighthouse
-│   └── stripe-webhook.js           # Subscription events
+├── themes/
+│   ├── ember/src/            # Full src/ directory
+│   ├── forge/src/
+│   ├── slate/src/
+│   ├── drift/src/
+│   └── bloom/src/
 │
-├── data/
-│   ├── clients.json                # Client records
-│   │   # Schema: { client_id, dashboard_url, stripe_customer_id,
-│   │   #           requests_remaining, created_at, last_updated }
-│   └── requests.json               # Request records
-│       # Schema: { request_id, client_id, type, price, status,
-│       #           created_at, completed_at }
+├── registry/
+│   └── themes.json           # Theme metadata, URLs, descriptions
 │
-├── emails/
-│   ├── welcome.html                # Dashboard ready
-│   ├── status-summary.html         # Weekly/monthly digest
-│   ├── request-completed.html      # Update confirmation
-│   ├── usage-warning.html          # Threshold alert
-│   └── anniversary.html            # Day 365 touchpoint
+├── showcase/
+│   ├── index.html            # Static showcase page
+│   ├── styles.css            # Showcase styling
+│   └── screenshots/          # Theme preview images
 │
-├── cron/
-│   ├── lighthouse-batch.js         # Weekly Lighthouse runs
-│   ├── email-scheduler.js          # Trigger email sends
-│   └── dashboard-generator.js      # Nightly static dashboard rebuilds
+├── scripts/
+│   └── build-tarballs.ts     # Tarball builder
 │
-├── static/
-│   └── clients/                    # Generated per-client dashboards
-│       └── {client-uuid}/
-│           └── index.html
+├── dist/themes/              # Built tarballs
 │
-└── config/
-    ├── pricing.json                # Fixed request prices
-    │   # { logo_swap: 25, image_replacement: 25, text_update: 25,
-    │   #   blog_post: 50, new_section: 75, new_page: 150 }
-    └── copy.json                   # Human voice templates
-        # { status_great: "Your site had a great week.",
-        #   issue_fixed: "We noticed something — already fixed." }
+└── README.md                 # Documentation
 ```
-
----
-
-## Risk Summary
-
-### Technical Risks
-
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Lighthouse at scale | Medium | Medium | Weekly batch, sampling |
-| Cron job collisions | High at scale | Medium | Queue system at 50 clients |
-| Cloudflare API limits | Low | Medium | Caching, graceful degradation |
-| JSON file corruption | Medium | High | Backup on every write |
-| Dashboard URL guessing | Very Low | High | UUIDv4 (122 bits entropy) |
-
-### Business Risks
-
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Zero attach rate | Medium | Critical | Hand-sell first 10 |
-| "Small updates" abuse | High | High | Clear definitions in writing |
-| Request disputes | Medium | Medium | Fixed prices + published definitions |
-| Churn at month 3 | Medium | High | Make invisible work visible |
-| $79 price point wrong | Medium | Medium | Adjust based on first 10 |
-
-### Operational Risks
-
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| One-person bottleneck | High at scale | Critical | Team expansion at 30 clients |
-| Scope creep | Medium | High | This document is the contract |
-| Dashboard feels rushed | Medium | High | Week 5 is polish only |
 
 ---
 
@@ -805,48 +1101,34 @@ harbor/
 
 | # | Question | Owner | Deadline |
 |---|----------|-------|----------|
-| 1 | Monthly request allowance: 3 or 5 updates? | Shipyard leadership | Before first client |
-| 2 | "Small update" definition document | Shipyard leadership | Before launch (ToS) |
-| 3 | Request dispute resolution policy | Shipyard leadership | Before first client |
-| 4 | Lighthouse threshold refinement | Engineering | Week 2 |
-| 5 | First 10 client selection criteria | Shipyard sales | Week 5 |
-| 6 | Welcome email content approach | Steve + Engineering | Week 3 |
-| 7 | Security model: UUID-only vs magic link expiry | Engineering | Week 5 |
+| 1 | Where do themes live? R2 tarballs (recommended) or npm? | Engineering | Before launch |
+| 2 | How does `emdash create --theme` integrate? | Emdash core team | Before launch |
+| 3 | Screenshot generation: manual or automated? | Engineering | Week 1 |
+| 4 | Theme structure contract definition | Engineering | Week 1 |
+| 5 | Versioning strategy | Engineering | Week 2 |
 
 ---
 
-## Success Metrics
+## Board Conditions Timeline
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| First 10 contracts | Within 30 days of launch | Stripe subscriptions |
-| Attach rate | 30% of eligible clients | Subscriptions / Total clients |
-| Monthly churn | < 10% | Cancellations / Active |
-| Dashboard engagement | 2+ views/month per client | Analytics |
-| Support tickets | < 1 per client per month | Ticket count |
-
----
-
-## Timeline (5 Weeks)
-
-| Week | Focus | Key Deliverables |
-|------|-------|------------------|
-| 1 | Core architecture + Stripe | Project setup, JSON schemas, Stripe webhook |
-| 2 | Dashboard template + health logic | HTML template, CSS, health indicator, thresholds |
-| 3 | Email templates + Cloudflare integration | 5 email templates, Cloudflare API client |
-| 4 | Lighthouse CI + cron jobs | Weekly batch runner, nightly generator |
-| 5 | Copy refinement + QA + deployment | Polish, voice audit, production deploy |
+| Milestone | Target | Status |
+|-----------|--------|--------|
+| Showcase website deployed | +2 weeks | NOT DONE |
+| Analytics instrumented | +2 weeks | NOT DONE |
+| Coming Soon themes added | +1 week | NOT DONE |
+| Pricing page live | +3 weeks | NOT DONE |
+| **Board re-review** | +3 weeks | PENDING |
 
 ---
 
 ## Ship Test
 
-> Does the client open their HARBOR dashboard and in one second feel cared for — not abandoned?
+> Does the user run `npx wardrobe install ember` and feel "I can't believe I just did that"?
 >
 > **If yes, ship it.**
 
 ---
 
 *Generated by Great Minds Agency — Phase Planning Skill*
-*Source: rounds/shipyard-maintenance-system/decisions.md, prds/failed/shipyard-maintenance-system.md*
-*Project Slug: shipyard-maintenance-system*
+*Source: rounds/emdash-marketplace/decisions.md, prds/emdash-marketplace.md*
+*Project Slug: emdash-marketplace*
