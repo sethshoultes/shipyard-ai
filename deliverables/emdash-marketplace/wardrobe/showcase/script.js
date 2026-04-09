@@ -111,6 +111,121 @@ document.addEventListener('DOMContentLoaded', function() {
     themeCards.forEach(card => {
         observer.observe(card);
     });
+
+    /**
+     * Email capture form handling
+     */
+    const emailForm = document.getElementById('email-form');
+    const emailInput = document.getElementById('email-input');
+    const formMessage = document.getElementById('form-message');
+    const notifyBtn = document.querySelector('.notify-btn');
+
+    if (emailForm) {
+        emailForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = emailInput.value.trim();
+
+            // Validate email format
+            if (!validateEmail(email)) {
+                showFormError('Please enter a valid email address');
+                emailInput.classList.add('error');
+                return;
+            }
+
+            // Clear any previous error states
+            emailInput.classList.remove('error');
+            formMessage.className = 'form-message';
+
+            // Send to API endpoint
+            submitEmail(email);
+        });
+
+        // Clear error state on input focus
+        emailInput.addEventListener('focus', function() {
+            emailInput.classList.remove('error');
+            if (formMessage.classList.contains('error')) {
+                formMessage.textContent = '';
+            }
+        });
+    }
+
+    /**
+     * Validate email format
+     */
+    function validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    /**
+     * Submit email to API endpoint
+     */
+    function submitEmail(email) {
+        // Configurable API endpoint - replace with your actual endpoint
+        const apiEndpoint = 'https://api.example.com/notifications/subscribe';
+
+        // Disable button and show loading state
+        notifyBtn.disabled = true;
+        const originalText = notifyBtn.textContent;
+        notifyBtn.textContent = 'Subscribing...';
+
+        // Create request payload
+        const payload = {
+            email: email,
+            source: 'wardrobe-showcase',
+            timestamp: new Date().toISOString()
+        };
+
+        // Send POST request
+        fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Success
+            showFormSuccess('Thanks! Check your email for confirmation.');
+            emailInput.value = '';
+            notifyBtn.classList.add('success');
+            setTimeout(() => {
+                notifyBtn.classList.remove('success');
+                notifyBtn.textContent = originalText;
+                notifyBtn.disabled = false;
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Email submission error:', error);
+            // Show user-friendly error message
+            showFormError('Something went wrong. Please try again.');
+            notifyBtn.textContent = originalText;
+            notifyBtn.disabled = false;
+        });
+    }
+
+    /**
+     * Show form success message
+     */
+    function showFormSuccess(message) {
+        formMessage.textContent = message;
+        formMessage.classList.add('success');
+    }
+
+    /**
+     * Show form error message
+     */
+    function showFormError(message) {
+        formMessage.textContent = message;
+        formMessage.classList.add('error');
+    }
 });
 
 /**

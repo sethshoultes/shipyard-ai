@@ -50,6 +50,13 @@ async function validateTheme(themeName: string): Promise<string> {
     );
   }
 
+  // Check if theme is coming soon
+  if ((theme as any).comingSoon) {
+    throw new Error(
+      `Theme "${themeName}" is coming soon (${(theme as any).estimatedRelease}). Stay tuned for updates!`
+    );
+  }
+
   return theme.name;
 }
 

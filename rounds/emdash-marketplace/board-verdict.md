@@ -1,6 +1,6 @@
 # Board Verdict: Emdash Theme Marketplace (Wardrobe)
 
-**Date:** April 8, 2026
+**Date:** April 9, 2026
 **Reviewers:** Warren Buffett, Shonda Rhimes
 **Project:** emdash-marketplace
 
@@ -8,48 +8,39 @@
 
 ## Points of Agreement
 
-Both board members converge on the following assessments:
+Both board members agree on the following:
 
-### 1. **Excellent Execution on Limited Scope**
-- Buffett: "The team delivered the full PRD with minimal resources" — under $1,000 equivalent
-- Rhimes: "The personality-driven naming is excellent" — themes have distinct identities
+1. **Technical Execution is Solid** — The team delivered the PRD scope cleanly. CLI works, themes are complete, showcase website exists, tarballs are tiny (5-6KB). Capital efficient MVP under $1,000.
 
-### 2. **Strong Core Install Experience**
-- Buffett: Clean architecture, tiny tarballs (5-6KB), no over-engineering
-- Rhimes: "The install experience has dramatic timing" — satisfying transformation reveal
+2. **Strong Identity Positioning** — Theme copy and personality work is excellent. "Instant dignity for your Emdash site" and character-driven descriptions (e.g., "Bold. Editorial. For people with something to say.") are praised by both reviewers.
 
-### 3. **This is a Feature, Not a Business**
-- Buffett: "A well-built feature masquerading as a business"
-- Rhimes: "A vending machine, not a relationship"
+3. **Good Transformation Moment** — The CLI messaging ("Your site is now wearing Ember") nails the emotional beat. The "try another" philosophy invites return behavior.
 
-### 4. **No User Retention Mechanism**
-- Buffett: "Anonymous users can't become paying customers" — no identity, no telemetry
-- Rhimes: "There is no reason to return to Wardrobe after installing a theme"
+4. **Missing User Analytics** — Neither reviewer sees a way to know who installs what. No telemetry, no install counts, no insight into user behavior.
 
-### 5. **Missing Content Flywheel**
-- Buffett: "Platform value comes from creators, not just our 5 themes"
-- Rhimes: "Five themes is a premiere, not a franchise" — no submission path, no creator tools
+5. **Preview with User Content Not Delivered** — The PRD mentioned this feature; it was not implemented in the current build.
 
-### 6. **No Discovery Path**
-- Buffett: No showcase website deployed, no live demo sites
-- Rhimes: "We don't know how they got to the wardrobe" — missing Act One
+6. **No Community or Social Layer** — No gallery of user sites, no forum, no Discord, no way for users to connect or share their transformations.
+
+7. **Coming Soon Themes Create Anticipation** — The 4 upcoming themes (Aurora, Chronicle, Neon, Haven) with release windows are properly positioned as retention hooks. Both reviewers see this as progress.
+
+8. **Showcase Website Now Exists** — Visual gallery with screenshots, clear 3-step installation guide, proper hero section. This addresses a previous blocker.
 
 ---
 
 ## Points of Tension
 
-| Topic | Buffett's View | Rhimes' View |
-|-------|----------------|--------------|
-| **Primary Gap** | Revenue model (no pricing, no commerce rails) | Narrative arc (no discovery, no retention hooks) |
-| **Solution Priority** | Add pricing and user identity first | Add marketplace gallery and community showcase first |
-| **Competitive Concern** | "A competent developer could rebuild this in a weekend" | Less concerned with competition, more with engagement |
-| **MVP Readiness** | Technically complete but commercially incomplete | Emotionally incomplete — "pilot without a series" |
-| **Score** | 5/10 | 4/10 |
+| Topic | Buffett's Position | Shonda's Position |
+|-------|-------------------|-------------------|
+| **Core Problem** | No business model — "a feature, not a business" | Retention gap — "designed to be a destination, not a habit" |
+| **What's Most Urgent** | Pricing rails and revenue mechanism | Community showcase and post-install engagement |
+| **Competitive Moat** | Near zero — can be copied in a weekend | Not primary concern (narrative focus) |
+| **Score** | 5/10 | 6/10 |
+| **Framing** | "Efficient loss" | "Pilot with a season order" |
 
-### Underlying Tension
-Buffett prioritizes *monetization infrastructure* before launch — even if themes remain free, build the payment rails. Rhimes prioritizes *emotional hooks* before launch — without discovery and retention, no users will reach the payment rails anyway.
+**The Tension:** Buffett sees a product that needs to *monetize*, Shonda sees a product that needs to *retain*. Both are right. The product lacks both revenue capture and engagement loops.
 
-**Resolution:** Both are correct. Discovery must precede payment (Rhimes), but payment infrastructure should exist when users arrive (Buffett). These are sequential dependencies, not competing priorities.
+**Resolution:** These are sequential dependencies, not competing priorities. Discovery and retention (Shonda) must precede payment infrastructure (Buffett), but both must exist before meaningful launch.
 
 ---
 
@@ -57,81 +48,78 @@ Buffett prioritizes *monetization infrastructure* before launch — even if them
 
 # HOLD
 
-**Rationale:** The technical MVP is complete, but launching now would waste the opportunity. Users who discover Wardrobe have no reason to return, no path to become paying customers, and no mechanism to spread the word. A "launch" without discovery, retention, and monetization infrastructure isn't a launch — it's a soft disappearance.
+**Rationale:** Wardrobe is a technically sound MVP that lacks the two essential elements for full launch: (1) a revenue mechanism and (2) retention mechanics beyond the first install. Launching now would acquire users we can't monetize and won't retain long-term.
 
-**Average Score:** 4.5/10
+**Progress Since Last Review:** Shonda notes +2 point improvement across all categories. Coming Soon themes, email capture, and showcase website represent real progress. The product has evolved from "pilot without a series" to "pilot with a season order."
 
 ---
 
 ## Conditions for Proceeding to PROCEED
 
-The board requires the following before approving launch:
+Before Wardrobe can launch publicly, the following must be addressed:
 
 ### Must-Have (Blockers)
 
-1. **Marketplace Showcase Website (Deployed)**
-   - Visual gallery of all themes with screenshots
-   - Live preview links (not just CLI preview command)
-   - Mobile-responsive, SEO-optimized
-   - *Owner: Product/Design*
+1. **Pricing Infrastructure** — Build the rails for paid themes, even if v1 themes remain free. Account system or payment hooks for future premium themes. (Buffett)
 
-2. **Basic Analytics Infrastructure**
-   - Anonymous install tracking (which themes, from where)
-   - No PII required — just aggregate usage data
-   - *Owner: Engineering*
+2. **Basic Analytics** — Anonymous telemetry on theme installs. Know which themes are popular, which are ignored. Display install counts as social proof. (Both)
 
-3. **Coming Soon / Roadmap Visibility**
-   - At least 3 "Coming Soon" themes teased
-   - Creates anticipation and return visits
-   - *Owner: Product*
+3. **Post-Install Engagement Hook** — After installation, prompt users toward one of: email signup, showcase gallery submission, or social share. Don't let the story end at installation. (Shonda)
 
-### Should-Have (Strong Recommendations)
+### Should-Have (Pre-Launch)
 
-4. **Pricing Page / Premium Theme Rails**
-   - Even if all launch themes are free
-   - Display "Premium themes coming Q3 2026"
-   - Payment infrastructure stubbed (Stripe/LemonSqueezy)
-   - *Owner: Product/Engineering*
+4. **Expand Theme Catalog to 8-10** — 5 feels sparse. Either accelerate Coming Soon themes (Aurora, Chronicle, Neon, Haven) or recruit 2-3 external designers. (Buffett)
 
-5. **Theme Submission Form**
-   - Intake form for third-party theme creators
-   - Manual review process is fine for v1
-   - Signals platform ambition
-   - *Owner: Product*
+5. **User Showcase Gallery** — "Sites Wearing Wardrobe" page showing real implementations. Creates user-generated content flywheel. (Shonda)
 
-6. **Email Capture Mechanism**
-   - "Get notified when new themes drop"
-   - Builds owned audience for retention
-   - *Owner: Marketing*
+6. **Install Counts / Social Proof** — "1,247 sites running Ember" creates confidence and FOMO. Display in CLI and website. (Both)
 
-### Nice-to-Have (v1.1)
+### Nice-to-Have (Post-Launch)
 
-7. **"Sites Wearing This" Gallery**
-8. **Theme ratings/reviews**
-9. **Creator spotlight content**
-10. **Seasonal collection theming**
+7. **Preview with User Content** — Let users see their actual content in a theme before committing. (PRD requirement, not yet delivered)
+
+8. **Community Forum/Discord** — Space for customization questions, feature requests, designer collaboration. (Shonda)
+
+9. **Third-Party Theme Submission Flow** — If this is to be a true marketplace, it needs sellers. Creator tools and revenue share. (Buffett)
+
+10. **Theme Evolution Communication** — Changelogs, update announcements, roadmap visibility. (Shonda)
 
 ---
 
 ## Recommended Timeline
 
-| Milestone | Target | Status |
-|-----------|--------|--------|
-| Showcase website deployed | +2 weeks | Blocking |
-| Analytics instrumented | +2 weeks | Blocking |
-| Coming Soon themes added | +1 week | Blocking |
-| Pricing page live | +3 weeks | Strong rec |
-| Theme submission form | +3 weeks | Strong rec |
-| Launch approval checkpoint | +3 weeks | Board re-review |
+| Milestone | Target | Owner |
+|-----------|--------|-------|
+| Post-install engagement hooks | +1 week | Product/Engineering |
+| Basic analytics instrumented | +2 weeks | Engineering |
+| Pricing page / premium rails stubbed | +2 weeks | Product/Engineering |
+| Showcase gallery page | +3 weeks | Design/Engineering |
+| Install counts displayed | +3 weeks | Engineering |
+| Board re-review | +4 weeks | Board |
+
+---
+
+## Score Summary
+
+| Reviewer | Score | Change | Verdict |
+|----------|-------|--------|---------|
+| Warren Buffett | 5/10 | — | HOLD — needs business model |
+| Shonda Rhimes | 6/10 | +2 | HOLD — needs retention mechanics |
+| **Consolidated** | **5.5/10** | **+1** | **HOLD** |
 
 ---
 
 ## Board Signatures
 
-**Warren Buffett** — *"Revenue first, or efficiency is just efficient loss."*
-**Shonda Rhimes** — *"Make them act, make them wait, make them feel."*
+**Warren Buffett** — *"Price is what you pay, value is what you get. The themes provide value, but we capture none of it."*
+
+**Shonda Rhimes** — *"Make them laugh, make them cry, make them wait. Wardrobe now makes them wait. Next step: make them belong."*
 
 ---
 
-**Verdict Issued:** April 8, 2026
+**Verdict Issued:** April 9, 2026
 **Next Review:** Upon completion of blocking conditions
+
+*"The team built exactly what was asked. The ask was incomplete."*
+
+— Great Minds Agency Board

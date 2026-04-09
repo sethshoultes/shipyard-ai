@@ -1,4 +1,5 @@
 {
+  "cdnBaseUrl": "https://cdn.emdash.dev/themes",
   "themes": [
     {
       "name": "ember",
@@ -6,6 +7,7 @@
       "personality": "Magazine-style, serif headings, dark navy + burnt orange",
       "version": "1.0.0",
       "tarballUrl": "https://cdn.emdash.dev/themes/ember@1.0.0.tar.gz",
+      "sha256": "c1d24f686f79fb29a11c1312d3c70cf121410e54ef7465c8ccedd98a06bf2d49",
       "previewUrl": "https://wardrobe.emdash.dev#ember"
     },
     {
@@ -14,6 +16,7 @@
       "personality": "Dark mode, monospace, neon green accents, terminal-inspired",
       "version": "1.0.0",
       "tarballUrl": "https://cdn.emdash.dev/themes/forge@1.0.0.tar.gz",
+      "sha256": "667dbd1a47d736f73e32c4f69a212bb1290f33445d993e637d5900cfcf84c995",
       "previewUrl": "https://wardrobe.emdash.dev#forge"
     },
     {
@@ -22,6 +25,7 @@
       "personality": "Gray palette, blue accents, system fonts, structured",
       "version": "1.0.0",
       "tarballUrl": "https://cdn.emdash.dev/themes/slate@1.0.0.tar.gz",
+      "sha256": "9500e5d7cb0f7e4691d540d8268722d5a210241bed869ccdad21985406058378",
       "previewUrl": "https://wardrobe.emdash.dev#slate"
     },
     {
@@ -30,6 +34,7 @@
       "personality": "Whitespace, thin sans-serif, sage green accent",
       "version": "1.0.0",
       "tarballUrl": "https://cdn.emdash.dev/themes/drift@1.0.0.tar.gz",
+      "sha256": "6bfa171b0c7b99a8804b8461e5238ed8fe7db78666a8e2c031df7bfc2970169a",
       "previewUrl": "https://wardrobe.emdash.dev#drift"
     },
     {
@@ -38,7 +43,36 @@
       "personality": "Rounded corners, cream background, terracotta accents",
       "version": "1.0.0",
       "tarballUrl": "https://cdn.emdash.dev/themes/bloom@1.0.0.tar.gz",
+      "sha256": "df7d4aad86417e75dc980cf427accf7f9306fefa956a37694f17a566792529e0",
       "previewUrl": "https://wardrobe.emdash.dev#bloom"
+    },
+    {
+      "name": "aurora",
+      "description": "For brands that refuse to blend in.",
+      "personality": "Gradient, modern, colorful. Vibrant color transitions with contemporary sans-serif",
+      "comingSoon": true,
+      "estimatedRelease": "Coming Summer 2026"
+    },
+    {
+      "name": "chronicle",
+      "description": "Stories deserve dignity.",
+      "personality": "Newspaper-inspired, classic serif typography, elegant black & white with gold accents",
+      "comingSoon": true,
+      "estimatedRelease": "Coming Fall 2026"
+    },
+    {
+      "name": "neon",
+      "description": "The future is now.",
+      "personality": "Cyberpunk, dark background with bright neon accents, monospace fonts, futuristic edge",
+      "comingSoon": true,
+      "estimatedRelease": "Coming Summer 2026"
+    },
+    {
+      "name": "haven",
+      "description": "Home on the internet.",
+      "personality": "Cozy, cottage-core aesthetic, warm earth tones, hand-drawn elements, intimate spacing",
+      "comingSoon": true,
+      "estimatedRelease": "Coming Fall 2026"
     }
   ]
 }
