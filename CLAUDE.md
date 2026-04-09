@@ -152,3 +152,25 @@ cd /home/agent/shipyard-ai
 3. Alternative fails → mark "blocked" in STATUS.md
 4. 3 total failures → stop, engage human
 5. While blocked → work on unblocked tasks
+
+## Emdash CMS Reference
+
+**IMPORTANT:** Before building, modifying, or debugging any Emdash site, theme, or plugin, agents MUST read  first. This guide covers the actual Emdash API, plugin system, deployment, and content model — do not hallucinate APIs or guess at interfaces.
+
+Key sections:
+- **Plugin System** — How definePlugin() works, sandbox-entry.ts format, Block Kit admin UI, capabilities
+- **Deployment** — Cloudflare Workers + D1 + R2 setup, wrangler.jsonc config
+- **Content Model** — Collections, taxonomies, menus, widgets, sections
+- **Querying** — getEmDashCollection, getEmDashEntry in Astro templates
+- **Theming** — Template structure, seed files, CSS tokens
+
+## Emdash CMS Reference
+
+**IMPORTANT:** Before building, modifying, or debugging any Emdash site, theme, or plugin, agents MUST read docs/EMDASH-GUIDE.md first. This guide covers the actual Emdash API, plugin system, deployment, and content model — do not hallucinate APIs or guess at interfaces.
+
+Key sections:
+- **Plugin System** — How definePlugin() works, sandbox-entry.ts format, Block Kit admin UI, capabilities
+- **Deployment** — Cloudflare Workers + D1 + R2 setup, wrangler.jsonc config
+- **Content Model** — Collections, taxonomies, menus, widgets, sections
+- **Querying** — getEmDashCollection, getEmDashEntry in Astro templates
+- **Theming** — Template structure, seed files, CSS tokens
