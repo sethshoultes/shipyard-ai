@@ -8,6 +8,14 @@ Shipyard AI is an autonomous agency that turns product requirements into deploye
 
 ---
 
+## Status
+
+**What works today:** [EventDash](plugins/eventdash/) — event management with ticketing, CSV import, and check-in. Start here.
+
+**What's in progress:** 6 more plugins (MemberShip, ReviewPulse, SEODash, CommerceKit, FormForge, AdminPulse) — API migrations underway.
+
+---
+
 ## How It Works
 
 Every PRD runs through a 7-phase pipeline powered by AI agents with distinct roles and personalities:
@@ -69,30 +77,32 @@ PRD → Debate → Plan → Build → QA → Creative Review → Board Review �
 
 ### Emdash Plugins (7)
 
-| Plugin | Description |
-|--------|-------------|
-| **MemberShip** | Membership management with Stripe billing, content gating, member portals |
-| **EventDash** | Event management with ticketing, multi-day events, CSV import, check-in |
-| **AdminPulse** | Admin dashboard with site health monitoring |
-| **ReviewPulse** | Review collection and display with Google import |
-| **FormForge** | Form builder with templates, submissions, and validation |
-| **SEODash** | SEO management and optimization tools |
-| **CommerceKit** | E-commerce toolkit for Emdash sites |
+| Plugin | Status | Description |
+|--------|--------|-------------|
+| **EventDash** | ✅ Working | Event management with ticketing, multi-day events, CSV import, check-in |
+| **MemberShip** | ❌ Known Issues | Membership management with Stripe billing — API migration needed |
+| **ReviewPulse** | ❌ Known Issues | Review collection and display — API migration needed |
+| **SEODash** | ❌ Known Issues | SEO management tools — API migration needed |
+| **CommerceKit** | 🔧 In Progress | E-commerce toolkit — unverified |
+| **FormForge** | 🔧 In Progress | Form builder with templates — unverified |
+| **AdminPulse** | 🔧 In Progress | Admin dashboard — different architecture |
 
 ### Example Sites (4)
 
 Live Emdash sites running on Cloudflare Workers with D1 databases and R2 storage:
 
-| Site | Live URL | Template |
-|------|----------|----------|
-| **Bella's Bistro** | [bellas.shipyard.company](https://bellas.shipyard.company) | Restaurant / Marketing |
-| **Craft & Co Studio** | [craft.shipyard.company](https://craft.shipyard.company) | Design Studio / Portfolio |
-| **Peak Dental Care** | [dental.shipyard.company](https://dental.shipyard.company) | Dental Practice / Marketing |
-| **Sunrise Yoga Studio** | [yoga.shipyard.company](https://yoga.shipyard.company) | Yoga Studio / Marketing |
+| Site | Custom Domain | Workers Dev URL | Template |
+|------|---------------|-----------------|----------|
+| **Bella's Bistro** | [bellas.shipyard.company](https://bellas.shipyard.company) | [bellas-bistro.workers.dev](https://bellas-bistro.workers.dev) | Restaurant / Marketing |
+| **Craft & Co Studio** | [craft.shipyard.company](https://craft.shipyard.company) | [craft-co-studio.workers.dev](https://craft-co-studio.workers.dev) | Design Studio / Portfolio |
+| **Peak Dental Care** | [dental.shipyard.company](https://dental.shipyard.company) | [peak-dental.workers.dev](https://peak-dental.workers.dev) | Dental Practice / Marketing |
+| **Sunrise Yoga Studio** | [yoga.shipyard.company](https://yoga.shipyard.company) | [sunrise-yoga.workers.dev](https://sunrise-yoga.workers.dev) | Yoga Studio / Marketing |
+
+> **Note:** Custom domains route through Caddy on DO server. Workers dev URLs are direct to Cloudflare — use these if custom domains are down.
 
 ### Wardrobe Theme Marketplace
 
-5 installable themes for Emdash with a CLI installer:
+5 themes for Emdash — browse the showcase:
 
 | Theme | Personality |
 |-------|-------------|
@@ -102,7 +112,7 @@ Live Emdash sites running on Cloudflare Workers with D1 databases and R2 storage
 | **Bloom** | Warm and organic — rounded corners, cream + terracotta |
 | **Slate** | Corporate and clean — gray palette, blue accents, structured |
 
-**Preview:** [wardrobe-showcase.pages.dev](https://wardrobe-showcase.pages.dev)
+**Browse themes:** [wardrobe-showcase.pages.dev](https://wardrobe-showcase.pages.dev)
 
 ## Usage
 
