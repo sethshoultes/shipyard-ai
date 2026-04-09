@@ -18,8 +18,11 @@ PRD → Debate → Plan → Build → QA → Creative Review → Board Review �
 
 | Phase | What Happens | Agents |
 |-------|-------------|--------|
-| **Debate** | Steve Jobs and Elon Musk argue strategy across two rounds | Steve, Elon, Rick Rubin, Phil Jackson |
-| **Plan** | Task breakdown with wave-based parallel execution | Planner, Sara Blakely |
+| **Debate R1** | Steve and Elon each stake their position on strategy | Steve Jobs, Elon Musk |
+| **Debate R2** | They challenge each other's arguments | Steve Jobs, Elon Musk |
+| **Essence** | Rick Rubin distills the debate to what matters | Rick Rubin |
+| **Consolidation** | Phil Jackson synthesizes decisions from the debate | Phil Jackson |
+| **Plan** | Task breakdown with wave-based parallel execution | Planner, Sara Blakely (gut check) |
 | **Build** | Code written, tested, committed | Builder agents |
 | **QA** | Two independent quality passes | Margaret Hamilton |
 | **Creative Review** | Visual design, copy, and demo script review | Jony Ive, Maya Angelou, Aaron Sorkin |
