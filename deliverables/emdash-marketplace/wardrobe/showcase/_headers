@@ -1,0 +1,31 @@
+/*
+  # Cache control for all resources
+  Cache-Control: max-age=3600, public
+  # Security headers
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Cache static assets longer
+/screenshots/*
+  Cache-Control: max-age=31536000, immutable
+
+/styles.css
+  Cache-Control: max-age=31536000, immutable
+
+/script.js
+  Cache-Control: max-age=31536000, immutable
+
+# HTML pages - cache but check for updates
+/index.html
+  Cache-Control: max-age=3600, must-revalidate
+  Content-Type: text/html; charset=utf-8
+
+# Set proper MIME types
+/screenshots/*.svg
+  Content-Type: image/svg+xml; charset=utf-8
+
+# Add CORS headers for API calls if needed
+/*
+  Access-Control-Allow-Origin: *

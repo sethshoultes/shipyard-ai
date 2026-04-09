@@ -1,0 +1,23 @@
+name = "wardrobe-showcase"
+type = "javascript"
+compatibility_date = "2026-04-09"
+
+[env.production]
+name = "wardrobe-showcase-production"
+routes = [
+  { pattern = "*.emdash.app/*", zone_name = "emdash.app" }
+]
+
+# Build configuration for static assets
+[build]
+command = ""
+cwd = "./"
+watch_paths = ["index.html", "styles.css", "script.js", "screenshots/**/*"]
+
+# Static assets directory
+[build.upload]
+directory = "."
+format = "service-worker"
+
+# Cloudflare Pages configuration
+pages_build_output_dir = "."

@@ -1,47 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Essential Meta Tags -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Wardrobe - Instant dignity for your Emdash site. Choose from 5 carefully curated themes.">
-    <title>Wardrobe - Emdash Themes</title>
+    <meta name="description" content="Install a new theme in one command. Your content stays untouched. Choose from 5 carefully curated Emdash themes — Ember, Forge, Slate, Drift, and Bloom.">
+    <meta name="keywords" content="emdash themes, astro themes, cms themes, wardrobe, theme marketplace, static site generator, web design">
+    <meta name="author" content="Emdash">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Wardrobe — Theme Marketplace for Emdash">
+    <meta property="og:description" content="Install a new theme in one command. Your content stays untouched.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://wardrobe.emdash.app/">
+    <meta property="og:image" content="https://wardrobe.emdash.app/og-image.png">
+    <meta property="og:image:alt" content="Wardrobe - Emdash Theme Marketplace">
+    <meta property="og:site_name" content="Wardrobe">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Wardrobe — Theme Marketplace for Emdash">
+    <meta name="twitter:description" content="Install a new theme in one command. Your content stays untouched.">
+    <meta name="twitter:image" content="https://wardrobe.emdash.app/twitter-image.png">
+    <meta name="twitter:site" content="@emdash">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://wardrobe.emdash.app/">
+
+    <!-- Preconnect for performance optimization -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Title for browser tab -->
+    <title>Wardrobe — Theme Marketplace for Emdash</title>
+
+    <!-- Optimize CSS loading: inline critical CSS, defer non-critical -->
+    <style>
+        /* Critical CSS - inline for faster first paint */
+        html { scroll-behavior: smooth; }
+        body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .header { background: #ffffff; border-bottom: 1px solid #e5e7eb; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .hero { padding: 80px 0; text-align: center; background: linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%); }
+    </style>
     <link rel="stylesheet" href="styles.css">
+
+    <!-- JSON-LD Structured Data for SoftwareApplication -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Wardrobe",
+        "description": "Theme marketplace for Emdash - Install a new theme in one command. Your content stays untouched.",
+        "url": "https://wardrobe.emdash.app/",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Web",
+        "offers": {
+            "@type": "AggregateOffer",
+            "priceCurrency": "USD",
+            "price": "0",
+            "availability": "https://schema.org/InStock"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": "Emdash",
+            "url": "https://emdash.app/"
+        }
+    }
+    </script>
+
 </head>
 <body>
-    <header class="header">
+    <header class="header" role="banner">
         <div class="container">
             <div class="logo">
-                <h1>Wardrobe</h1>
+                <h1 aria-label="Wardrobe - Theme Marketplace">Wardrobe</h1>
                 <p class="tagline">Instant dignity for your Emdash site</p>
             </div>
             <nav class="nav" aria-label="Main navigation">
-                <a href="#themes">Themes</a>
-                <a href="#install">Install</a>
+                <a href="#themes" aria-label="Browse available themes">Themes</a>
+                <a href="#install" aria-label="View installation guide">Install</a>
             </nav>
         </div>
     </header>
 
-    <main>
+    <main role="main">
         <!-- Hero Section -->
-        <section class="hero">
+        <section class="hero" aria-label="Hero section">
             <div class="container">
                 <h2 class="hero-title">Transform Your Site in One Command</h2>
                 <p class="hero-subtitle">Try it on. If it doesn't fit, try another. Your content stays untouched.</p>
-                <div class="hero-cta">
-                    <code class="code-block">npx wardrobe install [theme]</code>
+                <div class="hero-cta" aria-label="Installation command example">
+                    <code class="code-block" role="img" aria-label="Install command: npx wardrobe install [theme]">npx wardrobe install [theme]</code>
                 </div>
             </div>
         </section>
 
         <!-- Themes Section -->
-        <section id="themes" class="themes-section">
+        <section id="themes" class="themes-section" aria-label="Available themes">
             <div class="container">
                 <h2 class="section-title">Five Themes. One Command.</h2>
                 <p class="section-subtitle">Each with distinct personality. Choose the one that fits your voice.</p>
 
-                <div class="themes-grid">
+                <div class="themes-grid" role="list">
                     <!-- Ember Theme -->
-                    <article class="theme-card" data-theme="ember">
+                    <article class="theme-card" data-theme="ember" role="listitem" aria-label="Ember theme - Bold, editorial design">
                         <div class="theme-image">
                             <img src="screenshots/ember.svg" alt="Ember theme preview - Bold, editorial design" loading="lazy">
                         </div>
@@ -57,7 +122,7 @@
                     </article>
 
                     <!-- Forge Theme -->
-                    <article class="theme-card" data-theme="forge">
+                    <article class="theme-card" data-theme="forge" role="listitem" aria-label="Forge theme - Dark technical design">
                         <div class="theme-image">
                             <img src="screenshots/forge.svg" alt="Forge theme preview - Dark technical design" loading="lazy">
                         </div>
@@ -73,7 +138,7 @@
                     </article>
 
                     <!-- Slate Theme -->
-                    <article class="theme-card" data-theme="slate">
+                    <article class="theme-card" data-theme="slate" role="listitem" aria-label="Slate theme - Clean professional design">
                         <div class="theme-image">
                             <img src="screenshots/slate.svg" alt="Slate theme preview - Clean professional design" loading="lazy">
                         </div>
@@ -89,7 +154,7 @@
                     </article>
 
                     <!-- Drift Theme -->
-                    <article class="theme-card" data-theme="drift">
+                    <article class="theme-card" data-theme="drift" role="listitem" aria-label="Drift theme - Minimal airy design">
                         <div class="theme-image">
                             <img src="screenshots/drift.svg" alt="Drift theme preview - Minimal airy design" loading="lazy">
                         </div>
@@ -105,7 +170,7 @@
                     </article>
 
                     <!-- Bloom Theme -->
-                    <article class="theme-card" data-theme="bloom">
+                    <article class="theme-card" data-theme="bloom" role="listitem" aria-label="Bloom theme - Warm inviting design">
                         <div class="theme-image">
                             <img src="screenshots/bloom.svg" alt="Bloom theme preview - Warm inviting design" loading="lazy">
                         </div>
@@ -124,22 +189,22 @@
         </section>
 
         <!-- Install Guide Section -->
-        <section id="install" class="install-section">
+        <section id="install" class="install-section" aria-label="Installation guide">
             <div class="container">
                 <h2 class="section-title">Installation is Simple</h2>
-                <div class="install-steps">
-                    <div class="step">
-                        <div class="step-number">1</div>
+                <div class="install-steps" role="list">
+                    <div class="step" role="listitem" aria-label="Step 1: Choose Your Theme">
+                        <div class="step-number" aria-hidden="true">1</div>
                         <h3>Choose Your Theme</h3>
                         <p>Browse the themes above and pick one that resonates.</p>
                     </div>
-                    <div class="step">
-                        <div class="step-number">2</div>
+                    <div class="step" role="listitem" aria-label="Step 2: Copy the Command">
+                        <div class="step-number" aria-hidden="true">2</div>
                         <h3>Copy the Command</h3>
                         <p>Click the copy button or manually type the install command.</p>
                     </div>
-                    <div class="step">
-                        <div class="step-number">3</div>
+                    <div class="step" role="listitem" aria-label="Step 3: Run in Your Project">
+                        <div class="step-number" aria-hidden="true">3</div>
                         <h3>Run in Your Project</h3>
                         <p>Your theme installs in under 3 seconds. Your content stays exactly the same.</p>
                     </div>
@@ -148,9 +213,9 @@
         </section>
     </main>
 
-    <footer class="footer">
+    <footer class="footer" role="contentinfo" aria-label="Footer">
         <div class="container">
-            <p>&copy; 2024 Wardrobe. Part of the Emdash ecosystem.</p>
+            <p>&copy; 2024 Wardrobe. Part of the <a href="https://emdash.app/" aria-label="Visit Emdash website">Emdash ecosystem</a>.</p>
             <p class="footer-note">Pick a theme. Change your life. (At least your website's.)</p>
         </div>
     </footer>

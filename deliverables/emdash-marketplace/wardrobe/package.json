@@ -9,7 +9,8 @@
   "scripts": {
     "cli": "tsx cli/index.ts",
     "build": "tsc",
-    "build:tarballs": "tsx scripts/build-tarballs.ts"
+    "build:tarballs": "tsx scripts/build-tarballs.ts",
+    "upload:themes": "tsx scripts/upload-tarballs.ts"
   },
   "dependencies": {
     "commander": "^13.1.0",

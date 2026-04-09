@@ -37,11 +37,138 @@ Generated: 2026-04-08
 
 All tarballs meet the target and hard limit requirements.
 
-## Current Distribution (V1)
+## Cloudflare R2 Distribution (V1 - Recommended)
 
-For V1, tarballs are stored locally in the `dist/themes/` directory.
+Per architectural decisions, R2 is the recommended distribution method for V1 due to:
+- CDN-backed fast downloads for sub-3-second installs
+- Simple URL structure and scalability
+- Cost-effective for theme distribution
 
-### Local Distribution Path
+### R2 URL Format
+
+All theme tarballs are served through Cloudflare's CDN:
+
+```
+https://pub-{ACCOUNT_ID}.r2.dev/{theme}@{version}.tar.gz
+```
+
+Example:
+```
+https://pub-abc123def456.r2.dev/ember@1.0.0.tar.gz
+https://pub-abc123def456.r2.dev/forge@1.0.0.tar.gz
+```
+
+### Setup Process
+
+#### 1. Create the R2 Bucket
+
+First, ensure you have Wrangler CLI installed:
+
+```bash
+npm install -g @cloudflare/wrangler
+wrangler login
+```
+
+Then create the bucket:
+
+```bash
+bash scripts/create-r2-bucket.sh emdash-themes
+```
+
+Or manually using Wrangler:
+
+```bash
+wrangler r2 bucket create emdash-themes
+```
+
+#### 2. Configure R2 Credentials
+
+Copy `.env.example` to `.env` and fill in your credentials:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with:
+- `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare account ID (32-char hex)
+- `R2_ACCESS_KEY_ID`: API token access key
+- `R2_SECRET_ACCESS_KEY`: API token secret key
+
+Get credentials from Cloudflare Dashboard:
+1. Go to https://dash.cloudflare.com/?to=/:account/r2
+2. Click Settings > API tokens
+3. Create new R2 API token with "Edit" permissions
+4. Copy credentials to `.env`
+
+#### 3. Upload Tarballs to R2
+
+Ensure tarballs are built:
+
+```bash
+npm run build:tarballs
+```
+
+Upload to R2:
+
+```bash
+npm run upload:themes
+```
+
+This will:
+- Validate R2 credentials
+- Upload all tarballs from `dist/themes/`
+- Display CDN URLs for each theme
+- Verify successful uploads
+
+Example output:
+```
+🚀 Uploading 5 theme tarballs to R2...
+   Bucket: emdash-themes
+   Account: abc123def456...
+
+✓ Uploaded ember@1.0.0.tar.gz (6.27 KB)
+✓ Uploaded forge@1.0.0.tar.gz (5.08 KB)
+✓ Uploaded slate@1.0.0.tar.gz (5.18 KB)
+✓ Uploaded drift@1.0.0.tar.gz (5.32 KB)
+✓ Uploaded bloom@1.0.0.tar.gz (5.45 KB)
+
+✓ All tarballs uploaded successfully!
+
+R2 URLs:
+  https://pub-abc123def456.r2.dev/ember@1.0.0.tar.gz
+  https://pub-abc123def456.r2.dev/forge@1.0.0.tar.gz
+  https://pub-abc123def456.r2.dev/slate@1.0.0.tar.gz
+  https://pub-abc123def456.r2.dev/drift@1.0.0.tar.gz
+  https://pub-abc123def456.r2.dev/bloom@1.0.0.tar.gz
+```
+
+#### 4. Update Registry
+
+Update `registry/themes.json` with the R2 URLs:
+
+```json
+{
+  "themes": [
+    {
+      "id": "ember",
+      "name": "Ember",
+      "version": "1.0.0",
+      "url": "https://pub-{ACCOUNT_ID}.r2.dev/ember@1.0.0.tar.gz"
+    }
+  ]
+}
+```
+
+### Performance
+
+With R2 + Cloudflare CDN:
+- Download speeds: < 1 second globally
+- Install time: < 3 seconds total
+- Bandwidth cost: Efficient with Cloudflare's global network
+
+## Local Distribution (Development)
+
+For V1 development/testing, tarballs are stored locally in the `dist/themes/` directory:
 
 ```
 /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/dist/themes/
@@ -52,31 +179,21 @@ For V1, tarballs are stored locally in the `dist/themes/` directory.
 └── bloom@1.0.0.tar.gz
 ```
 
-The CLI (in development/testing) can reference these local paths or they can be served by a development server.
+The CLI can reference these local paths for testing before deployment to R2.
 
-## Future Distribution (V2+)
+## Alternative Distribution Methods (Not Recommended for V1)
 
-Once deployed, the registry (`registry/themes.json`) will point to:
-
-### Option A: CDN (R2)
-```
-https://cdn.emdash.dev/themes/{theme}@{version}.tar.gz
-```
-
-### Option B: npm Packages
+### Option A: npm Packages
 ```
 npm install @wardrobe/{theme}@{version}
 ```
+(More complex setup, better for later versions)
 
-### Option C: GitHub Releases
+### Option B: GitHub Releases
 ```
 https://github.com/emdash-app/wardrobe/releases/download/v{version}/{theme}@{version}.tar.gz
 ```
-
-Current registry entries are placeholders pointing to CDN:
-- `https://cdn.emdash.dev/themes/{theme}@1.0.0.tar.gz`
-
-These URLs will be updated once the distribution infrastructure is deployed.
+(Manual release management, slower than CDN)
 
 ## Extraction Verification
 

@@ -241,6 +241,13 @@ code {
     }
 }
 
+@media (min-width: 768px) {
+    .themes-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--spacing-md);
+    }
+}
+
 @media (min-width: 1024px) {
     .themes-grid {
         grid-template-columns: repeat(5, 1fr);
@@ -343,6 +350,11 @@ code {
     font-size: 0.875rem;
     white-space: nowrap;
     flex-shrink: 0;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
 }
 
 .copy-btn:hover {
@@ -372,6 +384,12 @@ code {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--spacing-lg);
+}
+
+@media (min-width: 640px) {
+    .install-steps {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (min-width: 768px) {
@@ -467,7 +485,35 @@ button:focus {
 }
 
 /* ============================================================================
-   Very Small Screens (375px and below)
+   Mobile Improvements (all sizes)
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    /* Ensure no horizontal overflow */
+    body {
+        overflow-x: hidden;
+    }
+
+    .container {
+        padding: 0 var(--spacing-md);
+    }
+
+    /* Improve readability on small text */
+    body {
+        font-size: 16px;
+    }
+
+    code {
+        font-size: 0.85em;
+    }
+
+    .install-command {
+        word-break: break-word;
+    }
+}
+
+/* ============================================================================
+   Small Mobile Screens (375px and below)
    ============================================================================ */
 
 @media (max-width: 375px) {
@@ -504,5 +550,19 @@ button:focus {
 
     .copy-btn {
         width: 100%;
+    }
+
+    .code-block {
+        font-size: 0.875rem;
+        word-break: break-word;
+        max-width: 100%;
+    }
+
+    .theme-name {
+        font-size: 1.125rem;
+    }
+
+    .install-command {
+        font-size: 0.8rem;
     }
 }

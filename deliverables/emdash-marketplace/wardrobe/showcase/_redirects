@@ -1,0 +1,17 @@
+# Redirect rules for Cloudflare Pages
+
+# Redirect root to index.html (handled automatically by Pages)
+# Explicitly handled redirects below:
+
+# Ensure trailing slashes are consistent
+/themes / 301
+/install / 301
+
+# Redirect old theme URLs if needed
+/theme/* /index.html 200
+
+# API documentation redirect (if applicable)
+/api/docs* /index.html 200
+
+# Ensure index.html is served for single-page app behavior if needed
+/* /index.html 200
