@@ -184,10 +184,7 @@ function escapeICalString(str: string): string {
  */
 function validateStringLength(value: string, maxLength: number, fieldName: string): string {
 	if (value.length > maxLength) {
-		throw new Response(
-			JSON.stringify({ error: `${fieldName} must be ${maxLength} characters or less` }),
-			{ status: 400, headers: { "Content-Type": "application/json" } }
-		);
+		throw new Error(`${fieldName} must be ${maxLength} characters or less`);
 	}
 	return value;
 }
@@ -376,10 +373,7 @@ export default definePlugin({
 					return { events: limited, total: events.length };
 				} catch (error) {
 					ctx.log.error(`Events list error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to fetch events" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to fetch events");
 				}
 			},
 		},
@@ -398,26 +392,17 @@ export default definePlugin({
 					const eventId = String(rc.pathParams?.id ?? "").trim();
 
 					if (!eventId) {
-						throw new Response(
-							JSON.stringify({ error: "Event ID required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Event ID required");
 					}
 
 					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
 					if (!eventJson) {
-						throw new Response(
-							JSON.stringify({ error: "Event not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Event not found");
 					}
 
 					const event = parseJSON<EventRecord>(eventJson, null);
 					if (!event) {
-						throw new Response(
-							JSON.stringify({ error: "Event not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Event not found");
 					}
 
 					const waitlist = await getWaitlist(ctx, eventId);
@@ -429,12 +414,9 @@ export default definePlugin({
 						waitlistCount: waitlist.length,
 					};
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Event detail error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to fetch event" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to fetch event");
 				}
 			},
 		},
@@ -462,40 +444,25 @@ export default definePlugin({
 
 					// Validate input
 					if (!eventId) {
-						throw new Response(
-							JSON.stringify({ error: "Event ID required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Event ID required");
 					}
 
 					if (!name) {
-						throw new Response(
-							JSON.stringify({ error: "Name is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Name is required");
 					}
 
 					if (!email || !isValidEmail(email)) {
-						throw new Response(
-							JSON.stringify({ error: "Valid email is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Valid email is required");
 					}
 
 					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
 					if (!eventJson) {
-						throw new Response(
-							JSON.stringify({ error: "Event not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Event not found");
 					}
 
 					const event = parseJSON<EventRecord>(eventJson, null);
 					if (!event) {
-						throw new Response(
-							JSON.stringify({ error: "Event not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Event not found");
 					}
 
 					// Acquire event-level lock to prevent capacity overflow (P0 fix)
@@ -504,10 +471,7 @@ export default definePlugin({
 					const lockKey = `register-lock:${eventId}`;
 					const existingLock = await ctx.kv.get<string>(lockKey);
 					if (existingLock) {
-						throw new Response(
-							JSON.stringify({ error: "Registration in progress, please try again" }),
-							{ status: 429, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Registration in progress, please try again");
 					}
 					await ctx.kv.set(lockKey, "1", { ex: 5 }); // 5 second lock
 
@@ -516,10 +480,7 @@ export default definePlugin({
 						const freshEventJson = await ctx.kv.get<string>(`event:${eventId}`);
 						const freshEvent = parseJSON<EventRecord>(freshEventJson, null);
 						if (!freshEvent) {
-							throw new Response(
-								JSON.stringify({ error: "Event not found" }),
-								{ status: 404, headers: { "Content-Type": "application/json" } }
-							);
+							throw new Error("Event not found");
 						}
 
 						// Check if already registered
@@ -671,12 +632,9 @@ export default definePlugin({
 						await ctx.kv.delete(lockKey);
 					}
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Registration error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Registration failed" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Registration failed");
 				}
 			},
 		},
@@ -698,26 +656,17 @@ export default definePlugin({
 					const email = validateStringLength(String(input.email ?? "").trim().toLowerCase(), 254, "Email");
 
 					if (!eventId || !email || !isValidEmail(email)) {
-						throw new Response(
-							JSON.stringify({ error: "Event ID and valid email required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Event ID and valid email required");
 					}
 
 					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
 					if (!eventJson) {
-						throw new Response(
-							JSON.stringify({ error: "Event not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Event not found");
 					}
 
 					const event = parseJSON<EventRecord>(eventJson, null);
 					if (!event) {
-						throw new Response(
-							JSON.stringify({ error: "Event not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Event not found");
 					}
 
 					// Check if registered
@@ -728,10 +677,7 @@ export default definePlugin({
 					if (regJson) {
 						const registration = parseJSON<RegistrationRecord>(regJson, null);
 						if (!registration) {
-							throw new Response(
-								JSON.stringify({ error: "Registration not found" }),
-								{ status: 404, headers: { "Content-Type": "application/json" } }
-							);
+							throw new Error("Registration not found");
 						}
 						isRegistered = true;
 
@@ -788,10 +734,7 @@ export default definePlugin({
 					}
 
 					if (!isRegistered && !isWaitlisted) {
-						throw new Response(
-							JSON.stringify({ error: "No registration or waitlist entry found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("No registration or waitlist entry found");
 					}
 
 					// Promote from waitlist if someone is waiting and we just freed a registered spot
@@ -836,12 +779,9 @@ export default definePlugin({
 						message: isWaitlisted ? "Waitlist entry cancelled" : "Registration cancelled",
 					};
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Cancellation error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Cancellation failed" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Cancellation failed");
 				}
 			},
 		},
@@ -860,15 +800,6 @@ export default definePlugin({
 					const rc = routeCtx as Record<string, unknown>;
 					const input = rc.input as Record<string, unknown>;
 
-					// Check admin auth
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const title = validateStringLength(String(input.title ?? "").trim(), 200, "Title");
 					const date = String(input.date ?? "").trim();
 					const time = String(input.time ?? "").trim();
@@ -880,12 +811,7 @@ export default definePlugin({
 					const stripeProductId = String(input.stripeProductId ?? "").trim();
 
 					if (!title || !date || !time || !location || capacity < 1) {
-						throw new Response(
-							JSON.stringify({
-								error: "Title, date, time, location, and capacity required",
-							}),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Title, date, time, location, and capacity required");
 					}
 
 					// Validate ticketTypes if provided
@@ -900,12 +826,7 @@ export default definePlugin({
 							const ticketDescription = validateStringLength(String(tt.description ?? "").trim(), 500, "Ticket description");
 
 							if (!name || !stripePriceId || price < 0 || ticketCapacity < 1) {
-								throw new Response(
-									JSON.stringify({
-										error: "Ticket type requires: name, stripePriceId, price, capacity",
-									}),
-									{ status: 400, headers: { "Content-Type": "application/json" } }
-								);
+								throw new Error("Ticket type requires: name, stripePriceId, price, capacity");
 							}
 
 							return {
@@ -921,12 +842,7 @@ export default definePlugin({
 						});
 
 						if (requiresPayment && ticketTypes.length === 0) {
-							throw new Response(
-								JSON.stringify({
-									error: "Paid events require at least one ticket type",
-								}),
-								{ status: 400, headers: { "Content-Type": "application/json" } }
-							);
+							throw new Error("Paid events require at least one ticket type");
 						}
 					}
 
@@ -961,12 +877,9 @@ export default definePlugin({
 
 					return { success: true, eventId };
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Create event error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to create event" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to create event");
 				}
 			},
 		},
@@ -985,15 +898,6 @@ export default definePlugin({
 					const rc = routeCtx as Record<string, unknown>;
 					const input = rc.input as Record<string, unknown>;
 
-					// Check admin auth
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const title = validateStringLength(String(input.title ?? "").trim(), 200, "Title");
 					const time = String(input.time ?? "").trim();
 					const location = validateStringLength(String(input.location ?? "").trim(), 500, "Location");
@@ -1003,12 +907,7 @@ export default definePlugin({
 					const endTime = String(input.endTime ?? "").trim();
 
 					if (!title || !time || !location || capacity < 1 || dayOfWeek < 0 || dayOfWeek > 6) {
-						throw new Response(
-							JSON.stringify({
-								error: "Title, time, location, capacity, and dayOfWeek (0-6) required",
-							}),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Title, time, location, capacity, and dayOfWeek (0-6) required");
 					}
 
 					const templateId = generateId();
@@ -1031,12 +930,9 @@ export default definePlugin({
 
 					return { success: true, templateId };
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Create template error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to create template" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to create template");
 				}
 			},
 		},
@@ -1054,40 +950,22 @@ export default definePlugin({
 					const rc = routeCtx as Record<string, unknown>;
 					const input = rc.input as Record<string, unknown>;
 
-					// Check admin auth
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const templateId = String(input.templateId ?? "").trim();
 					const weeks = Math.max(1, parseInt(String(input.weeks ?? "4"), 10));
 					const startDateInput = String(input.startDate ?? "");
 
 					if (!templateId) {
-						throw new Response(
-							JSON.stringify({ error: "Template ID required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Template ID required");
 					}
 
 					const templateJson = await ctx.kv.get<string>(`event-template:${templateId}`);
 					if (!templateJson) {
-						throw new Response(
-							JSON.stringify({ error: "Template not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Template not found");
 					}
 
 					const template = parseJSON<EventTemplateRecord>(templateJson, null);
 					if (!template) {
-						throw new Response(
-							JSON.stringify({ error: "Template not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Template not found");
 					}
 
 					// Determine start date
@@ -1101,10 +979,7 @@ export default definePlugin({
 					now.setHours(0, 0, 0, 0);
 					currentDate.setHours(0, 0, 0, 0);
 					if (currentDate < now) {
-						throw new Response(
-							JSON.stringify({ error: "Start date must be in the future" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Start date must be in the future");
 					}
 
 					// Generate instances for N weeks
@@ -1152,12 +1027,9 @@ export default definePlugin({
 
 					return { success: true, generatedCount: generatedIds.length };
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Generate recurring error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to generate recurring events" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to generate recurring events");
 				}
 			},
 		},
@@ -1181,62 +1053,41 @@ export default definePlugin({
 					const ticketType = validateStringLength(String(input.ticketType ?? "").trim(), 100, "Ticket type");
 
 					if (!eventId || !name || !email || !ticketType || !isValidEmail(email)) {
-						throw new Response(
-							JSON.stringify({ error: "Event ID, name, email, and ticket type required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Event ID, name, email, and ticket type required");
 					}
 
 					// Get event
 					const eventJson = await ctx.kv.get<string>(`event:${eventId}`);
 					if (!eventJson) {
-						throw new Response(
-							JSON.stringify({ error: "Event not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Event not found");
 					}
 
 					const event = parseJSON<EventRecord>(eventJson, null);
 					if (!event) {
-						throw new Response(
-							JSON.stringify({ error: "Event not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Event not found");
 					}
 
 					// Validate it's a paid event
 					if (!event.requiresPayment || !event.ticketTypes || event.ticketTypes.length === 0) {
-						throw new Response(
-							JSON.stringify({ error: "Event does not accept paid registrations" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Event does not accept paid registrations");
 					}
 
 					// Find the ticket type
 					const selectedTicket = event.ticketTypes.find((t) => t.name === ticketType);
 					if (!selectedTicket) {
-						throw new Response(
-							JSON.stringify({ error: "Ticket type not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Ticket type not found");
 					}
 
 					// Check capacity
 					if (selectedTicket.sold >= selectedTicket.capacity) {
-						throw new Response(
-							JSON.stringify({ error: "Ticket type is sold out" }),
-							{ status: 409, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Ticket type is sold out");
 					}
 
 					// Get Stripe API key
 					const stripeKey = ctx.env?.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY;
 					if (!stripeKey) {
 						ctx.log.error("Stripe secret key not configured");
-						throw new Response(
-							JSON.stringify({ error: "Payment processing not available" }),
-							{ status: 503, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Payment processing not available");
 					}
 
 					// Create payment intent via Stripe API
@@ -1262,20 +1113,14 @@ export default definePlugin({
 
 					if (!paymentIntentResponse.ok) {
 						ctx.log.error(`Stripe API error: ${paymentIntentResponse.status}`);
-						throw new Response(
-							JSON.stringify({ error: "Failed to create payment intent" }),
-							{ status: 502, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Failed to create payment intent");
 					}
 
 					const paymentIntent = (await paymentIntentResponse.json()) as Record<string, unknown>;
 					const clientSecret = String(paymentIntent.client_secret ?? "");
 
 					if (!clientSecret) {
-						throw new Response(
-							JSON.stringify({ error: "Failed to create payment intent" }),
-							{ status: 502, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Failed to create payment intent");
 					}
 
 					// Create pending registration record
@@ -1307,12 +1152,9 @@ export default definePlugin({
 						status: "pending",
 					};
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Checkout error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Checkout failed" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Checkout failed");
 				}
 			},
 		},

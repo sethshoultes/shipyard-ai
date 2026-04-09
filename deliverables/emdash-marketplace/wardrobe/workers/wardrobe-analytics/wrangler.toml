@@ -1,0 +1,22 @@
+name = "wardrobe-analytics"
+main = "src/index.ts"
+compatibility_date = "2026-03-29"
+compatibility_flags = ["nodejs_compat"]
+
+# D1 Database binding for analytics
+d1_databases = [
+  {
+    binding = "ANALYTICS_DB",
+    database_name = "wardrobe-analytics",
+    database_id = "your-database-id-here"
+  }
+]
+
+# Environment variables
+vars = { ENVIRONMENT = "production" }
+
+# Rate limiting and security
+limits = {
+  cpu_max_ms = 100,
+  request_body_size_mb = 1
+}

@@ -22,9 +22,16 @@ export function createMockKV(): MockKV {
 		_store: store,
 		get: vi.fn(async <T>(key: string): Promise<T | null> => {
 			const val = store.get(key);
-			return val !== undefined ? (val as unknown as T) : null;
+			if (val === undefined) return null;
+			// Auto-deserialize: kv.get returns typed data
+			try {
+				return JSON.parse(val) as T;
+			} catch {
+				return val as unknown as T;
+			}
 		}),
 		set: vi.fn(async (key: string, value: unknown, _opts?: { ex?: number }): Promise<void> => {
+			// Auto-serialize: kv.set accepts objects directly
 			store.set(key, typeof value === "string" ? value : JSON.stringify(value));
 		}),
 		delete: vi.fn(async (key: string): Promise<boolean> => {
@@ -119,21 +126,15 @@ export async function seedReview(
 	kv: MockKV,
 	review: ReturnType<typeof createTestReview>
 ) {
-	await kv.set(`review:${review.id}`, JSON.stringify(review));
+	// kv.set auto-serializes, so pass the object directly
+	await kv.set(`review:${review.id}`, review);
 
-	const listJson = await kv.get<string>("reviews:list");
-	let list: string[] = [];
-	if (listJson) {
-		try {
-			list = JSON.parse(listJson);
-		} catch {
-			list = [];
-		}
-	}
+	// kv.get returns typed data directly
+	const list = await kv.get<string[]>("reviews:list") ?? [];
 	if (!list.includes(review.id)) {
 		list.push(review.id);
 	}
-	await kv.set("reviews:list", JSON.stringify(list));
+	await kv.set("reviews:list", list);
 }
 
 /**

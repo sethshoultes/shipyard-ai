@@ -982,24 +982,15 @@ export default definePlugin({
 
 					// Validate input
 					if (!email) {
-						throw new Response(
-							JSON.stringify({ error: "Email is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Email is required");
 					}
 
 					if (!isValidEmail(email)) {
-						throw new Response(
-							JSON.stringify({ error: "Invalid email format" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Invalid email format");
 					}
 
 					if (!planId) {
-						throw new Response(
-							JSON.stringify({ error: "Plan is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Plan is required");
 					}
 
 					// Get plans
@@ -1010,10 +1001,7 @@ export default definePlugin({
 						(p: PlanConfig) => p.id === planId
 					);
 					if (!selectedPlan) {
-						throw new Response(
-							JSON.stringify({ error: "Plan not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Plan not found");
 					}
 
 					// Check existing member
@@ -1040,10 +1028,7 @@ export default definePlugin({
 					const existingLock = await ctx.kv.get<string>(lockKey);
 					if (existingLock) {
 						// Another registration is in progress
-						throw new Response(
-							JSON.stringify({ error: "Registration in progress, please try again" }),
-							{ status: 429, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Registration in progress, please try again");
 					}
 					await (ctx.kv as any).set(lockKey, "1", { ex: 5 }); // 5 second lock
 
@@ -1119,12 +1104,9 @@ export default definePlugin({
 						await ctx.kv.delete(lockKey);
 					}
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Register error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Internal server error");
 				}
 			},
 		},
@@ -1245,43 +1227,31 @@ export default definePlugin({
 					const email = String(input.email ?? "").trim().toLowerCase();
 
 					if (!email || !isValidEmail(email)) {
-						throw new Response(
-							JSON.stringify({ error: "Invalid email" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Invalid email");
 					}
 
 					const encodedEmail = emailToKvKey(email);
 					const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
 					if (!memberJson) {
-						throw new Response(
-							JSON.stringify({ error: "Member not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Member not found");
 					}
 
 					const member = parseJSON<MemberRecord>(memberJson, null);
 					if (!member) {
-						throw new Response(
-							JSON.stringify({ error: "Member not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Member not found");
 					}
 
 					member.status = "active";
 					member.approvedAt = new Date().toISOString();
 
-					await ctx.kv.set(`member:${encodedEmail}`, JSON.stringify(member));
+					await ctx.kv.set(`member:${encodedEmail}`, member);
 					ctx.log.info(`Member approved: ${email}`);
 
 					return { success: true };
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Approve error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Internal server error");
 				}
 			},
 		},
@@ -1301,42 +1271,30 @@ export default definePlugin({
 					const email = String(input.email ?? "").trim().toLowerCase();
 
 					if (!email || !isValidEmail(email)) {
-						throw new Response(
-							JSON.stringify({ error: "Invalid email" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Invalid email");
 					}
 
 					const encodedEmail = emailToKvKey(email);
 					const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
 					if (!memberJson) {
-						throw new Response(
-							JSON.stringify({ error: "Member not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Member not found");
 					}
 
 					const member = parseJSON<MemberRecord>(memberJson, null);
 					if (!member) {
-						throw new Response(
-							JSON.stringify({ error: "Member not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Member not found");
 					}
 
 					member.status = "revoked";
 
-					await ctx.kv.set(`member:${encodedEmail}`, JSON.stringify(member));
+					await ctx.kv.set(`member:${encodedEmail}`, member);
 					ctx.log.info(`Member revoked: ${email}`);
 
 					return { success: true };
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Revoke error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Internal server error");
 				}
 			},
 		},
@@ -1478,32 +1436,20 @@ export default definePlugin({
 
 					// Validate inputs
 					if (!email) {
-						throw new Response(
-							JSON.stringify({ error: "Email is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Email is required");
 					}
 
 					if (!isValidEmail(email)) {
-						throw new Response(
-							JSON.stringify({ error: "Invalid email format" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Invalid email format");
 					}
 
 					if (!planId) {
-						throw new Response(
-							JSON.stringify({ error: "Plan is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Plan is required");
 					}
 
 					if (!stripeApiKey) {
 						ctx.log.error("Stripe API key not configured");
-						throw new Response(
-							JSON.stringify({ error: "Payment processing not available" }),
-							{ status: 500, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Payment processing not available");
 					}
 
 					// Get plans
@@ -1515,18 +1461,12 @@ export default definePlugin({
 					);
 
 					if (!selectedPlan) {
-						throw new Response(
-							JSON.stringify({ error: "Plan not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Plan not found");
 					}
 
 					// Reject free plans
 					if (selectedPlan.price <= 0) {
-						throw new Response(
-							JSON.stringify({ error: "Free plans cannot be purchased" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Free plans cannot be purchased");
 					}
 
 					// Look up or create member first
@@ -1569,20 +1509,14 @@ export default definePlugin({
 						if (!customerRes.ok) {
 							const errorData = await customerRes.text();
 							ctx.log.error(`Stripe customer creation failed: ${errorData}`);
-							throw new Response(
-								JSON.stringify({ error: "Failed to create Stripe customer" }),
-								{ status: 500, headers: { "Content-Type": "application/json" } }
-							);
+							throw new Error("Failed to create Stripe customer");
 						}
 
 						const customerData = await customerRes.json() as Record<string, any>;
 						stripeCustomerId = String(customerData.id ?? "");
 
 						if (!stripeCustomerId) {
-							throw new Response(
-								JSON.stringify({ error: "Failed to get Stripe customer ID" }),
-								{ status: 500, headers: { "Content-Type": "application/json" } }
-							);
+							throw new Error("Failed to get Stripe customer ID");
 						}
 
 						member.stripeCustomerId = stripeCustomerId;
@@ -1613,10 +1547,7 @@ export default definePlugin({
 					if (!checkoutRes.ok) {
 						const errorData = await checkoutRes.text();
 						ctx.log.error(`Stripe checkout session creation failed: ${errorData}`);
-						throw new Response(
-							JSON.stringify({ error: "Failed to create checkout session" }),
-							{ status: 500, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Failed to create checkout session");
 					}
 
 					const sessionData = await checkoutRes.json() as Record<string, any>;
@@ -1624,16 +1555,13 @@ export default definePlugin({
 					const checkoutUrl = String(sessionData.url ?? "");
 
 					if (!sessionId || !checkoutUrl) {
-						throw new Response(
-							JSON.stringify({ error: "Invalid Stripe session response" }),
-							{ status: 500, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Invalid Stripe session response");
 					}
 
 					// Store session ID in KV with 24h TTL for success route to retrieve
 					await (ctx.kv as any).set(
 						`checkout:${sessionId}`,
-						JSON.stringify({ email, planId, stripeCustomerId, createdAt: new Date().toISOString() }),
+						{ email, planId, stripeCustomerId, createdAt: new Date().toISOString() },
 						{ ex: 86400 }
 					);
 
@@ -1642,14 +1570,11 @@ export default definePlugin({
 						sessionId,
 					};
 				} catch (error) {
-					if (error instanceof Response) {
+					if (error instanceof Error) {
 						throw error;
 					}
 					ctx.log.error(`Checkout create error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to create checkout session" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to create checkout session");
 				}
 			},
 		},
@@ -1672,18 +1597,12 @@ export default definePlugin({
 					const jwtSecret = (ctx as any).env?.JWT_SECRET as string | undefined;
 
 					if (!sessionId) {
-						throw new Response(
-							JSON.stringify({ error: "Session ID is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Session ID is required");
 					}
 
 					if (!stripeApiKey) {
 						ctx.log.error("Stripe API key not configured");
-						throw new Response(
-							JSON.stringify({ error: "Payment processing not available" }),
-							{ status: 500, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Payment processing not available");
 					}
 
 					// Retrieve session from Stripe API (expand subscription)
@@ -1700,10 +1619,7 @@ export default definePlugin({
 					if (!sessionRes.ok) {
 						const errorData = await sessionRes.text();
 						ctx.log.error(`Stripe session retrieval failed: ${errorData}`);
-						throw new Response(
-							JSON.stringify({ error: "Failed to retrieve checkout session" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Failed to retrieve checkout session");
 					}
 
 					const sessionData = await sessionRes.json() as Record<string, any>;
@@ -1711,17 +1627,11 @@ export default definePlugin({
 					const subscription = sessionData.subscription as Record<string, any> | string | undefined;
 
 					if (!customerEmail) {
-						throw new Response(
-							JSON.stringify({ error: "Customer email not found in session" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Customer email not found in session");
 					}
 
 					if (!subscription) {
-						throw new Response(
-							JSON.stringify({ error: "Subscription not found in session" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Subscription not found in session");
 					}
 
 					// Extract subscription ID
@@ -1730,10 +1640,7 @@ export default definePlugin({
 						: String(subscription.id ?? "");
 
 					if (!subscriptionId) {
-						throw new Response(
-							JSON.stringify({ error: "Invalid subscription data" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Invalid subscription data");
 					}
 
 					// Get subscription details to extract period end
@@ -1767,10 +1674,7 @@ export default definePlugin({
 								stripeCustomerId: checkoutData.stripeCustomerId,
 							};
 						} else {
-							throw new Response(
-								JSON.stringify({ error: "Member not found" }),
-								{ status: 404, headers: { "Content-Type": "application/json" } }
-							);
+							throw new Error("Member not found");
 						}
 					}
 
@@ -1813,14 +1717,11 @@ export default definePlugin({
 						...(authCookie && { cookie: authCookie }),
 					};
 				} catch (error) {
-					if (error instanceof Response) {
+					if (error instanceof Error) {
 						throw error;
 					}
 					ctx.log.error(`Checkout success error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to process checkout completion" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to process checkout completion");
 				}
 			},
 		},
@@ -1855,19 +1756,13 @@ export default definePlugin({
 					}
 
 					if (!token) {
-						throw new Response(
-							JSON.stringify({ error: "Unauthorized" }),
-							{ status: 401, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Unauthorized");
 					}
 
 					// Verify JWT
 					const jwtSecret = (ctx as any).env?.JWT_SECRET as string | undefined;
 					if (!jwtSecret) {
-						throw new Response(
-							JSON.stringify({ error: "JWT secret not configured" }),
-							{ status: 500, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("JWT secret not configured");
 					}
 
 					const payload = await verifyJWT(token, jwtSecret);
@@ -1882,18 +1777,12 @@ export default definePlugin({
 					const encodedEmail = emailToKvKey(payload.email);
 					const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
 					if (!memberJson) {
-						throw new Response(
-							JSON.stringify({ error: "Member not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Member not found");
 					}
 
 					const member = parseJSON<MemberRecord>(memberJson, null);
 					if (!member) {
-						throw new Response(
-							JSON.stringify({ error: "Member not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Member not found");
 					}
 
 					// Get plan details
@@ -1902,10 +1791,7 @@ export default definePlugin({
 					const plan = plans.find((p: PlanConfig) => p.id === member.plan);
 
 					if (!plan) {
-						throw new Response(
-							JSON.stringify({ error: "Plan not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Plan not found");
 					}
 
 					return {
@@ -1921,12 +1807,9 @@ export default definePlugin({
 						stripeSubscriptionId: member.stripeSubscriptionId,
 					};
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Dashboard error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Internal server error");
 				}
 			},
 		},
@@ -1960,45 +1843,30 @@ export default definePlugin({
 					}
 
 					if (!token) {
-						throw new Response(
-							JSON.stringify({ error: "Unauthorized" }),
-							{ status: 401, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Unauthorized");
 					}
 
 					// Verify JWT
 					const jwtSecret = (ctx as any).env?.JWT_SECRET as string | undefined;
 					if (!jwtSecret) {
-						throw new Response(
-							JSON.stringify({ error: "JWT secret not configured" }),
-							{ status: 500, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("JWT secret not configured");
 					}
 
 					const payload = await verifyJWT(token, jwtSecret);
 					if (!payload) {
-						throw new Response(
-							JSON.stringify({ error: "Invalid or expired token" }),
-							{ status: 401, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Invalid or expired token");
 					}
 
 					// Get member
 					const encodedEmail = emailToKvKey(payload.email);
 					const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
 					if (!memberJson) {
-						throw new Response(
-							JSON.stringify({ error: "Member not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Member not found");
 					}
 
 					const member = parseJSON<MemberRecord>(memberJson, null);
 					if (!member) {
-						throw new Response(
-							JSON.stringify({ error: "Member not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Member not found");
 					}
 
 					// Update member to mark for cancellation
@@ -2006,7 +1874,7 @@ export default definePlugin({
 					member.status = "active"; // Keep active until period end
 					member.lastSyncAt = new Date().toISOString();
 
-					await ctx.kv.set(`member:${encodedEmail}`, JSON.stringify(member));
+					await ctx.kv.set(`member:${encodedEmail}`, member);
 					ctx.log.info(`Subscription cancelled at period end for ${member.email}`);
 
 					return {
@@ -2015,12 +1883,9 @@ export default definePlugin({
 						message: `Your subscription will be cancelled on ${member.currentPeriodEnd || member.expiresAt}. You'll maintain access until then.`,
 					};
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Dashboard cancel error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Internal server error");
 				}
 			},
 		},
@@ -2056,53 +1921,35 @@ export default definePlugin({
 					}
 
 					if (!token) {
-						throw new Response(
-							JSON.stringify({ error: "Unauthorized" }),
-							{ status: 401, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Unauthorized");
 					}
 
 					// Verify JWT
 					const jwtSecret = (ctx as any).env?.JWT_SECRET as string | undefined;
 					if (!jwtSecret) {
-						throw new Response(
-							JSON.stringify({ error: "JWT secret not configured" }),
-							{ status: 500, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("JWT secret not configured");
 					}
 
 					const payload = await verifyJWT(token, jwtSecret);
 					if (!payload) {
-						throw new Response(
-							JSON.stringify({ error: "Invalid or expired token" }),
-							{ status: 401, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Invalid or expired token");
 					}
 
 					const newPlanId = String(input.newPlanId ?? "").trim();
 					if (!newPlanId) {
-						throw new Response(
-							JSON.stringify({ error: "New plan ID is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("New plan ID is required");
 					}
 
 					// Get member
 					const encodedEmail = emailToKvKey(payload.email);
 					const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
 					if (!memberJson) {
-						throw new Response(
-							JSON.stringify({ error: "Member not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Member not found");
 					}
 
 					const member = parseJSON<MemberRecord>(memberJson, null);
 					if (!member) {
-						throw new Response(
-							JSON.stringify({ error: "Member not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Member not found");
 					}
 
 					// Get plans
@@ -2111,18 +1958,12 @@ export default definePlugin({
 
 					const newPlan = plans.find((p: PlanConfig) => p.id === newPlanId);
 					if (!newPlan) {
-						throw new Response(
-							JSON.stringify({ error: "Plan not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Plan not found");
 					}
 
 					const currentPlan = plans.find((p: PlanConfig) => p.id === member.plan);
 					if (!currentPlan) {
-						throw new Response(
-							JSON.stringify({ error: "Current plan not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Current plan not found");
 					}
 
 					// Update member plan
@@ -2130,7 +1971,7 @@ export default definePlugin({
 					member.lastSyncAt = new Date().toISOString();
 					member.cancelAtPeriodEnd = false; // Clear cancellation flag on upgrade
 
-					await ctx.kv.set(`member:${encodedEmail}`, JSON.stringify(member));
+					await ctx.kv.set(`member:${encodedEmail}`, member);
 					ctx.log.info(`Member upgraded from ${currentPlan.id} to ${newPlanId}: ${member.email}`);
 
 					return {
@@ -2143,12 +1984,9 @@ export default definePlugin({
 						message: `Successfully upgraded to ${newPlan.name}. Your new price is $${(newPlan.price / 100).toFixed(2)}/${newPlan.interval}.`,
 					};
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Dashboard upgrade error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Internal server error");
 				}
 			},
 		},
@@ -2164,14 +2002,6 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = rc.input as Record<string, unknown>;
 					const code = String(input.code ?? "").trim().toUpperCase();
 					const discountType = String(input.discountType ?? "") as "percent" | "fixed";
@@ -2183,33 +2013,21 @@ export default definePlugin({
 
 					// Validate input
 					if (!code || code.length < 2) {
-						throw new Response(
-							JSON.stringify({ error: "Coupon code must be at least 2 characters" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Coupon code must be at least 2 characters");
 					}
 
 					if (!discountType || !["percent", "fixed"].includes(discountType)) {
-						throw new Response(
-							JSON.stringify({ error: "Discount type must be 'percent' or 'fixed'" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Discount type must be 'percent' or 'fixed'");
 					}
 
 					if (discountAmount <= 0) {
-						throw new Response(
-							JSON.stringify({ error: "Discount amount must be greater than 0" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Discount amount must be greater than 0");
 					}
 
 					// Check if coupon already exists
 					const existing = await ctx.kv.get<string>(`coupon:${code}`);
 					if (existing) {
-						throw new Response(
-							JSON.stringify({ error: "Coupon code already exists" }),
-							{ status: 409, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Coupon code already exists");
 					}
 
 					const coupon: CouponRecord = {
@@ -2244,12 +2062,9 @@ export default definePlugin({
 						message: `Coupon ${code} created successfully`,
 					};
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Coupon create error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Internal server error");
 				}
 			},
 		},
@@ -2264,14 +2079,6 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const listJson = await ctx.kv.get<string>("coupons:list");
 					const couponCodes = parseJSON<string[]>(listJson, []);
 
@@ -2291,12 +2098,9 @@ export default definePlugin({
 						total: coupons.length,
 					};
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Coupon list error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Internal server error");
 				}
 			},
 		},
@@ -2375,12 +2179,9 @@ export default definePlugin({
 							: `Save $${(coupon.discountAmount / 100).toFixed(2)} with this code!`,
 					};
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Coupon validate error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Internal server error");
 				}
 			},
 		},

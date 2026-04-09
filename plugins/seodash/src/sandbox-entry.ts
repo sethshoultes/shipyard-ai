@@ -34,15 +34,6 @@ function generateId(): string {
 	return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-function parseJSON<T>(json: string | undefined | null, fallback: T): T {
-	if (!json) return fallback;
-	try {
-		return JSON.parse(json) as T;
-	} catch {
-		return fallback;
-	}
-}
-
 /**
  * Hash a URL path into a KV-safe key segment.
  * Uses a simple deterministic hash to avoid special chars in keys.
@@ -151,17 +142,17 @@ export function computeSeoScore(issues: SeoIssue[]): number {
 // ---------------------------------------------------------------------------
 
 async function getPageList(ctx: PluginContext): Promise<string[]> {
-	const listJson = await ctx.kv.get<string>("seo:pages:list");
-	return parseJSON(listJson, []);
+	const list = await ctx.kv.get<string[]>("seo:pages:list");
+	return list ?? [];
 }
 
 async function setPageList(ctx: PluginContext, list: string[]): Promise<void> {
-	await ctx.kv.set("seo:pages:list", JSON.stringify(list));
+	await ctx.kv.set("seo:pages:list", list);
 }
 
 async function getPageByHash(ctx: PluginContext, hash: string): Promise<PageSeoData | null> {
-	const json = await ctx.kv.get<string>(`seo:${hash}`);
-	return parseJSON<PageSeoData | null>(json, null);
+	const page = await ctx.kv.get<PageSeoData>(`seo:${hash}`);
+	return page ?? null;
 }
 
 async function getAllPages(ctx: PluginContext): Promise<PageSeoData[]> {
@@ -299,22 +290,16 @@ export default definePlugin({
 		"plugin:install": {
 			handler: async (_event: unknown, ctx: PluginContext) => {
 				ctx.log.info("SEODash installed — initializing KV schema");
-				await ctx.kv.set("seo:pages:list", JSON.stringify([]));
-				await ctx.kv.set(
-					"seo:sitemap-settings",
-					JSON.stringify({
-						defaultChangefreq: "monthly",
-						defaultPriority: 0.8,
-						patterns: [],
-					}),
-				);
-				await ctx.kv.set(
-					"seo:robots-settings",
-					JSON.stringify({
-						rules: [],
-						sitemapUrl: "",
-					}),
-				);
+				await ctx.kv.set("seo:pages:list", []);
+				await ctx.kv.set("seo:sitemap-settings", {
+					defaultChangefreq: "monthly",
+					defaultPriority: 0.8,
+					patterns: [],
+				});
+				await ctx.kv.set("seo:robots-settings", {
+					rules: [],
+					sitemapUrl: "",
+				});
 			},
 		},
 	},
@@ -328,22 +313,11 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } },
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 					const path = String(input.path ?? "").trim();
 
 					if (!path) {
-						throw new Response(
-							JSON.stringify({ error: "Page path is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } },
-						);
+						throw new Error("Page path is required");
 					}
 
 					const pathHash = hashPath(path);
@@ -378,7 +352,7 @@ export default definePlugin({
 					page.issues = issues;
 
 					// Store page data
-					await ctx.kv.set(`seo:${pathHash}`, JSON.stringify(page));
+					await ctx.kv.set(`seo:${pathHash}`, page);
 
 					// Update page list
 					const list = await getPageList(ctx);
@@ -391,12 +365,9 @@ export default definePlugin({
 
 					return { page };
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`savePage error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to save page SEO data" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } },
-					);
+					throw new Error("Failed to save page SEO data");
 				}
 			},
 		},
@@ -409,42 +380,25 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } },
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 					const path = String(input.path ?? "").trim();
 
 					if (!path) {
-						throw new Response(
-							JSON.stringify({ error: "Page path is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } },
-						);
+						throw new Error("Page path is required");
 					}
 
 					const pathHash = hashPath(path);
 					const page = await getPageByHash(ctx, pathHash);
 
 					if (!page) {
-						throw new Response(
-							JSON.stringify({ error: "Page not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } },
-						);
+						throw new Error("Page not found");
 					}
 
 					return { page };
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`getPage error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to fetch page SEO data" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } },
-					);
+					throw new Error("Failed to fetch page SEO data");
 				}
 			},
 		},
@@ -454,17 +408,8 @@ export default definePlugin({
 		// List all pages with SEO data.
 		// -----------------------------------------------------------------
 		listPages: {
-			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+			handler: async (_routeCtx: unknown, ctx: PluginContext) => {
 				try {
-					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } },
-						);
-					}
-
 					const pages = await getAllPages(ctx);
 
 					// Sort by path alphabetically
@@ -472,12 +417,9 @@ export default definePlugin({
 
 					return { pages, total: pages.length };
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`listPages error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to list pages" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } },
-					);
+					throw new Error("Failed to list pages");
 				}
 			},
 		},
@@ -490,32 +432,18 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } },
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 					const path = String(input.path ?? "").trim();
 
 					if (!path) {
-						throw new Response(
-							JSON.stringify({ error: "Page path is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } },
-						);
+						throw new Error("Page path is required");
 					}
 
 					const pathHash = hashPath(path);
 					const existing = await getPageByHash(ctx, pathHash);
 
 					if (!existing) {
-						throw new Response(
-							JSON.stringify({ error: "Page not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } },
-						);
+						throw new Error("Page not found");
 					}
 
 					await ctx.kv.delete(`seo:${pathHash}`);
@@ -529,12 +457,9 @@ export default definePlugin({
 
 					return { deleted: true, path };
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`deletePage error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to delete page" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } },
-					);
+					throw new Error("Failed to delete page");
 				}
 			},
 		},
@@ -552,20 +477,14 @@ export default definePlugin({
 					const path = String(input.path ?? "").trim();
 
 					if (!path) {
-						throw new Response(
-							JSON.stringify({ error: "Page path is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } },
-						);
+						throw new Error("Page path is required");
 					}
 
 					const pathHash = hashPath(path);
 					const page = await getPageByHash(ctx, pathHash);
 
 					if (!page) {
-						throw new Response(
-							JSON.stringify({ error: "Page not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } },
-						);
+						throw new Error("Page not found");
 					}
 
 					// Return only public-safe fields
@@ -590,12 +509,9 @@ export default definePlugin({
 						},
 					};
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`getPagePublic error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to fetch page SEO data" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } },
-					);
+					throw new Error("Failed to fetch page SEO data");
 				}
 			},
 		},
@@ -605,17 +521,8 @@ export default definePlugin({
 		// Run audit on all pages, return aggregate score and issues.
 		// -----------------------------------------------------------------
 		auditAll: {
-			handler: async (routeCtx: unknown, ctx: PluginContext) => {
+			handler: async (_routeCtx: unknown, ctx: PluginContext) => {
 				try {
-					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } },
-						);
-					}
-
 					const pages = await getAllPages(ctx);
 
 					// Re-audit each page and update stored data
@@ -624,7 +531,7 @@ export default definePlugin({
 						page.issues = issues;
 						page.seoScore = computeSeoScore(issues);
 						const pathHash = hashPath(page.path);
-						await ctx.kv.set(`seo:${pathHash}`, JSON.stringify(page));
+						await ctx.kv.set(`seo:${pathHash}`, page);
 					}
 
 					const allIssues = pages.flatMap((p) => (p.issues ?? []).map((i) => ({ ...i, path: p.path })));
@@ -640,12 +547,9 @@ export default definePlugin({
 						pages,
 					};
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`auditAll error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to run audit" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } },
-					);
+					throw new Error("Failed to run audit");
 				}
 			},
 		},
@@ -661,23 +565,19 @@ export default definePlugin({
 					const pages = await getAllPages(ctx);
 					const siteUrl = ctx.site?.url ?? "https://example.com";
 
-					const settingsJson = await ctx.kv.get<string>("seo:sitemap-settings");
-					const settings = parseJSON<SitemapSettings>(settingsJson, {
+					const settings = await ctx.kv.get<SitemapSettings>("seo:sitemap-settings") ?? {
 						defaultChangefreq: "monthly",
 						defaultPriority: 0.8,
 						patterns: [],
-					});
+					};
 
 					const xml = generateSitemapXml(pages, siteUrl, settings);
 
 					return { xml, contentType: "application/xml" };
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`Sitemap error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to generate sitemap" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } },
-					);
+					throw new Error("Failed to generate sitemap");
 				}
 			},
 		},
@@ -690,22 +590,13 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } },
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 
-					const settingsJson = await ctx.kv.get<string>("seo:sitemap-settings");
-					const current = parseJSON<SitemapSettings>(settingsJson, {
+					const current = await ctx.kv.get<SitemapSettings>("seo:sitemap-settings") ?? {
 						defaultChangefreq: "monthly",
 						defaultPriority: 0.8,
 						patterns: [],
-					});
+					};
 
 					if (typeof input.defaultChangefreq === "string") {
 						current.defaultChangefreq = input.defaultChangefreq;
@@ -717,16 +608,13 @@ export default definePlugin({
 						current.patterns = input.patterns as SitemapSettings["patterns"];
 					}
 
-					await ctx.kv.set("seo:sitemap-settings", JSON.stringify(current));
+					await ctx.kv.set("seo:sitemap-settings", current);
 
 					return { settings: current };
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`sitemapSettings error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to update sitemap settings" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } },
-					);
+					throw new Error("Failed to update sitemap settings");
 				}
 			},
 		},
@@ -739,11 +627,10 @@ export default definePlugin({
 			public: true,
 			handler: async (_routeCtx: unknown, ctx: PluginContext) => {
 				try {
-					const settingsJson = await ctx.kv.get<string>("seo:robots-settings");
-					const settings = parseJSON<RobotsSettings>(settingsJson, {
+					const settings = await ctx.kv.get<RobotsSettings>("seo:robots-settings") ?? {
 						rules: [],
 						sitemapUrl: "",
-					});
+					};
 
 					// Auto-set sitemap URL if available
 					if (!settings.sitemapUrl && ctx.site?.url) {
@@ -754,12 +641,9 @@ export default definePlugin({
 
 					return { content, contentType: "text/plain" };
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`robotsTxt error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to generate robots.txt" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } },
-					);
+					throw new Error("Failed to generate robots.txt");
 				}
 			},
 		},
@@ -772,21 +656,12 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } },
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 
-					const settingsJson = await ctx.kv.get<string>("seo:robots-settings");
-					const current = parseJSON<RobotsSettings>(settingsJson, {
+					const current = await ctx.kv.get<RobotsSettings>("seo:robots-settings") ?? {
 						rules: [],
 						sitemapUrl: "",
-					});
+					};
 
 					if (Array.isArray(input.rules)) {
 						current.rules = input.rules as RobotsSettings["rules"];
@@ -795,16 +670,13 @@ export default definePlugin({
 						current.sitemapUrl = input.sitemapUrl;
 					}
 
-					await ctx.kv.set("seo:robots-settings", JSON.stringify(current));
+					await ctx.kv.set("seo:robots-settings", current);
 
 					return { settings: current };
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`robotsSettings error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to update robots settings" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } },
-					);
+					throw new Error("Failed to update robots settings");
 				}
 			},
 		},
@@ -822,32 +694,23 @@ export default definePlugin({
 					const path = String(input.path ?? "").trim();
 
 					if (!path) {
-						throw new Response(
-							JSON.stringify({ error: "Page path is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } },
-						);
+						throw new Error("Page path is required");
 					}
 
 					const pathHash = hashPath(path);
 					const page = await getPageByHash(ctx, pathHash);
 
 					if (!page) {
-						throw new Response(
-							JSON.stringify({ error: "Page not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } },
-						);
+						throw new Error("Page not found");
 					}
 
 					const html = generateSocialPreviewHtml(page);
 
 					return { html, contentType: "text/html" };
 				} catch (error) {
-					if (error instanceof Response) throw error;
+					if (error instanceof Error) throw error;
 					ctx.log.error(`socialPreview error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to generate social preview" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } },
-					);
+					throw new Error("Failed to generate social preview");
 				}
 			},
 		},
@@ -856,16 +719,7 @@ export default definePlugin({
 		// Admin page: SEO pages list HTML
 		// -----------------------------------------------------------------
 		adminPagesList: {
-			handler: async (routeCtx: unknown, ctx: PluginContext) => {
-				const rc = routeCtx as Record<string, unknown>;
-				const adminUser = rc.user as Record<string, unknown> | undefined;
-				if (!adminUser || !adminUser.isAdmin) {
-					throw new Response(
-						JSON.stringify({ error: "Admin access required" }),
-						{ status: 403, headers: { "Content-Type": "application/json" } },
-					);
-				}
-
+			handler: async (_routeCtx: unknown, ctx: PluginContext) => {
 				const pages = await getAllPages(ctx);
 				pages.sort((a, b) => a.path.localeCompare(b.path));
 				const html = renderSeoPagesList(pages);
@@ -877,16 +731,7 @@ export default definePlugin({
 		// Admin widget: SEO Score
 		// -----------------------------------------------------------------
 		adminScoreWidget: {
-			handler: async (routeCtx: unknown, ctx: PluginContext) => {
-				const rc = routeCtx as Record<string, unknown>;
-				const adminUser = rc.user as Record<string, unknown> | undefined;
-				if (!adminUser || !adminUser.isAdmin) {
-					throw new Response(
-						JSON.stringify({ error: "Admin access required" }),
-						{ status: 403, headers: { "Content-Type": "application/json" } },
-					);
-				}
-
+			handler: async (_routeCtx: unknown, ctx: PluginContext) => {
 				const pages = await getAllPages(ctx);
 				const allIssues = pages.flatMap((p) => p.issues ?? []);
 				const avgScore = pages.length > 0
@@ -902,16 +747,7 @@ export default definePlugin({
 		// Admin widget: SEO Issues
 		// -----------------------------------------------------------------
 		adminIssuesWidget: {
-			handler: async (routeCtx: unknown, ctx: PluginContext) => {
-				const rc = routeCtx as Record<string, unknown>;
-				const adminUser = rc.user as Record<string, unknown> | undefined;
-				if (!adminUser || !adminUser.isAdmin) {
-					throw new Response(
-						JSON.stringify({ error: "Admin access required" }),
-						{ status: 403, headers: { "Content-Type": "application/json" } },
-					);
-				}
-
+			handler: async (_routeCtx: unknown, ctx: PluginContext) => {
 				const pages = await getAllPages(ctx);
 				const allIssues = pages.flatMap((p) => (p.issues ?? []).map((i) => ({ ...i, path: p.path })));
 				const html = renderSeoIssuesWidget(allIssues);
@@ -923,16 +759,7 @@ export default definePlugin({
 		// Admin page: Audit report HTML
 		// -----------------------------------------------------------------
 		adminAuditReport: {
-			handler: async (routeCtx: unknown, ctx: PluginContext) => {
-				const rc = routeCtx as Record<string, unknown>;
-				const adminUser = rc.user as Record<string, unknown> | undefined;
-				if (!adminUser || !adminUser.isAdmin) {
-					throw new Response(
-						JSON.stringify({ error: "Admin access required" }),
-						{ status: 403, headers: { "Content-Type": "application/json" } },
-					);
-				}
-
+			handler: async (_routeCtx: unknown, ctx: PluginContext) => {
 				const pages = await getAllPages(ctx);
 				const html = renderAuditReport(pages);
 				return { html };

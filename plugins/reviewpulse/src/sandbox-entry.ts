@@ -128,8 +128,8 @@ async function sendReviewNotifications(
 	ctx: PluginContext,
 	newReviews: ReviewRecord[]
 ): Promise<number> {
-	const notifJson = await ctx.kv.get<string>("settings:notifications");
-	const notifSettings = parseJSON<Record<string, unknown>>(notifJson, {});
+	const notifJson = await ctx.kv.get<Record<string, unknown>>("settings:notifications");
+	const notifSettings = (notifJson ?? {});
 
 	const emails = notifSettings.emails as string[] | undefined;
 	if (!emails || emails.length === 0) return 0;
@@ -255,13 +255,13 @@ export function computeStats(reviews: ReviewRecord[]): ReviewStats {
 // ---------------------------------------------------------------------------
 
 async function getAllReviews(ctx: PluginContext): Promise<ReviewRecord[]> {
-	const listJson = await ctx.kv.get<string>("reviews:list");
-	const ids: string[] = parseJSON(listJson, []);
+	const listJson = await ctx.kv.get<string[]>("reviews:list");
+	const ids: string[] = (listJson ?? []);
 
 	const reviews: ReviewRecord[] = [];
 	for (const id of ids) {
-		const json = await ctx.kv.get<string>(`review:${id}`);
-		const review = parseJSON<ReviewRecord | null>(json, null);
+		const json = await ctx.kv.get<ReviewRecord | null>(`review:${id}`);
+		const review = json;
 		if (review) reviews.push(review);
 	}
 
@@ -271,25 +271,25 @@ async function getAllReviews(ctx: PluginContext): Promise<ReviewRecord[]> {
 }
 
 async function addReviewToList(ctx: PluginContext, sourceId: string): Promise<void> {
-	const listJson = await ctx.kv.get<string>("reviews:list");
-	const ids: string[] = parseJSON(listJson, []);
+	const listJson = await ctx.kv.get<string[]>("reviews:list");
+	const ids: string[] = (listJson ?? []);
 	if (!ids.includes(sourceId)) {
 		ids.push(sourceId);
-		await ctx.kv.set("reviews:list", JSON.stringify(ids));
+		await ctx.kv.set("reviews:list", ids);
 	}
 }
 
 async function updateStatsCache(ctx: PluginContext): Promise<ReviewStats> {
 	const reviews = await getAllReviews(ctx);
 	const stats = computeStats(reviews);
-	await ctx.kv.set("reviews:stats", JSON.stringify(stats), { ex: 3600 });
+	await ctx.kv.set("reviews:stats", stats, { ex: 3600 });
 	return stats;
 }
 
 async function getStatsCache(ctx: PluginContext): Promise<ReviewStats> {
-	const cached = await ctx.kv.get<string>("reviews:stats");
+	const cached = await ctx.kv.get<ReviewStats | null>("reviews:stats");
 	if (cached) {
-		const stats = parseJSON<ReviewStats | null>(cached, null);
+		const stats = cached;
 		if (stats) return stats;
 	}
 	return updateStatsCache(ctx);
@@ -304,17 +304,14 @@ export default definePlugin({
 		"plugin:install": {
 			handler: async (_event: unknown, ctx: PluginContext) => {
 				ctx.log.info("ReviewPulse installed — initializing KV schema");
-				await ctx.kv.set("reviews:list", JSON.stringify([]));
-				await ctx.kv.set(
-					"reviews:stats",
-					JSON.stringify({
-						averageRating: 0,
-						totalCount: 0,
-						bySource: { google: 0, yelp: 0, manual: 0 },
-						trend: "stable",
-						previousAverage: 0,
-					})
-				);
+				await ctx.kv.set("reviews:list", []);
+				await ctx.kv.set("reviews:stats", {
+					averageRating: 0,
+					totalCount: 0,
+					bySource: { google: 0, yelp: 0, manual: 0 },
+					trend: "stable",
+					previousAverage: 0,
+				});
 			},
 		},
 	},
@@ -329,22 +326,14 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					// Get existing review IDs for deduplication
-					const existingList = await ctx.kv.get<string>("reviews:list");
-					const existingIds: string[] = parseJSON(existingList, []);
+					const existingList = await ctx.kv.get<string[]>("reviews:list");
+					const existingIds: string[] = (existingList ?? []);
 					const existingReviews = new Map<string, ReviewRecord>();
 
 					for (const id of existingIds) {
-						const json = await ctx.kv.get<string>(`review:${id}`);
-						const review = parseJSON<ReviewRecord | null>(json, null);
+						const json = await ctx.kv.get<ReviewRecord | null>(`review:${id}`);
+						const review = json;
 						if (review) existingReviews.set(id, review);
 					}
 
@@ -386,7 +375,7 @@ export default definePlugin({
 									}
 
 									const reviewId = normalized.id;
-									await ctx.kv.set(`review:${reviewId}`, JSON.stringify(normalized));
+									await ctx.kv.set(`review:${reviewId}`, normalized);
 									await addReviewToList(ctx, reviewId);
 									dedupKeys.add(dedupKey);
 									newReviews.push(normalized);
@@ -398,10 +387,7 @@ export default definePlugin({
 						}
 					} else if (!placeId && !await ctx.kv.get<string>("settings:yelp-business-id")) {
 						// Neither source configured
-						throw new Response(
-							JSON.stringify({ error: "No review sources configured. Set a Google Place ID or Yelp Business ID in settings." }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("No review sources configured. Set a Google Place ID or Yelp Business ID in settings.");
 					}
 
 					// ----------------------------------------------------------
@@ -435,7 +421,7 @@ export default definePlugin({
 									}
 
 									const reviewId = normalized.id;
-									await ctx.kv.set(`review:${reviewId}`, JSON.stringify(normalized));
+									await ctx.kv.set(`review:${reviewId}`, normalized);
 									await addReviewToList(ctx, reviewId);
 									dedupKeys.add(dedupKey);
 									newReviews.push(normalized);
@@ -471,10 +457,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Sync error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Review sync failed" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Review sync failed");
 				}
 			},
 		},
@@ -536,10 +519,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Reviews list error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to fetch reviews" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to fetch reviews");
 				}
 			},
 		},
@@ -554,40 +534,28 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const pathParams = rc.pathParams as Record<string, string> | undefined;
+					const pathParams = rc.input as Record<string, string> | undefined;
 					const reviewId = pathParams?.id ?? String((rc.input as Record<string, unknown>)?.id ?? "");
 
 					if (!reviewId) {
-						throw new Response(
-							JSON.stringify({ error: "Review ID required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Review ID required");
 					}
 
-					const json = await ctx.kv.get<string>(`review:${reviewId}`);
+					const json = await ctx.kv.get<ReviewRecord | null>(`review:${reviewId}`);
 					if (!json) {
-						throw new Response(
-							JSON.stringify({ error: "Review not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Review not found");
 					}
 
-					const review = parseJSON<ReviewRecord | null>(json, null);
+					const review = json;
 					if (!review) {
-						throw new Response(
-							JSON.stringify({ error: "Review not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Review not found");
 					}
 
 					return { review };
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Review detail error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to fetch review" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to fetch review");
 				}
 			},
 		},
@@ -601,38 +569,21 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 					const reviewId = String(input.id ?? "");
 
 					if (!reviewId) {
-						throw new Response(
-							JSON.stringify({ error: "Review ID required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Review ID required");
 					}
 
-					const json = await ctx.kv.get<string>(`review:${reviewId}`);
+					const json = await ctx.kv.get<ReviewRecord | null>(`review:${reviewId}`);
 					if (!json) {
-						throw new Response(
-							JSON.stringify({ error: "Review not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Review not found");
 					}
 
-					const review = parseJSON<ReviewRecord | null>(json, null);
+					const review = json;
 					if (!review) {
-						throw new Response(
-							JSON.stringify({ error: "Review not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Review not found");
 					}
 
 					// Apply updates
@@ -643,16 +594,13 @@ export default definePlugin({
 						review.flagged = input.flagged;
 					}
 
-					await ctx.kv.set(`review:${reviewId}`, JSON.stringify(review));
+					await ctx.kv.set(`review:${reviewId}`, review);
 
 					return { review };
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Review update error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to update review" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to update review");
 				}
 			},
 		},
@@ -670,10 +618,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Stats error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to fetch stats" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to fetch stats");
 				}
 			},
 		},
@@ -723,10 +668,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Widget data error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to fetch widget data" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to fetch widget data");
 				}
 			},
 		},
@@ -740,23 +682,12 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 
 					if (typeof input.googlePlaceId === "string") {
 						const placeId = input.googlePlaceId.trim();
 						if (!placeId) {
-							throw new Response(
-								JSON.stringify({ error: "Google Place ID cannot be empty" }),
-								{ status: 400, headers: { "Content-Type": "application/json" } }
-							);
+							throw new Error("Google Place ID cannot be empty");
 						}
 						await ctx.kv.set("settings:google-place-id", placeId);
 					}
@@ -771,40 +702,31 @@ export default definePlugin({
 					}
 
 					if (input.displayPrefs && typeof input.displayPrefs === "object") {
-						await ctx.kv.set(
-							"settings:display",
-							JSON.stringify(input.displayPrefs)
-						);
+						await ctx.kv.set("settings:display", input.displayPrefs);
 					}
 
 					if (input.notifications && typeof input.notifications === "object") {
-						await ctx.kv.set(
-							"settings:notifications",
-							JSON.stringify(input.notifications)
-						);
+						await ctx.kv.set("settings:notifications", input.notifications);
 					}
 
 					// Return current settings
 					const googlePlaceId = await ctx.kv.get<string>("settings:google-place-id");
 					const yelpBizId = await ctx.kv.get<string>("settings:yelp-business-id");
-					const displayJson = await ctx.kv.get<string>("settings:display");
-					const notifJson = await ctx.kv.get<string>("settings:notifications");
+					const displayJson = await ctx.kv.get<Record<string, unknown>>("settings:display");
+					const notifJson = await ctx.kv.get<Record<string, unknown>>("settings:notifications");
 
 					return {
 						settings: {
 							googlePlaceId: googlePlaceId ?? null,
 							yelpBusinessId: yelpBizId ?? null,
-							display: parseJSON(displayJson, {}),
-							notifications: parseJSON(notifJson, {}),
+							display: (displayJson ?? {}),
+							notifications: (notifJson ?? {}),
 						},
 					};
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Settings update error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to update settings" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to update settings");
 				}
 			},
 		},
@@ -817,8 +739,8 @@ export default definePlugin({
 			public: true,
 			handler: async (_routeCtx: unknown, ctx: PluginContext) => {
 				try {
-					const listJson = await ctx.kv.get<string>("reviews:list");
-					const ids: string[] = parseJSON(listJson, []);
+					const listJson = await ctx.kv.get<string[]>("reviews:list");
+					const ids: string[] = (listJson ?? []);
 					const syncCursor = await ctx.kv.get<string>("reviews:sync-cursor");
 
 					return {
@@ -852,46 +774,26 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 					const reviewId = String(input.reviewId ?? "");
 
 					if (!reviewId) {
-						throw new Response(
-							JSON.stringify({ error: "Review ID required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Review ID required");
 					}
 
-					const json = await ctx.kv.get<string>(`review:${reviewId}`);
+					const json = await ctx.kv.get<ReviewRecord | null>(`review:${reviewId}`);
 					if (!json) {
-						throw new Response(
-							JSON.stringify({ error: "Review not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Review not found");
 					}
 
-					const review = parseJSON<ReviewRecord | null>(json, null);
+					const review = json;
 					if (!review) {
-						throw new Response(
-							JSON.stringify({ error: "Review not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Review not found");
 					}
 
 					const apiKey = ctx.env?.ANTHROPIC_API_KEY;
 					if (!apiKey) {
-						throw new Response(
-							JSON.stringify({ error: "Anthropic API key not configured" }),
-							{ status: 500, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Anthropic API key not configured");
 					}
 
 					// Get business context from settings
@@ -938,10 +840,7 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 
 					if (!response.ok) {
 						ctx.log.error(`Anthropic API error: ${response.status}`);
-						throw new Response(
-							JSON.stringify({ error: "AI response generation failed" }),
-							{ status: 502, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("AI response generation failed");
 					}
 
 					const data = (await response.json()) as Record<string, unknown>;
@@ -956,10 +855,7 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Draft response error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to generate response draft" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to generate response draft");
 				}
 			},
 		},
@@ -972,60 +868,37 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 					const reviewId = String(input.reviewId ?? "");
 					const replyText = String(input.replyText ?? "");
 
 					if (!reviewId) {
-						throw new Response(
-							JSON.stringify({ error: "Review ID required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Review ID required");
 					}
 
 					if (!replyText.trim()) {
-						throw new Response(
-							JSON.stringify({ error: "Reply text cannot be empty" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Reply text cannot be empty");
 					}
 
-					const json = await ctx.kv.get<string>(`review:${reviewId}`);
+					const json = await ctx.kv.get<ReviewRecord | null>(`review:${reviewId}`);
 					if (!json) {
-						throw new Response(
-							JSON.stringify({ error: "Review not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Review not found");
 					}
 
-					const review = parseJSON<ReviewRecord | null>(json, null);
+					const review = json;
 					if (!review) {
-						throw new Response(
-							JSON.stringify({ error: "Review not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Review not found");
 					}
 
 					review.replyText = replyText;
 					review.repliedAt = new Date().toISOString();
-					await ctx.kv.set(`review:${reviewId}`, JSON.stringify(review));
+					await ctx.kv.set(`review:${reviewId}`, review);
 
 					return { review };
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Save response error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to save response" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to save response");
 				}
 			},
 		},
@@ -1042,39 +915,22 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 					const name = String(input.name ?? "").trim();
 					const body = String(input.body ?? "").trim();
 					const category = String(input.category ?? "custom") as ResponseTemplate["category"];
 
 					if (!name) {
-						throw new Response(
-							JSON.stringify({ error: "Template name is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Template name is required");
 					}
 
 					if (!body) {
-						throw new Response(
-							JSON.stringify({ error: "Template body is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Template body is required");
 					}
 
 					const validCategories = ["thank-you", "apology", "follow-up", "custom"];
 					if (!validCategories.includes(category)) {
-						throw new Response(
-							JSON.stringify({ error: "Invalid category. Must be: thank-you, apology, follow-up, or custom" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Invalid category. Must be: thank-you, apology, follow-up, or custom");
 					}
 
 					const template: ResponseTemplate = {
@@ -1085,22 +941,19 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 						createdAt: new Date().toISOString(),
 					};
 
-					await ctx.kv.set(`template:${template.id}`, JSON.stringify(template));
+					await ctx.kv.set(`template:${template.id}`, template);
 
 					// Update templates list
-					const listJson = await ctx.kv.get<string>("templates:list");
-					const ids: string[] = parseJSON(listJson, []);
+					const listJson = await ctx.kv.get<string[]>("templates:list");
+					const ids: string[] = (listJson ?? []);
 					ids.push(template.id);
-					await ctx.kv.set("templates:list", JSON.stringify(ids));
+					await ctx.kv.set("templates:list", ids);
 
 					return { template };
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Create template error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to create template" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to create template");
 				}
 			},
 		},
@@ -1113,21 +966,13 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
-					const listJson = await ctx.kv.get<string>("templates:list");
-					const ids: string[] = parseJSON(listJson, []);
+					const listJson = await ctx.kv.get<string[]>("templates:list");
+					const ids: string[] = (listJson ?? []);
 					const templates: ResponseTemplate[] = [];
 
 					for (const id of ids) {
-						const json = await ctx.kv.get<string>(`template:${id}`);
-						const template = parseJSON<ResponseTemplate | null>(json, null);
+						const json = await ctx.kv.get<ResponseTemplate | null>(`template:${id}`);
+						const template = json;
 						if (template) templates.push(template);
 					}
 
@@ -1135,10 +980,7 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`List templates error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to list templates" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to list templates");
 				}
 			},
 		},
@@ -1151,48 +993,28 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 					const templateId = String(input.id ?? "");
 
 					if (!templateId) {
-						throw new Response(
-							JSON.stringify({ error: "Template ID required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Template ID required");
 					}
 
-					const json = await ctx.kv.get<string>(`template:${templateId}`);
+					const json = await ctx.kv.get<ResponseTemplate | null>(`template:${templateId}`);
 					if (!json) {
-						throw new Response(
-							JSON.stringify({ error: "Template not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Template not found");
 					}
 
-					const template = parseJSON<ResponseTemplate | null>(json, null);
+					const template = json;
 					if (!template) {
-						throw new Response(
-							JSON.stringify({ error: "Template not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Template not found");
 					}
 
 					return { template };
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Get template error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to get template" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to get template");
 				}
 			},
 		},
@@ -1205,41 +1027,27 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 					const templateId = String(input.id ?? "");
 
 					if (!templateId) {
-						throw new Response(
-							JSON.stringify({ error: "Template ID required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Template ID required");
 					}
 
 					// Remove from KV
 					await ctx.kv.delete(`template:${templateId}`);
 
 					// Remove from list
-					const listJson = await ctx.kv.get<string>("templates:list");
-					const ids: string[] = parseJSON(listJson, []);
+					const listJson = await ctx.kv.get<string[]>("templates:list");
+					const ids: string[] = (listJson ?? []);
 					const filtered = ids.filter((id) => id !== templateId);
-					await ctx.kv.set("templates:list", JSON.stringify(filtered));
+					await ctx.kv.set("templates:list", filtered);
 
 					return { deleted: true, id: templateId };
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Delete template error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to delete template" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to delete template");
 				}
 			},
 		},
@@ -1252,41 +1060,24 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 					const templateId = String(input.templateId ?? "");
 					const reviewId = String(input.reviewId ?? "");
 
 					if (!templateId || !reviewId) {
-						throw new Response(
-							JSON.stringify({ error: "Template ID and Review ID are required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Template ID and Review ID are required");
 					}
 
-					const templateJson = await ctx.kv.get<string>(`template:${templateId}`);
-					const template = parseJSON<ResponseTemplate | null>(templateJson, null);
+					const templateJson = await ctx.kv.get<ResponseTemplate | null>(`template:${templateId}`);
+					const template = templateJson;
 					if (!template) {
-						throw new Response(
-							JSON.stringify({ error: "Template not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Template not found");
 					}
 
-					const reviewJson = await ctx.kv.get<string>(`review:${reviewId}`);
-					const review = parseJSON<ReviewRecord | null>(reviewJson, null);
+					const reviewJson = await ctx.kv.get<ReviewRecord | null>(`review:${reviewId}`);
+					const review = reviewJson;
 					if (!review) {
-						throw new Response(
-							JSON.stringify({ error: "Review not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Review not found");
 					}
 
 					const businessName = await ctx.kv.get<string>("settings:business-name") ?? "Our Business";
@@ -1301,10 +1092,7 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Apply template error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to apply template" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to apply template");
 				}
 			},
 		},
@@ -1321,14 +1109,6 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 					const name = String(input.name ?? "").trim();
 					const recipientEmails = (input.recipientEmails ?? []) as string[];
@@ -1337,31 +1117,19 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 					const yelpReviewUrl = input.yelpReviewUrl ? String(input.yelpReviewUrl) : undefined;
 
 					if (!name) {
-						throw new Response(
-							JSON.stringify({ error: "Campaign name is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Campaign name is required");
 					}
 
 					if (!Array.isArray(recipientEmails) || recipientEmails.length === 0) {
-						throw new Response(
-							JSON.stringify({ error: "At least one recipient email is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("At least one recipient email is required");
 					}
 
 					if (recipientEmails.length > 50) {
-						throw new Response(
-							JSON.stringify({ error: "Maximum 50 recipients per campaign" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Maximum 50 recipients per campaign");
 					}
 
 					if (!message) {
-						throw new Response(
-							JSON.stringify({ error: "Campaign message is required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Campaign message is required");
 					}
 
 					const campaign: Campaign = {
@@ -1376,22 +1144,19 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 						createdAt: new Date().toISOString(),
 					};
 
-					await ctx.kv.set(`campaign:${campaign.id}`, JSON.stringify(campaign));
+					await ctx.kv.set(`campaign:${campaign.id}`, campaign);
 
 					// Update campaigns list
-					const listJson = await ctx.kv.get<string>("campaigns:list");
-					const ids: string[] = parseJSON(listJson, []);
+					const listJson = await ctx.kv.get<string[]>("campaigns:list");
+					const ids: string[] = (listJson ?? []);
 					ids.push(campaign.id);
-					await ctx.kv.set("campaigns:list", JSON.stringify(ids));
+					await ctx.kv.set("campaigns:list", ids);
 
 					return { campaign };
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Create campaign error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to create campaign" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to create campaign");
 				}
 			},
 		},
@@ -1404,52 +1169,32 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 					const campaignId = String(input.campaignId ?? "");
 
 					if (!campaignId) {
-						throw new Response(
-							JSON.stringify({ error: "Campaign ID required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Campaign ID required");
 					}
 
-					const json = await ctx.kv.get<string>(`campaign:${campaignId}`);
+					const json = await ctx.kv.get<Campaign | null>(`campaign:${campaignId}`);
 					if (!json) {
-						throw new Response(
-							JSON.stringify({ error: "Campaign not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Campaign not found");
 					}
 
-					const campaign = parseJSON<Campaign | null>(json, null);
+					const campaign = json;
 					if (!campaign) {
-						throw new Response(
-							JSON.stringify({ error: "Campaign not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Campaign not found");
 					}
 
 					if (campaign.status === "sent") {
-						throw new Response(
-							JSON.stringify({ error: "Campaign has already been sent" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Campaign has already been sent");
 					}
 
 					const businessName = await ctx.kv.get<string>("settings:business-name") ?? "Our Business";
 
 					// Update status to sending
 					campaign.status = "sending";
-					await ctx.kv.set(`campaign:${campaignId}`, JSON.stringify(campaign));
+					await ctx.kv.set(`campaign:${campaignId}`, campaign);
 
 					const html = generateReviewRequestHTML(
 						businessName,
@@ -1483,7 +1228,7 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 					campaign.sentCount = sentCount;
 					campaign.status = sentCount > 0 ? "sent" : "failed";
 					campaign.sentAt = new Date().toISOString();
-					await ctx.kv.set(`campaign:${campaignId}`, JSON.stringify(campaign));
+					await ctx.kv.set(`campaign:${campaignId}`, campaign);
 
 					return {
 						campaign,
@@ -1494,10 +1239,7 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Send campaign error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to send campaign" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to send campaign");
 				}
 			},
 		},
@@ -1510,21 +1252,13 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
-					const listJson = await ctx.kv.get<string>("campaigns:list");
-					const ids: string[] = parseJSON(listJson, []);
+					const listJson = await ctx.kv.get<string[]>("campaigns:list");
+					const ids: string[] = (listJson ?? []);
 					const campaigns: Campaign[] = [];
 
 					for (const id of ids) {
-						const json = await ctx.kv.get<string>(`campaign:${id}`);
-						const campaign = parseJSON<Campaign | null>(json, null);
+						const json = await ctx.kv.get<Campaign | null>(`campaign:${id}`);
+						const campaign = json;
 						if (campaign) campaigns.push(campaign);
 					}
 
@@ -1532,10 +1266,7 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`List campaigns error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to list campaigns" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to list campaigns");
 				}
 			},
 		},
@@ -1552,14 +1283,6 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 					const range = String(input.range ?? "365d");
 
@@ -1635,10 +1358,7 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Analytics data error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to fetch analytics data" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to fetch analytics data");
 				}
 			},
 		},
@@ -1651,14 +1371,6 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 					const range = String(input.range ?? "365d");
 
@@ -1688,10 +1400,7 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Analytics export error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to export analytics" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to export analytics");
 				}
 			},
 		},
@@ -1704,14 +1413,6 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = (rc.input ?? {}) as Record<string, unknown>;
 					const range = String(input.range ?? "365d");
 
@@ -1838,10 +1539,7 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Analytics page error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Failed to render analytics page" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Failed to render analytics page");
 				}
 			},
 		},
@@ -1941,20 +1639,12 @@ Write a concise response (2-4 sentences). Be genuine, not generic. Do not use ex
 		settingsPage: {
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				const rc = routeCtx as Record<string, unknown>;
-				const adminUser = rc.user as Record<string, unknown> | undefined;
-				if (!adminUser || !adminUser.isAdmin) {
-					throw new Response(
-						JSON.stringify({ error: "Admin access required" }),
-						{ status: 403, headers: { "Content-Type": "application/json" } }
-					);
-				}
-
 				const googlePlaceId = (await ctx.kv.get<string>("settings:google-place-id")) ?? "";
 				const yelpBusinessId = (await ctx.kv.get<string>("settings:yelp-business-id")) ?? "";
-				const notifJson = await ctx.kv.get<string>("settings:notifications");
-				const notifSettings = parseJSON<Record<string, unknown>>(notifJson, {});
-				const displayJson = await ctx.kv.get<string>("settings:display");
-				const displaySettings = parseJSON<Record<string, unknown>>(displayJson, {});
+				const notifJson = await ctx.kv.get<Record<string, unknown>>("settings:notifications");
+				const notifSettings = (notifJson ?? {});
+				const displayJson = await ctx.kv.get<Record<string, unknown>>("settings:display");
+				const displaySettings = (displayJson ?? {});
 				const syncCursor = (await ctx.kv.get<string>("reviews:sync-cursor")) ?? "Never";
 
 				const notifEmails = Array.isArray(notifSettings.emails)
