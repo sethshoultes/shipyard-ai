@@ -32,6 +32,10 @@ async function validateTheme(themeName) {
             .map((t) => t.name)
             .join(', ')}`);
     }
+    // Check if theme is coming soon
+    if (theme.comingSoon) {
+        throw new Error(`Theme "${themeName}" is coming soon (${theme.estimatedRelease}). Stay tuned for updates!`);
+    }
     return theme.name;
 }
 /**
