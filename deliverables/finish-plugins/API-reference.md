@@ -1,6 +1,6 @@
 # MemberShip Plugin -- REST API Reference
 
-**Version:** 1.5.0
+**Version:** 1.0.0
 **Base path:** `/membership`
 
 All routes are prefixed with the plugin's base path. For example, a route documented as `POST /register` is reached at `POST /membership/register`.
@@ -122,22 +122,14 @@ GET /membership/status
 ```json
 {
   "email": "user@example.com",
-  "active": true,
-  "plan": "pro",
-  "status": "active",
-  "expiresAt": "2026-05-05T00:00:00.000Z",
-  "stripeCustomerId": "cus_abc123",
-  "stripeSubscriptionId": "sub_xyz789",
-  "stripePaymentMethod": "Visa 4242",
-  "planInterval": "month",
-  "currentPeriodEnd": "2026-05-05T00:00:00.000Z",
-  "cancelAtPeriodEnd": false
+  "active": true
 }
 ```
 
 **Behavior:**
-- `active` is `false` if `status !== "active"` or if `expiresAt` is in the past.
-- Returns `{ email, active: false }` if no member record exists.
+- Returns only `email` and `active` status for privacy (no plan, payment, or Stripe details).
+- `active` is `false` if member does not exist, status is not "active", or subscription has expired.
+- For full member details including plan and billing info, use `GET /membership/portal` with authentication.
 
 ---
 

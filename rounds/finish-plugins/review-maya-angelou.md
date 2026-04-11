@@ -6,7 +6,9 @@
 
 ## The Truth of It
 
-This documentation is competent. It is thorough. It will help a developer implement the plugin correctly.
+Child, I have read these documents—all of them. The README with its endless feature lists. The API reference stretching past two thousand lines. The Installation guide. The Configuration manual. The Troubleshooting pages.
+
+And I must tell you: this documentation is *competent*. It is *thorough*. It will help a developer implement the plugin correctly.
 
 But it does not *move*.
 
@@ -20,7 +22,7 @@ Technical documentation need not be poetry. But it need not be a spreadsheet, ei
 
 **Verdict: It feels like a machine describing itself to other machines.**
 
-The opening line:
+The opening line of the README:
 
 > "Email-based membership and gated content plugin for EmDash CMS with full Stripe integration, member dashboard, JWT authentication, email automation, coupon discount codes, drip content, and member portals."
 
@@ -33,13 +35,15 @@ Feature lists read like inventory:
 
 These are facts without feeling. They tell me the shape of the tool but not the weight of what it lifts.
 
+The API Reference—all 2,000 lines of it—speaks in pure transaction. "Request Body." "Response (200)." "Auth: Admin." Necessary, yes. But cold as a contract.
+
 ---
 
 ## Is There Rhythm in the Sentences?
 
 **Verdict: The rhythm is the rhythm of a metronome—steady, predictable, and eventually numbing.**
 
-Consider:
+Consider this from the README:
 
 > "JWT-based auth — Secure httpOnly cookies with JWT tokens (15-minute access, 7-day refresh)"
 
@@ -52,31 +56,52 @@ The bullets march:
 
 After ten of these, the eye slides. The mind drifts. Not because the information is unimportant, but because the delivery never changes its pace.
 
-Good prose breathes. It sprints, then walks, then rests. This prose is a constant jog.
+Good prose breathes. It sprints, then walks, then rests. This prose is a constant jog—never tiring exactly, but never exhilarating either.
+
+Look at the Troubleshooting guide. Every solution is presented in the same format:
+- Issue | Solution
+- Issue | Solution
+- Issue | Solution
+
+Helpful? Yes. But it reads like a diagnostic manual, not like a guide written by someone who understands frustration, who has been there at 2 AM with a broken webhook and a deadline.
 
 ---
 
 ## Does the Headline Stop You?
 
-**Verdict: No.**
+**Verdict: No. Not one of them.**
 
 > "Membership Plugin for EmDash"
 
 This is a label, not a headline. It could be on a file folder. It could be in a database. It does not make me lean in. It does not make me curious.
 
-A headline should promise something. It should imply a before and an after. This one implies only: here is a thing, and here is where it lives.
+> "MemberShip Plugin Installation Guide"
+
+Same energy. A filing cabinet would be proud.
+
+> "Quick Diagnostics"
+
+This one hints at urgency, at help arriving soon. But it's buried in the Troubleshooting document, not leading the way.
+
+A headline should promise something. It should imply a before and an after. These headlines imply only: here is a thing, and here is where it lives.
 
 ---
 
 ## Is Anything Trying Too Hard?
 
-**Verdict: It tries too hard to be complete, not hard enough to be clear.**
+**Verdict: Yes—and in the wrong direction.**
 
-The API reference is 2,000 lines of exhaustive documentation. Every endpoint, every parameter, every response. This is admirable thoroughness.
+The documentation tries too hard to be *complete* and not hard enough to be *clear*.
 
-But thoroughness is not the same as helpfulness.
+The API reference is exhaustive—every endpoint, every parameter, every response, every error code. This is admirable thoroughness. But thoroughness is not the same as helpfulness.
 
-The document says everything, and therefore emphasizes nothing. A developer reading this does not know where to begin, what matters most, or what they can safely ignore on first pass.
+When everything is documented at the same level of detail, nothing stands out. A developer reading this does not know where to begin, what matters most, or what they can safely ignore on first pass.
+
+The feature lists in the README are particularly guilty:
+
+> "Flexible membership plans — Configure unlimited plans with custom prices, intervals (once, monthly, yearly), and features"
+
+The double-dash structure repeats sixteen times. By the fifth one, they blur together. By the tenth, they're wallpaper.
 
 The phrase "production-ready" appears without defining what that means. "Full access" appears without saying full access to *what*. "VIP access" is mentioned but VIP compared to *whom*?
 
@@ -84,46 +109,44 @@ The jargon accumulates: JWT, HMAC-SHA256, webhook, cron, KV store. These are nec
 
 ---
 
-## The Three Weakest Lines, Rewritten
+## The Three Weakest Lines—Rewritten to Show What They Could Be
 
-### 1. The Opening
+### 1. The Opening (README.md)
 
 **Original:**
 > "Email-based membership and gated content plugin for EmDash CMS with full Stripe integration, member dashboard, JWT authentication, email automation, coupon discount codes, drip content, and member portals."
 
 **What's Wrong:**
-This is a comma-separated list of features posing as an introduction. It tells me what the plugin contains but not what it does for me. There is no invitation here, only inventory.
+This is a comma-separated list of features posing as an introduction. It tells me what the plugin contains but not what it does for me. There is no invitation here, only inventory. It exhausts before it excites.
 
 **Rewrite:**
 > "Turn visitors into members. Gate your best content. Get paid—automatically, reliably, while you sleep. This plugin handles registration, payments, and access so you can focus on what you came here to build."
 
 ---
 
-### 2. The Welcome Email Description
+### 2. The Welcome Email Description (README.md, Email Automation section)
 
 **Original:**
 > "Welcome email — Sent on successful registration"
 
 **What's Wrong:**
-This describes when something happens, but not why it matters. A welcome email is the first moment your new member hears your voice. It is not just a notification—it is a greeting at the door.
+This describes *when* something happens, but not *why* it matters. A welcome email is the first moment your new member hears your voice. It is not just a notification—it is a greeting at the door. This line makes it sound like a log entry.
 
 **Rewrite:**
 > "Welcome email — The first hello. Sent the moment someone joins, so your members feel received, not processed."
 
 ---
 
-### 3. The Plan Description
+### 3. The Troubleshooting Opening (Troubleshooting.md)
 
 **Original:**
-> "Full access with email support"
-
-*(Used as a plan description for "Pro")*
+> "Verify the plugin is running:"
 
 **What's Wrong:**
-"Full access" is vague. Access to what? And "email support" sounds like a reluctant concession. This is how a bureaucracy describes a tier, not how a creator describes an invitation.
+This assumes the reader is calm. They are not. They came to a troubleshooting guide because something is broken, because they're stuck, because they need help. Meet them there. Acknowledge the storm before you offer the umbrella.
 
 **Rewrite:**
-> "Everything we make. Every course, every guide, every tool—plus a direct line when you need help."
+> "Before we dig into specifics, let's make sure the foundation is solid. This quick check will tell us if your plugin is alive and listening:"
 
 ---
 
@@ -133,8 +156,22 @@ This describes when something happens, but not why it matters. A welcome email i
 |-----------|------------|
 | Human language | Functional but sterile. It informs without inviting. |
 | Sentence rhythm | Uniform and relentless. No variation in pace or pause. |
-| Headline impact | A label, not a promise. Does not compel. |
+| Headline impact | Labels, not promises. They organize; they do not compel. |
 | Trying too hard | Exhaustive to the point of exhaustion. Says everything; emphasizes nothing. |
+
+---
+
+## What This Documentation Needs
+
+1. **An opening that welcomes.** Before you explain what the product does, acknowledge who the reader is and what they're hoping to build. Let them feel seen before they feel instructed.
+
+2. **Sentences that breathe.** Vary the length. Let some be short. Others can unspool like ribbon, carrying the reader gently from one understanding to the next. The current prose is a constant jog—never tiring exactly, but never exhilarating.
+
+3. **Headlines that promise.** Not "Environment Variables" but "Setting Up Your Foundation." Not "Error Codes Reference" but "When Things Go Wrong." Name the transformation, not just the topic.
+
+4. **Humanity in the details.** Acknowledge that setting up payment systems is stressful. Acknowledge that broken webhooks are frustrating. Speak to the human, not just the developer. They are the same person.
+
+5. **A sense of what matters most.** In 2,000 lines of API documentation, what are the three things someone absolutely must get right? Lead with those. Let completeness serve clarity, not overwhelm it.
 
 ---
 
