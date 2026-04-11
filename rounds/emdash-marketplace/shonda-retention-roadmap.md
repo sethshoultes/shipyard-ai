@@ -16,12 +16,11 @@ User has boring site → Discovers Wardrobe → Installs theme → Has nice site
 
 This is a movie. We need a series.
 
+> "Characters don't change once; they keep changing, and we keep watching because we want to see who they become next."
+
 ---
 
 ## Retention Philosophy
-
-> "The best transformations aren't endings. They're beginnings."
-> — Shonda Rhimes
 
 Users return when they have:
 1. **Unfinished business** — Something they started but haven't completed
@@ -277,7 +276,7 @@ Submitted for review. We'll email you within 48 hours.
 **Gallery Page Features:**
 - Filterable by theme
 - Screenshot + live link
-- "I'm wearing this" counter
+- "Sites wearing this" counter
 - Featured/Staff Pick badges
 
 **Implementation:**
@@ -359,32 +358,34 @@ June 2026: "Chronicle Progress Update"
 
 ---
 
-### Feature 7: Post-Install Touchpoints
+### Feature 7: Seasonal Collections
 
-**Problem:** After install, no prompt for next action.
+**Problem:** Theme releases feel random, not like events.
 
-**Solution — Success Screen Enhancement:**
+**Solution:** Group themes into seasonal collections.
+
+**Example:**
 ```
-✓ Your site is now wearing ember.
+FALL 2026 COLLECTION
+"Cozy themes for autumn"
 
-What's next?
-  [1] Preview your transformed site
-  [2] Submit to our showcase gallery
-  [3] Share on Twitter
-  [4] Try another theme
-  [q] Done for now
+  Haven — Home on the internet
+  Chronicle — Stories deserve dignity
 
-Your choice: _
+Available September 15, 2026
 ```
 
-**Twitter Share (Pre-populated):**
-> Just transformed my @emdash site with the Ember theme from Wardrobe. One command. Zero hassle.
->
-> npx wardrobe install ember
->
-> #emdash #wardrobe
+**Why it works:**
+- Fashion metaphor extended naturally
+- Creates "appointment viewing"
+- Gives users a reason to check back seasonally
+- Batch releases feel like events, not trickles
 
-**Retention impact:** Immediate next action captures momentum. Sharing creates return visits (checking engagement).
+**Implementation:**
+- Group Coming Soon themes by season
+- Coordinated release dates
+- Launch email to subscribers
+- Update showcase with seasonal messaging
 
 ---
 
@@ -409,7 +410,7 @@ Behind-the-scenes email arrives (Feature 5)
     ↓
 User anticipates new theme
     ↓
-New theme launches
+New theme launches (Feature 7)
     ↓
 User installs new theme
     ↓
@@ -443,7 +444,7 @@ User installs new theme
 | Feature | Effort | Impact |
 |---------|--------|--------|
 | Progress System | Medium | Low-Medium |
-| Post-Install Touchpoints | Low | Medium |
+| Seasonal Collections | Low | Medium |
 | Account System | High | High (enables all) |
 
 ---
@@ -464,7 +465,7 @@ User installs new theme
 | Theme update adoption rate | 50%+ within 7 days |
 | User-to-evangelist conversion | 10% share or submit |
 
-### Targets (Q3 2026)
+### Q3 2026 Targets
 | Metric | Target |
 |--------|--------|
 | Email capture rate | 15% of installs |
@@ -484,7 +485,7 @@ The goal isn't to trap users. It's to give them reasons to return because they *
 
 A wardrobe isn't something you visit once. It's something you return to every morning, wondering who you want to be today.
 
-Build for that.
+Because the best transformations aren't endings. They're beginnings.
 
 ---
 

@@ -1,28 +1,32 @@
-# Sara Blakely Gut-Check: NERVE v1
+# Sara Blakely Gut-Check: Wardrobe Theme Marketplace
+
+**Date:** April 11, 2026
 
 ## Would a real customer pay for this?
 
-**Yes — but they won't thank you.** This is underwear. Nobody wants to buy daemon management. They want "no more 3 AM fires." NERVE delivers that, but the value is invisible by design. Document every incident it prevents or you'll get zero budget next quarter.
+**Yes, but not yet.** The problem is real — nobody wants an ugly site. The solution sounds magical. But right now you're selling air. No deployed demos = no proof. I built Spanx by cutting the feet off pantyhose and showing women the result. You're describing pantyhose with no mirror.
 
 ## What's confusing? What would make someone bounce?
 
-- 12 tasks to verify 5 scripts. Smells like bureaucracy.
-- "process_item() is a stub" — so the main thing it does... it doesn't do?
-- Board score 4.7/10 but "READY FOR BUILD" — pick one.
-- No answer to: "Is it working right now?" without tailing logs.
+- "Emdash" — what is that? You assume I know. I don't.
+- 5 themes with cute names (Ember, Forge, Drift) — why should I care? What do they LOOK like?
+- "Instant dignity" sounds great but I can't SEE it anywhere
+- The showcase has SVG placeholders. That's embarrassing. It screams "we didn't finish."
 
 ## 30-Second Elevator Pitch
 
-"NERVE runs your pipeline queue, survives crashes, and shuts down clean. One script to start, one to stop, zero config. Install it, forget it, stop waking up at 3 AM."
+"Your website looks like you built it in 2012. One command, 3 seconds, and it looks like you hired a designer. Pick a style, run one line, keep all your content. Try it: `npx wardrobe install ember`."
 
-## What would I test first with $0 marketing budget?
+## What would you test first with $0 marketing budget?
 
-Run it on the real pipeline for one week. Count manual interventions. Zero = ship it. More than zero = that's your bug list. Don't write docs. Don't polish. Just run it and watch.
+Post a before/after GIF in one developer community (Reddit r/webdev, Hacker News, Dev.to). That's it. If the GIF doesn't make them say "wait, how?" — the product isn't ready. The transformation IS the marketing.
 
 ## What's the retention hook?
 
-**Fear of going back.** One week without a 3 AM page and they'll never uninstall. But you must *prove* that absence — Task-11 (baseline metrics) is the most important task here. Without before/after numbers, NERVE is a ghost nobody remembers to fund.
+**Weak.** One install, done. No reason to come back. Where's the upsell?
+- "New themes drop monthly — enter email to know first." That's your hook.
+- V2: Premium themes. Custom fonts. White-label. That's where money lives.
 
----
+## Honest Verdict
 
-**Bottom line:** Ship it. But cut the ceremony. The plan is over-engineered for "run queue, don't crash." Measure the pain reduction. Let the silence sell it.
+The engineering is solid. The vision is right. But you're 48 hours from magic and drowning in infrastructure tickets. **Deploy one demo TODAY.** Let people see ONE transformation. Perfection is the enemy of traction. Ship the mirror, then sell the pantyhose.

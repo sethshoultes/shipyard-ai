@@ -4,58 +4,53 @@
 
 ## Where Elon Is Optimizing for the Wrong Metric
 
-**Elon's measuring engineering effort. He should be measuring emotional response.**
+**Elon is optimizing for engineering time. He should be optimizing for first impression.**
 
-"Screenshots are sufficient for v1." Sufficient for *what*? For documenting that themes exist? Sure. For making someone *want* a theme? Absolutely not.
+"Screenshots work" is the most dangerous sentence in his entire position. Screenshots are DEAD. They're artifacts. They're promises you can't verify. A screenshot of a theme is like a photograph of a meal — you have no idea if the restaurant is even still open.
 
-A screenshot is a corpse. A live preview is a living thing. When you hover and the theme *responds*, when you see YOUR words in that design — that's not a feature, that's the sale. You don't cut the moment that converts.
+His "10x path" of pre-bundling themes into a CLI binary optimizes for install speed nobody asked for. The bottleneck isn't "30 seconds vs 3 seconds" — it's the 10 minutes of scrolling a README trying to imagine what your site would look like. The transformation must be VISIBLE before the command is run.
 
-"CLI + README" optimizes for developer convenience. We're not selling to developers. We're selling to writers, small business owners, people who feel *shame* about their websites. A GitHub README tells them: "This isn't for you."
+Reducing to 3 themes because "Drift/Bloom overlap" betrays a fundamental misunderstanding. Themes aren't feature coverage — they're emotional resonance. You don't pick a wedding dress because it "covers the formal category." You pick the one that makes you cry.
 
-**The 10x insight Elon missed:** The marketplace IS the marketing. It's not a distribution problem to solve later — it's the first impression of what Emdash makes possible. Ship an ugly showcase, get ugly results.
+A README with screenshots isn't a product. It's homework.
 
 ---
 
 ## Why Design Quality Matters HERE
 
-Elon will attack "Wardrobe" as naming vanity. He's wrong.
+Elon would argue: "Just ship the themes. Polish later."
 
-`emdash-themes list` is forgettable. `npx wardrobe install ember` is *tweetable*. In a world with zero marketing budget, tweetability IS the distribution strategy.
+Wrong. Emdash is a DESIGN TOOL for people who care about aesthetics but don't code. These users judge products by how the product LOOKS — instantly, viscerally. A README with screenshots signals: "This is for developers who tolerate ugly."
 
-He'll attack "no user accounts" as scope creep avoidance. It's not. It's conversion optimization. Every form field is a decision point. Every decision point is an exit. Five themes, one command, no login — that's a funnel with no leaks.
+The marketplace IS the proof. If we can't make browsing five themes feel magical, why would anyone trust us to make their website feel magical?
 
-He'll attack "the marketplace must be stunning" as perfectionism. But Emdash sells *beauty*. A utilitarian showcase selling beauty is like a dirty restaurant selling food. The medium IS the message.
-
----
-
-## Where Elon Is Right (Concessions)
-
-**1. Cut to 3 themes.** He's correct. Ember, Forge, Slate span the range. Drift and Bloom overlap. Kill them.
-
-**2. Themes in Emdash core.** `emdash create --theme ember` is brilliant. The marketplace becomes discovery for existing users, not the front door for new ones. I was wrong to separate them.
-
-**3. Pre-bundle for speed.** Embedding themes in the CLI for instant install is the right call. 30 seconds kills the magic. 3 seconds preserves it.
+First impressions are the ONLY impressions for a product with zero existing users.
 
 ---
 
-## My Non-Negotiable Decisions (LOCKED)
+## Where Elon Is Right (Honest Concessions)
 
-### 1. Live Preview with User Content
-Not screenshots. Not demo content. YOUR site wearing the theme. This is the product. Without it, we're a README.
+1. **User accounts are absurd.** Agreed completely. No login. No signup. Zero friction.
 
-### 2. The Name "Wardrobe"
-One word. Human. Tweetable. `npx wardrobe` ships or I don't.
+2. **Live demos that drift are worse than no demos.** If we can't maintain them, don't ship them. I'll accept curated screenshots over broken live previews.
 
-### 3. Visual Showcase (Not GitHub README)
-A single stunning HTML page. Not a Next.js app — Elon's right that's overkill. But three cards that FEEL like the themes they represent. The showcase must make you want to try one. A README makes you want to close the tab.
+3. **Distribution through Emdash core is correct.** `emdash create --theme ember` should exist. The marketplace complements this; it doesn't replace it.
+
+4. **"Preview with your content" is v2.** I wanted it. He's right — it's a 40-hour feature hiding as v1.
 
 ---
 
-## The Synthesis
+## My 3 Non-Negotiables (LOCKED)
 
-Elon wants: CLI + 3 themes + README
-I want: CLI + 3 themes + beautiful showcase + live preview
+### 1. "Wardrobe" Naming
+The product is called Wardrobe. Not "Emdash Theme Marketplace." Not "emdash-themes." Names create emotional real estate. This one is ours.
 
-The delta is one HTML file and preview infrastructure. That's not scope creep — that's the difference between a tool and a product.
+### 2. 5 Themes, Not 3
+Three themes feels like a test. Five feels like a collection. The difference between "some options" and "a curated selection" is the difference between a gas station and a boutique.
 
-**Build the gasp. Ship Wardrobe.**
+### 3. Visual Gallery Page (Not a README)
+One single HTML page. Hosted on Cloudflare Pages. Five theme cards with full-bleed screenshots that breathe. No login, no backend, no complexity — but NOT a README in a GitHub repo. The URL you share must be beautiful because the URL IS the marketing.
+
+---
+
+*Speed without soul is just fast mediocrity. Ship something people screenshot.*

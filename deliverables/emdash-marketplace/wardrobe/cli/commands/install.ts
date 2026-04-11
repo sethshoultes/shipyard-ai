@@ -201,6 +201,11 @@ export async function installTheme(
       console.log(`Try it on. If it doesn't fit, try another.\n`);
       console.log(`Installed in ${elapsed}s\n`);
 
+      // Post-install reveal: dev server hint (per Board Condition Tier 1 #3)
+      console.log(`Run \`npm run dev\` to see your transformed site.`);
+      console.log(`Then open http://localhost:4321`);
+      console.log(`Admin panel: http://localhost:4321/_emdash/admin\n`);
+
       // Send anonymous telemetry (fire-and-forget, non-blocking)
       sendTelemetry(validThemeName);
     } finally {

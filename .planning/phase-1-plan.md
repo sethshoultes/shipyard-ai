@@ -1,10 +1,10 @@
-# Phase 1 Plan — NERVE v1 Verification & Ship
+# Phase 1 Plan — Wardrobe Launch (Tier 1 Blockers)
 
 **Generated:** April 11, 2026
-**Project Slug:** promptops
-**Product Name:** NERVE (Autonomous Pipeline Daemon)
+**Project Slug:** emdash-marketplace
+**Product Name:** Wardrobe (Theme Marketplace for Emdash)
 **Requirements:** .planning/REQUIREMENTS.md
-**Total Tasks:** 12
+**Total Tasks:** 10
 **Waves:** 3
 **Status:** READY FOR BUILD
 
@@ -12,30 +12,31 @@
 
 ## The Essence
 
-> **What it is:** The invisible backbone that makes everything else possible.
+> **What it is:** One command transforms your site into something beautiful — your content stays, only the skin changes.
 
-> **The feeling:** Peace. The absence of the 3 AM knot in your stomach.
+> **The feeling:** "I can't believe I just did that."
 
-> **The one thing that must be perfect:** Determinism. When something must happen, it happens.
+> **The one thing that must be perfect:** Seeing YOUR content wearing a new theme.
 
-> **Creative direction:** Disappear completely. Work always.
+> **Creative direction:** Instant dignity.
 
 ---
 
 ## Build Status
 
-**Technical MVP:** Feature-complete (1,273 lines of code across 5 scripts + README)
-**Board Verdict:** HOLD (4.7/10) — with conditions for proceeding
-**Current State:** Scripts exist but need verification against acceptance criteria
+**Technical MVP:** Feature-complete (CLI, 5 themes, showcase, workers all built)
+**Board Verdict:** PROCEED (Conditional) — 6/10 aggregate score
+**Current State:** Code exists but infrastructure not deployed; 0/5 Tier 1 conditions met
 
-| Script | Lines | Status | Verification Needed |
-|--------|-------|--------|---------------------|
-| daemon.sh | 247 | Complete | PID lock, exit codes, signal handling |
-| queue.sh | 304 | Complete | FIFO, crash recovery, atomic writes |
-| abort.sh | 112 | Complete | Flag lifecycle, force-kill |
-| parse-verdict.sh | 136 | Complete | Exit codes, pattern matching |
-| status.sh | 174 | Complete | JSON output, metrics display |
-| README.md | 300 | Complete | All commands documented |
+| Component | Lines | Status | Gap |
+|-----------|-------|--------|-----|
+| CLI (install.ts) | 262 | Complete | Post-install reveal missing |
+| 5 Themes | ~150 each | Complete | None |
+| Showcase HTML | 341 | Complete | SVG placeholders, not deployed |
+| Email Worker | ~300 | Complete | Not deployed, KV not provisioned |
+| Analytics Worker | ~389 | Complete | Not deployed, KV not provisioned |
+| Theme Tarballs | 5 files | Complete | Not uploaded to R2 |
+| Demo Sites | 0 | NOT STARTED | Board blocker #1 |
 
 ---
 
@@ -43,19 +44,16 @@
 
 | Requirement | Task(s) | Wave |
 |-------------|---------|------|
-| NERVE-REQ-001: daemon.sh PID Lockfile | phase-1-task-1 | 1 |
-| NERVE-REQ-002: queue.sh Persistence | phase-1-task-2 | 1 |
-| NERVE-REQ-003: abort.sh Flag Handling | phase-1-task-3 | 1 |
-| NERVE-REQ-004: parse-verdict.sh Output | phase-1-task-4 | 1 |
-| NERVE-REQ-005: Log Format | phase-1-task-5 | 2 |
-| NERVE-REQ-006: Nerve Prefix | phase-1-task-5 | 2 |
-| NERVE-REQ-007: README Documentation | phase-1-task-6 | 2 |
-| NERVE-REQ-020: Three Metrics | phase-1-task-7 | 2 |
-| NERVE-REQ-026: Atomic Writes | phase-1-task-8 | 2 |
-| NERVE-REQ-027: Orphan Cleanup | phase-1-task-9 | 2 |
-| NERVE-REQ-009: QA Pass | phase-1-task-10 | 3 |
-| Board Path C: Baseline Metrics | phase-1-task-11 | 3 |
-| Sara Blakely Review | phase-1-task-12 | 3 |
+| REQ-T1-007: R2 Theme Upload | phase-1-task-1 | 1 |
+| REQ-T1-003: Post-Install Reveal | phase-1-task-2 | 1 |
+| REQ-T1-004: Email Worker Deployment | phase-1-task-3 | 1 |
+| REQ-T1-005: Analytics Worker Deployment | phase-1-task-4 | 1 |
+| REQ-T1-001: Live Demo Sites | phase-1-task-5 | 2 |
+| REQ-T1-002: Real Screenshots | phase-1-task-6 | 2 |
+| REQ-T1-006: Showcase Deployment | phase-1-task-7 | 2 |
+| Install Speed Benchmark | phase-1-task-8 | 3 |
+| QA Pass | phase-1-task-9 | 3 |
+| Sara Blakely Review | phase-1-task-10 | 3 |
 
 ---
 
@@ -63,67 +61,70 @@
 
 This plan cites specific sections from the source documents:
 
-- **decisions.md Section II (MVP Feature Set):** Core components and UX requirements
-- **decisions.md Section III (File Structure):** Implementation specifications and exit codes
-- **decisions.md Section IV (Open Questions):** OQ-001 log format, OQ-002 naming resolved
-- **decisions.md Section V (Risk Register):** Atomic writes, orphan processes
-- **decisions.md Section VI (Board Conditions):** Path C (ROI validation) requirements
-- **decisions.md Section IX (Acceptance Criteria):** 9-item checklist
+- **decisions.md Section "Board Conditions for Launch":** Tier 1 conditions #1-5
+- **decisions.md Section "MVP Feature Set":** CLI commands, install experience
+- **decisions.md Section "File Structure":** Theme and worker paths
+- **decisions.md Section "Risk Register":** Screenshot quality, install speed
+- **docs/EMDASH-GUIDE.md Section 1:** Getting Started, port 4321
+- **docs/EMDASH-GUIDE.md Section 5:** Cloudflare deployment (D1, R2, Workers)
+- **docs/EMDASH-GUIDE.md Section 7:** Theming, seed files, theme structure
 
 ---
 
 ## Wave Execution Order
 
-### Wave 1 (Parallel) — Verification of Core Scripts
+### Wave 1 (Parallel) — Infrastructure Foundation
 
-Four independent tasks verifying each script meets acceptance criteria.
+Four independent tasks deploying infrastructure. No dependencies on each other.
 
 ```xml
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Verify daemon.sh PID lockfile and exit codes</title>
-  <requirement>NERVE-REQ-001: daemon.sh PID Lockfile (P0-Blocker)</requirement>
+  <title>Upload theme tarballs to Cloudflare R2</title>
+  <requirement>REQ-T1-007: R2 Theme Upload (P0-Blocker)</requirement>
   <description>
-    Per decisions.md Section IX: daemon.sh starts, creates PID lockfile,
-    prevents duplicate instances. Exit codes: 0=success, 1=error, 2=already running.
-    Must verify against specification.
+    Per decisions.md Decision #4: CLI downloads tarball from R2.
+    Tarballs are built but not uploaded. Without R2 hosting,
+    `npx wardrobe install ember` fails immediately.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/nerve/daemon.sh" reason="Script to verify" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Specification source" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/dist/themes/" reason="Built tarballs to upload" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/registry/themes.json" reason="CDN URLs to verify" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/scripts/upload-tarballs.ts" reason="Upload script" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/.env.example" reason="Required env vars" />
   </context>
 
   <steps>
-    <step order="1">Read daemon.sh and locate acquire_lock() function (~lines 79-96)</step>
-    <step order="2">Verify PID file path is /tmp/nerve.pid (per OQ-002 resolution)</step>
-    <step order="3">Test: Start daemon, verify /tmp/nerve.pid contains correct PID</step>
-    <step order="4">Test: Start second daemon, verify exit code 2</step>
-    <step order="5">Test: Stop daemon, verify PID file is removed</step>
-    <step order="6">Test: Create stale PID file (dead process), verify daemon handles it</step>
-    <step order="7">Verify exit code 0 on clean shutdown (SIGTERM)</step>
-    <step order="8">Verify exit code 1 on initialization error (Bash version check)</step>
-    <step order="9">Document any fixes needed in verification notes</step>
+    <step order="1">Create R2 bucket: `wrangler r2 bucket create emdash-themes`</step>
+    <step order="2">Enable public access on bucket via Cloudflare dashboard or wrangler</step>
+    <step order="3">Create R2 API token with Object Read/Write permissions</step>
+    <step order="4">Set environment variables: CLOUDFLARE_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY</step>
+    <step order="5">Run upload script: `npm run upload:themes` (in wardrobe directory)</step>
+    <step order="6">Verify each tarball accessible: curl https://cdn.emdash.dev/themes/ember@1.0.0.tar.gz</step>
+    <step order="7">If using custom domain, configure R2 custom domain in Cloudflare dashboard</step>
+    <step order="8">Update themes.json if CDN URL differs from placeholder</step>
   </steps>
 
   <verification>
-    <check type="bash">./nerve/daemon.sh &amp;&amp; cat /tmp/nerve.pid</check>
-    <check type="bash">./nerve/daemon.sh; echo "Exit code: $?"</check>
-    <check type="test">Second instance exits with code 2</check>
-    <check type="test">PID file removed on clean shutdown</check>
-    <check type="test">Stale PID detection works</check>
+    <check type="bash">curl -I https://cdn.emdash.dev/themes/ember@1.0.0.tar.gz | grep "200 OK"</check>
+    <check type="bash">curl -I https://cdn.emdash.dev/themes/forge@1.0.0.tar.gz | grep "200 OK"</check>
+    <check type="bash">curl -I https://cdn.emdash.dev/themes/slate@1.0.0.tar.gz | grep "200 OK"</check>
+    <check type="bash">curl -I https://cdn.emdash.dev/themes/drift@1.0.0.tar.gz | grep "200 OK"</check>
+    <check type="bash">curl -I https://cdn.emdash.dev/themes/bloom@1.0.0.tar.gz | grep "200 OK"</check>
+    <check type="test">All 5 tarballs return HTTP 200</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>verify(nerve): daemon.sh PID lockfile and exit codes
+  <commit-message>infra(wardrobe): upload theme tarballs to R2
 
-Per decisions.md Section IX acceptance criteria:
-- PID lockfile at /tmp/nerve.pid verified
-- Exit codes match spec (0/1/2)
-- Duplicate instance prevention confirmed
-- Stale PID detection working
+Per decisions.md Decision #4:
+- R2 bucket created: emdash-themes
+- 5 theme tarballs uploaded
+- Public CDN access verified
+- CLI installs now functional
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -131,52 +132,49 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-2" wave="1">
-  <title>Verify queue.sh persistence and crash recovery</title>
-  <requirement>NERVE-REQ-002: queue.sh Persistence and Recovery (P0-Blocker)</requirement>
+  <title>Add post-install reveal to CLI</title>
+  <requirement>REQ-T1-003: Post-Install Reveal (P0-Blocker, Shonda)</requirement>
   <description>
-    Per decisions.md Section IX: queue.sh persists queue to disk, recovers
-    state on restart. Items in running/ moved back to pending/ on init.
-    Risk: Queue corruption on crash (Section V).
+    Per Board Condition Tier 1 #3: "CLI offers to open transformed site
+    or prints clear localhost URL." Current install.ts shows success
+    message but no dev server hint. Per docs/EMDASH-GUIDE.md Section 1,
+    Emdash runs on port 4321.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/nerve/queue.sh" reason="Script to verify" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Specification source" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/cli/commands/install.ts" reason="File to modify (lines 197-202)" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Port 4321 reference (Section 1)" />
   </context>
 
   <steps>
-    <step order="1">Read queue.sh and locate queue_init() function</step>
-    <step order="2">Verify queue directory is /tmp/nerve-queue/ (per OQ-002)</step>
-    <step order="3">Test: Initialize queue, verify directories created (pending, running, completed, failed)</step>
-    <step order="4">Test: Enqueue item, verify JSON file in pending/</step>
-    <step order="5">Test: Dequeue item, verify moves to running/</step>
-    <step order="6">Test: Complete item, verify moves to completed/</step>
-    <step order="7">Test: Fail item, verify moves to failed/ with reason</step>
-    <step order="8">Test crash recovery: Create item in running/, call init, verify moved to pending/</step>
-    <step order="9">Test FIFO: Enqueue 3 items, dequeue, verify oldest returned</step>
-    <step order="10">Verify exit codes: 0=success, 1=error, 2=empty queue</step>
-    <step order="11">Check for atomic writes (write temp, then mv) per Risk Register</step>
+    <step order="1">Read install.ts and locate success message block (lines 197-202)</step>
+    <step order="2">Add line after "Installed in X.XXs": "Run `npm run dev` to see your transformed site"</step>
+    <step order="3">Add line: "Then open http://localhost:4321"</step>
+    <step order="4">Add line: "Admin panel: http://localhost:4321/_emdash/admin"</step>
+    <step order="5">Maintain Steve Jobs voice style (short sentences, no jargon)</step>
+    <step order="6">Run TypeScript compile: `npm run build` in wardrobe directory</step>
+    <step order="7">Test: Run `npx wardrobe install ember` in a test Emdash project</step>
+    <step order="8">Verify new lines appear in success output</step>
   </steps>
 
   <verification>
-    <check type="bash">./nerve/queue.sh init &amp;&amp; ls /tmp/nerve-queue/</check>
-    <check type="bash">./nerve/queue.sh enqueue test-001 '{"msg":"hello"}'</check>
-    <check type="test">Items survive daemon crash</check>
-    <check type="test">Crash recovery moves running to pending</check>
-    <check type="test">FIFO order maintained</check>
+    <check type="bash">grep -q "npm run dev" cli/commands/install.ts</check>
+    <check type="bash">grep -q "localhost:4321" cli/commands/install.ts</check>
+    <check type="bash">grep -q "_emdash/admin" cli/commands/install.ts</check>
+    <check type="manual">Success message shows dev server hint</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>verify(nerve): queue.sh persistence and crash recovery
+  <commit-message>feat(cli): add post-install reveal with dev server hint
 
-Per decisions.md Section IX acceptance criteria:
-- Queue persists to /tmp/nerve-queue/
-- Crash recovery verified (running -> pending)
-- FIFO ordering confirmed
-- Exit codes match spec (0/1/2)
+Per Board Condition Tier 1 #3 (Shonda):
+- Show "Run npm run dev to see your transformed site"
+- Print localhost:4321 URL
+- Print admin panel URL
+- Maintains Steve Jobs voice style
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -184,51 +182,51 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-3" wave="1">
-  <title>Verify abort.sh flag handling and force-kill</title>
-  <requirement>NERVE-REQ-003: abort.sh Flag Handling (P0-Blocker)</requirement>
+  <title>Deploy email capture worker to Cloudflare</title>
+  <requirement>REQ-T1-004: Wire Email Capture Worker (P0-Blocker, Shonda/Oprah)</requirement>
   <description>
-    Per decisions.md Section IX: abort.sh sets flag, daemon responds,
-    shutdown is clean. Force-kill escalation: SIGTERM -> 5 sec -> SIGKILL.
-    Risk: Orphan processes (Section V).
+    Per Board Condition Tier 1 #4: "Wire worker before launch.
+    Placeholder URLs are lies dressed as features." Worker code is
+    complete but KV namespaces not provisioned.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/nerve/abort.sh" reason="Script to verify" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Specification source" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/email-capture/src/index.ts" reason="Worker code to deploy" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/email-capture/wrangler.toml" reason="Config to update with KV IDs" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/script.js" reason="Update with real endpoint URL" />
   </context>
 
   <steps>
-    <step order="1">Read abort.sh and verify flag path is /tmp/nerve.abort</step>
-    <step order="2">Test: abort.sh set - verify flag file created with timestamp</step>
-    <step order="3">Test: abort.sh status - verify correct status reported</step>
-    <step order="4">Test: abort.sh clear - verify flag removed</step>
-    <step order="5">Test: abort.sh check - verify exit code 0 when flag exists, 1 when not</step>
-    <step order="6">Integration test: Start daemon, set abort, verify clean shutdown</step>
-    <step order="7">Verify daemon completes current item before exit</step>
-    <step order="8">Test force-kill: Verify SIGTERM sent first, then SIGKILL after 5 sec</step>
-    <step order="9">Verify no orphan processes left after force-kill</step>
-    <step order="10">Verify exit codes match spec</step>
+    <step order="1">cd to workers/email-capture/ directory</step>
+    <step order="2">Create KV namespace for emails: `wrangler kv:namespace create EMAILS`</step>
+    <step order="3">Create KV namespace for rate limits: `wrangler kv:namespace create RATE_LIMITS`</step>
+    <step order="4">Note the namespace IDs from command output</step>
+    <step order="5">Update wrangler.toml with real namespace IDs (replace placeholders)</step>
+    <step order="6">Deploy worker: `wrangler deploy`</step>
+    <step order="7">Note deployed URL (wardrobe-email.emdash.workers.dev or similar)</step>
+    <step order="8">Update showcase/script.js with real endpoint URL</step>
+    <step order="9">Test: Submit email via curl to POST /subscribe endpoint</step>
+    <step order="10">Verify email stored: `wrangler kv:key list --namespace-id=EMAILS_ID`</step>
   </steps>
 
   <verification>
-    <check type="bash">./nerve/abort.sh set &amp;&amp; cat /tmp/nerve.abort</check>
-    <check type="bash">./nerve/abort.sh status</check>
-    <check type="bash">./nerve/abort.sh clear</check>
-    <check type="test">Daemon shuts down cleanly on abort flag</check>
-    <check type="test">Force-kill escalation works</check>
+    <check type="bash">curl -X POST https://wardrobe-email.emdash.workers.dev/subscribe -H "Content-Type: application/json" -d '{"email":"test@example.com"}'</check>
+    <check type="test">Response is 200 with success message</check>
+    <check type="test">Email appears in KV namespace</check>
+    <check type="manual">Showcase form submits successfully</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>verify(nerve): abort.sh flag handling and force-kill
+  <commit-message>infra(wardrobe): deploy email capture worker
 
-Per decisions.md Section IX acceptance criteria:
-- Abort flag at /tmp/nerve.abort
-- Clean shutdown on flag detection
-- Force-kill escalation (SIGTERM -> SIGKILL)
-- No orphan processes
+Per Board Condition Tier 1 #4 (Shonda/Oprah):
+- KV namespaces created: EMAILS, RATE_LIMITS
+- Worker deployed to production
+- Showcase form wired to real endpoint
+- Email persistence verified
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -236,51 +234,54 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-4" wave="1">
-  <title>Verify parse-verdict.sh patterns and exit codes</title>
-  <requirement>NERVE-REQ-004: parse-verdict.sh JSON Output (P0-Blocker)</requirement>
+  <title>Deploy analytics telemetry worker to Cloudflare</title>
+  <requirement>REQ-T1-005: Deploy Analytics Worker (P0-Blocker, Buffett)</requirement>
   <description>
-    Per decisions.md Section IX: parse-verdict.sh returns verdict with
-    exit codes: 0=PASS, 1=FAIL, 2=ERROR (no verdict, file missing, ambiguous).
-    Patterns: **Status:** PASS/FAIL, VERDICT: PASS/FAIL
+    Per Board Condition Tier 1 #5: "Track which themes are installed."
+    CLI already calls telemetry endpoint (install.ts line 34) but worker
+    not deployed. Analytics enable data-driven decisions.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/nerve/parse-verdict.sh" reason="Script to verify" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Specification source" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/analytics/src/index.ts" reason="Worker code to deploy" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/analytics/wrangler.toml" reason="Config to update" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/cli/commands/install.ts" reason="Telemetry call at line 34" />
   </context>
 
   <steps>
-    <step order="1">Read parse-verdict.sh and locate pattern matching logic</step>
-    <step order="2">Create test file with **Status:** PASS, verify exit code 0</step>
-    <step order="3">Create test file with **Status:** FAIL, verify exit code 1</step>
-    <step order="4">Create test file with VERDICT: PASS, verify exit code 0</step>
-    <step order="5">Create test file with VERDICT: FAIL, verify exit code 1</step>
-    <step order="6">Test missing file, verify exit code 2</step>
-    <step order="7">Test file with no verdict, verify exit code 2</step>
-    <step order="8">Test ambiguous file (both PASS and FAIL), verify exit code 2</step>
-    <step order="9">Verify patterns don't match substrings (PASSING, FAILED)</step>
-    <step order="10">Document any pattern edge cases</step>
+    <step order="1">cd to workers/analytics/ directory</step>
+    <step order="2">Create KV namespace: `wrangler kv:namespace create ANALYTICS`</step>
+    <step order="3">Note the namespace ID from command output</step>
+    <step order="4">Update wrangler.toml with real namespace ID</step>
+    <step order="5">Generate API key for stats endpoint: `openssl rand -hex 32`</step>
+    <step order="6">Set API key secret: `wrangler secret put API_KEY`</step>
+    <step order="7">Deploy worker: `wrangler deploy`</step>
+    <step order="8">Verify deployment URL matches CLI constant (line 20 in install.ts)</step>
+    <step order="9">Test track endpoint: curl POST /track with theme payload</step>
+    <step order="10">Test stats endpoint: curl GET /stats with X-API-Key header</step>
+    <step order="11">Document telemetry opt-out: WARDROBE_TELEMETRY_DISABLED=1</step>
   </steps>
 
   <verification>
-    <check type="bash">echo '**Status:** PASS' | ./nerve/parse-verdict.sh -; echo "Exit: $?"</check>
-    <check type="bash">echo '**Status:** FAIL' | ./nerve/parse-verdict.sh -; echo "Exit: $?"</check>
-    <check type="test">Exit 0 on PASS verdict</check>
-    <check type="test">Exit 1 on FAIL verdict</check>
-    <check type="test">Exit 2 on missing/ambiguous</check>
+    <check type="bash">curl -X POST https://wardrobe-analytics.emdash.workers.dev/track -H "Content-Type: application/json" -d '{"theme":"ember","os":"darwin","timestamp":1234567890,"cliVersion":"1.0.0"}'</check>
+    <check type="bash">curl https://wardrobe-analytics.emdash.workers.dev/health</check>
+    <check type="test">Track endpoint returns 200</check>
+    <check type="test">Health endpoint returns 200</check>
+    <check type="test">Stats endpoint works with API key</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>verify(nerve): parse-verdict.sh patterns and exit codes
+  <commit-message>infra(wardrobe): deploy analytics telemetry worker
 
-Per decisions.md Section IX acceptance criteria:
-- Exit 0 = PASS verdict
-- Exit 1 = FAIL verdict
-- Exit 2 = ERROR (no verdict, missing, ambiguous)
-- Patterns match specification
+Per Board Condition Tier 1 #5 (Buffett):
+- KV namespace created: ANALYTICS
+- API key secret configured
+- Worker deployed to production
+- CLI telemetry now functional
+- Opt-out documented: WARDROBE_TELEMETRY_DISABLED=1
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -288,61 +289,65 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 2 (Parallel, after Wave 1) — Quality & Risk Mitigation
+### Wave 2 (Parallel, after Wave 1) — Demo Sites & Showcase
 
-Five tasks for log format, documentation, metrics, and risk mitigations.
+Three tasks for demo sites, screenshots, and showcase deployment.
 
 ```xml
 <task-plan id="phase-1-task-5" wave="2">
-  <title>Verify log format and nerve prefix usage</title>
-  <requirement>NERVE-REQ-005: Log Format, NERVE-REQ-006: Nerve Prefix (P0-Blocker)</requirement>
+  <title>Deploy 5 live demo sites to Cloudflare</title>
+  <requirement>REQ-T1-001: Deploy Live Demo Sites (P0-Blocker, Oprah/Shonda)</requirement>
   <description>
-    Per decisions.md OQ-001/OQ-002 Resolution: All logs use format
-    [TIMESTAMP] [COMPONENT] message. All paths use nerve prefix.
-    Clinical voice: no emoji, no exclamation, no casual language.
+    Per Board Condition Tier 1 #1: "Each theme must have a working preview URL."
+    This is the highest-impact blocker. Per docs/EMDASH-GUIDE.md Section 5,
+    each site needs D1 database and R2 bucket.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/nerve/daemon.sh" reason="Check log format" />
-    <file path="/home/agent/shipyard-ai/nerve/queue.sh" reason="Check log format" />
-    <file path="/home/agent/shipyard-ai/nerve/abort.sh" reason="Check log format" />
-    <file path="/home/agent/shipyard-ai/nerve/parse-verdict.sh" reason="Check log format" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="OQ-001/002 resolutions" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/themes/" reason="Theme source files" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5: Cloudflare deployment, Section 7: Seed files" />
   </context>
 
   <steps>
-    <step order="1">Grep all scripts for log functions and echo statements</step>
-    <step order="2">Verify timestamp format: ISO8601 UTC (YYYY-MM-DDTHH:MM:SSZ)</step>
-    <step order="3">Verify component tags: [DAEMON], [QUEUE], [ABORT], [VERDICT]</step>
-    <step order="4">Verify no emoji anywhere in output</step>
-    <step order="5">Verify no exclamation marks</step>
-    <step order="6">Verify no casual language ("Oops!", "Hey!", etc.)</step>
-    <step order="7">Verify path /tmp/nerve.pid (not promptops)</step>
-    <step order="8">Verify path /tmp/nerve.abort (not promptops)</step>
-    <step order="9">Verify path /tmp/nerve-queue/ (not promptops)</step>
-    <step order="10">Test: ps aux | grep nerve returns daemon</step>
-    <step order="11">Fix any violations found</step>
+    <step order="1">For each theme (ember, forge, slate, drift, bloom), create new Emdash site:</step>
+    <step order="2">  `npm create emdash@latest` → name: wardrobe-demo-{theme}</step>
+    <step order="3">  Copy theme's src/ directory over the starter src/</step>
+    <step order="4">  Create D1 database: `wrangler d1 create wardrobe-demo-{theme}`</step>
+    <step order="5">  Create R2 bucket: `wrangler r2 bucket create wardrobe-demo-{theme}-media`</step>
+    <step order="6">  Configure wrangler.jsonc with binding names</step>
+    <step order="7">  Run migrations: `wrangler d1 migrations apply wardrobe-demo-{theme}`</step>
+    <step order="8">  Seed demo content: `npx emdash seed` (or import sample posts)</step>
+    <step order="9">  Deploy: `wrangler deploy`</step>
+    <step order="10">  Configure custom domain: {theme}.wardrobe.emdash.dev</step>
+    <step order="11">Repeat for all 5 themes</step>
+    <step order="12">Update showcase index.html with live demo URLs</step>
+    <step order="13">Update themes.json previewUrl fields if needed</step>
   </steps>
 
   <verification>
-    <check type="bash">grep -r "promptops" /home/agent/shipyard-ai/nerve/</check>
-    <check type="bash">grep -r "!" /home/agent/shipyard-ai/nerve/*.sh | grep -v "#"</check>
-    <check type="test">All logs match [TIMESTAMP] [COMPONENT] message</check>
-    <check type="test">No promptops references</check>
-    <check type="test">Clinical voice maintained</check>
+    <check type="bash">curl -I https://ember.wardrobe.emdash.dev | grep "200 OK"</check>
+    <check type="bash">curl -I https://forge.wardrobe.emdash.dev | grep "200 OK"</check>
+    <check type="bash">curl -I https://slate.wardrobe.emdash.dev | grep "200 OK"</check>
+    <check type="bash">curl -I https://drift.wardrobe.emdash.dev | grep "200 OK"</check>
+    <check type="bash">curl -I https://bloom.wardrobe.emdash.dev | grep "200 OK"</check>
+    <check type="manual">Each demo site renders with sample content</check>
+    <check type="manual">Each demo site reflects its theme's personality</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Verify after daemon tested" />
+    <depends-on task-id="phase-1-task-1" reason="R2 must be working for theme downloads" />
   </dependencies>
 
-  <commit-message>verify(nerve): log format and nerve prefix usage
+  <commit-message>infra(wardrobe): deploy 5 live demo sites
 
-Per decisions.md OQ-001/OQ-002 resolutions:
-- Log format: [TIMESTAMP] [COMPONENT] message
-- ISO8601 UTC timestamps
-- nerve prefix on all paths
-- Clinical voice (no emoji/exclamation)
+Per Board Condition Tier 1 #1 (Oprah/Shonda):
+- ember.wardrobe.emdash.dev deployed
+- forge.wardrobe.emdash.dev deployed
+- slate.wardrobe.emdash.dev deployed
+- drift.wardrobe.emdash.dev deployed
+- bloom.wardrobe.emdash.dev deployed
+- Each site has D1 database and R2 storage
+- Sample content seeded for fair comparison
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -350,52 +355,53 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-6" wave="2">
-  <title>Verify README documentation completeness</title>
-  <requirement>NERVE-REQ-007: README Documentation (P0-Blocker)</requirement>
+  <title>Generate real screenshots from live demo sites</title>
+  <requirement>REQ-T1-002: Replace SVG Placeholders (P0-Blocker, Oprah)</requirement>
   <description>
-    Per decisions.md Section IX: README.md documents all commands with examples.
-    Must cover all scripts, functions, exit codes, workflows, troubleshooting.
+    Per Board Condition Tier 1 #2: "People can't see themselves in placeholders."
+    Currently showcase has SVG files. Generate real screenshots using Playwright
+    script that exists at scripts/generate-screenshots.ts.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/nerve/README.md" reason="Documentation to verify" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Specification source" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/scripts/generate-screenshots.ts" reason="Screenshot generation script" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/screenshots/" reason="Output directory (currently SVGs)" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/index.html" reason="Update img src if format changes" />
   </context>
 
   <steps>
-    <step order="1">Read README.md and create checklist of documented items</step>
-    <step order="2">Verify daemon.sh documented: start, stop, status, exit codes</step>
-    <step order="3">Verify queue.sh documented: push, pop, peek, depth, metrics</step>
-    <step order="4">Verify abort.sh documented: set, clear, status, force-kill</step>
-    <step order="5">Verify parse-verdict.sh documented: patterns, exit codes</step>
-    <step order="6">Verify status.sh documented: human/JSON output</step>
-    <step order="7">Check for usage examples for each command</step>
-    <step order="8">Verify troubleshooting section exists</step>
-    <step order="9">Verify failure modes documented</step>
-    <step order="10">Cross-reference with decisions.md acceptance criteria</step>
-    <step order="11">Add any missing documentation</step>
+    <step order="1">Verify demo sites are deployed and accessible (depends on task-5)</step>
+    <step order="2">Install Playwright if needed: `npx playwright install`</step>
+    <step order="3">Update generate-screenshots.ts with live demo URLs if hardcoded differently</step>
+    <step order="4">Run screenshot script: `npm run screenshots`</step>
+    <step order="5">Verify output files exist: ember.png, forge.png, slate.png, drift.png, bloom.png</step>
+    <step order="6">Optimize images with Sharp if not done by script (< 100KB each)</step>
+    <step order="7">Remove old SVG files from screenshots/ directory</step>
+    <step order="8">Update showcase/index.html img src to use .png instead of .svg</step>
+    <step order="9">Review screenshots for quality - must "capture the magic"</step>
+    <step order="10">Consider GIFs showing transformation (optional per Risk Register)</step>
   </steps>
 
   <verification>
-    <check type="manual">All scripts documented</check>
-    <check type="manual">All functions with parameters documented</check>
-    <check type="manual">All exit codes documented</check>
-    <check type="manual">Usage examples present</check>
-    <check type="manual">Troubleshooting section exists</check>
+    <check type="bash">ls -la showcase/screenshots/*.png</check>
+    <check type="bash">file showcase/screenshots/ember.png | grep "PNG image"</check>
+    <check type="test">All 5 PNG files exist and are valid images</check>
+    <check type="test">Each image is under 200KB</check>
+    <check type="manual">Screenshots convey theme personality</check>
   </verification>
 
   <dependencies>
-    <!-- No strict dependencies, but better after scripts verified -->
+    <depends-on task-id="phase-1-task-5" reason="Need live demo sites to capture screenshots" />
   </dependencies>
 
-  <commit-message>verify(nerve): README documentation completeness
+  <commit-message>feat(showcase): replace SVG placeholders with real screenshots
 
-Per decisions.md Section IX acceptance criteria:
-- All scripts documented
-- All functions and parameters
-- All exit codes
-- Usage examples
-- Troubleshooting section
+Per Board Condition Tier 1 #2 (Oprah):
+- Generated 1200x800 PNG screenshots for all 5 themes
+- Captured from live demo sites with sample content
+- Optimized for web (< 200KB each)
+- Removed placeholder SVGs
+- Screenshots show actual Emdash content
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -403,150 +409,57 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-7" wave="2">
-  <title>Verify three observability metrics</title>
-  <requirement>NERVE-REQ-020: Three Observability Metrics (P1-Must)</requirement>
+  <title>Deploy showcase website to Cloudflare Pages</title>
+  <requirement>REQ-T1-006: Deploy Showcase Website (P0-Blocker)</requirement>
   <description>
-    Per decisions.md Decision 8: Three metrics required before scale work:
-    queue_depth, latency_last, error_count. Numbers before features.
-    Metrics written to /tmp/nerve-metrics.json.
+    Per decisions.md Decision #8 and Board Override: "All four board members
+    require a deployed showcase website before launch." Showcase code is
+    complete but not deployed. Must wire to email worker endpoint.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/nerve/daemon.sh" reason="Metrics update logic" />
-    <file path="/home/agent/shipyard-ai/nerve/queue.sh" reason="Queue metrics" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Decision 8" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/" reason="Static files to deploy" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/wrangler.toml" reason="Pages config" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/script.js" reason="Email endpoint URL" />
   </context>
 
   <steps>
-    <step order="1">Locate metrics_update() function in daemon.sh</step>
-    <step order="2">Verify queue_depth tracked (pending items count)</step>
-    <step order="3">Verify latency_last tracked (last item processing time)</step>
-    <step order="4">Verify error_count tracked (failed items)</step>
-    <step order="5">Test: Run daemon, process items, check /tmp/nerve-metrics.json</step>
-    <step order="6">Verify JSON schema: {"queue_depth":N,"latency_last":N,"error_count":N,"timestamp":"..."}</step>
-    <step order="7">Verify metrics updated after each queue poll cycle</step>
-    <step order="8">Verify metrics log every 60 seconds (heartbeat)</step>
-    <step order="9">Test status.sh --json includes metrics</step>
+    <step order="1">Verify showcase/script.js has correct email worker endpoint (from task-3)</step>
+    <step order="2">Verify showcase/index.html uses .png screenshots (from task-6)</step>
+    <step order="3">Create Pages project: `wrangler pages project create wardrobe-showcase`</step>
+    <step order="4">Deploy: `wrangler pages deploy showcase/ --project-name wardrobe-showcase`</step>
+    <step order="5">Note deployment URL (wardrobe-showcase.pages.dev)</step>
+    <step order="6">Configure custom domain: wardrobe.emdash.dev (or wardrobe.emdash.app)</step>
+    <step order="7">Verify HTTPS working on custom domain</step>
+    <step order="8">Test all theme cards render with screenshots</step>
+    <step order="9">Test copy-to-clipboard buttons work</step>
+    <step order="10">Test email capture form submits successfully</step>
+    <step order="11">Test mobile responsiveness (iPhone, Android viewports)</step>
+    <step order="12">Run accessibility check (WCAG 2.1 AA)</step>
   </steps>
 
   <verification>
-    <check type="bash">cat /tmp/nerve-metrics.json | jq .</check>
-    <check type="test">queue_depth accurate</check>
-    <check type="test">latency_last accurate</check>
-    <check type="test">error_count accurate</check>
-    <check type="test">Metrics JSON valid</check>
+    <check type="bash">curl -I https://wardrobe.emdash.dev | grep "200 OK"</check>
+    <check type="manual">All 5 theme cards visible with real screenshots</check>
+    <check type="manual">Copy buttons work (click and verify clipboard)</check>
+    <check type="manual">Email form submits without error</check>
+    <check type="manual">Mobile layout correct at 375px width</check>
+    <check type="test">Page loads in under 3 seconds on 4G</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Daemon must work for metrics" />
-    <depends-on task-id="phase-1-task-2" reason="Queue must work for metrics" />
+    <depends-on task-id="phase-1-task-3" reason="Email worker must be deployed first" />
+    <depends-on task-id="phase-1-task-6" reason="Real screenshots must be generated first" />
   </dependencies>
 
-  <commit-message>verify(nerve): three observability metrics
+  <commit-message>infra(wardrobe): deploy showcase to Cloudflare Pages
 
-Per decisions.md Decision 8:
-- queue_depth tracked
-- latency_last tracked
-- error_count tracked
-- Metrics written to /tmp/nerve-metrics.json
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-8" wave="2">
-  <title>Implement atomic file writes</title>
-  <requirement>NERVE-REQ-026: Atomic File Writes (P2-Should)</requirement>
-  <description>
-    Per decisions.md Risk Register: Queue corruption on crash during write.
-    Mitigation: Write to temp file, then mv to final location.
-    Currently NOT implemented per Risk Scanner findings.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/nerve/queue.sh" reason="File to modify" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Risk Register" />
-  </context>
-
-  <steps>
-    <step order="1">Locate queue_enqueue() function in queue.sh (~lines 83-110)</step>
-    <step order="2">Identify direct write: cat > "$item_file" pattern</step>
-    <step order="3">Modify to: Write to temp file (.tmp suffix)</step>
-    <step order="4">Add: mv temp file to final location (atomic rename)</step>
-    <step order="5">Repeat for queue_fail() reason update</step>
-    <step order="6">Repeat for any other JSON file writes</step>
-    <step order="7">Test: Enqueue item, verify no .tmp files remain</step>
-    <step order="8">Test: Interrupt write, verify no partial JSON</step>
-    <step order="9">Update metrics_update() in daemon.sh if needed</step>
-  </steps>
-
-  <verification>
-    <check type="bash">ls /tmp/nerve-queue/**/*.tmp 2>/dev/null || echo "No temp files"</check>
-    <check type="test">Writes use temp + mv pattern</check>
-    <check type="test">No partial JSON files possible</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Queue verification complete first" />
-  </dependencies>
-
-  <commit-message>fix(nerve): implement atomic file writes
-
-Per decisions.md Risk Register:
-- Write to temp file first
-- mv to final location (atomic rename)
-- Prevents queue corruption on crash
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-9" wave="2">
-  <title>Verify orphan process cleanup</title>
-  <requirement>NERVE-REQ-027: Orphan Process Cleanup (P2-Should)</requirement>
-  <description>
-    Per decisions.md Risk Register: Orphan processes on unclean shutdown.
-    Mitigation: Abort escalation SIGTERM -> 5 sec wait -> SIGKILL.
-    Verify abort.sh force-kill implements this.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/nerve/abort.sh" reason="Script to verify/modify" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Risk Register" />
-  </context>
-
-  <steps>
-    <step order="1">Locate force-kill implementation in abort.sh</step>
-    <step order="2">Verify SIGTERM sent first (kill -15 or kill -TERM)</step>
-    <step order="3">Verify 5-second wait before SIGKILL</step>
-    <step order="4">Verify SIGKILL sent if process still running (kill -9 or kill -KILL)</step>
-    <step order="5">Test: Start daemon, force-kill, verify no orphan processes</step>
-    <step order="6">Test: ps aux | grep nerve after force-kill shows nothing</step>
-    <step order="7">If not implemented, add escalation logic</step>
-    <step order="8">Verify PID file cleaned up after force-kill</step>
-  </steps>
-
-  <verification>
-    <check type="bash">./nerve/daemon.sh &amp; sleep 1 &amp;&amp; ./nerve/abort.sh force-kill &amp;&amp; ps aux | grep daemon.sh</check>
-    <check type="test">SIGTERM sent first</check>
-    <check type="test">5 second wait</check>
-    <check type="test">SIGKILL if needed</check>
-    <check type="test">No orphan processes</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="Abort verification complete first" />
-  </dependencies>
-
-  <commit-message>verify(nerve): orphan process cleanup escalation
-
-Per decisions.md Risk Register:
-- SIGTERM sent first
-- 5 second wait
-- SIGKILL if still running
-- No orphan processes
+Per decisions.md Decision #8 and Board Override:
+- Showcase deployed to wardrobe.emdash.dev
+- All 5 theme cards with real screenshots
+- Email capture wired to production worker
+- Mobile-responsive verified
+- WCAG 2.1 AA accessible
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -554,144 +467,148 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 3 (Sequential, after Wave 2) — QA, Metrics, Review
+### Wave 3 (Sequential, after Wave 2) — Validation & Review
 
-Three tasks for final QA, baseline metrics, and customer review.
+Three tasks for benchmarking, QA, and customer review.
+
+```xml
+<task-plan id="phase-1-task-8" wave="3">
+  <title>Benchmark install speed (sub-3-second target)</title>
+  <requirement>decisions.md Decision #5: Install Speed Target</requirement>
+  <description>
+    Per Decision #5: "30-second install kills the magic. The transformation
+    must feel instant." Target is sub-3-second install. Now that R2 is live,
+    benchmark actual install time.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/cli/commands/install.ts" reason="Install timing code" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/dist/themes/" reason="Tarball sizes" />
+  </context>
+
+  <steps>
+    <step order="1">Create fresh Emdash test project: `npm create emdash@latest` → test-benchmark</step>
+    <step order="2">Install wardrobe CLI in test project</step>
+    <step order="3">Run timed install: `time npx wardrobe install ember`</step>
+    <step order="4">Record: download time, extraction time, total time</step>
+    <step order="5">Repeat for all 5 themes</step>
+    <step order="6">Test on simulated slow connection (throttle to 4G)</step>
+    <step order="7">Document results in benchmark report</step>
+    <step order="8">If any theme exceeds 3 seconds, investigate tarball size optimization</step>
+    <step order="9">Verify tarball sizes are reasonable (< 100KB each)</step>
+  </steps>
+
+  <verification>
+    <check type="bash">ls -lh dist/themes/*.tar.gz</check>
+    <check type="test">All tarballs under 100KB</check>
+    <check type="test">Ember install < 3 seconds on broadband</check>
+    <check type="test">All themes install < 3 seconds on broadband</check>
+    <check type="test">All themes install < 5 seconds on 4G</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-1" reason="R2 must be live for real benchmarks" />
+    <depends-on task-id="phase-1-task-5" reason="Demo sites confirm themes work" />
+  </dependencies>
+
+  <commit-message>test(wardrobe): benchmark install speed - all themes sub-3s
+
+Per decisions.md Decision #5:
+- Ember: X.XXs
+- Forge: X.XXs
+- Slate: X.XXs
+- Drift: X.XXs
+- Bloom: X.XXs
+- All themes meet sub-3-second target on broadband
+- 4G performance acceptable (< 5s)
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-9" wave="3">
+  <title>QA Pass - Verify all Tier 1 conditions met</title>
+  <requirement>All Tier 1 Board Conditions (P0-Blockers)</requirement>
+  <description>
+    Final verification that all 5 Tier 1 launch conditions are met.
+    This is the gate before board re-review.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Full requirements list" />
+    <file path="/home/agent/shipyard-ai/rounds/emdash-marketplace/decisions.md" reason="Board conditions source" />
+  </context>
+
+  <steps>
+    <step order="1">Tier 1 #1: Verify all 5 demo sites accessible and content-rich</step>
+    <step order="2">Tier 1 #2: Verify all screenshots are real PNGs (not SVGs)</step>
+    <step order="3">Tier 1 #3: Verify CLI shows dev server hint after install</step>
+    <step order="4">Tier 1 #4: Verify email capture works end-to-end (submit, store, no errors)</step>
+    <step order="5">Tier 1 #5: Verify analytics telemetry records install events</step>
+    <step order="6">Verify showcase deployed and functional</step>
+    <step order="7">Verify R2 tarballs downloadable</step>
+    <step order="8">Verify full install flow: `npx wardrobe install ember` in fresh project</step>
+    <step order="9">Verify `npm run dev` starts site successfully after install</step>
+    <step order="10">Document any issues found</step>
+    <step order="11">Create QA report: wardrobe-qa-report.md</step>
+    <step order="12">Pass/Fail verdict for each Tier 1 condition</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Tier 1 #1: Demo sites PASS/FAIL</check>
+    <check type="manual">Tier 1 #2: Screenshots PASS/FAIL</check>
+    <check type="manual">Tier 1 #3: Post-install reveal PASS/FAIL</check>
+    <check type="manual">Tier 1 #4: Email capture PASS/FAIL</check>
+    <check type="manual">Tier 1 #5: Analytics telemetry PASS/FAIL</check>
+    <check type="manual">All 5 conditions PASS = LAUNCH READY</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-7" reason="Showcase must be deployed" />
+    <depends-on task-id="phase-1-task-8" reason="Install speed must be verified" />
+  </dependencies>
+
+  <commit-message>qa(wardrobe): verify all Tier 1 board conditions
+
+QA Pass Results:
+- Tier 1 #1 Demo Sites: PASS
+- Tier 1 #2 Screenshots: PASS
+- Tier 1 #3 Post-Install Reveal: PASS
+- Tier 1 #4 Email Capture: PASS
+- Tier 1 #5 Analytics: PASS
+
+VERDICT: LAUNCH READY for board re-review
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
 
 ```xml
 <task-plan id="phase-1-task-10" wave="3">
-  <title>QA Pass - Verify all acceptance criteria</title>
-  <requirement>NERVE-REQ-009: QA Pass (P0-Blocker)</requirement>
-  <description>
-    Per decisions.md Section IX: QA Pass confirms zero P0 issues.
-    Final verification of all 9 acceptance criteria from decisions.md.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/nerve/" reason="All scripts to verify" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Section IX checklist" />
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Full requirements" />
-  </context>
-
-  <steps>
-    <step order="1">Create QA checklist from decisions.md Section IX</step>
-    <step order="2">Verify: daemon.sh starts, creates PID lockfile, prevents duplicates</step>
-    <step order="3">Verify: queue.sh persists queue to disk, recovers on restart</step>
-    <step order="4">Verify: abort.sh sets flag, daemon responds, shutdown clean</step>
-    <step order="5">Verify: parse-verdict.sh returns JSON with verdict and issue counts</step>
-    <step order="6">Verify: All scripts use consistent log format</step>
-    <step order="7">Verify: All scripts use nerve prefix for file paths</step>
-    <step order="8">Verify: README.md documents all commands with examples</step>
-    <step order="9">Verify: All files committed to deliverables directory</step>
-    <step order="10">Document any P0 issues found</step>
-    <step order="11">Create QA report: nerve-qa-report.md</step>
-    <step order="12">Pass/Fail verdict</step>
-  </steps>
-
-  <verification>
-    <check type="manual">All 9 acceptance criteria verified</check>
-    <check type="manual">No P0 issues outstanding</check>
-    <check type="manual">QA report created</check>
-    <check type="bash">./nerve/parse-verdict.sh nerve-qa-report.md; echo "Exit: $?"</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="Log format verified" />
-    <depends-on task-id="phase-1-task-6" reason="Documentation verified" />
-    <depends-on task-id="phase-1-task-7" reason="Metrics verified" />
-    <depends-on task-id="phase-1-task-8" reason="Atomic writes implemented" />
-    <depends-on task-id="phase-1-task-9" reason="Orphan cleanup verified" />
-  </dependencies>
-
-  <commit-message>qa(nerve): verify all acceptance criteria
-
-Per decisions.md Section IX:
-- All 9 acceptance criteria verified
-- No P0 issues outstanding
-- QA report: nerve-qa-report.md
-- VERDICT: PASS
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-11" wave="3">
-  <title>Document baseline metrics for ROI validation</title>
-  <requirement>Board Path C: Validate Internal ROI (decisions.md Section VI)</requirement>
-  <description>
-    Per Board Conditions (Buffett's Path C): Document baseline metrics
-    before NERVE. Required to later prove NERVE prevented X failures worth $Y.
-    This enables ROI validation post-deployment.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Section VI Board Conditions" />
-    <file path="/home/agent/shipyard-ai/STATUS.md" reason="Current pipeline state" />
-    <file path="/home/agent/shipyard-ai/qa-monitor.log" reason="Historical failures" />
-  </context>
-
-  <steps>
-    <step order="1">Review decisions.md Section VI - Path C requirements</step>
-    <step order="2">Document baseline metrics BEFORE NERVE:</step>
-    <step order="3">  - Pipeline failure rate (how many runs fail per week)</step>
-    <step order="4">  - Duplicate daemon instances (how often)</step>
-    <step order="5">  - Lost queue items (how many)</step>
-    <step order="6">  - Manual recovery time (hours per incident)</step>
-    <step order="7">  - 3 AM incidents (count per month)</step>
-    <step order="8">Check qa-monitor.log and STATUS.md for historical data</step>
-    <step order="9">Create baseline-metrics.md with findings</step>
-    <step order="10">Define success criteria for post-NERVE metrics</step>
-    <step order="11">Plan: Re-measure after 2 weeks of NERVE operation</step>
-  </steps>
-
-  <verification>
-    <check type="manual">baseline-metrics.md created</check>
-    <check type="manual">Pre-NERVE failure rate documented</check>
-    <check type="manual">Success criteria defined</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-10" reason="QA complete, ready for metrics" />
-  </dependencies>
-
-  <commit-message>docs(nerve): document baseline metrics for ROI validation
-
-Per decisions.md Section VI (Buffett's Path C):
-- Pre-NERVE failure rate documented
-- Baseline metrics established
-- Success criteria defined
-- Ready for post-deployment comparison
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-12" wave="3">
   <title>Sara Blakely customer gut-check</title>
   <requirement>SKILL.md Step 7: Customer value validation</requirement>
   <description>
     Per skill instructions: Spawn Sara Blakely agent for customer perspective.
-    NERVE is internal tooling - customer is the operations team.
+    Wardrobe customers are developers and site owners using Emdash.
     "Would they pay for this? What feels like engineering vanity?"
   </description>
 
   <context>
     <file path="/home/agent/shipyard-ai/.planning/phase-1-plan.md" reason="This plan" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Board decisions" />
-    <file path="/home/agent/shipyard-ai/nerve/README.md" reason="Product documentation" />
+    <file path="/home/agent/shipyard-ai/rounds/emdash-marketplace/decisions.md" reason="Board decisions and essence" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/README.md" reason="Product documentation" />
   </context>
 
   <steps>
     <step order="1">Spawn haiku sub-agent as Sara Blakely</step>
-    <step order="2">Prompt: Read phase plan and NERVE scripts</step>
-    <step order="3">Answer: Would operations team actually use NERVE?</step>
-    <step order="4">Answer: What would make them say "finally, peace at 3 AM"?</step>
+    <step order="2">Prompt: Read phase plan and Wardrobe showcase</step>
+    <step order="3">Answer: Would a developer actually use Wardrobe?</step>
+    <step order="4">Answer: What would make them say "I can't believe I just did that"?</step>
     <step order="5">Answer: What feels like engineering vanity vs. real value?</step>
-    <step order="6">Answer: Is the "invisible backbone" truly invisible?</step>
-    <step order="7">Answer: Does zero-configuration actually work?</step>
-    <step order="8">Answer: Does it deliver "the absence of friction"?</step>
+    <step order="6">Answer: Is "instant dignity" delivered or just promised?</step>
+    <step order="7">Answer: Does the 3-second install actually feel instant?</step>
+    <step order="8">Answer: Would they tell a friend about it?</step>
     <step order="9">Write findings to .planning/sara-blakely-review.md</step>
     <step order="10">Review and address major gaps if any</step>
   </steps>
@@ -703,13 +620,13 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-10" reason="Review after QA pass" />
+    <depends-on task-id="phase-1-task-9" reason="Review after QA pass" />
   </dependencies>
 
-  <commit-message>docs(nerve): add Sara Blakely customer gut-check
+  <commit-message>docs(wardrobe): add Sara Blakely customer gut-check
 
 Per SKILL.md: Validate customer value.
-Would operations team choose NERVE?
+Would developers choose Wardrobe?
 Engineering vanity vs. real value analysis.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
@@ -722,33 +639,31 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 | Wave | Tasks | Description | Parallelism |
 |------|-------|-------------|-------------|
-| 1 | 4 | Verify core scripts (daemon, queue, abort, verdict) | 4 parallel |
-| 2 | 5 | Quality & risk (log format, docs, metrics, atomic, orphan) | 5 parallel (after Wave 1) |
-| 3 | 3 | Final (QA pass, baseline metrics, Sara review) | Sequential (after Wave 2) |
+| 1 | 4 | Infrastructure foundation (R2, CLI, workers) | 4 parallel |
+| 2 | 3 | Demo sites, screenshots, showcase | 3 parallel (after Wave 1) |
+| 3 | 3 | Validation (benchmark, QA, Sara review) | Sequential (after Wave 2) |
 
-**Total Tasks:** 12
-**Maximum Parallelism:** Wave 2 (5 concurrent tasks)
-**Timeline:** 2-3 days (verification focus, minimal code changes)
+**Total Tasks:** 10
+**Maximum Parallelism:** Wave 1 (4 concurrent tasks)
+**Timeline:** 5-7 days (infrastructure focus, minimal code changes)
 
 ---
 
 ## Dependencies Diagram
 
 ```
-Wave 1:  [task-1: daemon.sh] ─────────────────────────────────────────>
-         [task-2: queue.sh]  ─────────────────────────────────────────>
-         [task-3: abort.sh]  ─────────────────────────────────────────>
-         [task-4: verdict.sh] ────────────────────────────────────────>
+Wave 1:  [task-1: R2 Upload] ──────────────────────────────────────────────>
+         [task-2: CLI Reveal] ─────────────────────────────────────────────>
+         [task-3: Email Worker] ───────────────────────────────────────────>
+         [task-4: Analytics Worker] ───────────────────────────────────────>
 
-Wave 2:  [task-5: log format] ───> (depends on task-1) ───────────────>
-         [task-6: README docs] ───────────────────────────────────────>
-         [task-7: metrics] ───> (depends on tasks 1,2) ───────────────>
-         [task-8: atomic writes] ───> (depends on task-2) ────────────>
-         [task-9: orphan cleanup] ───> (depends on task-3) ───────────>
+Wave 2:  [task-5: Demo Sites] ───> (depends on task-1) ────────────────────>
+         [task-6: Screenshots] ───> (depends on task-5) ───────────────────>
+         [task-7: Showcase] ───> (depends on tasks 3,6) ───────────────────>
 
-Wave 3:  [task-10: QA Pass] ───> (depends on tasks 5-9) ──────────────>
-         [task-11: baseline] ───> (depends on task-10) ───────────────>
-         [task-12: Sara review] ───> (depends on task-10) ────────────>
+Wave 3:  [task-8: Benchmark] ───> (depends on tasks 1,5) ──────────────────>
+         [task-9: QA Pass] ───> (depends on tasks 7,8) ────────────────────>
+         [task-10: Sara] ───> (depends on task-9) ─────────────────────────>
 ```
 
 ---
@@ -759,20 +674,20 @@ Wave 3:  [task-10: QA Pass] ───> (depends on tasks 5-9) ──────
 
 | Risk | Mitigation | Task |
 |------|------------|------|
-| Queue corruption on crash | Atomic writes (write temp, mv) | task-8 |
-| Orphan processes | SIGTERM -> wait -> SIGKILL | task-9 |
-| Documentation gaps | README verification | task-6 |
-| Log format inconsistency | Verification against OQ-001 | task-5 |
-| No baseline metrics | Document pre-NERVE state | task-11 |
+| R2 CDN not configured | Create bucket, upload tarballs, verify access | task-1 |
+| Email endpoint not wired | Deploy worker, provision KV, update showcase | task-3 |
+| No post-install reveal | Add dev server hint to CLI | task-2 |
+| Screenshots are placeholders | Generate from live demo sites | task-6 |
+| No analytics | Deploy telemetry worker | task-4 |
 
 ### Accepted for v1 (Not Blocking)
 
 | Risk | Impact | Notes |
 |------|--------|-------|
-| Single-machine architecture | High at scale | Sharding path clear for v2 |
-| No automated tests | Medium | Ship proves correctness |
-| Race condition in lockfile | Low | Documented limitation |
-| process_item() is a stub | N/A | Intentional for v1 |
+| 5 themes shipped at once | Medium | Board acknowledged, mitigation not followed |
+| No version pinning | Low | V2 feature per decisions.md |
+| CLI-only excludes non-technical users | Medium | V2 web install flow planned |
+| No Emdash core integration | Low | Open question, not blocking launch |
 
 ---
 
@@ -782,27 +697,27 @@ Wave 3:  [task-10: QA Pass] ───> (depends on tasks 5-9) ──────
 - [x] Each task has clear verification criteria
 - [x] Dependencies form valid DAG (no cycles)
 - [x] Each task can be committed independently
-- [x] Risk mitigations addressed (atomic writes, orphan cleanup)
-- [x] Decisions compliance verified (nerve prefix, log format)
-- [x] Board Path C addressed (baseline metrics)
-- [x] 2-3 day timeline achievable
-- [x] Ship test defined: "Peace. The absence of 3 AM knots."
-- [x] Sara Blakely customer gut-check scheduled (task-12)
+- [x] Risk mitigations addressed (R2, workers, screenshots)
+- [x] Board conditions mapped to tasks
+- [x] Emdash docs cited for technical accuracy (Section 1, 5, 7)
+- [x] 5-7 day timeline achievable
+- [x] Ship test defined: "I can't believe I just did that"
+- [x] Sara Blakely customer gut-check scheduled (task-10)
 
 ---
 
 ## Ship Test
 
-> Does the daemon silently handle queue operations without user intervention?
+> Does `npx wardrobe install ember` transform a site in under 3 seconds?
 >
-> Does the operations team feel "peace" — the absence of 3 AM knots in their stomach?
+> Does seeing the transformed site make the user feel "I can't believe I just did that"?
 >
-> Does it disappear completely and work always?
+> Does the showcase make you want to try it immediately?
 >
 > **If yes, ship it.**
 
 ---
 
 *Generated by Great Minds Agency — Phase Planning Skill*
-*Source: rounds/promptops/decisions.md, CLAUDE.md*
-*Project Slug: promptops*
+*Source: rounds/emdash-marketplace/decisions.md, docs/EMDASH-GUIDE.md*
+*Project Slug: emdash-marketplace*
