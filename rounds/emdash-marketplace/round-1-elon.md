@@ -1,85 +1,84 @@
-# Emdash Theme Marketplace — Round 1 Review
+# Emdash Theme Marketplace — Elon's Review
 
-**Reviewer:** Elon Musk, Chief Product & Growth Officer
+## Architecture: Simplest System That Works
 
----
+The PRD specs three components. You need one.
 
-## Architecture: What's the Simplest System That Works?
+**Kill the marketplace website.** A web app to browse 5 themes is absurd overhead. The "marketplace" is a README with screenshots and `npx emdash-themes install ember`. Done.
 
-The PRD over-engineers this. You don't need:
-- A "marketplace website" with Next.js/Astro. That's a whole second app.
-- Live demo sites for each theme (5 Workers deployments to maintain).
+**Kill live demo sites.** Maintaining 5 Workers deployments that will drift from theme reality is operational debt for zero marginal value. Screenshots work.
 
-**Simplest system:** Static JSON registry + GitHub raw URLs. The CLI does everything.
-- `emdash-themes list` → fetches `themes.json` from CDN
-- `emdash-themes preview ember` → opens theme's GitHub README with screenshots
-- `emdash-themes install ember` → pulls tarball from R2/npm, swaps `src/`
+Simplest architecture:
+- `themes.json` on R2 (registry of available themes)
+- Theme tarballs on R2
+- CLI that fetches and extracts
 
-The "marketplace" is a single-page HTML file with 5 cards. Or just a README. Ship the CLI, not a website.
+That's it. No website. No framework. No infra.
 
-## Performance: Where Are the Bottlenecks?
+## Performance: 10x Path
 
-1. **30-second install is slow.** Unzipping a `src/` directory should take <3 seconds. If it's 30s, you're doing something wrong — network latency, npm overhead, or unnecessary steps.
-2. **Live preview per theme** means 5x the hosting, 5x the maintenance. These will drift from actual theme state. Screenshots are sufficient for v1.
+The PRD claims "install in under 30 seconds." That's slow. Swapping a `src/` directory should take 3 seconds.
 
-**10x path:** Pre-bundle themes into the CLI itself. `npx emdash-themes` ships with all 5 themes embedded. Zero network calls. Instant install.
+If it's 30s, you're doing something wrong:
+1. **npm overhead** — shipping themes as npm packages adds registry latency
+2. **Post-install hooks** — if themes require `npm install` afterward, that's the real cost
 
-## Distribution: 10,000 Users Without Paid Ads
+**10x path:** Pre-bundle all 5 themes into the CLI binary. `npx emdash-themes install ember` extracts from local cache. Zero network after first download.
 
-Emdash launched April 1. It's now April 8. User base is ~0.
+## Distribution: 10K Users
 
-You don't get 10k users by building a marketplace for a product nobody uses yet. This is backwards.
+Emdash launched 10 days ago with zero users. A theme marketplace doesn't distribute itself.
 
-**Actual distribution path:**
-1. Themes ship IN Emdash core. `emdash create --theme ember`. Zero friction.
-2. Every Emdash site footer: "Built with Emdash" → link to themes.
-3. Post themes individually on HN, Reddit, Astro Discord. Each theme is content.
-4. One killer theme that goes viral (think: "the brutalist one" or "the terminal one").
+**First principles:** Users find themes THROUGH Emdash, not the other way around.
 
-Marketplace discoverability is a v2 problem. v1 is "make Emdash sites look good."
+Path to 10K:
+1. `emdash create --theme ember` in Emdash core. No separate marketplace needed.
+2. Every Emdash site footer links to theme gallery. Viral loop.
+3. Post each theme individually — 5 launches, not 1.
+4. Astro ecosystem: submit to made-with-astro.com, Astro Discord, etc.
 
-## What to CUT (v2 Disguised as v1)
+The marketplace is a v2 discovery problem. v1 is "make Emdash sites not look generic."
 
-- **Live demo sites per theme.** Screenshots work. Cut.
-- **Marketplace website.** CLI + README. Cut.
-- **5 themes.** Ship 3. Ember (bold), Forge (dark/tech), Slate (corporate). That's the range. Cut Drift and Bloom — they're aesthetic overlap with no differentiation.
-- **Theme preview server.** "See theme with YOUR content" is complex. Requires running local server, injecting your D1 data. Cut.
+## What to CUT
 
-**Real MVP:** CLI + 3 themes + screenshots in a GitHub README.
+| Feature | Verdict | Why |
+|---------|---------|-----|
+| Marketplace website | CUT | 5 items don't need a web app. README works. |
+| Live demo per theme | CUT | Screenshots + local preview. Maintaining 5 live sites is overhead. |
+| "Preview with your content" | CUT | Requires running user's D1 locally. 40-hour feature masquerading as v1. |
+| 5 themes | CUT to 3 | Ember (bold), Forge (dark), Slate (corporate) cover the range. Drift/Bloom overlap. |
 
-## Technical Feasibility: Can One Agent Session Build This?
+Real MVP: CLI + 3 themes + GitHub README.
 
-**Yes, but only the stripped-down version.**
+## Technical Feasibility
 
-One session can build:
-- CLI that downloads + swaps `src/` (~200 lines)
-- 3 theme `src/` directories (~500 lines each, mostly CSS)
-- Static HTML showcase page
+**One agent session can build:**
+- CLI (~200 lines of code)
+- 3 theme src/ directories (CSS variants of starter)
+- Screenshot gallery README
 
-One session cannot build:
-- 5 fully distinct visual themes (each needs design decisions, iteration)
-- Live preview infrastructure (Workers, routing, data injection)
-- A polished Next.js marketplace app
+**One agent session cannot build:**
+- 5 fully distinct, polished visual themes
+- Live preview infrastructure
+- A marketplace web application
 
-**Scope to fit reality.** Build the pipeline first, then add themes.
+The PRD scope exceeds single-session capacity. Scope must match reality.
 
-## Scaling: What Breaks at 100x?
+## Scaling: 100x
 
-Nothing, because there's nothing to break. This is a static file distribution problem.
+Nothing breaks because there's nothing to break.
 
-- Themes on R2/npm: infinite scale.
-- CLI: runs locally, no server.
-- If you build a marketplace app: that's where scale problems appear (caching, CDN, search indexing). Don't build it.
+- Themes on R2: infinite scale, pennies/month
+- CLI: runs locally
+- JSON registry: cache forever, bust on version bump
 
-**The only 100x question:** Can community contributors add themes? That requires theme validation, security review, submission process. All v2.
+The only 100x problem: community theme submission. That requires validation, security review, quality gates. All v2. Don't build submission flows for a product with 5 first-party themes.
 
----
+## Verdict
 
-## Summary
-
-**Ship:** CLI + 3 themes + GitHub README with screenshots.
-**Cut:** Marketplace site, live demos, 2 themes, preview server.
-**Timeline:** One focused session if scope is honest.
-**Distribution:** Themes in core, not a separate marketplace.
+**Build:** CLI + 3 themes + README
+**Cut:** Marketplace site, live demos, preview server, 2 themes
+**Distribution:** Bundle in Emdash core, not separate product
+**Timeline:** One session if scope is honest
 
 The PRD wants a marketplace. The product needs themes. Build the themes.

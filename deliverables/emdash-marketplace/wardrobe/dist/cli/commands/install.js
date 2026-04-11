@@ -10,6 +10,33 @@ import { fetchThemesRegistry } from '../utils/fetch-registry.js';
 import { downloadFile } from '../utils/download.js';
 import { extractTarball, createTempDir, removeTempDir } from '../utils/extract.js';
 import { backupDirectory, restoreBackup, replaceDirectory, checkCriticalFiles, } from '../utils/fs-utils.js';
+const ANALYTICS_URL = 'https://wardrobe-analytics.emdash.workers.dev/track';
+/**
+ * Send anonymous telemetry for installs (fire-and-forget)
+ */
+async function sendTelemetry(theme) {
+    // Check opt-out
+    if (process.env.WARDROBE_TELEMETRY_DISABLED === '1' ||
+        process.env.WARDROBE_TELEMETRY_DISABLED === 'true') {
+        return;
+    }
+    try {
+        // Fire-and-forget - don't await
+        fetch(ANALYTICS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                theme,
+                os: process.platform,
+                timestamp: Date.now(),
+                cliVersion: '1.0.0'
+            })
+        }).catch(() => { }); // Silently ignore errors
+    }
+    catch {
+        // Silently ignore all errors
+    }
+}
 /**
  * Show progress bar
  */
@@ -126,6 +153,12 @@ export async function installTheme(themeName, options = {}) {
             console.log(`Your site is now wearing ${validThemeName}.\n`);
             console.log(`Try it on. If it doesn't fit, try another.\n`);
             console.log(`Installed in ${elapsed}s\n`);
+            // Post-install reveal: dev server hint (per Board Condition Tier 1 #3)
+            console.log(`Run \`npm run dev\` to see your transformed site.`);
+            console.log(`Then open http://localhost:4321`);
+            console.log(`Admin panel: http://localhost:4321/_emdash/admin\n`);
+            // Send anonymous telemetry (fire-and-forget, non-blocking)
+            sendTelemetry(validThemeName);
         }
         finally {
             // Cleanup temp directory
