@@ -1,0 +1,16 @@
+name = "drift-api"
+main = "src/index.ts"
+compatibility_date = "2024-03-29"
+compatibility_flags = ["nodejs_compat"]
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "drift"
+database_id = "YOUR_DATABASE_ID_HERE"
+
+# Environment variables (set via wrangler secret)
+# EMDASH_AUTH_SECRET - Used for any additional auth needs
+
+[vars]
+ENVIRONMENT = "production"
