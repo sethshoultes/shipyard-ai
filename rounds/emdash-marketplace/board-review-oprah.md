@@ -1,59 +1,59 @@
-# Board Review: Emdash Theme Marketplace ("Wardrobe")
+# Board Review: Emdash Theme Marketplace (Wardrobe)
 
-**Reviewer:** Oprah Winfrey, Board Member
-**Date:** April 9, 2026
-**Deliverable:** emdash-marketplace (Wardrobe)
+**Reviewer:** Oprah Winfrey
+**Role:** Board Member, Great Minds Agency
+**Date:** April 2026
 
 ---
 
-## Overview
+## Executive Summary
 
-Wardrobe is a theme marketplace for Emdash CMS. Five curated themes. One-command install. The promise: *"Transform your site in one command."*
+I've spent my career recognizing what makes people feel seen, empowered, and capable of transformation. Wardrobe understands something fundamental: **people don't just want to change how their website looks — they want to feel confident about who they are online.**
 
-I sat with this the way I sit with any product that wants to reach people. Not just *will it work* — but *will it matter*?
+This isn't a theme marketplace. It's permission to try on a new identity.
 
 ---
 
 ## First-5-Minutes Experience
 
-**Would a new user feel welcomed or overwhelmed?**
+**Verdict: Welcomed, not overwhelmed.**
 
-*Welcomed.* This is one of the most considerate onboarding flows I've seen in developer tools.
+The moment you land on the showcase page, you know exactly what this is and what it asks of you. "Transform Your Site in One Command" — that's a promise anyone can understand. The tagline "Instant dignity for your Emdash site" gave me chills. *Dignity.* That's what people are really looking for.
 
-The homepage opens with: **"Transform Your Site in One Command."** That's not jargon — that's a promise anyone can understand. Then it shows them exactly what to type: `npx wardrobe install [theme]`.
+What works beautifully:
+- **Five themes, not fifty.** Curated selection removes decision paralysis
+- **One-line install commands.** No configuration files, no wrestling with settings
+- **"Try it on. If it doesn't fit, try another."** — This language is genius. It removes the fear of commitment
+- **Your content stays untouched.** The number one fear addressed immediately
 
-But here's what moved me: they added a "What is npx?" tooltip. They anticipated that someone might not know. That's empathy embedded in code.
+What could improve:
+- The showcase uses SVG placeholders for screenshots. Real screenshots showing actual sites would let visitors *see themselves* in the theme
+- No live demo links visible on the page (they exist in the registry but aren't prominently featured)
+- The hero could include a 10-second video showing the transformation in action
 
-The three-step explainer — *Pick a theme, Copy the command, Watch your site transform* — respects the user's time and intelligence. No overwhelming documentation. No twelve-step setup. Just clarity.
-
-The tagline "Instant dignity for your Emdash site" is poetry. It tells you this isn't about features — it's about transformation. About becoming who you were meant to be. That resonates.
-
-**Potential friction:** The showcase uses SVG placeholder images rather than real theme screenshots. For a visual product, *seeing* is believing. Without compelling previews, users have to trust descriptions alone. That's asking a lot.
+**First-5-minutes score: 8/10** — Clear, inviting, removes friction. Just needs the visual proof.
 
 ---
 
 ## Emotional Resonance
 
-**Does this make people feel something?**
+**Verdict: This makes people feel something.**
 
-Yes — and I want to talk about *what* they feel.
+Let me tell you what I noticed in the theme descriptions:
 
-Each theme has a personality statement:
-- **Ember:** "Bold. Editorial. For people with something to say."
-- **Drift:** "Minimal and airy. Let your content breathe."
-- **Bloom:** "Warm and inviting. Where community feels at home."
+- Ember: "For people with something to say"
+- Forge: "Built for builders"
+- Slate: "For people who need to be trusted"
+- Drift: "Let your content breathe"
+- Bloom: "Where community feels at home"
 
-These aren't feature lists. These are identities. When someone reads "For people with something to say" — they're not picking CSS. They're choosing who they want to be.
+These aren't feature lists. They're *identity statements*. When a bakery owner reads "Warm and inviting. Where community feels at home," she's not thinking about border-radius. She's thinking, "That's who I want to be for my customers."
 
-The Bloom theme README says: *"Your story deserves to bloom."* That's speaking to the person behind the website. That's honoring their work.
+The philosophy in Bloom's README — "Bloom believes your content is beautiful on its own. The design is generous—plenty of breathing room, soft edges, warm touches. Nothing overwhelms the story" — that's not documentation. That's a blessing.
 
-The install success message is perfect:
-> "Your site is now wearing [theme]."
-> "Try it on. If it doesn't fit, try another."
+The install success message: "Your site is now wearing [theme]. Try it on. If it doesn't fit, try another." The clothing metaphor throughout is warm and human. Technology often makes people feel small. This makes them feel like they're picking out an outfit, not configuring software.
 
-That's the language of transformation, not transaction. It positions theme-changing as self-expression, not technical labor.
-
-**What's missing:** The emotional journey stops at install. Where's the moment of delight when they see their content in a new skin? There's no confetti, no celebration, no "look at what you just did." The CLI output is warm but understated. For some users, this is perfect. For others — especially first-timers — a bigger moment might land better.
+**Emotional resonance score: 9/10** — This team understands that websites are personal.
 
 ---
 
@@ -61,22 +61,25 @@ That's the language of transformation, not transaction. It positions theme-chang
 
 **Would I recommend this to my audience?**
 
-With conditions — yes.
+Yes, with caveats.
 
 **What builds trust:**
-- SHA256 checksums on tarballs (security-conscious)
-- Automatic backup before install with rollback on failure
-- Clear "your content stays untouched" promise (repeated throughout)
-- Under 6KB per theme tarball — lean, no bloat
-- "No spam. Just themes." on the email signup — respecting boundaries
+- Clear privacy policy on telemetry with easy opt-out
+- Backup created automatically before any change
+- Rollback instructions provided upfront
+- Open source (MIT license)
+- Three-second install time — promises made, promises kept
+- "No spam. Just themes." — They understand email trust
 
-**What undermines trust:**
-- The email form submits to `api.example.com` — a placeholder that would fail in production
-- No live demos are actually linked (preview URLs exist but may not be deployed)
-- "Coming Soon" themes are listed alongside available ones — could confuse users
-- No testimonials, case studies, or social proof
+**What could strengthen trust:**
+- No testimonials or social proof from real users
+- No "who made this" section — people trust people, not just products
+- The email capture worker endpoint isn't shown to have any confirmation of data practices
+- Coming Soon themes with release dates (Summer/Fall 2026) — will they actually ship? Track record matters
 
-This feels like a *functional prototype* rather than a *polished product*. For my audience — people who need things to work the first time — I'd want to see those rough edges smoothed before recommending widely.
+For my book club members, small business owners, and creatives in my audience — yes, I would recommend this. It respects their time, doesn't patronize them with complexity, and gives them a safe way to experiment.
+
+**Trust score: 7.5/10** — Solid foundation, needs the human faces and stories behind it.
 
 ---
 
@@ -84,59 +87,69 @@ This feels like a *functional prototype* rather than a *polished product*. For m
 
 **Who's being left out?**
 
-This is where Wardrobe shines — and where it still has work to do.
+The team has done meaningful work here:
+- WCAG 2.1 AA compliance claimed
+- Semantic HTML throughout
+- ARIA labels on interactive elements
+- Keyboard navigation support
+- `prefers-reduced-motion` respected
+- Focus states for all interactive elements
+- Min-height 44px on buttons (touch-friendly)
+- Color contrast appears considered
 
-**Done well:**
-- Semantic HTML throughout (proper `role`, `aria-label` attributes)
-- `prefers-reduced-motion` media query respects users with vestibular disorders
-- Keyboard navigation support (Enter key triggers copy buttons)
-- Focus states visible on all interactive elements
-- Mobile-responsive design down to 375px screens
-- Alt text on theme preview images
+**But I'm concerned about:**
 
-**Gaps:**
-- No skip-to-content link for screen reader users
-- The copy buttons say "Copy" but don't announce what's being copied — screen reader users might not know they're copying a command
-- No Spanish, French, or other language support — English-only excludes millions
-- The tooltip for "What is npx?" uses `tabindex="0"` but the explanation requires hover/focus — keyboard users can access it, but it could be clearer
-- Color contrast on `.notify-privacy` text (#999 on warm background) may not meet WCAG AA standards
+1. **Screen reader experience** — The SVG screenshots have alt text, but placeholder icons in "Coming Soon" cards use `aria-hidden="true"` with just a letter. Screen reader users may not understand what themes are coming.
 
-**The bigger question:** The themes themselves vary in accessibility. Forge's neon-on-dark aesthetic is beautiful but could present contrast issues. Bloom's terracotta-on-cream needs verification. Each theme should ship with an accessibility statement.
+2. **Cognitive accessibility** — The showcase is clear, but the CLI experience requires comfort with terminal commands. No GUI alternative exists for users who find command lines intimidating.
 
----
+3. **Language** — English only. For a global audience, localization would matter.
 
-## What I Wish I'd Seen
+4. **Vision impairment** — The theme cards have small text for "personality" descriptions. Low-contrast gray on white (#666 on #fff) may not meet WCAG AA for that text size.
 
-1. **Real screenshots** — Show me a bakery website wearing Bloom. Show me a tech blog wearing Forge. Let me *see* transformation.
+5. **Economic accessibility** — The themes are free, which is wonderful. But requires Emdash CMS, which may have its own barriers.
 
-2. **A human story** — "We built this because every small business owner deserves a beautiful website." Or: "A creator told us she cried when her site finally looked like her." Give me the *why*.
-
-3. **A guarantee** — "Install any theme. If you're not happy, we'll personally help you find the right one." Risk reversal builds trust.
-
-4. **Celebration** — When someone installs their first theme, make it feel like an achievement. They just changed their digital presence. That matters.
+**Accessibility score: 7/10** — Better than most, but the CLI-only approach excludes non-technical users entirely. A web-based "one-click install" button connected to their Emdash account would open this to everyone.
 
 ---
 
-## Score: 7/10
+## The Deeper Question
 
-**Justification:** Thoughtful, human-centered design with genuine emotional intelligence — but placeholder content and missing demos prevent it from being recommendable at scale today.
+The PRD says: "Every Emdash site looks the same."
 
----
+Wardrobe solves this technically. But the real gift here is emotional permission. Most people are afraid to change things. Afraid they'll break something. Afraid of commitment. Afraid they'll look foolish.
 
-## Final Thoughts
+"Try it on. If it doesn't fit, try another."
 
-Wardrobe understands something most developer tools don't: people don't want features. They want to feel something. They want to become something.
+That single line is worth more than all the technical documentation combined. It says: *You're allowed to experiment. You're allowed to change your mind. You're allowed to discover who you want to be.*
 
-The language here — "instant dignity," "your content breathe," "where community feels at home" — that's not marketing. That's ministry. It's telling people their work matters and deserves to look like it matters.
-
-What's missing is the follow-through. The infrastructure is there. The heart is there. But the *proof* — the screenshots, the demos, the testimonials, the deployed success stories — that's where the work remains.
-
-When those pieces come together, this won't just be a theme marketplace. It'll be a transformation engine. And that's something I could stand behind.
+That's not product design. That's wisdom.
 
 ---
 
-*"Your site is now wearing Bloom."*
+## Overall Score
 
-That one line tells me the creators understand. Now show the world.
+**8/10**
 
-— Oprah
+*Justification:* Wardrobe delivers genuine emotional resonance and removes real friction, but needs live demos, social proof, and a path for non-technical users to participate in the transformation.
+
+---
+
+## Recommendations
+
+1. **Add real screenshots** — SVG placeholders don't let people see themselves in the themes
+2. **Feature live demo links prominently** — Let visitors experience their content in each theme
+3. **Create a "Meet the Makers" section** — People trust people
+4. **Consider a web-based install flow** — For users who fear the terminal
+5. **Add one testimonial per theme** — "Here's what happened when [bakery name] switched to Bloom"
+6. **Ship those Coming Soon themes** — Promises create expectation. Meet them.
+
+---
+
+**Final Thought:**
+
+You know what I love about Wardrobe? It treats a technical product with emotional intelligence. It knows that the person installing a theme isn't just updating CSS — they're deciding how they want the world to see them.
+
+That's rare. That's valuable. That's worth building on.
+
+*— Oprah*

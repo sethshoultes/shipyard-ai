@@ -1,0 +1,30 @@
+name = "wardrobe-analytics"
+main = "src/index.ts"
+compatibility_date = "2026-04-01"
+
+# KV namespace for storing analytics events and aggregated stats
+[[kv_namespaces]]
+binding = "ANALYTICS"
+id = "ANALYTICS_KV_ID_PLACEHOLDER"
+preview_id = "ANALYTICS_KV_PREVIEW_ID_PLACEHOLDER"
+
+# Environment variables (secrets should be set via wrangler secret put)
+[vars]
+CORS_ORIGIN = "https://emdash.dev"
+
+# Production environment
+[env.production]
+name = "wardrobe-analytics"
+[[env.production.kv_namespaces]]
+binding = "ANALYTICS"
+id = "ANALYTICS_KV_ID_PLACEHOLDER"
+
+# Staging environment
+[env.staging]
+name = "wardrobe-analytics-staging"
+[[env.staging.kv_namespaces]]
+binding = "ANALYTICS"
+id = "ANALYTICS_KV_STAGING_ID_PLACEHOLDER"
+
+# Note: Set API_KEY secret using:
+# wrangler secret put API_KEY

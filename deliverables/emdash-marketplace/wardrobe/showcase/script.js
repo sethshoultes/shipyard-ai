@@ -162,8 +162,8 @@ document.addEventListener('DOMContentLoaded', function() {
      * Submit email to API endpoint
      */
     function submitEmail(email) {
-        // Configurable API endpoint - replace with your actual endpoint
-        const apiEndpoint = 'https://api.example.com/notifications/subscribe';
+        // Wardrobe email capture worker endpoint
+        const apiEndpoint = 'https://wardrobe-email-capture.emdash.workers.dev/subscribe';
 
         // Disable button and show loading state
         notifyBtn.disabled = true;

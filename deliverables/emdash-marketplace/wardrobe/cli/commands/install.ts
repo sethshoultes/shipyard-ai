@@ -17,6 +17,35 @@ import {
   checkCriticalFiles,
 } from '../utils/fs-utils.js';
 
+const ANALYTICS_URL = 'https://wardrobe-analytics.emdash.workers.dev/track';
+
+/**
+ * Send anonymous telemetry for installs (fire-and-forget)
+ */
+async function sendTelemetry(theme: string): Promise<void> {
+  // Check opt-out
+  if (process.env.WARDROBE_TELEMETRY_DISABLED === '1' ||
+      process.env.WARDROBE_TELEMETRY_DISABLED === 'true') {
+    return;
+  }
+
+  try {
+    // Fire-and-forget - don't await
+    fetch(ANALYTICS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        theme,
+        os: process.platform,
+        timestamp: Date.now(),
+        cliVersion: '1.0.0'
+      })
+    }).catch(() => {}); // Silently ignore errors
+  } catch {
+    // Silently ignore all errors
+  }
+}
+
 interface InstallOptions {
   verbose?: boolean;
 }
@@ -171,6 +200,9 @@ export async function installTheme(
       console.log(`Your site is now wearing ${validThemeName}.\n`);
       console.log(`Try it on. If it doesn't fit, try another.\n`);
       console.log(`Installed in ${elapsed}s\n`);
+
+      // Send anonymous telemetry (fire-and-forget, non-blocking)
+      sendTelemetry(validThemeName);
     } finally {
       // Cleanup temp directory
       await removeTempDir(tempDir);
