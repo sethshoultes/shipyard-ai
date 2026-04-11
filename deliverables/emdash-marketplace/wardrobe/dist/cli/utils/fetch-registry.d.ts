@@ -7,9 +7,12 @@ export interface Theme {
     version: string;
     url?: string;
     tarballUrl?: string;
+    sha256?: string;
+    previewUrl?: string;
 }
 /**
  * Fetch themes.json registry from CDN
- * Falls back to hardcoded themes if network fails
+ * Supports environment variable EMDASH_CDN_BASE_URL for custom CDN base URL
+ * Falls back to default CDN if not specified
  */
 export declare function fetchThemesRegistry(): Promise<Theme[]>;

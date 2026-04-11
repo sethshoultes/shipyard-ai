@@ -1,8 +1,9 @@
 /**
  * Download tarball with progress indicator
  */
-import { createWriteStream } from 'fs';
+import { createWriteStream, readFileSync } from 'fs';
 import { promises as fs } from 'fs';
+import { createHash } from 'crypto';
 /**
  * Download a file from URL and save to disk
  */
@@ -37,4 +38,14 @@ export async function downloadFile(url, targetPath, onProgress) {
         fileStream.on('error', (error) => reject(error));
         fileStream.end();
     });
+}
+/**
+ * Verify file integrity using sha256 hash
+ */
+export async function verifyFileSha256(filePath, expectedSha256) {
+    const fileContent = readFileSync(filePath);
+    const hash = createHash('sha256');
+    hash.update(fileContent);
+    const computedSha256 = hash.digest('hex');
+    return computedSha256 === expectedSha256;
 }

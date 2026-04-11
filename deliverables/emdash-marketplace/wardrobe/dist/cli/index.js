@@ -29,13 +29,26 @@ program
             return;
         }
         console.log('\nAvailable themes:\n');
-        for (const theme of themes) {
+        // Separate active themes from coming soon themes
+        const activeThemes = themes.filter((t) => !t.comingSoon);
+        const comingSoonThemes = themes.filter((t) => t.comingSoon);
+        // Display active themes
+        for (const theme of activeThemes) {
             console.log(`  ${theme.name.toUpperCase()}`);
             console.log(`    ${theme.description}`);
             console.log(`    npx wardrobe install ${theme.name}`);
             console.log();
         }
-        console.log(`Total: ${themes.length} theme(s)\n`);
+        // Display coming soon themes
+        if (comingSoonThemes.length > 0) {
+            console.log('Coming Soon:\n');
+            for (const theme of comingSoonThemes) {
+                console.log(`  ${theme.name.toUpperCase()} — ${theme.estimatedRelease}`);
+                console.log(`    ${theme.description}`);
+                console.log();
+            }
+        }
+        console.log(`Total: ${themes.length} theme(s) (${activeThemes.length} available, ${comingSoonThemes.length} coming soon)\n`);
     }
     catch (error) {
         console.error('Failed to fetch themes. Please check your internet connection and try again.');

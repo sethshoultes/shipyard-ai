@@ -8,7 +8,7 @@
 import { join, resolve } from 'path';
 import { existsSync } from 'fs';
 import { fetchThemesRegistry } from '../utils/fetch-registry.js';
-import { downloadFile } from '../utils/download.js';
+import { downloadFile, verifyFileSha256 } from '../utils/download.js';
 import { extractTarball, createTempDir, removeTempDir } from '../utils/extract.js';
 import {
   backupDirectory,
