@@ -1,80 +1,116 @@
-# Drift Demo Script
-*Runtime: ~2 minutes*
+# NERVE Demo Script
+**Runtime:** 2 minutes
+**Format:** NARRATOR + [SCREEN] stage directions
 
 ---
 
-[SCREEN: Dark terminal, cursor blinking. 2:47 AM timestamp in corner.]
+**[SCREEN: Black. A cursor blinks.]**
 
-**NARRATOR:** It's three in the morning. Your phone buzzes. Support ticket: "The AI is telling customers to contact our competitor."
+NARRATOR:
+It's 2 AM. You're watching a pipeline run.
 
-[SCREEN: Slack notification slides in. Screenshot of chatbot response recommending a competitor by name.]
+**[SCREEN: Terminal scrolling. Log lines flying past.]**
 
-**NARRATOR:** You know exactly what happened. Someone pushed a prompt change to production six hours ago. Except you don't know *who*, you don't know *what* they changed, and you definitely don't have a way to undo it.
+NARRATOR:
+Not because you want to be here. Because the last time you didn't watch, the pipeline crashed at 2:47 AM, and by the time you woke up, it had been spinning for four hours doing nothing. And nobody knew. And the client demo was at nine.
 
-[SCREEN: Quick cuts — frantic scrolling through Git history, grep commands returning nothing, a Notion doc titled "prompts_v3_FINAL_v2.txt"]
+**[SCREEN: The scrolling freezes. A single line: "Connection timeout."]**
 
-**NARRATOR:** So you do what everyone does. You open seventeen browser tabs. You Slack the person who might have touched it. You wait. The chatbot keeps recommending your competitor.
+NARRATOR:
+So now you watch. You watch it like it's a sleeping baby. You watch it like it's a fuse you lit and you're not sure how long it is.
 
-[SCREEN: Terminal goes dark. Beat. Then: `$ drift init`]
+**[SCREEN: Cut to a clean terminal. Prompt waiting.]**
 
-**NARRATOR:** This is Drift. And that nightmare? It ends right here.
+NARRATOR:
+This is NERVE.
 
-[SCREEN: Terminal executes `drift init my-project`. Output appears:
-```
-Initializing Drift project...
+**[SCREEN: Types `./daemon.sh start`]**
 
-Project initialized: my-project
-API Key: dk_1a2b3c4d...
+NARRATOR:
+One command. It starts.
 
-⚠️  Save this key! It won't be shown again.
-```]
+**[SCREEN: `[2026-04-11T14:22:33Z] [DAEMON] started (PID: 12345)`]**
 
-**NARRATOR:** No signup form. No OAuth dance. No "verify your email." You run one command, you get an API key, you're live.
+NARRATOR:
+No configuration file. No YAML. No "let me just set up the"—no. It starts. It runs. It does exactly one thing: it makes sure your pipeline never dies in the dark.
 
-[SCREEN: Terminal shows `$ drift push system-prompt --file ./prompt.txt`]
+**[SCREEN: Types `./queue.sh push qa-pass /reports/qa-report.md`]**
 
-**NARRATOR:** Now watch. I've got a prompt in a text file. The same prompt that's been copy-pasted through Slack channels and buried in random repos. Let's give it a proper home.
+NARRATOR:
+Queue a job. Any job.
 
-[SCREEN: Terminal executes. Output:
-```
-Pushed system-prompt v1.
-```]
+**[SCREEN: `[2026-04-11T14:22:34Z] [QUEUE] pushed item a1b2c3d4e5f6 (type: qa-pass)`]**
 
-**NARRATOR:** That's it. Version one. It's stored. It's tracked. It's real.
+NARRATOR:
+That item is now in a persistent queue. Not in memory. Not in some Redis you forgot to configure. In a directory. On disk. Where it belongs.
 
-[SCREEN: Terminal shows same command executed two more times with different files, versions incrementing to v2, v3]
+**[SCREEN: Types `./queue.sh metrics`]**
 
-**NARRATOR:** Your teammate pushes a change Tuesday. Another one Thursday. Each one gets a version number. Each one is stored. Nothing disappears into the void.
+**[SCREEN: `[2026-04-11T14:22:35Z] [METRICS] depth=1 processing=0 completed=0 errors=0`]**
 
-[SCREEN: Split screen — left side shows terminal, right side shows a curl command fetching the prompt via API]
+NARRATOR:
+Now here's where it gets interesting.
 
-**NARRATOR:** And here's the thing — your application pulls the prompt from Drift's API at runtime. Not baked into a deploy. Not hardcoded. *Live*.
+**[SCREEN: Terminal suddenly closes. Dramatic.]**
 
-[SCREEN: Terminal shows `$ drift push system-prompt --file ./bad-prompt.txt -m "added competitor mention"`. Output: `Pushed system-prompt v4.`]
+NARRATOR:
+Power outage. Kernel panic. Your laptop dies because you forgot to plug it in. Whatever. The daemon's gone.
 
-**NARRATOR:** So when that 3 AM nightmare happens — when v4 tells customers to call your competitor —
+**[SCREEN: New terminal opens. Types `./daemon.sh start`]**
 
-[SCREEN: Terminal clears. Shows: `$ drift rollback system-prompt --to 3`]
+NARRATOR:
+Start it again.
 
-**NARRATOR:** — you don't wake up your entire engineering team. You don't revert a deploy. You don't pray.
+**[SCREEN: `[2026-04-11T14:23:01Z] [QUEUE] initialized with 1 pending items (recovered 1)`]**
 
-[SCREEN: Terminal executes. Output:
-```
-Rolled back to v3. Live now.
-```]
+NARRATOR:
+*Recovered one.*
 
-**NARRATOR:** *Live. Now.* Two words. Two seconds. The chatbot is fixed. You go back to sleep.
+That job you queued? It's still there. Still waiting. Because NERVE doesn't guess about state. It writes to disk. It reads from disk. If it was processing when you crashed, it moves back to pending. Zero lost work. Zero.
 
-[SCREEN: Terminal fades. Drift logo appears, minimal. Tagline underneath: "Version control for your AI prompts."]
+**[SCREEN: Types `./parse-verdict.sh report /reports/qa-report.md`]**
 
-**NARRATOR:** Git is for code. Drift is for prompts. Because at 3 AM, you shouldn't be digging through Notion docs.
+NARRATOR:
+Parse a QA report.
 
-[SCREEN: Single line appears below logo: `npm install -g @drift/cli`]
+**[SCREEN: `{"file":"/reports/qa-report.md","verdict":"BLOCKED","issues":{"p0":6,"p1":2,"p2":0},"parsed_at":"2026-04-11T14:23:15Z"}`]**
 
-**NARRATOR:** You should be going back to sleep.
+NARRATOR:
+Not "it looks like maybe there might be some issues." BLOCKED. Six P0s. Two P1s. That's the answer. Unambiguous. Grep-able. Debuggable at 2 AM when you've had too much coffee and not enough sleep.
 
-[SCREEN: Fade to black.]
+**[SCREEN: Types `grep '\[QUEUE\]' nerve.log`]**
+
+**[SCREEN: Shows clean, filtered output—only queue operations.]**
+
+NARRATOR:
+Every component logs to the same format. Square brackets. Timestamps. No emoji. No colors. Because when something breaks, you don't need it to look pretty. You need to find it. Fast.
+
+**[SCREEN: Types `./abort.sh set`]**
+
+**[SCREEN: `[2026-04-11T14:23:30Z] [ABORT] abort flag set`
+`[2026-04-11T14:23:30Z] [ABORT] daemon (PID: 12345) will shutdown on next poll`]**
+
+NARRATOR:
+And when you need to stop? You tell it to stop. It finishes what it's doing. It shuts down clean. No orphan processes. No zombie jobs. No wondering if it's still running somewhere.
+
+**[SCREEN: `[2026-04-11T14:23:31Z] [DAEMON] shutdown complete`]**
+
+NARRATOR:
+That's it.
+
+**[SCREEN: Freeze on the clean log output.]**
+
+NARRATOR:
+NERVE isn't a dashboard. It isn't a platform. It's the thing that lets you close your laptop at 2 AM and go to sleep.
+
+**[SCREEN: Fade to black. Text appears: `NERVE — The invisible backbone.`]**
+
+NARRATOR:
+Because the best infrastructure is infrastructure you forget exists.
+
+**[SCREEN: Hold on tagline. Fade out.]**
 
 ---
 
-*END DEMO*
+*"Real artists ship."* — Steve Jobs
+*"The best part is no part."* — Elon Musk

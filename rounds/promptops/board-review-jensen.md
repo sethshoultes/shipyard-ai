@@ -1,157 +1,134 @@
-# Board Review: PromptOps (Drift)
+# Board Review: PromptOps / NERVE
 
 **Reviewer:** Jensen Huang, CEO NVIDIA
 **Date:** 2026-04-11
-**Status:** Build In Progress
+**Project:** promptops (NERVE daemon)
 
 ---
 
 ## Executive Summary
 
-The team shipped a working prompt versioning system—CLI, API, and Cloudflare Worker backend. Clean TypeScript, proper auth with SHA-256 hashing, D1 database. The code is solid. The product thesis is correct: prompts are production artifacts that need deployment tooling.
+NERVE is pipeline infrastructure—a daemon, queue, abort mechanism, and verdict parser for autonomous operations. It's competent bash scripting with good engineering hygiene. But it's infrastructure for *internal tooling*, not a product with compounding value.
 
-But here's the problem: **this is infrastructure, not an AI company.**
+**This is plumbing. Excellent plumbing. But plumbing doesn't compound.**
 
 ---
 
-## What's the Moat? What Compounds Over Time?
+## Strategic Analysis
 
-**Current answer: Nothing.**
+### 1. What's the Moat? What Compounds Over Time?
 
-Right now, Drift is a glorified key-value store with version history. Every company could build this in a week. The PRD even acknowledges this—"This is the state of deployment tooling circa 2005."
+**Current moat: None.**
+
+This is commodity infrastructure. Any competent team can build a file-based queue with PID lockfiles in a weekend. The "zero configuration" philosophy is good engineering taste, but it's not defensible.
 
 **What could compound:**
-- **Prompt telemetry at scale.** If every prompt execution flows through the proxy, you're sitting on the largest dataset of prompt-to-outcome correlations in existence. Which prompts produce better outputs? Which fail silently? This is data no one else has.
-- **Cross-customer prompt patterns.** Anonymous aggregation of what prompt structures work across industries. "Companies using chain-of-thought in customer service prompts see 23% higher resolution rates." That's defensible.
-- **Network effects from prompt sharing.** A registry of public prompts. Think npm, but for AI behaviors. First one to reach critical mass wins.
+- If every pipeline execution generated telemetry that trained a model to predict failures → that's compounding data
+- If the verdict parser learned which P0 patterns actually block ships vs. noise → that's compounding intelligence
+- If queue optimization learned from execution patterns → that's compounding performance
 
-None of these are being built. The proxy doesn't even log telemetry yet.
+**Today:** Static scripts. No learning. No data flywheel. No compounding.
 
----
+### 2. Where's the AI Leverage? Are We Using AI Where It 10x's the Outcome?
 
-## Where's the AI Leverage?
+**Current AI leverage: Zero.**
 
-**Current answer: Zero.**
+This is pure bash. The verdict parser does regex matching—no semantic understanding of *why* something failed, no prediction of *what will fail*, no automated remediation.
 
-This is a product *for* AI applications that uses *no* AI. That's a missed opportunity.
+**Where AI should be:**
+| Component | Current | AI-Leveraged (10x) |
+|-----------|---------|-------------------|
+| Verdict Parser | Regex for PASS/FAIL/BLOCKED | LLM understands *context* of failures, correlates with past fixes, suggests remediations |
+| Queue | FIFO ordering | ML-prioritized by predicted impact, blast radius, developer availability |
+| Abort | Manual flag | Anomaly detection auto-aborts runaway pipelines before humans notice |
+| Daemon | Poll loop | Predictive scheduling—knows *when* to run based on commit patterns |
 
-**Where AI would 10x the outcome:**
+**The irony:** This is called "promptops" but has zero prompts. Zero LLM calls. Zero AI.
 
-1. **Prompt auto-optimization.** Run A/B tests automatically, use an LLM to synthesize learnings and suggest improved versions. "Based on 10,000 executions, here's a prompt that scores 15% higher on your success metric."
+### 3. What's the Unfair Advantage We're Not Building?
 
-2. **Prompt migration.** When users switch from GPT-4 to Claude to Llama, auto-translate prompts. Different models have different prompt idioms. An AI that understands these nuances is a retention moat.
+**Three massive missed opportunities:**
 
-3. **Semantic diff, not text diff.** The `diff` command shows character changes. Useless. What changed in the prompt's *behavior*? AI can analyze: "This version is more likely to refuse requests. This version is more verbose."
+1. **Execution Memory**
+   Every pipeline run is training data. What failed? What passed? What took how long? This should feed a model that gets *smarter* with every execution. Right now, metrics go to a JSON file and die there.
 
-4. **Prompt debugging.** When a prompt starts failing, use AI to diagnose: "Your prompt relies on knowledge the model doesn't have. Here's a fix."
+2. **Semantic QA Understanding**
+   The verdict parser treats QA reports as text to grep. But these reports have *meaning*. An LLM could:
+   - Classify failures by root cause
+   - Detect duplicate issues across runs
+   - Predict which fixes will resolve which failures
+   - Auto-generate fix PRs for common patterns
 
-You're building infrastructure for AI while ignoring AI as infrastructure. That's backwards.
+3. **Cross-Pipeline Intelligence**
+   If this runs across multiple projects, it sees patterns no single team sees. Which dependencies cause cascading failures? Which code patterns correlate with P0 issues? That's *organizational intelligence* no one else has.
 
----
+**We're building a file queue when we could be building a learning system.**
 
-## What's the Unfair Advantage We're Not Building?
+### 4. What Would Make This a Platform, Not Just a Product?
 
-**The proxy is a trojan horse. We're not using it.**
+**Current state:** Internal tool. Single-purpose. No extensibility.
 
-Every LLM request flows through your edge network. You see:
-- Prompt content
-- Model responses
-- Latency
-- Token usage
-- (Eventually) User feedback
+**Platform requirements:**
 
-This is a **data moat** waiting to happen. But the current implementation just passes requests through. No logging. No analytics. No learning.
+| Dimension | Current | Platform |
+|-----------|---------|----------|
+| **Integrations** | Hardcoded qa-pass type | Plugin architecture for any pipeline stage |
+| **API** | Bash scripts | REST/gRPC API, SDK, webhooks |
+| **Multi-tenancy** | Single daemon | Isolated namespaces, per-project queues |
+| **Extensibility** | None | Custom verdict parsers, queue strategies, abort conditions |
+| **Marketplace** | None | Community-contributed integrations |
+| **Data** | Ephemeral | Durable, queryable, exportable execution history |
 
-**Unfair advantages we should be building:**
-
-1. **Observability-first.** LangSmith is "too heavy" per the PRD. So be lighter—but still capture everything. Store embeddings of prompts and responses. Build similarity search. "Find all prompts similar to this failing one."
-
-2. **Enterprise prompt governance.** Companies will need to audit AI usage for compliance. Be the system of record. SOC2 is on the roadmap, but governance features aren't.
-
-3. **Prompt security scanning.** Detect prompt injection attacks, jailbreak attempts, data exfiltration patterns. Real-time. At the edge. This alone could be a product.
-
-4. **Cost optimization.** Track spending per prompt. Identify expensive prompts. Suggest cheaper alternatives. Companies would pay for this today.
-
----
-
-## What Would Make This a Platform, Not Just a Product?
-
-**Current state: Product. Barely.**
-
-A platform has:
-- **Ecosystem.** Others build on top of you.
-- **Network effects.** More users = more value for each user.
-- **Lock-in through integration depth.** Leaving is painful.
-
-**Path to platform:**
-
-1. **Prompt Registry.** Public prompts with ratings, forks, attribution. Every AI developer goes to Drift to find prompts. npm install, but for system prompts.
-
-2. **Evaluation Framework.** Define success metrics per prompt. Drift runs continuous evaluation. When a model update breaks your prompt, we alert you. When a better prompt emerges, we notify you.
-
-3. **Prompt SDK.** Go beyond proxy injection. Native SDKs that make Drift the canonical way to manage prompts in Python/TypeScript. Every `openai.chat.completions.create()` goes through Drift.
-
-4. **Prompt Marketplace.** Premium prompts from experts. Revenue share. Prompt engineers become a profession with Drift as their platform.
-
-5. **Model-Agnostic Intelligence.** Be the abstraction layer between applications and models. Automatic failover. Cost-optimized routing. Prompt translation. Companies use Drift because switching models becomes trivial.
-
-Right now, customers could leave in 10 minutes. That's not a platform.
+**The platform play:**
+NERVE becomes the "Datadog for AI pipelines"—observability, orchestration, and optimization for any team running autonomous AI workloads. The daemon is the wedge; the intelligence layer is the moat.
 
 ---
 
-## Technical Assessment
+## What I'd Fund vs. What I See
 
-**What's good:**
-- Clean TypeScript, proper types
-- SHA-256 key hashing with constant-time comparison (security-conscious)
-- Cloudflare Workers + D1 = globally distributed, low latency
-- CLI UX is developer-friendly ("drift init" requires no signup)
-
-**What's missing:**
-- Proxy only mentioned in PRD, not in deliverables
-- Dashboard directory is empty
-- No telemetry or logging infrastructure
-- No A/B testing implementation
-- No SDK wrappers
-
-**Execution grade: 60%** of MVP scope delivered. CLI and API work. Proxy and dashboard don't exist.
+| What I'd Fund | What I See |
+|--------------|------------|
+| AI-native pipeline orchestration | Bash scripts with file queues |
+| Learning system that improves with every run | Static execution with dead-end metrics |
+| Platform with API, SDK, integrations | Internal tool with CLI only |
+| Predictive failure detection | Regex-based verdict parsing |
+| Execution intelligence as a service | Temporary files in /tmp |
 
 ---
 
-## Score: 5/10
+## The Hard Question
 
-**Justification:** Solid execution on a thin slice of a much larger opportunity—the team built version control when they should be building the prompt operating system.
+Why is this called "promptops" when there are no prompts?
+
+The name implies AI-native operations. The implementation is 1990s cron with better logging. Either the vision is wrong or the execution hasn't caught up.
+
+**If the vision is AI-native pipeline operations:** This is pre-MVP. The daemon is scaffolding for an intelligence layer that doesn't exist yet.
+
+**If the vision is reliable bash tooling:** It's done, but it's not a venture-scale opportunity.
 
 ---
 
 ## Recommendations
 
-1. **Ship the proxy immediately.** Without it, there's no data flywheel. The proxy is the entire business.
+1. **Add an LLM to the verdict parser.** Today. This is the obvious first step. Make it understand failures, not just pattern-match them.
 
-2. **Add telemetry on day one.** Every request through the proxy should be logged with embeddings. This data becomes your moat.
+2. **Persist execution history.** Move from `/tmp` to durable storage. Every run is training data.
 
-3. **Build one AI feature.** Prompt auto-optimization or semantic diff. Something that makes customers say "I couldn't build this myself."
+3. **Build the prediction layer.** Use execution history to predict which pipelines will fail *before* they run.
 
-4. **Define the platform play.** Before Series A, you need a story beyond "git for prompts." The market for developer tools is brutal. The market for AI platforms is infinite.
+4. **Expose an API.** If this is a platform, it needs programmatic access. CLI-only is a toy.
 
-5. **Talk to enterprises.** They're desperate for prompt governance. Find three enterprises with prompt sprawl. Build what they need. Charge $100k/year.
-
----
-
-## The NVIDIA Lens
-
-At NVIDIA, we don't sell GPUs. We sell acceleration. We sell the ability to do what was previously impossible.
-
-Drift, as built, is a convenience. It saves time. That's a nice-to-have.
-
-What would make it essential? **Drift should make prompts intelligent.** Self-improving. Self-debugging. Self-optimizing. Every prompt should get better every day, automatically, because Drift is learning from every execution across every customer.
-
-That's not a tool. That's a platform. That's a moat.
-
-Build that.
+5. **Rename or re-scope.** "PromptOps" with zero prompts is a credibility gap. Either add the AI or change the name.
 
 ---
 
-*Jensen Huang*
-*CEO, NVIDIA*
-*Board Member, Great Minds Agency*
+## Score: 4/10
+
+**Justification:** Solid infrastructure engineering with zero AI leverage, no compounding moat, and no platform potential in current form—it's excellent plumbing waiting for the building.
+
+---
+
+*"The more you can do with software, the more you should do with AI. This does everything with bash."*
+
+— Jensen Huang
+Board Member, Great Minds Agency

@@ -1,383 +1,231 @@
-# Shonda Retention Roadmap: What Keeps Users Coming Back
+# NERVE Retention Roadmap: What Keeps Users Coming Back
 
-**Product:** Drift (PromptOps)
-**Author:** Based on Shonda Rhimes' Board Review
-**Version:** 1.1
+**Author:** Shonda Rhimes (Retention & Engagement Lens)
 **Date:** 2026-04-11
+**Version:** 1.1
 
 ---
 
-## The Core Problem
+## The Core Truth About Retention
 
-> "The only reason to return is if something breaks. That's **fear-based retention**—the worst kind."
+Every great show has a reason people tune in next week. It's never just "the plot was good." It's:
+- **Unfinished business** — they need to know what happens next
+- **Ritual belonging** — Thursday at 9pm is "their time"
+- **Identity investment** — they've told friends about it, it's part of who they are
+- **Earned trust** — the show has never betrayed them
 
-Drift currently has **zero retention hooks**. Users complete a task and leave. There's no story arc, no progression, no cliffhanger that pulls them back tomorrow.
-
----
-
-## Retention Philosophy
-
-Great retention comes from four feelings:
-
-| Feeling | Current State | Target State |
-|---------|---------------|--------------|
-| **Relief** | Rollback works (fear-based) | "Crisis averted. Your users never knew." (heroic) |
-| **Power** | Versions increment | "You control your AI fleet." (commanding) |
-| **Insight** | None | "Version 3 outperforms all others." (discovery) |
-| **Progress** | None | "You're building something over time." (investment) |
+NERVE needs all four.
 
 ---
 
-## V1.1 Features: The Retention Engine
+## Current State: Why Users Wouldn't Come Back
 
-### Phase 1: Immediate Wins (Week 1-2)
+Based on board reviews, NERVE has a retention problem it doesn't even know about:
 
-#### 1.1 First Push Celebration
-**Hook:** Progress Narrative
-
-When a user pushes their first prompt, don't just say `Pushed system-prompt v1.`
-
-Instead:
-```
-Your first prompt is live.
-You just took control of your AI's soul.
-
-Next: Push another prompt, or see your dashboard at drift.dev/dashboard
-```
-
-**Why it works:** Marks a milestone. Creates investment. Opens a door to the dashboard.
+| Retention Driver | Current State | Gap |
+|-----------------|---------------|-----|
+| **Unfinished business** | None. NERVE is stateless. Each run is isolated. | No continuity between sessions |
+| **Ritual belonging** | None. NERVE runs in background. Users forget it exists. | Invisible = forgettable |
+| **Identity investment** | None. No community, no sharing, no "I use NERVE" badge | Users have no stake in its success |
+| **Earned trust** | Questionable. No proof of reliability metrics | Trust is asserted, not demonstrated |
 
 ---
 
-#### 1.2 Heroic Rollback Messaging
-**Hook:** Relief + Power
+## What Keeps Infrastructure Users Coming Back
 
-Current: `Rolled back to v2. Live now.`
+Infrastructure is different from entertainment, but the psychology is the same:
 
-New:
-```
-Crisis averted.
-Version 2 is back in production. Your users never knew.
+### 1. The Empty Inbox Effect
+Users return to things that eliminate anxiety. NERVE promises "the absence of the 3 AM knot" — but only if they *experience* that absence repeatedly.
 
-Rolled back in 0.3 seconds.
-```
+**Retention mechanism:** Users who have survived one near-failure because of NERVE become loyal.
 
-**Why it works:** Transforms a scary moment into a victory. User feels competent and protected.
+### 2. The Dashboard Habit
+Users who check status become invested in maintaining good status.
 
----
+**Retention mechanism:** A daily touchpoint creates ritual.
 
-#### 1.3 Narrative List Command
-**Hook:** Progress + Insight
+### 3. The War Stories Effect
+Infrastructure that saves you once becomes part of your professional identity. "Let me tell you about the time our pipeline almost crashed production..."
 
-Current `drift list` output:
-```
-system-prompt: v5 (current)
-  v4, v3, v2, v1
-```
-
-New output:
-```
-system-prompt
-  5 versions | Created 3 days ago | Last updated 2 hours ago
-  Current: v5 | Best performer: v3 (94% success rate)
-  No issues detected.
-```
-
-**Why it works:** Tells a story. Shows history. Plants the seed of performance comparison.
+**Retention mechanism:** Shareable moments create advocates.
 
 ---
 
-### Phase 2: The Daily Hook (Week 3-4)
+## V1.1 Features: The Retention Layer
 
-#### 2.1 Performance Dashboard
-**Hook:** Insight + Power
+### Feature 1: The Chronicle
+**What it does:** Persistent execution history with narrative framing.
 
-A web dashboard (the missing MVP feature) that shows:
-
-- **Prompt health at a glance:** Green/yellow/red status per prompt
-- **Request volume:** "Your prompts handled 12,847 requests today"
-- **Performance trends:** Line chart of success rate over time
-- **Anomaly flags:** "Version 4 success rate dropped 27% vs Version 3"
-
-**The Cliffhanger:** After each push, show:
+Instead of ephemeral logs, NERVE maintains a running chronicle:
 ```
-Prompt deployed. Monitoring performance...
-Check back in 1 hour for initial results.
+2026-04-11 03:42:17 — NERVE caught a runaway pipeline. Queue depth: 47. Action: Abort triggered.
+2026-04-11 14:22:03 — Clean sweep. 12 items processed. Zero failures.
+2026-04-10 09:15:44 — P0 blocked on qa-verdict. Total wait: 23 minutes. Resolved by human.
 ```
 
-**Why it works:** Creates a reason to return. Something is happening in the background that you want to know about.
+**Why it retains:** Unfinished business. Users check back to see what happened. The chronicle gives NERVE a *memory*, making it feel alive.
+
+**Implementation:** Log aggregation with human-readable summaries. Weekly digest email option.
 
 ---
 
-#### 2.2 Anomaly Alerts
-**Hook:** Insight + Relief
+### Feature 2: The Health Score
+**What it does:** A single number (0-100) representing pipeline health over the last 7 days.
 
-Push notifications or emails when:
-- Success rate drops below threshold
-- Latency spikes
-- Error patterns emerge
-- A prompt hasn't been updated in 30 days (drift detection)
+Displayed on:
+- CLI startup: `NERVE Health: 94 — All systems nominal`
+- Optional web dashboard
+- Slack/Teams integration
 
-Example alert:
-```
-Unusual pattern detected in `customer-service-prompt`.
-Success rate dropped from 89% to 67% in the last hour.
+**Why it retains:** Ritual belonging. Checking the health score becomes a morning habit. A high score feels good. A dip creates urgency.
 
-[View Details] [Rollback to v3]
-```
-
-**Why it works:** Brings users back before crisis. Positions Drift as a guardian.
+**Components:**
+- Success rate (weight: 40%)
+- Average queue wait time (weight: 20%)
+- Abort frequency (weight: 20%)
+- P0 escape rate (weight: 20%)
 
 ---
 
-### Phase 3: The Weekly Hook (Week 5-6)
+### Feature 3: The Close Call Notification
+**What it does:** When NERVE prevents a failure, it tells you.
 
-#### 3.1 Weekly Digest Email
-**Hook:** Progress + Insight
-
-Every Monday morning:
 ```
-Your Week in Drift
-─────────────────────
-Deploys: 12
-Rollbacks: 2
-Total requests: 47,293
-Uptime: 99.97%
-
-Top Performer: customer-service-prompt v7
-  Success rate: 96% | 23,441 requests
-
-Needs Attention: onboarding-prompt v2
-  Success rate dropped 12% this week
-
-[View Full Report]
+NERVE CLOSE CALL — 2026-04-11 03:42
+Pipeline "deploy-prod" was about to ship with a P0 blocker.
+NERVE caught it. Zero pages sent. Sleep preserved.
+[View details] [Share this save]
 ```
 
-**Why it works:** Recaps progress. Creates anticipation for next week. Shows ROI.
+**Why it retains:** War stories. Shareable moments. The "share this save" button lets users post to Slack, creating social proof and identity investment.
 
 ---
 
-#### 3.2 Version Comparison Reports
-**Hook:** Insight + Power
+### Feature 4: Streak Tracking
+**What it does:** Tracks consecutive days without a failure escaping to production.
 
-After a new version runs for 1 week, auto-generate:
 ```
-Version Performance Report: system-prompt
-
-v5 (current) vs v4 (previous)
-─────────────────────────────
-Success Rate: 91% vs 88% (+3%)
-Avg Latency: 340ms vs 380ms (-40ms)
-Token Usage: 847 avg vs 923 avg (-8%)
-
-Verdict: v5 is outperforming. Keep it.
-
-[Share Report] [Export PDF]
+Current streak: 34 days
+Longest streak: 89 days
+Close calls survived: 7
 ```
 
-**Why it works:** Validates user decisions. Creates shareable artifacts.
+**Why it retains:** Gamification without being childish. Users become invested in maintaining their streak. Breaking a streak creates memorable moments.
 
 ---
 
-### Phase 4: The Community Hook (Week 7-8)
+### Feature 5: The Reliability Certificate
+**What it does:** After 30 days of operation, NERVE generates a reliability report.
 
-#### 4.1 Prompt Changelog (Auto-Generated)
-**Hook:** Progress + Shareable
-
-Auto-generate a changelog from push messages:
 ```
-system-prompt Changelog
-───────────────────────
-v5 (Apr 10) - Added chain-of-thought reasoning
-v4 (Apr 8) - Reduced token usage
-v3 (Apr 5) - Fixed hallucination issue
-v2 (Apr 3) - Added context window
-v1 (Apr 1) - Initial version
-
-[Embed Widget] [Share Link]
+NERVE RELIABILITY CERTIFICATE
+Period: 2026-03-11 to 2026-04-11
+Items processed: 1,247
+Success rate: 99.2%
+Pages prevented: ~12 (estimated)
+Avg response time: 340ms
 ```
 
-**Why it works:** Documents progress. Creates external proof of work.
+**Why it retains:** Earned trust. Concrete proof that NERVE works. Shareable with leadership to justify the tooling investment.
 
 ---
 
-#### 4.2 "Powered by Drift" Badge
-**Hook:** Social Proof + Distribution
+### Feature 6: The Weekly Digest
+**What it does:** A human-readable summary of the week, delivered via email or Slack.
 
-For apps using Drift, offer an embeddable badge:
 ```
-[Prompts managed by Drift]
+NERVE WEEKLY — Week of April 5
+Your pipeline ran 89 jobs. 2 were close calls.
+Highlight: Monday's deploy-prod would have shipped a P0 if NERVE hadn't intervened.
+Health trend: Improving (+7 from last week)
 ```
 
-Links to a public page showing:
-- Number of versions
-- Uptime
-- Last updated
-
-**Why it works:** Viral distribution. Social proof. Users become advocates.
+**Why it retains:** Ritual. The weekly digest creates a touchpoint that reminds users NERVE exists and is protecting them.
 
 ---
 
-#### 4.3 Public Prompt Library (Opt-In)
-**Hook:** Community + Discovery
-
-Users can publish prompts to a public registry:
-```
-drift publish customer-service-prompt --public
-```
-
-Public library features:
-- Search by use case
-- Fork prompts
-- Star/rating system
-- Attribution ("by @username")
-
-**Why it works:** Network effects. Community. Reasons to browse and return.
-
----
-
-### Phase 5: The Mastery Hook (Week 9-12)
-
-#### 5.1 Prompt Score
-**Hook:** Progress + Gamification (Subtle)
-
-Each prompt gets a score based on:
-- Version count (iteration = learning)
-- Uptime
-- Performance consistency
-- A/B test wins
-
-Display: `system-prompt: Score 87 / 100`
-
-**Why it works:** Creates a goal to improve. Progress without cheesy badges.
-
----
-
-#### 5.2 Milestones
-**Hook:** Progress Narrative
-
-Track and celebrate:
-- First prompt pushed
-- 10 prompts managed
-- 100 versions deployed
-- 10,000 requests handled
-- First rollback (survival badge)
-- 30-day streak (no incidents)
-
-Example notification:
-```
-Milestone: 10,000 Requests
-Your prompts have handled 10,000 requests without incident.
-You're officially running production AI.
-
-[Share Achievement]
-```
-
-**Why it works:** Marks progress. Creates shareable moments.
-
----
-
-#### 5.3 "Beat Your Best" Challenge
-**Hook:** Competition (With Self)
-
-After each push:
-```
-Version 4 had a 89% success rate.
-Let's see if Version 5 can beat it.
-
-Results in 24 hours.
-```
-
-Next day:
-```
-Version 5 Results: 92% success rate
-You beat your previous best.
-
-[See Details] [Push Next Version]
-```
-
-**Why it works:** Creates suspense. Makes iteration a game.
-
----
-
-## The Content Flywheel
+## The Retention Flywheel
 
 ```
-User creates prompts
-       │
-       ▼
-Drift generates insights
-("Your prompt improved 23%")
-       │
-       ▼
-User shares insight
-(Twitter, blog, Slack)
-       │
-       ▼
-Developer sees proof, signs up
-       │
-       ▼
-       └──────── Repeat ────────►
+Chronicle (memory) → Health Score (ritual) → Close Call (stories) → Certificate (trust)
+                                    ↑                                              ↓
+                                    ←────────────── Weekly Digest ←────────────────
 ```
 
-**V1.1 Flywheel Features:**
-- [ ] Shareable performance reports
-- [ ] Embeddable changelog widget
-- [ ] "Powered by Drift" badge
-- [ ] Public prompt library
-- [ ] Weekly digest with share buttons
-- [ ] Milestone achievement cards
+Each feature reinforces the others:
+1. Chronicle provides data for Health Score
+2. Health Score creates daily check-in habit
+3. Close Calls create shareable moments
+4. Certificates build trust with stakeholders
+5. Weekly Digest reminds users to engage with all of the above
 
 ---
 
 ## Implementation Priority
 
-| Priority | Feature | Effort | Impact |
-|----------|---------|--------|--------|
-| P0 | First Push Celebration | 2 hours | Medium |
-| P0 | Heroic Rollback Messaging | 1 hour | Medium |
-| P0 | Narrative List Command | 4 hours | Medium |
-| P1 | Performance Dashboard | 2 weeks | High |
-| P1 | Anomaly Alerts | 1 week | High |
-| P1 | Weekly Digest Email | 3 days | High |
-| P2 | Version Comparison Reports | 1 week | Medium |
-| P2 | Auto-Generated Changelog | 3 days | Medium |
-| P2 | "Powered by Drift" Badge | 2 days | Medium |
-| P3 | Public Prompt Library | 3 weeks | High |
-| P3 | Prompt Score | 1 week | Medium |
-| P3 | Milestones | 1 week | Medium |
+| Feature | Effort | Impact | Priority |
+|---------|--------|--------|----------|
+| Chronicle | Medium | High | P0 — Requires persistent storage, addresses Warren's "measure before optimize" concern |
+| Health Score | Low | High | P0 — Quick win, visible daily |
+| Close Call Notification | Low | Medium | P1 — Requires detection logic |
+| Weekly Digest | Low | Medium | P1 — Aggregates existing data |
+| Streak Tracking | Low | Medium | P2 — Nice to have |
+| Reliability Certificate | Medium | High | P2 — Addresses trust gap Oprah identified |
 
 ---
 
 ## Success Metrics
 
-| Metric | Current | V1.1 Target |
-|--------|---------|-------------|
-| Daily Active Users (% of total) | Unknown | 15% |
-| Weekly Return Rate | Unknown | 40% |
-| Dashboard Visits / Week | 0 | 3 per user |
-| Email Open Rate | N/A | 35% |
-| Shared Reports / Week | 0 | 100 |
-| Public Prompts | 0 | 500 |
+| Metric | Target (90 days post-v1.1) |
+|--------|---------------------------|
+| Daily active users (health score checks) | 80%+ of operators |
+| Weekly digest open rate | 60%+ |
+| Close call shares (Slack/email) | 2+ per month |
+| User-initiated "show me the certificate" requests | At least 1 per operator per quarter |
+| NPS from infrastructure users | 40+ |
 
 ---
 
-## The Shonda Test
+## The Emotional Arc
 
-> "People don't remember what you built. They remember how you made them feel."
+Like any good series, NERVE v1.1 takes users on a journey:
 
-After V1.1, users should feel:
+**Episode 1 (Day 1):** Setup. User installs NERVE. Sees Health Score of 50 ("establishing baseline").
 
-- **Relief:** "Drift saved me from a production disaster."
-- **Power:** "I control my AI fleet with confidence."
-- **Insight:** "I learned something about my prompts I didn't know."
-- **Progress:** "I'm getting better at this every week."
+**Episode 2 (Week 1):** Rising action. First close call. NERVE catches a P0. User receives notification. Shares with team.
 
-These feelings create obsession. Obsession creates retention. Retention creates a business.
+**Episode 3 (Week 2):** Trust building. Weekly digest arrives. Health score climbing. User starts checking habitually.
+
+**Episode 4 (Month 1):** Payoff. Reliability certificate generated. User shows leadership. Identity investment: "We use NERVE."
+
+**Episode 5 (Ongoing):** Ritual. The dashboard check becomes routine. Breaking a streak becomes the exception that reinforces the value. Users become advocates.
 
 ---
 
-*"The undo button for your AI's soul" is a promise of redemption.*
-*V1.1 delivers the drama.*
+## What V1.1 Does NOT Include (Future Seasons)
 
-— Based on Shonda Rhimes' Board Review
+- **Community features** — Leaderboards, cross-team comparisons (v2.0)
+- **Predictive capabilities** — "Based on patterns, tomorrow's deploy may need attention" (v2.0, addresses Jensen's AI concerns)
+- **API access** — Let other tools read Health Score (v1.2)
+- **Mobile notifications** — Push alerts for close calls (v1.2)
+
+---
+
+## Final Note
+
+Oprah said NERVE needs a "welcome mat." Warren said it needs customers. Jensen said it needs AI.
+
+But before any of that matters, NERVE needs users who *come back*.
+
+The best infrastructure is invisible. But invisible infrastructure gets replaced when budget cuts come. V1.1 makes NERVE visible enough to be valued, without being so visible it becomes annoying.
+
+**The goal:** When someone asks "what tools do you use?", operators say "NERVE" with pride.
+
+---
+
+*"The only way to have a long-running series is to make people care about next week."*
+
+— Shonda Rhimes
+Retention & Engagement
+Great Minds Agency

@@ -1,77 +1,99 @@
-# Round 1: Elon Musk — Chief Product & Growth Officer
+# Round 1 Review: PromptOps — Elon Musk
 
-## Architecture: Simpler Than This
+**Role:** Chief Product & Growth Officer
+**Project:** Operations hardening for autonomous pipeline daemon
+**Status:** Already shipped (2026-04-11) — this is a post-mortem review
 
-The proxy is unnecessary for MVP. It adds latency, complexity, and a critical failure point between customer apps and their LLM. Nobody will route production traffic through an unproven startup's proxy on day one.
+---
 
-**Simplest system that works:** CLI + API + Dashboard. That's it.
+## First Problem: No PRD Exists
 
-Users call our API to fetch the active prompt, inject it client-side. No proxy. No man-in-the-middle. The CLI pushes prompts. The dashboard shows versions. This is a key-value store with versioning. Build that.
+The PRD at `/prds/promptops.md` doesn't exist. This is a red flag. Either:
+1. The project shipped without a formal PRD (bad process)
+2. The PRD was deleted after shipping (why?)
+3. The PRD was never created (this was a "just fix it" project)
 
-The proxy is a v2 feature disguised as v1. Cut it.
+Based on the retrospective, this was operations work. Operations work often skips formal PRDs because it's "obviously needed." That's exactly when PRDs matter most — to scope what's actually being changed.
 
-## Performance: The Proxy IS the Bottleneck
+---
 
-Every millisecond of latency in LLM responses is visible to end users. You're proposing to add a network hop + DB lookup + request rewriting to every single API call. At 100ms added latency (realistic for CF Worker + D1), you're increasing perceived response time by 10-20% for fast LLM calls.
+## Architecture: The Simplest System That Works
 
-**10x path:** Don't proxy. Fetch prompt at app startup or cache it. Polling/webhooks for updates. Zero runtime latency cost.
+What shipped (from retrospective):
+- PID lockfile → prevents duplicate daemons
+- Queue persistence → survives crashes
+- Abort flag → stops runaway pipelines
+- Strict verdict parsing → unambiguous QA results
+- Deterministic commits → bash > agent prompts
 
-## Distribution: This Can Work
+**Verdict: This is correct.** Four files, no new dependencies, defense in depth. The principle "trust bash, not instructions" is exactly right. Agent prompts are probabilistic; shell commands are deterministic. When reliability matters, determinism wins.
 
-The "Show HN: Git for prompts" angle is solid. Controversial framing drives engagement.
+---
 
-**Realistic path to 10,000 users:**
-1. HN front page = 5-10K uniques, ~500 signups (5% conversion)
-2. Dev Twitter threads with demo videos = 2-3K more over 2 weeks
-3. r/LocalLLaMA is underrated — 500K+ subscribers who obsess over this stuff
-4. ProductHunt is worthless for developer tools. Skip it.
+## Performance: Where Are The Bottlenecks?
 
-The real unlock: Get mentioned in one AI newsletter (Ben's Bites, The Rundown). That's 100K+ eyeballs of the exact target audience.
+The retrospective doesn't mention performance. This is an operations project, not an optimization project. The bottleneck in this system isn't CPU or memory — it's reliability. A daemon that runs twice wastes 100% of resources. A daemon that crashes loses 100% of queue state.
 
-**Missing:** Open source the CLI and core. Proprietary developer tools don't spread. OSS does.
+**10x path:** The project already took it. Moving from "it works sometimes" to "it works every time" is the 10x improvement for operations code.
 
-## What to CUT
+---
 
-1. **Proxy (v1)** — Already explained. This is premature optimization for a use case you haven't validated.
-2. **A/B testing** — Listed as "nice to have" but seeping into the architecture. Cut it entirely from v1 thinking.
-3. **Dashboard (half of it)** — You don't need "performance metrics per version" in MVP. You need: list prompts, view content, rollback. Three views.
-4. **`promptops diff`** — Users have `diff`. Don't rebuild Unix.
-5. **API key auth** — For MVP, use a single project token. No project management UI needed.
+## Distribution: How Does This Reach 10,000 Users?
 
-## Technical Feasibility: Barely
+It doesn't. This is internal infrastructure. The "users" are the other agents and the pipeline itself. If this works, the products it ships reach 10,000 users. If this fails, nothing ships.
 
-The 7-hour estimate is aggressive but possible IF you cut scope.
+**This is leverage work, not direct distribution.**
 
-- Foundation + CLI + basic dashboard: Doable in one session
-- Proxy with streaming, multi-provider support, injection logic: Not in the same session
-- Publishing to npm, CF deployment, AND polish: Someone's cutting corners
+---
 
-**One agent session can build:** CLI + API + static dashboard. No proxy. No A/B. No metrics.
+## What to CUT: Scope Creep Avoided
 
-## Scaling: What Breaks at 100x
+The retrospective explicitly mentions: "Initial scope creep temptation — could have expanded to rewrite the entire pipeline." They resisted. Good.
 
-At 100K requests/month (your Pro tier baseline):
-- **D1 is fine** — It's SQLite, handles reads well
-- **Single CF Worker** — Also fine, auto-scales
+**What would be v2 features masquerading as v1:**
+- Metrics/observability (not needed until you know it works)
+- Dashboard for daemon status (visualization before reliability is backwards)
+- Multi-daemon coordination (solve single daemon first)
+- Automated recovery (manual abort flags are enough for v1)
 
-At 10M requests/month:
-- **D1 write contention** — Every prompt fetch could be a log write. You'll need to batch or queue
-- **Prompt content storage** — If average prompt is 2KB, 1000 prompts = 2MB. Fine. But logs grow unbounded
+---
 
-**The real scaling problem:** You log every request. At 100K req/month = 100K log rows. At 10M/month = 10M rows. D1 has a 10GB limit. You hit it in ~6 months at scale. Plan for log rotation or external storage (R2) from day one.
+## Technical Feasibility: Can One Agent Session Build This?
 
-## Final Verdict
+Yes. Four files changed. No architectural decisions required — this is plumbing work. The hardest part is knowing what to change, not changing it.
 
-The core insight is correct: prompt versioning is a real pain point. The solution is over-engineered.
+**One agent session could build this in 2-3 hours if given a clear PRD.** The lack of PRD is the only risk here.
 
-**Ship this instead:**
-1. CLI that pushes prompts to an API
-2. API that returns the active prompt by name
-3. One-page dashboard showing version history
-4. Users integrate by fetching prompts at startup, not through a proxy
+---
 
-Build the proxy when you have 100 users begging for it. Not before.
+## Scaling: What Breaks at 100x Usage?
+
+The PID lockfile pattern assumes one daemon per machine. At 100x, you need:
+1. Multiple daemons processing multiple queues
+2. Distributed locking (Redis, etcd, or similar)
+3. Queue partitioning
+
+**Current architecture is single-machine.** That's fine for now. When it breaks, you'll know because queue depth will exceed single-daemon throughput. The fix is obvious: shard the queue, run multiple workers.
+
+---
+
+## Final Position
+
+This project did the right thing: minimal scope, deterministic execution, defense in depth.
+
+**What was missing:**
+1. The PRD itself (process failure)
+2. Testing beyond "reasoning about it" (acceptable risk for ops work)
+3. Documentation updates (technical debt)
+
+**What was done well:**
+1. Resisted scope creep
+2. Chose determinism over elegance
+3. Shipped without breaking existing functionality
+
+**Grade: B+** — Good execution, weak process discipline. A project this important should have a PRD on file.
 
 ---
 
 *"The best part is no part. The best process is no process."*
+*But if you're going to have a process, document it.*

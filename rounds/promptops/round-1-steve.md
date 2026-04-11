@@ -1,79 +1,65 @@
-# Steve Jobs — Chief Design & Brand Officer
-## PromptOps Design Review, Round 1
+# PromptOps — Steve Jobs' Position
+
+## Product Naming
+
+**Call it NERVE.**
+
+Not "PromptOps." That sounds like a DevOps subcommittee. Nobody falls in love with a committee.
+
+NERVE. Because that's what this is — the central nervous system that keeps everything running. It's the thing you don't think about until it fails. When your spine works, you don't notice it. When it doesn't, you can't move.
+
+One word. Four letters. Says exactly what it does: the essential system that connects intention to action.
+
+## Design Philosophy
+
+This is invisible architecture — and that's its genius.
+
+The best infrastructure is infrastructure you forget exists. Like plumbing. Like electricity. You flip a switch, the light comes on. You don't think about transformers and substations. You think about what you're going to read.
+
+NERVE is the product that makes every other product possible. It's not the show — it's the stage. And the stage must be perfect, or the show falls apart.
+
+**The philosophy is: determinism over elegance.** A bash command executes. A prompt requests. We build with commands.
+
+## User Experience — The First 30 Seconds
+
+Here's what the first 30 seconds feel like: *nothing.*
+
+And that's the point. The daemon starts. The queue persists. Pipelines complete. No duplicate runs. No hung processes. No lost state.
+
+The user experience is the *absence* of friction. It's the 3 AM moment when you're NOT getting paged because the system handled it. It's the confidence that when you push a PRD, it builds.
+
+The best UX for infrastructure is *trust.* You trust the floor won't collapse. You trust the elevator will stop at your floor. You trust NERVE.
+
+## Brand Voice
+
+Quiet confidence. Technical precision. Zero apology.
+
+NERVE doesn't explain itself. It doesn't hedge. It says: "Queue persisted. Pipeline complete. Build shipped."
+
+No exclamation marks. No emojis. No "Oops, something went wrong!" — because things don't go wrong. And when they do, the message is clinical and clear.
+
+The voice is a seasoned surgeon, not a chatbot. Competent. Economical. Trustworthy.
+
+## What to Say NO To
+
+**NO** to configurability for its own sake. Every option is a failure to decide.
+
+**NO** to dashboards and visualizations. If you need a chart to understand if the system is working, the system isn't working simply enough.
+
+**NO** to agent-driven operations. The retrospective nailed it: "Trust bash, not instructions." When something must happen, code makes it happen. We don't ask. We execute.
+
+**NO** to graceful degradation theater. Either it works or it fails clearly. No "partially running" states.
+
+## The Emotional Hook
+
+People will love NERVE because it gives them something rare: *peace of mind.*
+
+Every developer has that knot in their stomach — did the deploy work? Is the daemon running? Will I get paged at dinner?
+
+NERVE unties that knot. It's the sleep you get when you know — truly know — that the system is handling it. Not hoping. Knowing.
+
+That's not just a feature. That's freedom.
 
 ---
 
-### Product Naming: Kill "PromptOps"
-
-**PromptOps is a forgettable, committee-designed name.** It sounds like DevOps had a baby with a buzzword generator. Nobody falls in love with "Ops."
-
-The name should be **Drift**.
-
-Why? Because prompts drift. They evolve. They shift between versions. And when things go wrong, you *drift back* to what worked. It's a verb. It's a feeling. It's one word. When someone asks "How do you manage your prompts?" the answer is "We use Drift." That's a sentence that sounds like a decision, not a chore.
-
-`drift push`, `drift rollback`, `drift diff` — these feel like actions, not bureaucracy.
-
----
-
-### Design Philosophy: The Prompt is the Product
-
-Here's what everyone misses: **the prompt IS the product now.** Not the code. Not the model. The prompt. And yet we treat it like a config file buried in a repo.
-
-This tool should make you *feel* the gravity of your prompts. Every push should feel deliberate. Every rollback should feel like a rescue mission. The dashboard shouldn't just show versions — it should tell the *story* of your prompt's evolution.
-
-The insanely great version of this? It makes prompt engineering feel like *craftsmanship*, not configuration.
-
----
-
-### First 30 Seconds: Zero to Control
-
-Here's what happens:
-
-1. `npm install -g drift` — done.
-2. `drift init` — you get an API key, no signup form, no email verification, no friction.
-3. `drift push welcome --file welcome.txt` — your first prompt is live.
-
-In 30 seconds, you've gone from chaos to control. That's the feeling. Not "I've configured another tool." The feeling is: **"I finally have a grip on this."**
-
-The proxy URL should be dead simple. `drift.sh/v1` — that's it. If your proxy URL has the word "api" twice, you've already lost.
-
----
-
-### Brand Voice: Confident, Not Clever
-
-Drift speaks like a senior engineer who's seen everything break at 2am. No cutesy copy. No "Oopsie! Something went wrong!" When a rollback succeeds, it says: **"Rolled back to v3. Live now."**
-
-The voice is:
-- **Direct** — "Push failed. Prompt 'system' not found."
-- **Helpful without coddling** — "Try `drift list` to see available prompts."
-- **Never apologetic** — We don't say sorry. We fix things.
-
----
-
-### What to Say NO To
-
-1. **NO to prompt templates in v1.** Users already have Jinja, Handlebars, whatever. We version the output, not the machinery.
-2. **NO to team features at launch.** One person, one project, one API key. Collaboration is a v2 problem.
-3. **NO to analytics dashboards with seventeen charts.** One number matters at first: "Is this version working?" Show pass/fail. Show latency. That's it.
-4. **NO to "A/B testing" in the MVP.** This is feature creep dressed up as sophistication. Ship versioning first. Experimentation is a distraction until you have users who need it.
-5. **NO to native LLM provider integrations.** The proxy is dumb. It passes headers. That's the whole point — we're the layer *before* the model, not married to it.
-
-Simplicity isn't about what you include. It's about having the courage to exclude.
-
----
-
-### The Emotional Hook: Sleep at Night
-
-Here's why people will love this:
-
-Right now, every developer shipping AI products has a quiet terror: *"What if the prompt someone changed last Tuesday is why conversions dropped?"* There's no history. There's no rollback. There's only git blame and prayer.
-
-Drift gives you **the undo button for your AI's personality.**
-
-When the CEO asks why the chatbot started being rude to customers, you don't dig through commits. You open Drift, see that version 7 went live Thursday at 4pm, and you roll back to version 6. Done. Crisis over.
-
-**That peace of mind? That's the product.**
-
----
-
-*The people who built this have to believe prompts matter. If we treat this like infrastructure tooling, we'll build infrastructure tooling. If we treat it like the control panel for AI's soul, we'll build something people can't live without.*
+*"Simplicity is the ultimate sophistication."* And NERVE is sophisticated enough to disappear.
