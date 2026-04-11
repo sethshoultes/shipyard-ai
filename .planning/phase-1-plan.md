@@ -1,46 +1,41 @@
-# Phase 1 Plan — MemberShip Plugin Ship
+# Phase 1 Plan — NERVE v1 Verification & Ship
 
 **Generated:** April 11, 2026
-**Project Slug:** finish-plugins
-**Product Name:** MemberShip
+**Project Slug:** promptops
+**Product Name:** NERVE (Autonomous Pipeline Daemon)
 **Requirements:** .planning/REQUIREMENTS.md
-**Total Tasks:** 16
-**Waves:** 4
-**Timeline:** 1 week (ship this week per decisions.md)
+**Total Tasks:** 12
+**Waves:** 3
+**Status:** READY FOR BUILD
 
 ---
 
 ## The Essence
 
-> **What is this product REALLY about?**
-> Making people who feel inadequate feel capable.
+> **What it is:** The invisible backbone that makes everything else possible.
 
-> **What's the feeling it should evoke?**
-> "I built that."
+> **The feeling:** Peace. The absence of the 3 AM knot in your stomach.
 
-> **What's the one thing that must be perfect?**
-> The first 30 seconds.
+> **The one thing that must be perfect:** Determinism. When something must happen, it happens.
 
-> **Creative direction:**
-> Disappear.
+> **Creative direction:** Disappear completely. Work always.
 
 ---
 
 ## Build Status
 
-**Technical MVP:** Feature-complete (10,195 lines of code)
-**Board Verdict:** PROCEED (with conditions)
-**Blockers:** 7 ship-gate items from decisions.md Section VI
+**Technical MVP:** Feature-complete (1,273 lines of code across 5 scripts + README)
+**Board Verdict:** HOLD (4.7/10) — with conditions for proceeding
+**Current State:** Scripts exist but need verification against acceptance criteria
 
-| Ship-Gate Condition | Status | This Phase |
-|---------------------|--------|------------|
-| Deploy to real EmDash site | NOT DONE | Yes |
-| Three real Stripe transactions | NOT DONE | Yes |
-| Webhook failure recovery verified | NOT DONE | Yes |
-| Documentation complete | PARTIAL | Yes |
-| Admin dashboard beautiful | DONE | Verify |
-| Admin authentication exists | PARTIAL | Yes |
-| Brand voice applied throughout | PARTIAL | Yes |
+| Script | Lines | Status | Verification Needed |
+|--------|-------|--------|---------------------|
+| daemon.sh | 247 | Complete | PID lock, exit codes, signal handling |
+| queue.sh | 304 | Complete | FIFO, crash recovery, atomic writes |
+| abort.sh | 112 | Complete | Flag lifecycle, force-kill |
+| parse-verdict.sh | 136 | Complete | Exit codes, pattern matching |
+| status.sh | 174 | Complete | JSON output, metrics display |
+| README.md | 300 | Complete | All commands documented |
 
 ---
 
@@ -48,85 +43,87 @@
 
 | Requirement | Task(s) | Wave |
 |-------------|---------|------|
-| REQ-001: Deploy to real EmDash site | phase-1-task-13 | 4 |
-| REQ-002: Three real Stripe transactions | phase-1-task-14 | 4 |
-| REQ-003: Webhook failure recovery | phase-1-task-3 | 2 |
-| REQ-004: Documentation complete | phase-1-task-7, phase-1-task-8, phase-1-task-9, phase-1-task-10 | 2-3 |
-| REQ-005: Admin dashboard beautiful | phase-1-task-5 | 2 |
-| REQ-006: Admin authentication | phase-1-task-2 | 1 |
-| REQ-007: Brand voice | phase-1-task-6 | 2 |
-| REQ-013: Two permission tiers | phase-1-task-1 | 1 |
-| REQ-015: Empty state CTA | phase-1-task-4 | 1 |
+| NERVE-REQ-001: daemon.sh PID Lockfile | phase-1-task-1 | 1 |
+| NERVE-REQ-002: queue.sh Persistence | phase-1-task-2 | 1 |
+| NERVE-REQ-003: abort.sh Flag Handling | phase-1-task-3 | 1 |
+| NERVE-REQ-004: parse-verdict.sh Output | phase-1-task-4 | 1 |
+| NERVE-REQ-005: Log Format | phase-1-task-5 | 2 |
+| NERVE-REQ-006: Nerve Prefix | phase-1-task-5 | 2 |
+| NERVE-REQ-007: README Documentation | phase-1-task-6 | 2 |
+| NERVE-REQ-020: Three Metrics | phase-1-task-7 | 2 |
+| NERVE-REQ-026: Atomic Writes | phase-1-task-8 | 2 |
+| NERVE-REQ-027: Orphan Cleanup | phase-1-task-9 | 2 |
+| NERVE-REQ-009: QA Pass | phase-1-task-10 | 3 |
+| Board Path C: Baseline Metrics | phase-1-task-11 | 3 |
+| Sara Blakely Review | phase-1-task-12 | 3 |
 
 ---
 
 ## Documentation References
 
-This plan cites specific sections from the docs/ directory:
+This plan cites specific sections from the source documents:
 
-- **EMDASH-GUIDE.md Section 6 (Plugin System):** Defines plugin structure, hooks, routes, ctx.kv, ctx.email capabilities
-- **EMDASH-GUIDE.md Section 6 (Block Kit):** Admin UI rendering for sandboxed plugins
-- **EMDASH-GUIDE.md Section 6 (Plugin Context):** Available plugin APIs (storage, kv, content, media, http, log)
-- **decisions.md Section VI (Shipping Criteria):** Ship-gate checklist items
-- **decisions.md Section II (MVP Feature Set):** What ships vs. what's cut
-- **decisions.md Section V (Risk Register):** Critical risks requiring mitigation
+- **decisions.md Section II (MVP Feature Set):** Core components and UX requirements
+- **decisions.md Section III (File Structure):** Implementation specifications and exit codes
+- **decisions.md Section IV (Open Questions):** OQ-001 log format, OQ-002 naming resolved
+- **decisions.md Section V (Risk Register):** Atomic writes, orphan processes
+- **decisions.md Section VI (Board Conditions):** Path C (ROI validation) requirements
+- **decisions.md Section IX (Acceptance Criteria):** 9-item checklist
 
 ---
 
 ## Wave Execution Order
 
-### Wave 1 (Parallel) — Foundation: Cut Scope & Harden Auth
+### Wave 1 (Parallel) — Verification of Core Scripts
 
-Three independent tasks that establish the v1 scope boundary and security foundation.
+Four independent tasks verifying each script meets acceptance criteria.
 
 ```xml
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Remove GroupRecord code (two-tier permission model)</title>
-  <requirement>REQ-013: Two permission tiers only (members vs non-members)</requirement>
+  <title>Verify daemon.sh PID lockfile and exit codes</title>
+  <requirement>NERVE-REQ-001: daemon.sh PID Lockfile (P0-Blocker)</requirement>
   <description>
-    Per decisions.md Decision 6: Delete ~500 lines of group/role code.
-    Complexity is a tax on attention. Seven permission levels means you're
-    a corporation pretending to be a yoga studio. Two tiers enables deletion.
+    Per decisions.md Section IX: daemon.sh starts, creates PID lockfile,
+    prevents duplicate instances. Exit codes: 0=success, 1=error, 2=already running.
+    Must verify against specification.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Contains GroupRecord types and group routes" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/astro/GroupManagement.astro" reason="1,086 lines - entire file should be removed" />
-    <file path="/home/agent/shipyard-ai/rounds/finish-plugins/decisions.md" reason="Decision 6 locked: two tiers only" />
+    <file path="/home/agent/shipyard-ai/nerve/daemon.sh" reason="Script to verify" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Specification source" />
   </context>
 
   <steps>
-    <step order="1">Open sandbox-entry.ts and identify GroupRecord type definition (~lines 50-80)</step>
-    <step order="2">Identify all group-related routes: groups/create, groups/invite, groups/remove, groups/:id, groups/accept, groups/my, groups/my/invite, groups/my/remove</step>
-    <step order="3">Remove GroupRecord type and GroupInviteCode type</step>
-    <step order="4">Remove all 8 group-related routes from routes object</step>
-    <step order="5">Remove any helper functions specific to groups (e.g., generateInviteCode)</step>
-    <step order="6">Delete entire file: src/astro/GroupManagement.astro (1,086 lines)</step>
-    <step order="7">Update src/astro/index.ts to remove GroupManagement export</step>
-    <step order="8">Search for any remaining "group" or "Group" references in codebase</step>
-    <step order="9">Run TypeScript build: npm run build</step>
-    <step order="10">Run tests: npm test</step>
-    <step order="11">Verify binary permission check remains: isMember(email) returns boolean only</step>
+    <step order="1">Read daemon.sh and locate acquire_lock() function (~lines 79-96)</step>
+    <step order="2">Verify PID file path is /tmp/nerve.pid (per OQ-002 resolution)</step>
+    <step order="3">Test: Start daemon, verify /tmp/nerve.pid contains correct PID</step>
+    <step order="4">Test: Start second daemon, verify exit code 2</step>
+    <step order="5">Test: Stop daemon, verify PID file is removed</step>
+    <step order="6">Test: Create stale PID file (dead process), verify daemon handles it</step>
+    <step order="7">Verify exit code 0 on clean shutdown (SIGTERM)</step>
+    <step order="8">Verify exit code 1 on initialization error (Bash version check)</step>
+    <step order="9">Document any fixes needed in verification notes</step>
   </steps>
 
   <verification>
-    <check type="bash">npm run build</check>
-    <check type="bash">npm test</check>
-    <check type="bash">grep -r "GroupRecord" src/ (should return nothing)</check>
-    <check type="bash">grep -r "groups/" src/ (should return nothing)</check>
-    <check type="manual">GroupManagement.astro file deleted</check>
+    <check type="bash">./nerve/daemon.sh &amp;&amp; cat /tmp/nerve.pid</check>
+    <check type="bash">./nerve/daemon.sh; echo "Exit code: $?"</check>
+    <check type="test">Second instance exits with code 2</check>
+    <check type="test">PID file removed on clean shutdown</check>
+    <check type="test">Stale PID detection works</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>refactor(membership): remove group/role code per Decision 6
+  <commit-message>verify(nerve): daemon.sh PID lockfile and exit codes
 
-Per decisions.md: Two permission tiers only (members vs non-members).
-Deleted ~500 lines of GroupRecord, GroupInviteCode, group routes.
-Removed GroupManagement.astro (1,086 lines).
-Complexity is a tax on attention.
+Per decisions.md Section IX acceptance criteria:
+- PID lockfile at /tmp/nerve.pid verified
+- Exit codes match spec (0/1/2)
+- Duplicate instance prevention confirmed
+- Stale PID detection working
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -134,57 +131,104 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-2" wave="1">
-  <title>Harden admin authentication and add audit logging</title>
-  <requirement>REQ-006: Admin authentication exists (ship-gate blocker)</requirement>
+  <title>Verify queue.sh persistence and crash recovery</title>
+  <requirement>NERVE-REQ-002: queue.sh Persistence and Recovery (P0-Blocker)</requirement>
   <description>
-    Per decisions.md Open Question #6: "Anyone with endpoint can modify members."
-    This is a CRITICAL security gap. Must verify isAdmin on all admin routes
-    and add audit logging for security visibility.
+    Per decisions.md Section IX: queue.sh persists queue to disk, recovers
+    state on restart. Items in running/ moved back to pending/ on init.
+    Risk: Queue corruption on crash (Section V).
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Contains admin routes that need auth hardening" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6: Plugin Context - ctx.log for structured logging" />
-    <file path="/home/agent/shipyard-ai/rounds/finish-plugins/decisions.md" reason="Risk Register: No admin authentication - CRITICAL" />
+    <file path="/home/agent/shipyard-ai/nerve/queue.sh" reason="Script to verify" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Specification source" />
   </context>
 
   <steps>
-    <step order="1">Create helper function: assertAdmin(rc, ctx) that throws 403 if !rc.user?.isAdmin</step>
-    <step order="2">Add audit logging: ctx.log.warn on failed admin auth attempts with IP/email if available</step>
-    <step order="3">Apply assertAdmin() to all admin routes:</step>
-    <step order="4">  - /approve, /revoke, /admin/mark-paid</step>
-    <step order="5">  - /reports/*, /export/csv, /import/csv</step>
-    <step order="6">  - /forms/create, /forms/:id (PUT), /forms/:id/submissions</step>
-    <step order="7">  - /coupons/create, /coupons (list)</step>
-    <step order="8">  - /webhooks/*, /gating/rules (POST)</step>
-    <step order="9">Add rate limiting on failed admin auth: track in KV, block after 5 failures</step>
-    <step order="10">Add audit log entries for successful admin actions:</step>
-    <step order="11">  - ctx.log.info(`ADMIN_ACTION: ${adminEmail} ${action} ${targetEmail}`)</step>
-    <step order="12">Add test case for admin auth rejection</step>
-    <step order="13">Add test case for rate limiting</step>
-    <step order="14">Run tests to verify</step>
+    <step order="1">Read queue.sh and locate queue_init() function</step>
+    <step order="2">Verify queue directory is /tmp/nerve-queue/ (per OQ-002)</step>
+    <step order="3">Test: Initialize queue, verify directories created (pending, running, completed, failed)</step>
+    <step order="4">Test: Enqueue item, verify JSON file in pending/</step>
+    <step order="5">Test: Dequeue item, verify moves to running/</step>
+    <step order="6">Test: Complete item, verify moves to completed/</step>
+    <step order="7">Test: Fail item, verify moves to failed/ with reason</step>
+    <step order="8">Test crash recovery: Create item in running/, call init, verify moved to pending/</step>
+    <step order="9">Test FIFO: Enqueue 3 items, dequeue, verify oldest returned</step>
+    <step order="10">Verify exit codes: 0=success, 1=error, 2=empty queue</step>
+    <step order="11">Check for atomic writes (write temp, then mv) per Risk Register</step>
   </steps>
 
   <verification>
-    <check type="bash">npm test -- --grep "admin"</check>
-    <check type="test">Non-admin user gets 403 on /approve</check>
-    <check type="test">Rate limited after 5 failed attempts</check>
-    <check type="manual">Audit log entries appear in ctx.log output</check>
+    <check type="bash">./nerve/queue.sh init &amp;&amp; ls /tmp/nerve-queue/</check>
+    <check type="bash">./nerve/queue.sh enqueue test-001 '{"msg":"hello"}'</check>
+    <check type="test">Items survive daemon crash</check>
+    <check type="test">Crash recovery moves running to pending</check>
+    <check type="test">FIFO order maintained</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>security(membership): harden admin auth and add audit logging
+  <commit-message>verify(nerve): queue.sh persistence and crash recovery
 
-Ship-gate blocker: Admin authentication must exist.
-- assertAdmin() helper for all admin routes
-- Audit logging for auth attempts and actions
-- Rate limiting on failed admin auth (5 attempts)
-- ctx.log.warn/info for security visibility
+Per decisions.md Section IX acceptance criteria:
+- Queue persists to /tmp/nerve-queue/
+- Crash recovery verified (running -> pending)
+- FIFO ordering confirmed
+- Exit codes match spec (0/1/2)
 
-Closes security gap in decisions.md Open Question #6.
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-3" wave="1">
+  <title>Verify abort.sh flag handling and force-kill</title>
+  <requirement>NERVE-REQ-003: abort.sh Flag Handling (P0-Blocker)</requirement>
+  <description>
+    Per decisions.md Section IX: abort.sh sets flag, daemon responds,
+    shutdown is clean. Force-kill escalation: SIGTERM -> 5 sec -> SIGKILL.
+    Risk: Orphan processes (Section V).
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/nerve/abort.sh" reason="Script to verify" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Specification source" />
+  </context>
+
+  <steps>
+    <step order="1">Read abort.sh and verify flag path is /tmp/nerve.abort</step>
+    <step order="2">Test: abort.sh set - verify flag file created with timestamp</step>
+    <step order="3">Test: abort.sh status - verify correct status reported</step>
+    <step order="4">Test: abort.sh clear - verify flag removed</step>
+    <step order="5">Test: abort.sh check - verify exit code 0 when flag exists, 1 when not</step>
+    <step order="6">Integration test: Start daemon, set abort, verify clean shutdown</step>
+    <step order="7">Verify daemon completes current item before exit</step>
+    <step order="8">Test force-kill: Verify SIGTERM sent first, then SIGKILL after 5 sec</step>
+    <step order="9">Verify no orphan processes left after force-kill</step>
+    <step order="10">Verify exit codes match spec</step>
+  </steps>
+
+  <verification>
+    <check type="bash">./nerve/abort.sh set &amp;&amp; cat /tmp/nerve.abort</check>
+    <check type="bash">./nerve/abort.sh status</check>
+    <check type="bash">./nerve/abort.sh clear</check>
+    <check type="test">Daemon shuts down cleanly on abort flag</check>
+    <check type="test">Force-kill escalation works</check>
+  </verification>
+
+  <dependencies>
+    <!-- No dependencies - Wave 1 foundational task -->
+  </dependencies>
+
+  <commit-message>verify(nerve): abort.sh flag handling and force-kill
+
+Per decisions.md Section IX acceptance criteria:
+- Abort flag at /tmp/nerve.abort
+- Clean shutdown on flag detection
+- Force-kill escalation (SIGTERM -> SIGKILL)
+- No orphan processes
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -192,50 +236,51 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-4" wave="1">
-  <title>Implement empty state with clear CTA</title>
-  <requirement>REQ-015: Empty state with clear CTA (Decision 3)</requirement>
+  <title>Verify parse-verdict.sh patterns and exit codes</title>
+  <requirement>NERVE-REQ-004: parse-verdict.sh JSON Output (P0-Blocker)</requirement>
   <description>
-    Per decisions.md Decision 3: Show empty state with "Create Your First Member"
-    CTA when no members exist. No demo data generation complexity.
+    Per decisions.md Section IX: parse-verdict.sh returns verdict with
+    exit codes: 0=PASS, 1=FAIL, 2=ERROR (no verdict, file missing, ambiguous).
+    Patterns: **Status:** PASS/FAIL, VERDICT: PASS/FAIL
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/astro/AdminReporting.astro" reason="Admin dashboard - add empty state" />
-    <file path="/home/agent/shipyard-ai/rounds/finish-plugins/decisions.md" reason="Decision 3: Empty state, no demo data" />
+    <file path="/home/agent/shipyard-ai/nerve/parse-verdict.sh" reason="Script to verify" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Specification source" />
   </context>
 
   <steps>
-    <step order="1">Open AdminReporting.astro</step>
-    <step order="2">Add member count check at top of component</step>
-    <step order="3">If memberCount === 0, render empty state view:</step>
-    <step order="4">  - Centered container with warm, inviting design</step>
-    <step order="5">  - Heading: "No members yet"</step>
-    <step order="6">  - Subheading: "Create your first member to get started."</step>
-    <step order="7">  - CTA button: "Create Your First Member" (links to registration form)</step>
-    <step order="8">  - Optional: illustration or icon (simple, not clipart)</step>
-    <step order="9">Apply brand voice: terse, confident, warm</step>
-    <step order="10">Ensure CTA button has prominent styling (primary color, large touch target)</step>
-    <step order="11">Test with empty KV store</step>
-    <step order="12">Verify normal dashboard appears when members exist</step>
+    <step order="1">Read parse-verdict.sh and locate pattern matching logic</step>
+    <step order="2">Create test file with **Status:** PASS, verify exit code 0</step>
+    <step order="3">Create test file with **Status:** FAIL, verify exit code 1</step>
+    <step order="4">Create test file with VERDICT: PASS, verify exit code 0</step>
+    <step order="5">Create test file with VERDICT: FAIL, verify exit code 1</step>
+    <step order="6">Test missing file, verify exit code 2</step>
+    <step order="7">Test file with no verdict, verify exit code 2</step>
+    <step order="8">Test ambiguous file (both PASS and FAIL), verify exit code 2</step>
+    <step order="9">Verify patterns don't match substrings (PASSING, FAILED)</step>
+    <step order="10">Document any pattern edge cases</step>
   </steps>
 
   <verification>
-    <check type="manual">Empty state displays when member count is 0</check>
-    <check type="manual">CTA button is prominent and clickable</check>
-    <check type="manual">Copy follows brand voice (terse, warm)</check>
-    <check type="manual">Normal dashboard displays when members exist</check>
+    <check type="bash">echo '**Status:** PASS' | ./nerve/parse-verdict.sh -; echo "Exit: $?"</check>
+    <check type="bash">echo '**Status:** FAIL' | ./nerve/parse-verdict.sh -; echo "Exit: $?"</check>
+    <check type="test">Exit 0 on PASS verdict</check>
+    <check type="test">Exit 1 on FAIL verdict</check>
+    <check type="test">Exit 2 on missing/ambiguous</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>feat(membership): add empty state with clear CTA
+  <commit-message>verify(nerve): parse-verdict.sh patterns and exit codes
 
-Per Decision 3: Empty state instead of demo data.
-- "Create Your First Member" CTA when memberCount === 0
-- Terse, warm copy following brand voice
-- No demo data generation complexity
+Per decisions.md Section IX acceptance criteria:
+- Exit 0 = PASS verdict
+- Exit 1 = FAIL verdict
+- Exit 2 = ERROR (no verdict, missing, ambiguous)
+- Patterns match specification
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -243,126 +288,61 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 2 (Parallel, after Wave 1) — Verification & Documentation
+### Wave 2 (Parallel, after Wave 1) — Quality & Risk Mitigation
 
-Seven tasks for webhook testing, design review, and documentation completion.
-
-```xml
-<task-plan id="phase-1-task-3" wave="2">
-  <title>Verify webhook failure recovery (kill-test)</title>
-  <requirement>REQ-003: Webhook failure recovery verified (ship-gate blocker)</requirement>
-  <description>
-    Per decisions.md Decision 8: Kill-test webhook failure before ship.
-    Customer service nightmare: Stripe payment succeeds but member doesn't get access.
-    Must verify system recovers from webhook failure mid-transaction.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Stripe webhook handler implementation" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/__tests__/integration.test.ts" reason="Add kill-test" />
-    <file path="/home/agent/shipyard-ai/rounds/finish-plugins/decisions.md" reason="Decision 8: Webhook failure handling" />
-  </context>
-
-  <steps>
-    <step order="1">Review current webhook handler in sandbox-entry.ts (lines 1400-1500)</step>
-    <step order="2">Identify recovery mechanisms: idempotency key, retry logic</step>
-    <step order="3">Create test case: test_webhook_failure_recovery</step>
-    <step order="4">Simulate scenario:</step>
-    <step order="5">  - Start checkout session</step>
-    <step order="6">  - Payment succeeds in Stripe</step>
-    <step order="7">  - Webhook call throws error mid-processing</step>
-    <step order="8">  - Verify member record is NOT corrupted</step>
-    <step order="9">  - Simulate Stripe retry (re-send webhook)</step>
-    <step order="10">  - Verify member gets access on retry</step>
-    <step order="11">If recovery mechanism missing, implement:</step>
-    <step order="12">  - Atomic idempotency check (setNX pattern)</step>
-    <step order="13">  - Cleanup on failure (remove processing flag)</step>
-    <step order="14">  - Recovery endpoint for admin to manually reconcile</step>
-    <step order="15">Document manual recovery procedure in troubleshooting.md</step>
-    <step order="16">Run full test suite</step>
-  </steps>
-
-  <verification>
-    <check type="test">npm test -- --grep "webhook failure"</check>
-    <check type="test">Stripe retry delivers access after initial failure</check>
-    <check type="test">No duplicate member records created</check>
-    <check type="test">No duplicate emails sent</check>
-    <check type="manual">Manual recovery procedure documented</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Admin auth needed for recovery endpoint" />
-  </dependencies>
-
-  <commit-message>test(membership): verify webhook failure recovery (kill-test)
-
-Ship-gate blocker: Webhook failure recovery must be verified.
-- Added test: webhook failure mid-transaction
-- Verified Stripe retry delivers member access
-- Atomic idempotency check prevents duplicates
-- Manual recovery procedure documented
-
-Per Decision 8: Prevents "payment succeeds, access denied" nightmare.
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
+Five tasks for log format, documentation, metrics, and risk mitigations.
 
 ```xml
 <task-plan id="phase-1-task-5" wave="2">
-  <title>Review admin dashboard design (Steve's requirement)</title>
-  <requirement>REQ-005: Admin dashboard beautiful (ship-gate blocker)</requirement>
+  <title>Verify log format and nerve prefix usage</title>
+  <requirement>NERVE-REQ-005: Log Format, NERVE-REQ-006: Nerve Prefix (P0-Blocker)</requirement>
   <description>
-    Per decisions.md Decision 4: Admin dashboard receives equal design investment.
-    For first 6 months, admin panel IS the product. Ugly admin = abandoned installs.
-    Review and enhance if needed.
+    Per decisions.md OQ-001/OQ-002 Resolution: All logs use format
+    [TIMESTAMP] [COMPONENT] message. All paths use nerve prefix.
+    Clinical voice: no emoji, no exclamation, no casual language.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/astro/AdminReporting.astro" reason="Main admin dashboard" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/astro/MemberDashboard.astro" reason="Member-facing dashboard for comparison" />
-    <file path="/home/agent/shipyard-ai/rounds/finish-plugins/decisions.md" reason="Decision 4: Admin UI quality" />
+    <file path="/home/agent/shipyard-ai/nerve/daemon.sh" reason="Check log format" />
+    <file path="/home/agent/shipyard-ai/nerve/queue.sh" reason="Check log format" />
+    <file path="/home/agent/shipyard-ai/nerve/abort.sh" reason="Check log format" />
+    <file path="/home/agent/shipyard-ai/nerve/parse-verdict.sh" reason="Check log format" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="OQ-001/002 resolutions" />
   </context>
 
   <steps>
-    <step order="1">Open AdminReporting.astro and review current design</step>
-    <step order="2">Check against "spreadsheet-like" anti-pattern:</step>
-    <step order="3">  - Tables should have proper spacing and alignment</step>
-    <step order="4">  - Cards should have visual hierarchy</step>
-    <step order="5">  - Buttons should have clear styling</step>
-    <step order="6">Compare design quality to MemberDashboard.astro (customer-facing)</step>
-    <step order="7">Review mobile responsiveness</step>
-    <step order="8">Check accessibility: aria-labels, semantic HTML, focus states</step>
-    <step order="9">If improvements needed, apply:</step>
-    <step order="10">  - Better typography (heading hierarchy)</step>
-    <step order="11">  - Improved spacing (breathing room)</step>
-    <step order="12">  - Status badges with color coding</step>
-    <step order="13">  - Hover states on interactive elements</step>
-    <step order="14">  - Loading states for async operations</step>
-    <step order="15">Take screenshot of final admin dashboard</step>
-    <step order="16">Document design decisions in code comments</step>
+    <step order="1">Grep all scripts for log functions and echo statements</step>
+    <step order="2">Verify timestamp format: ISO8601 UTC (YYYY-MM-DDTHH:MM:SSZ)</step>
+    <step order="3">Verify component tags: [DAEMON], [QUEUE], [ABORT], [VERDICT]</step>
+    <step order="4">Verify no emoji anywhere in output</step>
+    <step order="5">Verify no exclamation marks</step>
+    <step order="6">Verify no casual language ("Oops!", "Hey!", etc.)</step>
+    <step order="7">Verify path /tmp/nerve.pid (not promptops)</step>
+    <step order="8">Verify path /tmp/nerve.abort (not promptops)</step>
+    <step order="9">Verify path /tmp/nerve-queue/ (not promptops)</step>
+    <step order="10">Test: ps aux | grep nerve returns daemon</step>
+    <step order="11">Fix any violations found</step>
   </steps>
 
   <verification>
-    <check type="manual">Admin dashboard is NOT spreadsheet-like</check>
-    <check type="manual">Design parity with member-facing components</check>
-    <check type="manual">Mobile responsive</check>
-    <check type="manual">Accessibility: proper aria-labels, focus states</check>
-    <check type="manual">Screenshot captured for board review</check>
+    <check type="bash">grep -r "promptops" /home/agent/shipyard-ai/nerve/</check>
+    <check type="bash">grep -r "!" /home/agent/shipyard-ai/nerve/*.sh | grep -v "#"</check>
+    <check type="test">All logs match [TIMESTAMP] [COMPONENT] message</check>
+    <check type="test">No promptops references</check>
+    <check type="test">Clinical voice maintained</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies - Wave 2 task -->
+    <depends-on task-id="phase-1-task-1" reason="Verify after daemon tested" />
   </dependencies>
 
-  <commit-message>style(membership): review and enhance admin dashboard design
+  <commit-message>verify(nerve): log format and nerve prefix usage
 
-Ship-gate: Admin dashboard must be beautiful.
-Per Decision 4: Equal design investment as customer-facing.
-- Verified not spreadsheet-like
-- Design parity with member dashboard
-- Mobile responsive, accessible
-- Screenshot captured for board review
+Per decisions.md OQ-001/OQ-002 resolutions:
+- Log format: [TIMESTAMP] [COMPONENT] message
+- ISO8601 UTC timestamps
+- nerve prefix on all paths
+- Clinical voice (no emoji/exclamation)
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -370,64 +350,52 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-6" wave="2">
-  <title>Apply brand voice audit (3-word principle)</title>
-  <requirement>REQ-007: Brand voice applied throughout (ship-gate blocker)</requirement>
+  <title>Verify README documentation completeness</title>
+  <requirement>NERVE-REQ-007: README Documentation (P0-Blocker)</requirement>
   <description>
-    Per decisions.md Decision 5: Terse, confident, warm copy.
-    Three words where competitors use twelve.
-    Maya Angelou's rewrites: "They're in. Welcome email sent."
+    Per decisions.md Section IX: README.md documents all commands with examples.
+    Must cover all scripts, functions, exit codes, workflows, troubleshooting.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/email.ts" reason="Email template copy" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Response messages" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/astro/RegistrationForm.astro" reason="Form labels and messages" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/astro/AdminReporting.astro" reason="Admin UI copy" />
-    <file path="/home/agent/shipyard-ai/rounds/finish-plugins/decisions.md" reason="Decision 5: Brand voice" />
+    <file path="/home/agent/shipyard-ai/nerve/README.md" reason="Documentation to verify" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Specification source" />
   </context>
 
   <steps>
-    <step order="1">Create COPY-AUDIT.md checklist</step>
-    <step order="2">Review email templates in email.ts:</step>
-    <step order="3">  - Welcome email: "They're in. Welcome email sent." not "Registration confirmed..."</step>
-    <step order="4">  - Payment receipt: terse, warm</step>
-    <step order="5">  - Cancellation: respectful, brief</step>
-    <step order="6">Review sandbox-entry.ts response messages:</step>
-    <step order="7">  - Success: short, confident</step>
-    <step order="8">  - Errors: helpful, not technical</step>
-    <step order="9">Review RegistrationForm.astro:</step>
-    <step order="10">  - Labels: minimal, clear</step>
-    <step order="11">  - CTA button: action-oriented</step>
-    <step order="12">  - Error messages: human, not jargon</step>
-    <step order="13">Review AdminReporting.astro:</step>
-    <step order="14">  - Section headers: terse</step>
-    <step order="15">  - Empty states: warm, not clinical</step>
-    <step order="16">Apply Maya Angelou rewrites where applicable</step>
-    <step order="17">Remove any passive voice</step>
-    <step order="18">Remove any corporate/marketing speak</step>
-    <step order="19">Document voice guidelines in COPY-AUDIT.md</step>
+    <step order="1">Read README.md and create checklist of documented items</step>
+    <step order="2">Verify daemon.sh documented: start, stop, status, exit codes</step>
+    <step order="3">Verify queue.sh documented: push, pop, peek, depth, metrics</step>
+    <step order="4">Verify abort.sh documented: set, clear, status, force-kill</step>
+    <step order="5">Verify parse-verdict.sh documented: patterns, exit codes</step>
+    <step order="6">Verify status.sh documented: human/JSON output</step>
+    <step order="7">Check for usage examples for each command</step>
+    <step order="8">Verify troubleshooting section exists</step>
+    <step order="9">Verify failure modes documented</step>
+    <step order="10">Cross-reference with decisions.md acceptance criteria</step>
+    <step order="11">Add any missing documentation</step>
   </steps>
 
   <verification>
-    <check type="manual">COPY-AUDIT.md checklist completed</check>
-    <check type="manual">No passive voice in user-facing copy</check>
-    <check type="manual">No technical jargon visible to users</check>
-    <check type="manual">Maya Angelou rewrites applied</check>
-    <check type="bash">grep -r "has been" src/ (find passive voice)</check>
+    <check type="manual">All scripts documented</check>
+    <check type="manual">All functions with parameters documented</check>
+    <check type="manual">All exit codes documented</check>
+    <check type="manual">Usage examples present</check>
+    <check type="manual">Troubleshooting section exists</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies - Wave 2 task -->
+    <!-- No strict dependencies, but better after scripts verified -->
   </dependencies>
 
-  <commit-message>docs(membership): apply brand voice audit (3-word principle)
+  <commit-message>verify(nerve): README documentation completeness
 
-Ship-gate: Brand voice must be applied throughout.
-Per Decision 5: Terse, confident, warm.
-- Maya Angelou rewrites applied
-- No passive voice
-- No technical jargon
-- COPY-AUDIT.md checklist completed
+Per decisions.md Section IX acceptance criteria:
+- All scripts documented
+- All functions and parameters
+- All exit codes
+- Usage examples
+- Troubleshooting section
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -435,60 +403,52 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-7" wave="2">
-  <title>Write installation.md documentation</title>
-  <requirement>REQ-004: Documentation complete (ship-gate blocker)</requirement>
+  <title>Verify three observability metrics</title>
+  <requirement>NERVE-REQ-020: Three Observability Metrics (P1-Must)</requirement>
   <description>
-    Per decisions.md Decision 7: Documentation complete BEFORE ship.
-    Installation guide for MemberShip plugin.
+    Per decisions.md Decision 8: Three metrics required before scale work:
+    queue_depth, latency_last, error_count. Numbers before features.
+    Metrics written to /tmp/nerve-metrics.json.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6: Plugin registration in astro.config.mjs" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/package.json" reason="Package name and dependencies" />
-    <file path="/home/agent/shipyard-ai/rounds/finish-plugins/decisions.md" reason="Decision 7: Documentation blocker" />
+    <file path="/home/agent/shipyard-ai/nerve/daemon.sh" reason="Metrics update logic" />
+    <file path="/home/agent/shipyard-ai/nerve/queue.sh" reason="Queue metrics" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Decision 8" />
   </context>
 
   <steps>
-    <step order="1">Create membership/docs/installation.md</step>
-    <step order="2">Write Prerequisites section:</step>
-    <step order="3">  - Emdash site running on Cloudflare Workers</step>
-    <step order="4">  - Stripe account with API keys</step>
-    <step order="5">  - Resend account for email</step>
-    <step order="6">Write Installation section:</step>
-    <step order="7">  - npm install @shipyard/membership</step>
-    <step order="8">  - Add to astro.config.mjs plugins array</step>
-    <step order="9">  - Reference EMDASH-GUIDE.md Section 6 for plugin registration</step>
-    <step order="10">Write Environment Setup section:</step>
-    <step order="11">  - STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET</step>
-    <step order="12">  - RESEND_API_KEY</step>
-    <step order="13">  - JWT_SECRET</step>
-    <step order="14">Write Verification section:</step>
-    <step order="15">  - Visit admin panel</step>
-    <step order="16">  - Verify MemberShip appears in plugins</step>
-    <step order="17">Write Next Steps: link to configuration.md</step>
-    <step order="18">Use brand voice: terse, confident, no jargon</step>
+    <step order="1">Locate metrics_update() function in daemon.sh</step>
+    <step order="2">Verify queue_depth tracked (pending items count)</step>
+    <step order="3">Verify latency_last tracked (last item processing time)</step>
+    <step order="4">Verify error_count tracked (failed items)</step>
+    <step order="5">Test: Run daemon, process items, check /tmp/nerve-metrics.json</step>
+    <step order="6">Verify JSON schema: {"queue_depth":N,"latency_last":N,"error_count":N,"timestamp":"..."}</step>
+    <step order="7">Verify metrics updated after each queue poll cycle</step>
+    <step order="8">Verify metrics log every 60 seconds (heartbeat)</step>
+    <step order="9">Test status.sh --json includes metrics</step>
   </steps>
 
   <verification>
-    <check type="manual">installation.md exists and is complete</check>
-    <check type="manual">Prerequisites clear</check>
-    <check type="manual">Step-by-step instructions accurate</check>
-    <check type="manual">References EMDASH-GUIDE.md Section 6</check>
-    <check type="manual">Brand voice applied</check>
+    <check type="bash">cat /tmp/nerve-metrics.json | jq .</check>
+    <check type="test">queue_depth accurate</check>
+    <check type="test">latency_last accurate</check>
+    <check type="test">error_count accurate</check>
+    <check type="test">Metrics JSON valid</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies - Wave 2 task -->
+    <depends-on task-id="phase-1-task-1" reason="Daemon must work for metrics" />
+    <depends-on task-id="phase-1-task-2" reason="Queue must work for metrics" />
   </dependencies>
 
-  <commit-message>docs(membership): write installation.md
+  <commit-message>verify(nerve): three observability metrics
 
-Ship-gate: Documentation must be complete.
-- Prerequisites: Emdash, Stripe, Resend
-- Installation steps with astro.config.mjs
-- Environment variable setup
-- Verification procedure
-- References EMDASH-GUIDE.md Section 6
+Per decisions.md Decision 8:
+- queue_depth tracked
+- latency_last tracked
+- error_count tracked
+- Metrics written to /tmp/nerve-metrics.json
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -496,61 +456,97 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-8" wave="2">
-  <title>Write configuration.md documentation</title>
-  <requirement>REQ-004: Documentation complete (ship-gate blocker)</requirement>
+  <title>Implement atomic file writes</title>
+  <requirement>NERVE-REQ-026: Atomic File Writes (P2-Should)</requirement>
   <description>
-    Per decisions.md Decision 7: Documentation complete BEFORE ship.
-    Configuration guide for Stripe, Resend, plans setup.
+    Per decisions.md Risk Register: Queue corruption on crash during write.
+    Mitigation: Write to temp file, then mv to final location.
+    Currently NOT implemented per Risk Scanner findings.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Configuration options and default plans" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6: Plugin settings schema" />
-    <file path="/home/agent/shipyard-ai/rounds/finish-plugins/decisions.md" reason="Decision 7: Documentation blocker" />
+    <file path="/home/agent/shipyard-ai/nerve/queue.sh" reason="File to modify" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Risk Register" />
   </context>
 
   <steps>
-    <step order="1">Create membership/docs/configuration.md</step>
-    <step order="2">Write Stripe Setup section:</step>
-    <step order="3">  - Creating Stripe products and prices</step>
-    <step order="4">  - Configuring webhook endpoint</step>
-    <step order="5">  - Webhook events to subscribe (checkout.session.completed, etc.)</step>
-    <step order="6">Write Resend Setup section:</step>
-    <step order="7">  - API key configuration</step>
-    <step order="8">  - Sender email setup</step>
-    <step order="9">Write Plans Configuration section:</step>
-    <step order="10">  - Default plans (free, pro, premium)</step>
-    <step order="11">  - Custom plan creation</step>
-    <step order="12">  - Stripe price ID mapping</step>
-    <step order="13">Write Admin Settings section:</step>
-    <step order="14">  - Settings schema from plugin definition</step>
-    <step order="15">  - Reference EMDASH-GUIDE.md Section 6: settingsSchema</step>
-    <step order="16">Write Security section:</step>
-    <step order="17">  - JWT_SECRET generation</step>
-    <step order="18">  - Webhook signature verification</step>
-    <step order="19">Use brand voice: clear, no jargon</step>
+    <step order="1">Locate queue_enqueue() function in queue.sh (~lines 83-110)</step>
+    <step order="2">Identify direct write: cat > "$item_file" pattern</step>
+    <step order="3">Modify to: Write to temp file (.tmp suffix)</step>
+    <step order="4">Add: mv temp file to final location (atomic rename)</step>
+    <step order="5">Repeat for queue_fail() reason update</step>
+    <step order="6">Repeat for any other JSON file writes</step>
+    <step order="7">Test: Enqueue item, verify no .tmp files remain</step>
+    <step order="8">Test: Interrupt write, verify no partial JSON</step>
+    <step order="9">Update metrics_update() in daemon.sh if needed</step>
   </steps>
 
   <verification>
-    <check type="manual">configuration.md exists and is complete</check>
-    <check type="manual">Stripe setup accurate</check>
-    <check type="manual">Resend setup accurate</check>
-    <check type="manual">Plans configuration clear</check>
-    <check type="manual">References EMDASH-GUIDE.md Section 6</check>
+    <check type="bash">ls /tmp/nerve-queue/**/*.tmp 2>/dev/null || echo "No temp files"</check>
+    <check type="test">Writes use temp + mv pattern</check>
+    <check type="test">No partial JSON files possible</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies - Wave 2 task -->
+    <depends-on task-id="phase-1-task-2" reason="Queue verification complete first" />
   </dependencies>
 
-  <commit-message>docs(membership): write configuration.md
+  <commit-message>fix(nerve): implement atomic file writes
 
-Ship-gate: Documentation must be complete.
-- Stripe products, prices, webhooks setup
-- Resend API key and sender configuration
-- Plans: free, pro, premium
-- Security: JWT_SECRET, webhook verification
-- References EMDASH-GUIDE.md Section 6
+Per decisions.md Risk Register:
+- Write to temp file first
+- mv to final location (atomic rename)
+- Prevents queue corruption on crash
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-9" wave="2">
+  <title>Verify orphan process cleanup</title>
+  <requirement>NERVE-REQ-027: Orphan Process Cleanup (P2-Should)</requirement>
+  <description>
+    Per decisions.md Risk Register: Orphan processes on unclean shutdown.
+    Mitigation: Abort escalation SIGTERM -> 5 sec wait -> SIGKILL.
+    Verify abort.sh force-kill implements this.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/nerve/abort.sh" reason="Script to verify/modify" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Risk Register" />
+  </context>
+
+  <steps>
+    <step order="1">Locate force-kill implementation in abort.sh</step>
+    <step order="2">Verify SIGTERM sent first (kill -15 or kill -TERM)</step>
+    <step order="3">Verify 5-second wait before SIGKILL</step>
+    <step order="4">Verify SIGKILL sent if process still running (kill -9 or kill -KILL)</step>
+    <step order="5">Test: Start daemon, force-kill, verify no orphan processes</step>
+    <step order="6">Test: ps aux | grep nerve after force-kill shows nothing</step>
+    <step order="7">If not implemented, add escalation logic</step>
+    <step order="8">Verify PID file cleaned up after force-kill</step>
+  </steps>
+
+  <verification>
+    <check type="bash">./nerve/daemon.sh &amp; sleep 1 &amp;&amp; ./nerve/abort.sh force-kill &amp;&amp; ps aux | grep daemon.sh</check>
+    <check type="test">SIGTERM sent first</check>
+    <check type="test">5 second wait</check>
+    <check type="test">SIGKILL if needed</check>
+    <check type="test">No orphan processes</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-3" reason="Abort verification complete first" />
+  </dependencies>
+
+  <commit-message>verify(nerve): orphan process cleanup escalation
+
+Per decisions.md Risk Register:
+- SIGTERM sent first
+- 5 second wait
+- SIGKILL if still running
+- No orphan processes
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -558,127 +554,62 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 3 (Parallel, after Wave 2) — Final Documentation
+### Wave 3 (Sequential, after Wave 2) — QA, Metrics, Review
 
-Three tasks completing the documentation suite.
-
-```xml
-<task-plan id="phase-1-task-9" wave="3">
-  <title>Write api-reference.md documentation</title>
-  <requirement>REQ-004: Documentation complete (ship-gate blocker)</requirement>
-  <description>
-    Per decisions.md Decision 7: Documentation complete BEFORE ship.
-    API reference for all 52+ endpoints.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="All route definitions" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/API.md" reason="Existing API documentation to enhance" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6: Plugin routes pattern" />
-  </context>
-
-  <steps>
-    <step order="1">Create membership/docs/api-reference.md (or enhance existing API.md)</step>
-    <step order="2">Organize by category (matching REQUIREMENTS.md structure):</step>
-    <step order="3">  - Authentication endpoints</step>
-    <step order="4">  - Member management endpoints</step>
-    <step order="5">  - Checkout/payment endpoints</step>
-    <step order="6">  - Reporting endpoints</step>
-    <step order="7">  - Gating endpoints</step>
-    <step order="8">For each endpoint document:</step>
-    <step order="9">  - Method and path</step>
-    <step order="10">  - Description</step>
-    <step order="11">  - Request body schema (if applicable)</step>
-    <step order="12">  - Response schema</step>
-    <step order="13">  - Authentication requirement</step>
-    <step order="14">  - Example request/response</step>
-    <step order="15">Mark admin endpoints clearly</step>
-    <step order="16">Mark public endpoints clearly</step>
-    <step order="17">Reference EMDASH-GUIDE.md Section 6 for route patterns</step>
-    <step order="18">Use consistent formatting</step>
-  </steps>
-
-  <verification>
-    <check type="manual">api-reference.md exists and is complete</check>
-    <check type="manual">All 52+ endpoints documented</check>
-    <check type="manual">Request/response examples included</check>
-    <check type="manual">Admin vs public endpoints marked</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Group endpoints removed, don't document" />
-  </dependencies>
-
-  <commit-message>docs(membership): write api-reference.md
-
-Ship-gate: Documentation must be complete.
-- All endpoints documented by category
-- Request/response schemas
-- Authentication requirements
-- Example requests/responses
-- Admin vs public endpoints marked
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
+Three tasks for final QA, baseline metrics, and customer review.
 
 ```xml
 <task-plan id="phase-1-task-10" wave="3">
-  <title>Write troubleshooting.md documentation</title>
-  <requirement>REQ-004: Documentation complete (ship-gate blocker)</requirement>
+  <title>QA Pass - Verify all acceptance criteria</title>
+  <requirement>NERVE-REQ-009: QA Pass (P0-Blocker)</requirement>
   <description>
-    Per decisions.md Decision 7: Documentation complete BEFORE ship.
-    Troubleshooting guide for common issues.
+    Per decisions.md Section IX: QA Pass confirms zero P0 issues.
+    Final verification of all 9 acceptance criteria from decisions.md.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Error handling patterns" />
-    <file path="/home/agent/shipyard-ai/rounds/finish-plugins/decisions.md" reason="Risk Register items" />
+    <file path="/home/agent/shipyard-ai/nerve/" reason="All scripts to verify" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Section IX checklist" />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Full requirements" />
   </context>
 
   <steps>
-    <step order="1">Create membership/docs/troubleshooting.md</step>
-    <step order="2">Write Webhook Issues section:</step>
-    <step order="3">  - "Webhook signature verification failed"</step>
-    <step order="4">  - "Member didn't get access after payment"</step>
-    <step order="5">  - Manual recovery procedure (from task-3)</step>
-    <step order="6">Write Authentication Issues section:</step>
-    <step order="7">  - "JWT token expired"</step>
-    <step order="8">  - "Admin access denied"</step>
-    <step order="9">Write Email Issues section:</step>
-    <step order="10">  - "Welcome email not sent"</step>
-    <step order="11">  - "Resend rate limit hit"</step>
-    <step order="12">Write Configuration Issues section:</step>
-    <step order="13">  - "Stripe key invalid"</step>
-    <step order="14">  - "Missing environment variables"</step>
-    <step order="15">Write Debugging section:</step>
-    <step order="16">  - How to check ctx.log output</step>
-    <step order="17">  - How to verify KV data</step>
-    <step order="18">Write FAQ section with common questions</step>
-    <step order="19">Use brand voice: helpful, not condescending</step>
+    <step order="1">Create QA checklist from decisions.md Section IX</step>
+    <step order="2">Verify: daemon.sh starts, creates PID lockfile, prevents duplicates</step>
+    <step order="3">Verify: queue.sh persists queue to disk, recovers on restart</step>
+    <step order="4">Verify: abort.sh sets flag, daemon responds, shutdown clean</step>
+    <step order="5">Verify: parse-verdict.sh returns JSON with verdict and issue counts</step>
+    <step order="6">Verify: All scripts use consistent log format</step>
+    <step order="7">Verify: All scripts use nerve prefix for file paths</step>
+    <step order="8">Verify: README.md documents all commands with examples</step>
+    <step order="9">Verify: All files committed to deliverables directory</step>
+    <step order="10">Document any P0 issues found</step>
+    <step order="11">Create QA report: nerve-qa-report.md</step>
+    <step order="12">Pass/Fail verdict</step>
   </steps>
 
   <verification>
-    <check type="manual">troubleshooting.md exists and is complete</check>
-    <check type="manual">Webhook issues covered</check>
-    <check type="manual">Authentication issues covered</check>
-    <check type="manual">Email issues covered</check>
-    <check type="manual">Manual recovery procedure included</check>
+    <check type="manual">All 9 acceptance criteria verified</check>
+    <check type="manual">No P0 issues outstanding</check>
+    <check type="manual">QA report created</check>
+    <check type="bash">./nerve/parse-verdict.sh nerve-qa-report.md; echo "Exit: $?"</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="Needs webhook recovery procedure" />
+    <depends-on task-id="phase-1-task-5" reason="Log format verified" />
+    <depends-on task-id="phase-1-task-6" reason="Documentation verified" />
+    <depends-on task-id="phase-1-task-7" reason="Metrics verified" />
+    <depends-on task-id="phase-1-task-8" reason="Atomic writes implemented" />
+    <depends-on task-id="phase-1-task-9" reason="Orphan cleanup verified" />
   </dependencies>
 
-  <commit-message>docs(membership): write troubleshooting.md
+  <commit-message>qa(nerve): verify all acceptance criteria
 
-Ship-gate: Documentation must be complete.
-- Webhook issues and recovery procedure
-- Authentication troubleshooting
-- Email delivery issues
-- Configuration problems
-- Debugging guide
-- FAQ section
+Per decisions.md Section IX:
+- All 9 acceptance criteria verified
+- No P0 issues outstanding
+- QA report: nerve-qa-report.md
+- VERDICT: PASS
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -686,53 +617,51 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-11" wave="3">
-  <title>Create documentation index and verify completeness</title>
-  <requirement>REQ-004: Documentation complete (ship-gate blocker)</requirement>
+  <title>Document baseline metrics for ROI validation</title>
+  <requirement>Board Path C: Validate Internal ROI (decisions.md Section VI)</requirement>
   <description>
-    Create docs index and verify all 4 documentation files are complete and accurate.
+    Per Board Conditions (Buffett's Path C): Document baseline metrics
+    before NERVE. Required to later prove NERVE prevented X failures worth $Y.
+    This enables ROI validation post-deployment.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/docs/installation.md" reason="Verify exists" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/docs/configuration.md" reason="Verify exists" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/docs/api-reference.md" reason="Verify exists" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/docs/troubleshooting.md" reason="Verify exists" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Section VI Board Conditions" />
+    <file path="/home/agent/shipyard-ai/STATUS.md" reason="Current pipeline state" />
+    <file path="/home/agent/shipyard-ai/qa-monitor.log" reason="Historical failures" />
   </context>
 
   <steps>
-    <step order="1">Create membership/docs/README.md as index</step>
-    <step order="2">Link to all 4 documentation files</step>
-    <step order="3">Add quick start section</step>
-    <step order="4">Verify each doc file exists</step>
-    <step order="5">Verify each doc file has content (not empty)</step>
-    <step order="6">Check all internal links work</step>
-    <step order="7">Verify consistent formatting across docs</step>
-    <step order="8">Add version number and last updated date</step>
-    <step order="9">Update main README.md to link to docs/</step>
+    <step order="1">Review decisions.md Section VI - Path C requirements</step>
+    <step order="2">Document baseline metrics BEFORE NERVE:</step>
+    <step order="3">  - Pipeline failure rate (how many runs fail per week)</step>
+    <step order="4">  - Duplicate daemon instances (how often)</step>
+    <step order="5">  - Lost queue items (how many)</step>
+    <step order="6">  - Manual recovery time (hours per incident)</step>
+    <step order="7">  - 3 AM incidents (count per month)</step>
+    <step order="8">Check qa-monitor.log and STATUS.md for historical data</step>
+    <step order="9">Create baseline-metrics.md with findings</step>
+    <step order="10">Define success criteria for post-NERVE metrics</step>
+    <step order="11">Plan: Re-measure after 2 weeks of NERVE operation</step>
   </steps>
 
   <verification>
-    <check type="bash">ls /home/agent/shipyard-ai/plugins/membership/docs/</check>
-    <check type="manual">All 4 docs exist</check>
-    <check type="manual">docs/README.md index created</check>
-    <check type="manual">All internal links work</check>
-    <check type="manual">Consistent formatting</check>
+    <check type="manual">baseline-metrics.md created</check>
+    <check type="manual">Pre-NERVE failure rate documented</check>
+    <check type="manual">Success criteria defined</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-7" reason="Needs installation.md" />
-    <depends-on task-id="phase-1-task-8" reason="Needs configuration.md" />
-    <depends-on task-id="phase-1-task-9" reason="Needs api-reference.md" />
-    <depends-on task-id="phase-1-task-10" reason="Needs troubleshooting.md" />
+    <depends-on task-id="phase-1-task-10" reason="QA complete, ready for metrics" />
   </dependencies>
 
-  <commit-message>docs(membership): create documentation index
+  <commit-message>docs(nerve): document baseline metrics for ROI validation
 
-Ship-gate: Documentation must be complete.
-- docs/README.md index with all 4 files
-- All internal links verified
-- Consistent formatting across docs
-- Version and last updated added
+Per decisions.md Section VI (Buffett's Path C):
+- Pre-NERVE failure rate documented
+- Baseline metrics established
+- Success criteria defined
+- Ready for post-deployment comparison
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -740,199 +669,29 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-12" wave="3">
-  <title>Run full test suite and build verification</title>
-  <requirement>Pre-deployment verification</requirement>
-  <description>
-    Run complete test suite and verify build works before deployment.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/__tests__/integration.test.ts" reason="Test suite" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/vitest.config.ts" reason="Test configuration" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/package.json" reason="Build scripts" />
-  </context>
-
-  <steps>
-    <step order="1">Run TypeScript type check: npm run typecheck (or tsc --noEmit)</step>
-    <step order="2">Run full test suite: npm test</step>
-    <step order="3">Check test coverage: npm test -- --coverage</step>
-    <step order="4">Run build: npm run build</step>
-    <step order="5">Verify dist/ output exists</step>
-    <step order="6">Check for any console warnings or errors</step>
-    <step order="7">Run lint if configured: npm run lint</step>
-    <step order="8">Document test results</step>
-    <step order="9">Fix any failing tests</step>
-    <step order="10">Re-run until all pass</step>
-  </steps>
-
-  <verification>
-    <check type="bash">npm run build</check>
-    <check type="bash">npm test</check>
-    <check type="manual">All tests pass</check>
-    <check type="manual">Build succeeds without errors</check>
-    <check type="manual">No TypeScript errors</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Code changes affect tests" />
-    <depends-on task-id="phase-1-task-2" reason="Auth changes affect tests" />
-    <depends-on task-id="phase-1-task-3" reason="Webhook tests added" />
-  </dependencies>
-
-  <commit-message>test(membership): run full test suite and build verification
-
-- TypeScript type check passed
-- All tests passing
-- Build succeeds
-- Ready for deployment
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
----
-
-### Wave 4 (Sequential, after Wave 3) — Production Validation
-
-Four tasks for deploying and validating in production.
-
-```xml
-<task-plan id="phase-1-task-13" wave="4">
-  <title>Deploy to real EmDash site</title>
-  <requirement>REQ-001: Deploy to real EmDash site (ship-gate blocker)</requirement>
-  <description>
-    Per decisions.md Section VI: Must deploy to one real EmDash site in production mode.
-    Not test environment. Demonstrates real-world integration capability.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5: Deployment to Cloudflare Workers" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/docs/installation.md" reason="Installation procedure" />
-    <file path="/home/agent/shipyard-ai/rounds/finish-plugins/decisions.md" reason="Ship gate: real deployment" />
-  </context>
-
-  <steps>
-    <step order="1">Identify target EmDash site for deployment (e.g., yoga.shipyard.company)</step>
-    <step order="2">Verify Stripe production keys are available</step>
-    <step order="3">Verify Resend production credentials are available</step>
-    <step order="4">Follow installation.md procedure</step>
-    <step order="5">Add MemberShip plugin to astro.config.mjs</step>
-    <step order="6">Configure wrangler.toml with required bindings</step>
-    <step order="7">Set production secrets: wrangler secret put STRIPE_SECRET_KEY, etc.</step>
-    <step order="8">Deploy: wrangler deploy</step>
-    <step order="9">Verify plugin loads in admin panel</step>
-    <step order="10">Verify MemberShip menu item appears</step>
-    <step order="11">Verify admin dashboard renders</step>
-    <step order="12">Verify empty state CTA appears (no members yet)</step>
-    <step order="13">Document deployment URL and configuration</step>
-  </steps>
-
-  <verification>
-    <check type="bash">wrangler deploy</check>
-    <check type="manual">Plugin visible in admin panel</check>
-    <check type="manual">Admin dashboard renders correctly</check>
-    <check type="manual">Empty state CTA visible</check>
-    <check type="manual">No console errors</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-11" reason="Docs complete for deployment" />
-    <depends-on task-id="phase-1-task-12" reason="Tests passing, build verified" />
-  </dependencies>
-
-  <commit-message>deploy(membership): deploy to real EmDash site
-
-Ship-gate: Must deploy to production EmDash site.
-- Deployed to: [site URL]
-- Plugin loads correctly
-- Admin dashboard renders
-- Empty state CTA visible
-- Ready for production transactions
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-14" wave="4">
-  <title>Complete three real Stripe transactions</title>
-  <requirement>REQ-002: Three real Stripe transactions (ship-gate blocker)</requirement>
-  <description>
-    Per decisions.md Section VI: Process 3 production Stripe transactions with real cards.
-    Validates complete payment flow end-to-end.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/docs/configuration.md" reason="Stripe setup procedure" />
-    <file path="/home/agent/shipyard-ai/rounds/finish-plugins/decisions.md" reason="Ship gate: 3 transactions" />
-  </context>
-
-  <steps>
-    <step order="1">Ensure Stripe is in production mode (not test)</step>
-    <step order="2">Register first test member via registration form</step>
-    <step order="3">Complete Stripe checkout with real card</step>
-    <step order="4">Verify member record created in KV</step>
-    <step order="5">Verify welcome email received</step>
-    <step order="6">Repeat for second test member</step>
-    <step order="7">Verify second transaction complete</step>
-    <step order="8">Repeat for third test member</step>
-    <step order="9">Verify third transaction complete</step>
-    <step order="10">Check Stripe dashboard: 3 successful payments</step>
-    <step order="11">Check admin dashboard: 3 members listed</step>
-    <step order="12">Check email: 3 welcome emails sent</step>
-    <step order="13">Document transaction IDs and timestamps</step>
-    <step order="14">Test member dashboard access for each</step>
-  </steps>
-
-  <verification>
-    <check type="manual">Stripe dashboard shows 3 successful payments</check>
-    <check type="manual">Admin dashboard shows 3 members</check>
-    <check type="manual">3 welcome emails received</check>
-    <check type="manual">Each member can access member dashboard</check>
-    <check type="manual">Transaction IDs documented</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-13" reason="Deployed to production site" />
-  </dependencies>
-
-  <commit-message>test(membership): complete three real Stripe transactions
-
-Ship-gate: 3 production transactions required.
-- Transaction 1: [ID] - [timestamp]
-- Transaction 2: [ID] - [timestamp]
-- Transaction 3: [ID] - [timestamp]
-- All members created correctly
-- All emails delivered
-- Payment flow validated end-to-end
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-15" wave="4">
   <title>Sara Blakely customer gut-check</title>
   <requirement>SKILL.md Step 7: Customer value validation</requirement>
   <description>
     Per skill instructions: Spawn Sara Blakely agent for customer perspective.
-    "Would a real customer pay for this? What feels like engineering vanity?"
+    NERVE is internal tooling - customer is the operations team.
+    "Would they pay for this? What feels like engineering vanity?"
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/.planning/phase-1-plan.md" reason="This phase plan" />
-    <file path="/home/agent/shipyard-ai/rounds/finish-plugins/decisions.md" reason="Board decisions" />
+    <file path="/home/agent/shipyard-ai/.planning/phase-1-plan.md" reason="This plan" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Board decisions" />
+    <file path="/home/agent/shipyard-ai/nerve/README.md" reason="Product documentation" />
   </context>
 
   <steps>
-    <step order="1">Spawn haiku sub-agent as Sara Blakely (growth-mindset entrepreneur)</step>
-    <step order="2">Prompt: Read phase plan and deployed MemberShip plugin</step>
-    <step order="3">Answer: Would a yoga studio owner actually use MemberShip?</step>
-    <step order="4">Answer: What would make them say "shut up and take my money"?</step>
-    <step order="5">Answer: What feels like engineering vanity vs. customer value?</step>
-    <step order="6">Answer: Is the first 30 seconds perfect? (per The Essence)</step>
-    <step order="7">Answer: Does the admin feel capable or overwhelmed?</step>
-    <step order="8">Answer: Does it make them feel "I built that"?</step>
+    <step order="1">Spawn haiku sub-agent as Sara Blakely</step>
+    <step order="2">Prompt: Read phase plan and NERVE scripts</step>
+    <step order="3">Answer: Would operations team actually use NERVE?</step>
+    <step order="4">Answer: What would make them say "finally, peace at 3 AM"?</step>
+    <step order="5">Answer: What feels like engineering vanity vs. real value?</step>
+    <step order="6">Answer: Is the "invisible backbone" truly invisible?</step>
+    <step order="7">Answer: Does zero-configuration actually work?</step>
+    <step order="8">Answer: Does it deliver "the absence of friction"?</step>
     <step order="9">Write findings to .planning/sara-blakely-review.md</step>
     <step order="10">Review and address major gaps if any</step>
   </steps>
@@ -944,74 +703,14 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-14" reason="Review after production validation" />
+    <depends-on task-id="phase-1-task-10" reason="Review after QA pass" />
   </dependencies>
 
-  <commit-message>docs(membership): add Sara Blakely customer gut-check
+  <commit-message>docs(nerve): add Sara Blakely customer gut-check
 
 Per SKILL.md: Validate customer value.
-Would a yoga studio owner choose MemberShip?
-Engineering vanity vs. customer value analysis.
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-16" wave="4">
-  <title>Ship gate checklist completion</title>
-  <requirement>Final verification before ship</requirement>
-  <description>
-    Verify all 7 ship-gate items from decisions.md Section VI are complete.
-    Final checklist before declaring MemberShip v1 shipped.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/rounds/finish-plugins/decisions.md" reason="Section VI ship gate" />
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="All requirements" />
-  </context>
-
-  <steps>
-    <step order="1">Create SHIP-CHECKLIST.md</step>
-    <step order="2">Verify each ship-gate item:</step>
-    <step order="3">  - [ ] Deployed to one real EmDash site (task-13)</step>
-    <step order="4">  - [ ] Three real Stripe transactions (task-14)</step>
-    <step order="5">  - [ ] Webhook failure recovery verified (task-3)</step>
-    <step order="6">  - [ ] Documentation complete (tasks 7-11)</step>
-    <step order="7">  - [ ] Admin dashboard is beautiful (task-5)</step>
-    <step order="8">  - [ ] Admin authentication exists (task-2)</step>
-    <step order="9">  - [ ] Brand voice applied (task-6)</step>
-    <step order="10">Document any exceptions or known issues</step>
-    <step order="11">Include Sara Blakely feedback summary</step>
-    <step order="12">Request stakeholder sign-off</step>
-    <step order="13">Mark MemberShip v1 as SHIPPED</step>
-    <step order="14">Update STATUS.md: MemberShip shipped, EventDash next</step>
-  </steps>
-
-  <verification>
-    <check type="bash">cat SHIP-CHECKLIST.md</check>
-    <check type="manual">All 7 ship-gate items verified</check>
-    <check type="manual">Known issues documented</check>
-    <check type="manual">Stakeholder sign-off obtained</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-15" reason="Needs Sara Blakely review" />
-  </dependencies>
-
-  <commit-message>docs(membership): complete ship gate checklist
-
-MemberShip v1 SHIPPED.
-All 7 ship-gate items verified:
-- [x] Deployed to production
-- [x] 3 real Stripe transactions
-- [x] Webhook recovery verified
-- [x] Documentation complete
-- [x] Admin dashboard beautiful
-- [x] Admin auth exists
-- [x] Brand voice applied
-
-EventDash next after validation.
+Would operations team choose NERVE?
+Engineering vanity vs. real value analysis.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -1023,116 +722,87 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 | Wave | Tasks | Description | Parallelism |
 |------|-------|-------------|-------------|
-| 1 | 3 | Foundation: Cut scope, harden auth, empty state | 3 parallel |
-| 2 | 6 | Verification: Webhook test, design, voice, docs | 6 parallel (after Wave 1) |
-| 3 | 4 | Final Docs: API ref, troubleshooting, verify, build | 4 parallel (after Wave 2) |
-| 4 | 4 | Production: Deploy, transactions, review, ship | Sequential (after Wave 3) |
+| 1 | 4 | Verify core scripts (daemon, queue, abort, verdict) | 4 parallel |
+| 2 | 5 | Quality & risk (log format, docs, metrics, atomic, orphan) | 5 parallel (after Wave 1) |
+| 3 | 3 | Final (QA pass, baseline metrics, Sara review) | Sequential (after Wave 2) |
 
-**Total Tasks:** 16
-**Maximum Parallelism:** Wave 2 (6 concurrent tasks)
-**Timeline:** 1 week (ship this week per decisions.md)
+**Total Tasks:** 12
+**Maximum Parallelism:** Wave 2 (5 concurrent tasks)
+**Timeline:** 2-3 days (verification focus, minimal code changes)
 
 ---
 
 ## Dependencies Diagram
 
 ```
-Wave 1:  [task-1: Cut groups]  ─────────────────────────────────────────────────>
-         [task-2: Admin auth]  ─────────────────────────────────────────────────>
-         [task-4: Empty state] ─────────────────────────────────────────────────>
+Wave 1:  [task-1: daemon.sh] ─────────────────────────────────────────>
+         [task-2: queue.sh]  ─────────────────────────────────────────>
+         [task-3: abort.sh]  ─────────────────────────────────────────>
+         [task-4: verdict.sh] ────────────────────────────────────────>
 
-Wave 2:  [task-3: Webhook test] ───> (depends on task-2) ────────────────────────>
-         [task-5: Design review] ───────────────────────────────────────────────>
-         [task-6: Brand voice] ─────────────────────────────────────────────────>
-         [task-7: installation.md] ─────────────────────────────────────────────>
-         [task-8: configuration.md] ────────────────────────────────────────────>
+Wave 2:  [task-5: log format] ───> (depends on task-1) ───────────────>
+         [task-6: README docs] ───────────────────────────────────────>
+         [task-7: metrics] ───> (depends on tasks 1,2) ───────────────>
+         [task-8: atomic writes] ───> (depends on task-2) ────────────>
+         [task-9: orphan cleanup] ───> (depends on task-3) ───────────>
 
-Wave 3:  [task-9: api-reference.md] ───> (depends on task-1) ───────────────────>
-         [task-10: troubleshooting.md] ───> (depends on task-3) ────────────────>
-         [task-11: docs index] ───> (depends on tasks 7-10) ────────────────────>
-         [task-12: tests/build] ───> (depends on tasks 1-3) ────────────────────>
-
-Wave 4:  [task-13: Deploy] ───> (depends on tasks 11,12) ───────────────────────>
-         [task-14: 3 transactions] ───> (depends on task-13) ───────────────────>
-         [task-15: Sara review] ───> (depends on task-14) ──────────────────────>
-         [task-16: Ship checklist] ───> (depends on task-15) ───────────────────>
+Wave 3:  [task-10: QA Pass] ───> (depends on tasks 5-9) ──────────────>
+         [task-11: baseline] ───> (depends on task-10) ───────────────>
+         [task-12: Sara review] ───> (depends on task-10) ────────────>
 ```
 
 ---
 
 ## Risk Notes
 
-### Critical (Address in Wave 1-2)
+### Addressed in This Phase
 
-1. **Admin Authentication Gap** — CRITICAL per Risk Register
-   - Task-2 addresses this
-   - Must verify before production deployment
-   - Rate limiting on failed attempts
-
-2. **Webhook Failure Recovery** — CRITICAL per Decision 8
-   - Task-3 addresses this
-   - Kill-test required before ship
-   - Manual recovery procedure documented
-
-3. **Documentation Incomplete** — BLOCKER per Decision 7
-   - Tasks 7-11 address this
-   - All 4 docs required before deployment
-   - No "PENDING" status allowed
-
-### High (Monitor During Execution)
-
-4. **Production Stripe Keys** — Dependency
-   - Need production keys for task-13
-   - Coordinate with infrastructure
-
-5. **Production EmDash Site** — Dependency
-   - Need target site for deployment
-   - Coordinate with team
-
-6. **Brand Voice Consistency** — Quality
-   - Task-6 audits all copy
-   - Maya Angelou's 3-word principle
+| Risk | Mitigation | Task |
+|------|------------|------|
+| Queue corruption on crash | Atomic writes (write temp, mv) | task-8 |
+| Orphan processes | SIGTERM -> wait -> SIGKILL | task-9 |
+| Documentation gaps | README verification | task-6 |
+| Log format inconsistency | Verification against OQ-001 | task-5 |
+| No baseline metrics | Document pre-NERVE state | task-11 |
 
 ### Accepted for v1 (Not Blocking)
 
-7. **4,000-line monolith** — Technical debt
-   - Refactor after revenue
-   - Not a ship blocker
-
-8. **~60% code duplication** — Technical debt
-   - Extract shared module in v2
-   - Not a ship blocker
-
-9. **KV architecture** — Scaling
-   - Acceptable for <1K records
-   - D1 migration path exists
+| Risk | Impact | Notes |
+|------|--------|-------|
+| Single-machine architecture | High at scale | Sharding path clear for v2 |
+| No automated tests | Medium | Ship proves correctness |
+| Race condition in lockfile | Low | Documented limitation |
+| process_item() is a stub | N/A | Intentional for v1 |
 
 ---
 
 ## Verification Checklist
 
-- [x] All ship-gate blockers have task coverage
+- [x] All P0 requirements have task coverage
 - [x] Each task has clear verification criteria
 - [x] Dependencies form valid DAG (no cycles)
 - [x] Each task can be committed independently
-- [x] Risk mitigations addressed in relevant tasks
-- [x] Decisions compliance verified (MemberShip name, two tiers, etc.)
-- [x] Cut features NOT included (groups, coupons, multi-step)
-- [x] EMDASH-GUIDE.md Section 6 referenced for technical patterns
-- [x] 1-week timeline achievable with parallel execution
-- [x] Ship test defined: "I built that"
-- [x] Sara Blakely customer gut-check scheduled (task-15)
+- [x] Risk mitigations addressed (atomic writes, orphan cleanup)
+- [x] Decisions compliance verified (nerve prefix, log format)
+- [x] Board Path C addressed (baseline metrics)
+- [x] 2-3 day timeline achievable
+- [x] Ship test defined: "Peace. The absence of 3 AM knots."
+- [x] Sara Blakely customer gut-check scheduled (task-12)
 
 ---
 
 ## Ship Test
 
-> Does the admin see their first member registered and feel "I built that"?
+> Does the daemon silently handle queue operations without user intervention?
+>
+> Does the operations team feel "peace" — the absence of 3 AM knots in their stomach?
+>
+> Does it disappear completely and work always?
 >
 > **If yes, ship it.**
 
 ---
 
 *Generated by Great Minds Agency — Phase Planning Skill*
-*Source: rounds/finish-plugins/decisions.md, docs/EMDASH-GUIDE.md, CLAUDE.md*
-*Project Slug: finish-plugins*
+*Source: rounds/promptops/decisions.md, CLAUDE.md*
+*Project Slug: promptops*

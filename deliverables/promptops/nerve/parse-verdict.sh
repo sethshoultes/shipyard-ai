@@ -7,11 +7,11 @@ set -euo pipefail
 # Configuration
 readonly METRICS_FILE="${METRICS_FILE:-/tmp/nerve-metrics.json}"
 
-# Logging: [TIMESTAMP] [COMPONENT] message
+# Logging: [TIMESTAMP] [COMPONENT] message (sent to stderr to not interfere with return values)
 log() {
     local component="$1"
     shift
-    echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] [$component] $*"
+    echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] [$component] $*" >&2
 }
 
 # Verdict patterns (strict matching)
