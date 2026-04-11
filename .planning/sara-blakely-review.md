@@ -1,26 +1,27 @@
-# Sara Blakely Gut-Check — Wardrobe
+# Sara Blakely Gut-Check: MemberShip Plugin
 
-## Would a real customer pay for this?
-**Yes, but not for "5 themes."** They'd pay to stop feeling embarrassed by their site. That's the product — *dignity on demand*. Your plan buries this under 20 infrastructure tasks.
+**Would a real customer pay for this?**
 
-## What's confusing? What makes someone bounce?
-1. **"Wardrobe" means nothing.** I don't know what Emdash is. The showcase assumes I do. Fatal.
-2. **5 themes sounds thin.** Why trust this vs. 500 on Envato?
-3. **"Coming Soon" feels like vapor.** Promise something specific or don't tease.
-4. **No before/after.** Show the transformation, not just screenshots.
+Maybe. But they're paying for "member pays, gets access" — that's table stakes, not a moat. The plan obsesses over 16 tasks and 52+ endpoints. A yoga studio owner cares about ONE thing: "Did they get in?" Everything else is noise.
 
-## 30-Second Elevator Pitch
-*"Your Emdash site looks like a developer made it. One command, and it looks like a designer did. Pick a vibe. Paste. Done. Your words stay — only the wrapper changes."*
+**What's confusing? What makes them bounce?**
 
-## What would I test first with $0 marketing budget?
-Post one before/after GIF on Twitter. "My blog before Wardrobe vs. after — 11 seconds." If it doesn't spread, the product lacks word-of-mouth DNA. Kill it.
+The first 30 seconds. Empty state says "Create Your First Member" — but is that for THEM or for their customers? They don't know if they're testing or setting up. They'll click, fumble, feel dumb, leave. Clarify: "Your members sign up here: [link]. You manage them here."
 
-## What's the retention hook?
-**Weak.** "Coming Soon" and email capture are engineer-brain solutions. Real retention: make the installed site *so good* they tell one friend. Your plan optimizes the funnel, not the product.
+**30-Second Elevator Pitch:**
 
-## The Hard Truth
-This plan is 80% infrastructure, 20% customer magic. Flip it. Nobody cares about R2 buckets or sha256 hashes. They care about looking good without hiring a designer.
+"Customer pays, gets instant access, you get the email. One plugin, no developers, start charging today."
 
-**Ship faster. Learn what they actually want. The plan is too precious.**
+**What would I test with $0 budget?**
 
-— Sara
+Three real yoga studios. Free setup. Watch their faces. Not "3 real Stripe transactions" — that's YOUR checklist. Watch WHERE THEY GET STUCK. That's worth more than 4 documentation files.
+
+**What's the retention hook?**
+
+Missing. Where's "You made $847 this week"? Where's the automatic "renew in 7 days" email? The dashboard shows members, not momentum. Momentum is the drug. Add one line: weekly revenue. That's the hook.
+
+**Honest verdict:**
+
+Cut documentation in half. Kill the "brand voice audit" (clear > clever). Add auto-renewal emails — that's the feature that makes them say "shut up and take my money." Ship to ONE confused customer before writing troubleshooting.md. You'll learn more in 20 minutes than from 16 tasks.
+
+The code is 80% there. The experience is 50% there. Fix the first 30 seconds. Show them the money.

@@ -1,0 +1,23 @@
+{
+  "name": "@shipyard/membership",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Email-based membership and gated content plugin for EmDash CMS. Integrates with Stripe Payment Links.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./sandbox": "./src/sandbox-entry.ts",
+    "./astro": "./src/astro/index.ts"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "emdash": "^0.1.0"
+  },
+  "devDependencies": {
+    "emdash": "^0.1.0",
+    "typescript": "^5.5",
+    "vitest": "^4.1.2"
+  }
+}

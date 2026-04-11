@@ -1,13 +1,13 @@
 # Essence
 
 **What is this product REALLY about?**
-Making small business owners feel capable instead of inadequate.
+Making people who feel inadequate feel capable.
 
-**What's the feeling it should evoke?**
-"I did that. I built that."
+**The feeling:**
+"I built that."
 
-**What's the one thing that must be perfect?**
+**The one thing that must be perfect:**
 The first 30 seconds.
 
 **Creative direction:**
-Competence without complexity.
+Disappear.

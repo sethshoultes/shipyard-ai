@@ -1,0 +1,246 @@
+---
+/**
+ * GatedContent.astro — Task 5 (Phase 3 Wave 2)
+ *
+ * Content gating at the Portable Text block level.
+ * Uses the gating engine (src/gating.ts) to check member access.
+ *
+ * Features:
+ * - Membership plan checks (is member's plan in the required list?)
+ * - Drip content checks (is content unlocked yet?)
+ * - Visual badges ("Members Only" or "Premium")
+ * - Shows teaser + unlock date for locked drip content
+ * - Shows full content for members with access
+ *
+ * Props from Portable Text block:
+ *   - gatingRuleId?: string (reference to gating rule in KV)
+ *   - badge?: "default" | "premium" | "members-only" (visual style)
+ *   - teaser?: string (preview text for locked content)
+ *   - children?: any (full content if access granted)
+ */
+
+import { PortableText } from "emdash/ui";
+
+interface Props {
+	node: {
+		gatingRuleId?: string;
+		badge?: "default" | "premium" | "members-only";
+		teaser?: string;
+		_rawChildren?: unknown;
+	};
+	children?: any;
+}
+
+const { node, children } = Astro.props;
+
+// Get member email from cookie
+const memberEmail = Astro.cookies.get("membership-email")?.value?.toLowerCase() || "";
+const memberId = Astro.cookies.get("membership-id")?.value || "";
+
+interface AccessCheckResult {
+	hasAccess: boolean;
+	reason?: string;
+	unlocksOn?: string; // ISO date string
+	daysRemaining?: number;
+	requiredPlan?: string;
+}
+
+let accessResult: AccessCheckResult = { hasAccess: true }; // Default: public content
+let badgeText = "";
+let lockedMessage = "";
+
+// If gatingRuleId is provided, check access via API
+if (node.gatingRuleId && memberEmail && memberId) {
+	try {
+		const response = await fetch(
+			new URL(
+				`/_emdash/api/plugins/membership/check-access?email=${encodeURIComponent(memberEmail)}&gatingRuleId=${encodeURIComponent(node.gatingRuleId)}`,
+				Astro.url.origin
+			),
+			{ credentials: "include" }
+		);
+
+		if (response.ok) {
+			accessResult = (await response.json()) as AccessCheckResult;
+		} else {
+			// API error — deny access for safety
+			accessResult = { hasAccess: false, reason: "Unable to verify access" };
+		}
+	} catch (error) {
+		console.error("Failed to check gating access:", error);
+		accessResult = { hasAccess: false, reason: "Error checking access" };
+	}
+}
+
+// Determine badge text based on gating rule type
+if (!accessResult.hasAccess) {
+	if (accessResult.reason?.includes("unlocks in")) {
+		// Drip content locked
+		badgeText = "Coming Soon";
+		if (accessResult.daysRemaining && accessResult.daysRemaining > 0) {
+			lockedMessage = `Unlocks in ${accessResult.daysRemaining} day${accessResult.daysRemaining !== 1 ? "s" : ""}`;
+		} else if (accessResult.unlocksOn) {
+			const unlockDate = new Date(accessResult.unlocksOn);
+			lockedMessage = `Unlocks on ${unlockDate.toLocaleDateString()}`;
+		}
+	} else {
+		// Membership requirement
+		badgeText = node.badge === "premium" ? "Premium" : "Members Only";
+		lockedMessage = node.teaser || "This content is available to members. Subscribe to access.";
+	}
+} else {
+	// Show badge for premium/members-only content even when accessible
+	if (node.badge === "premium") {
+		badgeText = "Premium";
+	} else if (node.badge === "members-only") {
+		badgeText = "Members Only";
+	}
+}
+
+const showBadge = badgeText.length > 0 && node.badge !== "default";
+const teaserText = node.teaser || "This content is exclusive to members. Upgrade to access.";
+---
+
+<div
+	class={`gated-content ${accessResult.hasAccess ? "gated-content--unlocked" : "gated-content--locked"}`}
+	role={accessResult.hasAccess ? "region" : "complementary"}
+	aria-label={accessResult.hasAccess ? "Full content" : "Locked content preview"}
+>
+	{showBadge && (
+		<div
+			class={`gated-content__badge gated-content__badge--${node.badge}`}
+			aria-label={`Content badge: ${badgeText}`}
+		>
+			{badgeText}
+		</div>
+	)}
+
+	{accessResult.hasAccess ? (
+		<div class="gated-content__inner">
+			{children}
+		</div>
+	) : (
+		<div class="gated-content__fallback">
+			{node.teaser ? (
+				<p class="gated-content__teaser">{node.teaser}</p>
+			) : (
+				<p class="gated-content__message">{lockedMessage || teaserText}</p>
+			)}
+
+			{accessResult.unlocksOn && (
+				<p class="gated-content__unlock-date">
+					{lockedMessage}
+				</p>
+			)}
+
+			<a
+				href="/members/portal#upgrade"
+				class="gated-content__cta"
+				aria-label={accessResult.requiredPlan ? `Upgrade to ${accessResult.requiredPlan} plan` : "View membership options"}
+			>
+				{accessResult.requiredPlan ? `Upgrade to access` : "View membership options"}
+			</a>
+		</div>
+	)}
+</div>
+
+<style>
+	.gated-content {
+		position: relative;
+	}
+
+	.gated-content__inner {
+		/* Content rendered normally */
+	}
+
+	/* Locked state styling */
+	.gated-content--locked {
+		position: relative;
+	}
+
+	.gated-content__fallback {
+		padding: 1.5rem;
+		border: 1px solid #e0e0e0;
+		border-radius: 0.5rem;
+		background: linear-gradient(135deg, #f5f5f5 0%, #f9f9f9 100%);
+		text-align: center;
+		color: #555;
+	}
+
+	.gated-content__message,
+	.gated-content__teaser {
+		margin: 0 0 1rem 0;
+		font-size: 0.95rem;
+		line-height: 1.5;
+	}
+
+	.gated-content__teaser {
+		color: #666;
+		font-style: italic;
+	}
+
+	.gated-content__unlock-date {
+		margin: 0.5rem 0 1rem 0;
+		font-size: 0.85rem;
+		color: #999;
+	}
+
+	.gated-content__cta {
+		display: inline-block;
+		padding: 0.75rem 1.5rem;
+		min-height: 44px;
+		background-color: #c4704b; /* Terracotta primary */
+		color: white;
+		text-decoration: none;
+		border-radius: 0.25rem;
+		font-weight: 500;
+		transition: background-color 0.2s ease;
+		line-height: 1.5;
+		text-align: center;
+	}
+
+	.gated-content__cta:hover {
+		background-color: #b55939;
+	}
+
+	.gated-content__cta:focus {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	/* Keyboard navigation indicator for accessibility */
+	.gated-content__cta:focus-visible {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	/* Badge styling */
+	.gated-content__badge {
+		display: inline-block;
+		position: absolute;
+		top: -0.5rem;
+		right: 0;
+		padding: 0.25rem 0.75rem;
+		border-radius: 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		z-index: 10;
+	}
+
+	.gated-content__badge--premium {
+		background-color: #d4a853; /* Gold accent */
+		color: #2c2c2c;
+	}
+
+	.gated-content__badge--members-only {
+		background-color: #7a8b6f; /* Sage secondary */
+		color: white;
+	}
+
+	/* Unlocked state (show badge if present) */
+	.gated-content--unlocked .gated-content__badge {
+		top: 0;
+	}
+</style>

@@ -1,105 +1,114 @@
 # Round 1 — Elon Musk (Chief Product & Growth)
 
-## The Reality Check
+## The Brutal Truth
 
-Let's be honest about what we're debating. We have two plugins claiming "v1" status:
-- **MemberShip**: ~5,700 lines, Phases 1-4 complete, Phase 5 planned
-- **EventDash/Convene**: ~6,400 lines, Phases 1-4 Wave 2 complete, Wave 3 planned
+We're in round N+1 of "finishing" plugins that have already been "finished" multiple times. The decisions.md says "LOCKED FOR BUILD PHASE" but nothing is deployed. This is process theater.
 
-That's 12,000+ lines of code that has been "verified" by reading verification reports that *themselves* haven't been validated against running code. The QA report says "SHIP" but admits Task 12 (Documentation) is "PENDING."
+**The actual state:**
+- MemberShip: 6,495 lines in src/, 3,984 of which are in a single `sandbox-entry.ts` monolith
+- EventDash: 5,876 lines, same pattern — 3,600 lines in one file
+- Documentation: Doesn't exist. Zero docs directories.
+- Production deployments: Zero. "Tested on Sunrise Yoga" is a lie — show me the URL.
 
-**Question 1: Has anyone actually run this on a live EmDash site?** The decisions.md says "Tested on a live EmDash site (Sunrise Yoga for EventDash, Bella's for MemberShip)" — but where's the evidence?
+## Architecture: First Principles
 
-## Architecture: What's The Simplest System?
+**Simplest system that works:** Stripe handles payments. KV stores membership status. Email confirms. Done.
 
-The original Round 1 decision was correct: **Stripe as source of truth, D1 for list operations.** But I see no D1 in the current codebase. Everything is still KV. The decisions were made, but were they implemented?
+What we built instead: Group memberships, webhook systems with HMAC signing, drip content schedules, coupon engines, multi-gateway support. This is MemberPress feature parity for an audience of zero.
 
-**First principles:** Two plugins that do nearly identical things:
-- User registration → Stripe payment → webhook confirmation → KV update → email
-- Admin CRUD → list/filter/paginate → dashboard
+**Cut immediately:**
+- Group/corporate memberships (0 customers asked)
+- Developer webhooks (0 integrations exist)
+- Drip content scheduling (build when someone pays for it)
+- Multi-payment gateways (Stripe is 95% of the market)
 
-That's the pattern. Everything else is feature bloat.
+**Keep:**
+- Stripe checkout + webhooks
+- KV member storage
+- Email confirmation
+- Basic admin CRUD
 
-**The 10x simpler architecture:**
-1. One shared auth module (JWT, currently duplicated)
-2. One shared Stripe module (checkout, webhooks, currently duplicated)
-3. One shared email module (Resend, currently duplicated)
-4. Plugin-specific: only the data model and admin UI
+That's 1,500 lines, not 10,000.
 
-We're shipping two plugins that are 60% identical code.
+## Performance: Where It Breaks
 
-## Performance: Where Are The Bottlenecks?
+The code has no pagination. `listMembers` iterates all KV keys. At 1,000 members, admin dashboard takes 3+ seconds. At 10,000, it times out.
 
-**KV list iteration is still the problem.** The verification report claims "Member lookup: O(1) via email hash" — but admin list views still iterate. Phase 4 added "reporting" endpoints. How do those work at 10,000 records?
+**Bottlenecks:**
+1. KV list operations — O(n) scan for every admin view
+2. Synchronous email sends — blocks request until Resend responds
+3. No caching — same data fetched on every request
 
-**The numbers that matter:**
-- Stripe webhook processing: 3-5 seconds latency acceptable? No. 500ms or fail.
-- Admin dashboard load: < 2 seconds claimed. Prove it with 1,000 members.
-- Email sending: Resend has 100/second limits. What happens at a 500-person event?
+**10x path:** Background queue for emails. Cursor-based pagination for lists. That's it.
 
-**10x path:** Background job queue for anything that can be async. Webhook confirms immediately, queues the email. Dashboard fetches paginated data, not full dumps.
+## Distribution: Path to 10,000
 
-## Distribution: Path to 10,000 Users
+There is no path because there's no product in market.
 
-The PRD is still silent on distribution. This is still a fatal error.
+**Current EmDash users:** Unknown. The question is unanswered in decisions.md. This is the most important number.
 
-**Reality:** EmDash has how many users today? 100? 500? The plugins are ahead of the market.
+**Strategy:**
+1. Deploy MemberShip to ONE real site this week
+2. Get 10 paying members through the system
+3. Fix what breaks
+4. Then worry about EventDash
 
-**What we should be doing:**
-1. Ship one plugin (MemberShip) perfectly. Not two plugins at 80%.
-2. Embed it in every EmDash template by default.
-3. Get 10 paying customers using it in production before launching the second.
+We're optimizing distribution for a product nobody can install.
 
-**The anti-pattern we're doing:** Building feature parity with MemberPress/EventBrite for an audience that doesn't exist yet.
+## What to CUT (v2 Masquerading as v1)
 
-## What to CUT
+**Cut from MemberShip v1:**
+- GroupRecord, GroupInviteCode (lines 52-72) — 0 demand
+- WebhookEndpoint, WebhookLog (lines 77-97) — 0 integrations
+- dripSchedule in PlanConfig — 0 content libraries exist
+- CouponRecord — premature optimization
 
-**Phase 5 MemberShip features (all should be cut from v1):**
-- Astro admin reporting dashboard → The API exists. Site owners can build their own UI. Defer.
-- Multi-step registration forms → 90% of signups are single-form. Defer.
-- Integration testing → Should have been done in Phase 2, not Phase 5. This is technical debt, not a feature.
+**Cut from EventDash v1:**
+- Multi-day events
+- CSV import/export
+- Event series
+- Venue management with coordinates
+- Embeddable widgets
 
-**EventDash Wave 3 (all should be cut from v1):**
-- Multi-day events → Single-day events with "Part 1 of 3" in title works fine. Defer.
-- CSV import → Manual onboarding for first 50 customers. Learn their needs. Defer.
-- Cohort analysis → Zero customers have asked for this. Defer.
-- Advanced webhooks with retry → Ship simple webhooks. Add retry when someone complains.
-
-**What to keep for v1:**
-- Core payment flows (done)
-- Email confirmation (done)
-- Admin dashboard (done)
-- Basic reporting (done)
+Ship: event creation, registration, payment, confirmation email. 4 features.
 
 ## Technical Feasibility
 
-**Can one agent session finish this?** The code exists. The question is validation.
+**Can one agent session ship this?** No. The code exists but:
 
-**What's actually blocking ship:**
-1. Live deployment on a real EmDash site (not just "test on Sunrise Yoga" — actually do it)
-2. 5 real transactions through Stripe (not test mode — production)
-3. Webhook failure handling verified (kill the webhook endpoint mid-transaction)
+1. No docs directory exists — needs to be created from scratch
+2. No deployment config — where's wrangler.toml?
+3. No evidence of Stripe production mode testing
+4. 4,000-line monolith needs decomposition before anyone can maintain it
 
-If those three pass, ship. If they don't, we have real work to do.
+**What's achievable in one session:**
+- Create docs/installation.md, docs/api-reference.md
+- Add pagination to member list endpoint
+- Deploy to one real site
+- Run 3 test transactions
 
 ## What Breaks at 100x
 
-At 100x scale (1,000 → 100,000 operations/day):
-1. **KV costs:** $0.50/million reads × 100K reads/day = $1.50/day per site. Acceptable but not efficient.
-2. **Stripe API limits:** 100 requests/second. Checkout creates are 2-3 calls each. Max ~35 concurrent checkouts/sec.
-3. **Email rate limits:** Resend's free tier is 100/day. Growth plan is 50K/month. Event with 500 attendees eats 1% of monthly quota.
-4. **No queue system:** Everything is synchronous. One slow Stripe call blocks the entire request.
+| Component | Current | At 100x | Fix |
+|-----------|---------|---------|-----|
+| KV reads | 1K/day | 100K/day | Acceptable ($0.05/day) |
+| List operations | 100 members | 10K members | Breaks — needs D1 |
+| Email sends | 10/day | 1K/day | Hits Resend limits |
+| Admin dashboard | 1 admin | 50 admins | No auth = chaos |
 
-**Fix before shipping:** Add a simple queue for emails. Everything else can wait.
+**The real risk:** No admin authentication. Anyone with the endpoint can modify members. This ships before scaling discussions.
 
 ## Bottom Line
 
-**We're building Phase 5 features when we haven't validated Phase 2 in production.**
+Stop debating. Ship ugly. Learn fast.
 
-Ship criteria should be:
-1. One plugin (MemberShip) deployed to one real customer
-2. Three real Stripe transactions completed
-3. Webhook failure recovery tested
-4. Documentation complete (not "PENDING")
+**This week:**
+1. Deploy MemberShip to bellas-bakery.emdash.dev (or wherever)
+2. Create one $5/month plan
+3. Sign up with a real card
+4. Verify webhook updates status
+5. Check email arrives
 
-Everything else is procrastination. Stop planning. Start shipping.
+If all 5 pass: ship. If any fail: fix that ONE thing. Not another planning round.
+
+The 4,000-line monolith isn't elegant. Ship it anyway. Refactor after revenue.

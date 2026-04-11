@@ -1,0 +1,476 @@
+---
+/**
+ * MemberDashboard.astro
+ *
+ * Self-serve member dashboard component.
+ * - Reads JWT from httpOnly cookie
+ * - Fetches subscription data from /dashboard API
+ * - Displays plan info, billing period, upgrade/cancel options
+ * - Group management section (owner: invite/remove, member: read-only)
+ * - Minimal, clean styling with no framework dependencies
+ *
+ * Usage:
+ * <MemberDashboard />
+ */
+
+import GroupManagement from "./GroupManagement.astro";
+
+interface DashboardData {
+	email: string;
+	plan: string;
+	planId: string;
+	price: number;
+	interval: "month" | "year" | "once";
+	currentPeriodEnd?: string;
+	status: "pending" | "active" | "revoked" | "cancelled" | "past_due" | "cancelling";
+	cancelAtPeriodEnd: boolean;
+	stripePaymentMethod?: string;
+	stripeSubscriptionId?: string;
+}
+
+// Fetch dashboard data
+let dashboardData: DashboardData | null = null;
+let error: string | null = null;
+
+try {
+	const response = await fetch("/api/membership/dashboard", {
+		method: "GET",
+		credentials: "include", // Include cookies
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+
+	if (!response.ok) {
+		if (response.status === 401) {
+			error = "You are not logged in. Please log in to view your membership.";
+		} else {
+			const data = await response.json() as any;
+			error = data.error || "Failed to load dashboard data";
+		}
+	} else {
+		dashboardData = await response.json() as DashboardData;
+	}
+} catch (err) {
+	error = "Failed to load dashboard data. Please try again.";
+	console.error("Dashboard fetch error:", err);
+}
+
+// Format currency
+function formatCurrency(cents: number, locale: string = "en-US"): string {
+	return new Intl.NumberFormat(locale, {
+		style: "currency",
+		currency: "USD",
+	}).format(cents / 100);
+}
+
+// Format date
+function formatDate(dateStr?: string): string {
+	if (!dateStr) return "—";
+	try {
+		const date = new Date(dateStr);
+		return date.toLocaleDateString("en-US", {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+		});
+	} catch {
+		return "—";
+	}
+}
+
+// Get status badge color
+function getStatusColor(status: string): string {
+	switch (status) {
+		case "active":
+			return "#22c55e";
+		case "past_due":
+		case "cancelling":
+			return "#ef4444";
+		case "pending":
+			return "#f59e0b";
+		default:
+			return "#6b7280";
+	}
+}
+
+// Get status display text
+function getStatusText(status: string, cancelAtPeriodEnd: boolean): string {
+	if (cancelAtPeriodEnd) return "Cancelling";
+	switch (status) {
+		case "active":
+			return "Active";
+		case "past_due":
+			return "Payment Failed";
+		case "pending":
+			return "Pending Approval";
+		case "cancelled":
+			return "Cancelled";
+		case "cancelling":
+			return "Cancelling";
+		default:
+			return status.charAt(0).toUpperCase() + status.slice(1);
+	}
+}
+
+// Get interval display text
+function getIntervalText(interval: string): string {
+	switch (interval) {
+		case "month":
+			return "per month";
+		case "year":
+			return "per year";
+		case "once":
+			return "one-time";
+		default:
+			return interval;
+	}
+}
+---
+
+<div class="member-dashboard">
+	<style>
+		.member-dashboard {
+			font-family: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI",
+				sans-serif;
+			color: #2c2c2c;
+			line-height: 1.6;
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 2rem;
+		}
+
+		.dashboard-header {
+			margin-bottom: 2rem;
+			border-bottom: 1px solid #e5e5e5;
+			padding-bottom: 1.5rem;
+		}
+
+		.dashboard-header h1 {
+			font-family: Lora, serif;
+			font-size: 2rem;
+			font-weight: 600;
+			margin: 0 0 0.5rem 0;
+			color: #2c2c2c;
+		}
+
+		.dashboard-header p {
+			margin: 0;
+			color: #666;
+			font-size: 0.95rem;
+		}
+
+		.error-banner {
+			background: #fecaca;
+			border: 1px solid #fca5a5;
+			border-radius: 6px;
+			padding: 1rem;
+			margin-bottom: 2rem;
+			color: #991b1b;
+			font-size: 0.95rem;
+		}
+
+		.section {
+			margin-bottom: 2rem;
+			padding: 1.5rem;
+			background: #faf8f5;
+			border-radius: 8px;
+			border: 1px solid #e5e5e5;
+		}
+
+		.section h2 {
+			font-family: Lora, serif;
+			font-size: 1.25rem;
+			font-weight: 600;
+			margin: 0 0 1rem 0;
+			color: #2c2c2c;
+		}
+
+		.section h3 {
+			font-family: Lora, serif;
+			font-size: 1rem;
+			font-weight: 600;
+			margin: 1rem 0 0.5rem 0;
+			color: #2c2c2c;
+		}
+
+		.plan-info {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1.5rem;
+		}
+
+		.info-item {
+			border-bottom: 1px solid #d4c4b5;
+			padding-bottom: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.info-item:last-child {
+			border-bottom: none;
+			margin-bottom: 0;
+			padding-bottom: 0;
+		}
+
+		.info-label {
+			font-size: 0.85rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			color: #7a8b6f;
+			margin-bottom: 0.25rem;
+		}
+
+		.info-value {
+			font-size: 1.25rem;
+			font-weight: 600;
+			color: #2c2c2c;
+		}
+
+		.badge {
+			display: inline-block;
+			padding: 0.4rem 0.8rem;
+			border-radius: 4px;
+			font-size: 0.85rem;
+			font-weight: 600;
+			color: white;
+			margin-bottom: 0.5rem;
+		}
+
+		.button-group {
+			display: flex;
+			gap: 1rem;
+			margin-top: 1.5rem;
+			flex-wrap: wrap;
+		}
+
+		.button {
+			padding: 0.75rem 1.5rem;
+			border-radius: 4px;
+			border: none;
+			font-size: 0.95rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			font-family: inherit;
+		}
+
+		.button-primary {
+			background: #c4704b;
+			color: white;
+		}
+
+		.button-primary:hover {
+			background: #a85838;
+			transform: translateY(-1px);
+			box-shadow: 0 2px 8px rgba(196, 112, 75, 0.2);
+		}
+
+		.button-secondary {
+			background: white;
+			color: #2c2c2c;
+			border: 1px solid #d4c4b5;
+		}
+
+		.button-secondary:hover {
+			background: #faf8f5;
+			border-color: #c4704b;
+		}
+
+		.button-danger {
+			background: #fecaca;
+			color: #991b1b;
+			border: 1px solid #fca5a5;
+		}
+
+		.button-danger:hover {
+			background: #fed7d7;
+		}
+
+		.button:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+
+		.loading {
+			color: #666;
+			font-style: italic;
+			padding: 1rem;
+			text-align: center;
+		}
+
+		.payment-method-item {
+			background: white;
+			padding: 1rem;
+			border-radius: 4px;
+			border: 1px solid #e5e5e5;
+			margin-bottom: 0.5rem;
+		}
+
+		.empty-state {
+			color: #666;
+			font-size: 0.95rem;
+			padding: 1rem 0;
+		}
+
+		.help-text {
+			color: #666;
+			font-size: 0.85rem;
+			margin-top: 0.5rem;
+		}
+
+		/* Mobile responsive */
+		@media (max-width: 640px) {
+			.member-dashboard {
+				padding: 1rem;
+			}
+
+			.dashboard-header h1 {
+				font-size: 1.5rem;
+			}
+
+			.plan-info {
+				grid-template-columns: 1fr;
+			}
+
+			.section {
+				padding: 1rem;
+			}
+
+			.button-group {
+				flex-direction: column;
+			}
+
+			.button {
+				width: 100%;
+				text-align: center;
+			}
+		}
+	</style>
+
+	{
+		error ? (
+			<div class="error-banner">
+				<strong>Error:</strong> {error}
+			</div>
+		) : dashboardData ? (
+			<>
+				<div class="dashboard-header">
+					<h1>Your Membership</h1>
+					<p>{dashboardData.email}</p>
+				</div>
+
+				{/* Plan Summary */}
+				<section class="section">
+					<h2>Plan Summary</h2>
+
+					<div class="plan-info">
+						<div>
+							<div class="info-item">
+								<div class="info-label">Current Plan</div>
+								<div class="info-value">{dashboardData.plan}</div>
+								<div class="help-text">
+									{formatCurrency(dashboardData.price)}{" "}
+									{getIntervalText(dashboardData.interval)}
+								</div>
+							</div>
+
+							<div class="info-item">
+								<div class="info-label">Renewal Date</div>
+								<div class="info-value">
+									{formatDate(dashboardData.currentPeriodEnd)}
+								</div>
+								{dashboardData.cancelAtPeriodEnd && (
+									<div class="help-text" style="color: #ef4444; margin-top: 0.5rem;">
+										Your subscription will be cancelled on this date.
+									</div>
+								)}
+							</div>
+						</div>
+
+						<div>
+							<div class="info-item">
+								<div class="info-label">Status</div>
+								<div>
+									<span
+										class="badge"
+										style={`background-color: ${getStatusColor(dashboardData.status)}`}
+									>
+										{getStatusText(dashboardData.status, dashboardData.cancelAtPeriodEnd)}
+									</span>
+								</div>
+								{dashboardData.status === "past_due" && (
+									<div class="help-text" style="color: #ef4444; margin-top: 0.5rem;">
+										Your last payment failed. Please update your payment method.
+									</div>
+								)}
+							</div>
+						</div>
+					</div>
+
+					{dashboardData.status === "active" && (
+						<div class="button-group">
+							<button
+								class="button button-secondary"
+								onclick="alert('Upgrade plan functionality coming soon')"
+							>
+								Upgrade Plan
+							</button>
+							<button
+								class="button button-danger"
+								onclick="if(confirm('Are you sure you want to cancel? You\'ll maintain access until your renewal date.')) { fetch('/api/membership/dashboard/cancel', { method: 'POST', credentials: 'include' }).then(r => r.json()).then(d => alert(d.message || 'Cancelled successfully')).catch(e => alert('Error: ' + e)); }"
+							>
+								Cancel Subscription
+							</button>
+						</div>
+					)}
+
+					{dashboardData.cancelAtPeriodEnd && (
+						<div class="button-group">
+							<button
+								class="button button-primary"
+								onclick="alert('Resume subscription functionality coming soon')"
+							>
+								Resume Subscription
+							</button>
+						</div>
+					)}
+				</section>
+
+				{/* Payment Method */}
+				{dashboardData.stripePaymentMethod && (
+					<section class="section">
+						<h2>Payment Method</h2>
+						<div class="payment-method-item">
+							<strong>Card ending in</strong> {dashboardData.stripePaymentMethod}
+						</div>
+						<button
+							class="button button-secondary"
+							onclick="alert('Update payment method functionality coming soon')"
+							style="margin-top: 1rem;"
+						>
+							Update Payment Method
+						</button>
+					</section>
+				)}
+
+				{/* Group Management */}
+				<GroupManagement />
+
+				{/* Help */}
+				<section class="section">
+					<h2>Need Help?</h2>
+					<p class="empty-state">
+						If you have any questions about your subscription or billing, please{" "}
+						<a href="/contact" style="color: #c4704b; text-decoration: none;">
+							contact support
+						</a>
+						.
+					</p>
+				</section>
+			</>
+		) : (
+			<div class="loading">Loading your membership information...</div>
+		)
+	}
+</div>
