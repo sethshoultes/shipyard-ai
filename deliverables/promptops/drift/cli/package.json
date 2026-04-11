@@ -1,0 +1,42 @@
+{
+  "name": "drift-prompt",
+  "version": "1.0.0",
+  "description": "Drift CLI - The undo button for your AI's soul. Version, deploy, and rollback prompts.",
+  "type": "module",
+  "bin": {
+    "drift": "./bin/drift.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0"
+  },
+  "keywords": [
+    "prompt",
+    "ai",
+    "llm",
+    "versioning",
+    "rollback",
+    "cli"
+  ],
+  "author": "Shipyard AI",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shipyard-ai/drift"
+  }
+}
