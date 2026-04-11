@@ -58,8 +58,8 @@ parse_verdict() {
 
     # Count unique verdicts
     local pass_count fail_count
-    pass_count=$(echo "$matches" | grep -cE '(PASS)' || echo "0")
-    fail_count=$(echo "$matches" | grep -cE '(FAIL)' || echo "0")
+    pass_count=$(echo "$matches" | grep -cE '(PASS)' || true)
+    fail_count=$(echo "$matches" | grep -cE '(FAIL)' || true)
 
     # Check for ambiguity (both PASS and FAIL found)
     if [[ "$pass_count" -gt 0 ]] && [[ "$fail_count" -gt 0 ]]; then

@@ -1,56 +1,87 @@
-# Copy Review: NERVE
-
+# Copy Review — NERVE
 **Reviewer:** Maya Angelou
-**Date:** 2026-04-11
+**Date:** 2026-04-11 (Updated)
 **Verdict:** The bones are good. The soul needs tending.
 
 ---
 
-## Does the language feel human, not corporate?
+## The Truth About This Copy
 
-*Mostly yes.* There's a discipline here that I respect—the writing doesn't hide behind jargon or inflate itself with importance. "Deterministic over elegance" says what it means. "Zero configuration" doesn't apologize.
+Child, this README is fighting with itself.
 
-But some lines read like they were written for a machine to read, not a person to feel. "Autonomous pipeline daemon for operations hardening" belongs in a data center, not a story. It explains without inviting.
+It wants to feel like a quiet, confident engineer explaining their life's work over black coffee. Sometimes it gets there. Other times it puts on a suit and starts talking like a manual it didn't write.
 
-The best moments—*"Survives crashes, no lost state"*—sound like something you'd say to another human being at 2 AM when something is finally working. That's where the copy lives.
-
----
-
-## Is there rhythm in the sentences?
-
-The philosophy section finds its cadence:
-
-> *Determinism over elegance. When something must happen, it happens.*
-
-Hear that? Short, long. Statement, proof. It breathes.
-
-But then:
-
-> *NERVE is the autonomous pipeline daemon for operations hardening. It provides deterministic execution, crash recovery, and clean shutdown mechanisms.*
-
-That second sentence is a grocery list dressed as prose. Three items, no pause, no breath. The reader's eye slides past it. Rhythm is not about what you say—it's about how you let the reader *rest* between meanings.
+Let me tell you what I felt.
 
 ---
 
-## Does the headline stop you?
+## Does the Language Feel Human?
+
+**Mostly yes.** The philosophy section breathes:
+
+> *"Determinism over elegance. When something must happen, it happens."*
+
+That line has a heartbeat. You can hear a person behind it — someone who has been burned by clever code that didn't work when it mattered.
+
+> *"Invisible architecture. The best infra is infra you forget exists."*
+
+This too. It's a belief, not a feature list.
+
+> *"Zero configuration. Every option is a failure to decide."*
+
+Now that's conviction. That's someone who knows what they believe.
+
+But then we stumble into:
+
+> *"NERVE is the autonomous pipeline daemon for operations hardening. It provides deterministic execution, crash recovery, and clean shutdown mechanisms for the Shipyard AI pipeline."*
+
+Darling, that sentence is wearing a tie it didn't choose. "Operations hardening" — who talks like that? Not humans. Not the same person who wrote "When something must happen, it happens."
+
+---
+
+## Is There Rhythm in the Sentences?
+
+**In places.** The philosophy bullets have rhythm — short punch, then the explanation lands:
+
+- *"Zero configuration."* (Beat.) *"Every option is a failure to decide."*
+- *"Clinical voice."* (Beat.) *"No emoji. No color codes. Just facts."*
+
+Hear that? Statement, then proof. It breathes.
+
+But the technical sections fall into monotone. Every command description sounds the same:
+
+| `init` | Initialize queue directories |
+| `push` | Add item to queue |
+| `pop` | Get next item for processing |
+
+All the same length. All the same cadence. When everything sounds alike, nothing stands out. The ear goes numb.
+
+---
+
+## Does the Headline Stop You?
 
 **"The invisible backbone that makes everything else possible."**
 
-This stops me. Not because it shouts, but because it knows what it is. It doesn't compete for attention—it claims its place in the story. *Invisible* is humble. *Possible* is generous. The line gives credit to others while standing firm in its own necessity.
+It's trying. I see the intention — importance through humility. But "backbone" is tired. "Makes everything else possible" is what every infrastructure tool says about itself.
 
-The headline understands something essential: the best infrastructure is the kind nobody notices until it's gone.
+The headline doesn't *stop* me. It asks me to keep scrolling.
+
+A headline should make you pause. This one politely requests your attention without earning it.
 
 ---
 
-## Is anything trying too hard?
+## Is Anything Trying Too Hard?
 
-Yes. Three places:
+**The closing quotes.**
 
-1. **"Unambiguous QA results. No guessing."** — The first sentence already carried the weight. "No guessing" sounds like it's afraid you didn't understand. It cheapens what came before.
+> *"Real artists ship."* — Steve Jobs
+> *"The best part is no part."* — Elon Musk
 
-2. **"Stops runaway pipelines cleanly."** — "Cleanly" is doing no work here. Either it stops them or it doesn't. The word adds length without adding confidence.
+Two quotes from two famous men, placed side by side like matching bookends. This doesn't feel earned — it feels like decoration. Like name-dropping at a party.
 
-3. The closing quotes from Steve Jobs and Elon Musk. This is borrowed authority. The work should stand without needing famous names to validate it. If the philosophy is strong, let the philosophy speak.
+One quote can illuminate. Two quotes compete. And quoting the founders at the end of a README for a daemon script? The clothes don't fit the occasion.
+
+If the philosophy is strong, let the philosophy speak. Borrowed authority is still borrowed.
 
 ---
 
@@ -60,35 +91,32 @@ Yes. Three places:
 
 > *"NERVE is the autonomous pipeline daemon for operations hardening. It provides deterministic execution, crash recovery, and clean shutdown mechanisms for the Shipyard AI pipeline."*
 
-This tells me what NERVE *is* but not why I should care. It's a description emptied of consequence.
+**What's wrong:** Corporate. Dense. Forgettable. Too many concepts fighting for space in two sentences. It tells me what NERVE *is* but not why I should care.
 
 **Rewrite:**
-
-> *NERVE keeps your pipeline running when everything else is trying to stop it. It recovers from crashes. It shuts down without losing work. It does what must be done.*
+> NERVE keeps your pipeline running when everything else is trying to stop it. It recovers from crashes. It shuts down without losing work. It does what must be done.
 
 ---
 
 ### Weakness #2
 
-> *"Unambiguous QA results. No guessing."*
+> *"The invisible backbone that makes everything else possible."*
 
-The repetition doesn't reinforce—it undermines.
+**What's wrong:** "Backbone" is worn out. "Makes everything else possible" could describe a battery, or oxygen, or a hundred other things. It's generic praise, not specific truth.
 
 **Rewrite:**
-
-> *Unambiguous QA results. The answer is always yes or no—never maybe.*
+> You won't see it working. You'll only notice when it stops.
 
 ---
 
 ### Weakness #3
 
-> *"Stops runaway pipelines cleanly."*
+> *"Crash Recovery: On initialization, any items left in the `processing` state (from a previous crash) are automatically moved back to `pending`. No queue state is ever lost."*
 
-This is timid. A thing that stops runaway pipelines is powerful. Let the power show.
+**What's wrong:** The facts are right, but the feeling is flat. This is one of the most important promises in the system — and it reads like a footnote. When you make a big promise, let it land.
 
 **Rewrite:**
-
-> *When the pipeline runs away from you, this brings it back.*
+> When NERVE wakes up after a crash, it looks for the work that got interrupted. Whatever was in flight goes back to the line. Nothing lost. Nothing forgotten.
 
 ---
 

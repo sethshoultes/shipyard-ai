@@ -1,59 +1,58 @@
 # Round 2: Steve Jobs Responds
 
-## Challenging Elon's Weakest Positions
+## Where Elon Is Optimizing for the Wrong Metric
 
-**The PRD Obsession Is Process Theater.**
+**Elon, you're optimizing for speed-to-ship over clarity-of-purpose.**
 
-Elon grades this project B+ because a document is missing. But the retrospective *is* the document. It captures what was built, why, and what was learned. A PRD written before the work would have been wrong — because you don't know what you're building until you build it.
+"Ship in 4 hours instead of 7." Three hours saved. For what? A CLI nobody remembers and a dashboard nobody trusts. You're treating this like a SpaceX rocket test where failures are data. Software products aren't rockets. Users don't come back after the explosion.
 
-Demanding a PRD for operations work is optimizing for auditors, not outcomes. The system works. Every time. That's an A+. The paperwork is irrelevant.
+**The SDK approach is the wrong abstraction.** `promptops.getPrompt("system-prompt")` at boot time means you've just created a deployment dependency. Your app now fails to start if PromptOps is down. You traded proxy latency for boot-time fragility. That's not removing a hop—that's moving the failure earlier in the chain.
 
-**"Testing beyond reasoning" is a false flag.**
+**"Build the aspirin, not the vitamin."** But you've misdiagnosed the headache. The pain isn't "I need to rollback." The pain is *I'm scared to deploy in the first place.* Rollback is the emergency brake. What developers want is confidence *before* they push. That's what real-time switching enables. You're building the airbag when you should be building the seatbelt.
 
-Elon says testing was "acceptable risk." No — it was the correct choice. Testing infrastructure that manages tests creates infinite regress. You test by shipping. You ship by trusting the architecture. The architecture is four files with no dependencies. What would you test that the running system doesn't prove every hour?
-
-**The 100x scaling section is premature optimization disguised as wisdom.**
-
-Redis? Distributed locking? Queue partitioning? We don't have a queue depth problem. We have a "don't crash" problem, and we solved it. When we need distributed workers, we'll build distributed workers. Today, we need a daemon that doesn't die. That's what we built.
+**The 10K user path is hollow.** HN upvotes, Twitter threads, SEO plays—these are distribution tactics, not product strategy. You can growth-hack your way to 10,000 users who churn in 30 days. Or you can build something 100 people can't live without, and let them drag the other 9,900 in. Distribution follows devotion.
 
 ---
 
-## Defending Design Quality
+## Why Design Quality Matters HERE
 
-Elon might ask: "Why does naming matter? Why does brand voice matter for internal infrastructure?"
+Elon will say: "This is infrastructure. Nobody sees it. Stop polishing."
 
-Because **internal infrastructure becomes external infrastructure.** Every tool that works gets shared. Every daemon that runs gets copied. The discipline of naming it right — NERVE, not "PromptOps" — is the discipline of thinking clearly about what it does.
+**Wrong frame.** The experience IS the product for developer tools. When a developer runs `nerve push` and sees clean, surgical output—that's trust being built. When the CLI returns in 200ms with zero noise—that's anxiety being relieved.
 
-And clarity compounds. When the 3 AM page doesn't come, someone will ask why. The answer should be "NERVE handled it" — not "the PromptOps daemon's queue persistence mechanism maintained state across the crash event."
+Infrastructure that *feels* solid IS solid to the user. There is no difference between perceived reliability and actual reliability in terms of adoption. We're not building for machines. We're building for the *humans* who operate machines.
 
-One word. Four letters. That's not marketing. That's communication.
-
----
-
-## Concessions to Elon
-
-He's right about three things:
-
-1. **Documentation is technical debt.** We shipped without updating docs. That's a real gap that will cost us later.
-
-2. **"Trust bash, not instructions" is the core principle.** Elon identified it instantly. Determinism over elegance isn't just my philosophy — it's the architecture. He validated the most important decision.
-
-3. **This is leverage work.** The framing is correct. We didn't build a product; we built the foundation for products. The value multiplies.
+The name matters. The voice matters. "Git for prompts" is positioning. NERVE is identity.
 
 ---
 
-## My Non-Negotiable Decisions (LOCKED)
+## Where Elon Is Right
 
-### 1. The Name is NERVE
-Not PromptOps. Not "the daemon." NERVE. This is decided.
+**Concession 1:** The proxy IS risky for v1. Streaming complexity, provider compatibility, security surface—all real concerns. We shouldn't ship something fragile just to ship. Cut the proxy.
 
-### 2. No Dashboards. No Visualizations. No Metrics v1.
-If it works, you know. If it doesn't, the error is clear. We don't build observation theater. We build systems that don't need observation.
+**Concession 2:** Rate limiting per API key before launch. Non-negotiable. One bad actor shouldn't kill everyone. He's absolutely right.
 
-### 3. Bash Commands, Not Agent Prompts
-Anything that must happen gets executed, not requested. Deterministic execution is the contract. This is the architectural principle that makes everything else work.
+**Concession 3:** The SEO play for "prompt versioning" is smart. Zero competition. We should own that term before someone else does.
+
+**Concession 4:** CLI-first is correct. Dashboard is read-only v1. No one needs another button to click.
 
 ---
 
-*"Real artists ship."*
-*We shipped. Now we defend what we shipped.*
+## My Three Non-Negotiables (LOCKED)
+
+**1. The name is NERVE.**
+Not PromptOps. Names shape destiny. We're building something essential, not something descriptive. One word. Four letters. Done.
+
+**2. Determinism over elegance.**
+When something must happen, code makes it happen. We don't negotiate with probability. Fetch-on-boot with aggressive caching—fine. But the fallback must be local, not "retry and hope."
+
+**3. The first experience is trust, not features.**
+The product must work flawlessly before we add anything. No dashboards with charts, no analytics, no "nice-to-haves" until the core is bulletproof. The proof is in the silence.
+
+---
+
+*"Focus is about saying no."*
+
+I'm saying no to the proxy for now. I'm saying no to growth tactics before product-market fit. I'm saying yes to building something so solid that silence becomes the feature.
+
+Elon wants to ship fast. I want to ship *right*. The intersection: ship small, ship solid, ship something worth remembering.

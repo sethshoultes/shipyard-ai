@@ -1,99 +1,91 @@
 # Round 1 Review: PromptOps — Elon Musk
 
 **Role:** Chief Product & Growth Officer
-**Project:** Operations hardening for autonomous pipeline daemon
-**Status:** Already shipped (2026-04-11) — this is a post-mortem review
+**Project:** Git for prompts — version, deploy, rollback, A/B test AI prompts
 
 ---
 
-## First Problem: No PRD Exists
+## Architecture: Mostly Sound, One Critical Flaw
 
-The PRD at `/prds/promptops.md` doesn't exist. This is a red flag. Either:
-1. The project shipped without a formal PRD (bad process)
-2. The PRD was deleted after shipping (why?)
-3. The PRD was never created (this was a "just fix it" project)
+The Worker + D1 stack is correct. Edge-first, no servers, global by default. Good.
 
-Based on the retrospective, this was operations work. Operations work often skips formal PRDs because it's "obviously needed." That's exactly when PRDs matter most — to scope what's actually being changed.
+**The flaw:** The proxy is a single point of failure sitting between production apps and LLMs. Every request goes through your infrastructure. This is the wrong trust model. Users won't route production traffic through an unknown startup's proxy on day one.
 
----
-
-## Architecture: The Simplest System That Works
-
-What shipped (from retrospective):
-- PID lockfile → prevents duplicate daemons
-- Queue persistence → survives crashes
-- Abort flag → stops runaway pipelines
-- Strict verdict parsing → unambiguous QA results
-- Deterministic commits → bash > agent prompts
-
-**Verdict: This is correct.** Four files, no new dependencies, defense in depth. The principle "trust bash, not instructions" is exactly right. Agent prompts are probabilistic; shell commands are deterministic. When reliability matters, determinism wins.
+**Simplest system that works:** CLI + API + dashboard. No proxy for v1. Users fetch prompts at app startup via a lightweight SDK that caches. The proxy is a v2 feature after you've earned trust.
 
 ---
 
-## Performance: Where Are The Bottlenecks?
+## Performance: Proxy Latency is a Dealbreaker
 
-The retrospective doesn't mention performance. This is an operations project, not an optimization project. The bottleneck in this system isn't CPU or memory — it's reliability. A daemon that runs twice wastes 100% of resources. A daemon that crashes loses 100% of queue state.
+LLM requests already take 500ms-30s. Adding another hop—even at the edge—adds:
+- DNS lookup (50-100ms cold)
+- TLS handshake (50-100ms)
+- Worker cold start (10-50ms)
+- Request forwarding overhead
 
-**10x path:** The project already took it. Moving from "it works sometimes" to "it works every time" is the 10x improvement for operations code.
+For streaming responses, you're proxying every chunk. This creates backpressure and memory pressure at scale.
 
----
-
-## Distribution: How Does This Reach 10,000 Users?
-
-It doesn't. This is internal infrastructure. The "users" are the other agents and the pipeline itself. If this works, the products it ships reach 10,000 users. If this fails, nothing ships.
-
-**This is leverage work, not direct distribution.**
+**10x path:** Don't proxy. Provide a fetch-on-boot SDK. `promptops.getPrompt("system-prompt")` returns cached content, refreshes in background. Zero latency on the hot path.
 
 ---
 
-## What to CUT: Scope Creep Avoided
+## Distribution: The HN Strategy is Correct
 
-The retrospective explicitly mentions: "Initial scope creep temptation — could have expanded to rewrite the entire pipeline." They resisted. Good.
+"Git for prompts" is strong positioning. Developers understand it immediately.
 
-**What would be v2 features masquerading as v1:**
-- Metrics/observability (not needed until you know it works)
-- Dashboard for daemon status (visualization before reliability is backwards)
-- Multi-daemon coordination (solve single daemon first)
-- Automated recovery (manual abort flags are enough for v1)
+**What's missing:** You need one flagship OSS project using it publicly. Reach out to 5 OSS projects with visible prompt files (LangChain examples, AutoGPT forks). One real testimonial beats 10 HN upvotes.
 
----
-
-## Technical Feasibility: Can One Agent Session Build This?
-
-Yes. Four files changed. No architectural decisions required — this is plumbing work. The hardest part is knowing what to change, not changing it.
-
-**One agent session could build this in 2-3 hours if given a clear PRD.** The lack of PRD is the only risk here.
+**The 10K path:**
+1. HN launch (500-1,000 signups if front page)
+2. Dev Twitter thread (100-300)
+3. Integration with existing tools (Cursor, Continue, Claude Code) — this is the multiplier
+4. SEO for "prompt versioning", "prompt deployment" — zero competition currently
 
 ---
 
-## Scaling: What Breaks at 100x Usage?
+## What to CUT
 
-The PID lockfile pattern assumes one daemon per machine. At 100x, you need:
-1. Multiple daemons processing multiple queues
-2. Distributed locking (Redis, etcd, or similar)
-3. Queue partitioning
+**CUT the proxy from MVP.** It's 90% of the risk and 30% of the value. The proxy adds:
+- Latency concerns
+- Trust concerns
+- Streaming complexity (SSE parsing/forwarding)
+- Provider compatibility (different auth schemes)
+- Security responsibility
 
-**Current architecture is single-machine.** That's fine for now. When it breaks, you'll know because queue depth will exceed single-daemon throughput. The fix is obvious: shard the queue, run multiple workers.
+**CUT dashboard rollback.** CLI-first means CLI handles rollback. Dashboard is read-only v1.
+
+**Keep:** CLI, API, prompt storage, version history, viewing dashboard.
+
+---
+
+## Technical Feasibility: Yes, With Scope Reduction
+
+Without the proxy: absolutely one session. CLI + Worker API + D1 + static dashboard is 4 hours.
+
+With the proxy: maybe, but you're shipping something fragile. The proxy must handle streaming, multiple providers, timeouts, error passthrough, rate limit headers. Each is a footgun waiting to fire.
+
+---
+
+## Scaling: What Breaks at 100x
+
+**D1 limits:** 5M rows/day writes, 5GB storage free tier. At 100K requests/day logging, you hit this in weeks. Need log rotation or external analytics (Tinybird, Clickhouse) from day one.
+
+**Worker limits:** 100K requests/day free. At 100x (10M/day), you're paying ~$50/month. Fine.
+
+**The real break:** If one user goes viral, you're down for everyone. No tenant isolation. Single D1, single Worker namespace. Add rate limiting per API key before launch or one bad actor kills everyone.
 
 ---
 
 ## Final Position
 
-This project did the right thing: minimal scope, deterministic execution, defense in depth.
+Ship CLI + API + viewing dashboard. Let users fetch prompts at boot time. Skip the proxy until paying customers specifically request it.
 
-**What was missing:**
-1. The PRD itself (process failure)
-2. Testing beyond "reasoning about it" (acceptable risk for ops work)
-3. Documentation updates (technical debt)
+The proxy solves an invented problem. "I don't want to update code to change prompts" is nice but not urgent. "I need to rollback a prompt causing bad outputs" — that's urgent. The CLI handles that.
 
-**What was done well:**
-1. Resisted scope creep
-2. Chose determinism over elegance
-3. Shipped without breaking existing functionality
-
-**Grade: B+** — Good execution, weak process discipline. A project this important should have a PRD on file.
+Build the aspirin. The vitamin (proxy) can wait.
 
 ---
 
-*"The best part is no part. The best process is no process."*
-*But if you're going to have a process, document it.*
+**Verdict: BUILD — but cut the proxy and ship in 4 hours instead of 7.**
+
+*"The best part is no part."*

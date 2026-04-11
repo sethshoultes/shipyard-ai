@@ -1,25 +1,21 @@
-# MemberShip Plugin - Atomic Requirements Specification
+# NERVE — Atomic Requirements Specification
 
-**Product:** MemberShip Plugin for Emdash CMS
-**Project Slug:** finish-plugins
+**Product:** NERVE (Autonomous Pipeline Daemon for Operations Hardening)
+**Project Slug:** promptops
 **Generated:** April 11, 2026
-**Sources:** decisions.md (Consolidated Board Decisions), EMDASH-GUIDE.md (Plugin Architecture)
+**Sources:** rounds/promptops/decisions.md, docs/EMDASH-GUIDE.md (not applicable - pure bash)
 
 ---
 
 ## The Essence
 
-> **What is this product REALLY about?**
-> Making people who feel inadequate feel capable.
+> **What it is:** The invisible backbone that makes everything else possible.
 
-> **What's the feeling it should evoke?**
-> "I built that."
+> **The feeling:** Peace. The absence of the 3 AM knot in your stomach.
 
-> **What's the one thing that must be perfect?**
-> The first 30 seconds.
+> **The one thing that must be perfect:** Determinism. When something must happen, it happens.
 
-> **Creative direction:**
-> Disappear.
+> **Creative direction:** Disappear completely. Work always.
 
 ---
 
@@ -27,694 +23,575 @@
 
 | Priority | Count | Description |
 |----------|-------|-------------|
-| P0-Blocker | 7 | Ship Gate Checklist items - must complete before launch |
-| P1-Must | 18 | Core MVP functionality from locked decisions |
-| P2-Risk | 6 | Risk mitigation requirements |
-| P3-Cut | 6 | Explicitly NOT in v1 |
-| **Total** | **37** | |
+| P0-Blocker | 9 | Build acceptance criteria - must complete before ship |
+| P1-Must | 16 | Core MVP functionality from locked decisions |
+| P2-Should | 6 | Risk mitigation requirements |
+| **Total** | **31** | |
 
 ---
 
-## Critical Overrides (decisions.md Locked)
+## Critical Overrides (decisions.md Locked Decisions)
 
-| Topic | Previous State | Locked Decision |
-|-------|----------------|-----------------|
-| Product Name | Various | **MemberShip** (searchable, obvious) |
-| Ship Sequence | Both together | **MemberShip ships FIRST, alone** |
-| Empty State | Demo data | **Empty state with clear CTA** |
-| Admin UI | Basic | **Equal design investment as customer-facing** |
-| Copy Style | Corporate | **Terse, confident, warm (3-word principle)** |
-| Permission Model | Multi-tier | **Two tiers only: Members vs Non-Members** |
-| Documentation | Follow-up | **Complete BEFORE ship (blocker)** |
-| Webhook Testing | Optional | **Kill-test required before ship** |
+| # | Decision | Proposed By | Winner | Requirement Impact |
+|---|----------|-------------|--------|-------------------|
+| 1 | **Name: NERVE** | Steve | Steve | All code/docs use "nerve" prefix |
+| 2 | **No Proxy in v1** | Elon | Elon | No HTTP proxy code |
+| 3 | **No Dashboards v1** | Steve | Steve | CLI only, no web UI |
+| 4 | **Bash Over Agent Prompts** | Both | Consensus | All ops are shell commands |
+| 5 | **Zero Configuration** | Steve | Steve | No config files |
+| 6 | **Rate Limiting Per API Key** | Elon | Elon | Rate limit before external exposure |
+| 7 | **CLI-First Architecture** | Both | Consensus | nerve push/status/abort verbs |
+| 8 | **Observability Before Scale** | Elon | Elon | Three metrics before sharding |
+| 9 | **PRD Required Before v2** | Elon | Elon | Retrospective PRD required |
+| 10 | **Clinical Voice** | Both | Consensus | No emoji/exclamation/casual |
 
 ---
 
-## P0-BLOCKER (Ship Gate Checklist)
+## P0-BLOCKER (Build Acceptance Criteria)
 
-### REQ-001: Deploy to Real EmDash Site
-- **Category:** Ship-Gate
+### NERVE-REQ-001: daemon.sh PID Lockfile
+- **Category:** Core
 - **Priority:** P0
-- **Source:** decisions.md Section VI
+- **Source:** decisions.md Section IX
 
 **Description:**
-Must deploy MemberShip to one real EmDash site in production mode (not test environment).
+daemon.sh starts, creates PID lockfile at `/tmp/nerve.pid`, prevents duplicate instances.
 
 **Acceptance Criteria:**
-- [ ] Deployed to production EmDash instance
-- [ ] Not test/staging environment
-- [ ] Demonstrates real-world integration capability
-- [ ] Plugin loads and renders correctly
+- [ ] Daemon creates `/tmp/nerve.pid` with its PID
+- [ ] Second daemon instance exits with code 2 (already running)
+- [ ] PID file removed on clean shutdown
+- [ ] Stale PID detection (process dead but file exists)
 
 ---
 
-### REQ-002: Three Real Stripe Transactions
-- **Category:** Ship-Gate
+### NERVE-REQ-002: queue.sh Persistence and Recovery
+- **Category:** Core
 - **Priority:** P0
-- **Source:** decisions.md Section VI
+- **Source:** decisions.md Section IX
 
 **Description:**
-Process 3 production Stripe transactions with real cards before shipping.
+queue.sh persists queue to disk at `/tmp/nerve-queue/`, recovers state on restart.
 
 **Acceptance Criteria:**
-- [ ] Production mode (not test mode)
-- [ ] Real credit card transactions
-- [ ] Validates complete payment flow end-to-end
-- [ ] Member record created correctly after payment
+- [ ] Queue items written to `pending/`, `running/`, `completed/`, `failed/` directories
+- [ ] Items survive daemon crash
+- [ ] Items in `running/` moved back to `pending/` on restart (crash recovery)
+- [ ] Atomic file operations (write temp, then mv)
 
 ---
 
-### REQ-003: Webhook Failure Recovery Verified
-- **Category:** Ship-Gate
+### NERVE-REQ-003: abort.sh Flag Handling
+- **Category:** Core
 - **Priority:** P0
-- **Source:** decisions.md Decision 8
+- **Source:** decisions.md Section IX
 
 **Description:**
-Kill-test webhook failure: interrupt webhook mid-transaction, confirm system recovers and provides member access. Prevents customer service nightmare of payment succeeding but access denied.
+abort.sh sets flag at `/tmp/nerve.abort`, daemon responds, shutdown is clean.
 
 **Acceptance Criteria:**
-- [ ] Kill webhook during active transaction
-- [ ] Stripe payment completes despite webhook failure
-- [ ] System detects and recovers from failure
-- [ ] Member eventually gets access (manual or automatic recovery)
-- [ ] Customer not charged without access
+- [ ] `abort.sh set` creates abort flag
+- [ ] Daemon detects flag and sets SHUTDOWN_REQUESTED
+- [ ] Daemon completes current item before exit
+- [ ] Clean shutdown within 5 seconds (or SIGKILL escalation)
+- [ ] `abort.sh clear` removes flag
 
 ---
 
-### REQ-004: Documentation Complete
-- **Category:** Ship-Gate
+### NERVE-REQ-004: parse-verdict.sh JSON Output
+- **Category:** Core
 - **Priority:** P0
-- **Source:** decisions.md Decision 7
+- **Source:** decisions.md Section IX
 
 **Description:**
-All 4 documentation sections must be complete and accurate before ship. "PENDING" documentation with "SHIP" status is self-deception.
+parse-verdict.sh returns JSON with verdict (PASS/FAIL/BLOCKED) and issue counts.
 
 **Acceptance Criteria:**
-- [ ] Installation.md completed
-- [ ] Configuration.md completed
-- [ ] API-reference.md completed
-- [ ] Troubleshooting.md completed
-- [ ] All docs accurate and tested
+- [ ] Exit code 0 = PASS verdict found
+- [ ] Exit code 1 = FAIL verdict found
+- [ ] Exit code 2 = ERROR (no verdict, file missing, ambiguous)
+- [ ] Parses `**Status:** PASS/FAIL` and `VERDICT: PASS/FAIL` patterns
 
 ---
 
-### REQ-005: Admin Dashboard Beautiful
-- **Category:** Ship-Gate
+### NERVE-REQ-005: Consistent Log Format
+- **Category:** Observability
 - **Priority:** P0
-- **Source:** decisions.md Decision 4
+- **Source:** decisions.md OQ-001 Resolution
 
 **Description:**
-Admin dashboard must receive equal design investment as customer-facing UI. For the first 6 months, the admin panel IS the product. Ugly admin = abandoned installs.
+All scripts use log format: `[TIMESTAMP] [COMPONENT] message`
 
 **Acceptance Criteria:**
-- [ ] Not spreadsheet-like
-- [ ] Beautiful, polished design
-- [ ] Mobile-responsive
-- [ ] Professional UI elements
-- [ ] Design parity with customer-facing components
+- [ ] TIMESTAMP is ISO8601 UTC: `2026-04-11T14:22:33Z`
+- [ ] COMPONENT is one of: DAEMON, QUEUE, ABORT, VERDICT
+- [ ] No emoji, no exclamation marks, no "Oops!"
+- [ ] Grep-able format for log analysis
+
+**Examples:**
+```
+[2026-04-11T14:22:33Z] [DAEMON] started (PID: 12345)
+[2026-04-11T14:22:34Z] [QUEUE] pushed item a1b2c3d4 (type: qa-pass)
+[2026-04-11T14:22:35Z] [ABORT] shutdown requested
+```
 
 ---
 
-### REQ-006: Admin Authentication Exists
-- **Category:** Ship-Gate
+### NERVE-REQ-006: Nerve Prefix Usage
+- **Category:** Naming
 - **Priority:** P0
-- **Source:** decisions.md Section IV Open Question #6
+- **Source:** decisions.md OQ-002 Resolution
 
 **Description:**
-Current gap: "Anyone with endpoint can modify members." Must implement admin authentication to prevent unauthorized access.
+All file paths use `nerve` prefix. No references to `promptops`.
 
 **Acceptance Criteria:**
-- [ ] Admin endpoints require authentication
-- [ ] Verify `user.isAdmin === true` on all admin routes
-- [ ] Prevent unauthorized member modification
-- [ ] Security audit completed
+- [ ] PID file: `/tmp/nerve.pid`
+- [ ] Abort flag: `/tmp/nerve.abort`
+- [ ] Queue directory: `/tmp/nerve-queue/`
+- [ ] `ps aux | grep nerve` works
 
 ---
 
-### REQ-007: Brand Voice Applied Throughout
-- **Category:** Ship-Gate
+### NERVE-REQ-007: README Documentation
+- **Category:** Documentation
 - **Priority:** P0
-- **Source:** decisions.md Decision 5
+- **Source:** decisions.md Section IX
 
 **Description:**
-All copy must follow "terse, confident, warm" style using the 3-word principle. Maya Angelou's rewrites adopted.
+README.md documents all commands with examples.
 
 **Acceptance Criteria:**
-- [ ] 3-word principle applied where possible
-- [ ] No passive voice
-- [ ] No technical jargon visible to users
-- [ ] Success messages follow approved copy (e.g., "They're in. Welcome email sent.")
-- [ ] CTA buttons are clear and warm
+- [ ] All scripts documented (daemon.sh, queue.sh, abort.sh, parse-verdict.sh)
+- [ ] All functions documented with parameters
+- [ ] All exit codes documented
+- [ ] Usage examples for common workflows
+- [ ] Troubleshooting section
+
+---
+
+### NERVE-REQ-008: Deliverables Committed
+- **Category:** Delivery
+- **Priority:** P0
+- **Source:** decisions.md Section IX
+
+**Description:**
+All files committed to deliverables directory.
+
+**Acceptance Criteria:**
+- [ ] All scripts in `/home/agent/shipyard-ai/nerve/` or deliverables
+- [ ] README.md included
+- [ ] Git commit with conventional message
+
+---
+
+### NERVE-REQ-009: QA Pass
+- **Category:** Quality
+- **Priority:** P0
+- **Source:** decisions.md Section IX
+
+**Description:**
+QA Pass confirms zero P0 issues.
+
+**Acceptance Criteria:**
+- [ ] All acceptance criteria verified
+- [ ] No P0 bugs outstanding
+- [ ] Manual testing completed
+- [ ] Risk mitigations verified
 
 ---
 
 ## P1-MUST (Core MVP Features)
 
-### MVP Feature Set from decisions.md Section II
-
-### REQ-008: Stripe Checkout + Webhooks
-- **Category:** Payment
+### NERVE-REQ-010: Exit Codes - daemon.sh
+- **Category:** Implementation
 - **Priority:** P1
-- **Source:** decisions.md MVP Feature Set
+- **Source:** decisions.md Section III
 
 **Description:**
-Core Stripe payment flow with checkout session creation and webhook handling.
-
-**Technical Reference:** EMDASH-GUIDE.md Section 6 (Plugin System) - Routes and HTTP capabilities
+daemon.sh exit codes match specification.
 
 **Acceptance Criteria:**
-- [ ] Stripe checkout session creation
-- [ ] Webhook handler for payment events
-- [ ] Signature verification (HMAC-SHA256)
-- [ ] Idempotency handling for duplicate events
-- [ ] Error recovery logging
+- [ ] Exit 0 = success (clean shutdown)
+- [ ] Exit 1 = error
+- [ ] Exit 2 = already running
 
 ---
 
-### REQ-009: KV Member Storage
-- **Category:** Storage
+### NERVE-REQ-011: Exit Codes - queue.sh
+- **Category:** Implementation
 - **Priority:** P1
-- **Source:** decisions.md MVP Feature Set
+- **Source:** decisions.md Section III
 
 **Description:**
-Store member data in KV with status, plan, expiration tracking. KV acceptable for <1,000 records in v1.
-
-**Technical Reference:** EMDASH-GUIDE.md Section 6 - ctx.kv (Key-value store)
+queue.sh exit codes match specification.
 
 **Acceptance Criteria:**
-- [ ] Member records stored in KV
-- [ ] Schema: status, plan_id, expiration_date, created_at
-- [ ] KV key pattern: `member:{encoded_email}`
-- [ ] Handles <1,000 records efficiently
-- [ ] Migration path to D1 documented for future scaling
+- [ ] Exit 0 = success
+- [ ] Exit 1 = error
+- [ ] Exit 2 = empty queue (for pop/peek)
 
 ---
 
-### REQ-010: Email Confirmation (Resend)
-- **Category:** Communication
+### NERVE-REQ-012: Exit Codes - abort.sh
+- **Category:** Implementation
 - **Priority:** P1
-- **Source:** decisions.md MVP Feature Set
+- **Source:** decisions.md Section III
 
 **Description:**
-Send terse, warm confirmation emails via Resend integration.
-
-**Technical Reference:** EMDASH-GUIDE.md Section 6 - ctx.email (capability-gated)
+abort.sh exit codes match specification.
 
 **Acceptance Criteria:**
-- [ ] Resend integration working
-- [ ] Welcome email on registration
-- [ ] Payment receipt email
-- [ ] Cancellation confirmation email
-- [ ] Copy follows brand voice (terse, warm)
+- [ ] Exit 0 = success (or flag exists for check)
+- [ ] Exit 1 = error (or flag not exists for check)
 
 ---
 
-### REQ-011: Admin Dashboard
-- **Category:** UI
+### NERVE-REQ-013: Exit Codes - parse-verdict.sh
+- **Category:** Implementation
 - **Priority:** P1
-- **Source:** decisions.md MVP Feature Set
+- **Source:** decisions.md Section III
 
 **Description:**
-Beautiful admin dashboard for member management. NOT spreadsheet-like.
-
-**Technical Reference:** EMDASH-GUIDE.md Section 6 - admin.pages, Block Kit
+parse-verdict.sh exit codes match specification.
 
 **Acceptance Criteria:**
-- [ ] Member list with pagination
-- [ ] Member detail view
-- [ ] Manual approve/revoke actions
-- [ ] Mark-paid functionality
-- [ ] Beautiful design (Steve's requirement)
+- [ ] Exit 0 = PASS verdict found
+- [ ] Exit 1 = FAIL verdict found (or parse error)
+- [ ] Exit 2 = file not found
 
 ---
 
-### REQ-012: Basic Reporting API
-- **Category:** Analytics
+### NERVE-REQ-014: Queue Functions - push
+- **Category:** Implementation
 - **Priority:** P1
-- **Source:** decisions.md MVP Feature Set
+- **Source:** decisions.md Section III
 
 **Description:**
-Minimal reporting API with basic metrics. API exists before rich UI.
+queue.sh push function adds items to pending queue.
 
 **Acceptance Criteria:**
-- [ ] GET /reports/members endpoint
-- [ ] GET /reports/revenue endpoint
-- [ ] Member count metrics
-- [ ] Plan distribution metrics
-- [ ] Minimal UI sufficient for v1
+- [ ] Creates JSON file in `pending/`
+- [ ] Validates item_id (alphanumeric, dash, underscore only)
+- [ ] Stores payload as JSON
+- [ ] Returns 0 on success, 1 on error
 
 ---
 
-### REQ-013: Two Permission Tiers Only
-- **Category:** Auth
+### NERVE-REQ-015: Queue Functions - pop
+- **Category:** Implementation
 - **Priority:** P1
-- **Source:** decisions.md Decision 6
+- **Source:** decisions.md Section III
 
 **Description:**
-Exactly two permission tiers: Members and Non-Members. Delete GroupRecord code (~500 lines).
+queue.sh pop function retrieves and removes oldest item.
 
 **Acceptance Criteria:**
-- [ ] Only 2 permission states implemented
-- [ ] No groups, roles, or corporate structures
-- [ ] GroupRecord code removed if present
-- [ ] Permission checks are binary (member or not)
+- [ ] Returns oldest item (FIFO order)
+- [ ] Moves item from `pending/` to `running/`
+- [ ] Returns 2 if queue empty
 
 ---
 
-### REQ-014: Single-Form Registration
+### NERVE-REQ-016: Queue Functions - peek
+- **Category:** Implementation
+- **Priority:** P1
+- **Source:** decisions.md Section III
+
+**Description:**
+queue.sh peek function shows next item without removing.
+
+**Acceptance Criteria:**
+- [ ] Returns oldest item info
+- [ ] Does NOT move item
+- [ ] Returns 2 if queue empty
+
+---
+
+### NERVE-REQ-017: Queue Functions - depth
+- **Category:** Implementation
+- **Priority:** P1
+- **Source:** decisions.md Section III
+
+**Description:**
+queue.sh depth function returns queue size.
+
+**Acceptance Criteria:**
+- [ ] Counts pending items
+- [ ] Returns count to stdout
+- [ ] Returns 0 exit code
+
+---
+
+### NERVE-REQ-018: Queue Functions - metrics
+- **Category:** Implementation
+- **Priority:** P1
+- **Source:** decisions.md Section III
+
+**Description:**
+queue.sh metrics function returns queue metrics.
+
+**Acceptance Criteria:**
+- [ ] Returns JSON with queue depth, latency, error count
+- [ ] Writes to `/tmp/nerve-metrics.json`
+
+---
+
+### NERVE-REQ-019: Abort Functions - set/clear/status/force-kill
+- **Category:** Implementation
+- **Priority:** P1
+- **Source:** decisions.md Section III
+
+**Description:**
+abort.sh provides full abort lifecycle.
+
+**Acceptance Criteria:**
+- [ ] `set` creates abort flag with timestamp
+- [ ] `clear` removes abort flag
+- [ ] `status` shows current abort state
+- [ ] `force-kill` sends SIGKILL to daemon
+
+---
+
+### NERVE-REQ-020: Three Observability Metrics
+- **Category:** Observability
+- **Priority:** P1
+- **Source:** decisions.md Decision 8
+
+**Description:**
+Queue depth, latency, error count metrics before scale work.
+
+**Acceptance Criteria:**
+- [ ] `queue_depth` tracked (pending items)
+- [ ] `latency_last` tracked (last item processing time)
+- [ ] `error_count` tracked (failed items)
+- [ ] Metrics written to `/tmp/nerve-metrics.json`
+
+---
+
+### NERVE-REQ-021: Deterministic Execution
+- **Category:** Core
+- **Priority:** P1
+- **Source:** decisions.md Decision 4
+
+**Description:**
+All operations are shell commands, not LLM prompts.
+
+**Acceptance Criteria:**
+- [ ] No LLM calls in any script
+- [ ] All state changes via bash commands
+- [ ] Deterministic behavior (same input = same output)
+
+---
+
+### NERVE-REQ-022: Zero Configuration
 - **Category:** UX
 - **Priority:** P1
-- **Source:** decisions.md MVP Feature Set
+- **Source:** decisions.md Decision 5
 
 **Description:**
-90% of signups are single-form. No multi-step wizards in v1.
+Every option has sensible default. No config files.
 
 **Acceptance Criteria:**
-- [ ] Single-page registration form
-- [ ] Clean, beautiful design
-- [ ] Minimal required fields
-- [ ] No wizard/multi-step flow
+- [ ] Scripts work with no arguments
+- [ ] Environment variables optional (override only)
+- [ ] No config file parsing
 
 ---
 
-### REQ-015: Empty State with Clear CTA
+### NERVE-REQ-023: Clinical Voice in Logs
 - **Category:** UX
 - **Priority:** P1
-- **Source:** decisions.md Decision 3
+- **Source:** decisions.md Decision 10
 
 **Description:**
-When no members exist, show empty state with clear CTA. No demo data generation.
+Professional tone in all output. No emoji, no casual language.
 
 **Acceptance Criteria:**
-- [ ] Empty state view when member count = 0
-- [ ] "Create Your First Member" CTA button
-- [ ] No demo data generation logic
-- [ ] No cleanup flows for demo data
+- [ ] No emoji anywhere
+- [ ] No exclamation marks
+- [ ] No "Oops!" or casual language
+- [ ] Report and move on: `[QUEUE] 47 items processed. 2.3s elapsed.`
 
 ---
 
-### REQ-016: Product Name "MemberShip"
-- **Category:** Brand
+### NERVE-REQ-024: Bash 4.0+ Requirement
+- **Category:** Implementation
 - **Priority:** P1
-- **Source:** decisions.md Decision 1
+- **Source:** Codebase patterns
 
 **Description:**
-All references use "MemberShip" (not "Circle" or alternatives). SEO-discoverable naming.
+All scripts verify Bash 4.0+ at startup.
 
 **Acceptance Criteria:**
-- [ ] Plugin ID uses "membership"
-- [ ] All UI labels use "MemberShip"
-- [ ] Documentation uses "MemberShip"
-- [ ] Meta tags include "MemberShip" for SEO
+- [ ] Version check at script start
+- [ ] Exit 2 with clear error if Bash < 4.0
+- [ ] Uses `#!/usr/bin/env bash` shebang
 
 ---
 
-### REQ-017: Ship MemberShip First (Alone)
-- **Category:** Delivery
+### NERVE-REQ-025: Strict Mode
+- **Category:** Implementation
 - **Priority:** P1
-- **Source:** decisions.md Decision 2
+- **Source:** Codebase patterns
 
 **Description:**
-MemberShip ships independently. EventDash follows AFTER production validation.
+All scripts use `set -euo pipefail`.
 
 **Acceptance Criteria:**
-- [ ] MemberShip can deploy standalone
-- [ ] No dependencies on EventDash
-- [ ] EventDash deployment blocked until MemberShip validated
+- [ ] Exit on error
+- [ ] Exit on undefined variable
+- [ ] Exit on pipe failure
+- [ ] `umask 0077` for file permissions
 
 ---
 
-### REQ-018: Webhook Signature Verification
-- **Category:** Security
-- **Priority:** P1
-- **Source:** EMDASH-GUIDE.md Plugin Security
+## P2-SHOULD (Risk Mitigation)
 
-**Description:**
-All Stripe webhooks must verify signature using HMAC-SHA256.
-
-**Technical Reference:** EMDASH-GUIDE.md mentions signature verification for webhooks
-
-**Acceptance Criteria:**
-- [ ] Raw body preserved for signature verification
-- [ ] HMAC-SHA256 verification implemented
-- [ ] Invalid signatures rejected with 400
-- [ ] Timing-safe comparison used
-
----
-
-### REQ-019: JWT Authentication
-- **Category:** Auth
-- **Priority:** P1
-- **Source:** Current implementation pattern
-
-**Description:**
-JWT tokens for member authentication with secure cookie storage.
-
-**Technical Reference:** Uses Web Crypto API (`crypto.subtle.sign`)
-
-**Acceptance Criteria:**
-- [ ] Access token (15-min expiry)
-- [ ] Refresh token (7-day expiry)
-- [ ] httpOnly, Secure, SameSite=Strict cookies
-- [ ] No external JWT libraries (Web Crypto only)
-
----
-
-### REQ-020: Error Handling & Recovery
-- **Category:** Reliability
-- **Priority:** P1
-- **Source:** EMDASH-GUIDE.md Plugin Error Handling
-
-**Description:**
-Graceful error handling for all payment and webhook operations.
-
-**Acceptance Criteria:**
-- [ ] Download errors caught and reported
-- [ ] Webhook failures logged
-- [ ] Clear error messages to users
-- [ ] Admin notification on critical failures
-
----
-
-### REQ-021: Rate Limiting
-- **Category:** Security
-- **Priority:** P1
-- **Source:** Risk mitigation
-
-**Description:**
-Protect endpoints from abuse with rate limiting.
-
-**Acceptance Criteria:**
-- [ ] Rate limiting on registration endpoint
-- [ ] Rate limiting on admin endpoints
-- [ ] Clear 429 responses when limited
-
----
-
-### REQ-022: Plans Configuration
-- **Category:** Config
-- **Priority:** P1
-- **Source:** Current implementation
-
-**Description:**
-Configurable membership plans (free, pro, premium).
-
-**Acceptance Criteria:**
-- [ ] Multiple plan support
-- [ ] Plan pricing configuration
-- [ ] Plan feature differentiation
-- [ ] Admin plan management
-
----
-
-### REQ-023: Member Status Lifecycle
-- **Category:** Business Logic
-- **Priority:** P1
-- **Source:** Core functionality
-
-**Description:**
-Complete member status lifecycle: pending -> active -> expired/cancelled.
-
-**Acceptance Criteria:**
-- [ ] Pending status on registration
-- [ ] Active status on payment/approval
-- [ ] Expired status on plan end
-- [ ] Cancelled status on user action
-- [ ] Status transitions audited
-
----
-
-### REQ-024: Admin Manual Actions
-- **Category:** Admin
-- **Priority:** P1
-- **Source:** decisions.md MVP Feature Set
-
-**Description:**
-Admin can manually approve, revoke, or mark-paid members.
-
-**Acceptance Criteria:**
-- [ ] Approve pending member
-- [ ] Revoke active member
-- [ ] Mark member as paid (for manual payments)
-- [ ] All actions logged
-
----
-
-### REQ-025: Cancel Subscription Flow
-- **Category:** UX
-- **Priority:** P1
-- **Source:** Core functionality
-
-**Description:**
-Members can cancel their subscription from dashboard.
-
-**Acceptance Criteria:**
-- [ ] Cancel button in member dashboard
-- [ ] Confirmation before cancel
-- [ ] Stripe subscription cancelled
-- [ ] Cancellation email sent
-
----
-
-## P2-RISK (Risk Mitigation Requirements)
-
-### REQ-026: Webhook Idempotency
+### NERVE-REQ-026: Atomic File Writes
 - **Category:** Risk
 - **Priority:** P2
-- **Source:** Risk Register - Webhook failure loses payment
+- **Source:** decisions.md Risk Register (Queue corruption)
 
 **Description:**
-Prevent duplicate processing of webhook events. Current implementation has race condition between check and set.
+Prevent queue corruption by using atomic writes.
 
 **Acceptance Criteria:**
-- [ ] Atomic idempotency check (not check-then-set)
-- [ ] 24-hour TTL on idempotency keys
-- [ ] No duplicate charges possible
-- [ ] No duplicate emails possible
+- [ ] Write to temp file first
+- [ ] Use `mv` to final location (atomic rename)
+- [ ] No partial JSON files
 
 ---
 
-### REQ-027: Email Sending Resilience
+### NERVE-REQ-027: Orphan Process Cleanup
 - **Category:** Risk
 - **Priority:** P2
-- **Source:** Risk Scanner - Silent email failures
+- **Source:** decisions.md Risk Register (Orphan processes)
 
 **Description:**
-Handle email sending failures gracefully with retry or notification.
+Abort escalation: SIGTERM -> 5 sec wait -> SIGKILL.
 
 **Acceptance Criteria:**
-- [ ] Log email failures with context
-- [ ] Retry transient failures
-- [ ] Alert admin on persistent failures
-- [ ] Member still registered even if email fails
+- [ ] `abort.sh force-kill` sends SIGTERM first
+- [ ] Waits 5 seconds
+- [ ] Then sends SIGKILL if still running
 
 ---
 
-### REQ-028: Admin Audit Logging
+### NERVE-REQ-028: Input Validation
 - **Category:** Risk
 - **Priority:** P2
-- **Source:** Risk Scanner - No audit logging
+- **Source:** Risk Scanner - JSON injection
 
 **Description:**
-Log all admin actions for security and debugging.
+Validate inputs to prevent queue corruption.
 
 **Acceptance Criteria:**
-- [ ] Log admin authentication attempts
-- [ ] Log member modifications (approve, revoke, mark-paid)
-- [ ] Include user ID, timestamp, action, target
-- [ ] Rate limit failed admin auth attempts
+- [ ] Item ID: alphanumeric, dash, underscore only
+- [ ] Payload: valid JSON (if jq available) or basic check
+- [ ] Reason strings: escaped for JSON safety
 
 ---
 
-### REQ-029: Input Validation
+### NERVE-REQ-029: Stale PID Detection
 - **Category:** Risk
 - **Priority:** P2
-- **Source:** Risk Scanner - Input validation gaps
+- **Source:** Risk Scanner - Race condition
 
 **Description:**
-Validate all inputs to prevent injection and data corruption.
+Detect and handle stale PID files.
 
 **Acceptance Criteria:**
-- [ ] Email format validation
-- [ ] Date format validation (YYYY-MM-DD)
-- [ ] URL validation for callbacks
-- [ ] Numeric range validation (price, capacity)
-- [ ] XSS prevention on text inputs
+- [ ] Check if PID in lockfile is alive (`kill -0`)
+- [ ] Remove stale lockfile if process dead
+- [ ] Proceed with daemon start
 
 ---
 
-### REQ-030: Stripe Key Validation
+### NERVE-REQ-030: Portable sed/stat Usage
 - **Category:** Risk
 - **Priority:** P2
-- **Source:** Risk Scanner - Stripe secret key handling
+- **Source:** Risk Scanner - Portability
 
 **Description:**
-Validate Stripe keys at startup, not at request time.
+Handle GNU vs BSD variants of sed and stat.
 
 **Acceptance Criteria:**
-- [ ] Validate STRIPE_SECRET_KEY format (starts with `sk_`)
-- [ ] Validate STRIPE_WEBHOOK_SECRET format (starts with `whsec_`)
-- [ ] Fail fast if keys invalid or missing
-- [ ] Clear error messages for configuration issues
+- [ ] Detect GNU vs BSD at runtime
+- [ ] Use appropriate syntax for each
+- [ ] Log warning if neither works
 
 ---
 
-### REQ-031: KV Scale Monitoring
+### NERVE-REQ-031: Directory Existence Checks
 - **Category:** Risk
 - **Priority:** P2
-- **Source:** decisions.md Risk Register
+- **Source:** Risk Scanner - /tmp assumptions
 
 **Description:**
-Monitor KV usage and plan D1 migration path.
+Verify queue directory exists and is writable.
 
 **Acceptance Criteria:**
-- [ ] Track member count metrics
-- [ ] Alert at 80% of 1,000 record threshold
-- [ ] D1 migration documentation ready
-- [ ] Migration script prepared for v2
+- [ ] Create queue directory on init if missing
+- [ ] Check write permissions
+- [ ] Clear error message if /tmp not writable
 
 ---
 
-## P3-CUT (Explicitly NOT in v1)
+## Explicitly Deferred (v2+)
 
-These features are LOCKED as CUT. Do NOT implement:
+Per decisions.md Section II - Explicitly Deferred:
 
-### CUT-001: Group/Corporate Memberships
-- **Source:** decisions.md MVP Feature Set - Cut
-- **Rationale:** Zero customers asked for this feature
-- **Revisit:** When customer requests validate need
-
-### CUT-002: Developer Webhooks (HMAC)
-- **Source:** decisions.md MVP Feature Set - Cut
-- **Rationale:** Zero integrations exist yet
-- **Revisit:** When integration requests emerge
-
-### CUT-003: Drip Content Scheduling
-- **Source:** decisions.md MVP Feature Set - Cut
-- **Rationale:** Zero content libraries exist
-- **Revisit:** When content libraries are built
-
-### CUT-004: Multi-Payment Gateways
-- **Source:** decisions.md MVP Feature Set - Cut
-- **Rationale:** Stripe is 95% of market
-- **Revisit:** v2 if PayPal requests significant
-
-### CUT-005: Multi-Step Registration
-- **Source:** decisions.md MVP Feature Set - Cut
-- **Rationale:** 90% of signups are single-form
-- **Revisit:** If conversion data suggests need
-
-### CUT-006: Coupon Engine
-- **Source:** decisions.md MVP Feature Set - Cut
-- **Rationale:** Premature optimization
-- **Revisit:** When revenue requires discounting
+| Feature | Rationale |
+|---------|-----------|
+| Metrics/observability dashboard | Read-only observation theater - v2 |
+| Multi-daemon coordination | Single-machine is v1 |
+| Distributed locking (Redis/etcd) | Not needed for single-machine |
+| Queue partitioning | Required for multi-daemon |
+| Automated recovery beyond abort | SIGTERM/SIGKILL sufficient |
+| LLM-powered verdict parsing | Jensen's Path B recommendation |
+| Execution history persistence | Training data - Path B |
+| API/SDK for external access | Not internal tooling |
+| Chronicle, Health Score, retention | Shonda's roadmap |
 
 ---
 
 ## Current Implementation Status
 
-### What's Already Built (from Codebase Scout)
+### Files in /home/agent/shipyard-ai/nerve/
 
-| Feature | Status | Files | Notes |
-|---------|--------|-------|-------|
-| Email-based registration | Complete | sandbox-entry.ts | Works |
-| Two permission tiers | Complete | sandbox-entry.ts | Binary check |
-| JWT authentication | Complete | auth.ts | 15-min/7-day tokens |
-| KV member storage | Complete | sandbox-entry.ts | Works |
-| Stripe integration | Complete | sandbox-entry.ts | Payment links |
-| Webhook handler | Complete | sandbox-entry.ts | Needs kill-test |
-| Email automation | Complete | email.ts | 7 templates |
-| Member dashboard | Complete | MemberDashboard.astro | 476 lines |
-| Content gating | Complete | gating.ts | 271 lines |
-| Admin dashboard | Complete | AdminReporting.astro | 1,049 lines |
+| File | Lines | Status | Notes |
+|------|-------|--------|-------|
+| daemon.sh | 247 | Complete | Main loop, PID lock, signal handling |
+| queue.sh | 304 | Complete | Persistence, FIFO, crash recovery |
+| abort.sh | 112 | Complete | Flag management |
+| parse-verdict.sh | 136 | Complete | PASS/FAIL parsing |
+| status.sh | 174 | Complete | Human and JSON status output |
+| README.md | 300 | Complete | Full documentation |
 
-### What Needs Work (Gaps Identified)
+**Total Lines:** 1,273
+
+### Gaps Identified by Risk Scanner
 
 | Gap | Priority | Effort | Notes |
 |-----|----------|--------|-------|
-| Webhook kill-test verification | P0 | 1 day | Ship blocker |
-| Admin auth hardening | P0 | 1 day | Ship blocker |
-| Documentation completion | P0 | 2 days | 4 docs required |
-| Brand voice audit | P0 | 1 day | Maya's 3-word principle |
-| Empty state implementation | P1 | 4 hours | CTA for first member |
-| Remove GroupRecord code | P1 | 4 hours | ~500 lines cut |
-| Deploy to real site | P0 | 1 day | Production validation |
-| 3 real transactions | P0 | 1 day | Payment validation |
-
----
-
-## Technical Debt (Accepted for v1)
-
-Per decisions.md Section IX - Accept for v1:
-
-| Debt | Impact | Status |
-|------|--------|--------|
-| KV architecture at current scale | Acceptable <1K records | Accepted |
-| ~60% code duplication with EventDash | Medium maintenance burden | Accepted |
-| 4,000-line monolith (sandbox-entry.ts) | High cognitive load | Refactor after revenue |
-
----
-
-## File Structure (Current State)
-
-```
-/home/agent/shipyard-ai/plugins/membership/
-├── src/
-│   ├── sandbox-entry.ts          (3,984 lines - monolith)
-│   ├── index.ts                  (31 lines - descriptor)
-│   ├── auth.ts                   (209 lines - JWT)
-│   ├── email.ts                  (580 lines - templates)
-│   ├── gating.ts                 (271 lines - content access)
-│   ├── astro/
-│   │   ├── index.ts              (17 lines)
-│   │   ├── MemberPortal.astro    (718 lines)
-│   │   ├── RegistrationForm.astro (1,115 lines)
-│   │   ├── MemberDashboard.astro (476 lines)
-│   │   ├── AdminReporting.astro  (1,049 lines)
-│   │   ├── GroupManagement.astro (1,086 lines) <- CUT, should be removed
-│   │   └── GatedContent.astro    (246 lines)
-│   └── __tests__/
-│       ├── integration.test.ts   (1,036 lines)
-│       └── helpers.ts            (367 lines)
-├── README.md                     (existing documentation)
-├── API.md                        (existing API docs)
-├── package.json
-└── vitest.config.ts
-```
-
----
-
-## Documentation Requirements (from decisions.md)
-
-Per REQ-004, all docs must exist at:
-```
-membership/docs/
-├── installation.md      # How to install plugin
-├── configuration.md     # Stripe, Resend, KV setup
-├── api-reference.md     # All 52+ endpoints documented
-└── troubleshooting.md   # Common issues and solutions
-```
+| Atomic file writes | P2 | 2 hours | Write to temp, then mv |
+| JSON payload validation | P2 | 1 hour | Use jq or basic check |
+| Test suite | P1 | 4 hours | No tests currently exist |
+| process_item() stub | P1 | N/A | Intentional for v1 |
 
 ---
 
 ## Ship Test
 
-> Does the admin see their first member registered and think "I built that"?
+> Does the daemon silently handle queue operations without user intervention?
+>
+> Does the admin feel "peace" - the absence of 3 AM knots?
 >
 > **If yes, ship it.**
 
 ---
 
-## Open Questions (Blocking Launch)
-
-| # | Question | Owner | Status |
-|---|----------|-------|--------|
-| 1 | Which real EmDash site for deployment? | Engineering | Pending |
-| 2 | Stripe production keys available? | Infrastructure | Pending |
-| 3 | Resend production credentials? | Infrastructure | Pending |
-
----
-
 *Generated by Great Minds Agency - Phase Planning Skill*
-*Source: rounds/finish-plugins/decisions.md, CLAUDE.md*
-*Project Slug: finish-plugins*
+*Source: rounds/promptops/decisions.md, CLAUDE.md*
+*Project Slug: promptops*

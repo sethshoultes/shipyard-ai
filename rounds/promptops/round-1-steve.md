@@ -4,62 +4,68 @@
 
 **Call it NERVE.**
 
-Not "PromptOps." That sounds like a DevOps subcommittee. Nobody falls in love with a committee.
+Not "PromptOps." That's a word designed by committee for a slide deck nobody reads. It sounds like something you'd find in a Jira ticket graveyard. Nobody falls in love with a ticket.
 
-NERVE. Because that's what this is — the central nervous system that keeps everything running. It's the thing you don't think about until it fails. When your spine works, you don't notice it. When it doesn't, you can't move.
+NERVE. One word. Four letters. It's the central nervous system that keeps everything alive. When your spine works, you dance. When it doesn't, you're paralyzed. That's exactly what this is — the infrastructure that turns intention into action.
 
-One word. Four letters. Says exactly what it does: the essential system that connects intention to action.
+Great names aren't descriptive. They're evocative. iPhone doesn't describe what it does. It describes what it *feels* like — personal, intimate, yours. NERVE does the same: essential, alive, connected.
 
 ## Design Philosophy
 
-This is invisible architecture — and that's its genius.
+**The best design is invisible design.**
 
-The best infrastructure is infrastructure you forget exists. Like plumbing. Like electricity. You flip a switch, the light comes on. You don't think about transformers and substations. You think about what you're going to read.
+Think about electricity. You flip a switch, light appears. You don't think about transformers, substations, or the grid. You think about what you're reading. That invisibility is the highest form of design excellence.
 
-NERVE is the product that makes every other product possible. It's not the show — it's the stage. And the stage must be perfect, or the show falls apart.
+NERVE is the product that makes every other product possible. It's not the show — it's the stage. And here's the truth about stages: nobody applauds them. But without a solid stage, every dancer falls.
 
-**The philosophy is: determinism over elegance.** A bash command executes. A prompt requests. We build with commands.
+The philosophy is brutal and simple: **determinism over elegance.** A bash command executes. A prompt *requests*. When something must happen, we don't ask. We execute.
 
 ## User Experience — The First 30 Seconds
 
-Here's what the first 30 seconds feel like: *nothing.*
+Here's what the first 30 seconds feel like: **nothing.**
 
-And that's the point. The daemon starts. The queue persists. Pipelines complete. No duplicate runs. No hung processes. No lost state.
+That's the entire point. The daemon starts. The queue persists. Pipelines complete. No duplicate runs. No hung processes. No lost state. No drama.
 
-The user experience is the *absence* of friction. It's the 3 AM moment when you're NOT getting paged because the system handled it. It's the confidence that when you push a PRD, it builds.
+The user experience is the *absence* of friction. It's 3 AM and you're sleeping — actually sleeping — because you know NERVE handled it. Not hoping. *Knowing.*
 
-The best UX for infrastructure is *trust.* You trust the floor won't collapse. You trust the elevator will stop at your floor. You trust NERVE.
+The best UX for infrastructure isn't delight. It's trust. You trust the floor won't collapse. You trust the elevator stops at your floor. You trust NERVE.
 
 ## Brand Voice
 
-Quiet confidence. Technical precision. Zero apology.
+**Quiet confidence. Surgical precision. Zero apology.**
 
-NERVE doesn't explain itself. It doesn't hedge. It says: "Queue persisted. Pipeline complete. Build shipped."
+NERVE speaks like a seasoned surgeon, not a chatbot. No exclamation marks. No emoji. No "Oops, something went wrong!" Because things don't go wrong. And when they do, the message is clinical:
 
-No exclamation marks. No emojis. No "Oops, something went wrong!" — because things don't go wrong. And when they do, the message is clinical and clear.
+`[QUEUE] 47 items processed. 2.3s elapsed.`
 
-The voice is a seasoned surgeon, not a chatbot. Competent. Economical. Trustworthy.
+Not: "Great job! You processed 47 items! Keep it up!"
+
+Competent systems don't celebrate themselves. They report and move on.
 
 ## What to Say NO To
 
-**NO** to configurability for its own sake. Every option is a failure to decide.
+**NO to dashboards.** If you need a chart to know if the system works, the system doesn't work simply enough.
 
-**NO** to dashboards and visualizations. If you need a chart to understand if the system is working, the system isn't working simply enough.
+**NO to configurability.** Every option is a failure to decide. We decide. Users trust.
 
-**NO** to agent-driven operations. The retrospective nailed it: "Trust bash, not instructions." When something must happen, code makes it happen. We don't ask. We execute.
+**NO to agent-driven operations.** The retrospective nailed it: "Trust bash, not instructions." When something must happen, code makes it happen. We don't negotiate with probability.
 
-**NO** to graceful degradation theater. Either it works or it fails clearly. No "partially running" states.
+**NO to graceful degradation theater.** Either it works or it fails clearly. No "partially running" states. No zombie processes pretending to be alive.
+
+**NO to features that prove the system works.** The proof is in the silence.
 
 ## The Emotional Hook
 
-People will love NERVE because it gives them something rare: *peace of mind.*
+People will love NERVE because it gives them something priceless: **peace of mind.**
 
-Every developer has that knot in their stomach — did the deploy work? Is the daemon running? Will I get paged at dinner?
+Every developer knows that knot in the stomach. Did the deploy work? Is the daemon running? Will I get paged at dinner? That anxiety is a tax on creativity. It steals focus. It kills joy.
 
-NERVE unties that knot. It's the sleep you get when you know — truly know — that the system is handling it. Not hoping. Knowing.
+NERVE unties that knot. It's the sleep you get when you *know* — truly know — the system is solid. Not hoping. Knowing.
 
-That's not just a feature. That's freedom.
+That's not a feature. That's freedom.
 
 ---
 
-*"Simplicity is the ultimate sophistication."* And NERVE is sophisticated enough to disappear.
+*"Simplicity is the ultimate sophistication."*
+
+NERVE is sophisticated enough to disappear. And that's the most sophisticated thing a product can do.

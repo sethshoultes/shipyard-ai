@@ -1,27 +1,28 @@
-# Sara Blakely Gut-Check: MemberShip Plugin
+# Sara Blakely Gut-Check: NERVE v1
 
-**Would a real customer pay for this?**
+## Would a real customer pay for this?
 
-Maybe. But they're paying for "member pays, gets access" — that's table stakes, not a moat. The plan obsesses over 16 tasks and 52+ endpoints. A yoga studio owner cares about ONE thing: "Did they get in?" Everything else is noise.
+**Yes — but they won't thank you.** This is underwear. Nobody wants to buy daemon management. They want "no more 3 AM fires." NERVE delivers that, but the value is invisible by design. Document every incident it prevents or you'll get zero budget next quarter.
 
-**What's confusing? What makes them bounce?**
+## What's confusing? What would make someone bounce?
 
-The first 30 seconds. Empty state says "Create Your First Member" — but is that for THEM or for their customers? They don't know if they're testing or setting up. They'll click, fumble, feel dumb, leave. Clarify: "Your members sign up here: [link]. You manage them here."
+- 12 tasks to verify 5 scripts. Smells like bureaucracy.
+- "process_item() is a stub" — so the main thing it does... it doesn't do?
+- Board score 4.7/10 but "READY FOR BUILD" — pick one.
+- No answer to: "Is it working right now?" without tailing logs.
 
-**30-Second Elevator Pitch:**
+## 30-Second Elevator Pitch
 
-"Customer pays, gets instant access, you get the email. One plugin, no developers, start charging today."
+"NERVE runs your pipeline queue, survives crashes, and shuts down clean. One script to start, one to stop, zero config. Install it, forget it, stop waking up at 3 AM."
 
-**What would I test with $0 budget?**
+## What would I test first with $0 marketing budget?
 
-Three real yoga studios. Free setup. Watch their faces. Not "3 real Stripe transactions" — that's YOUR checklist. Watch WHERE THEY GET STUCK. That's worth more than 4 documentation files.
+Run it on the real pipeline for one week. Count manual interventions. Zero = ship it. More than zero = that's your bug list. Don't write docs. Don't polish. Just run it and watch.
 
-**What's the retention hook?**
+## What's the retention hook?
 
-Missing. Where's "You made $847 this week"? Where's the automatic "renew in 7 days" email? The dashboard shows members, not momentum. Momentum is the drug. Add one line: weekly revenue. That's the hook.
+**Fear of going back.** One week without a 3 AM page and they'll never uninstall. But you must *prove* that absence — Task-11 (baseline metrics) is the most important task here. Without before/after numbers, NERVE is a ghost nobody remembers to fund.
 
-**Honest verdict:**
+---
 
-Cut documentation in half. Kill the "brand voice audit" (clear > clever). Add auto-renewal emails — that's the feature that makes them say "shut up and take my money." Ship to ONE confused customer before writing troubleshooting.md. You'll learn more in 20 minutes than from 16 tasks.
-
-The code is 80% there. The experience is 50% there. Fix the first 30 seconds. Show them the money.
+**Bottom line:** Ship it. But cut the ceremony. The plan is over-engineered for "run queue, don't crash." Measure the pain reduction. Let the silence sell it.

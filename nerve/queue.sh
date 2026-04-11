@@ -82,7 +82,7 @@ queue_init() {
 # Enqueue a new item
 queue_enqueue() {
     local item_id="$1"
-    local payload="${2:-{}}"
+    local payload="${2:-'{}'}"
     local timestamp
     timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
@@ -100,10 +100,12 @@ queue_enqueue() {
         return 1
     fi
 
-    # Write item file
-    cat > "$item_file" <<EOF
+    # Write item file atomically (write temp, then mv)
+    local temp_file="${QUEUE_DIR}/pending/.${item_id}.json.tmp"
+    cat > "$temp_file" <<EOF
 {"id":"${item_id}","status":"pending","created":"${timestamp}","payload":${payload}}
 EOF
+    mv "$temp_file" "$item_file"
 
     queue_log "enqueued item ${item_id}"
     return 0
