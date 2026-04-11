@@ -1,0 +1,41 @@
+name: Wardrobe CI/CD
+
+on:
+  push:
+    branches: [main, feature/*]
+    paths:
+      - 'deliverables/emdash-marketplace/wardrobe/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'deliverables/emdash-marketplace/wardrobe/**'
+
+defaults:
+  run:
+    working-directory: deliverables/emdash-marketplace/wardrobe
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: deliverables/emdash-marketplace/wardrobe/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  verify-tarballs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify tarball integrity
+        run: |
+          cd deliverables/emdash-marketplace/wardrobe/dist/themes
+          for tarball in *.tar.gz; do
+            echo "Verifying $tarball..."
+            tar -tzf "$tarball" > /dev/null
+            echo "✓ $tarball is valid"
+          done

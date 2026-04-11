@@ -1,46 +1,45 @@
-# Shonda Retention Roadmap: Wardrobe v1.1
+# Wardrobe Retention Roadmap v1.1
 
-**Author:** Shonda Rhimes, Board Member
+**Author:** Based on Shonda Rhimes' Board Review
 **Date:** April 11, 2026
-**Purpose:** What Keeps Users Coming Back
+**Focus:** What Keeps Users Coming Back
 
 ---
 
-## The Retention Problem
+## The Core Problem
 
-Wardrobe currently operates as a **single-transaction product**:
+Wardrobe is currently a **one-transaction product**:
 
 ```
-User discovers → User installs → [END]
+User has boring site → Discovers Wardrobe → Installs theme → Has nice site → [END]
 ```
 
-> "Wardrobe is designed as a single-transaction product. Install a theme, done. This is a movie, not a series—satisfying but finite."
-
-There is no reason to return after the initial transformation. In great television, we never fully resolve. We leave threads dangling. Wardrobe resolves too quickly and too completely.
-
----
-
-## Current Retention Assessment
-
-| Category | Score | Assessment |
-|----------|-------|------------|
-| Story Arc | 7/10 | Clean narrative, excellent transformation moment, silent payoff |
-| Retention Hooks | 5/10 | Coming Soon and email capture exist but incomplete |
-| Content Strategy | 5/10 | Good foundation, no flywheel |
-| Emotional Cliffhangers | 6/10 | Future themes create anticipation, no ongoing hooks |
-| **Overall** | **6/10** | *Pilot with a season order* |
+This is a movie. We need a series.
 
 ---
 
 ## Retention Philosophy
 
-> *"In television, we say: make them laugh, make them cry, make them wait. Wardrobe now makes them wait. Next step: make them belong."*
+> "The best transformations aren't endings. They're beginnings."
+> — Shonda Rhimes
 
-Retention comes from three sources:
+Users return when they have:
+1. **Unfinished business** — Something they started but haven't completed
+2. **Anticipated events** — Something coming they don't want to miss
+3. **Community belonging** — A place where they're recognized
+4. **Evolving identity** — New ways to express who they're becoming
 
-1. **Anticipation** — Something new is coming *(Partial: Coming Soon themes)*
-2. **Investment** — I've put something into this *(Missing)*
-3. **Identity** — This is part of who I am *(Missing)*
+---
+
+## Current State Assessment
+
+| Category | Score | Assessment |
+|----------|-------|------------|
+| Story Arc | 7/10 | Strong setup, evocative characters, invisible climax |
+| Retention Hooks | 5/10 | Coming Soon and email exist, no post-install loop |
+| Content Strategy | 5/10 | Good foundation, no flywheel mechanics |
+| Emotional Cliffhangers | 6/10 | Season tease works, no episode hooks |
+| **Overall** | **6/10** | *Pilot without a second episode* |
 
 ---
 
@@ -60,6 +59,8 @@ Each theme is an identity choice, not a feature list:
 - *"Bold. Editorial. For people with something to say."* (Ember)
 - *"Dark and technical. Built for builders."* (Forge)
 - *"Warm and inviting. Where community feels at home."* (Bloom)
+- *"Clean and professional. Trust at first glance."* (Slate)
+- *"Minimal and airy. Let your content breathe."* (Drift)
 
 You're casting yourself.
 
@@ -70,7 +71,7 @@ Four themes with evocative names, personality teasers, and release windows:
 - **Neon:** "The future is now" — Summer 2026
 - **Haven:** "Home on the internet" — Fall 2026
 
-"Stories deserve dignity" makes me want to see it NOW.
+"Stories deserve dignity" makes you want to see it NOW.
 
 ---
 
@@ -79,174 +80,290 @@ Four themes with evocative names, personality teasers, and release windows:
 ### 1. The Silent Payoff
 The install completes with a terminal message. But the *actual* magic—seeing YOUR content transformed—requires the user to manually start their dev server and discover it alone.
 
-> "We're leaving before the reveal. In television, we'd never cut away before showing the character's face when they see the transformation."
+> "We're cutting away before the reveal. In Grey's Anatomy, we never cut before showing someone's face when they see the flatline become a heartbeat."
 
-### 2. Non-Functional Email Capture
-The form exists with proper UX ("No spam. Just themes.") but submits to `api.example.com`—a placeholder.
-
-> "The promise is made but not kept."
-
-### 3. No Flywheel
+### 2. No Flywheel
 Content flows one direction: Emdash creates themes → users consume themes. No user contribution. No remix culture. No community voice.
 
 **Current:**
 ```
-User discovers → User installs → [END]
+Emdash creates themes → Users consume themes → [END]
 ```
 
 **Target:**
 ```
-User installs → User customizes → User shares →
-Others discover → They install → They share → [LOOP]
+User installs theme →
+User customizes →
+User shares their site →
+Others see the gallery →
+They discover Wardrobe →
+They install →
+They share →
+[LOOP]
 ```
 
-### 4. No Progress or History
+### 3. No Progress or History
 Every visit is treated as a first visit. Returning audiences want acknowledgment of their history.
 
+### 4. No Post-Install Relationship
+After installation, Wardrobe has done its job. There's no:
+- "How's Ember treating you?" follow-up
+- Day-2 customization tips email
+- Progress indicator ("You've tried 1 of 5 themes")
+
 ---
 
-## v1.1 Feature Set: The Retention Release
+## V1.1 Features: The Retention Loop
 
-### Feature 1: Post-Install Revelation
+### Feature 1: Post-Install Reveal
 
-**Problem:** The transformation happens silently.
+**Problem:** The aha moment happens off-screen.
 
-**Solution:** After install completes, prompt:
-```
+**Solution:**
+```bash
+npx wardrobe install ember
+
+✓ Theme installed.
+
 Your site is now wearing ember.
 
-Want to see the transformation? [Y/n]
+┌─────────────────────────────────────────┐
+│  View your transformation:              │
+│  → http://localhost:4321                │
+│                                         │
+│  Open now? [Y/n]                        │
+└─────────────────────────────────────────┘
 ```
-
-Selecting `Y` auto-launches `wardrobe preview` and opens the browser.
-
-**Why It Matters:** Never cut away before showing the character's face when they see the transformation. The payoff must be witnessed.
-
-**Retention Impact:** Emotional peak increases likelihood of sharing, submission, return.
-
----
-
-### Feature 2: Functional Email Capture
-
-**Problem:** Email form submits to placeholder URL.
-
-**Solution:** Wire a real endpoint (Buttondown, Mailchimp, or custom).
 
 **Implementation:**
-1. Update showcase form `action` URL
-2. Set up list with "Wardrobe Themes" segment
-3. Create welcome email:
-   - Confirmation of signup
-   - Current theme count (5 available, 4 coming)
-   - Preview of next theme dropping
+- Detect if dev server is running
+- Offer to open browser automatically (`open` command)
+- If server not running, offer to start it
 
-**Why It Matters:** Email is the most reliable return channel. Someone who signs up WILL return when notified.
-
-**Priority:** Day 1. This is the single highest-leverage retention fix.
+**Retention impact:** Ensures emotional payoff. Users who SEE the transformation are more likely to share it.
 
 ---
 
-### Feature 3: Community Showcase Gallery
+### Feature 2: Day-2 Engagement Email
 
-**Problem:** No social proof. Users can't see real sites using themes.
+**Problem:** After installation, Wardrobe has no relationship with the user.
 
-**Solution:** Add "Sites Wearing [Theme]" gallery to showcase:
+**Solution:** Automated email sequence triggered by theme installation.
 
+**Email 1: Installation +24 hours**
 ```
-┌─────────────────────────────────────────────┐
-│  SITES WEARING EMBER                        │
-├─────────────────────────────────────────────┤
-│  [Screenshot]    [Screenshot]    [Screenshot]│
-│  site1.com       site2.com       site3.com  │
-│                                             │
-│  [Submit Your Site →]                       │
-└─────────────────────────────────────────────┘
+Subject: How's Ember treating you?
+
+You installed Ember yesterday. Here's what most Ember users do next:
+
+1. Customize the accent color
+   → Edit src/styles/theme.css, line 12
+
+2. Add your logo
+   → Replace public/logo.svg
+
+3. Adjust the header layout
+   → See our customization guide: [link]
+
+Wearing Ember well? Share your site with us:
+→ Submit to the gallery: [link]
+
+Trying on something else? That's what wardrobes are for:
+→ wardrobe list
+
+— The Wardrobe Team
+```
+
+**Email 2: Installation +7 days**
+```
+Subject: 127 sites are wearing Ember this week
+
+You're part of the Ember community now. Here's what's happening:
+
+• New this week: 3 Ember sites joined the gallery
+• Most popular customization: Dark mode variant
+• Coming soon: Ember 1.1 with pull-quote components
+
+See the gallery → [link]
+Submit your site → [link]
+```
+
+**Implementation:**
+- Capture email at install (optional, privacy-first)
+- Use existing Cloudflare Workers infrastructure
+- KV storage for subscriber management
+- Drip sequence via scheduled workers
+
+**Retention impact:** Creates ongoing relationship. Users who receive value post-purchase return.
+
+---
+
+### Feature 3: Theme Versioning & Updates
+
+**Problem:** Once installed, a theme is frozen. No reason to return.
+
+**Solution:** Version tracking with update notifications.
+
+**CLI Enhancement:**
+```bash
+npx wardrobe list
+
+Installed Themes:
+┌─────────┬───────────┬────────────┬─────────────────┐
+│ Theme   │ Installed │ Latest     │ Status          │
+├─────────┼───────────┼────────────┼─────────────────┤
+│ ember   │ 1.0.0     │ 1.1.0      │ Update available│
+└─────────┴───────────┴────────────┴─────────────────┘
+
+Run `wardrobe update ember` to get the latest.
+```
+
+**Update Command:**
+```bash
+npx wardrobe update ember
+
+Updating ember: 1.0.0 → 1.1.0
+
+What's new in Ember 1.1:
+• Pull-quote component for editorial emphasis
+• Dark mode variant (prefers-color-scheme support)
+• Performance improvements (-200ms load time)
+
+Proceed? [Y/n]
+```
+
+**Implementation:**
+- Add `version` field to theme registry
+- Store installed version in local `.wardrobe` config
+- Compare on `wardrobe list`
+- Non-destructive updates (preserve customizations)
+
+**Retention impact:** Creates return visits. Users check for updates like checking for new episodes.
+
+---
+
+### Feature 4: Site Gallery
+
+**Problem:** No social proof. No community. No way to see what's possible.
+
+**Solution:** Curated gallery of sites using each theme.
+
+**Gallery Structure:**
+```
+/gallery
+  /ember
+    - Site 1: "The Morning Brief" (news blog)
+    - Site 2: "Studio Volta" (design agency)
+    - Site 3: "Chef's Table Portland" (restaurant)
+  /forge
+    - Site 1: "DevTools Weekly" (developer newsletter)
+    ...
 ```
 
 **Submission Flow:**
-1. User clicks "Submit Your Site"
-2. Form: URL, Name, Theme Used, Screenshot (optional)
-3. Moderation queue
-4. Approved sites appear in gallery
-
-**The Flywheel:**
-```
-User installs → User submits → Gallery grows →
-New user sees gallery → They install → They submit → [LOOP]
-```
-
-**Why It Matters:**
-- **Investment:** User submits their site, now has stake in platform
-- **Social proof:** Others see real sites, increasing install confidence
-- **Return visits:** Users check if their submission is live, see others' sites
-
----
-
-### Feature 4: Theme Versioning & Update Notifications
-
-**Problem:** Once installed, themes are static. No reason to check for updates.
-
-**Solution - CLI Enhancement:**
 ```bash
-$ npx wardrobe list
+npx wardrobe submit
 
-INSTALLED THEMES:
-  ember     v1.0.0  (latest: v1.1.0 - NEW!)
+Submit your site to the Wardrobe Gallery
 
-AVAILABLE THEMES:
-  forge     v1.0.0
-  bloom     v1.0.0
-  drift     v1.0.0
-  minimal   v1.0.0
+Site URL: https://example.com
+Your name: Jane Smith
+Brief description: A newsletter about sustainable fashion
+Screenshot captured ✓
 
-Run `wardrobe update ember` to get the latest version.
+Submitted for review. We'll email you within 48 hours.
 ```
 
-**The Cliffhanger I Want:**
-> *"You're using Ember v1.0. Version 1.1 drops next week with magazine-style image galleries. Want early access?"*
+**Gallery Page Features:**
+- Filterable by theme
+- Screenshot + live link
+- "I'm wearing this" counter
+- Featured/Staff Pick badges
 
-That's a cliffhanger. That brings me back.
+**Implementation:**
+- Static gallery page (Astro)
+- Submission via CLI → Worker → KV queue
+- Manual curation (initially)
+- Cloudflare R2 for screenshot storage
 
-**Why It Matters:** Updates create ongoing value. Users return to get improvements.
+**Retention impact:**
+- Submitters return to see their site featured
+- Browsers return to see new submissions
+- Creates aspirational motivation ("My site could be here")
 
 ---
 
-### Feature 5: Progress Tracking
+### Feature 5: Behind-the-Scenes Content
 
-**Problem:** Every visit is a first visit. No acknowledgment of history.
+**Problem:** Coming Soon themes are a season cliffhanger, but no episode-to-episode engagement.
 
-**Solution - Local State Tracking:**
-Store in `~/.wardrobe/history.json`:
-```json
-{
-  "installed": ["ember", "forge"],
-  "previewed": ["bloom"],
-  "firstInstall": "2026-04-10",
-  "installCount": 2
-}
+**Solution:** Monthly "Design Diary" content showing theme creation process.
+
+**Content Calendar:**
+```
+April 2026: "Chronicle: How We're Designing for Long-Form"
+- Typography exploration
+- Reading rhythm research
+- Early wireframes
+
+May 2026: "Aurora: Finding the Line Between Bold and Obnoxious"
+- Color theory for attention
+- A/B test results from user research
+- Component sketches
+
+June 2026: "Chronicle Progress Update"
+- Beta screenshots
+- User feedback integration
+- Launch date confirmation
 ```
 
-**CLI Integration:**
-```bash
-$ npx wardrobe status
+**Distribution:**
+- Email to subscribers
+- Blog post on showcase site
+- Social media excerpts
 
-YOUR WARDROBE JOURNEY:
-  Themes tried: 3 of 9
-  Currently wearing: ember (installed Apr 10)
+**Implementation:**
+- Markdown content in `/content/diary/`
+- Rendered on showcase site
+- Email via Workers
 
-  Themes you might like:
-    drift - "Quiet confidence" - similar to ember
-```
-
-**Why It Matters:** Progress creates investment. "3 of 9" implies completion desire.
+**Retention impact:** Creates appointment content. Users check in monthly to see progress on themes they're anticipating.
 
 ---
 
-### Feature 6: Post-Install Touchpoints
+### Feature 6: Progress & Achievement System
+
+**Problem:** No sense of journey. Installation is the end, not the beginning.
+
+**Solution:** Light gamification that recognizes user milestones.
+
+**Achievements:**
+```
+┌─────────────────────────────────────────────────────┐
+│ Your Wardrobe Journey                               │
+├─────────────────────────────────────────────────────┤
+│ ✓ First Fit       - Installed your first theme     │
+│ ✓ Adventurous     - Tried 3 different themes       │
+│ ○ Curator         - Submitted to the gallery       │
+│ ○ Early Adopter   - Installed a theme on launch day│
+│ ○ Feedback Friend - Submitted a feature request    │
+└─────────────────────────────────────────────────────┘
+```
+
+**Implementation:**
+- Local tracking in `.wardrobe/journey.json`
+- Optional sync to account (future)
+- Display on `wardrobe status`
+
+**Retention impact:** Creates unfinished business. Users return to complete their journey.
+
+---
+
+### Feature 7: Post-Install Touchpoints
 
 **Problem:** After install, no prompt for next action.
 
-**Solution - Success Screen Enhancement:**
+**Solution — Success Screen Enhancement:**
 ```
 ✓ Your site is now wearing ember.
 
@@ -267,34 +384,67 @@ Your choice: _
 >
 > #emdash #wardrobe
 
-**Why It Matters:** Immediate next action captures momentum. Sharing creates return visits (checking engagement).
+**Retention impact:** Immediate next action captures momentum. Sharing creates return visits (checking engagement).
 
 ---
 
-### Feature 7: Explicit Safety Narrative
+## The Retention Loop (Complete)
 
-**Problem:** The backup story is silent. `src.backup` is created but users don't know they have a safety net.
-
-**Solution:** Make safety explicit in messaging:
-> "Your words. New clothes. Zero risk. Try them all."
-
-Add `wardrobe restore` command to complete the try-on metaphor.
-
-**Why It Matters:** In great drama, transformation comes with risk. Here, the transformation is *too* safe. Lean INTO the safety narrative as a feature.
+```
+User installs theme
+    ↓
+CLI shows transformation (Feature 1)
+    ↓
+Day-2 email with customization tips (Feature 2)
+    ↓
+User customizes, shares site
+    ↓
+Gallery submission (Feature 4)
+    ↓
+Site featured, user notified
+    ↓
+User checks for theme updates (Feature 3)
+    ↓
+Behind-the-scenes email arrives (Feature 5)
+    ↓
+User anticipates new theme
+    ↓
+New theme launches
+    ↓
+User installs new theme
+    ↓
+[LOOP]
+```
 
 ---
 
-## v1.1 Prioritized Backlog
+## Implementation Priority
 
-| Priority | Feature | Effort | Retention Impact |
-|----------|---------|--------|------------------|
-| **P0** | Functional Email Capture | Low | Critical |
-| **P0** | Post-Install Preview Prompt | Low | High |
-| **P1** | Community Showcase Gallery | Medium | High |
-| **P1** | Theme Versioning | Medium | Medium |
-| **P2** | Progress Tracking | Medium | Medium |
-| **P2** | Post-Install Touchpoints | Low | Medium |
-| **P3** | Explicit Safety/Restore | Low | Low |
+### Sprint 1 (Immediate)
+| Feature | Effort | Impact |
+|---------|--------|--------|
+| Post-Install Reveal | Low | High |
+| Wire Email Capture | Low | Critical |
+
+### Sprint 2 (Next 2 Weeks)
+| Feature | Effort | Impact |
+|---------|--------|--------|
+| Theme Versioning | Medium | High |
+| Day-2 Email Sequence | Medium | High |
+
+### Sprint 3 (Month 2)
+| Feature | Effort | Impact |
+|---------|--------|--------|
+| Gallery MVP (static) | Medium | Medium |
+| Gallery Submission Flow | Medium | Medium |
+| Behind-the-Scenes Content | Low | Medium |
+
+### Future
+| Feature | Effort | Impact |
+|---------|--------|--------|
+| Progress System | Medium | Low-Medium |
+| Post-Install Touchpoints | Low | Medium |
+| Account System | High | High (enables all) |
 
 ---
 
@@ -314,36 +464,30 @@ Add `wardrobe restore` command to complete the try-on metaphor.
 | Theme update adoption rate | 50%+ within 7 days |
 | User-to-evangelist conversion | 10% share or submit |
 
----
-
-## The Path to 8+
-
-To reach an 8/10 rating:
-
-1. **Connect the email capture** — Wire a real endpoint. Today.
-2. **Post-install preview** — Show the transformation, don't just announce it
-3. **Community showcase** — Let users see themselves in the story
-4. **Theme versioning** — Create reasons to return for updates
-5. **Progress tracking** — "You've explored 3 of 9 themes"
+### Targets (Q3 2026)
+| Metric | Target |
+|--------|--------|
+| Email capture rate | 15% of installs |
+| Day-2 email open rate | 45% |
+| 30-day retention | 25% |
+| Theme diversity | 20% tried 2+ themes |
+| Gallery submissions | 50 sites |
 
 ---
 
-## The Retention Narrative
+## Closing Principle
 
-**Before v1.1:**
-> User installs theme → Story ends
+> "In television, we say: make them laugh, make them cry, make them wait.
+> Wardrobe has the wait. Now it needs the reasons to stay."
 
-**After v1.1:**
-> User installs theme → Sees transformation → Submits to gallery → Gets email about new theme → Returns to try it → Updates previous theme → Shares their site → [CONTINUES]
+The goal isn't to trap users. It's to give them reasons to return because they *want* to—because there's always something new to see, something to contribute, something to anticipate.
 
-This is how a pilot becomes a series.
+A wardrobe isn't something you visit once. It's something you return to every morning, wondering who you want to be today.
+
+Build for that.
 
 ---
 
-## Closing Thought
-
-> "Transformation needs witnesses. It needs consequence. It needs a reason to return to see what happens next. The bones are excellent. The characters have voice. The transformation moment is emotional. Now we need the ensemble cast—the community that turns individual stories into a shared universe."
-
-*— Shonda Rhimes*
-*Board Member, Great Minds Agency*
-*April 11, 2026*
+*Retention Roadmap v1.1*
+*Wardrobe Theme Marketplace*
+*Great Minds Agency*

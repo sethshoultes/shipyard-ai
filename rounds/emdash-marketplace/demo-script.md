@@ -1,145 +1,123 @@
 # Wardrobe Demo Script
-*Runtime: 2 minutes*
+**Runtime: 2 minutes**
 
 ---
 
-**[SCREEN: Close-up on a laptop screen. 2:47 AM in the menu bar. A website that looks... fine. Functional. Forgettable.]**
+[SCREEN: A laptop. Late. The glow of the screen on someone's face. Clock shows 1:47 AM.]
 
 NARRATOR:
-It's three in the morning and you're staring at your website wondering why it doesn't feel like you built it.
+Here's a moment you know.
 
-**[SCREEN: The site scrolls. Blog posts. An about page. Real work. Real words. Generic design.]**
-
-NARRATOR:
-You did. Every word. Every section. You stayed up late getting the copy right, making sure it sounded like you—and then you looked at it and thought: this could be anyone's site.
-
-**[SCREEN: Quick cuts — three other websites. Different logos, same template energy. Same Bootstrap grays. Same "clean minimal" that means nothing.]**
+[SCREEN: Pull back to reveal a website on screen. It's... fine. Default fonts. Gray palette. The content is clearly someone's passion project—there's a blog, an about page, real writing. But the design says nothing.]
 
 NARRATOR:
-Because it could be.
+You've been building this thing for three months. Every paragraph, you wrote. Every headline, you sweated. You got the words right. You know you did.
 
-**[SCREEN: Back to the original site. Cursor hovers over the CSS file in a code editor. 847 lines.]**
-
-NARRATOR:
-And you know what you're supposed to do. Learn CSS. Watch tutorials. Spend a weekend reading about "design systems." Maybe hire someone—if you have the budget, which you probably don't, because you're building this thing yourself at three in the morning.
-
-**[SCREEN: The laptop closes. Beat. Then it opens again. Fresh terminal window.]**
+[SCREEN: The cursor blinks on the site. The design is competent. Generic. Invisible.]
 
 NARRATOR:
-Here's another idea.
+And then you look at it... and it looks like a million other sites. It looks like you grabbed a template and threw your words in.
 
-**[SCREEN: User types: `npx wardrobe list`]**
-
-NARRATOR:
-What if you could just... try something on?
-
-**[SCREEN: The terminal fills with output:]**
-
-```
-Available themes:
-
-  EMBER
-    Bold. Editorial. For people with something to say.
-    npx wardrobe install ember
-
-  FORGE
-    Dark and technical. Built for builders.
-    npx wardrobe install forge
-
-  SLATE
-    Clean and professional. Trust at first glance.
-    npx wardrobe install slate
-
-  DRIFT
-    Minimal and airy. Let your content breathe.
-    npx wardrobe install drift
-
-  BLOOM
-    Warm and inviting. Where community feels at home.
-    npx wardrobe install bloom
-```
+[SCREEN: Close on the person's face. The frustration is real.]
 
 NARRATOR:
-Five themes. Not templates—themes. Personalities. One of them is you. And you're going to know which one by the tagline.
+Because you did.
 
-**[SCREEN: Cursor stops on "Bold. Editorial. For people with something to say."]**
-
-NARRATOR:
-Let's say that's you. Let's say you have something to say.
-
-**[SCREEN: User types: `npx wardrobe install ember`]**
-
-**[SCREEN: Progress bar appears, fills rapidly:]**
-
-```
-Downloading... [████████████████████████████░░] 93%
-```
-
-**[SCREEN: Progress completes. Output:]**
-
-```
-✓ Theme installed.
-
-Your site is now wearing ember.
-
-Try it on. If it doesn't fit, try another.
-
-Installed in 2.14s
-```
+[SCREEN: Cut to—a code editor. CSS file open. 900 lines. The cursor scrolls. And scrolls. And scrolls.]
 
 NARRATOR:
-Two seconds. Not two hours. Not two weekends. Two. Seconds.
+You could learn CSS. Really learn it. Flexbox. Grid. Custom properties. Two weekends, maybe three. And then you'd still have to figure out what actually looks good. The colors. The fonts. The spacing that makes something feel professional instead of just... there.
 
-**[SCREEN: Browser window. User hits refresh. The page transforms—same content, completely different feel. Dark navy. Burnt orange. Serif headings. Magazine-style grids. Intentional. Confident. Bold.]**
-
-NARRATOR:
-Same words. Same blog posts. Same about page you wrote. But now?
-
-**[SCREEN: Slow pan down the transformed site. Pull quotes. Asymmetric layouts. The content finally looks like someone meant it.]**
+[SCREEN: The laptop closes. Hard cut to black. Beat.]
 
 NARRATOR:
-Now it looks like someone built this on purpose.
+Or.
 
-**[SCREEN: Terminal again.]**
-
-NARRATOR:
-But here's the thing—
-
-**[SCREEN: User types: `npx wardrobe install drift`]**
+[SCREEN: Terminal window opens.]
 
 NARRATOR:
-—you're not locked in.
+You could try something on.
 
-**[SCREEN: Two-second install. Browser refresh. Same content now in Drift — light, airy, thin sans-serif, sage green accents, generous whitespace.]**
-
-NARRATOR:
-Don't love it? Change it. Your backup's automatic. Your content never moves.
-
-**[SCREEN: Rapid montage — Forge (dark mode, terminal aesthetic, neon green), Slate (professional, structured, trustworthy), Bloom (warm, inviting, rounded corners). Same content wearing five different outfits.]**
+[SCREEN: Hands type: npx wardrobe install ember — then pause before hitting Enter.]
 
 NARRATOR:
-Five personalities. One command. Your words, finally dressed the way you imagined them.
+This is Ember. "Bold. Editorial. For people with something to say."
 
-**[SCREEN: Split screen — the "before" generic site on the left, the Ember-transformed site on the right. Same content. Night and day.]**
-
-NARRATOR:
-We didn't touch a single word. We just changed what it was wearing.
-
-**[SCREEN: Terminal, clean and simple:]**
-
-```
-npx wardrobe install ember
-```
-
-**[SCREEN: The command fades. Wardrobe logo appears.]**
+[SCREEN: Hit Enter. A progress bar appears, fills in about two seconds.]
 
 NARRATOR:
-Wardrobe. Try it on. If it doesn't fit?
+Watch what happens next.
 
-**[SCREEN: Text appears below the logo: "Try another."]**
+[SCREEN: Terminal shows: "✓ Theme installed. Your site is now wearing Ember."]
+
+[SCREEN: Browser tab. The generic site is still visible. The cursor moves to the refresh button.]
 
 NARRATOR:
-Try another.
+Same content. Same database. Same words you stayed up writing.
+
+[SCREEN: Click refresh. The page transforms.]
+
+[SCREEN: Dark navy background. Burnt orange accents. Serif headings that command the page. Magazine-style layout. Pull quotes. Asymmetric grids. The SAME CONTENT—but now it has presence. Now it has voice.]
+
+NARRATOR:
+But now?
+
+[SCREEN: Slow scroll down the transformed site. The blog posts look like features in a magazine. The about page looks like someone important wrote it.]
+
+NARRATOR:
+Now it looks like you *meant* it.
+
+[SCREEN: Hold on the transformed site. Let it breathe.]
+
+NARRATOR:
+That took two seconds. Not two weekends. Two seconds.
+
+[SCREEN: Cut back to terminal.]
+
+NARRATOR:
+And here's the thing—
+
+[SCREEN: Type: npx wardrobe install forge]
+
+NARRATOR:
+—you're not committed. You're just trying things on.
+
+[SCREEN: Progress bar. Done. Refresh. Now the site is dark mode, neon green accents, monospace fonts. Technical. Sharp. A developer's site.]
+
+NARRATOR:
+That's Forge. Built for builders.
+
+[SCREEN: Terminal again: npx wardrobe install drift]
+
+[SCREEN: Refresh. Now it's light, airy, generous whitespace, sage green. The same content, breathing differently.]
+
+NARRATOR:
+That's Drift. Minimal. Airy.
+
+[SCREEN: Quick montage—Slate (professional, gray-blue, trustworthy), Bloom (warm, rounded corners, terracotta)—same content, five different personalities.]
+
+NARRATOR:
+Five themes. Five versions of you. Your old design is backed up automatically. Your content never moves. You're just... changing clothes.
+
+[SCREEN: Split screen—the original generic site on the left. The Ember-transformed site on the right. Same words. Different worlds.]
+
+NARRATOR:
+Same person. Different outfit.
+
+[SCREEN: Terminal, clean. Just the command: npx wardrobe install ember]
+
+NARRATOR:
+One command. Three seconds. And your site finally looks like you built it on purpose.
+
+[SCREEN: The Wardrobe logo fades in. Below it: "Try it on."]
+
+NARRATOR:
+Wardrobe.
+
+[SCREEN: Tagline appears: "If it doesn't fit, try another."]
+
+NARRATOR:
+Your words deserve it.
 
 ---
 
