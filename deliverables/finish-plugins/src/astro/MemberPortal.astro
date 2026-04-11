@@ -1,0 +1,718 @@
+---
+/**
+ * MemberPortal.astro — Task 7 (Phase 3 Wave 2)
+ *
+ * Member portal: content library view.
+ * Shows accessible content, locked content with unlock dates, plan info.
+ *
+ * Features:
+ * - "Your Content Library" — list of pages/courses member can access
+ * - Show locked content with unlock dates (drip schedule)
+ * - Show plan info + billing date
+ * - Clean, minimal design
+ * - Fetch from /membership/portal API endpoint
+ *
+ * Props from Portable Text block:
+ *   - showPlanInfo?: boolean (default true)
+ *   - showLockedContent?: boolean (default true)
+ *   - title?: string (custom title, default "Your Content Library")
+ */
+
+interface ContentItem {
+	id: string;
+	title: string;
+	type: "page" | "course"; // Type of content
+	url?: string;
+	locked: boolean;
+	unlocksOn?: string; // ISO date
+	daysRemaining?: number;
+	category?: string;
+}
+
+interface PlanInfo {
+	name: string;
+	renewalDate?: string; // ISO date
+	status: "active" | "trialing" | "expired";
+	features: string[];
+}
+
+interface PortalData {
+	member?: {
+		name?: string;
+		email?: string;
+	};
+	content: ContentItem[];
+	plan?: PlanInfo;
+	lastSync?: string; // ISO date
+}
+
+interface Props {
+	showPlanInfo?: boolean;
+	showLockedContent?: boolean;
+	title?: string;
+}
+
+const {
+	showPlanInfo = true,
+	showLockedContent = true,
+	title = "Your Content Library",
+} = Astro.props;
+
+// Get member email from cookie
+const memberEmail = Astro.cookies.get("membership-email")?.value?.toLowerCase() || "";
+
+let portalData: PortalData = {
+	content: [],
+	plan: undefined,
+};
+
+let error: string | null = null;
+
+// Fetch portal data from API
+if (memberEmail) {
+	try {
+		const response = await fetch(
+			new URL(
+				`/_emdash/api/plugins/membership/portal?email=${encodeURIComponent(memberEmail)}`,
+				Astro.url.origin
+			),
+			{ credentials: "include" }
+		);
+
+		if (response.ok) {
+			portalData = (await response.json()) as PortalData;
+		} else {
+			error = "Failed to load content library";
+		}
+	} catch (err) {
+		console.error("Portal data fetch error:", err);
+		error = "Error loading your content library";
+	}
+}
+
+// Separate accessible and locked content
+const accessibleContent = portalData.content.filter((c) => !c.locked);
+const lockedContent = showLockedContent
+	? portalData.content.filter((c) => c.locked)
+	: [];
+
+/**
+ * Format unlock date for display
+ */
+function formatUnlockDate(dateStr: string): string {
+	try {
+		const date = new Date(dateStr);
+		return new Intl.DateTimeFormat("en-US", {
+			month: "short",
+			day: "numeric",
+			year: "numeric",
+		}).format(date);
+	} catch {
+		return dateStr;
+	}
+}
+
+/**
+ * Format date for plan renewal
+ */
+function formatRenewalDate(dateStr: string | undefined): string {
+	if (!dateStr) return "Not specified";
+	try {
+		const date = new Date(dateStr);
+		return new Intl.DateTimeFormat("en-US", {
+			month: "short",
+			day: "numeric",
+			year: "numeric",
+		}).format(date);
+	} catch {
+		return dateStr;
+	}
+}
+
+/**
+ * Get content type badge
+ */
+function getContentTypeBadge(type: string): string {
+	return type === "course" ? "Course" : "Page";
+}
+---
+
+<div class="member-portal" role="main" aria-label="Member portal">
+	<!-- Header -->
+	<div class="member-portal__header">
+		<h1 class="member-portal__title">{title}</h1>
+		{portalData.member?.name && (
+			<p class="member-portal__welcome">
+				Welcome, <span class="member-portal__name">{portalData.member.name}</span>
+			</p>
+		)}
+	</div>
+
+	<!-- Error state -->
+	{error && (
+		<div class="member-portal__error" role="alert" aria-live="polite">
+			<p>{error}</p>
+			<a href="#retry" class="member-portal__retry-btn">Retry</a>
+		</div>
+	)}
+
+	<!-- Plan info section -->
+	{showPlanInfo && portalData.plan && (
+		<div class="member-portal__plan-section">
+			<div class="member-portal__plan-card">
+				<div class="member-portal__plan-header">
+					<h3 class="member-portal__plan-name">{portalData.plan.name}</h3>
+					<span class={`member-portal__plan-status member-portal__plan-status--${portalData.plan.status}`}>
+						{portalData.plan.status === "active" ? "Active" : portalData.plan.status === "trialing" ? "Trial" : "Expired"}
+					</span>
+				</div>
+
+				{portalData.plan.features && portalData.plan.features.length > 0 && (
+					<div class="member-portal__plan-features">
+						<p class="member-portal__plan-features-label">Included features:</p>
+						<ul class="member-portal__plan-features-list">
+							{portalData.plan.features.slice(0, 3).map((feature) => (
+								<li class="member-portal__plan-feature">{feature}</li>
+							))}
+							{portalData.plan.features.length > 3 && (
+								<li class="member-portal__plan-feature">
+									+ {portalData.plan.features.length - 3} more
+								</li>
+							)}
+						</ul>
+					</div>
+				)}
+
+				{portalData.plan.renewalDate && (
+					<div class="member-portal__plan-renewal">
+						<span class="member-portal__plan-renewal-label">Renews on:</span>
+						<span class="member-portal__plan-renewal-date">
+							{formatRenewalDate(portalData.plan.renewalDate)}
+						</span>
+					</div>
+				)}
+			</div>
+		</div>
+	)}
+
+	<!-- Accessible content section -->
+	{accessibleContent.length > 0 ? (
+		<section class="member-portal__content-section" aria-label="Available content">
+			<h2 class="member-portal__section-title">
+				Available Content ({accessibleContent.length})
+			</h2>
+			<div class="member-portal__content-grid">
+				{accessibleContent.map((item) => (
+					<article class="member-portal__content-item">
+						<div class="member-portal__content-header">
+							<h3 class="member-portal__content-title">
+								{item.url ? (
+									<a href={item.url} class="member-portal__content-link">
+										{item.title}
+									</a>
+								) : (
+									<span>{item.title}</span>
+								)}
+							</h3>
+							<span
+								class={`member-portal__content-badge member-portal__content-badge--${item.type}`}
+								aria-label={`Content type: ${getContentTypeBadge(item.type)}`}
+							>
+								{getContentTypeBadge(item.type)}
+							</span>
+						</div>
+
+						{item.category && (
+							<p class="member-portal__content-category">{item.category}</p>
+						)}
+
+						<a
+							href={item.url || "#"}
+							class="member-portal__content-btn"
+							aria-label={`View ${item.title}`}
+						>
+							View Content
+							<span aria-hidden="true">→</span>
+						</a>
+					</article>
+				))}
+			</div>
+		</section>
+	) : (
+		<div class="member-portal__empty" role="status" aria-live="polite">
+			<p>No content available yet. Check back soon!</p>
+		</div>
+	)}
+
+	<!-- Locked content section -->
+	{showLockedContent && lockedContent.length > 0 && (
+		<section class="member-portal__locked-section" aria-label="Coming soon content">
+			<h2 class="member-portal__section-title">
+				Coming Soon ({lockedContent.length})
+			</h2>
+			<p class="member-portal__locked-subtitle">
+				These items will unlock as part of your membership journey.
+			</p>
+
+			<div class="member-portal__locked-grid">
+				{lockedContent.map((item) => (
+					<div class="member-portal__locked-item">
+						<div class="member-portal__locked-header">
+							<h4 class="member-portal__locked-title">{item.title}</h4>
+							<span class={`member-portal__locked-badge member-portal__locked-badge--${item.type}`}>
+								{getContentTypeBadge(item.type)}
+							</span>
+						</div>
+
+						{item.category && (
+							<p class="member-portal__locked-category">{item.category}</p>
+						)}
+
+						<div class="member-portal__unlock-info">
+							{item.daysRemaining && item.daysRemaining > 0 ? (
+								<>
+									<p class="member-portal__unlock-soon">
+										Unlocks in {item.daysRemaining} day{item.daysRemaining !== 1 ? "s" : ""}
+									</p>
+									{item.unlocksOn && (
+										<p class="member-portal__unlock-date">
+											{formatUnlockDate(item.unlocksOn)}
+										</p>
+									)}
+								</>
+							) : (
+								<p class="member-portal__unlock-coming">Coming soon</p>
+							)}
+						</div>
+					</div>
+				))}
+			</div>
+		</section>
+	)}
+
+	<!-- Footer with last sync info -->
+	{portalData.lastSync && (
+		<div class="member-portal__footer">
+			<p class="member-portal__last-sync">
+				Last updated: {new Date(portalData.lastSync).toLocaleString()}
+			</p>
+		</div>
+	)}
+</div>
+
+<style>
+	.member-portal {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+	}
+
+	/* Header */
+	.member-portal__header {
+		border-bottom: 2px solid #d4a853;
+		padding-bottom: 1rem;
+	}
+
+	.member-portal__title {
+		margin: 0 0 0.5rem 0;
+		font-size: 1.75rem;
+		color: #2c2c2c;
+		font-family: Lora, serif;
+		font-weight: 600;
+	}
+
+	.member-portal__welcome {
+		margin: 0;
+		font-size: 0.95rem;
+		color: #666;
+	}
+
+	.member-portal__name {
+		font-weight: 600;
+		color: #c4704b;
+	}
+
+	/* Error state */
+	.member-portal__error {
+		padding: 1.5rem;
+		background-color: #ffebee;
+		border: 1px solid #ef5350;
+		border-radius: 0.5rem;
+		text-align: center;
+	}
+
+	.member-portal__error p {
+		margin: 0 0 0.75rem 0;
+		color: #c62828;
+		font-weight: 500;
+	}
+
+	.member-portal__retry-btn {
+		display: inline-block;
+		padding: 0.75rem 1.5rem;
+		min-height: 44px;
+		background-color: #c62828;
+		color: white;
+		text-decoration: none;
+		border-radius: 0.25rem;
+		font-weight: 500;
+		transition: background-color 0.2s;
+		line-height: 1.5;
+		text-align: center;
+	}
+
+	.member-portal__retry-btn:hover {
+		background-color: #b71c1c;
+	}
+
+	.member-portal__retry-btn:focus {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	.member-portal__retry-btn:focus-visible {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	/* Plan section */
+	.member-portal__plan-section {
+		margin-bottom: 1rem;
+	}
+
+	.member-portal__plan-card {
+		padding: 1.5rem;
+		background: linear-gradient(135deg, #fff3e0 0%, #fff8e1 100%);
+		border: 1px solid #d4a853;
+		border-radius: 0.5rem;
+	}
+
+	.member-portal__plan-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 1rem;
+	}
+
+	.member-portal__plan-name {
+		margin: 0;
+		font-size: 1.25rem;
+		color: #2c2c2c;
+		font-family: Lora, serif;
+		font-weight: 600;
+	}
+
+	.member-portal__plan-status {
+		padding: 0.25rem 0.75rem;
+		border-radius: 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.member-portal__plan-status--active {
+		background-color: #e8f5e9;
+		color: #2e7d32;
+	}
+
+	.member-portal__plan-status--trialing {
+		background-color: #e3f2fd;
+		color: #1976d2;
+	}
+
+	.member-portal__plan-status--expired {
+		background-color: #ffebee;
+		color: #c62828;
+	}
+
+	.member-portal__plan-features {
+		margin-bottom: 1rem;
+	}
+
+	.member-portal__plan-features-label {
+		margin: 0 0 0.5rem 0;
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: #666;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.member-portal__plan-features-list {
+		margin: 0;
+		padding-left: 1.5rem;
+		list-style: none;
+	}
+
+	.member-portal__plan-feature {
+		margin: 0.25rem 0;
+		font-size: 0.9rem;
+		color: #555;
+		position: relative;
+		padding-left: 0.5rem;
+	}
+
+	.member-portal__plan-feature::before {
+		content: "✓";
+		position: absolute;
+		left: -1rem;
+		color: #2e7d32;
+		font-weight: 700;
+	}
+
+	.member-portal__plan-renewal {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.75rem;
+		background-color: rgba(255, 255, 255, 0.5);
+		border-radius: 0.25rem;
+		font-size: 0.9rem;
+	}
+
+	.member-portal__plan-renewal-label {
+		font-weight: 600;
+		color: #666;
+	}
+
+	.member-portal__plan-renewal-date {
+		color: #c4704b;
+		font-weight: 600;
+	}
+
+	/* Content sections */
+	.member-portal__content-section,
+	.member-portal__locked-section {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.member-portal__section-title {
+		margin: 0;
+		font-size: 1.2rem;
+		color: #2c2c2c;
+		font-family: Lora, serif;
+		font-weight: 600;
+	}
+
+	.member-portal__locked-subtitle {
+		margin: 0;
+		font-size: 0.9rem;
+		color: #999;
+		font-style: italic;
+	}
+
+	/* Content grid */
+	.member-portal__content-grid,
+	.member-portal__locked-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+		gap: 1rem;
+	}
+
+	.member-portal__content-item,
+	.member-portal__locked-item {
+		padding: 1rem;
+		border: 1px solid #e0e0e0;
+		border-radius: 0.5rem;
+		background-color: white;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		transition: box-shadow 0.2s;
+	}
+
+	.member-portal__content-item:hover {
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.member-portal__content-header,
+	.member-portal__locked-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: start;
+		gap: 0.5rem;
+	}
+
+	.member-portal__content-title,
+	.member-portal__locked-title {
+		margin: 0;
+		font-size: 1rem;
+		color: #2c2c2c;
+		font-weight: 600;
+	}
+
+	.member-portal__content-link {
+		color: #c4704b;
+		text-decoration: none;
+		transition: color 0.2s;
+	}
+
+	.member-portal__content-link:hover {
+		color: #b55939;
+		text-decoration: underline;
+	}
+
+	.member-portal__content-badge,
+	.member-portal__locked-badge {
+		padding: 0.25rem 0.5rem;
+		border-radius: 0.2rem;
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		white-space: nowrap;
+	}
+
+	.member-portal__content-badge--page,
+	.member-portal__locked-badge--page {
+		background-color: #e3f2fd;
+		color: #1976d2;
+	}
+
+	.member-portal__content-badge--course,
+	.member-portal__locked-badge--course {
+		background-color: #f3e5f5;
+		color: #7b1fa2;
+	}
+
+	.member-portal__content-category,
+	.member-portal__locked-category {
+		margin: 0;
+		font-size: 0.8rem;
+		color: #999;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.member-portal__content-btn {
+		padding: 0.75rem 1.5rem;
+		min-height: 44px;
+		background-color: #c4704b;
+		color: white;
+		text-decoration: none;
+		border-radius: 0.25rem;
+		font-weight: 500;
+		font-size: 0.85rem;
+		text-align: center;
+		transition: background-color 0.2s;
+		line-height: 1.5;
+	}
+
+	.member-portal__content-btn:hover {
+		background-color: #b55939;
+	}
+
+	.member-portal__content-btn:focus {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	.member-portal__content-btn:focus-visible {
+		outline: 3px solid #d4a853;
+		outline-offset: 2px;
+	}
+
+	/* Locked content unlock info */
+	.member-portal__unlock-info {
+		padding: 0.75rem;
+		background-color: #f5f5f5;
+		border-radius: 0.25rem;
+		text-align: center;
+	}
+
+	.member-portal__unlock-soon,
+	.member-portal__unlock-coming {
+		margin: 0;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: #666;
+	}
+
+	.member-portal__unlock-date {
+		margin: 0.25rem 0 0 0;
+		font-size: 0.8rem;
+		color: #999;
+	}
+
+	/* Empty state */
+	.member-portal__empty {
+		text-align: center;
+		padding: 2rem;
+		color: #999;
+		font-style: italic;
+	}
+
+	/* Footer */
+	.member-portal__footer {
+		padding: 1rem 0;
+		border-top: 1px solid #e0e0e0;
+		text-align: center;
+	}
+
+	.member-portal__last-sync {
+		margin: 0;
+		font-size: 0.8rem;
+		color: #999;
+	}
+
+	/* Mobile responsive: 375px and above */
+	@media (max-width: 768px) {
+		.member-portal {
+			gap: 1.5rem;
+		}
+
+		.member-portal__title {
+			font-size: 1.5rem;
+		}
+
+		.member-portal__content-grid,
+		.member-portal__locked-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.member-portal__plan-header {
+			flex-direction: column;
+			align-items: start;
+			gap: 0.5rem;
+		}
+
+		.member-portal__content-btn {
+			width: 100%;
+		}
+
+		.member-portal__retry-btn {
+			width: 100%;
+		}
+	}
+
+	/* Extra small screens: 320px and above */
+	@media (max-width: 375px) {
+		.member-portal {
+			padding: 0.75rem;
+			gap: 1rem;
+		}
+
+		.member-portal__title {
+			font-size: 1.25rem;
+		}
+
+		.member-portal__plan-card {
+			padding: 1rem;
+		}
+
+		.member-portal__content-item,
+		.member-portal__locked-item {
+			padding: 0.75rem;
+		}
+
+		.member-portal__content-btn,
+		.member-portal__retry-btn {
+			width: 100%;
+			min-height: 44px;
+			padding: 0.75rem 1rem;
+		}
+	}
+</style>

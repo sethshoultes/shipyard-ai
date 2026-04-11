@@ -1,25 +1,25 @@
-# WARDROBE - Atomic Requirements Specification
+# MemberShip Plugin - Atomic Requirements Specification
 
-**Product:** Theme Marketplace for Emdash CMS
-**Project Slug:** emdash-marketplace
-**Generated:** April 9, 2026
-**Sources:** PRD (emdash-marketplace.md), Decisions (decisions.md), Board Verdict
+**Product:** MemberShip Plugin for Emdash CMS
+**Project Slug:** finish-plugins
+**Generated:** April 11, 2026
+**Sources:** decisions.md (Consolidated Board Decisions), EMDASH-GUIDE.md (Plugin Architecture)
 
 ---
 
 ## The Essence
 
 > **What is this product REALLY about?**
-> One command transforms your site into something beautiful — your content stays, only the skin changes.
+> Making people who feel inadequate feel capable.
 
 > **What's the feeling it should evoke?**
-> "I can't believe I just did that."
+> "I built that."
 
 > **What's the one thing that must be perfect?**
-> Seeing YOUR content wearing a new theme.
+> The first 30 seconds.
 
 > **Creative direction:**
-> Instant dignity.
+> Disappear.
 
 ---
 
@@ -27,1108 +27,694 @@
 
 | Priority | Count | Description |
 |----------|-------|-------------|
-| P0-Blocker | 3 | Board conditions - must complete before launch |
-| P1-Must | 48 | Core MVP functionality |
-| P2-Should | 10 | Strong recommendations |
-| P3-Nice | 5 | Future phases (V2+) |
-| **Total** | **66** | |
+| P0-Blocker | 7 | Ship Gate Checklist items - must complete before launch |
+| P1-Must | 18 | Core MVP functionality from locked decisions |
+| P2-Risk | 6 | Risk mitigation requirements |
+| P3-Cut | 6 | Explicitly NOT in v1 |
+| **Total** | **37** | |
 
 ---
 
-## Critical Overrides (Decisions.md > PRD)
+## Critical Overrides (decisions.md Locked)
 
-| Topic | PRD Says | Decisions.md Says (LOCKED) |
-|-------|----------|---------------------------|
-| Product Name | emdash-themes | **Wardrobe** |
-| CLI Command | npx emdash-themes install | **npx wardrobe install** |
-| Preview Method | Live preview server | **Screenshots only (V1)** |
-| Demo Sites | Live demo per theme | **CUT - Screenshots instead** |
-| Architecture | Next.js marketplace | **Static HTML showcase** |
-| Install Speed | Under 30 seconds | **Under 3 seconds** |
-| Distribution | npm packages | **R2 tarballs (recommended)** |
-
----
-
-## Locked Decisions Summary
-
-| # | Decision | Winner | Build Implication |
-|---|----------|--------|-------------------|
-| 1 | Product Name: Wardrobe | Steve | CLI is `npx wardrobe install`, not emdash-themes |
-| 2 | Theme Count: 5 | Steve | Ember, Forge, Slate, Drift, Bloom |
-| 3 | Preview: Screenshots | Elon | No live preview infrastructure in V1 |
-| 4 | Architecture: CLI-first | Elon | Static HTML showcase, CLI downloads tarballs |
-| 5 | Install Speed: <3 seconds | Elon | Aggressive caching, small tarballs |
-| 6 | Brand Voice | Steve | Confident friend, zero jargon |
-| 7 | Distribution: Themes in Core | Elon | `emdash create --theme [name]` |
-| 8 | Showcase: Static HTML | Compromise | Deploy to Cloudflare Pages |
+| Topic | Previous State | Locked Decision |
+|-------|----------------|-----------------|
+| Product Name | Various | **MemberShip** (searchable, obvious) |
+| Ship Sequence | Both together | **MemberShip ships FIRST, alone** |
+| Empty State | Demo data | **Empty state with clear CTA** |
+| Admin UI | Basic | **Equal design investment as customer-facing** |
+| Copy Style | Corporate | **Terse, confident, warm (3-word principle)** |
+| Permission Model | Multi-tier | **Two tiers only: Members vs Non-Members** |
+| Documentation | Follow-up | **Complete BEFORE ship (blocker)** |
+| Webhook Testing | Optional | **Kill-test required before ship** |
 
 ---
 
-## P0-BLOCKER (Board Conditions - Must Complete Before Launch)
+## P0-BLOCKER (Ship Gate Checklist)
 
-### REQ-001: Marketplace Showcase Website (Deployed)
-- **Category:** Board-Blocker
+### REQ-001: Deploy to Real EmDash Site
+- **Category:** Ship-Gate
 - **Priority:** P0
-- **Source:** Board Verdict (Buffett, Rhimes)
+- **Source:** decisions.md Section VI
 
 **Description:**
-Build and deploy a visual marketplace website displaying all 5 themes with screenshots, descriptions, personality taglines, and one-click copy buttons for install commands. Must be mobile-responsive and SEO-optimized.
+Must deploy MemberShip to one real EmDash site in production mode (not test environment).
 
 **Acceptance Criteria:**
-- [ ] Static HTML page deployed to Cloudflare Pages
-- [ ] 5 theme cards with screenshots/GIFs
-- [ ] One-click copy for install commands
-- [ ] Mobile-responsive design
-- [ ] SEO meta tags and Open Graph
+- [ ] Deployed to production EmDash instance
+- [ ] Not test/staging environment
+- [ ] Demonstrates real-world integration capability
+- [ ] Plugin loads and renders correctly
 
 ---
 
-### REQ-002: Basic Anonymous Install Analytics
-- **Category:** Board-Blocker
+### REQ-002: Three Real Stripe Transactions
+- **Category:** Ship-Gate
 - **Priority:** P0
-- **Source:** Board Verdict (Buffett)
+- **Source:** decisions.md Section VI
 
 **Description:**
-Implement telemetry to track which themes are installed, from what geographic regions, and frequency. No PII required. Data aggregated and anonymous.
+Process 3 production Stripe transactions with real cards before shipping.
 
 **Acceptance Criteria:**
-- [ ] CLI sends anonymous telemetry on install
-- [ ] Theme name, timestamp, OS logged
-- [ ] No user identity or PII collected
-- [ ] Analytics endpoint operational
-- [ ] Basic dashboard showing install counts
+- [ ] Production mode (not test mode)
+- [ ] Real credit card transactions
+- [ ] Validates complete payment flow end-to-end
+- [ ] Member record created correctly after payment
 
 ---
 
-### REQ-003: Coming Soon Themes (3+ Teased)
-- **Category:** Board-Blocker
+### REQ-003: Webhook Failure Recovery Verified
+- **Category:** Ship-Gate
 - **Priority:** P0
-- **Source:** Board Verdict (Rhimes)
+- **Source:** decisions.md Decision 8
 
 **Description:**
-Showcase at least 3 future themes in "Coming Soon" status within registry and marketplace. Create open loops to drive repeat visits and anticipation.
+Kill-test webhook failure: interrupt webhook mid-transaction, confirm system recovers and provides member access. Prevents customer service nightmare of payment succeeding but access denied.
 
 **Acceptance Criteria:**
-- [ ] 3+ "Coming Soon" themes in registry
-- [ ] Coming Soon section on showcase website
-- [ ] Email capture for notifications
-- [ ] Teased personalities and estimated dates
+- [ ] Kill webhook during active transaction
+- [ ] Stripe payment completes despite webhook failure
+- [ ] System detects and recovers from failure
+- [ ] Member eventually gets access (manual or automatic recovery)
+- [ ] Customer not charged without access
 
 ---
 
-## P1-MUST (Critical MVP Features)
-
-### CLI Requirements
-
-#### REQ-004: Product Name: "Wardrobe"
-- **Category:** CLI
-- **Priority:** P1
-- **Source:** Decisions #1
+### REQ-004: Documentation Complete
+- **Category:** Ship-Gate
+- **Priority:** P0
+- **Source:** decisions.md Decision 7
 
 **Description:**
-All references to the product, CLI, package names, and marketing materials must use "Wardrobe" (not "emdash-themes").
+All 4 documentation sections must be complete and accurate before ship. "PENDING" documentation with "SHIP" status is self-deception.
 
 **Acceptance Criteria:**
-- [ ] Package name is "wardrobe"
-- [ ] All CLI output uses Wardrobe branding
-- [ ] Documentation references Wardrobe
+- [ ] Installation.md completed
+- [ ] Configuration.md completed
+- [ ] API-reference.md completed
+- [ ] Troubleshooting.md completed
+- [ ] All docs accurate and tested
 
 ---
 
-#### REQ-005: CLI Command: npx wardrobe list
-- **Category:** CLI
-- **Priority:** P1
-- **Source:** Decisions MVP Feature Set
+### REQ-005: Admin Dashboard Beautiful
+- **Category:** Ship-Gate
+- **Priority:** P0
+- **Source:** decisions.md Decision 4
 
 **Description:**
-CLI command that fetches themes.json registry and displays all available themes with descriptions, personality tags, and version.
+Admin dashboard must receive equal design investment as customer-facing UI. For the first 6 months, the admin panel IS the product. Ugly admin = abandoned installs.
 
 **Acceptance Criteria:**
-- [ ] Fetches registry from CDN
-- [ ] Displays theme name, description, personality
-- [ ] Shows version and install command
+- [ ] Not spreadsheet-like
+- [ ] Beautiful, polished design
+- [ ] Mobile-responsive
+- [ ] Professional UI elements
+- [ ] Design parity with customer-facing components
 
 ---
 
-#### REQ-006: CLI Command: npx wardrobe install [theme]
-- **Category:** CLI
-- **Priority:** P1
-- **Source:** Decisions MVP Feature Set
+### REQ-006: Admin Authentication Exists
+- **Category:** Ship-Gate
+- **Priority:** P0
+- **Source:** decisions.md Section IV Open Question #6
 
 **Description:**
-CLI command that downloads a theme tarball, extracts it, backs up existing src/ directory, and swaps in the new theme's src/.
+Current gap: "Anyone with endpoint can modify members." Must implement admin authentication to prevent unauthorized access.
 
 **Acceptance Criteria:**
-- [ ] Downloads tarball from R2/CDN
-- [ ] Creates backup of existing src/
-- [ ] Extracts and validates theme
-- [ ] Swaps src/ directory
-- [ ] Success message: "Your site is now wearing [theme-name]."
+- [ ] Admin endpoints require authentication
+- [ ] Verify `user.isAdmin === true` on all admin routes
+- [ ] Prevent unauthorized member modification
+- [ ] Security audit completed
 
 ---
 
-#### REQ-007: CLI Command: npx wardrobe preview [theme]
-- **Category:** CLI
-- **Priority:** P1
-- **Source:** Decisions MVP Feature Set
+### REQ-007: Brand Voice Applied Throughout
+- **Category:** Ship-Gate
+- **Priority:** P0
+- **Source:** decisions.md Decision 5
 
 **Description:**
-CLI command that opens a browser to display theme screenshots/GIFs and description.
+All copy must follow "terse, confident, warm" style using the 3-word principle. Maya Angelou's rewrites adopted.
 
 **Acceptance Criteria:**
-- [ ] Opens default browser
-- [ ] Shows theme preview page or images
-- [ ] Cross-platform support (Win/Mac/Linux)
-
----
-
-#### REQ-008: Install Speed Target: Under 3 Seconds
-- **Category:** CLI
-- **Priority:** P1
-- **Source:** Decisions #5
-
-**Description:**
-The wardrobe install command must complete (download + extract + swap) in under 3 seconds.
-
-**Acceptance Criteria:**
-- [ ] Benchmarked install time < 3 seconds
-- [ ] Network latency minimized
-- [ ] Tarball size optimized (<10KB each)
-
----
-
-#### REQ-009: Content Preservation on Install
-- **Category:** CLI
-- **Priority:** P1
-- **Source:** PRD, Decisions
-
-**Description:**
-When swapping theme's src/ directory, all user content in D1 database must remain untouched and accessible.
-
-**Acceptance Criteria:**
-- [ ] D1 data unchanged after install
-- [ ] Only presentation layer changes
-- [ ] Rollback available via backup
-
----
-
-### Theme Requirements
-
-#### REQ-010: Five Launch Themes
-- **Category:** Themes
-- **Priority:** P1
-- **Source:** PRD, Decisions #2
-
-**Description:**
-Ship exactly 5 themes with distinct personalities: Ember, Forge, Slate, Drift, Bloom.
-
-**Acceptance Criteria:**
-- [ ] All 5 themes complete with full src/ directory
-- [ ] Each theme has layouts, components, pages, CSS
-- [ ] Each theme builds successfully with Astro
-
----
-
-#### REQ-011: Theme: Ember (Bold, Editorial)
-- **Category:** Themes
-- **Priority:** P1
-- **Source:** PRD
-
-**Description:**
-Magazine-style theme with serif headings, dark navy + burnt orange, asymmetric grids.
-
-**Tagline:** "Ember is bold. Editorial. For people with something to say."
-**Target Users:** Restaurants, creative studios, magazines
-
-**Acceptance Criteria:**
-- [ ] Serif typography
-- [ ] Dark navy + burnt orange color palette
-- [ ] Asymmetric grid layout
-- [ ] Editorial magazine aesthetic
-
----
-
-#### REQ-012: Theme: Forge (Dark, Technical)
-- **Category:** Themes
-- **Priority:** P1
-- **Source:** PRD
-
-**Description:**
-Industrial theme with monospace fonts, neon green accents, terminal-inspired design.
-
-**Tagline:** "Built for builders."
-**Target Users:** SaaS, developer tools, tech companies
-
-**Acceptance Criteria:**
-- [ ] Monospace typography
-- [ ] Dark mode with neon green accents
-- [ ] Terminal-inspired aesthetic
-- [ ] Data-dense layout
-
----
-
-#### REQ-013: Theme: Slate (Clean, Professional)
-- **Category:** Themes
-- **Priority:** P1
-- **Source:** PRD
-
-**Description:**
-Corporate theme with gray palette, blue accents, system fonts, sidebar navigation.
-
-**Tagline:** "Slate is for people who need to be trusted. Clean. Steady. The kind of design that lets the work speak first."
-**Target Users:** Law firms, consulting, finance
-
-**Acceptance Criteria:**
-- [ ] Gray color palette with blue accents
-- [ ] System fonts
-- [ ] Sidebar navigation
-- [ ] Structured hierarchy
-
----
-
-#### REQ-014: Theme: Drift (Minimal, Airy)
-- **Category:** Themes
-- **Priority:** P1
-- **Source:** PRD
-
-**Description:**
-Minimal theme with whitespace, thin sans-serif, sage green accents.
-
-**Tagline:** "Let your content breathe."
-**Target Users:** Spas, yoga studios, wellness brands
-
-**Acceptance Criteria:**
-- [ ] Abundant whitespace
-- [ ] Thin sans-serif typography
-- [ ] Sage green accent color
-- [ ] Floating, airy layout
-
----
-
-#### REQ-015: Theme: Bloom (Warm, Organic)
-- **Category:** Themes
-- **Priority:** P1
-- **Source:** PRD
-
-**Description:**
-Warm theme with rounded corners, cream background, terracotta accents.
-
-**Tagline:** "Where community feels at home."
-**Target Users:** Bakeries, florists, local shops
-
-**Acceptance Criteria:**
-- [ ] Rounded corners
-- [ ] Cream background
-- [ ] Terracotta accents
-- [ ] Playful typography
-
----
-
-### Distribution Requirements
-
-#### REQ-016: Theme Format: Tarball Distribution (R2)
-- **Category:** Distribution
-- **Priority:** P1
-- **Source:** Decisions #4
-
-**Description:**
-Each theme distributed as compressed tarball (.tar.gz) stored on Cloudflare R2 bucket.
-
-**Acceptance Criteria:**
-- [ ] Tarballs hosted on R2
-- [ ] CDN caching configured
-- [ ] Public read access
-- [ ] Tarball size < 10KB each
-
----
-
-#### REQ-017: Theme Registry: themes.json on CDN
-- **Category:** Distribution
-- **Priority:** P1
-- **Source:** Decisions #4
-
-**Description:**
-Centralized registry file (themes.json) on CDN containing metadata for all available themes.
-
-**Schema:**
-```json
-{
-  "name": "string",
-  "slug": "string",
-  "description": "string",
-  "personality": "string",
-  "version": "string",
-  "tarballUrl": "string",
-  "previewUrl": "string",
-  "comingSoon": "boolean"
-}
-```
-
----
-
-#### REQ-018: R2 Bucket Configuration
-- **Category:** Distribution
-- **Priority:** P1
-- **Source:** Decisions
-
-**Description:**
-Set up Cloudflare R2 bucket for theme tarball hosting with CDN caching.
-
-**Acceptance Criteria:**
-- [ ] R2 bucket created
-- [ ] Public read access configured
-- [ ] CDN caching enabled
-- [ ] Upload script for tarballs
-
----
-
-#### REQ-019: NPM Package Publishing
-- **Category:** Distribution
-- **Priority:** P1
-- **Source:** PRD, Decisions
-
-**Description:**
-Publish Wardrobe CLI as npm package. Must be installable via `npx wardrobe [command]`.
-
-**Acceptance Criteria:**
-- [ ] Package name "wardrobe" available (check first!)
-- [ ] Published to npm registry
-- [ ] `npx wardrobe` works without prior install
-
----
-
-### Showcase Requirements
-
-#### REQ-020: Static Showcase Page
-- **Category:** Showcase
-- **Priority:** P1
-- **Source:** Decisions #8
-
-**Description:**
-Static HTML page with 5 theme cards showing screenshots, descriptions, and copy-paste install commands.
-
-**Acceptance Criteria:**
-- [ ] Single HTML page with embedded CSS/JS
-- [ ] 5 theme cards visible
-- [ ] Each card has screenshot, description, install command
-- [ ] Responsive grid layout
-
----
-
-#### REQ-021: Theme Preview Screenshots/GIFs
-- **Category:** Showcase
-- **Priority:** P1
-- **Source:** PRD, Decisions
-
-**Description:**
-Each theme must have preview screenshot or GIF showing the design. GIFs preferred to capture transformation.
-
-**Acceptance Criteria:**
-- [ ] High-quality screenshot for each theme
-- [ ] Consistent dimensions and format
-- [ ] Shows actual theme with demo content
-- [ ] GIFs showing transformation (optional but preferred)
-
----
-
-#### REQ-022: One-Click Copy for Install Commands
-- **Category:** Showcase
-- **Priority:** P1
-- **Source:** Decisions
-
-**Description:**
-Showcase page must include copy-to-clipboard buttons for each theme's install command.
-
-**Acceptance Criteria:**
-- [ ] Copy button for each theme card
-- [ ] Copies `npx wardrobe install [theme]`
-- [ ] Visual feedback on copy success
-
----
-
-#### REQ-023: Mobile-Responsive Showcase
-- **Category:** Showcase
-- **Priority:** P1
-- **Source:** Board Verdict
-
-**Description:**
-Showcase website must be responsive on mobile devices.
-
-**Acceptance Criteria:**
-- [ ] Works on phones and tablets
-- [ ] Touch-friendly interactions
-- [ ] Readable at all screen sizes
-
----
-
-#### REQ-024: SEO Optimization for Showcase
-- **Category:** Showcase
-- **Priority:** P1
-- **Source:** Board Verdict
-
-**Description:**
-Showcase website must include proper meta tags, Open Graph tags, semantic HTML, fast load times (<2 seconds).
-
-**Acceptance Criteria:**
-- [ ] Title and description meta tags
-- [ ] Open Graph tags for social sharing
-- [ ] Semantic HTML structure
-- [ ] Page load < 2 seconds
-
----
-
-#### REQ-025: Cloudflare Pages Deployment
-- **Category:** Showcase
-- **Priority:** P1
-- **Source:** PRD, Decisions
-
-**Description:**
-Deploy showcase website to Cloudflare Pages.
-
-**Acceptance Criteria:**
-- [ ] Deployed and accessible via public URL
-- [ ] SSL certificate active
-- [ ] Fast global CDN delivery
-
----
-
-### Brand & Copy Requirements
-
-#### REQ-026: Brand Voice & Copy Style
-- **Category:** Copy
-- **Priority:** P1
-- **Source:** Decisions #6
-
-**Description:**
-All copy must use Steve Jobs' voice: confident friend, zero jargon, short sentences, active verbs.
-
-**Acceptance Criteria:**
+- [ ] 3-word principle applied where possible
 - [ ] No passive voice
-- [ ] No technical jargon
-- [ ] Short, punchy sentences
-- [ ] Human and evocative
+- [ ] No technical jargon visible to users
+- [ ] Success messages follow approved copy (e.g., "They're in. Welcome email sent.")
+- [ ] CTA buttons are clear and warm
 
 ---
 
-#### REQ-027: Ember Tagline
-- **Category:** Copy
+## P1-MUST (Core MVP Features)
+
+### MVP Feature Set from decisions.md Section II
+
+### REQ-008: Stripe Checkout + Webhooks
+- **Category:** Payment
 - **Priority:** P1
-- **Source:** Decisions (Copy Review)
-
-**Copy:** "Ember is bold. Editorial. For people with something to say."
-
----
-
-#### REQ-028: Forge Tagline
-- **Category:** Copy
-- **Priority:** P1
-- **Source:** Decisions
-
-**Copy:** "Forge is dark, technical. Built for builders."
-
----
-
-#### REQ-029: Slate Tagline
-- **Category:** Copy
-- **Priority:** P1
-- **Source:** Decisions (Copy Review - Maya Angelou)
-
-**Copy:** "Slate is for people who need to be trusted. Clean. Steady. The kind of design that lets the work speak first."
-
----
-
-#### REQ-030: Drift Tagline
-- **Category:** Copy
-- **Priority:** P1
-- **Source:** Decisions
-
-**Copy:** "Let your content breathe."
-
----
-
-#### REQ-031: Bloom Tagline
-- **Category:** Copy
-- **Priority:** P1
-- **Source:** Decisions
-
-**Copy:** "Where community feels at home."
-
----
-
-#### REQ-032: Install Success Message
-- **Category:** Copy
-- **Priority:** P1
-- **Source:** Decisions
+- **Source:** decisions.md MVP Feature Set
 
 **Description:**
-When install completes, CLI must output branded success message.
+Core Stripe payment flow with checkout session creation and webhook handling.
 
-**Copy:** "Your site is now wearing [theme-name]."
-
----
-
-#### REQ-033: Core Value Proposition Copy
-- **Category:** Copy
-- **Priority:** P1
-- **Source:** Decisions (Maya Angelou Review)
-
-**Description:**
-Lead with one of these approved value propositions:
-- "Install in one command. Your content stays untouched."
-- "Pick a theme. Watch your site remember what it was meant to be."
-- "Copy the command. Paste it. You're done before you finish your coffee."
-
----
-
-### Technical Requirements
-
-#### REQ-034: Backup Strategy Before Install
-- **Category:** Technical
-- **Priority:** P1
-- **Source:** Implied
-
-**Description:**
-CLI must create automatic backup of existing src/ directory before swap.
+**Technical Reference:** EMDASH-GUIDE.md Section 6 (Plugin System) - Routes and HTTP capabilities
 
 **Acceptance Criteria:**
-- [ ] Backup created with timestamp
-- [ ] Backup stored locally (e.g., src.backup.TIMESTAMP/)
-- [ ] Restore possible if install fails
+- [ ] Stripe checkout session creation
+- [ ] Webhook handler for payment events
+- [ ] Signature verification (HMAC-SHA256)
+- [ ] Idempotency handling for duplicate events
+- [ ] Error recovery logging
 
 ---
 
-#### REQ-035: Error Handling & Rollback
-- **Category:** Technical
+### REQ-009: KV Member Storage
+- **Category:** Storage
 - **Priority:** P1
-- **Source:** Reliability
+- **Source:** decisions.md MVP Feature Set
 
 **Description:**
-CLI must handle download failures, extraction errors gracefully. If any step fails, rollback to previous state.
+Store member data in KV with status, plan, expiration tracking. KV acceptable for <1,000 records in v1.
+
+**Technical Reference:** EMDASH-GUIDE.md Section 6 - ctx.kv (Key-value store)
+
+**Acceptance Criteria:**
+- [ ] Member records stored in KV
+- [ ] Schema: status, plan_id, expiration_date, created_at
+- [ ] KV key pattern: `member:{encoded_email}`
+- [ ] Handles <1,000 records efficiently
+- [ ] Migration path to D1 documented for future scaling
+
+---
+
+### REQ-010: Email Confirmation (Resend)
+- **Category:** Communication
+- **Priority:** P1
+- **Source:** decisions.md MVP Feature Set
+
+**Description:**
+Send terse, warm confirmation emails via Resend integration.
+
+**Technical Reference:** EMDASH-GUIDE.md Section 6 - ctx.email (capability-gated)
+
+**Acceptance Criteria:**
+- [ ] Resend integration working
+- [ ] Welcome email on registration
+- [ ] Payment receipt email
+- [ ] Cancellation confirmation email
+- [ ] Copy follows brand voice (terse, warm)
+
+---
+
+### REQ-011: Admin Dashboard
+- **Category:** UI
+- **Priority:** P1
+- **Source:** decisions.md MVP Feature Set
+
+**Description:**
+Beautiful admin dashboard for member management. NOT spreadsheet-like.
+
+**Technical Reference:** EMDASH-GUIDE.md Section 6 - admin.pages, Block Kit
+
+**Acceptance Criteria:**
+- [ ] Member list with pagination
+- [ ] Member detail view
+- [ ] Manual approve/revoke actions
+- [ ] Mark-paid functionality
+- [ ] Beautiful design (Steve's requirement)
+
+---
+
+### REQ-012: Basic Reporting API
+- **Category:** Analytics
+- **Priority:** P1
+- **Source:** decisions.md MVP Feature Set
+
+**Description:**
+Minimal reporting API with basic metrics. API exists before rich UI.
+
+**Acceptance Criteria:**
+- [ ] GET /reports/members endpoint
+- [ ] GET /reports/revenue endpoint
+- [ ] Member count metrics
+- [ ] Plan distribution metrics
+- [ ] Minimal UI sufficient for v1
+
+---
+
+### REQ-013: Two Permission Tiers Only
+- **Category:** Auth
+- **Priority:** P1
+- **Source:** decisions.md Decision 6
+
+**Description:**
+Exactly two permission tiers: Members and Non-Members. Delete GroupRecord code (~500 lines).
+
+**Acceptance Criteria:**
+- [ ] Only 2 permission states implemented
+- [ ] No groups, roles, or corporate structures
+- [ ] GroupRecord code removed if present
+- [ ] Permission checks are binary (member or not)
+
+---
+
+### REQ-014: Single-Form Registration
+- **Category:** UX
+- **Priority:** P1
+- **Source:** decisions.md MVP Feature Set
+
+**Description:**
+90% of signups are single-form. No multi-step wizards in v1.
+
+**Acceptance Criteria:**
+- [ ] Single-page registration form
+- [ ] Clean, beautiful design
+- [ ] Minimal required fields
+- [ ] No wizard/multi-step flow
+
+---
+
+### REQ-015: Empty State with Clear CTA
+- **Category:** UX
+- **Priority:** P1
+- **Source:** decisions.md Decision 3
+
+**Description:**
+When no members exist, show empty state with clear CTA. No demo data generation.
+
+**Acceptance Criteria:**
+- [ ] Empty state view when member count = 0
+- [ ] "Create Your First Member" CTA button
+- [ ] No demo data generation logic
+- [ ] No cleanup flows for demo data
+
+---
+
+### REQ-016: Product Name "MemberShip"
+- **Category:** Brand
+- **Priority:** P1
+- **Source:** decisions.md Decision 1
+
+**Description:**
+All references use "MemberShip" (not "Circle" or alternatives). SEO-discoverable naming.
+
+**Acceptance Criteria:**
+- [ ] Plugin ID uses "membership"
+- [ ] All UI labels use "MemberShip"
+- [ ] Documentation uses "MemberShip"
+- [ ] Meta tags include "MemberShip" for SEO
+
+---
+
+### REQ-017: Ship MemberShip First (Alone)
+- **Category:** Delivery
+- **Priority:** P1
+- **Source:** decisions.md Decision 2
+
+**Description:**
+MemberShip ships independently. EventDash follows AFTER production validation.
+
+**Acceptance Criteria:**
+- [ ] MemberShip can deploy standalone
+- [ ] No dependencies on EventDash
+- [ ] EventDash deployment blocked until MemberShip validated
+
+---
+
+### REQ-018: Webhook Signature Verification
+- **Category:** Security
+- **Priority:** P1
+- **Source:** EMDASH-GUIDE.md Plugin Security
+
+**Description:**
+All Stripe webhooks must verify signature using HMAC-SHA256.
+
+**Technical Reference:** EMDASH-GUIDE.md mentions signature verification for webhooks
+
+**Acceptance Criteria:**
+- [ ] Raw body preserved for signature verification
+- [ ] HMAC-SHA256 verification implemented
+- [ ] Invalid signatures rejected with 400
+- [ ] Timing-safe comparison used
+
+---
+
+### REQ-019: JWT Authentication
+- **Category:** Auth
+- **Priority:** P1
+- **Source:** Current implementation pattern
+
+**Description:**
+JWT tokens for member authentication with secure cookie storage.
+
+**Technical Reference:** Uses Web Crypto API (`crypto.subtle.sign`)
+
+**Acceptance Criteria:**
+- [ ] Access token (15-min expiry)
+- [ ] Refresh token (7-day expiry)
+- [ ] httpOnly, Secure, SameSite=Strict cookies
+- [ ] No external JWT libraries (Web Crypto only)
+
+---
+
+### REQ-020: Error Handling & Recovery
+- **Category:** Reliability
+- **Priority:** P1
+- **Source:** EMDASH-GUIDE.md Plugin Error Handling
+
+**Description:**
+Graceful error handling for all payment and webhook operations.
 
 **Acceptance Criteria:**
 - [ ] Download errors caught and reported
-- [ ] Extraction errors trigger rollback
-- [ ] Original src/ restored on failure
-- [ ] Clear error messages
+- [ ] Webhook failures logged
+- [ ] Clear error messages to users
+- [ ] Admin notification on critical failures
 
 ---
 
-#### REQ-036: Theme Structure Contract
-- **Category:** Technical
-- **Priority:** P1
-- **Source:** Decisions (Open Question #4)
-
-**Description:**
-Define and document the exact structure of theme src/ directories.
-
-**Required Files:**
-- `live.config.ts` - Emdash collection configuration
-- `pages/index.astro` - Home page
-- `layouts/Base.astro` - Base layout wrapper
-
-**Acceptance Criteria:**
-- [ ] Contract documented in THEME_SPEC.md
-- [ ] All 5 themes conform to contract
-- [ ] Validation on install
-
----
-
-#### REQ-037: Automated Screenshot Generation
-- **Category:** Technical
-- **Priority:** P1
-- **Source:** Decisions (Recommended)
-
-**Description:**
-Use Playwright or Puppeteer to automatically generate screenshots of each theme with standardized demo content.
-
-**Acceptance Criteria:**
-- [ ] Screenshot script using Playwright
-- [ ] Consistent demo content for all themes
-- [ ] Multiple breakpoints (desktop, mobile)
-- [ ] Reproducible generation
-
----
-
-#### REQ-038: Documentation (README.md)
-- **Category:** Technical
-- **Priority:** P1
-- **Source:** Decisions
-
-**Description:**
-Comprehensive README documenting: overview, CLI commands, install instructions, theme structure, troubleshooting.
-
-**Acceptance Criteria:**
-- [ ] Clear getting started section
-- [ ] All CLI commands documented
-- [ ] Theme structure explained
-- [ ] Troubleshooting FAQ
-
----
-
-#### REQ-039: CI/CD Pipeline
-- **Category:** Technical
+### REQ-021: Rate Limiting
+- **Category:** Security
 - **Priority:** P1
 - **Source:** Risk mitigation
 
 **Description:**
-Automated testing that each theme's src/ compiles successfully with Astro build.
+Protect endpoints from abuse with rate limiting.
 
 **Acceptance Criteria:**
-- [ ] GitHub Actions workflow
-- [ ] Each theme builds without errors
-- [ ] Tests run on every push
-- [ ] Build failures block merge
+- [ ] Rate limiting on registration endpoint
+- [ ] Rate limiting on admin endpoints
+- [ ] Clear 429 responses when limited
 
 ---
 
-#### REQ-040: Version Strategy (V1)
-- **Category:** Technical
+### REQ-022: Plans Configuration
+- **Category:** Config
 - **Priority:** P1
-- **Source:** Decisions (Open Question #5)
+- **Source:** Current implementation
 
 **Description:**
-For V1, `wardrobe install` always fetches latest theme version. No lockfile required.
+Configurable membership plans (free, pro, premium).
 
 **Acceptance Criteria:**
-- [ ] Always downloads latest
-- [ ] Version displayed in list command
-- [ ] No lockfile needed
+- [ ] Multiple plan support
+- [ ] Plan pricing configuration
+- [ ] Plan feature differentiation
+- [ ] Admin plan management
 
 ---
 
-#### REQ-041: Tarball Build System
-- **Category:** Technical
+### REQ-023: Member Status Lifecycle
+- **Category:** Business Logic
 - **Priority:** P1
-- **Source:** PRD
+- **Source:** Core functionality
 
 **Description:**
-Automated build pipeline to generate theme tarballs (src/ directory only).
+Complete member status lifecycle: pending -> active -> expired/cancelled.
 
 **Acceptance Criteria:**
-- [ ] Build script for all themes
-- [ ] Tarballs include only src/ contents
-- [ ] Compression level optimized
-- [ ] Output to dist/themes/
+- [ ] Pending status on registration
+- [ ] Active status on payment/approval
+- [ ] Expired status on plan end
+- [ ] Cancelled status on user action
+- [ ] Status transitions audited
 
 ---
 
-#### REQ-042: Theme Validation on Install
-- **Category:** Technical
+### REQ-024: Admin Manual Actions
+- **Category:** Admin
 - **Priority:** P1
-- **Source:** Reliability
+- **Source:** decisions.md MVP Feature Set
 
 **Description:**
-Verify critical files exist after extraction before swapping.
+Admin can manually approve, revoke, or mark-paid members.
 
 **Acceptance Criteria:**
-- [ ] Check live.config.ts exists
-- [ ] Check pages/index.astro exists
-- [ ] Fail fast with clear error if missing
+- [ ] Approve pending member
+- [ ] Revoke active member
+- [ ] Mark member as paid (for manual payments)
+- [ ] All actions logged
 
 ---
 
-#### REQ-043: Tarball Integrity Verification
-- **Category:** Technical
-- **Priority:** P1
-- **Source:** Security
-
-**Description:**
-Add sha256 hash to registry, verify downloaded tarball before extraction.
-
-**Acceptance Criteria:**
-- [ ] sha256 hash in themes.json
-- [ ] Hash verified after download
-- [ ] Mismatch fails with error
-
----
-
-### Integration Requirements
-
-#### REQ-044: Core Integration: emdash create --theme
-- **Category:** Integration
-- **Priority:** P1
-- **Source:** Decisions #7
-
-**Description:**
-Emdash core CLI must support --theme flag to scaffold new sites with chosen theme.
-
-**Acceptance Criteria:**
-- [ ] Integration spec defined with Emdash team
-- [ ] `emdash create --theme ember` works
-- [ ] Theme pre-installed in new project
-
-**Status:** Pending Emdash core team decision
-
----
-
-### Analytics Requirements
-
-#### REQ-045: Anonymous Telemetry (CLI)
-- **Category:** Analytics
-- **Priority:** P1
-- **Source:** Board-Blocker
-
-**Description:**
-Log install events (theme name, timestamp, OS) to analytics endpoint. No PII.
-
-**Acceptance Criteria:**
-- [ ] POST to analytics endpoint on install
-- [ ] Data: theme, timestamp, OS, country (from IP)
-- [ ] No user identity
-- [ ] Opt-out possible
-
----
-
-#### REQ-046: Theme Popularity Metrics
-- **Category:** Analytics
-- **Priority:** P1
-- **Source:** Analytics
-
-**Description:**
-Dashboard showing install count per theme, ranked by popularity.
-
-**Acceptance Criteria:**
-- [ ] Install counts per theme
-- [ ] Weekly/monthly trends
-- [ ] Internal dashboard or report
-
----
-
-#### REQ-047: No PII Collection
-- **Category:** Analytics
-- **Priority:** P1
-- **Source:** Board Verdict
-
-**Description:**
-Analytics must not collect personally identifiable information.
-
-**Acceptance Criteria:**
-- [ ] No email, username, or user identity
-- [ ] Anonymous telemetry only
-- [ ] Privacy policy compliant
-
----
-
-### Success Metrics
-
-#### REQ-048: Showcase Load Time Target
-- **Category:** Metrics
-- **Priority:** P1
-- **Source:** PRD
-
-**Description:**
-Showcase page must load in under 2 seconds (first contentful paint).
-
-**Acceptance Criteria:**
-- [ ] FCP < 2 seconds on 3G
-- [ ] Lighthouse Performance > 90
-
----
-
-#### REQ-049: CLI Install Time Target
-- **Category:** Metrics
-- **Priority:** P1
-- **Source:** PRD, Decisions
-
-**Description:**
-Install command must complete in under 3 seconds.
-
-**Acceptance Criteria:**
-- [ ] End-to-end install < 3 seconds
-- [ ] Benchmarked before launch
-
----
-
-#### REQ-050: Content Preservation Validation
-- **Category:** Metrics
-- **Priority:** P1
-- **Source:** PRD
-
-**Description:**
-Test suite must verify content remains accessible after theme install.
-
-**Acceptance Criteria:**
-- [ ] Integration test with sample content
-- [ ] D1 data unchanged
-- [ ] Pages render correctly after swap
-
----
-
-#### REQ-051: Theme Availability Target
-- **Category:** Metrics
-- **Priority:** P1
-- **Source:** PRD
-
-**Description:**
-All 5 launch themes must be live and installable via CLI at launch.
-
-**Acceptance Criteria:**
-- [ ] All themes in registry
-- [ ] All tarballs on R2
-- [ ] All themes install successfully
-
----
-
-## P2-SHOULD (Strong Recommendations)
-
-#### REQ-052: Pricing Page / Premium Theme Rails
-- **Category:** Monetization
-- **Priority:** P2
-- **Source:** Board (Buffett)
-
-**Description:**
-Build pricing page indicating premium themes coming Q3 2026. Establish payment infrastructure.
-
----
-
-#### REQ-053: Theme Submission Intake Form
-- **Category:** Growth
-- **Priority:** P2
-- **Source:** Board
-
-**Description:**
-Web form for third-party designers to submit themes for curation.
-
----
-
-#### REQ-054: Email Capture Mechanism
-- **Category:** Retention
-- **Priority:** P2
-- **Source:** Board (Shonda)
-
-**Description:**
-"Get notified when new themes drop" email signup form on showcase page.
-
----
-
-#### REQ-055: Theme Update Notifications
-- **Category:** Retention
-- **Priority:** P2
-- **Source:** Shonda's Retention Roadmap
-
-**Description:**
-Mechanism to notify users when installed themes have updates.
-
----
-
-#### REQ-056: Geographic Install Distribution
-- **Category:** Analytics
-- **Priority:** P2
-- **Source:** Analytics
-
-**Description:**
-Analytics showing which themes are popular in different regions.
-
----
-
-#### REQ-057: Cost Monitoring
-- **Category:** Operations
-- **Priority:** P2
-- **Source:** Unit economics
-
-**Description:**
-Track monthly costs for CDN, R2, hosting.
-
----
-
-#### REQ-058: Monitoring & Alerts
-- **Category:** Operations
-- **Priority:** P2
-- **Source:** Operations
-
-**Description:**
-Set up monitoring for showcase uptime, R2 availability, install success rates.
-
----
-
-#### REQ-059: Domain Setup
-- **Category:** Operations
-- **Priority:** P2
-- **Source:** PRD
-
-**Description:**
-Secure domain for showcase website (e.g., wardrobe.shipyard.company).
-
----
-
-#### REQ-060: Privacy Compliance
-- **Category:** Legal
-- **Priority:** P2
-- **Source:** Legal
-
-**Description:**
-Ensure analytics comply with GDPR, CCPA. Include privacy policy.
-
----
-
-#### REQ-061: Install Confirmation Prompt
+### REQ-025: Cancel Subscription Flow
 - **Category:** UX
+- **Priority:** P1
+- **Source:** Core functionality
+
+**Description:**
+Members can cancel their subscription from dashboard.
+
+**Acceptance Criteria:**
+- [ ] Cancel button in member dashboard
+- [ ] Confirmation before cancel
+- [ ] Stripe subscription cancelled
+- [ ] Cancellation email sent
+
+---
+
+## P2-RISK (Risk Mitigation Requirements)
+
+### REQ-026: Webhook Idempotency
+- **Category:** Risk
 - **Priority:** P2
-- **Source:** UX
+- **Source:** Risk Register - Webhook failure loses payment
 
 **Description:**
-Add confirmation prompt before install: "This will replace src/. Continue?"
+Prevent duplicate processing of webhook events. Current implementation has race condition between check and set.
+
+**Acceptance Criteria:**
+- [ ] Atomic idempotency check (not check-then-set)
+- [ ] 24-hour TTL on idempotency keys
+- [ ] No duplicate charges possible
+- [ ] No duplicate emails possible
 
 ---
 
-## P3-NICE-TO-HAVE (V2 / Future Phases)
-
-#### REQ-062: Live Preview with User Content
-- **Category:** V2
-- **Priority:** P3
-- **Source:** Decisions (Cut from V1)
+### REQ-027: Email Sending Resilience
+- **Category:** Risk
+- **Priority:** P2
+- **Source:** Risk Scanner - Silent email failures
 
 **Description:**
-Authenticated D1 access to render live previews with user's actual content.
+Handle email sending failures gracefully with retry or notification.
+
+**Acceptance Criteria:**
+- [ ] Log email failures with context
+- [ ] Retry transient failures
+- [ ] Alert admin on persistent failures
+- [ ] Member still registered even if email fails
 
 ---
 
-#### REQ-063: User Accounts
-- **Category:** V2
-- **Priority:** P3
-- **Source:** Decisions (Cut from V1)
+### REQ-028: Admin Audit Logging
+- **Category:** Risk
+- **Priority:** P2
+- **Source:** Risk Scanner - No audit logging
 
 **Description:**
-User authentication, theme favoriting, installation history.
+Log all admin actions for security and debugging.
+
+**Acceptance Criteria:**
+- [ ] Log admin authentication attempts
+- [ ] Log member modifications (approve, revoke, mark-paid)
+- [ ] Include user ID, timestamp, action, target
+- [ ] Rate limit failed admin auth attempts
 
 ---
 
-#### REQ-064: Theme Ratings & Reviews
-- **Category:** V2
-- **Priority:** P3
-- **Source:** Decisions (Cut from V1)
+### REQ-029: Input Validation
+- **Category:** Risk
+- **Priority:** P2
+- **Source:** Risk Scanner - Input validation gaps
 
 **Description:**
-User-submitted ratings, reviews, and comments on themes.
+Validate all inputs to prevent injection and data corruption.
+
+**Acceptance Criteria:**
+- [ ] Email format validation
+- [ ] Date format validation (YYYY-MM-DD)
+- [ ] URL validation for callbacks
+- [ ] Numeric range validation (price, capacity)
+- [ ] XSS prevention on text inputs
 
 ---
 
-#### REQ-065: Search & Filtering
-- **Category:** V2
-- **Priority:** P3
-- **Source:** Decisions (Cut from V1)
+### REQ-030: Stripe Key Validation
+- **Category:** Risk
+- **Priority:** P2
+- **Source:** Risk Scanner - Stripe secret key handling
 
 **Description:**
-Search themes by name/keyword, filter by industry/personality/color.
+Validate Stripe keys at startup, not at request time.
+
+**Acceptance Criteria:**
+- [ ] Validate STRIPE_SECRET_KEY format (starts with `sk_`)
+- [ ] Validate STRIPE_WEBHOOK_SECRET format (starts with `whsec_`)
+- [ ] Fail fast if keys invalid or missing
+- [ ] Clear error messages for configuration issues
 
 ---
 
-#### REQ-066: Version Pinning
-- **Category:** V2
-- **Priority:** P3
-- **Source:** Decisions
+### REQ-031: KV Scale Monitoring
+- **Category:** Risk
+- **Priority:** P2
+- **Source:** decisions.md Risk Register
 
 **Description:**
-Optional version pinning: `wardrobe install ember@1.0.0` and wardrobe.lock file.
+Monitor KV usage and plan D1 migration path.
+
+**Acceptance Criteria:**
+- [ ] Track member count metrics
+- [ ] Alert at 80% of 1,000 record threshold
+- [ ] D1 migration documentation ready
+- [ ] Migration script prepared for v2
 
 ---
 
-## Explicitly NOT in V1 (Scope Fence)
+## P3-CUT (Explicitly NOT in v1)
 
-These features are explicitly CUT. Do NOT build:
+These features are LOCKED as CUT. Do NOT implement:
 
-| ID | Feature | Reason | Revisit At |
-|----|---------|--------|------------|
-| CUT-001 | Live preview server | 30 days engineering, 0 users | V2 with users |
-| CUT-002 | Live demo sites per theme | 5x maintenance burden | V2 |
-| CUT-003 | User accounts | Zero value for CLI install | V2 |
-| CUT-004 | Theme ratings/reviews | Curation IS quality signal | V2 |
-| CUT-005 | Search/filtering | 5 themes visible at glance | V2 |
-| CUT-006 | Submit Your Theme | Curate ruthlessly first | V2 |
-| CUT-007 | Pricing tiers | Free. Adoption is metric. | V2 |
+### CUT-001: Group/Corporate Memberships
+- **Source:** decisions.md MVP Feature Set - Cut
+- **Rationale:** Zero customers asked for this feature
+- **Revisit:** When customer requests validate need
+
+### CUT-002: Developer Webhooks (HMAC)
+- **Source:** decisions.md MVP Feature Set - Cut
+- **Rationale:** Zero integrations exist yet
+- **Revisit:** When integration requests emerge
+
+### CUT-003: Drip Content Scheduling
+- **Source:** decisions.md MVP Feature Set - Cut
+- **Rationale:** Zero content libraries exist
+- **Revisit:** When content libraries are built
+
+### CUT-004: Multi-Payment Gateways
+- **Source:** decisions.md MVP Feature Set - Cut
+- **Rationale:** Stripe is 95% of market
+- **Revisit:** v2 if PayPal requests significant
+
+### CUT-005: Multi-Step Registration
+- **Source:** decisions.md MVP Feature Set - Cut
+- **Rationale:** 90% of signups are single-form
+- **Revisit:** If conversion data suggests need
+
+### CUT-006: Coupon Engine
+- **Source:** decisions.md MVP Feature Set - Cut
+- **Rationale:** Premature optimization
+- **Revisit:** When revenue requires discounting
 
 ---
 
-## Risk Register
+## Current Implementation Status
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| NPM name collision (wardrobe) | Low | Medium | Check availability before publish |
-| CDN URLs hardcoded, no fallback | High | Critical | Deploy R2 before launch, add retry logic |
-| Sub-3s install unverified | High | Medium | Add performance benchmarks |
-| Theme contract not formalized | Medium | High | Document in THEME_SPEC.md |
-| Tarball zip slip vulnerability | Low | Critical | Add path validation |
-| Emdash core integration undefined | High | Critical | Define integration spec |
-| R2 bucket not provisioned | High | Critical | Provision before launch |
-| Showcase not deployed | Certain | Critical | Deploy to Cloudflare Pages |
-| Screenshot automation missing | High | Medium | Implement Playwright script |
-| 5 themes overreach | High | Medium | Phase rollout: Ember, Forge, Slate first |
+### What's Already Built (from Codebase Scout)
+
+| Feature | Status | Files | Notes |
+|---------|--------|-------|-------|
+| Email-based registration | Complete | sandbox-entry.ts | Works |
+| Two permission tiers | Complete | sandbox-entry.ts | Binary check |
+| JWT authentication | Complete | auth.ts | 15-min/7-day tokens |
+| KV member storage | Complete | sandbox-entry.ts | Works |
+| Stripe integration | Complete | sandbox-entry.ts | Payment links |
+| Webhook handler | Complete | sandbox-entry.ts | Needs kill-test |
+| Email automation | Complete | email.ts | 7 templates |
+| Member dashboard | Complete | MemberDashboard.astro | 476 lines |
+| Content gating | Complete | gating.ts | 271 lines |
+| Admin dashboard | Complete | AdminReporting.astro | 1,049 lines |
+
+### What Needs Work (Gaps Identified)
+
+| Gap | Priority | Effort | Notes |
+|-----|----------|--------|-------|
+| Webhook kill-test verification | P0 | 1 day | Ship blocker |
+| Admin auth hardening | P0 | 1 day | Ship blocker |
+| Documentation completion | P0 | 2 days | 4 docs required |
+| Brand voice audit | P0 | 1 day | Maya's 3-word principle |
+| Empty state implementation | P1 | 4 hours | CTA for first member |
+| Remove GroupRecord code | P1 | 4 hours | ~500 lines cut |
+| Deploy to real site | P0 | 1 day | Production validation |
+| 3 real transactions | P0 | 1 day | Payment validation |
 
 ---
 
-## File Structure (Per Decisions.md)
+## Technical Debt (Accepted for v1)
+
+Per decisions.md Section IX - Accept for v1:
+
+| Debt | Impact | Status |
+|------|--------|--------|
+| KV architecture at current scale | Acceptable <1K records | Accepted |
+| ~60% code duplication with EventDash | Medium maintenance burden | Accepted |
+| 4,000-line monolith (sandbox-entry.ts) | High cognitive load | Refactor after revenue |
+
+---
+
+## File Structure (Current State)
 
 ```
-wardrobe/
-├── cli/
-│   ├── index.ts              # CLI entry point
-│   ├── commands/
-│   │   ├── list.ts           # List available themes
-│   │   ├── install.ts        # Download and swap src/
-│   │   └── preview.ts        # Open theme preview
-│   └── utils/
-│       ├── fetch-registry.ts # Fetch themes.json
-│       ├── download.ts       # Download tarball
-│       ├── extract.ts        # Tarball extraction
-│       └── fs-utils.ts       # Backup, restore, replace
-│
-├── themes/
-│   ├── ember/src/            # Full src/ directory
-│   ├── forge/src/
-│   ├── slate/src/
-│   ├── drift/src/
-│   └── bloom/src/
-│
-├── registry/
-│   └── themes.json           # Theme metadata, URLs, descriptions
-│
-├── showcase/
-│   ├── index.html            # Static showcase page
-│   ├── styles.css            # Showcase styling
-│   └── screenshots/          # Theme preview images
-│
-├── scripts/
-│   └── build-tarballs.ts     # Tarball builder
-│
-├── dist/themes/              # Built tarballs
-│
-└── README.md                 # Documentation
+/home/agent/shipyard-ai/plugins/membership/
+├── src/
+│   ├── sandbox-entry.ts          (3,984 lines - monolith)
+│   ├── index.ts                  (31 lines - descriptor)
+│   ├── auth.ts                   (209 lines - JWT)
+│   ├── email.ts                  (580 lines - templates)
+│   ├── gating.ts                 (271 lines - content access)
+│   ├── astro/
+│   │   ├── index.ts              (17 lines)
+│   │   ├── MemberPortal.astro    (718 lines)
+│   │   ├── RegistrationForm.astro (1,115 lines)
+│   │   ├── MemberDashboard.astro (476 lines)
+│   │   ├── AdminReporting.astro  (1,049 lines)
+│   │   ├── GroupManagement.astro (1,086 lines) <- CUT, should be removed
+│   │   └── GatedContent.astro    (246 lines)
+│   └── __tests__/
+│       ├── integration.test.ts   (1,036 lines)
+│       └── helpers.ts            (367 lines)
+├── README.md                     (existing documentation)
+├── API.md                        (existing API docs)
+├── package.json
+└── vitest.config.ts
 ```
 
 ---
 
-## Open Questions (Blocking Launch)
+## Documentation Requirements (from decisions.md)
 
-| # | Question | Owner | Deadline |
-|---|----------|-------|----------|
-| 1 | Where do themes live? R2 tarballs (recommended) or npm? | Engineering | Before launch |
-| 2 | How does `emdash create --theme` integrate? | Emdash core team | Before launch |
-| 3 | Screenshot generation: manual or automated? | Engineering | Week 1 |
-| 4 | Theme structure contract definition | Engineering | Week 1 |
-| 5 | Versioning strategy | Engineering | Week 2 |
-
----
-
-## Board Conditions Timeline
-
-| Milestone | Target | Status |
-|-----------|--------|--------|
-| Showcase website deployed | +2 weeks | NOT DONE |
-| Analytics instrumented | +2 weeks | NOT DONE |
-| Coming Soon themes added | +1 week | NOT DONE |
-| Pricing page live | +3 weeks | NOT DONE |
-| **Board re-review** | +3 weeks | PENDING |
+Per REQ-004, all docs must exist at:
+```
+membership/docs/
+├── installation.md      # How to install plugin
+├── configuration.md     # Stripe, Resend, KV setup
+├── api-reference.md     # All 52+ endpoints documented
+└── troubleshooting.md   # Common issues and solutions
+```
 
 ---
 
 ## Ship Test
 
-> Does the user run `npx wardrobe install ember` and feel "I can't believe I just did that"?
+> Does the admin see their first member registered and think "I built that"?
 >
 > **If yes, ship it.**
 
 ---
 
-*Generated by Great Minds Agency — Phase Planning Skill*
-*Source: rounds/emdash-marketplace/decisions.md, prds/emdash-marketplace.md*
-*Project Slug: emdash-marketplace*
+## Open Questions (Blocking Launch)
+
+| # | Question | Owner | Status |
+|---|----------|-------|--------|
+| 1 | Which real EmDash site for deployment? | Engineering | Pending |
+| 2 | Stripe production keys available? | Infrastructure | Pending |
+| 3 | Resend production credentials? | Infrastructure | Pending |
+
+---
+
+*Generated by Great Minds Agency - Phase Planning Skill*
+*Source: rounds/finish-plugins/decisions.md, CLAUDE.md*
+*Project Slug: finish-plugins*
