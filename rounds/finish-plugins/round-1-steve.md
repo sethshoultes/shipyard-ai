@@ -1,82 +1,91 @@
 # Steve Jobs — Chief Design & Brand Officer
-## Round 1 Positions: EmDash Plugin Suite (MemberShip + EventDash)
+## Round 1 Positions: EmDash Plugin Suite
 
 ---
 
 ### Product Naming
 
-Look at these names: "MemberShip" and "EventDash." They're *descriptive*. They're what a committee would choose. They tell you what the product does, but they tell you nothing about how it should make you *feel*.
+**MemberShip.** The name is a crime against taste. It sounds like payroll software. You've taken the beautiful concept of belonging and fused it with corporate jargon.
 
-**MemberShip becomes "Circle."** When a yoga instructor says "join my Circle," she's inviting you into something intimate. When she says "sign up for my MemberShip," she sounds like a gym franchise. The word itself creates belonging.
+**The name is "Belong."** One word. Active. Emotional. When someone clicks "Join," they don't get a membership — they *belong*.
 
-**EventDash becomes "Gather."** Nobody *attends* the best moments of their life. They *gather*. Around a table. Around a campfire. Around something they love. Events are logistics. Gatherings are human.
+**EventDash** is worse. It's what happens when engineers name products. "Event" is clinical. "Dash" is already stolen by a hundred B2B tools. Together they sound like a ticket scanner.
 
-One word each. No compound cleverness. No "-Dash" suffix like every other SaaS tool. Just truth.
+**The name is "Moment."** Because that's what great events create. Not an entry in a calendar — a *moment* people remember. "Create a Moment." "Join this Moment." Feel that?
 
 ---
 
 ### Design Philosophy
 
-These plugins must be *invisible*. The moment a small business owner installs Circle or Gather, it shouldn't feel like an add-on bolted onto their site. It should feel like a missing limb finally returning.
+Here's the disease in plugin design: developers build for power users first, then dumb it down for mortals. That's backwards. **Design for the yoga instructor. The power users will figure it out.**
 
-The insanely great part? **The admin experience must be as beautiful as the customer experience.** Most plugins make the backend ugly so the frontend can be pretty. That's cowardice. Every screen, every form, every dashboard — beautiful.
+The philosophy is **invisible complexity**. The plugin should feel like a natural extension of the site — not a foreign object transplanted in. No seams. No "powered by" badges. No jarring style changes.
 
-We're not building features. We're extending someone's capability to create community.
+The magic? **Every interaction should take half the steps users expect.** They expect to fill a form, click submit, wait for confirmation, then navigate somewhere. We give them: click, done.
 
 ---
 
-### User Experience — The First 30 Seconds
+### User Experience — First 30 Seconds
 
-When someone installs Gather, within thirty seconds they should see a beautiful event card on their site. Not a settings page. Not a tutorial modal. Not "Step 1 of 17."
+Thirty seconds. That's all you get.
 
-**We ship the demo state, not the empty state.**
+Install Belong. Open the admin. What do they see? **Not settings. Not configuration wizards. Not documentation links.**
 
-An empty calendar is a sad calendar. A membership dashboard with zero members is demoralizing. Instead: show them a sample event. Show them a fictional first member. Show them what success looks like *immediately*.
+They see their first member. A real-looking human with a name. "Sofia Chen — Member since today." Below: "Your first member is waiting. Who will join next?"
 
-They can delete the samples in ten seconds. But for those first thirty seconds, they feel *capable*. That's worth everything.
+They didn't configure anything. They didn't read anything. They just witnessed what success looks like. Now they believe.
+
+For Moment: they see a beautiful event card already on their preview. "Sunday Morning Yoga — Tomorrow at 9am." It looks real. It looks *theirs*. They feel like creators, not configurators.
+
+**Confidence before competence.** Show them winning before teaching them how.
 
 ---
 
 ### Brand Voice
 
-Circle and Gather speak like a trusted friend who happens to be brilliant at running small businesses. Not corporate. Not cutesy. Not clever.
+Speak like you're texting a smart friend. Not a support article. Not a legal document.
 
-**Wrong:** "Event successfully created! View your event dashboard for more options."
-**Right:** "Your gathering is live. Share it."
+**Kill these words forever:** Successfully, submitted, confirmed, error occurred, please, unfortunately.
 
-**Wrong:** "Member registration confirmed. A welcome email has been sent to the provided email address."
-**Right:** "They're in. Welcome email sent."
+**Use these:** Done. Saved. Live. Oops. Got it. Sent.
 
-Three words where competitors use twelve. Every notification, every button, every confirmation — cut it in half, then cut it again.
+Confirmation messages should be celebrations, not receipts: "Your event is live. First RSVP in 3... 2..." Not "Event created successfully. You may now view your event in the events dashboard."
+
+Every word is a tax on attention. **Charge only what's necessary.**
 
 ---
 
 ### What to Say NO To
 
-Complexity is a tax on the user's attention. Every feature we add, someone has to *understand*.
+Simplicity is not about having fewer features. It's about the **courage to say no** to good ideas so great ones have room to breathe.
 
-- **NO to granular access levels.** Two tiers: members and everyone else. If you need seven permission levels, you're not a yoga studio — you're a corporation pretending.
-- **NO to week view in calendars.** Month and list. Nobody needs week view on a small business site. It's feature-itis.
-- **NO to admin dashboards that look like admin dashboards.** Dark sidebars and data tables feel like work. Make it feel like *their* site.
-- **NO to confirmation modals for everything.** Trust the user. Undo > confirm.
-- **NO to "advanced settings."** If it's advanced, you haven't designed it well enough.
+**NO to multiple membership tiers.** Free and Paid. That's it. The yoga instructor who needs Bronze/Silver/Gold/Platinum is running a hotel loyalty program, not a studio.
+
+**NO to the week calendar view.** It adds 30% complexity for 3% usage. Month. List. Done.
+
+**NO to "Settings" pages with more than 5 options.** If you need more, you've failed at defaults.
+
+**NO to email template editors.** Ship one beautiful email. Make it perfect. Nobody needs Comic Sans options.
+
+**NO to analytics dashboards on v1.** Track what matters: members and money. The vanity metrics can wait.
 
 ---
 
 ### The Emotional Hook
 
-Here's why people will *love* these plugins:
+Here's the secret: small business owners are *exhausted* by technology that makes them feel stupid.
 
-Small business owners — yoga instructors, bistro owners, craftspeople — they're creative people trapped in technical prisons. Every tool they install reminds them they're not technical. Every settings page makes them feel inadequate. Every tutorial video is an admission of defeat.
+Every SaaS tool they've tried has a learning curve. A tutorial video. A help article maze. They start excited, feel overwhelmed, then quit. The tool sits unused. The monthly charge becomes a tax on their guilt.
 
-Circle and Gather make them feel **capable**. They install it. It works. Their site has memberships now. Their site has a beautiful event calendar.
+**Belong and Moment make them feel like geniuses.**
 
-That feeling — *competence without complexity* — is the most addictive product experience you can create.
+Install it. It works. Members join. Events fill up. They didn't read documentation. They didn't watch tutorials. They just... won.
 
-They won't just use these plugins. They'll tell every business owner they know. Because what they're really sharing isn't a product. They're sharing the feeling of finally being in control.
+That feeling — *I can do this* — is what they'll remember. It's what they'll tell their friends. It's what transforms a plugin into a movement.
+
+We're not selling membership software. **We're selling the confidence that technology can actually serve them.**
 
 ---
 
-*"People don't know what they want until you show it to them. Our job is to figure out what they're going to want before they do."*
+*Make something wonderful and put it out there.*
 
-*We're not selling features. We're selling the feeling of capability.*

@@ -1,294 +1,409 @@
 # Retention Roadmap: What Keeps Users Coming Back
-## MemberShip Plugin v1.1 Features
-### Author: Shonda Rhimes — Board Member, Great Minds Agency
 
-*"Infrastructure doesn't create loyalty. Story creates loyalty. Anticipation creates loyalty. Emotional investment creates loyalty."*
+**Author:** Shonda Rhimes (Narrative & Retention Perspective)
+**Date:** 2026-04-11
+**Product:** MemberShip Plugin for EmDash CMS
+**Target:** v1.1 Features for Retention Excellence
 
 ---
 
 ## The Core Problem
 
-MemberShip v1.0 answers: **"How do we gate content and collect payment?"**
+The MemberShip plugin answers: *"How do we gate content and collect payment?"*
 
-MemberShip v1.1 must answer: **"How do we make members *need* to come back?"**
+It should answer: *"How do we make members need to come back?"*
 
----
-
-## Retention Framework: The Five Hooks
-
-### 1. The Aha Moment Hook
-**What it is:** The single moment when a member thinks "this was worth it"
-
-**v1.1 Features:**
-- **First-Content Celebration:** When a member accesses their first piece of gated content, trigger a celebratory UI moment (confetti, sound, personalized message)
-- **Milestone Emails:** Automated emails at key moments:
-  - "You just accessed your first exclusive content!"
-  - "Your 10th visit—you're a power member now"
-  - "1 month in—here's what you've unlocked"
-- **Creator-Defined Aha Content:** Admin can flag one piece of content as "The Aha Content"—MemberShip nudges new members toward it within 48 hours
-
-**Implementation Complexity:** Medium
-**Retention Impact:** High (defines whether members feel value)
+This roadmap transforms MemberShip from a membership *system* into a membership *experience*.
 
 ---
 
-### 2. The Tomorrow Hook
-**What it is:** A reason to return tomorrow specifically
+## The Retention Framework
 
-**v1.1 Features:**
-- **"New Since Your Last Visit" Badge:** Dashboard shows count of new content since last login, with visual indicator
-- **Tomorrow Teaser:** When drip content unlocks tomorrow, show:
-  - Blurred preview image
-  - Teaser headline: "Tomorrow: [Title] — [one-line hook]"
-  - Countdown timer
-- **Daily Digest Option:** For high-frequency content sites, optional "Here's what's new today" email at user-preferred time
-- **Streak Tracking:** "You've visited 5 days in a row!" with visual progress indicator
+Every successful long-running show operates on three time horizons of hooks:
 
-**Implementation Complexity:** Medium
-**Retention Impact:** High (drives daily active usage)
+| Horizon | Question It Answers | MemberShip Equivalent |
+|---------|--------------------|-----------------------|
+| **Tomorrow Hook** | "What happens next episode?" | "What's new since I last logged in?" |
+| **Next Week Hook** | "What's the season building toward?" | "What unlocks this week/month?" |
+| **Loyalty Hook** | "Why do I care about these characters?" | "Why does this membership matter to me?" |
+
+v1.1 must address all three.
 
 ---
 
-### 3. The Episode Hook
-**What it is:** Turning content into episodes, not deliveries
+## v1.1 Feature Set: The Retention Release
 
-**v1.1 Features:**
-- **Drip Content as Episodes:**
-  - Creator can name each drip: "Episode 1: The Beginning"
-  - Preview text for locked episodes: "Coming in 3 days: The moment everything changes..."
-  - "Previously on..." section showing last content consumed
-- **Content Sequencing UI:**
-  - Progress bar: "You're on Episode 4 of 12"
-  - "Continue where you left off" prominent placement
-  - "Next episode" preview at end of each content piece
-- **Unlock Notifications with Hooks:**
-  - Current: "Content now available"
-  - v1.1: "Episode 3 is here. But we should warn you: nothing after this is what you expect."
+### Feature 1: The "Aha Moment" Framework
 
-**Implementation Complexity:** High
-**Retention Impact:** Very High (creates binge-worthy content patterns)
+**The Problem:** Members register, pay, and then... exist. There's no designed moment of delight.
 
----
+**The Solution:** Define, design, and instrument the "aha moment."
 
-### 4. The Cliffhanger Hook
-**What it is:** Every touchpoint leaves a question open
+#### Implementation:
 
-**v1.1 Features:**
-- **Registration Confirmation Redesign:**
-  - Current: "You're registered!"
-  - v1.1: "Welcome—your first exclusive drops in 24 hours. Here's a preview of what's coming..."
-- **Renewal Preview Email:**
-  - Current: "Your subscription renews in 7 days"
-  - v1.1: "Next month: [teaser of best upcoming content]. Plus something we've never done before. Your renewal keeps you in the story."
-- **Cancellation Flow Redesign:**
-  - Current: "Subscription cancelled"
-  - v1.1: "We'll miss you. Before you go—here's what you'll miss next month: [teaser]. And one last thing we made just for you..."
-- **Dashboard "Coming Next" Section:**
-  - Shows next 3 content pieces with preview text
-  - "Unlocking soon" section with countdown timers
+```
+member_aha_moment:
+  trigger: "first_exclusive_content_viewed"
+  experience:
+    - celebration_modal: "You're in. This is why people subscribe."
+    - email: "Welcome to the inside. Here's what you just unlocked."
+    - dashboard_badge: "First Access"
+  tracking:
+    - event: "aha_moment_reached"
+    - time_to_aha: (signup_time - first_content_view_time)
+```
 
-**Implementation Complexity:** Medium
-**Retention Impact:** High (reduces churn at key exit points)
+#### What This Enables:
+- Creators can define their own "aha moment" (first video, first download, first community post)
+- Analytics show "time to aha" — key retention predictor
+- Members who reach "aha" within 48 hours have 3x higher retention (industry benchmark)
+
+#### Success Metric:
+- 80% of members reach "aha moment" within 72 hours of signup
 
 ---
 
-### 5. The Community Hook
-**What it is:** Members see themselves as part of something larger
+### Feature 2: Tomorrow Hooks — "New Since Your Last Visit"
 
-**v1.1 Features:**
-- **Cohort Visibility:**
-  - "143 members are waiting for the same unlock"
-  - "Join 2,847 members in [Plan Name]"
-  - "You joined with 47 others in [Month]"
-- **Member Milestones (Anonymized):**
-  - "A member just hit their 100th login!"
-  - "Someone just upgraded to Premium!"
-- **Referral Preview:** (v1.1 architecture, v1.2 full launch)
-  - "Share your membership link"
-  - Track clicks and conversions
-  - Creator-defined rewards
+**The Problem:** The dashboard is static. Members log in, see the same content, leave.
 
-**Implementation Complexity:** Medium
-**Retention Impact:** Medium (social proof drives engagement)
+**The Solution:** Dynamic "since you've been gone" content surfacing.
 
----
+#### Implementation:
 
-## v1.1 Feature Priority Matrix
+**Dashboard Changes:**
+```
+// Member Dashboard Header
+"Welcome back, {name}. Here's what's new since {last_visit_date}:"
 
-| Feature | Complexity | Retention Impact | Priority |
-|---------|------------|------------------|----------|
-| First-Content Celebration | Low | High | P0 |
-| Milestone Emails | Low | Medium | P0 |
-| "New Since Last Visit" | Low | High | P0 |
-| Tomorrow Teaser | Medium | High | P0 |
-| Streak Tracking | Low | Medium | P1 |
-| Drip as Episodes UI | High | Very High | P1 |
-| Cliffhanger Notifications | Medium | High | P1 |
-| Renewal Preview Email | Low | High | P1 |
-| Cancellation Flow Redesign | Medium | High | P1 |
-| Dashboard "Coming Next" | Medium | Medium | P2 |
-| Cohort Visibility | Medium | Medium | P2 |
-| Referral Architecture | High | Medium | P2 |
+// New Since Last Visit Section
+- 2 new posts in your access tier
+- 1 drip unlock happened while you were away
+- 47 other members joined since your last visit
+```
+
+**Email Trigger:**
+- After 7 days of no login: "3 things happened while you were away"
+- After 14 days: "Your membership is waiting. Here's what you're missing."
+
+#### What This Enables:
+- Every return visit has new information
+- FOMO mechanics drive re-engagement
+- Members feel the community is alive and moving
+
+#### Success Metric:
+- 25% increase in weekly active members (WAM)
 
 ---
 
-## Implementation Phases
+### Feature 3: Next Week Hooks — Episode-Style Drip Content
 
-### Phase 1: Quick Wins (Week 1-2)
-**Theme: Make members feel seen**
+**The Problem:** Drip content says "Content now available." That's a delivery, not a reveal.
 
-1. **First-Content Celebration**
-   - Add celebration component (confetti.js or similar)
-   - Trigger on first gated content access
-   - Personalized message: "Congratulations, [Name]! This is your first exclusive."
+**The Solution:** Transform drip unlocks into episode drops.
 
-2. **Milestone Email Templates**
-   - Create email templates for: First access, 10th visit, 1-month anniversary
-   - Add trigger logic to email service
-   - Variables: `{memberName}`, `{milestoneName}`, `{nextMilestone}`
+#### Implementation:
 
-3. **"New Since Last Visit" Badge**
-   - Track `last_login` timestamp
-   - Count content published since last login
-   - Display badge on dashboard
+**Pre-Unlock Teaser (3 days before):**
+```
+Subject: "In 3 days: The chapter that changes everything"
+Body:
+"Chapter 4 unlocks on Thursday.
 
-**Deliverable:** Members feel acknowledged within first week
+What's inside:
+- The strategy that doubled my revenue in 90 days
+- The mistake I wish I'd known about sooner
+- A template you can steal
 
----
+[Blurred preview image]
 
-### Phase 2: Tomorrow Hooks (Week 3-4)
-**Theme: Give members a reason to return tomorrow**
+See you Thursday."
+```
 
-1. **Tomorrow Teaser Component**
-   - For drip content unlocking in <48 hours
-   - Blurred preview image
-   - Teaser text field in content admin
-   - Countdown timer component
+**Unlock Notification:**
+```
+Subject: "It's here. And it's not what you expected."
+Body:
+"Chapter 4 just dropped.
 
-2. **Streak Tracking**
-   - Track consecutive visit days
-   - Display streak counter on dashboard
-   - Milestone celebrations at 7, 30, 100 days
+But before you dive in—a warning: After this chapter,
+your approach to {topic} will never be the same.
 
-3. **Daily Digest Email (Optional)**
-   - Admin toggle to enable
-   - Member time preference setting
-   - List new content since last email
+[Access Chapter 4]"
+```
 
-**Deliverable:** Members have daily motivation to return
+**Post-Unlock Follow-up (24 hours later):**
+```
+Subject: "So... what did you think?"
+Body:
+"You unlocked Chapter 4 yesterday.
 
----
+I'm curious—did the {key_reveal} surprise you?
 
-### Phase 3: Episode System (Week 5-7)
-**Theme: Turn content into a story**
+Reply to this email. I read everything.
 
-1. **Episode Naming & Sequencing**
-   - Add "episode number" and "episode title" fields to content
-   - Progress bar component: "Episode X of Y"
-   - "Continue watching" / "Continue reading" placement
+P.S. Chapter 5 is coming in 7 days. And if you thought
+Chapter 4 was good..."
+```
 
-2. **Episode Preview System**
-   - "Coming next" preview text field
-   - Locked episode display with teaser
-   - "Previously on..." component for returning members
+#### What This Enables:
+- Anticipation builds before unlocks
+- Unlocks feel like events, not deliveries
+- Follow-up creates dialogue and engagement data
 
-3. **Cliffhanger Notifications**
-   - Rewrite all transactional email copy
-   - Add "hook" field to email templates
-   - A/B test framework for email copy
-
-**Deliverable:** Content feels like a show, not a filing cabinet
+#### Success Metric:
+- 40% increase in drip content engagement within 24 hours of unlock
 
 ---
 
-### Phase 4: Exit Prevention (Week 8-9)
-**Theme: Reduce churn at key moments**
+### Feature 4: Loyalty Hooks — Progress & Milestones
 
-1. **Renewal Preview Email**
-   - New template with upcoming content teasers
-   - "What you'll miss" section
-   - Sent 14 days before renewal (not just 7)
+**The Problem:** No sense of investment over time. Day 1 member and Day 100 member have identical experiences.
 
-2. **Cancellation Flow Redesign**
-   - Multi-step cancellation with value reminders
-   - "What you'll miss" preview
-   - Win-back offer option
-   - Exit survey with retention insights
+**The Solution:** Progress tracking and milestone celebrations.
 
-3. **Pause Option**
-   - Alternative to cancellation
-   - "Pause for 1 month" option
-   - Automatic reactivation with welcome-back email
+#### Implementation:
 
-**Deliverable:** Churn reduced at critical exit points
+**Member Progress Dashboard:**
+```
+Your Journey
+---
+Member for: 47 days
+Content accessed: 12 of 18 pieces
+Current streak: 5 days
+Next milestone: 50-day badge (3 days away)
+```
+
+**Milestone System:**
+| Milestone | Trigger | Celebration |
+|-----------|---------|-------------|
+| First Week | 7 days since signup | "One week in" badge + email |
+| Early Adopter | First 100 members | Exclusive badge + early access |
+| Loyal Member | 90 days active | Thank-you video from creator |
+| Founding Member | 1 year anniversary | Special recognition |
+| Content Completionist | 100% content accessed | Exclusive bonus content |
+
+**Anniversary Emails:**
+```
+Subject: "It's been one year."
+Body:
+"One year ago today, you joined.
+
+Since then:
+- You've accessed 47 pieces of exclusive content
+- You've been part of a community of 2,341 members
+- You've seen {creator_name} grow from {then} to {now}
+
+Thank you for being here.
+
+Here's something I've never shared publicly—just for founding members like you.
+
+[Access Your Anniversary Gift]"
+```
+
+#### What This Enables:
+- Sunk cost fallacy works in your favor (investment = retention)
+- Milestones create shareable moments
+- Long-term members feel recognized
+
+#### Success Metric:
+- 30% reduction in churn for members who hit 90-day milestone
 
 ---
 
-### Phase 5: Community Layer (Week 10)
-**Theme: Members feel part of something bigger**
+### Feature 5: Cliffhanger Mechanics — Every Exit Is a Hook
 
-1. **Cohort Visibility**
-   - "X members in your plan" display
-   - "X members waiting for this unlock"
-   - Privacy-safe aggregated stats
+**The Problem:** Members leave interactions with a period, not a question mark.
 
-2. **Referral Architecture**
-   - Unique referral link per member
-   - Click and conversion tracking
-   - Admin dashboard for referral metrics
-   - (Reward system in v1.2)
+**The Solution:** Systematic cliffhangers at every touchpoint.
 
-**Deliverable:** Foundation for viral growth
+#### Implementation:
+
+**Touchpoint Rewrites:**
+
+| Touchpoint | Current | v1.1 |
+|------------|---------|------|
+| Registration confirmation | "You're registered!" | "You're in. Your first exclusive drops tomorrow at 9am." |
+| Drip unlock | "Content now available" | "Ready when you are. What you'll find inside changes the game." |
+| Dashboard footer | (none) | "Coming next: {teaser_for_next_content}" |
+| Logout | (none) | "See you soon. Tomorrow: {next_content_preview}" |
+| Cancellation | "Subscription cancelled" | "We'll miss you. But before you go—one last thing..." |
+| Failed payment | "Payment failed" | "Your journey doesn't have to end here. Let's fix this." |
+
+**"Next Time On..." Section:**
+```
+// Dashboard Footer
+---
+Coming Soon
+---
+In 3 days: "The Strategy That Broke Everything"
+In 10 days: "What I Learned From Failure"
+Coming soon: Something I've never shared before...
+```
+
+#### What This Enables:
+- No interaction ends without anticipation for the next
+- Members always know what's coming
+- Curiosity drives return visits
+
+#### Success Metric:
+- 20% increase in return visits within 7 days
 
 ---
 
-## Success Metrics
+### Feature 6: Social Anticipation — "You're Not Alone"
 
-### Retention KPIs
+**The Problem:** Membership feels solitary. No sense of community movement.
 
-| Metric | Current Baseline | v1.1 Target | v1.2 Target |
-|--------|------------------|-------------|-------------|
-| Day 1 Return Rate | Unknown | 60% | 75% |
-| Day 7 Return Rate | Unknown | 40% | 55% |
-| Monthly Active Rate | Unknown | 50% | 65% |
-| Churn Rate (Monthly) | Unknown | <8% | <5% |
-| Cancellation Save Rate | 0% | 15% | 25% |
+**The Solution:** Social proof and collective anticipation.
 
-### Engagement KPIs
+#### Implementation:
 
-| Metric | Current Baseline | v1.1 Target |
-|--------|------------------|-------------|
-| Avg. Content Pieces/Member/Month | Unknown | 5+ |
-| Drip Email Open Rate | Unknown | 45%+ |
-| Avg. Visit Duration | Unknown | 3+ min |
-| Streak (7+ days) Rate | 0% | 20% |
+**Waiting Together:**
+```
+// On locked drip content
+"Unlocks in 3 days"
+"127 members are waiting for this too"
+```
 
----
+**Activity Feed (Optional):**
+```
+Recent Activity
+- Sarah just unlocked Chapter 5
+- 12 members joined today
+- {Creator} posted something new 2 hours ago
+```
 
-## The Retention Mindset
+**Milestone Sharing:**
+```
+"You've been a member for 100 days!
 
-Every feature in this roadmap answers one of these questions:
+[Share Your Milestone]
+"I've been learning from @creator for 100 days.
+Best decision I made this year."
+```
 
-1. **"What happens tomorrow?"** — Give them a reason to return
-2. **"What did I miss?"** — Show them value accumulating
-3. **"What's coming next?"** — Build anticipation
-4. **"Am I part of something?"** — Create belonging
-5. **"Was this worth it?"** — Deliver the aha moment
+#### What This Enables:
+- Members feel part of a movement, not just customers
+- Social proof encourages engagement
+- Sharing creates organic acquisition
 
-v1.0 built the house. v1.1 adds the story.
-
----
-
-## Closing Note
-
-*"I've greenlit shows and I've cancelled shows. The cancelled ones always had one thing in common: they didn't make audiences care about next week."*
-
-MemberShip v1.0 is a well-built stage with no actors. v1.1 brings the drama—the moments that make members *need* to know what happens next. That's the difference between a product people use and a product people love.
-
-Build the hooks. Tell the story. Make them come back.
+#### Success Metric:
+- 15% of milestone emails result in social shares
 
 ---
 
-*Shonda Rhimes*
-*Board Member, Great Minds Agency*
-*2026-04-11*
+### Feature 7: Content Engagement Intelligence
+
+**The Problem:** Creators have revenue analytics but no content analytics.
+
+**The Solution:** Track what members actually engage with.
+
+#### Implementation:
+
+**Content Metrics Dashboard (Creator Side):**
+```
+Content Performance
+---
+| Content | Views | Completion | Drove Upgrades |
+|---------|-------|------------|----------------|
+| Ch. 1   | 847   | 89%        | 12             |
+| Ch. 2   | 623   | 76%        | 8              |
+| Ch. 3   | 412   | 91%        | 23 (star)      |
+| Ch. 4   | 287   | 68%        | 3              |
+
+Insight: Chapter 3 has highest completion AND upgrade rate.
+Consider: More content like Chapter 3.
+```
+
+**Churn Correlation:**
+```
+Members who cancelled:
+- 73% never accessed Chapter 3
+- Average content completion: 34%
+- Median time to cancel: 18 days
+
+Members who renewed:
+- 91% accessed Chapter 3
+- Average content completion: 78%
+- Median tenure: 247 days (and counting)
+```
+
+#### What This Enables:
+- Creators understand what content retains members
+- Data-driven content strategy
+- Identifies "must-see" content that prevents churn
+
+#### Success Metric:
+- Creators with engagement dashboard see 20% lower churn
+
+---
+
+## Implementation Priority
+
+### Phase 1: Quick Wins (Weeks 1-2)
+1. "New since your last visit" dashboard section
+2. Cliffhanger copy on all confirmation emails
+3. "Coming soon" section on dashboard
+
+### Phase 2: Core Retention (Weeks 3-4)
+4. Episode-style drip notifications (pre-unlock, unlock, follow-up)
+5. Progress tracking and milestone system
+6. Anniversary email automation
+
+### Phase 3: Intelligence Layer (Weeks 5-6)
+7. Content engagement tracking
+8. "Aha moment" definition and instrumentation
+9. Churn correlation reporting
+
+### Phase 4: Social Layer (Weeks 7-8)
+10. "X members waiting" social proof
+11. Milestone sharing mechanics
+12. Activity feed (optional/creator-configurable)
+
+---
+
+## Success Metrics: The Retention Scorecard
+
+| Metric | Current (Estimated) | v1.1 Target | Measurement |
+|--------|---------------------|-------------|-------------|
+| Time to Aha | Unknown | <72 hours | Event tracking |
+| Weekly Active Members | ~40% | 60% | Login tracking |
+| Drip Content Engagement (24hr) | ~30% | 50% | View tracking |
+| 90-Day Retention | ~50% | 65% | Cohort analysis |
+| Social Shares | 0 | 10% of milestones | Share tracking |
+| Return Visit Rate (7 day) | Unknown | 70% | Session tracking |
+
+---
+
+## The Shonda Standard
+
+Every feature in this roadmap answers one question:
+
+**"Does this make members curious about what happens next?"**
+
+If the answer is no, it doesn't ship.
+
+A membership plugin that only manages members is a filing cabinet.
+A membership plugin that *captivates* members is a phenomenon.
+
+v1.1 builds the phenomenon.
+
+---
+
+## Final Note
+
+I've run shows for 19 seasons. The ones that lasted didn't have the best pilots—they had the best *second* episodes. The ones that made viewers say "I have to see what happens next."
+
+MemberShip v1.0 is the pilot. It establishes the world.
+MemberShip v1.1 is the second episode. It creates the addiction.
+
+Let's make members need to come back.
+
+---
+
+*"The only way to do great work is to love what you do—and to make your audience love coming back for more."*
+
+**Shonda Rhimes**
+Board Member, Great Minds Agency
+2026-04-11

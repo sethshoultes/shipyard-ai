@@ -2,9 +2,9 @@
 
 Email-based membership and gated content plugin for EmDash CMS with full Stripe integration, member dashboard, JWT authentication, email automation, coupon discount codes, drip content, and member portals.
 
-**Version:** 3.0.0  
-**Status:** Production  
-**Phase:** 3 (Complete with Stripe, Dashboard, JWT, Webhooks, Coupons, Drip Content, Portals, Gating)
+**Version:** 1.0.0
+**Status:** Production
+**Phase:** 1 (Core Membership with Stripe, Dashboard, JWT, Webhooks)
 
 ## Features
 

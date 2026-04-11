@@ -1186,19 +1186,11 @@ export default definePlugin({
 						isActive = false;
 					}
 
+					// Return minimal info for public status check
+					// Sensitive fields (Stripe IDs, payment info) require authentication
 					return {
 						email,
 						active: isActive,
-						plan: member.plan,
-						status: member.status,
-						expiresAt: member.expiresAt,
-						// Include Stripe subscription info
-						stripeCustomerId: member.stripeCustomerId,
-						stripeSubscriptionId: member.stripeSubscriptionId,
-						stripePaymentMethod: member.stripePaymentMethod,
-						planInterval: member.planInterval,
-						currentPeriodEnd: member.currentPeriodEnd,
-						cancelAtPeriodEnd: member.cancelAtPeriodEnd,
 					};
 				} catch (error) {
 					ctx.log.error(`Status check error: ${String(error)}`);

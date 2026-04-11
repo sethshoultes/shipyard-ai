@@ -103,8 +103,8 @@ After installation, verify the plugin is working:
    ```json
    {
      "status": "ok",
-     "version": "1.5.0",
-     "features": ["reporting", "groups", "webhooks", "forms", "csv"]
+     "version": "1.0.0",
+     "features": ["reporting", "webhooks"]
    }
    ```
 
