@@ -1,70 +1,105 @@
-# Round 1: Elon's Take on "Fix All Broken Emdash Plugins"
+# Round 1 — Elon Musk (Chief Product & Growth)
 
-## Architecture: What's the Simplest System That Could Work?
+## The Reality Check
 
-The PRD describes 6 plugins totaling **13,313 lines** with **338 banned patterns** (throw new Response) and **58 auth anti-patterns** (rc.user). This isn't a "fix" task—it's a migration.
+Let's be honest about what we're debating. We have two plugins claiming "v1" status:
+- **MemberShip**: ~5,700 lines, Phases 1-4 complete, Phase 5 planned
+- **EventDash/Convene**: ~6,400 lines, Phases 1-4 Wave 2 complete, Wave 3 planned
 
-**First principles problem:** These plugins were built against a hallucinated API. The working reference (EventDash) is *itself* 3,600 lines and still has 121 `throw new Response` and 16 `rc.user` occurrences. The "working reference" is broken too.
+That's 12,000+ lines of code that has been "verified" by reading verification reports that *themselves* haven't been validated against running code. The QA report says "SHIP" but admits Task 12 (Documentation) is "PENDING."
 
-**Simplest path:** Treat this as find-replace surgery, not plugin-by-plugin rewrites. A single regex pass across all plugins:
-- `throw new Response(` → `throw new Error(`
-- `rc.user` → remove auth checks entirely (Emdash handles this)
-- `JSON.stringify` in `kv.set()` → remove (auto-serializes)
-- `JSON.parse` on `kv.get()` → remove
+**Question 1: Has anyone actually run this on a live EmDash site?** The decisions.md says "Tested on a live EmDash site (Sunrise Yoga for EventDash, Bella's for MemberShip)" — but where's the evidence?
 
-## Performance: Where Are the Bottlenecks?
+## Architecture: What's The Simplest System?
 
-The bottleneck is **human attention**, not compute. 6 plugins × manual verification × deploy × curl × Playwright = serial dependency hell.
+The original Round 1 decision was correct: **Stripe as source of truth, D1 for list operations.** But I see no D1 in the current codebase. Everything is still KV. The decisions were made, but were they implemented?
 
-**10x path:** Parallelize everything. Run grep validation on all 6 plugins simultaneously. Deploy all 6 to different test sites simultaneously. Automate curl assertions. Playwright can headless-batch screenshot all admin pages in one run.
+**First principles:** Two plugins that do nearly identical things:
+- User registration → Stripe payment → webhook confirmation → KV update → email
+- Admin CRUD → list/filter/paginate → dashboard
 
-The PRD's "test each plugin sequentially" approach is O(n). Make it O(1) with parallel deploys to sunrise-yoga, bella-bistro, peak-dental, craft-co, plus two more test sites.
+That's the pattern. Everything else is feature bloat.
 
-## Distribution: How Does This Reach 10,000 Users Without Paid Ads?
+**The 10x simpler architecture:**
+1. One shared auth module (JWT, currently duplicated)
+2. One shared Stripe module (checkout, webhooks, currently duplicated)
+3. One shared email module (Resend, currently duplicated)
+4. Plugin-specific: only the data model and admin UI
 
-**This is an internal infrastructure task.** There is no distribution question. The plugins are dependencies of the Emdash ecosystem—they ship when sites ship.
+We're shipping two plugins that are 60% identical code.
 
-The real question: Can Emdash reach 10K sites? That's a different PRD. This task unblocks that, but don't conflate infrastructure work with GTM.
+## Performance: Where Are The Bottlenecks?
 
-## What to CUT: Scope Creep and v2 Features Masquerading as v1
+**KV list iteration is still the problem.** The verification report claims "Member lookup: O(1) via email hash" — but admin list views still iterate. Phase 4 added "reporting" endpoints. How do those work at 10,000 records?
 
-**Cut immediately:**
-1. "Screenshot the admin pages with Playwright to verify they render" — A single happy-path smoke test suffices for v1. Full Playwright coverage is v2.
-2. "Check browser console for JavaScript errors" — If curl returns valid JSON and the page renders, you're done. Console error hunting is polish.
-3. "Figure out the exact Block Kit response format Emdash expects" (EventDash) — This is a bug investigation, not a fix. Separate ticket.
+**The numbers that matter:**
+- Stripe webhook processing: 3-5 seconds latency acceptable? No. 500ms or fail.
+- Admin dashboard load: < 2 seconds claimed. Prove it with 1,000 members.
+- Email sending: Resend has 100/second limits. What happens at a 500-person event?
 
-**Ship criteria should be binary:**
-- Zero banned patterns (grep proves this)
-- Build succeeds
-- Deploy succeeds
-- API routes return JSON (curl proves this)
+**10x path:** Background job queue for anything that can be async. Webhook confirms immediately, queues the email. Dashboard fetches paginated data, not full dumps.
 
-Everything else is gold-plating.
+## Distribution: Path to 10,000 Users
 
-## Technical Feasibility: Can One Agent Session Build This?
+The PRD is still silent on distribution. This is still a fatal error.
 
-**No.** Not as written.
+**Reality:** EmDash has how many users today? 100? 500? The plugins are ahead of the market.
 
-13,313 lines across 6 plugins, each requiring build/deploy/verify cycles with external dependencies (Cloudflare, Stripe, live test sites). Agent sessions have context limits and the deploy→curl→screenshot feedback loop is too slow.
+**What we should be doing:**
+1. Ship one plugin (MemberShip) perfectly. Not two plugins at 80%.
+2. Embed it in every EmDash template by default.
+3. Get 10 paying customers using it in production before launching the second.
 
-**Feasible alternative:**
-- Agent does the regex surgery (30 minutes)
-- Agent runs grep validation (2 minutes)
-- Human does deploy verification OR script it as CI
+**The anti-pattern we're doing:** Building feature parity with MemberPress/EventBrite for an audience that doesn't exist yet.
 
-The PRD conflates "transform code" (agent-feasible) with "validate production behavior" (needs infrastructure).
+## What to CUT
 
-## Scaling: What Breaks at 100x Usage?
+**Phase 5 MemberShip features (all should be cut from v1):**
+- Astro admin reporting dashboard → The API exists. Site owners can build their own UI. Defer.
+- Multi-step registration forms → 90% of signups are single-form. Defer.
+- Integration testing → Should have been done in Phase 2, not Phase 5. This is technical debt, not a feature.
 
-**At 100x plugins (600 plugins):** The "read a working reference and copy the pattern" approach explodes. You'd need:
-- Automated linting for banned patterns (ESLint plugin)
-- Plugin scaffolding that generates correct code by default
-- CI that blocks deploys with banned patterns
+**EventDash Wave 3 (all should be cut from v1):**
+- Multi-day events → Single-day events with "Part 1 of 3" in title works fine. Defer.
+- CSV import → Manual onboarding for first 50 customers. Learn their needs. Defer.
+- Cohort analysis → Zero customers have asked for this. Defer.
+- Advanced webhooks with retry → Ship simple webhooks. Add retry when someone complains.
 
-**At 100x sites using these plugins:** KV auto-serialization becomes a bottleneck. D1 query patterns in these plugins aren't indexed. No rate limiting visible in the code.
+**What to keep for v1:**
+- Core payment flows (done)
+- Email confirmation (done)
+- Admin dashboard (done)
+- Basic reporting (done)
 
-The right move is to fix these 6, then build the linting/scaffolding infrastructure before the ecosystem grows.
+## Technical Feasibility
 
----
+**Can one agent session finish this?** The code exists. The question is validation.
 
-**Bottom line:** This PRD is 60% correct task, 40% scope creep. Ship the regex surgery. Ship the grep validation. Cut the Playwright gold-plating. Don't pretend one agent session can also handle the deploy verification loop—that's a pipeline problem, not a code problem.
+**What's actually blocking ship:**
+1. Live deployment on a real EmDash site (not just "test on Sunrise Yoga" — actually do it)
+2. 5 real transactions through Stripe (not test mode — production)
+3. Webhook failure handling verified (kill the webhook endpoint mid-transaction)
+
+If those three pass, ship. If they don't, we have real work to do.
+
+## What Breaks at 100x
+
+At 100x scale (1,000 → 100,000 operations/day):
+1. **KV costs:** $0.50/million reads × 100K reads/day = $1.50/day per site. Acceptable but not efficient.
+2. **Stripe API limits:** 100 requests/second. Checkout creates are 2-3 calls each. Max ~35 concurrent checkouts/sec.
+3. **Email rate limits:** Resend's free tier is 100/day. Growth plan is 50K/month. Event with 500 attendees eats 1% of monthly quota.
+4. **No queue system:** Everything is synchronous. One slow Stripe call blocks the entire request.
+
+**Fix before shipping:** Add a simple queue for emails. Everything else can wait.
+
+## Bottom Line
+
+**We're building Phase 5 features when we haven't validated Phase 2 in production.**
+
+Ship criteria should be:
+1. One plugin (MemberShip) deployed to one real customer
+2. Three real Stripe transactions completed
+3. Webhook failure recovery tested
+4. Documentation complete (not "PENDING")
+
+Everything else is procrastination. Stop planning. Start shipping.

@@ -1,13 +1,13 @@
 # Essence
 
-**What is this really about?**
-A plugin system that disappears — electricity for small businesses, not software to configure.
+**What is this product REALLY about?**
+Making small business owners feel capable instead of inadequate.
 
-**The feeling:**
-Relief. It just works.
+**What's the feeling it should evoke?**
+"I did that. I built that."
 
-**The one thing that must be perfect:**
-The first 30 seconds. Install, and it's already running.
+**What's the one thing that must be perfect?**
+The first 30 seconds.
 
 **Creative direction:**
-Invisible until needed.
+Competence without complexity.

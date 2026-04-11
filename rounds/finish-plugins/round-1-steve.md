@@ -1,66 +1,68 @@
 # Steve Jobs — Chief Design & Brand Officer
-## Round 1 Position on Plugin System Completion
+## Round 1 Positions: EmDash Plugin Suite
 
 ---
 
 ### Product Naming
 
-**"Emdash"** — already perfect. It's a punctuation mark that connects ideas without interruption. That's exactly what a plugin system does. One word. Memorable. Literate. Keep it.
+"MemberShip" and "EventDash" are *functional* names. They describe what the product does. That's lazy. That's what engineers do when they can't be bothered to think about the human experience.
 
-The plugins themselves? MemberShip, ReviewPulse, SEODash, FormForge, CommerceKit, EventDash. These names are *mediocre*. They smell like a committee. "Dash" appearing twice is lazy. "Kit" and "Forge" are developer jargon that means nothing to a business owner.
+**MemberShip becomes "Circle."** A circle is intimate. It's exclusive. It's a community gathered around something they love. When a yoga studio owner says "join my Circle," it means something. When they say "join my MemberShip," they sound like a corporation.
 
-If I had my way: **Rolls, Stars, Rank, Forms, Shop, Events.** Simple nouns. Things you can touch. A yoga studio owner doesn't want "MemberShip" — they want to know who's in their Rolls.
+**EventDash becomes "Gather."** Events are logistics. Gatherings are *human*. People don't want to attend an event—they want to gather. The word itself creates warmth.
+
+One word. No compound cleverness. Just truth.
 
 ---
 
 ### Design Philosophy
 
-The philosophy here is correct but the execution is timid: **plugins should be invisible until needed.**
+These plugins must feel like they were *always there*. The moment someone installs Circle or Gather, it shouldn't feel like an add-on—it should feel like a missing piece finally arriving home.
 
-A great plugin system is like electricity in a building. You don't think about wiring — you flip a switch and the lights come on. These plugins have 4,000 lines of code throwing custom Response objects like they're building their own framework. That's not a plugin. That's a parasite competing with its host.
-
-The real insight in this PRD? "Emdash handles auth." Yes! The plugin doesn't need to know who's logged in any more than a lightbulb needs to know about the power grid. **Defer everything you can. Own only what you must.**
+The insanely great part? **Zero configuration that matters.** Stripe connects once. Colors inherit automatically. The calendar just *knows* it should match the site. We're not building plugins—we're building features that happen to be portable.
 
 ---
 
 ### User Experience — The First 30 Seconds
 
-Right now? A developer installs a plugin and hits a wall of cryptic errors. `.map() is not a function`. That's not an experience — it's a rejection.
+When someone installs Gather, within thirty seconds they should see an event card on their site. Not a settings screen. Not a tutorial. An actual, beautiful event card with a placeholder event called "Your First Gathering."
 
-The first 30 seconds should feel like plugging in a USB cable. Click. It works. The admin page loads instantly. The blocks appear. No configuration screens. No setup wizards. **Working is the default state.**
+The admin should feel proud *immediately*. We ship the demo state, not the empty state. An empty calendar is a sad calendar. We never show sad.
 
 ---
 
 ### Brand Voice
 
-Emdash should speak with the confidence of someone who's already solved your problem. Not "Configure your membership settings" — that's asking for work. Instead: "Your members are ready. Here's how they're doing."
+These plugins speak like a trusted friend who happens to be an expert. Not corporate. Not cutesy. Confident but never arrogant.
 
-Every message should assume success. Every error should offer a single clear action. **Never explain the system. Explain the outcome.**
+- **Wrong:** "Event successfully created! View your event dashboard."
+- **Right:** "Your gathering is live. Share it."
+
+Three words where competitors use twelve. Every notification, every button, every confirmation—cut it in half, then cut it again.
 
 ---
 
 ### What to Say NO To
 
-This PRD lists six plugins. That's five too many for launch. Ship EventDash — it's the reference, it's closest to working, and events are what small businesses actually do every week.
-
-Say no to:
-- **Multiple response formats** — one format, enforce it
-- **Plugin-level authentication** — the platform handles it, period
-- **Manual JSON serialization** — if developers are calling `JSON.stringify`, your API failed them
-- **Graceful degradation** — either the plugin works or it doesn't exist yet
-
-The banned patterns list exists because someone said yes to complexity. Every "throw new Response" was a developer working around a limitation that shouldn't exist.
+- **NO** to granular access levels. Two tiers: members and everyone else. Complexity is a tax on the user's attention.
+- **NO** to "check-in" features. This is digital—we know who registered. Physical check-in is theater.
+- **NO** to week view in the calendar. Month and list. Nobody needs week view on a small business site.
+- **NO** to admin dashboards that look like admin dashboards. The admin experience should be *as beautiful* as the customer experience.
 
 ---
 
 ### The Emotional Hook
 
-Small business owners are drowning in software that demands their attention. Every dashboard wants a login. Every tool wants configuration. Every plugin wants maintenance.
+Here's why people will *love* this:
 
-The emotional hook is **relief**. "I installed this, and it just... works. It knows my members. It knows my events. It doesn't ask me questions — it gives me answers."
+Small business owners—yoga instructors, bistro owners, craftspeople—they're creative people trapped in technical prisons. Every plugin they install makes them feel more inadequate, more dependent, more frustrated.
 
-People won't love this because it's powerful. They'll love it because it *disappears*. The best tools don't demand mastery. They grant capability. That's insanely great.
+Circle and Gather will make them feel *capable*. They'll install it and think: "I did that. I built that. My site has memberships now. My site has a beautiful event calendar."
+
+That feeling—**competence without complexity**—is the most addictive product experience you can create. They won't just use these plugins. They'll tell every business owner they know.
+
+We're not selling features. We're selling the feeling of finally being in control.
 
 ---
 
-**Ship one perfect plugin. Let it prove the architecture. Then, and only then, fix the rest.**
+*"Design is not just what it looks like. Design is how it works." — And how it makes people feel.*
