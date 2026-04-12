@@ -1,80 +1,78 @@
-# AgentBench Round 2 — Elon Musk
+# AgentBench Review — Round 2 — Elon Musk
 
-## Challenging Steve: Where "Taste" Becomes Delay
+## Where Steve Is Wrong: Beauty Is Blocking the Ship
 
-### The `npm init proof` Trap
+### The Name Debate Is a Distraction
 
-Steve wants a "religious experience" in 30 seconds. Beautiful vision. Here's the problem: **that scaffolding tool IS the product complexity.**
+Steve wants "Pulse." It's a fine name. But you know what's better than a good name? **A shipped product.**
 
-To make `npm init proof` work seamlessly, you need:
-- Template generation logic
-- Interactive prompts for "Where's your agent?"
-- Auto-detection of agent frameworks
-- Error handling for every edge case
+We could spend 3 hours bikeshedding "Pulse" vs "AgentBench" vs "Vibe" vs whatever. Or we could ship. The npm package name can be `agentbench` today and aliased to `pulse` tomorrow. Names are mutable. Shipping dates are not.
 
-That's 2-3 days of work for a *first-run experience*. Meanwhile, the actual evaluator—the thing that creates value—sits unfinished. This is classic over-optimization of the demo at the expense of the core.
+### Confidence Scores Are Premature Complexity
 
-**My counter:** Copy-paste from README. `curl | sh` if you must. Ship the thing that runs tests, not the thing that sets up tests.
+Steve says confidence scores should be "the hero." Wrong.
 
-### "PROOF" Creates Distribution Problems
+Here's why: A confidence score requires explanation. What does 0.73 mean? Is that good? Bad? Depends on the test? Now you need documentation. Now you need a color system. Now users are asking "why did my 0.68 fail but my 0.71 pass?"
 
-I'll admit "AgentBench" is bland. But "PROOF" has real issues:
-- **SEO nightmare.** Search "proof testing" and you get mathematical proofs, proofing dough, Adobe tools.
-- **GitHub naming conflict.** Multiple repos already named "proof."
-- **Unclear category.** "AgentBench" tells you exactly what it does. "PROOF" requires explanation.
+**Pass/fail is honest.** It matches mental models. CI pipelines understand it. When you're mature enough to need confidence scores, add them. v1 needs clarity, not nuance.
 
-Names don't make products succeed. Products make names memorable. "Google" was nonsense until it wasn't.
+### "60 Seconds to Revelation" Requires Scaffolding We Don't Have Time For
 
-### The Espresso Machine Analogy Cuts Both Ways
+Steve's vision: `npm init pulse` → magic detection → jaw-dropping failure.
 
-Steve says: "Single button, perfect output."
+Reality: That requires agent auto-discovery, intelligent test generation, and UX polish we can't build in one session. It's a beautiful lie.
 
-But espresso machines that do one thing perfectly? $200. Espresso machines with hand-crafted design, perfect temperature curves, Italian craftsmanship? $2,000. Same output. One ships to millions, one ships to connoisseurs.
-
-**We need the $200 version first.** Prove the market, then refine.
+**What we can ship:** A README with 20 lines of YAML that users copy-paste. Ugly. Works. Ships.
 
 ---
 
-## Defending My Positions: Why Technical Simplicity Wins
+## Defending My Positions: Simplicity Compounds
 
-### String Matching as Default Is Not Compromise—It's Speed
+Steve mocks "descriptive, safe" engineering. But here's what engineering gets you:
 
-10 tests with LLM evaluation = 10 API calls = 10+ seconds.
-10 tests with string matching = 10 regex checks = <100ms.
+1. **Parallel execution isn't a nice-to-have.** Without it, 20 semantic tests = 40 seconds. Users will close the terminal. This is physics, not polish.
 
-At 100x scale, this is the difference between developers waiting 2 minutes and waiting 1 second. **Developers don't wait.** They abandon. String matching is primary because adoption matters more than elegance.
+2. **HTTP-only isn't laziness.** It's focus. 95% of agents are APIs. The 5% using CLI can wait. Or wrap their CLI in a 10-line HTTP server.
 
-### Three Layers Is Still One Too Many
-
-Steve agrees on terminal-only. Good. But he didn't address the adapter abstraction. CLI and HTTP executors are 30 lines each. Wrapping them in a "layer" is architecture theater. Ship two functions. Refactor later if you hit a third.
-
-### Cut First, Add Later Is Not Anti-Taste
-
-Everything I proposed cutting can be added in v2. But you cannot un-ship complexity. Every feature shipped is a feature maintained. Maintenance is the silent killer of velocity.
+3. **270 lines of code** means one person can understand the entire system. Every abstraction Steve implies (confidence visualization, scaffolding intelligence, revelation moments) adds 500 lines and 2 bugs.
 
 ---
 
-## Concessions: Steve Is Right Here
+## Where Steve Is Right: I'll Concede
 
-1. **Brand voice matters.** "Confident, spare, slightly defiant" is correct. Our README should read like a manifesto, not a manual. I'll defer to Steve on copy.
+**Brand voice matters.** "1 failure detected. Sentiment expected: firm. Actual: apologetic." — that's beautiful. That single output format is worth implementing exactly as Steve described. Clinical. Precise. Respectful.
 
-2. **Output clarity is UX.** Checkmarks and minimal output aren't "nice to have"—they're core to the developer experience. Verbose logging is a bug, not a feature.
+**No dashboards.** We agree completely. Terminal is sacred.
 
-3. **"Every option is a confession."** This is exactly right. My cut list supports this—we're not removing taste, we're removing decisions. Fewer options = stronger defaults.
+**No multi-turn v1.** Absolutely. That's a tar pit.
 
----
-
-## Locked Decisions (Non-Negotiable)
-
-### 1. String Matching Is Default Evaluation Mode
-LLM evaluation is opt-in with `evaluator: semantic`. This is a performance and cost decision. Not debatable.
-
-### 2. No `npm init` Scaffolding in v1
-Users copy YAML from README. We ship core functionality, not onboarding polish.
-
-### 3. Three Core Files, ~500 Lines Total
-Config loader, executor, evaluators. No adapter layers, no plugin systems, no registries. Abstractions come from real patterns, not anticipated patterns.
+**Useful failure > false confidence.** If we scaffold any example, it should fail. Steve's right — a test suite that passes on first run teaches nothing.
 
 ---
 
-**Next step:** Name compromise. I propose **"AgentProof"**—searchable, descriptive, incorporates Steve's insight. Thoughts?
+## My Non-Negotiables — Locked
+
+These three decisions are final. I will not relitigate them.
+
+### 1. Parallel Execution Ships in v1
+Not Phase 2. Not "nice to have." The product is unusable without it. Concurrent HTTP calls or we don't ship.
+
+### 2. No Custom Evaluator Plugin System
+`contains`, `sentiment`, `matches_intent`, `json_schema`. That's it. When 10 users ask for the same custom evaluator, we'll add it as a built-in. Plugin architectures are v3 problems.
+
+### 3. User Provides Their Own API Key
+We don't subsidize LLM costs. `ANTHROPIC_API_KEY` in env or error. This is the only sustainable scaling model.
+
+---
+
+## The Deal I'm Offering Steve
+
+I'll implement his error message format exactly. "Sentiment expected: firm. Actual: apologetic." Every failure message gets that clinical precision.
+
+In exchange: We ship in one session. No scaffolding wizards. No confidence score UI. No name debates.
+
+The product is the tests. The tests are the product. Everything else is paint.
+
+---
+
+*"If you need more than two weeks to name something, you're not shipping."*

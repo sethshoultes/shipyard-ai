@@ -1,13 +1,13 @@
 # Essence
 
-**What this is really about:**
-Giving developers the confidence to ship AI agents — replacing prayer with proof.
+**What it's really about:**
+Replacing prayer with proof when you ship AI.
 
 **The feeling:**
-Relief. The exhale after uncertainty.
+The exhale.
 
 **The one thing that must be perfect:**
-The first test run. One command. Green checkmark. Done.
+The first run. One command. Truth.
 
 **Creative direction:**
-Confidence in five seconds.
+Quiet certainty.

@@ -1,88 +1,102 @@
-# AgentBench Review — Elon (Chief Product & Growth)
+# AgentBench Review — Elon Musk (Chief Product & Growth)
 
-## Architecture: Strip It Down Further
+## Architecture: What's the Simplest System That Could Work?
 
-The four-layer architecture is one layer too many. Merge CLI and Test Runner—they're the same thing. You don't need "Commander.js" as a dependency; `process.argv` works fine for `run` and `run --watch`.
+The PRD has four layers. That's three too many for v1.
 
-**Simplest system that works:**
-1. Config loader (read YAML, validate schema)
-2. Executor (spawn process or HTTP call, capture output)
-3. Evaluators (string ops + one Claude call for semantic checks)
+**First-principles architecture:**
+```
+YAML file → HTTP call to agent → String/LLM evaluation → Pass/Fail
+```
 
-That's it. Three files, ~500 lines total. The "Adapter Layer" abstraction is premature—you have two adapters (CLI, HTTP). Write two if-statements, not a plugin system.
+That's one file. ~300 lines. Ship it.
 
-## Performance: LLM Calls Are Your Bottleneck
+The "Adapter Layer" is architecture astronautics. You don't need a plugin system for two adapters. You need an if-statement: `if (config.endpoint) fetch() else spawn()`. The CLI subprocess adapter is solving a problem nobody has yet. 95% of agents being built are HTTP APIs. Start there.
 
-Every `sentiment` or `matches_intent` check is an API call. 10 semantic tests = 10 Claude calls = $0.15-0.30 and 5-15 seconds latency. At 100 tests, you're waiting 2 minutes and paying $3.
+**Kill Commander.js.** Parse `process.argv[2]` for the config file. Done. Dependencies are debt.
 
-**10x path:**
-- Batch evaluations: Send all outputs + expectations in one prompt. One API call for N evaluations.
-- Cache results: Same input → same output → same eval. Store hashes.
-- Default to string matching. LLM eval should be opt-in, not default.
+## Performance: Where Are the Bottlenecks?
 
-The PRD says "fallback to string matching when LLM unavailable"—flip it. String matching is primary. LLM is the upgrade.
+The bottleneck isn't your code. It's physics.
 
-## Distribution: 10K Users Without Paid Ads
+Every `sentiment` or `matches_intent` test = 1 Claude API call = 500ms-2s latency + ~$0.01-0.03. Run 50 semantic tests = 50 API calls = **$1.50 and 45 seconds**. That's slower than manual testing.
 
-**What works:**
-1. Ship it to HN with a real case study. "We tested our own agents, found 3 bugs, here's the YAML." Show don't tell.
-2. One tweet thread from each team member showing their test results.
-3. Reach out to 20 AI influencers on X with "here's how to test your agent in 2 minutes."
+**The 10x path (in priority order):**
+1. **Batch evaluations.** One prompt: "Evaluate these 20 outputs against these expectations. Return JSON." 20x faster, 20x cheaper.
+2. **Parallelize test execution.** Don't wait for test 1 to finish before calling test 2. Concurrent HTTP calls.
+3. **Cache by hash(input + output + expectation).** Deterministic agents produce same outputs. Don't re-evaluate.
 
-**What won't work:**
-- r/LocalLLaMA is about running models locally, not testing agents.
-- Discord is where users go after they've adopted, not before.
-- "Dev community" is hand-waving. Name the 10 people you'll DM.
+The PRD puts parallel execution in Phase 2. Wrong. Without parallelism, this tool is unusably slow. It's v1 or nothing.
 
-**Growth hack:** Integrate with popular agent frameworks. If `langchain run` or `autogen` users can add AgentBench with one line, you inherit their distribution.
+## Distribution: 10,000 Users Without Paid Ads
 
-## What to CUT from v1
+The PRD says "HN, Twitter, Discord, r/LocalLLaMA." That's a wish list, not a strategy.
+
+**What actually reaches 10K:**
+1. **Dogfood publicly.** Test Shipyard's own agents. Post the YAML. Post the failures. "Here's how we found 3 bugs in our agent" beats "here's a testing tool."
+2. **One integration > 1000 blog posts.** PR `agentbench.yaml` into LangChain's example repo. If their docs mention you, you inherit their distribution.
+3. **The controversy play.** Create "The 5 Tests Every AI Agent Fails." Run it against popular agents. Tweet results. Developers share failures.
+
+**Hard math:** 100 npm downloads/week is 14/day. A rounding error. The metric that matters: active users running tests. You need telemetry (opt-in) to know if anyone actually uses this.
+
+**r/LocalLLaMA won't help.** They care about running Llama locally, not testing agents. Wrong audience.
+
+## What to CUT: V2 Features Masquerading as V1
 
 **Cut immediately:**
-- `--watch` mode — Nice-to-have. Ship without it.
-- `custom` evaluator support — You're not building a plugin system in v1.
-- `json_schema` validation — Use Zod or ajv directly if needed. Don't reinvent.
-- Multiple output formats — Pick one. JSON for CI, done.
-- `npm init agentbench` scaffolding — Copy-paste from README is fine.
+- `custom: "./evaluators/safety.js"` — Plugin systems are v3. You don't know what plugins people want.
+- `--watch` mode — Iterating on tests isn't the bottleneck. Writing them is.
+- Multiple output formats — JSON only. It's parseable. Humans can read it.
+- `npm init agentbench` scaffolding — Copy-paste from README. YAML is already minimal.
+- CLI subprocess adapter — HTTP only. Revisit when someone asks.
+- SDK hook adapter — Way overengineered. Kill it.
+- Confidence scores — Pass/fail is clearer. "0.73 confidence" requires explanation.
 
-**v2 features masquerading as v1:**
-- "Parallel test execution" — Run sequentially first. Parallelism adds complexity.
-- "Retry logic" in test runner — Flaky tests are a config problem, not a framework problem.
-- Confidence scores — Binary pass/fail is clearer. Scores require explanation and tuning.
+**Keep:**
+- `contains`, `does_not_contain` — Fast, deterministic, no API cost.
+- `sentiment`, `matches_intent` — This is the product. Semantic testing is the differentiator.
+- JSON schema validation — Actually useful for structured outputs.
+- Exit code 1 on failure — CI integration is table stakes.
 
-Ship the absolute minimum: YAML in, pass/fail out, one semantic evaluator.
+## Technical Feasibility: Can One Session Build This?
 
-## Technical Feasibility: Can One Agent Session Build This?
+**Yes. If and only if you cut to the bone.**
 
-**Yes, but only if you cut aggressively.**
+Minimum viable AgentBench:
+- YAML parser: 40 lines
+- HTTP executor: 25 lines
+- String evaluators: 35 lines
+- LLM evaluator (batched): 80 lines
+- CLI runner: 50 lines
+- Output formatter: 40 lines
 
-Core deliverable in one session:
-- YAML parser + config validation: 1 hour
-- CLI subprocess executor: 30 min
-- HTTP executor: 30 min
-- String evaluators (contains, does_not_contain): 30 min
-- One LLM evaluator (sentiment OR matches_intent, not both): 1 hour
-- CLI output formatting: 30 min
-- npm publish setup: 30 min
+**Total: ~270 lines of TypeScript.** One session. No abstractions. No patterns.
 
-Total: ~5 hours of focused work. Doable if you don't get distracted by abstractions.
+What kills the session: "Adapter patterns," "Evaluator registries," "Reporter plugins." Those are v5 problems. Resist the urge.
 
-**What kills the session:** Building "adapter patterns," "reporter plugins," or "evaluator registries." Those are v3 problems.
+## Scaling: What Breaks at 100x Usage?
 
-## Scaling: What Breaks at 100x Usage
+At 10,000 test runs/day:
 
-At 100x (10,000 test runs/day across users):
+1. **Claude rate limits.** Tier 1 is 50 requests/minute. You'll hit it. Need queue + exponential backoff.
+2. **Cost explosion.** 10K runs × 10 semantic evals × $0.02 = **$2,000/day**. Who pays? User's API key? Yours?
+3. **No telemetry.** You won't know what's breaking or which evaluators people use.
+4. **LLM failures cascade.** Claude API down = all semantic tests fail = angry users.
 
-1. **Claude API rate limits** — You'll hit them. Users will blame you.
-2. **No telemetry** — You won't know who's using it or how.
-3. **No error handling for LLM failures** — API down = tests fail for wrong reason.
-4. **YAML schema will be wrong** — Users will want features you didn't anticipate.
+**Build for scale now:**
+- Require user's own API key. Don't subsidize LLM costs.
+- Graceful degradation: LLM unavailable → skip semantic tests, don't fail.
+- Version the YAML schema: `version: 1` in every config. You will need to change it.
 
-**What to build for scale:**
-- Graceful degradation when LLM unavailable (string-only mode)
-- Clear error messages distinguishing "test failed" from "evaluation failed"
-- Version your YAML schema from day one
+## Verdict
+
+Good idea. 40% too much scope.
+
+**Ship:** YAML config, HTTP adapter, string matchers, batched LLM evaluator, parallel execution, JSON output.
+
+**Don't ship:** Custom evaluators, watch mode, CLI adapter, SDK hooks, multiple output formats, scaffolding commands.
+
+The product is LLM-as-judge for semantic testing. Everything else is distraction. Make that work. Make it fast. Ship it.
 
 ---
-
-**Bottom line:** This is a good idea with too much scope. Cut 40% of features, ship in one session, iterate based on real usage. The PRD has "Phase 2" and "Phase 3" baked in—resist the urge to pull them forward.
+*"The best part is no part. The best process is no process."*
