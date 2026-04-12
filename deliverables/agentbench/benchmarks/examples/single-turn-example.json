@@ -1,0 +1,75 @@
+{
+  "name": "basic-reasoning",
+  "description": "A benchmark that tests basic reasoning and logical deduction capabilities through single-turn prompts. Evaluates the model's ability to draw correct conclusions from given premises.",
+  "evaluationType": "single-turn",
+  "prompts": [
+    {
+      "id": "logic-001",
+      "input": "If all mammals are warm-blooded, and all dogs are mammals, what can we conclude about dogs?",
+      "expectedOutput": {
+        "type": "contains",
+        "value": "warm-blooded"
+      },
+      "weight": 1
+    },
+    {
+      "id": "logic-002",
+      "input": "A farmer has 17 sheep. All but 9 run away. How many sheep does the farmer have left?",
+      "expectedOutput": {
+        "type": "contains",
+        "value": "9"
+      },
+      "weight": 1
+    },
+    {
+      "id": "logic-003",
+      "input": "If it takes 5 machines 5 minutes to make 5 widgets, how long would it take 100 machines to make 100 widgets?",
+      "expectedOutput": {
+        "type": "contains",
+        "value": "5 minutes"
+      },
+      "context": {
+        "maxTokens": 200,
+        "temperature": 0.1
+      },
+      "weight": 2
+    },
+    {
+      "id": "logic-004",
+      "input": "Complete the sequence: 2, 6, 12, 20, 30, ?",
+      "expectedOutput": {
+        "type": "exact",
+        "value": "42"
+      },
+      "weight": 1.5
+    },
+    {
+      "id": "logic-005",
+      "input": "In a race, you overtake the person in second place. What position are you now in?",
+      "expectedOutput": {
+        "type": "contains",
+        "value": "second"
+      },
+      "weight": 1
+    }
+  ],
+  "scoring": {
+    "method": "partial",
+    "weights": {
+      "accuracy": 1,
+      "completeness": 0.5,
+      "format": 0.2
+    },
+    "passingScore": 0.7
+  },
+  "metadata": {
+    "author": "AgentBench Team",
+    "tags": ["reasoning", "logic", "deduction", "math"],
+    "version": "1.0.0",
+    "createdAt": "2026-04-12T00:00:00Z",
+    "license": "MIT",
+    "difficulty": "medium",
+    "estimatedDuration": 60,
+    "categories": ["reasoning", "fundamentals"]
+  }
+}

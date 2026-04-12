@@ -1,0 +1,152 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agentbench.dev/schemas/cli-output/v1.0/result.schema.json",
+  "title": "AgentBench CLI Output Result",
+  "description": "Schema for AgentBench CLI benchmark execution results. SCHEMA VERSION 1.0 - LOCKED",
+  "version": "1.0",
+  "type": "object",
+  "required": ["meta", "run", "benchmarks", "summary"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "description": "Metadata about the CLI output and execution environment",
+      "required": ["schema_version", "timestamp", "cli_version"],
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "description": "Version of this output schema (semver format)",
+          "pattern": "^[0-9]+\\.[0-9]+$",
+          "const": "1.0"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when the result was generated"
+        },
+        "cli_version": {
+          "type": "string",
+          "description": "Version of the AgentBench CLI that produced this output",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[a-zA-Z0-9.]+)?$"
+        }
+      }
+    },
+    "run": {
+      "type": "object",
+      "description": "Information about the benchmark run execution",
+      "required": ["id", "suite", "agent", "duration", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this benchmark run",
+          "pattern": "^[a-zA-Z0-9-]+$"
+        },
+        "suite": {
+          "type": "string",
+          "description": "Name of the benchmark suite executed"
+        },
+        "agent": {
+          "type": "string",
+          "description": "Identifier of the agent being benchmarked"
+        },
+        "duration": {
+          "type": "number",
+          "description": "Total execution duration in milliseconds",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "description": "Overall run status",
+          "enum": ["completed", "failed", "partial", "timeout", "cancelled"]
+        }
+      }
+    },
+    "benchmarks": {
+      "type": "array",
+      "description": "Individual benchmark results",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "score", "passed", "details"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this benchmark",
+            "pattern": "^[a-zA-Z0-9-_]+$"
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable name of the benchmark"
+          },
+          "score": {
+            "type": "number",
+            "description": "Normalized score from 0 to 100",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "passed": {
+            "type": "boolean",
+            "description": "Whether the benchmark met passing criteria"
+          },
+          "details": {
+            "type": "object",
+            "description": "Additional benchmark-specific details",
+            "additionalProperties": true,
+            "properties": {
+              "duration_ms": {
+                "type": "number",
+                "description": "Individual benchmark duration in milliseconds",
+                "minimum": 0
+              },
+              "error": {
+                "type": ["string", "null"],
+                "description": "Error message if benchmark failed"
+              },
+              "attempts": {
+                "type": "integer",
+                "description": "Number of attempts made",
+                "minimum": 1
+              },
+              "metrics": {
+                "type": "object",
+                "description": "Custom metrics for this benchmark",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "description": "Aggregated summary of all benchmark results",
+      "required": ["total", "passed", "failed", "score"],
+      "additionalProperties": false,
+      "properties": {
+        "total": {
+          "type": "integer",
+          "description": "Total number of benchmarks executed",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "description": "Number of benchmarks that passed",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "description": "Number of benchmarks that failed",
+          "minimum": 0
+        },
+        "score": {
+          "type": "number",
+          "description": "Overall aggregate score (0-100)",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    }
+  }
+}

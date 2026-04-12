@@ -6,6 +6,43 @@ One command. One YAML file. Green checkmark. Done.
 
 ---
 
+## Project Structure
+
+This is a monorepo using npm workspaces with four packages:
+
+```
+agentbench/
+├── packages/
+│   ├── cli/      # Command-line interface
+│   ├── core/     # Core testing engine and evaluators
+│   ├── web/      # Web dashboard (optional)
+│   └── data/     # Data models and schemas
+├── package.json  # Root package with workspaces
+├── tsconfig.json # TypeScript project references
+└── vitest.config.ts # Test configuration
+```
+
+### Development
+
+```bash
+# Install all dependencies
+npm install
+
+# Build all packages
+npm run build
+
+# Run tests
+npm test
+
+# Type check
+npm run typecheck
+
+# Lint
+npm run lint
+```
+
+---
+
 ## Install
 
 ```bash

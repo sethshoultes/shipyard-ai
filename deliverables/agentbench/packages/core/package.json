@@ -1,0 +1,37 @@
+{
+  "name": "@agentbench/core",
+  "version": "1.0.0",
+  "description": "Core testing engine and evaluators for agentbench",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "agentbench",
+    "core",
+    "testing",
+    "ai"
+  ],
+  "author": "Shipyard AI",
+  "license": "MIT",
+  "dependencies": {
+    "@agentbench/data": "1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
