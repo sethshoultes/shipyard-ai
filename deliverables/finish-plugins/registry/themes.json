@@ -1,0 +1,149 @@
+{
+  "version": "1.0.0",
+  "themes": [
+    {
+      "name": "Ember",
+      "slug": "ember",
+      "description": "Magazine-style theme with serif headings, dark navy + burnt orange, asymmetric grids.",
+      "personality": "Bold, Editorial",
+      "tagline": "Ember is bold. Editorial. For people with something to say.",
+      "version": "1.0.0",
+      "tarballUrl": "https://wardrobe.shipyard.company/themes/ember-1.0.0.tar.gz",
+      "previewUrl": "https://wardrobe.shipyard.company/screenshots/ember.png",
+      "comingSoon": false,
+      "targetUsers": ["Restaurants", "Creative studios", "Magazines"],
+      "colors": {
+        "primary": "#1a2744",
+        "accent": "#d4622a"
+      },
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "Forge",
+      "slug": "forge",
+      "description": "Industrial theme with monospace fonts, neon green accents, terminal-inspired design.",
+      "personality": "Dark, Technical",
+      "tagline": "Built for builders.",
+      "version": "1.0.0",
+      "tarballUrl": "https://wardrobe.shipyard.company/themes/forge-1.0.0.tar.gz",
+      "previewUrl": "https://wardrobe.shipyard.company/screenshots/forge.png",
+      "comingSoon": false,
+      "targetUsers": ["SaaS", "Developer tools", "Tech companies"],
+      "colors": {
+        "primary": "#0d1117",
+        "accent": "#39d353"
+      },
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "Slate",
+      "slug": "slate",
+      "description": "Corporate theme with gray palette, blue accents, system fonts, sidebar navigation.",
+      "personality": "Clean, Professional",
+      "tagline": "Slate is for people who need to be trusted. Clean. Steady. The kind of design that lets the work speak first.",
+      "version": "1.0.0",
+      "tarballUrl": "https://wardrobe.shipyard.company/themes/slate-1.0.0.tar.gz",
+      "previewUrl": "https://wardrobe.shipyard.company/screenshots/slate.png",
+      "comingSoon": false,
+      "targetUsers": ["Law firms", "Consulting", "Finance"],
+      "colors": {
+        "primary": "#374151",
+        "accent": "#3b82f6"
+      },
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "Drift",
+      "slug": "drift",
+      "description": "Minimal theme with whitespace, thin sans-serif, sage green accents.",
+      "personality": "Minimal, Airy",
+      "tagline": "Let your content breathe.",
+      "version": "1.0.0",
+      "tarballUrl": "https://wardrobe.shipyard.company/themes/drift-1.0.0.tar.gz",
+      "previewUrl": "https://wardrobe.shipyard.company/screenshots/drift.png",
+      "comingSoon": false,
+      "targetUsers": ["Spas", "Yoga studios", "Wellness brands"],
+      "colors": {
+        "primary": "#fafafa",
+        "accent": "#86a873"
+      },
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "Bloom",
+      "slug": "bloom",
+      "description": "Warm theme with rounded corners, cream background, terracotta accents.",
+      "personality": "Warm, Organic",
+      "tagline": "Where community feels at home.",
+      "version": "1.0.0",
+      "tarballUrl": "https://wardrobe.shipyard.company/themes/bloom-1.0.0.tar.gz",
+      "previewUrl": "https://wardrobe.shipyard.company/screenshots/bloom.png",
+      "comingSoon": false,
+      "targetUsers": ["Bakeries", "Florists", "Local shops"],
+      "colors": {
+        "primary": "#fef7ed",
+        "accent": "#c2410c"
+      },
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "Aurora",
+      "slug": "aurora",
+      "description": "Gradient-rich theme with modern glass effects and smooth animations.",
+      "personality": "Modern, Vibrant",
+      "tagline": "Where gradients meet elegance.",
+      "version": "1.0.0",
+      "tarballUrl": "",
+      "previewUrl": "https://wardrobe.shipyard.company/screenshots/aurora-preview.png",
+      "comingSoon": true,
+      "estimatedRelease": "Q3 2026",
+      "targetUsers": ["Startups", "Creative agencies", "Portfolio sites"],
+      "colors": {
+        "primary": "#6366f1",
+        "accent": "#ec4899"
+      }
+    },
+    {
+      "name": "Timber",
+      "slug": "timber",
+      "description": "Rustic theme with wood textures, earthy tones, and hand-crafted feel.",
+      "personality": "Rustic, Artisan",
+      "tagline": "Crafted with care.",
+      "version": "1.0.0",
+      "tarballUrl": "",
+      "previewUrl": "https://wardrobe.shipyard.company/screenshots/timber-preview.png",
+      "comingSoon": true,
+      "estimatedRelease": "Q3 2026",
+      "targetUsers": ["Woodworkers", "Artisans", "Craft breweries"],
+      "colors": {
+        "primary": "#78350f",
+        "accent": "#a16207"
+      }
+    },
+    {
+      "name": "Neon",
+      "slug": "neon",
+      "description": "Cyberpunk-inspired theme with electric colors and bold typography.",
+      "personality": "Bold, Electric",
+      "tagline": "Light up the night.",
+      "version": "1.0.0",
+      "tarballUrl": "",
+      "previewUrl": "https://wardrobe.shipyard.company/screenshots/neon-preview.png",
+      "comingSoon": true,
+      "estimatedRelease": "Q4 2026",
+      "targetUsers": ["Gaming", "Nightlife", "Music venues"],
+      "colors": {
+        "primary": "#18181b",
+        "accent": "#f0abfc"
+      }
+    }
+  ],
+  "analytics": {
+    "endpoint": "https://api.wardrobe.shipyard.company/telemetry",
+    "enabled": true
+  },
+  "metadata": {
+    "lastUpdated": "2026-04-12T00:00:00Z",
+    "registryVersion": "1.0.0"
+  }
+}
