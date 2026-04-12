@@ -1,136 +1,165 @@
 #!/usr/bin/env bash
-# NERVE parse-verdict.sh — Strict verdict parsing from QA reports
-# Part of NERVE: Operations Hardening for Autonomous Pipeline Daemon
 #
-# Usage: ./parse-verdict.sh /path/to/qa-report.md
+# NERVE Verdict Parser — Strict QA verdict parsing
+# Returns JSON with verdict and issue counts
 #
-# Exit codes:
-#   0 - PASS verdict found
-#   1 - FAIL verdict found
-#   2 - ERROR (no verdict found, or ambiguous/multiple verdicts)
-#
-# Integrates with pipeline/qa/run-qa.sh output format:
-#   "**Status:** PASS" or "**Status:** FAIL"
-#   "VERDICT: PASS" or "VERDICT: FAIL"
 
 set -euo pipefail
 
-# Bash version check (require 4.0+)
-if [[ ${BASH_VERSION%%.*} -lt 4 ]]; then
-    echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [VERDICT] ERROR: Bash 4.0+ required" >&2
-    exit 2
-fi
-
-# Restrictive permissions
-umask 0077
-
-# Configuration
-VERBOSE="${NERVE_VERBOSE:-0}"
-
-# Logging function
-verdict_log() {
-    local message="$1"
-    local timestamp
-    timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-    echo "[${timestamp}] [VERDICT] ${message}"
+# Logging function: [TIMESTAMP] [COMPONENT] message
+log() {
+    local component="$1"
+    local message="$2"
+    echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] [${component}] ${message}" >&2
 }
 
-# Parse verdict from a file
-parse_verdict() {
+# Parse verdict from QA report file
+parse_file() {
     local file="$1"
 
-    # Validate file exists
     if [[ ! -f "$file" ]]; then
-        verdict_log "ERROR: file not found: ${file}"
-        return 2
-    fi
-
-    # Search for verdict patterns
-    # Pattern 1: "**Status:** PASS" or "**Status:** FAIL" (from run-qa.sh)
-    # Pattern 2: "VERDICT: PASS" or "VERDICT: FAIL" (also from run-qa.sh)
-    local matches
-    matches=$(grep -E '(\*\*Status:\*\*|VERDICT:)\s*(PASS|FAIL)' "$file" 2>/dev/null || echo "")
-
-    if [[ -z "$matches" ]]; then
-        verdict_log "ERROR: no verdict found in ${file}"
-        return 2
-    fi
-
-    # Count unique verdicts
-    local pass_count fail_count
-    pass_count=$(echo "$matches" | grep -cE '(PASS)' || true)
-    fail_count=$(echo "$matches" | grep -cE '(FAIL)' || true)
-
-    # Check for ambiguity (both PASS and FAIL found)
-    if [[ "$pass_count" -gt 0 ]] && [[ "$fail_count" -gt 0 ]]; then
-        verdict_log "ERROR: ambiguous verdict (both PASS and FAIL found) in ${file}"
-        return 2
-    fi
-
-    # Determine result
-    if [[ "$fail_count" -gt 0 ]]; then
-        verdict_log "parsed FAIL from ${file}"
+        log "VERDICT" "file not found: ${file}"
+        echo '{"verdict": "ERROR", "error": "file not found", "p0_count": 0, "p1_count": 0, "p2_count": 0}'
         return 1
-    elif [[ "$pass_count" -gt 0 ]]; then
-        verdict_log "parsed PASS from ${file}"
-        return 0
-    else
-        verdict_log "ERROR: no verdict found in ${file}"
-        return 2
-    fi
-}
-
-# Show help
-show_help() {
-    cat <<EOF
-NERVE parse-verdict.sh — Strict verdict parsing
-
-Usage: $0 <report-file>
-
-Arguments:
-  report-file    Path to QA report file (e.g., qa-report.md)
-
-Exit Codes:
-  0  PASS verdict found
-  1  FAIL verdict found
-  2  ERROR (no verdict, file not found, or ambiguous)
-
-Supported Formats:
-  "**Status:** PASS" or "**Status:** FAIL"
-  "VERDICT: PASS" or "VERDICT: FAIL"
-
-Examples:
-  $0 /path/to/qa-report.md
-  $0 projects/my-site/review/qa-report.md
-
-  # Check exit code
-  if $0 report.md; then
-    echo "QA passed"
-  else
-    echo "QA failed or error"
-  fi
-EOF
-}
-
-# Main entry point
-main() {
-    if [[ $# -lt 1 ]]; then
-        show_help >&2
-        exit 2
     fi
 
-    case "$1" in
-        --help|-h)
-            show_help
-            exit 0
+    local content
+    content=$(cat "$file")
+    parse_content "$content"
+}
+
+# Parse verdict from stdin or string
+parse_content() {
+    local content="${1:-$(cat)}"
+
+    local verdict="UNKNOWN"
+    local p0_count=0
+    local p1_count=0
+    local p2_count=0
+
+    # Detect verdict patterns (case-insensitive)
+    # Priority order: BLOCKED > FAIL > PASS
+    if echo "$content" | grep -qiE '(BLOCKED|Status:.*BLOCKED|Verdict:.*BLOCKED)'; then
+        verdict="BLOCKED"
+    elif echo "$content" | grep -qiE '(FAIL|Status:.*FAIL|Verdict:.*FAIL)'; then
+        verdict="FAIL"
+    elif echo "$content" | grep -qiE '(PASS|Status:.*PASS|Verdict:.*PASS)'; then
+        verdict="PASS"
+    fi
+
+    # Count P0 issues
+    p0_count=$(echo "$content" | grep -cE '^[|].*P0.*[|]' 2>/dev/null || echo "0")
+    if [[ "$p0_count" -eq 0 ]]; then
+        p0_count=$(echo "$content" | grep -cE 'P0[-_]' 2>/dev/null || echo "0")
+    fi
+
+    # Count P1 issues
+    p1_count=$(echo "$content" | grep -cE '^[|].*P1.*[|]' 2>/dev/null || echo "0")
+    if [[ "$p1_count" -eq 0 ]]; then
+        p1_count=$(echo "$content" | grep -cE 'P1[-_]' 2>/dev/null || echo "0")
+    fi
+
+    # Count P2 issues
+    p2_count=$(echo "$content" | grep -cE '^[|].*P2.*[|]' 2>/dev/null || echo "0")
+    if [[ "$p2_count" -eq 0 ]]; then
+        p2_count=$(echo "$content" | grep -cE 'P2[-_]' 2>/dev/null || echo "0")
+    fi
+
+    local total_issues=$((p0_count + p1_count + p2_count))
+
+    log "VERDICT" "parsed verdict=${verdict} p0=${p0_count} p1=${p1_count} p2=${p2_count}"
+
+    # Output JSON
+    cat << EOFJ
+{
+    "verdict": "${verdict}",
+    "p0_count": ${p0_count},
+    "p1_count": ${p1_count},
+    "p2_count": ${p2_count},
+    "total_issues": ${total_issues},
+    "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+}
+EOFJ
+}
+
+# Validate verdict is one of expected values
+validate_verdict() {
+    local verdict="$1"
+
+    case "$verdict" in
+        PASS|FAIL|BLOCKED)
+            log "VERDICT" "valid verdict: ${verdict}"
+            return 0
             ;;
         *)
-            parse_verdict "$1"
+            log "VERDICT" "invalid verdict: ${verdict}"
+            return 1
             ;;
     esac
 }
 
-# Run main if script is executed directly
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    main "$@"
-fi
+# Quick check if report passed
+is_passing() {
+    local file="$1"
+    local result
+    result=$(parse_file "$file" 2>/dev/null)
+    local verdict
+    verdict=$(echo "$result" | grep -oP '"verdict":\s*"\K[^"]+')
+
+    if [[ "$verdict" == "PASS" ]]; then
+        log "VERDICT" "report is passing"
+        return 0
+    else
+        log "VERDICT" "report is not passing (verdict: ${verdict})"
+        return 1
+    fi
+}
+
+# Main entry point
+main() {
+    local command="${1:-help}"
+
+    case "$command" in
+        file)
+            if [[ -z "${2:-}" ]]; then
+                echo "Usage: $0 file <path>"
+                exit 1
+            fi
+            parse_file "$2"
+            ;;
+        stdin)
+            parse_content
+            ;;
+        check)
+            if [[ -z "${2:-}" ]]; then
+                echo "Usage: $0 check <path>"
+                exit 1
+            fi
+            is_passing "$2"
+            ;;
+        validate)
+            if [[ -z "${2:-}" ]]; then
+                echo "Usage: $0 validate <verdict>"
+                exit 1
+            fi
+            validate_verdict "$2"
+            ;;
+        help|*)
+            echo "NERVE Verdict Parser"
+            echo ""
+            echo "Usage: $0 <command> [args]"
+            echo ""
+            echo "Commands:"
+            echo "  file <path>       Parse QA report file, output JSON"
+            echo "  stdin             Parse QA report from stdin, output JSON"
+            echo "  check <path>      Check if report is passing (exit 0 if PASS)"
+            echo "  validate <v>      Validate verdict string (PASS|FAIL|BLOCKED)"
+            echo "  help              Show this help"
+            echo ""
+            echo "Output JSON format:"
+            echo '  {"verdict": "PASS|FAIL|BLOCKED", "p0_count": N, "p1_count": N, "p2_count": N}'
+            ;;
+    esac
+}
+
+main "$@"
