@@ -1,0 +1,16 @@
+version: 1
+name: "Customer Support Agent Tests"
+agent:
+  command: "node ./agent.js"
+
+tests:
+  - name: "Handles refund request"
+    input: "I want a refund for order #12345"
+    expect:
+      - contains: "refund"
+      - does_not_contain: ["sorry we can't", "not possible"]
+
+  - name: "Handles account inquiry"
+    input: "What is my account balance?"
+    expect:
+      - contains: "balance"

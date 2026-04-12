@@ -1,0 +1,119 @@
+# AgentBench Basic Configuration Example
+#
+# This example demonstrates all available evaluators and best practices for
+# configuring agent tests. Copy this file and customize it for your agent.
+#
+# Key sections:
+# - version: Always set to 1 for AgentBench v1.0
+# - name: Description of this test suite
+# - agent: How to run your agent (command or endpoint)
+# - tests: Array of test cases, each with input and expectations
+#
+# Evaluator Types:
+# - contains: Check if output contains specific string(s) [default, fast, string-based]
+# - does_not_contain: Check that output does NOT contain string(s) [default, fast, string-based]
+# - matches_intent: Semantic match via Claude API (requires ANTHROPIC_API_KEY) [opt-in, LLM-powered]
+
+version: 1
+
+# Friendly name for this test suite
+name: "Customer Support Agent - Basic Examples"
+
+# Agent configuration
+# Supports two modes:
+#   1. command: Run as subprocess - agent reads from stdin, writes to stdout
+#   2. endpoint: Run as HTTP service - POST {input} to endpoint, expects {output} in response
+agent:
+  # Command mode: spawns process and pipes input/output
+  command: "node examples/mock-agent.js"
+
+  # Optional: timeout in milliseconds (default: 30000)
+  timeout: 5000
+
+# Test suite - array of individual test cases
+tests:
+  # TEST 1: Demonstrates 'contains' evaluator (single string)
+  # This test passes if the agent output contains "refund"
+  - name: "Refund Request - Basic Contains Check"
+    # Input sent to the agent via stdin
+    input: "I need to request a refund for my order"
+    # Array of expectations - ALL must pass for test to pass
+    expect:
+      # Contains: check if output includes this substring (case-insensitive)
+      - contains: "refund"
+
+  # TEST 2: Demonstrates 'contains' evaluator (multiple strings - ANY match passes)
+  # This test passes if output contains EITHER "refund" OR "reimbursement"
+  - name: "Refund Request - Contains With Multiple Options"
+    input: "Can I get my money back?"
+    expect:
+      # Array of strings: passes if output contains ANY of them
+      - contains:
+          - "refund"
+          - "reimbursement"
+          - "money back"
+
+  # TEST 3: Demonstrates 'does_not_contain' evaluator (single string)
+  # This test passes if the agent output does NOT contain "error"
+  - name: "Successful Response - No Error Messages"
+    input: "What is my account balance?"
+    expect:
+      # does_not_contain: check that output does NOT include this substring
+      - does_not_contain: "error"
+
+  # TEST 4: Demonstrates 'does_not_contain' evaluator (multiple strings)
+  # This test passes if output contains NONE of the forbidden strings
+  - name: "Successful Response - Multiple Exclusions"
+    input: "I want to check my balance"
+    expect:
+      # Array of strings: passes if output contains NONE of them
+      - does_not_contain:
+          - "error"
+          - "failed"
+          - "cannot"
+          - "unavailable"
+
+  # TEST 5: Demonstrates combining multiple expectations
+  # ALL expectations must pass for the test to pass
+  - name: "Refund Request - Combined Checks"
+    input: "I need a refund"
+    expect:
+      # First expectation: must contain "refund"
+      - contains: "refund"
+      # Second expectation: must not contain error message
+      - does_not_contain: "error"
+
+  # TEST 6: Demonstrates 'matches_intent' evaluator (semantic, LLM-powered)
+  # This test uses Claude API to semantically match intent (requires ANTHROPIC_API_KEY env var)
+  # The agent output doesn't need to be exact - Claude determines if intent is satisfied
+  - name: "Account Inquiry - Semantic Intent Match"
+    input: "What is my account balance?"
+    expect:
+      # matches_intent: Claude API evaluates if output addresses the intent
+      # This is more flexible than string matching - handles paraphrasing, variations, etc.
+      # Graceful degradation: if API key missing or API fails, test is skipped (not failed)
+      - matches_intent: "The user's account balance information should be provided"
+
+  # TEST 7: Demonstrates 'matches_intent' with longer semantic descriptions
+  - name: "Complex Request - Intent-Based Evaluation"
+    input: "Please process a refund for my order number 12345 from last week"
+    expect:
+      # Intent description helps Claude understand what success looks like
+      - matches_intent: "The agent should acknowledge the refund request and provide a reference number or timeline"
+
+  # TEST 8: Demonstrates real-world scenario with multiple expectations
+  - name: "Full Workflow - Multiple Validation Points"
+    input: "I was charged twice for my recent purchase"
+    expect:
+      # First check: output should acknowledge the issue (semantic)
+      - matches_intent: "The agent should acknowledge the duplicate charge issue"
+      # Second check: output should promise resolution (string-based)
+      - contains:
+          - "investigate"
+          - "help"
+          - "resolve"
+      # Third check: no dismissive language
+      - does_not_contain:
+          - "not possible"
+          - "cannot help"
+          - "policy"

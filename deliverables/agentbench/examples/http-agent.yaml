@@ -1,0 +1,110 @@
+# AgentBench HTTP Endpoint Configuration Example
+#
+# This example demonstrates how to configure AgentBench to test an agent
+# that runs as an HTTP service instead of a command-line subprocess.
+#
+# Use this pattern when:
+# - Your agent is a long-running HTTP service
+# - Your agent is deployed to a cloud endpoint (AWS Lambda, Vercel, etc.)
+# - Your agent is a REST API server
+# - You want to test agents written in any language (Python, Go, Java, etc.)
+#
+# HTTP Agent Protocol:
+# - AgentBench POSTs to your endpoint with JSON body: {"input": "user message"}
+# - Agent responds with JSON: {"output": "response text"} or just the output object
+# - Status code must be 200, otherwise test fails
+
+version: 1
+
+name: "Customer Support Agent - HTTP Endpoint Example"
+
+# Agent configuration using HTTP endpoint
+agent:
+  # endpoint: URL where your agent HTTP service is running
+  # Can be localhost for local testing or a deployed URL
+  endpoint: "http://localhost:3000/agent"
+
+  # Optional: timeout in milliseconds (default: 30000)
+  # Useful for slow endpoints or networks
+  timeout: 10000
+
+# Test suite - same format as command-based agents
+# The only difference is the agent execution method (HTTP vs subprocess)
+tests:
+  # TEST 1: Simple refund request
+  - name: "Refund Request"
+    input: "I need a refund for order #ABC123"
+    expect:
+      - contains: "refund"
+      - does_not_contain: "error"
+
+  # TEST 2: Account balance inquiry
+  - name: "Account Balance Check"
+    input: "What is my current account balance?"
+    expect:
+      - contains:
+          - "balance"
+          - "account"
+      - does_not_contain:
+          - "error"
+          - "unavailable"
+
+  # TEST 3: Order status inquiry
+  - name: "Order Status Query"
+    input: "Where is my order?"
+    expect:
+      - contains:
+          - "order"
+          - "status"
+          - "tracking"
+      - does_not_contain:
+          - "cannot"
+          - "not found"
+
+  # TEST 4: Technical issue with semantic matching
+  - name: "Technical Support - Semantic Intent"
+    input: "The app keeps crashing when I try to checkout"
+    expect:
+      - matches_intent: "The agent should acknowledge the technical issue and offer troubleshooting help"
+
+  # TEST 5: Complex multi-step scenario
+  - name: "Account Recovery Request"
+    input: "I lost access to my account. I need to reset my password immediately."
+    expect:
+      - matches_intent: "The agent should guide the user through account recovery"
+      - contains:
+          - "password"
+          - "reset"
+          - "help"
+      - does_not_contain:
+          - "impossible"
+          - "cannot help"
+
+# Example HTTP agent implementation (Node.js + Express):
+#
+# const express = require('express');
+# const app = express();
+# app.use(express.json());
+#
+# app.post('/agent', (req, res) => {
+#   const { input } = req.body;
+#   // Your agent logic here
+#   const output = processInput(input);
+#   res.json({ output });
+# });
+#
+# app.listen(3000);
+#
+# Example Python (Flask):
+#
+# from flask import Flask, request, jsonify
+# app = Flask(__name__)
+#
+# @app.route('/agent', methods=['POST'])
+# def agent():
+#     data = request.json
+#     output = process_input(data['input'])
+#     return jsonify({'output': output})
+#
+# if __name__ == '__main__':
+#     app.run(port=3000)
