@@ -1,56 +1,66 @@
-# Steve Jobs — Round 2 Response
+# Steve Jobs — Round 2
+## Emdash Theme Marketplace: Response to Elon
 
 ---
 
-## Where Elon Is Optimizing for the Wrong Metric
+### Where Elon Is Optimizing for the Wrong Metric
 
-**Elon is optimizing for engineering time. He should be optimizing for first impression.**
+**"Ship in a day, not a week" — speed to ship is not speed to adoption.**
 
-"Screenshots work" is the most dangerous sentence in his entire position. Screenshots are DEAD. They're artifacts. They're promises you can't verify. A screenshot of a theme is like a photograph of a meal — you have no idea if the restaurant is even still open.
+Elon wants to cut demo sites, use screenshots instead of live previews, and launch with 2 themes. He's optimizing for *time to deploy*, not *time to desire*.
 
-His "10x path" of pre-bundling themes into a CLI binary optimizes for install speed nobody asked for. The bottleneck isn't "30 seconds vs 3 seconds" — it's the 10 minutes of scrolling a README trying to imagine what your site would look like. The transformation must be VISIBLE before the command is run.
+A marketplace nobody wants isn't faster to success. It's faster to obscurity.
 
-Reducing to 3 themes because "Drift/Bloom overlap" betrays a fundamental misunderstanding. Themes aren't feature coverage — they're emotional resonance. You don't pick a wedding dress because it "covers the formal category." You pick the one that makes you cry.
+**"Screenshots are 95% as useful at 1% the cost."**
 
-A README with screenshots isn't a product. It's homework.
+Wrong. Screenshots show. Live previews *convince*. The gap between "looks nice" and "that's my site" is the gap between browsing and buying. Screenshots are brochures. Live demos are test drives. Nobody buys a car from a brochure.
 
----
+**"One demo site with a dropdown" — this is a grocery store mentality.**
 
-## Why Design Quality Matters HERE
-
-Elon would argue: "Just ship the themes. Polish later."
-
-Wrong. Emdash is a DESIGN TOOL for people who care about aesthetics but don't code. These users judge products by how the product LOOKS — instantly, viscerally. A README with screenshots signals: "This is for developers who tolerate ugly."
-
-The marketplace IS the proof. If we can't make browsing five themes feel magical, why would anyone trust us to make their website feel magical?
-
-First impressions are the ONLY impressions for a product with zero existing users.
+Switching themes via dropdown destroys the emotional isolation each theme needs. Ember shouldn't coexist with Drift on the same page. They're opinions, not options. The museum has separate rooms for Monet and Picasso.
 
 ---
 
-## Where Elon Is Right (Honest Concessions)
+### Why Design Quality Matters HERE
 
-1. **User accounts are absurd.** Agreed completely. No login. No signup. Zero friction.
+Elon asks: "How many active users?" Good question. But the answer isn't found in distribution hacks — it's found in the product itself.
 
-2. **Live demos that drift are worse than no demos.** If we can't maintain them, don't ship them. I'll accept curated screenshots over broken live previews.
+Emdash users are makers. Writers, photographers, small business owners with taste. They chose Emdash over WordPress because they care about craft. They will judge the marketplace in 3 seconds. If it looks like npm's package list, they'll assume the themes are equally generic.
 
-3. **Distribution through Emdash core is correct.** `emdash create --theme ember` should exist. The marketplace complements this; it doesn't replace it.
-
-4. **"Preview with your content" is v2.** I wanted it. He's right — it's a 40-hour feature hiding as v1.
+**The marketplace IS the portfolio.** It proves we can design. Screenshots on a static page prove nothing except that we can run `npx create-cloudflare`.
 
 ---
 
-## My 3 Non-Negotiables (LOCKED)
+### Where Elon Is Right
 
-### 1. "Wardrobe" Naming
-The product is called Wardrobe. Not "Emdash Theme Marketplace." Not "emdash-themes." Names create emotional real estate. This one is ours.
+**npm over R2 tarballs.** Correct. The ecosystem exists. Don't reinvent it. npm gives us versioning, caching, and familiarity for free.
 
-### 2. 5 Themes, Not 3
-Three themes feels like a test. Five feels like a collection. The difference between "some options" and "a curated selection" is the difference between a gas station and a boutique.
+**Cut live preview with user content for v1.** Agreed. Auth and D1 access is scope creep. Demo content that sings is sufficient — the user's imagination fills the gap.
 
-### 3. Visual Gallery Page (Not a README)
-One single HTML page. Hosted on Cloudflare Pages. Five theme cards with full-bleed screenshots that breathe. No login, no backend, no complexity — but NOT a README in a GitHub repo. The URL you share must be beautiful because the URL IS the marketing.
+**2 themes to start, 5 later.** I'll meet him halfway: **3 themes.** Two is a comparison. Three is a collection. Ship Forge, Drift, and Ember — max contrast, clear personalities.
+
+**Community themes are v2 infrastructure.** Absolutely. Curation requires standards. Standards require saying no. We're not ready to say no at scale yet.
 
 ---
 
-*Speed without soul is just fast mediocrity. Ship something people screenshot.*
+### My Non-Negotiables (Locked)
+
+1. **Name: Skins.** "Theme Marketplace" is a category. Skins is identity. `npx skins install ember` — that's the CLI poetry we ship.
+
+2. **Full-bleed immersive previews, not a card grid.** Each theme gets its own room. One scroll, five experiences. No dropdown switcher. No thumbnail grid. If we can't make people *feel* each theme, we've already lost.
+
+3. **No ratings, no reviews, no accounts.** Curation is our brand. We chose these themes. Users trust our taste or they don't. Democracy is for v3, when we've earned the right to scale.
+
+---
+
+### The Real Question
+
+Elon frames this as "weekend project inflated to a week."
+
+I frame it as: **the moment Emdash proves it has taste.**
+
+Every platform eventually has a marketplace. Most are forgettable. Ours shouldn't be. Not because we spent more time — because we spent the time on what matters.
+
+Ship 3 themes. Ship them beautifully. Ship them this week.
+
+*Speed is a virtue. Taste is a weapon.*

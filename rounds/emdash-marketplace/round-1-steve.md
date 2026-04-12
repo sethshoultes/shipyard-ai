@@ -1,79 +1,80 @@
 # Steve Jobs — Chief Design & Brand Officer
-## Emdash Theme Marketplace: Design Vision
+## Emdash Theme Marketplace: Round 1 Positions
 
 ---
 
 ### Product Naming
 
-**Call it "Wardrobe."**
+**Skins.**
 
-Not "Emdash Theme Marketplace." That's a filing cabinet label, not a name. Nobody falls in love with a filing cabinet.
+One syllable. Everyone knows it. Gamers skin their characters. Musicians skin their apps. It's tribal vocabulary for customization. "I grabbed a new skin" — that's how people actually talk.
 
-Wardrobe is what this IS — you're dressing your site. Your content is the body. The theme is the outfit. One word. Evocative. Instantly understood by anyone who's ever stood in front of a closet.
+"Theme Marketplace" is a category. Skins is an *identity*.
 
-`npx wardrobe install ember` — that's a sentence a human would actually say. That's what gets screenshotted and shared.
+`npx skins install ember` — four words. Say it out loud. It feels inevitable.
 
 ---
 
 ### Design Philosophy
 
-This product is about **instant transformation**. The site you had this morning looks completely different tonight — but all your words, your images, your soul is still there. Only the clothes changed.
+This is a **gallery**, not a grocery store.
 
-The marketplace must BE that transformation. Every theme card isn't a thumbnail — it's a portal. Hover and the theme wakes up. Motion. Life. Click and you're INSIDE it, wearing it, seeing YOUR content in a new skin in under two seconds.
+Every theme marketplace commits the same sin: they look like Amazon. Grids. Filters. Star ratings. Pagination. They're optimized for *having* a thousand mediocre options, not for *choosing* one exceptional one.
 
-The marketplace itself must be the sixth theme — so beautiful people ask "where did you get THAT website?" We're not building a directory. We're building a gallery.
+We have five themes. That's the whole product. So the marketplace must feel like a museum with five rooms — each one immersive, each one curated. You don't browse. You experience.
+
+The marketplace itself is the proof. If it doesn't take your breath away, why would anyone trust the themes inside it?
 
 ---
 
 ### The First 30 Seconds
 
-You land. Five themes. Full bleed. No sidebar. No hamburger menu. No "Sign up for our newsletter" popup.
+You arrive. No header. No navigation. No "Welcome to Skins" hero banner wasting your time.
 
-Just five worlds, arranged like vinyl records in a legendary store. Each one alive. Each one breathing with subtle animation.
+Five full-bleed theme previews. Scroll and each one consumes your screen. Ember *burns*. Drift *floats*. You're not reading descriptions — you're feeling temperatures.
 
-You don't READ about Ember. You FEEL it. The burnt orange. The editorial weight. The typography that demands to be taken seriously. You click. Your content appears inside it. Immediately. Not a demo. YOUR words.
+Click any theme. Instant. Not "loading preview" — *instant*. You're inside it, your content or demo content that sings, and you see what your site could become.
 
-One command. Copy. Paste. Refresh your site.
+The command appears. Copy. Paste. Done.
 
-**The gasp when your site transforms — that's the entire product.**
+Thirty seconds. Transformation. **That's the product.**
 
 ---
 
 ### Brand Voice
 
-Wardrobe speaks like a brilliant friend who works in fashion — confident, direct, never explains too much.
+Confident silence.
 
-- "Ember. Bold. Editorial. For people with something to say."
-- "Drift. Minimal. Calm. Let your work breathe."
-- "One command. Your content stays untouched."
+We don't explain. We don't pitch. We don't say "powerful" or "flexible" or "seamless." Those are words for products that need convincing.
 
-Short. Punchy. Active verbs. Zero jargon.
+- "Five ways to be seen."
+- "Your content. New clothes."
+- "One command."
 
-If I see "seamlessly" or "leverage" or "robust solution" anywhere, I will personally set it on fire.
+Short sentences. No exclamation points. We speak like someone who knows you'll choose us — not because we begged, but because we're right.
 
 ---
 
 ### What to Say NO To
 
-- **No user accounts.** An account is a wall between someone and their beautiful new website. Tear it down.
-- **No ratings and reviews.** Five curated themes don't need star ratings. We're not Amazon. Curation IS the quality guarantee.
-- **No "Submit Your Theme" button.** Not yet. Build the standard. Then maybe — maybe — invite others in.
-- **No search bar.** With five themes, search is an admission of chaos. You see everything in one glance.
-- **No customization panels.** Themes are design opinions. If you want to change everything, use code. Don't dilute the vision with "choose your accent color."
-- **No feature comparison tables.** This isn't enterprise software. It's fashion. You KNOW what looks good on you.
+- **No community submissions.** Not yet. Curation requires standards. Standards require saying no.
+- **No ratings.** Ratings are democracy. This is aristocracy. We chose these five.
+- **No customization panels.** A theme is an opinion. You accept the opinion or you don't.
+- **No search. No filters.** Five themes. One scroll. Search is for confusion.
+- **No accounts.** Anonymous. Instant. Friction-free.
 
 ---
 
 ### The Emotional Hook
 
-People aren't buying themes. They're buying **the end of website shame.**
+Every Emdash site looks identical right now. You poured your heart into content, and it wears a generic uniform.
 
-Every small business owner knows the embarrassment of sending someone to their outdated, ugly, "I built this myself" website. Every writer with a Medium blog secretly wishes they had something that felt THEIRS.
+Skins is the moment your site becomes *yours*. One command, and your bakery stops looking like a SaaS startup. Your yoga studio stops looking like a law firm.
 
-Wardrobe says: *This is for you. Beautiful. Professional. One command. Your content stays exactly where it is.*
+That recognition — *that's what I meant, that's who I am* — is why people will love this.
 
-That's not a feature list. That's **liberation**.
+Not features. Not speed. **Identity.**
 
 ---
 
-*Ship the gasp. Everything else is noise.*
+*Ship the transformation. Everything else is noise.*

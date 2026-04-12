@@ -5,75 +5,87 @@
 
 ### Product Naming
 
-**MemberShip** is a crime against taste. It sounds like payroll software. You've taken belonging and fused it with corporate jargon.
+**MemberShip** is a betrayal. You've taken the most human desire — *belonging* — and dressed it in corporate khakis.
 
-**The name is "Belong."** One word. Active. Emotional. When someone clicks "Join," they don't get a membership — they *belong*.
+**The name is "Belong."**
 
-**EventDash** is worse. It's what happens when engineers name products.
+One word. A verb disguised as an invitation. When someone joins, they don't receive a membership card — they cross a threshold. They *belong* now. That feeling — that transformation — is what we're selling.
 
-**The name is "Moment."** Because that's what great events create. Not a calendar entry — a *moment* people remember.
+**EventDash** sounds like analytics software. It sounds like something a project manager would put in a Jira ticket.
+
+**The name is "Moment."**
+
+Events are forgettable. Moments are forever. A yoga class isn't an event — it's a moment of stillness in chaos. A pottery workshop isn't an event — it's the moment someone touches clay and feels something shift. Name it what it creates.
 
 ---
 
 ### Design Philosophy
 
-Here's the disease in plugin design: developers build for power users first, then dumb it down. That's backwards. **Design for the yoga instructor. Power users will figure it out.**
+The disease of modern software: complexity cosplaying as capability. Every button is a tax. Every option is cognitive debt.
 
-The philosophy is **invisible complexity**. The plugin should feel like a natural extension — not a foreign object transplanted in. No seams. No jarring style changes.
+**Our philosophy is disappearance.** The best software becomes invisible — like a perfectly tuned instrument that lets the musician forget they're holding anything at all.
 
-**Every interaction should take half the steps users expect.**
+Design for the yoga instructor. She has 47 tabs open, a class in 20 minutes, and a student asking about parking. She doesn't have time to "learn your interface."
+
+**Every click must earn its existence.**
 
 ---
 
 ### User Experience — First 30 Seconds
 
-Install Belong. Open admin. What do they see? **Not settings. Not wizards. Not docs.**
+Install Belong. Open it.
 
-They see their first member. A real-looking human. "Sofia Chen — Member since today." Below: "Your first member is waiting. Who will join next?"
+What do you see? Not a settings panel. Not a wizard asking 17 questions about business logic. Not documentation links.
 
-They didn't configure anything. They just witnessed success. Now they believe.
+You see: **"Your first member is waiting."**
 
-**Confidence before competence.** Show them winning before teaching them how.
+One button. One invitation. The entire system compressed into a single confident promise.
+
+This is the difference between tools that teach and tools that trust. We trust they'll figure it out — because we made figuring it out unnecessary.
 
 ---
 
 ### Brand Voice
 
-Speak like you're texting a smart friend. Not a support article.
+We speak like a calm, confident friend who happens to know exactly what you need.
 
-**Kill these words:** Successfully, submitted, confirmed, error occurred, please, unfortunately.
+**Kill these words forever:** Successfully, submitted, confirmed, processing, unfortunately, please try again.
 
-**Use these:** Done. Saved. Live. Oops. Got it. Sent.
+**Use these:** Done. Sent. Saved. Live. Oops.
 
-Every word is a tax on attention. **Charge only what's necessary.**
+Every word is a toll booth. **We refuse to tax attention.**
+
+Error messages don't apologize — they solve. "We couldn't find that" not "Error 404: Resource not located."
 
 ---
 
 ### What to Say NO To
 
-**NO to multiple membership tiers.** Free and Paid. That's it.
+**NO** to multiple membership tiers. Free. Paid. That's it. If you need Bronze, Silver, and Gold, you're a airline, not a yoga studio.
 
-**NO to the week calendar view.** Month. List. Done.
+**NO** to week view in calendars. Month. List. Done. Every view is maintenance. Every option is confusion.
 
-**NO to "Settings" pages with more than 5 options.** If you need more, you've failed at defaults.
+**NO** to settings pages with more than five options. If you need more, you failed at defaults.
 
-**NO to email template editors.** Ship one beautiful email. Make it perfect.
+**NO** to template editors. Ship one beautiful email. Make it perfect. Let the words do the work.
 
-**NO to analytics dashboards.** Track members and money. Vanity metrics can wait.
+**NO** to analytics dashboards. Members. Revenue. That's it. Vanity metrics are for people avoiding real work.
 
 ---
 
 ### The Emotional Hook
 
-Small business owners are *exhausted* by technology that makes them feel stupid. Every SaaS tool has a learning curve, a tutorial video, a help article maze. They start excited, feel overwhelmed, then quit.
+Small business owners are *drowning* in software that makes them feel stupid.
 
-**Belong and Moment make them feel like geniuses.**
+Every tool has a learning curve. Every platform demands they become a part-time systems administrator. They started these businesses to teach yoga, to bake bread, to make pottery — not to debug webhook configurations.
 
-Install it. It works. Members join. Events fill up. They didn't read docs. They just... won.
+**Belong makes them feel like geniuses.**
 
-That feeling — *I can do this* — is what they'll remember. It's what they'll tell friends. It's what transforms a plugin into a movement.
+Install it. It works. Members join. Money arrives. They didn't watch a tutorial. They didn't read documentation. They just... won.
 
-**We're not selling membership software. We're selling confidence that technology can serve them.**
+That feeling — *I can do this* — is what they'll tell their friends about. It's what transforms software into a movement.
+
+We're not selling membership management. **We're selling the confidence that technology can finally, actually, serve them.**
 
 ---
 

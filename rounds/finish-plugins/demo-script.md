@@ -4,179 +4,171 @@
 ---
 
 **NARRATOR:**
-It's 11:47 PM.
+11:47 PM.
 
-[SCREEN: Dark room. Laptop glow on a woman's face. Elena. Late 30s. Yoga mat rolled in the corner. Empty coffee mug.]
-
-**NARRATOR:**
-Elena runs a yoga studio. Twenty-three students. Good ones. The kind who show up even when it rains.
-
-[SCREEN: Her browser. Tab hell. "WordPress membership plugins comparison." "MemberPress vs Paid Memberships Pro." "Why won't my plugin activate."]
+[SCREEN: Dark room. Laptop glow. Elena, late 30s. Yoga mat in the corner. Cold coffee.]
 
 **NARRATOR:**
-She's been at this for four hours.
+Elena teaches yoga. Twenty-three students. Good ones. The kind who show up when it rains.
 
-[SCREEN: MemberPress admin panel. A wall of settings. Dropdowns nested in dropdowns. A red error: "Please enter valid license key."]
-
-**NARRATOR:**
-Four hours trying to do one thing: let her students pay her.
-
-[SCREEN: Close on her eyes. Tired. The kind of tired that isn't about sleep.]
+[SCREEN: Browser tab hell. "WordPress membership plugins." "MemberPress vs Paid Memberships Pro." "Plugin won't activate help."]
 
 **NARRATOR:**
-She got into this because teaching yoga made people's lives better. But right now? Right now she's Googling "what is a webhook" at midnight because some plugin is asking her to configure one.
+Four hours she's been at this.
 
-[SCREEN: Google results for "what is a webhook." Wikipedia definition that starts with "In web development, a webhook is—"]
+[SCREEN: MemberPress admin. Settings nested inside settings. Red error: "Enter valid license key."]
+
+**NARRATOR:**
+Four hours to do one thing: let her students pay her.
+
+[SCREEN: Her face. Tired. The kind that sleep won't fix.]
+
+**NARRATOR:**
+She opened this studio because teaching changed people's lives. Now she's Googling "what is a webhook" at midnight because some software is asking her to configure one.
+
+[SCREEN: Google. "In web development, a webhook is an HTTP callback that—"]
 
 **NARRATOR:**
 She doesn't need to know what a webhook is. She needs to get paid.
 
-[SCREEN: Hard cut to black. Beat. Then—]
+[SCREEN: Cut to black. Beat.]
 
 **NARRATOR:**
-What if that was the only question that mattered?
+What if that was the only question?
 
-[SCREEN: Clean white. Emdash dashboard. One sidebar. Three options. Air to breathe.]
-
-**NARRATOR:**
-This is Elena's Emdash site. She built it last week. Today, she's going to add memberships.
-
-[SCREEN: Mouse moves to "Plugins." Single click.]
+[SCREEN: White. Clean. Emdash dashboard. Three sidebar items. Air.]
 
 **NARRATOR:**
-Not "spend three hours trying to add memberships." Actually add them.
+This is Elena's site. She built it last week. Today she's adding memberships. Not "trying to add." Adding.
 
-[SCREEN: Marketplace. MemberShip at the top. Blue button: "Install." Nothing else competing for attention.]
+[SCREEN: Mouse to "Plugins." Click.]
+
+[SCREEN: Marketplace. MemberShip. Blue button: "Install."]
 
 **NARRATOR:**
 One button.
 
-[SCREEN: Click. Progress bar fills. Three seconds. Done.]
+[SCREEN: Click. Progress bar. Three seconds.]
 
 **NARRATOR:**
-Installed.
+Done.
 
-[SCREEN: "Members" appears in sidebar. She clicks it.]
-
-**NARRATOR:**
-No wizard. No twenty questions about her business. No email asking her to complete her profile.
-
-[SCREEN: Dashboard. Clean. One big button: "Create your first plan." Three metric cards below—MRR, Members, Churn—all showing zero. But elegant zeros. Ready zeros.]
+[SCREEN: "Members" appears in sidebar. Click.]
 
 **NARRATOR:**
-Just this: "Create your first plan." Four words. And for the first time tonight, she's not lost.
+No wizard. No twenty questions. No "complete your profile."
 
-[SCREEN: Click. Simple form. Three fields. Plan name. Price. Billing cycle—dropdown showing Monthly, Yearly, Free.]
-
-**NARRATOR:**
-She types: "Unlimited Classes."
-
-[SCREEN: Text appears in the field. Clean typography.]
+[SCREEN: Dashboard. One button: "Create your first plan." Three cards below—MRR, Members, Churn. All zeros. But ready zeros.]
 
 **NARRATOR:**
-Forty dollars a month.
+Just this. Four words. And for the first time tonight, she's not lost.
 
-[SCREEN: "40" in the price field. Dropdown shows "Monthly."]
+[SCREEN: Click. Form. Three fields. Name. Price. Cycle.]
+
+**NARRATOR:**
+"Unlimited Classes." Forty a month.
+
+[SCREEN: Text fills. Dropdown shows "Monthly."]
 
 **NARRATOR:**
 Save.
 
-[SCREEN: Click. Toast notification: "Plan created." List view shows her new plan. Ten seconds total.]
+[SCREEN: Click. Toast: "Saved." Plan appears in list. Ten seconds total.]
 
 **NARRATOR:**
-That's it. That's her membership tier. The thing that took four hours last night? Just happened while I was talking.
+That's it. Her membership tier. The thing that ate four hours last night? Gone.
 
-[SCREEN: "Connect Stripe" button. Single click. OAuth flow—redirect, authorize, redirect back. Maybe four seconds total.]
+[SCREEN: "Connect Stripe." Click. OAuth redirect. Authorize. Back. Four seconds.]
 
 **NARRATOR:**
-Stripe connects in two clicks. No API keys. No webhook configuration. No documentation that assumes you already know what documentation is for.
+Stripe connects in two clicks. No API keys. No webhook configuration. No reading docs that assume you've read other docs first.
 
-[SCREEN: Dashboard. "Stripe Connected" with green checkmark.]
+[SCREEN: Dashboard. "Stripe Connected." Green check.]
 
 **NARRATOR:**
 Now here's what matters.
 
-[SCREEN: Cut to: Morning. Different location. Phone screen. Young guy, Marcus, looking at his phone on a bus.]
+[SCREEN: Cut to morning. Phone screen. Marcus, 20s, on a bus.]
 
 **NARRATOR:**
-Marcus has been meaning to sign up for Elena's classes for three weeks. Always something. Work, commute, life.
+Marcus has meant to sign up for three weeks. Always something.
 
-[SCREEN: He's on Elena's site. Homepage. Beautiful. Mountain backdrop. "Become a Member" button.]
-
-**NARRATOR:**
-Today, on the 7 train, somewhere between Flushing and Times Square, he finally does it.
-
-[SCREEN: Click. Registration form. Name. Email. Plan auto-selected. Credit card fields via Stripe. That's the whole form.]
+[SCREEN: Elena's site on his phone. "Become a Member."]
 
 **NARRATOR:**
-Name. Email. Card. He's done before his stop.
+Today, somewhere between Flushing and Times Square, he does.
 
-[SCREEN: Loading state. Brief. Then: "Welcome to the practice, Marcus." Simple. Warm. Not celebrating itself. Just... welcoming him.]
-
-**NARRATOR:**
-No account verification email. No password he'll forget by tomorrow. No "click here to confirm." He's in.
-
-[SCREEN: Cut back to Elena. Her studio. Morning light now. She's checking her phone before first class.]
+[SCREEN: Click. Form. Name. Email. Card. That's it.]
 
 **NARRATOR:**
-And three boroughs away—
+He's done before his stop.
 
-[SCREEN: Her dashboard. MRR: "$40". Members: "1". One notification.]
+[SCREEN: Brief loading. Then: "Welcome to the practice, Marcus."]
+
+**NARRATOR:**
+No verification email. No password to forget. No "click to confirm." He's in.
+
+[SCREEN: Cut to Elena. Studio. Morning light. Phone in hand before first class.]
+
+**NARRATOR:**
+Three boroughs away—
+
+[SCREEN: Her dashboard. MRR: "$40". Members: "1".]
 
 **NARRATOR:**
 Elena sees it happen.
 
-[SCREEN: She taps. Member list. Marcus. His name. His plan. "Active." One line.]
+[SCREEN: Tap. Member list. Marcus. "Active."]
 
 **NARRATOR:**
 Her first paying member. Right there. While she was unrolling mats.
 
-[SCREEN: She smiles. Not because the tech impressed her. Because it got out of her way.]
+[SCREEN: She smiles. Not at the tech. Because the tech got out of her way.]
 
 **NARRATOR:**
 Here's what MemberShip doesn't have.
 
-[SCREEN: Quick cuts—competitor UIs. Dense. Gray. Seventeen tabs. Role matrices. Permission levels. Config screens that scroll forever.]
+[SCREEN: Quick cuts—competitor UIs. Gray. Dense. Seventeen tabs. Permission matrices. Config screens that scroll forever.]
 
 **NARRATOR:**
-No Bronze tier. No Silver tier. No "granular permission matrices." No drip content scheduling. No features built for a corporation pretending to be a yoga studio.
+No Bronze tier. No Silver tier. No "granular permissions." No drip schedules. Nothing built for a corporation pretending to be a yoga studio.
 
-[SCREEN: Back to Elena's clean dashboard.]
-
-**NARRATOR:**
-Two tiers. Members and everyone else. Because that's what Elena actually needs.
-
-[SCREEN: Marcus, later, at home. Logging in. The "Members Only" content that was blurred before is now visible. Class schedule. Video library. Welcome message.]
+[SCREEN: Back to Elena's dashboard. Clean.]
 
 **NARRATOR:**
-When Marcus comes back, the gated content is unlocked. No configuration. The plugin just knows.
+Two tiers. Members and everyone else. That's what she needs.
 
-[SCREEN: Elena's dashboard. Days passing. MRR climbing. $40. $120. $280. Members: 1. 3. 7.]
+[SCREEN: Marcus at home. Logging in. Gated content unlocks. Class schedule. Videos. Welcome message.]
 
 **NARRATOR:**
-And over the next few weeks—
+When Marcus comes back, he's in. No configuration. The plugin just knows.
 
-[SCREEN: Dashboard. MRR: "$1,640". Members: "41". Graph trending up.]
+[SCREEN: Time lapse. Dashboard numbers climbing.]
+
+**NARRATOR:**
+Weeks pass.
+
+[SCREEN: MRR: "$1,640". Members: "41". Line going up.]
 
 **NARRATOR:**
 This happens.
 
-[SCREEN: Elena. Studio. End of class. Students rolling up mats. She's smiling.]
+[SCREEN: Elena. Studio. End of class. Students rolling mats. She's smiling.]
 
 **NARRATOR:**
-Not because she learned what a webhook is. Not because she mastered some admin panel. Because she never had to.
+Not because she learned what a webhook is. Because she never had to.
 
-[SCREEN: Close on the dashboard. The numbers. Clean.]
-
-**NARRATOR:**
-Small business owners don't want powerful software. They want to feel powerful themselves.
-
-[SCREEN: Elena closes her laptop. Grabs her mat. Walks toward students gathering for the next class.]
+[SCREEN: Dashboard numbers. Clean type. Honest data.]
 
 **NARRATOR:**
-MemberShip. One plugin. One click. One less thing between you and the work you actually love.
+Small business owners don't want powerful software.
 
-[SCREEN: Fade to logo. "MemberShip — for Emdash." Below: "Competence without complexity."]
+[SCREEN: Elena closes laptop. Grabs mat. Walks toward students.]
+
+**NARRATOR:**
+They want to feel powerful.
+
+[SCREEN: Logo. "MemberShip — for Emdash." Below: "You built that."]
 
 **NARRATOR:**
 Now go teach yoga.
@@ -186,5 +178,9 @@ Now go teach yoga.
 ---
 
 **RUNTIME:** 2:00
-**TONE:** Urgent, human, rhythmic. Walk-and-talk energy. Not a pitch—a story that moves.
-**MUSIC:** Minimal piano. Single notes. Building like a heartbeat. Think "the moment before something good happens."
+**TONE:** Urgent. Human. Walk-and-talk rhythm. A story that moves.
+**MUSIC:** Minimal piano. Single notes building like a heartbeat. The moment before something good happens.
+
+---
+
+*"People will forget your feature list. They will remember how you made them feel."*
