@@ -1,71 +1,49 @@
-# Steve Jobs — Round 2 Response
+# Round 2: Steve Jobs
 
 ---
 
 ## Where Elon Is Optimizing for the Wrong Metric
 
-### "Copy-paste from README is fine"
+**"Weekend project" is the wrong goal.** Elon wants to ship fast—I respect that. But he's optimizing for *time to first commit* when he should optimize for *time to first love*. A working CLI that nobody remembers is worse than shipping a week later with something people can't stop talking about.
 
-No. It's not fine. It's the difference between *using* a product and *loving* a product.
+**Cutting confidence scores is a mistake.** Elon says "pass/fail is what matters." Wrong. LLM outputs aren't binary—they're probabilistic. A test that passes with 51% confidence is qualitatively different from one that passes with 98%. Hiding this information doesn't make it go away; it just makes developers blind to risk. Confidence isn't vanity. It's honesty about the nature of what we're testing.
 
-Elon measures time-to-ship. I measure time-to-belief. That first `npm init proof` isn't about scaffolding—it's about the moment a developer thinks "these people understand me." Copy-pasting YAML from a README feels like homework. A single command that *works* feels like magic.
+**"Copy-paste from README works fine."** This is the engineer's trap—assuming everyone is you. The developer who copies from a README is already bought in. The developer who types `npm init proof` and gets a working example in 10 seconds? That's someone who didn't even know they wanted this. First impressions compound. The scaffolding isn't for power users. It's for converting skeptics.
 
-You don't get a second chance at first impressions. Ever.
-
-### "JSON for CI, done"
-
-CI is where tests *run*. The terminal is where developers *live*. Optimizing for machines over humans is precisely why most dev tools feel like punishment.
-
-A developer debugging at midnight doesn't want JSON. They want a red checkmark and a sentence that says *exactly* what went wrong. Human-readable by default. Machine-readable as a flag.
-
-### "Confidence scores are unclear"
-
-Confidence scores aren't for users—they're for *trust*. When an LLM says "this matches intent," a 94% vs 51% score tells you whether to ship or dig deeper. Binary pass/fail hides the uncertainty. We're not testing deterministic software. We're testing probabilistic systems. The output should reflect that reality.
+**GitHub Action in week 1 is premature.** Elon wants CI integration immediately. But CI amplifies whatever you've built—including your mistakes. Get the local experience perfect first. When developers *demand* CI integration, you've earned the right to build it.
 
 ---
 
 ## Why Design Quality Matters HERE
 
-Elon will say: "Ship ugly, iterate fast."
+Elon would attack the name change as bikeshedding. Here's why he's wrong:
 
-Here's why that's wrong *for this product specifically*:
+AI testing is a **new category**. There's no established player. The name isn't decoration—it's positioning. "AgentBench" sounds like one of twelve tools. "Proof" sounds like *the* answer. In a crowded market, you fight for attention. In an empty market, you define the category. We're in the second situation. The name is strategy.
 
-Testing tools live or die on trust. A sloppy first experience creates doubt: "If they cut corners here, what else is broken?" Developers are the most skeptical users on earth. They read your code. They judge your defaults. They notice when error messages are lazy.
-
-PROOF must feel *inevitable*—like the only sane way to test agents. That feeling comes from obsessive polish, not feature count.
-
-Three files and 500 lines can still be *beautiful*. Minimalism isn't the opposite of craft. It's craft distilled.
+The 30-second experience isn't polish—it's the product. If someone abandons Proof in the first minute, nothing else matters. Not your parallel execution, not your batched LLM calls, not your GitHub Action. Design isn't what happens after engineering. Design is what makes engineering matter.
 
 ---
 
 ## Where Elon Is Right
 
-**I concede:**
+**Parallel execution is table stakes.** I was wrong to defer this. Sequential LLM calls at 1s each is a non-starter. Concede.
 
-1. **Cut `--watch` from v1.** He's right. It's a luxury. Ship without it. Add it when someone screams for it.
+**HTTP + subprocess covers 99% of cases.** The SDK adapter is over-engineering. Cut it.
 
-2. **String matching as primary, LLM as upgrade.** Philosophically annoying, practically correct. Fast defaults, powerful opt-ins. I'll take the L.
+**Local-first is correct.** No hosted evaluation API. Stay on-machine. Privacy is a moat and a business model.
 
-3. **Batch LLM evaluations.** One call for N evaluations is obviously better. Ship it that way from day one. Don't retrofit.
-
-4. **"Name the 10 people you'll DM."** Vague distribution plans are fantasies. Specificity is accountability.
+**Watch mode is vanity.** Nobody watches agent tests. They run before deploy. Cut.
 
 ---
 
-## My Three Non-Negotiables (Locked)
+## My 3 Non-Negotiables
 
-### 1. The Name Is PROOF
+1. **The name is Proof.** This is the hill. `npx proof` is what developers will type. The brand compounds from here.
 
-Not AgentBench. Not negotiable. The name *is* the positioning. PROOF tells you what you get. AgentBench tells you what it is. We sell outcomes, not categories.
+2. **First run requires zero API keys.** Ship with string matching that works immediately. LLM evaluation is opt-in when you need semantic judgment. The first experience must feel free, fast, and magical.
 
-### 2. `npm init proof` Ships in v1
-
-One command. One question. Working test. This is the product's handshake. Cut anything else—don't cut this.
-
-### 3. Human-First Output
-
-Default output is beautiful, minimal, and designed for humans reading a terminal. CI gets a `--json` flag. We serve developers first, pipelines second.
+3. **Confidence scores ship in v1.** Pass/fail with a confidence percentage. Not hidden. Not "later." Developers deserve to know how certain the evaluation is. This is what makes Proof honest, not just functional.
 
 ---
 
-*Ship less. Ship it perfectly. Make them feel something.*
+*Iteration is overrated. Getting it right is underrated.*

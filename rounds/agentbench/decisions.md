@@ -1,252 +1,274 @@
-# AgentBench/PROOF — Final Decisions
-## Consolidated by Phil Jackson, The Zen Master
+# AgentBench → Proof: Locked Decisions
 
-*The triangle offense works because everyone knows their role. This document is our playbook.*
+*Consolidated by Phil Jackson, The Zen Master*
 
 ---
 
 ## Locked Decisions
 
-### 1. Product Name
+### 1. Product Name: **Proof**
 
-| Proposed | Champion | Winner | Resolution |
-|----------|----------|--------|------------|
-| "PROOF" | Steve | **TBD — Compromise** | Elon proposed "AgentProof" as middle ground |
-
-**The Conflict:**
-- Steve: "PROOF" sells the promise. One word. Verb and noun. "I have PROOF."
-- Elon: SEO nightmare. GitHub conflicts. "Google was nonsense until it wasn't" — but we don't have Google's distribution.
-
-**Phil's Call:** Name remains **OPEN**. Both have valid points. Ship with working title, rename after traction proves concept. The codebase should use a configurable brand constant.
+| Aspect | Decision |
+|--------|----------|
+| **Proposed by** | Steve Jobs (Round 1) |
+| **Winner** | Steve Jobs |
+| **Final Vote** | Unanimous (Elon conceded Round 2) |
+| **Rationale** | "AgentBench" is forgettable. "Proof" is a verb and noun. `npx proof` becomes the command. The name defines the category in an empty market. |
 
 ---
 
-### 2. First-Run Experience (`npm init` vs Copy-Paste)
+### 2. Parallel Test Execution: **Ships in v1**
 
-| Proposed | Champion | Winner | Why |
-|----------|----------|--------|-----|
-| `npm init proof` scaffolding | Steve | **Elon** | Time-to-ship beats time-to-belief for v1 |
-| Copy-paste from README | Elon | ✓ | 2-3 days of scaffolding work delays core value |
-
-**Steve's Concession:** Did not concede this explicitly.
-**Elon's Argument:** Scaffolding is 2-3 days of work for a first-run experience while the evaluator sits unfinished.
-
-**Phil's Call:** **Elon wins.** Copy-paste for v1. BUT — the README must be immaculate. Steve owns the README experience. If copy-paste feels like homework, we failed.
+| Aspect | Decision |
+|--------|----------|
+| **Proposed by** | Elon Musk (Round 1) |
+| **Winner** | Elon Musk |
+| **Final Vote** | Unanimous (Steve conceded Round 2) |
+| **Rationale** | Sequential LLM calls at ~1s latency each = 40s for 20 tests. Unacceptable. "Parallel execution isn't polish. It's table stakes." |
 
 ---
 
-### 3. Default Evaluation Mode
+### 3. LLM Evaluation: **Opt-in, Not Default**
 
-| Proposed | Champion | Winner | Why |
-|----------|----------|--------|-----|
-| LLM evaluation primary | (implicit in PRD) | **Elon** | Performance and cost |
-| String matching primary, LLM opt-in | Elon | ✓ | 10 tests: <100ms vs 10+ seconds |
-
-**Steve's Concession:** "Philosophically annoying, practically correct. I'll take the L."
-
-**Phil's Call:** **Locked.** String matching is default. LLM evaluation via `evaluator: semantic` opt-in.
+| Aspect | Decision |
+|--------|----------|
+| **Proposed by** | Elon Musk (Round 1) |
+| **Winner** | Elon Musk |
+| **Final Vote** | Unanimous |
+| **Rationale** | First run must work without API key. Default evaluators: `contains`, `does_not_contain`, `json_schema`. Semantic evaluation unlocks with `--llm` flag or when evaluator requires it. Privacy + speed + zero friction. |
 
 ---
 
-### 4. Output Format
+### 4. Scaffolding Command: **Cut**
 
-| Proposed | Champion | Winner | Why |
-|----------|----------|--------|-----|
-| JSON for CI only | Elon | **Steve** | Developers live in terminals, not CI |
-| Human-first, `--json` flag for CI | Steve | ✓ | "A developer debugging at midnight doesn't want JSON" |
-
-**Elon's Concession:** "Output clarity is UX... Verbose logging is a bug, not a feature."
-
-**Phil's Call:** **Locked.** Beautiful, minimal terminal output by default. `--json` flag for CI pipelines.
+| Aspect | Decision |
+|--------|----------|
+| **Proposed by** | Elon Musk (Round 2) |
+| **Winner** | Elon Musk |
+| **Disputed by** | Steve Jobs (wanted `npm init proof`) |
+| **Rationale** | Scaffolding requires template maintenance and debugging. README with copy-paste example ships faster. Converts skeptics via docs, not generators. |
 
 ---
 
-### 5. Architecture
+### 5. Watch Mode: **Cut**
 
-| Proposed | Champion | Winner | Why |
-|----------|----------|--------|-----|
-| Four layers (CLI, Runner, Adapter, Evaluator) | (PRD) | **Elon** | Adapter layer is premature |
-| Three files, ~500 lines | Elon | ✓ | "Two if-statements, not a plugin system" |
-
-**Phil's Call:** **Locked.** Three core modules:
-1. Config loader (YAML parse + validate)
-2. Executor (subprocess + HTTP, no adapter abstraction)
-3. Evaluators (string ops + single LLM call for semantic)
+| Aspect | Decision |
+|--------|----------|
+| **Proposed by** | Elon Musk (Round 1) |
+| **Winner** | Elon Musk |
+| **Final Vote** | Unanimous (Steve conceded Round 2) |
+| **Rationale** | "Nobody watch-modes their agent tests. They run them before deploy." |
 
 ---
 
-### 6. LLM Evaluation Strategy
+### 6. Dashboard/Web UI: **Cut from v1**
 
-| Proposed | Champion | Winner | Why |
-|----------|----------|--------|-----|
-| One API call per evaluation | (implicit) | **Elon** | Batching is obvious optimization |
-| Batch evaluations (one call for N tests) | Elon | ✓ | $0.15-0.30 and 5-15 seconds vs one call |
-
-**Steve's Concession:** "One call for N evaluations is obviously better. Ship it that way from day one."
-
-**Phil's Call:** **Locked.** Batch LLM evaluations from v1. Don't retrofit.
+| Aspect | Decision |
+|--------|----------|
+| **Proposed by** | Steve Jobs (Round 1) |
+| **Winner** | Steve Jobs |
+| **Final Vote** | Unanimous |
+| **Rationale** | "Dashboards are where focus goes to die. The terminal is sacred space." Elon goes further: "No web UI ever. Stay in the workflow." |
 
 ---
 
-### 7. Features Cut from v1
+### 7. SDK/Hook Adapter: **Cut**
 
-| Feature | Who Cut It | Agreement |
-|---------|------------|-----------|
-| `--watch` mode | Elon | Steve concedes: "He's right. It's a luxury." |
-| Custom evaluator support | Elon | No objection |
-| `json_schema` validation | Elon | No objection |
-| Multiple output formats | Elon | Steve won: human default + `--json` flag |
-| Parallel test execution | Elon | No objection |
-| Retry logic | Elon | No objection |
-| Confidence scores | Elon | Steve disagrees (see Open Questions) |
-| Multi-turn conversations | Steve | No objection |
-| Web dashboard | Steve | No objection |
-| Plugin ecosystems | Steve | Both agree |
+| Aspect | Decision |
+|--------|----------|
+| **Proposed by** | Elon Musk (Round 1) |
+| **Winner** | Elon Musk |
+| **Final Vote** | Unanimous (Steve conceded Round 2) |
+| **Rationale** | HTTP + subprocess covers 99% of cases. SDK adapter is over-engineering for users who don't exist yet. |
 
 ---
 
-### 8. Brand Voice
+### 8. Custom Evaluators: **Cut from v1**
 
-| Proposed | Champion | Winner | Why |
-|----------|----------|--------|-----|
-| "Confident. Spare. Slightly defiant." | Steve | **Steve** | Elon defers on copy |
-
-**Elon's Concession:** "Brand voice matters... Our README should read like a manifesto, not a manual. I'll defer to Steve on copy."
-
-**Phil's Call:** **Locked.** Steve owns brand voice. Short sentences. No hedging. Promises we keep.
+| Aspect | Decision |
+|--------|----------|
+| **Proposed by** | Elon Musk (Round 1) |
+| **Winner** | Elon Musk |
+| **Rationale** | `custom: "./evaluators/safety.js"` builds complexity for edge cases. Ship built-in evaluators only. |
 
 ---
 
-## MVP Feature Set (What Ships in v1)
+### 9. Output Format: **JSON Only**
 
-### Core Functionality
-- [ ] YAML config parsing with schema validation
-- [ ] CLI subprocess executor (`command` type)
-- [ ] HTTP executor (`http` type)
-- [ ] String evaluators: `contains`, `does_not_contain`
-- [ ] One semantic evaluator: `matches_intent` (LLM-backed, opt-in)
-- [ ] Batched LLM evaluation (one API call for all semantic checks)
-- [ ] Pass/fail output with checkmarks
-- [ ] `--json` flag for CI output
+| Aspect | Decision |
+|--------|----------|
+| **Proposed by** | Elon Musk (Round 1) |
+| **Winner** | Elon Musk |
+| **Rationale** | "Markdown is vanity." JSON for programmatic consumption. CLI output handles human readability. |
 
-### User Experience
-- [ ] README with copy-paste YAML examples
-- [ ] One command to run tests: `npx proof run` (or working title)
-- [ ] Clear error messages: "test failed" vs "evaluation failed"
-- [ ] Graceful degradation when LLM unavailable (string-only mode)
+---
 
-### Distribution
-- [ ] npm publish
-- [ ] HN launch post with real case study
-- [ ] 10 named DMs to AI developers/influencers
+### 10. Local-First Architecture: **No Hosted Evaluation**
+
+| Aspect | Decision |
+|--------|----------|
+| **Proposed by** | Both (aligned from start) |
+| **Winner** | Unanimous |
+| **Rationale** | "Your tests run on your machine. Your data stays on your machine. Privacy is a moat and a business model." |
+
+---
+
+### 11. Brand Voice: **Terse, Confident, Zero Apologies**
+
+| Aspect | Decision |
+|--------|----------|
+| **Proposed by** | Steve Jobs (Round 1) |
+| **Winner** | Steve Jobs |
+| **Final Vote** | Unanimous (Elon conceded Round 2) |
+| **Rationale** | "Test failed. Here's why." Not "Oops!" or "You might want to consider..." The voice is a senior engineer at 2am. |
+
+---
+
+## Contested Decision (Unresolved)
+
+### Confidence Scores
+
+| Steve's Position | Elon's Position |
+|------------------|-----------------|
+| Ships in v1. "LLM outputs aren't binary—they're probabilistic. A test that passes with 51% confidence is qualitatively different from 98%." | Cut. "False precision masquerading as insight. Pass/fail is honest. Users won't understand why 73% passes but 72% doesn't." |
+
+**Status:** UNRESOLVED. Requires Phil's ruling.
+
+**Phil's Ruling:** Steve wins. Confidence scores ship in v1 but displayed as tiers, not raw percentages:
+- **HIGH** (90%+): Green checkmark
+- **MEDIUM** (70-89%): Yellow checkmark with warning
+- **LOW** (<70%): Treated as failure with explanation
+
+This preserves Steve's insight (probabilistic nature of LLM evaluation) while addressing Elon's concern (users confused by arbitrary percentages).
+
+---
+
+## MVP Feature Set (v1)
+
+### What Ships
+
+| Component | Description |
+|-----------|-------------|
+| **CLI** | `npx proof` runs tests. `npx proof --llm` enables semantic evaluation. |
+| **Config Parser** | YAML → test definitions |
+| **Agent Adapters** | HTTP endpoint + subprocess (inline, no abstraction) |
+| **Built-in Evaluators** | `contains`, `does_not_contain`, `json_schema`, `matches_intent` (LLM), `sentiment` (LLM) |
+| **Parallel Execution** | All tests run concurrently from day one |
+| **LLM Batching** | One Claude call per test (not one per expectation) |
+| **Confidence Tiers** | HIGH/MEDIUM/LOW display (not raw percentages) |
+| **JSON Output** | `--output json` flag for CI integration |
+| **CLI Output** | Colored terminal output, terse error messages |
+
+### What Does NOT Ship
+
+| Cut Feature | Reason |
+|-------------|--------|
+| `npm init proof` scaffolding | Maintenance burden, docs suffice |
+| Watch mode | Nobody watch-modes agent tests |
+| Dashboard/Web UI | Terminal is sacred space |
+| Custom evaluators (`custom: "./eval.js"`) | Complexity for edge cases |
+| SDK/hook adapter | HTTP + subprocess covers 99% |
+| Multiple output formats | JSON only |
+| Hosted evaluation API | Local-first is the moat |
+| Multi-turn conversations | "Crutch for fuzzy thinking" |
+| Retry logic | Flaky agents are bugs, not test problems |
+| GitHub Action | v1.1 when users demand it |
 
 ---
 
 ## File Structure (What Gets Built)
 
 ```
-/proof (or working title)
+proof/
 ├── package.json
-├── README.md              # Steve owns copy. Manifesto, not manual.
-├── bin/
-│   └── proof.js           # CLI entry point. process.argv, no Commander.
+├── README.md                    # Copy-paste quick start
 ├── src/
-│   ├── config.js          # YAML loader + schema validation (~100 lines)
-│   ├── executor.js        # Subprocess + HTTP execution (~100 lines)
-│   └── evaluators.js      # String matchers + batched LLM call (~200 lines)
+│   ├── index.ts                 # CLI entry point
+│   ├── cli/
+│   │   └── run.ts               # Commander.js setup
+│   ├── config/
+│   │   └── parser.ts            # YAML → test definitions
+│   ├── runner/
+│   │   ├── executor.ts          # Parallel test execution
+│   │   ├── http-adapter.ts      # HTTP endpoint calls (inline)
+│   │   └── subprocess-adapter.ts # CLI subprocess calls (inline)
+│   ├── evaluators/
+│   │   ├── index.ts             # Evaluator registry
+│   │   ├── contains.ts          # String contains check
+│   │   ├── does-not-contain.ts  # String exclusion check
+│   │   ├── json-schema.ts       # JSON structure validation
+│   │   ├── matches-intent.ts    # LLM semantic matching
+│   │   └── sentiment.ts         # LLM sentiment analysis
+│   ├── llm/
+│   │   └── claude.ts            # Claude API integration (opt-in)
+│   └── output/
+│       ├── console.ts           # Colored terminal output
+│       └── json.ts              # JSON output for CI
 ├── tests/
-│   └── proof.test.js      # Dogfood: test the tester
+│   └── ...                      # Internal test suite
 └── examples/
-    └── basic.yaml         # Copy-paste starter
+    └── proof.yaml               # Example config for README
 ```
 
-**Total Target:** ~500 lines of core code (excluding tests/examples)
+---
+
+## Open Questions (Need Resolution)
+
+| # | Question | Context | Owner |
+|---|----------|---------|-------|
+| 1 | **Threshold for confidence tiers?** | Phil ruled HIGH/MEDIUM/LOW but exact cutoffs (90%/70%) need validation | Engineering |
+| 2 | **How to batch LLM evaluations?** | One prompt per test with multiple expectations—what's the prompt structure? | Engineering |
+| 3 | **API key configuration?** | Environment variable (`ANTHROPIC_API_KEY`)? Config file? Both? | Engineering |
+| 4 | **Error message templates?** | "Haikus of clarity" need actual copywriting. Who writes them? | Steve/Design |
+| 5 | **Subprocess timeout default?** | Agent hangs → test hangs. What's the default timeout? 30s? 60s? | Engineering |
+| 6 | **Rate limiting strategy?** | Parallel execution + Claude API = potential rate limit hits. Backoff strategy? | Engineering |
+| 7 | **Test file naming convention?** | `proof.yaml`? `*.proof.yaml`? `proof/*.yaml`? | Engineering |
+| 8 | **Version strategy?** | Ship as 0.1.0? 1.0.0? Semantic versioning commitment? | Product |
 
 ---
 
-## Open Questions (Require Resolution)
+## Risk Register
 
-### 1. Product Name
-- **Options:** PROOF, AgentBench, AgentProof, other
-- **Blocker:** Affects npm package name, GitHub repo, all marketing
-- **Owner:** Needs founder decision
-- **Recommendation:** Ship with `agentproof`, rebrand if traction warrants
-
-### 2. Confidence Scores
-- **Steve's Position:** "94% vs 51% tells you whether to ship or dig deeper. We're testing probabilistic systems."
-- **Elon's Position:** "Binary pass/fail is clearer. Scores require explanation and tuning."
-- **Resolution Needed:** Does semantic evaluator return score or binary?
-- **Recommendation:** Binary for v1 with score logged for debugging. Revisit in v2.
-
-### 3. `sentiment` vs `matches_intent` — Which Semantic Evaluator Ships?
-- **Elon:** "One LLM evaluator (sentiment OR matches_intent, not both)"
-- **Not explicitly resolved**
-- **Recommendation:** `matches_intent` is more general. Ship that. `sentiment` is v2.
-
-### 4. YAML Schema Versioning
-- **Elon:** "Version your YAML schema from day one"
-- **Not addressed by Steve**
-- **Recommendation:** Add `version: 1` field to schema. Trivial to implement.
+| # | Risk | Likelihood | Impact | Mitigation |
+|---|------|------------|--------|------------|
+| 1 | **LLM-as-judge inconsistency** | HIGH | HIGH | Confidence tiers + clear docs that semantic evaluation is probabilistic |
+| 2 | **Claude API costs surprise users** | MEDIUM | HIGH | Clear messaging that `--llm` flag incurs API costs. First run is free. |
+| 3 | **Parallel execution reveals race conditions** | MEDIUM | MEDIUM | Tests should be isolated. Document requirement clearly. |
+| 4 | **YAML parsing edge cases** | LOW | LOW | Use battle-tested parser (js-yaml). Validate schema strictly. |
+| 5 | **Name collision (`proof` on npm)** | MEDIUM | HIGH | Check npm availability immediately. Have backup: `@proof/cli`, `prooftest` |
+| 6 | **Scope creep during build** | HIGH | MEDIUM | This document is the spec. If it's not here, it doesn't ship. |
+| 7 | **"Terse" errors become "unhelpful" errors** | MEDIUM | MEDIUM | User testing on real failures. Iterate on specific error messages. |
+| 8 | **HTTP adapter doesn't cover streaming responses** | MEDIUM | LOW | v1 waits for complete response. Document limitation. |
+| 9 | **Subprocess adapter platform differences** | MEDIUM | MEDIUM | Test on macOS, Linux, Windows. Document supported platforms. |
+| 10 | **First user experience fails silently** | LOW | HIGH | Verbose error on missing config. Guide user to README. |
 
 ---
 
-## Risk Register (What Could Go Wrong)
+## The Essence (Guiding Star)
 
-### Technical Risks
-
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Claude API rate limits at scale | High | High | Graceful degradation to string-only mode |
-| LLM eval latency frustrates users | Medium | High | String matching default, batch API calls |
-| YAML schema doesn't anticipate user needs | High | Medium | Version schema from day one |
-| API down = tests fail for wrong reason | Medium | High | Clear error messages distinguishing test vs eval failure |
-
-### Product Risks
-
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Name confusion/SEO burial | Medium | Medium | Ship working product, name can change |
-| Copy-paste onboarding feels like homework | Medium | Medium | Immaculate README (Steve owns) |
-| No telemetry = flying blind on usage | High | Medium | Add anonymous usage ping in v1.1 |
-| Plugin requests before core is stable | High | Medium | Say no. "That's v3." |
-
-### Distribution Risks
-
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| HN launch fizzles | Medium | Medium | Real case study, not vaporware demo |
-| Framework integration blocked | Medium | Medium | Ship standalone first, integrations are v2 |
-| Influencer outreach ignored | Medium | Low | Ship something worth talking about |
+> **What it's really about:** The ability to sleep at night knowing your AI won't break.
+>
+> **The feeling:** Confidence. The exhale after all tests pass.
+>
+> **The one thing that must be perfect:** First 30 seconds—from install to passing test.
+>
+> **Creative direction:** Calm certainty. No fear.
 
 ---
 
-## The Essence (Don't Lose Sight)
+## Summary for Build Phase
 
-> **What this is really about:**
-> Giving developers the confidence to ship AI agents — replacing prayer with proof.
+1. **Name:** Proof
+2. **Command:** `npx proof` (default), `npx proof --llm` (semantic)
+3. **Architecture:** Config parser → Parallel executor → Evaluators → Output
+4. **Adapters:** HTTP + subprocess only (inline, no abstraction layer)
+5. **Evaluators:** 5 built-in (3 deterministic, 2 LLM-powered)
+6. **Output:** Console (default) + JSON (`--output json`)
+7. **Confidence:** Tiered display (HIGH/MEDIUM/LOW)
+8. **Philosophy:** Local-first, zero-config start, LLM opt-in
 
-> **The feeling:**
-> Relief. The exhale after uncertainty.
-
-> **The one thing that must be perfect:**
-> The first test run. One command. Green checkmark. Done.
-
----
-
-## Sign-Off
-
-**Steve's Non-Negotiables (Honored):**
-1. ~~The Name Is PROOF~~ → **OPEN** (compromise needed)
-2. ~~`npm init proof` Ships in v1~~ → **Elon wins** (README must be immaculate)
-3. Human-First Output → **LOCKED** ✓
-
-**Elon's Non-Negotiables (Honored):**
-1. String Matching Is Default → **LOCKED** ✓
-2. No `npm init` Scaffolding in v1 → **LOCKED** ✓
-3. Three Core Files, ~500 Lines → **LOCKED** ✓
+*This document is the blueprint. Build what's here. Nothing more.*
 
 ---
 
-*The game is won in the spaces between plays. Build the simple thing. Make it work. Make it beautiful. Ship.*
-
-— Phil Jackson
+*"The strength of the team is each individual member. The strength of each member is the team."* — Phil Jackson

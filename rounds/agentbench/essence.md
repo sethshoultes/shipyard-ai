@@ -1,13 +1,13 @@
 # Essence
 
-**What this is really about:**
-Giving developers the confidence to ship AI agents — replacing prayer with proof.
+**What it's really about:**
+The ability to sleep at night knowing your AI won't break.
 
 **The feeling:**
-Relief. The exhale after uncertainty.
+Confidence. The exhale after all tests pass.
 
 **The one thing that must be perfect:**
-The first test run. One command. Green checkmark. Done.
+First 30 seconds — from install to passing test.
 
 **Creative direction:**
-Confidence in five seconds.
+Calm certainty. No fear.

@@ -1,165 +1,151 @@
-# AgentBench Board Verdict
+# Board Verdict: AgentBench/Proof
+
 **Date:** 2026-04-12
-**Reviewers:** Warren Buffett, Oprah Winfrey, Jensen Huang, Shonda Rhimes
+**Reviewers:** Jensen Huang (NVIDIA CEO)
+**Status:** Final Consolidated Verdict
 
 ---
 
-## Points of Agreement
+## Points of Agreement Across Board Members
 
-### 1. Solid Technical Execution
-All four board members acknowledge that AgentBench is a **well-built, functional tool** that solves a real problem. The engineering is disciplined, the scope is focused, and the product works as advertised.
+### 1. The Problem Space Is Real
+All reviewers agree that AI agent testing is a genuine, unsolved problem. Developers are shipping agents without proper testing, and the market is wide open.
 
-- **Buffett:** "The team built exactly what developers need—no more, no less."
-- **Oprah:** "A sharp, honest tool that does one thing well."
-- **Jensen:** "Solid engineering execution on a validated problem."
-- **Shonda:** "Technically competent testing tool with solid bones."
+### 2. Local-First Architecture Is Correct
+Unanimous alignment that tests should run on-machine, data stays private. "Privacy is a moat and a business model." No hosted evaluation API in v1.
 
-### 2. No Business Model
-Every board member flagged the absence of monetization as a critical gap.
+### 3. The Name "Proof" Is Right
+Rebrand from AgentBench to Proof is locked. `npx proof` captures the essence: confidence, certainty, a verb and a noun.
 
-- **Buffett:** "This is currently a hobby, not a business."
-- **Jensen:** "You've built a good v1 tool. You haven't built a business."
-- **Oprah:** (Implicit in narrow audience concerns)
-- **Shonda:** (Implicit in retention mechanics absence)
+### 4. LLM Evaluation Must Be Opt-In
+First run works without API keys. Deterministic evaluators (`contains`, `does_not_contain`, `json_schema`) by default. Semantic evaluation unlocks with `--llm` flag.
 
-### 3. No Competitive Moat
-The product can be replicated quickly. There's no lock-in, no network effects, no data gravity.
+### 5. Parallel Execution Is Table Stakes
+Sequential LLM calls (~1s each) make the framework unusable. Parallel execution ships in v1, non-negotiable.
 
-- **Buffett:** "A competent developer could rebuild this in a day."
-- **Jensen:** "Any competent team could replicate this in a weekend. That's not a moat—that's a speed bump."
-
-### 4. Narrow Audience
-The tool serves experienced developers but excludes adjacent stakeholders.
-
-- **Oprah:** "Built for people who already know they need it, not for people who most need to discover it."
-- **Shonda:** "Utility, not a product users will champion."
-- **Buffett:** "Excellent unit economics for a free tool. Nonexistent unit economics for a business."
-
-### 5. No Retention Mechanics
-There's nothing that brings users back after the first run.
-
-- **Shonda:** "What brings people back tomorrow? Almost nothing. This is the fatal flaw."
-- **Jensen:** "Testing in CI is necessary but insufficient."
-- **Oprah:** "No warm welcome... no story."
+### 6. Terminal-First, No Dashboard
+"Dashboards are where focus goes to die." The terminal is sacred space. No web UI in v1 (Elon: "No web UI ever").
 
 ---
 
 ## Points of Tension
 
-### 1. Philosophy vs. Growth
-**Tension between:** Minimalist philosophy (Buffett appreciates restraint) vs. Platform ambition (Jensen wants ecosystem play)
+### 1. Delivery Gap: Foundation vs. Function
+**Current state:** ~40% delivered. Config parser, CLI scaffolding, HTTP adapter, subprocess adapter, error handling, TypeScript setup are done.
 
-- **Buffett:** "The team showed admirable restraint... wisely omitted" features
-- **Jensen:** "The unfair advantages are in the spaces you explicitly marked 'Non-Goals (v1).'"
-- **Resolution needed:** Should the product stay minimal and focused, or expand toward platform status?
+**Critical missing pieces:**
+- Test executor (the actual core loop)
+- Evaluators (contains, sentiment, matches_intent)
+- LLM integration (Anthropic SDK unused)
+- Output formatters
+- Example configs
+- Tests for the testing framework
 
-### 2. Developer Focus vs. Broader Accessibility
-**Tension between:** Sharp developer tool (technical purity) vs. Inclusive product (broader impact)
+**Tension:** The foundation is solid but the product doesn't actually work. This is scaffolding, not software.
 
-- **Oprah:** "Who do you want to empower? If it's senior developers who already test agents—mission accomplished."
-- **Jensen:** "Every AI agent will need testing. Who builds the thing that testing is impossible without?"
-- **Resolution needed:** Double down on developer excellence or broaden reach to PMs, QA, compliance?
+### 2. Scaffolding Command (`npm init proof`)
+- **Steve:** Essential for first 30-second magic, converts skeptics
+- **Elon:** Scope creep, README copy-paste suffices
+- **Resolution:** Cut from v1 (Elon wins)
 
-### 3. Open Source Purity vs. Commercial Viability
-**Tension between:** Community goodwill (MIT license, fully open) vs. Business sustainability (need revenue)
+### 3. Confidence Scores
+- **Steve:** Ship in v1. LLM outputs are probabilistic. 51% confidence != 98% confidence.
+- **Elon:** False precision. Pass/fail is honest.
+- **Resolution:** Tiered display (HIGH/MEDIUM/LOW) ships (Steve wins with compromise)
 
-- **Buffett:** "We've converted engineering capital into community goodwill with no clear path to recoup that investment."
-- **Jensen:** "Open source core + Enterprise hosted tier" is the expected path
-- **Resolution needed:** Define the commercial tier scope without undermining open source trust.
+### 4. Moat and Data Flywheel
+**Jensen's critical concern:** Zero compounding advantages being built.
+- No evaluation datasets being collected
+- No evaluator model fine-tuning path
+- No failure pattern taxonomy
+- Each customer's tests are siloed
 
-### 4. Tone & Emotional Investment
-**Tension between:** Terse/professional (developer culture norm) vs. Human/warm (user connection)
+**Tension:** Building a commodity before building the moat.
 
-- **Oprah:** "The README's tone is almost aggressively terse... human connection isn't bloat."
-- **Shonda:** "Functional tool, but no story arc."
-- **Buffett/Jensen:** (Less concerned with emotional resonance, more focused on business outcomes)
-- **Resolution needed:** Can the product add warmth without feeling inauthentic to developer culture?
+### 5. AI Leverage Underutilization
+**Jensen scores C+.** Using LLM-as-judge is table stakes, but missing:
+- Test generation from system prompts
+- AI-powered failure diagnosis
+- Prompt optimization suggestions
+- Adversarial test generation
 
 ---
 
 ## Overall Verdict
 
-# **PROCEED** (with conditions)
+# HOLD
 
-**Rationale:**
+**Not REJECT because:**
+- Problem space is validated and real
+- Technical foundation is solid
+- Design decisions are well-reasoned
+- Clear product vision exists
 
-The board agrees the product solves a real, validated problem with quality engineering. The AI agent testing market is nascent and growing—timing is favorable. However, the product is not yet a business, and without intervention, it risks becoming an orphaned utility that gets absorbed or forgotten.
-
-The 4/10 to 7/10 score range (average: **5.5/10**) reflects competent execution hampered by strategic incompleteness. This is not a rejection—it's an incomplete submission that needs revision.
-
-**Vote breakdown:**
-- **Buffett:** Conditional proceed (needs monetization clarity)
-- **Oprah:** Proceed with accessibility improvements
-- **Jensen:** Proceed aggressively toward platform vision
-- **Shonda:** Proceed only if retention mechanics are addressed
+**Not PROCEED because:**
+- Core functionality (test executor, evaluators) is missing
+- Product doesn't actually work yet
+- No moat or compounding advantages being built
+- AI leverage is underutilized (using AI as fancy string matcher)
 
 ---
 
 ## Conditions for Proceeding
 
-### Required Before v1.1 (Must-Haves)
+### Immediate (Before Next Review)
 
-1. **Define Monetization Path**
-   - Decision: Hosted tier, enterprise features, or explicit loss-leader strategy
-   - Owner: Product/Business lead
-   - Deadline: Before any Phase 2 engineering
+1. **Ship a Working MVP**
+   - Test executor must be functional
+   - Basic evaluators (`contains`, `does_not_contain`, `json_schema`) must work
+   - At least one LLM evaluator (`matches_intent` or `sentiment`) must work
+   - CLI must run tests end-to-end
 
-2. **Add Usage Telemetry (Opt-In)**
-   - Cannot make informed decisions without data
-   - Track: Tests run, evaluator types used, pass/fail rates, CI vs. manual runs
+2. **Dogfood the Framework**
+   - Write tests for Proof using Proof
+   - Document real bugs caught during development
 
-3. **CI Integration Guide**
-   - Guided GitHub Actions setup (not "figure it out yourself")
-   - This converts one-time users into habitual users
+3. **Example Config + Documentation**
+   - Working `proof.yaml` example
+   - README with copy-paste quick start that actually works
 
-4. **Soften First-Run Experience**
-   - Add warm README intro acknowledging developer anxiety
-   - Celebrate passing tests: "All tests passed! Your agent is ready to ship."
-   - Soften support language
+### Short-Term (v1.1 Planning)
 
-### Required Before v2.0 (Strategic Conditions)
+4. **Instrument for Data Collection**
+   - Plan how test runs will be logged (with consent)
+   - Design schema for evaluation dataset
+   - This is the foundation of the moat
 
-5. **Platform Decision**
-   - Choose: Stay minimal tool OR pursue platform/ecosystem play
-   - If platform: Prioritize community evaluators, public test library, hosted API
+5. **Test Generation POC**
+   - Prototype `proof init --analyze` that reads agent code and suggests tests
+   - This is the "wow" moment that differentiates Proof
 
-6. **Retention Mechanisms**
-   - Streak tracking, regression alerts, weekly digests
-   - Something that brings users back without manual effort
+### Medium-Term (Platform Vision)
 
-7. **Content Infrastructure**
-   - Blog, community Discord, test case library
-   - Case studies: "How X caught a critical bug"
+6. **Define the Flywheel**
+   - Evaluation data -> Better evaluator model -> Better evaluations -> More users -> More data
+   - Plan hosted evaluation tier architecture (multi-tenant from start)
 
-8. **Anthropic Partnership Conversation**
-   - Explore: Partner pricing, co-marketing, ecosystem listing
-   - Reduces platform risk, improves distribution
-
----
-
-## Next Steps
-
-| Priority | Action | Owner | Timeline |
-|----------|--------|-------|----------|
-| P0 | Monetization strategy decision | Leadership | 1 week |
-| P0 | Implement opt-in telemetry | Engineering | 2 weeks |
-| P1 | GitHub Actions integration guide | DevRel | 2 weeks |
-| P1 | README tone improvements | Product | 1 week |
-| P2 | Platform vs. Tool strategic decision | Board | 30 days |
-| P2 | Community Discord setup | DevRel | 30 days |
-| P3 | v1.1 retention features spec | Product | 45 days |
+7. **Evaluator Marketplace Roadmap**
+   - Community-contributed evaluators
+   - Domain-specific packages (`@proof/safety-eval`, `@proof/medical-compliance`)
 
 ---
 
 ## Summary
 
-AgentBench is a **good tool** that has not yet decided whether it wants to be a **great product** or a **viable business**. The board approves continued development contingent on addressing the strategic gaps outlined above.
+**Score:** 5/10 (Jensen's assessment stands)
 
-The market opportunity is real. The timing is favorable. The execution bar has been met. Now it's time to decide what this becomes.
+**Justification:** Solid problem space, correct architectural decisions, good design debates—but the product doesn't work yet and no moat is being built. The scaffolding is excellent; now build the house.
 
-**Verdict: PROCEED with conditions**
+**Next milestone:** Ship a working CLI that runs tests, catches failures, and outputs results. That's the table stakes. Then instrument for the data flywheel that turns this from a product into a platform.
 
 ---
 
-*Consolidated by Great Minds Agency Board*
-*2026-04-12*
+*"You're building a regression testing framework for AI agents. The concept is sound—but you're building a commodity before you've built the moat."* — Jensen Huang
+
+*"Ship it."* — Steve Jobs
+
+*"Build the thing that works, not the thing that sounds impressive."* — Elon Musk
+
+---
+
+**Verdict:** HOLD pending functional MVP delivery.

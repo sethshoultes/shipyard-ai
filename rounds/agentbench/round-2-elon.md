@@ -1,80 +1,62 @@
-# AgentBench Round 2 — Elon Musk
+# Round 2: Elon Musk — Response to Steve
 
-## Challenging Steve: Where "Taste" Becomes Delay
+## Where Beauty Is Getting in the Way of Shipping
 
-### The `npm init proof` Trap
+Steve, your instincts are often right, but "Proof" is a naming exercise dressed up as strategy.
 
-Steve wants a "religious experience" in 30 seconds. Beautiful vision. Here's the problem: **that scaffolding tool IS the product complexity.**
+**Problem 1: `npm init proof` is scope creep.**
+You want a beautiful first-30-seconds experience. I want to ship this week. Scaffolding commands require maintaining templates, updating them with every change, and debugging "why didn't my init work" issues. Copy-paste from README gets us to market faster. Beautiful onboarding is a v2 problem.
 
-To make `npm init proof` work seamlessly, you need:
-- Template generation logic
-- Interactive prompts for "Where's your agent?"
-- Auto-detection of agent frameworks
-- Error handling for every edge case
+**Problem 2: Confidence scores are UI theater.**
+You want "a beautiful checkmark with a confidence score." Confidence scores require calibrating LLM-as-judge outputs, displaying percentages that users won't understand, and defending why 73% is a pass but 72% isn't. Pass/fail is honest. Confidence scores are false precision masquerading as insight.
 
-That's 2-3 days of work for a *first-run experience*. Meanwhile, the actual evaluator—the thing that creates value—sits unfinished. This is classic over-optimization of the demo at the expense of the core.
-
-**My counter:** Copy-paste from README. `curl | sh` if you must. Ship the thing that runs tests, not the thing that sets up tests.
-
-### "PROOF" Creates Distribution Problems
-
-I'll admit "AgentBench" is bland. But "PROOF" has real issues:
-- **SEO nightmare.** Search "proof testing" and you get mathematical proofs, proofing dough, Adobe tools.
-- **GitHub naming conflict.** Multiple repos already named "proof."
-- **Unclear category.** "AgentBench" tells you exactly what it does. "PROOF" requires explanation.
-
-Names don't make products succeed. Products make names memorable. "Google" was nonsense until it wasn't.
-
-### The Espresso Machine Analogy Cuts Both Ways
-
-Steve says: "Single button, perfect output."
-
-But espresso machines that do one thing perfectly? $200. Espresso machines with hand-crafted design, perfect temperature curves, Italian craftsmanship? $2,000. Same output. One ships to millions, one ships to connoisseurs.
-
-**We need the $200 version first.** Prove the market, then refine.
+**Problem 3: "Haikus of clarity" don't write themselves.**
+Every minute spent crafting the perfect error message is a minute not spent on parallel test execution. Ship accurate errors first. Make them beautiful when we know what errors actually occur in production.
 
 ---
 
-## Defending My Positions: Why Technical Simplicity Wins
+## Why Technical Simplicity Wins
 
-### String Matching as Default Is Not Compromise—It's Speed
+The iPhone didn't ship with copy-paste. It shipped with *phone, email, and browser that actually worked*. You're quoting iPhone philosophy while proposing iPhone v3 features.
 
-10 tests with LLM evaluation = 10 API calls = 10+ seconds.
-10 tests with string matching = 10 regex checks = <100ms.
+My architecture is four components. Yours implies hidden complexity behind "describe what should happen and the machine figures out how to evaluate." That "figuring out" is:
+- Prompt engineering for every expectation type
+- Handling LLM inconsistency
+- Managing API costs users don't expect
 
-At 100x scale, this is the difference between developers waiting 2 minutes and waiting 1 second. **Developers don't wait.** They abandon. String matching is primary because adoption matters more than elegance.
-
-### Three Layers Is Still One Too Many
-
-Steve agrees on terminal-only. Good. But he didn't address the adapter abstraction. CLI and HTTP executors are 30 lines each. Wrapping them in a "layer" is architecture theater. Ship two functions. Refactor later if you hit a third.
-
-### Cut First, Add Later Is Not Anti-Taste
-
-Everything I proposed cutting can be added in v2. But you cannot un-ship complexity. Every feature shipped is a feature maintained. Maintenance is the silent killer of velocity.
+Local-first, string-matching-first, LLM-opt-in means: **works without an API key, works offline, works fast.** That's the real magic—not the illusion of magic powered by a $0.03 API call per test.
 
 ---
 
-## Concessions: Steve Is Right Here
+## Where Steve Is Right
 
-1. **Brand voice matters.** "Confident, spare, slightly defiant" is correct. Our README should read like a manifesto, not a manual. I'll defer to Steve on copy.
+I'll concede three points:
 
-2. **Output clarity is UX.** Checkmarks and minimal output aren't "nice to have"—they're core to the developer experience. Verbose logging is a bug, not a feature.
+1. **"AgentBench" is a bad name.** You're right. "Proof" is better. Short, memorable, verb-noun duality. Fine. Let's use it.
 
-3. **"Every option is a confession."** This is exactly right. My cut list supports this—we're not removing taste, we're removing decisions. Fewer options = stronger defaults.
+2. **No dashboard in v1.** Completely aligned. Terminal-first is the right call. I'd go further: no web UI ever. Stay in the workflow.
+
+3. **Brand voice matters.** "Test failed. Here's why." beats "Error: assertion failed at line 47." Terse confidence reads as competence. I'll write errors like a senior engineer at 2am.
 
 ---
 
 ## Locked Decisions (Non-Negotiable)
 
-### 1. String Matching Is Default Evaluation Mode
-LLM evaluation is opt-in with `evaluator: semantic`. This is a performance and cost decision. Not debatable.
+### 1. Parallel test execution from day one
+Not phase 2. Not "nice to have." Sequential LLM calls at 1s each make the framework unusable. This ships in v1 or we don't ship.
 
-### 2. No `npm init` Scaffolding in v1
-Users copy YAML from README. We ship core functionality, not onboarding polish.
+### 2. LLM evaluation is opt-in, not default
+First run works with `contains`, `does_not_contain`, `json_schema`. No API key required. Semantic evaluation unlocks with `--llm` flag. Users pay for magic only when they need it.
 
-### 3. Three Core Files, ~500 Lines Total
-Config loader, executor, evaluators. No adapter layers, no plugin systems, no registries. Abstractions come from real patterns, not anticipated patterns.
+### 3. No scaffolding command
+`npm init proof` is cut. README has a working example. Copy it. Paste it. Run it. We ship docs, not generators.
 
 ---
 
-**Next step:** Name compromise. I propose **"AgentProof"**—searchable, descriptive, incorporates Steve's insight. Thoughts?
+## The Path Forward
+
+Steve wants users to feel something. I want users to *have* something that works. These aren't incompatible—but when they conflict, working beats feeling.
+
+Rename to Proof. Ship parallel execution. Default to deterministic checks. Beautiful errors can come in v1.1 when we know what errors people actually hit.
+
+*The best products aren't designed. They're discovered through shipping.*

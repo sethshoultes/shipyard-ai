@@ -1,14 +1,8 @@
-# Retrospective: AgentBench
+# Retrospective: AgentBench → Proof
 
 **Author:** Marcus Aurelius
 **Date:** 2026-04-12
-**Role:** Observer and Reflector
-
----
-
-*"The object of life is not to be on the side of the majority, but to escape finding oneself in the ranks of the insane."*
-
-I have reviewed the full record of this endeavor. What follows is offered without flattery or malice—only the desire to see clearly.
+**Verdict:** HOLD (5/10)
 
 ---
 
@@ -16,113 +10,102 @@ I have reviewed the full record of this endeavor. What follows is offered withou
 
 ### 1. The Dialectic Process Produced Clarity
 
-The structured debate between Steve and Elon was not theater—it was productive collision. Steve pushed for craft and emotional resonance ("the first 30 seconds must create a religious experience"). Elon demanded ruthless scope reduction ("cut 40% of features, ship in one session").
+The structured debate between Steve and Elon worked. Two rounds of genuine conflict—name, confidence scores, scaffolding, parallel execution—led to decisions that neither would have reached alone. Steve's insistence on "Proof" gave the product identity. Elon's demand for parallel execution caught a fatal flaw before it shipped. The tension was productive; the synthesis was stronger than either thesis.
 
-Phil Jackson's consolidation was masterful: he locked decisions where consensus existed, left open what required founder judgment, and created a living document that anyone could read and understand. The `decisions.md` file is a model of how to crystallize disagreement into forward motion.
+### 2. Essence Capture Was Sharp
 
-**The lesson:** Tension, properly channeled, produces stronger decisions than consensus-seeking.
+"The ability to sleep at night knowing your AI won't break." This single line anchored every decision. When debates wandered, the essence pulled them back. The feeling (confidence, the exhale) and the one thing that must be perfect (first 30 seconds) gave the team a compass. This is what good product definition looks like.
 
-### 2. Scope Discipline Was Maintained
+### 3. Scope Discipline Was Ruthless
 
-The team resisted the gravitational pull of feature creep. They cut `--watch` mode, custom evaluators, parallel execution, retry logic, and web dashboards. They shipped ~400 lines of core code instead of 4,000. This restraint is rare and valuable.
+Eleven features were locked. Eight were explicitly cut: scaffolding, watch mode, dashboard, SDK adapters, custom evaluators, multiple output formats, hosted API, retry logic. The team said no more often than yes. This is rare. This is valuable. The decisions.md document is a model of what locked decisions should look like.
 
-The "What We Won't Build" section in the README—while narratively problematic (as Shonda noted)—represents genuine discipline. Most teams cannot say no. This team could.
+### 4. Design Debates Were Substantive, Not Political
 
-### 3. The Essence Was Articulated and Preserved
+Steve's case for confidence scores wasn't vanity—it was an argument about the probabilistic nature of LLM evaluation. Elon's case for cutting was about false precision. Phil's resolution (tiered display: HIGH/MEDIUM/LOW) honored both concerns. This is what productive disagreement looks like: positions with reasons, not egos defending territory.
 
-> "Giving developers the confidence to ship AI agents — replacing prayer with proof."
+### 5. The Retention Roadmap Showed Long-Term Thinking
 
-This essence survived from early ideation through final QA. The product delivers on this promise. One command, one YAML file, pass/fail output. The demo script captures the emotional journey: anxiety → testing → relief. The core vision remained intact.
-
-### 4. QA Rigor Exposed Real Issues
-
-Margaret Hamilton's QA passes were thorough and honest. She identified P0 blockers (uncommitted files, failing npm test) and P1 issues (example test mismatch, CLI documentation inconsistency). This prevented shipping a broken product while calling it done.
-
-The QA process distinguished between "works on my machine" and "works in reality."
-
-### 5. Multi-Perspective Board Review Revealed Blind Spots
-
-Four board members with distinct lenses—Buffett (economics), Oprah (accessibility), Jensen (platform thinking), Shonda (retention)—created a complete map of what the team could not see. No single reviewer captured the full picture. Together, they exposed the strategic gap between "good tool" and "viable business."
+Shonda's document demonstrates that someone was thinking beyond v1. The emotional hooks, the progressive disclosure model, the "holy shit" moment when Proof catches a real bug—this is user psychology understood. The loop from install to team standardization is mapped. The North Star is clear.
 
 ---
 
-## What Did Not Work
+## What Didn't Work
 
-### 1. Strategic Direction Was Deferred, Not Decided
+### 1. The Product Was Not Delivered
 
-The product shipped without a monetization path. Buffett's assessment was blunt: "This is currently a hobby, not a business." Jensen's was sharper: "You've built a good v1 tool. You haven't built a business."
+This is the fundamental failure. ~40% complete. The test executor—the core loop—was not built. The evaluators were not built. The LLM integration was not built. We have scaffolding, not software.
 
-The team built what developers need. They did not answer what the agency needs. This is not a technical failure—it is a strategic vacancy that will compound over time.
+A working CLI that runs zero tests is not an MVP. It is a README with build scripts. Jensen's assessment is correct: "This is scaffolding, not software." The process produced excellent decisions about what to build, but did not actually build the thing.
 
-**The cost:** Every week without a commercial path is a week where engineering capital converts to community goodwill with no return mechanism.
+### 2. Planning Consumed Execution Time
 
-### 2. Retention Was an Afterthought
+Two rounds of Steve/Elon debate. Phil's consolidation. Jensen's board review. Shonda's retention roadmap. The documentation is extensive and well-crafted. But somewhere between round 1 and round 2, the balance tipped from "necessary clarity" to "planning as procrastination."
 
-Shonda's review exposed the fatal flaw: nothing brings users back after the first run. No streaks, no notifications, no trend data, no community. The product is functionally complete but narratively dead.
+The test executor could have been built in the time spent debating whether to include watch mode (which was cut anyway). Perfect plans do not ship. Working software ships.
 
-The retention roadmap (`shonda-retention-roadmap.md`) is excellent—but it was written *after* the product shipped, not during design. Retention mechanics should inform architecture, not be bolted on later.
+### 3. No Moat Was Built
 
-**The cost:** User acquisition without retention is a leaky bucket. The team will work harder to refill what drains away.
+Jensen identified this clearly. Every test run generates labeled data (input, output, pass/fail). This data could train a faster, cheaper, proprietary evaluation model. Instead, each customer's tests are siloed. No network effects. No flywheel. No compounding advantage.
 
-### 3. The Name Was Never Resolved
+The team optimized for "local-first" (correct) but failed to architect for "instrument-first" (oversight). Privacy and data collection are not mutually exclusive. The labeled data opportunity was left on the table.
 
-Steve championed "PROOF." Elon objected on SEO grounds. Phil marked it "OPEN." Elon proposed "AgentProof." The codebase shipped as "AgentBench."
+### 4. AI Leverage Was Underutilized
 
-This indecision rippled through everything: npm package name, GitHub repo, README copy, demo script. The team shipped a product without knowing what to call it.
+The product uses LLM-as-judge for semantic evaluation. This is table stakes—the minimum to differentiate from regex matching. But:
 
-**The cost:** Brand confusion, split attention, future migration pain. A name is a commitment. This team made none.
+- No test generation from system prompts
+- No AI-powered failure diagnosis
+- No prompt optimization suggestions
+- No adversarial test generation
 
-### 4. Emotional Polish Was Sacrificed for Ship Speed
+The product uses AI where it adds 1.5x value, not 10x. This is a testing framework for AI agents that barely uses AI beyond evaluation. The irony is not lost.
 
-The README tone is "aggressively terse" (Oprah). The support section reads "dismissive rather than direct." The success message is a receipt, not a celebration. Maya Angelou's review praised the voice but noted: "occasionally it lectures when it should trust."
+### 5. The Board Review Came Too Late
 
-These are not feature gaps—they are craft failures. They could have been fixed with one editing pass before ship. They were not.
+Jensen's feedback—data flywheel, evaluator model, platform vs. product—would have reshaped the architecture if delivered earlier. Instead, it arrived after the foundation was poured. The hosted evaluation concerns, the benchmark leaderboard opportunity, the evaluator marketplace vision—all of this is post-hoc wisdom that cannot easily retrofit into what was built.
 
-### 5. Accessibility Was Not Considered
-
-Oprah's review surfaced what no one else mentioned: non-native English speakers, beginners, product managers, screen reader users—all excluded. The PRD promised "non-engineers can write tests" but delivered nothing to support this.
-
-The product works for senior developers. It ignores everyone else.
+Board reviews should inform design, not critique it after execution. The timing was wrong.
 
 ---
 
-## What Should the Agency Do Differently Next Time?
+## What the Agency Should Do Differently Next Time
 
-### 1. Resolve Strategic Questions Before Building
+### 1. Timebox Debates; Protect Execution
 
-The monetization question should have been answered in the PRD, not the board review. "Open source core + paid tier" or "loss-leader for agency deals" or "pure community goodwill"—pick one. Don't ship ambiguity.
+Two rounds of Steve/Elon debate is reasonable. But establish a hard gate: after decisions lock, 70% of remaining time goes to building, not planning. Document the v1.1 roadmap *after* v1 works. Shonda's retention roadmap is excellent, but it was premature—we don't need retention strategy for a product that doesn't function.
 
-**Rule:** If the board will ask a question, answer it before they do.
+**Concrete change:** Mandate that "ship working core" precedes "plan future features." The test executor should have been Day 1 work, before the second debate round.
 
-### 2. Design for Retention from Day One
+### 2. Board Review Before Architecture, Not After
 
-Retention mechanics are not post-launch polish. Streak tracking, CI integration, and notification hooks should be in the v1 architecture, even if not fully implemented. The data model must support them.
+Jensen's insights about data flywheels and platform plays should have arrived before the file structure was defined. Instead, the review came after HTTP adapters and subprocess runners were built.
 
-**Rule:** If users won't return tomorrow, the product is incomplete.
+**Concrete change:** Strategic board review happens *before* technical design begins. Tactical board review happens *after* MVP ships. Reverse the order next time.
 
-### 3. Name Things at the Start, Not the End
+### 3. Dogfood Earlier
 
-The name debate consumed attention across multiple rounds without resolution. Pick a name in the first session. Accept that it may not be perfect. Perfect names come from products people love, not from committee deliberation.
+"Write tests for Proof using Proof" was listed as a condition for proceeding. This should have been done during development, not after. If the team had tried to use Proof mid-build, they would have discovered immediately that the test executor didn't exist. Building something you cannot use is a warning sign.
 
-**Rule:** Ship with conviction. "AgentBench" was fine. Call it that. Move on.
+**Concrete change:** The product must be usable by the team before the first review milestone. If it cannot be used, it is not ready for review.
 
-### 4. Include One Emotional Edit Pass
+### 4. Architect for Instrumentation from Day One
 
-Before QA, before ship, assign one person to read every user-facing string with fresh eyes. Does the README feel human? Does the error message help or blame? Does success feel like a victory?
+The data flywheel opportunity was identified but not built. This should be embedded in the initial architecture, not retrofitted. Even with local-first execution, every test run could write to a local SQLite log. That log becomes the foundation for trend analysis, regression alerts, and eventually (with consent) the training data for a proprietary evaluator model.
 
-This pass takes two hours. It changes how the product feels forever.
+**Concrete change:** Include "data capture layer" in the initial file structure. Make instrumentation a first-class concern, not a v1.1 afterthought.
 
-### 5. Test the Test Suite
+### 5. Define "Done" Before Starting
 
-The example test suite shipped with a failing test. The mock agent didn't produce output matching the expectations. This is ironic for a testing product and erodes trust immediately.
+The project reached 40% completion and received a HOLD verdict. But what was the original definition of done? If "done" meant "working CLI that runs tests end-to-end," the project failed. If "done" meant "decisions documented and architecture defined," it succeeded. The ambiguity suggests the goal was never clearly stated.
 
-**Rule:** The demo must work. Always. Flawlessly.
+**Concrete change:** Before any project begins, write a single sentence: "This milestone is complete when [X] works." For AgentBench, that sentence should have been: "This milestone is complete when `npx proof` runs a test suite and outputs pass/fail results."
 
 ---
 
 ## Key Learning to Carry Forward
 
-**A product that works is necessary but not sufficient; a product must also have a reason to exist as a business, a reason for users to return, and a name its makers believe in.**
+**Decisions without delivery are theater; the test executor should have been built before the second debate round.**
 
 ---
 
@@ -130,37 +113,34 @@ The example test suite shipped with a failing test. The mock agent didn't produc
 
 **Justification:**
 
-- ✅ Dialectic rounds were completed with documented decisions
-- ✅ Essence was defined and preserved
-- ✅ Scope discipline was maintained
-- ✅ QA process was rigorous and honest
-- ✅ Board review was thorough and multi-perspectival
-- ❌ Name was not resolved
-- ❌ Monetization path was deferred
-- ❌ Retention was not designed into v1
-- ❌ Emotional polish was rushed
-- ❌ Example test suite shipped broken
+| Aspect | Score | Notes |
+|--------|-------|-------|
+| Essence capture | 9/10 | Sharp, focused, used as compass |
+| Debate structure | 8/10 | Two rounds, clear positions, resolutions documented |
+| Decision documentation | 9/10 | Locked decisions are exemplary |
+| Execution against decisions | 3/10 | Core functionality not built |
+| Board review timing | 4/10 | Came after architecture was set |
+| Risk identification | 7/10 | Risks noted, but "scope creep" risk materialized as "planning creep" |
+| Moat/platform thinking | 4/10 | Identified late, not architected |
 
-The team followed the *form* of the process while missing key *substance*. The deliverable exists and functions. The business case does not. This is the difference between completion and readiness.
+The process was followed for deliberation. It was not followed for delivery. A good process includes shipping; this one got lost in refinement.
 
 ---
 
 ## Final Reflection
 
-*"Waste no more time arguing about what a good man should be. Be one."*
+There is wisdom in debate. Steve and Elon sharpened each other. The product vision that emerged is cleaner than either started with. But wisdom without action is philosophy, not product.
 
-This team built a useful thing. They built it with discipline and speed. They listened to each other and consolidated disagreement into action. That is commendable.
+The emperor who deliberates endlessly while the legions wait is no better than one who marches blindly into ambush. The virtue is in balance: think clearly, then act decisively.
 
-But they also shipped a tool that solves a problem without deciding if solving the problem sustains them. They created something developers will use once and forget. They left the name unresolved, the tone cold, the strategy blank.
+AgentBench—now Proof—has clarity. It lacks existence.
 
-The next round must not repeat these errors. Strategic clarity, retention architecture, and emotional craft are not luxuries—they are requirements for anything that lasts.
+The task now is simple: build the test executor, build the evaluators, run a test, see it pass. Do not add another document until a green checkmark appears in the terminal.
 
-Build the thing that works. But also build the thing that returns value, that brings users back, that earns its name through use.
-
-That is the path forward.
+The exhale comes not from planning the breath, but from taking it.
 
 ---
 
-*— Marcus Aurelius*
-*Observer and Reflector*
-*2026-04-12*
+*"Waste no more time arguing about what a good man should be. Be one."*
+— Meditations, Book X
+
