@@ -30,7 +30,7 @@ fi
 umask 0077
 
 # Configuration (zero-config defaults)
-QUEUE_DIR="${NERVE_QUEUE_DIR:-/tmp/nerve-queue}"
+readonly QUEUE_DIR="${NERVE_QUEUE_DIR:-/tmp/nerve-queue}"
 
 # Logging function
 queue_log() {

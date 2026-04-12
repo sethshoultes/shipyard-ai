@@ -14,21 +14,22 @@ if [[ ${BASH_VERSION%%.*} -lt 4 ]]; then
 fi
 
 # Configuration
-readonly LOCKFILE="${NERVE_LOCKFILE:-/tmp/nerve.pid}"
+readonly LOCK_DIR="${NERVE_LOCK_DIR:-/tmp/nerve.lock}"
+readonly LOCKFILE="${LOCK_DIR}/pid"
 readonly ABORT_FLAG="${NERVE_ABORT_FLAG:-/tmp/nerve.abort}"
 readonly METRICS_FILE="${NERVE_METRICS_FILE:-/tmp/nerve-metrics.json}"
 readonly QUEUE_DIR="${NERVE_QUEUE_DIR:-/tmp/nerve-queue}"
 
 # Check if daemon is running
 daemon_status() {
-    if [[ -f "$LOCKFILE" ]]; then
+    if [[ -d "$LOCK_DIR" ]] && [[ -f "$LOCKFILE" ]]; then
         local pid
         pid="$(cat "$LOCKFILE" 2>/dev/null || echo "")"
         if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
             echo "RUNNING (PID: ${pid})"
             return 0
         else
-            echo "STOPPED (stale lockfile)"
+            echo "STOPPED (stale lock)"
             return 1
         fi
     else
@@ -82,7 +83,7 @@ json_output() {
     local daemon_running=false
     local daemon_pid=""
 
-    if [[ -f "$LOCKFILE" ]]; then
+    if [[ -d "$LOCK_DIR" ]] && [[ -f "$LOCKFILE" ]]; then
         daemon_pid="$(cat "$LOCKFILE" 2>/dev/null || echo "")"
         if [[ -n "$daemon_pid" ]] && kill -0 "$daemon_pid" 2>/dev/null; then
             daemon_running=true

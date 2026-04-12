@@ -23,7 +23,8 @@ umask 0077
 
 # Configuration (zero-config defaults)
 readonly NERVE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly LOCKFILE="${NERVE_LOCKFILE:-/tmp/nerve.pid}"
+readonly LOCK_DIR="${NERVE_LOCK_DIR:-/tmp/nerve.lock}"
+readonly LOCKFILE="${LOCK_DIR}/pid"
 readonly POLL_INTERVAL="${NERVE_POLL_INTERVAL:-5}"
 readonly HEARTBEAT_INTERVAL="${NERVE_HEARTBEAT_INTERVAL:-12}"
 readonly METRICS_FILE="${NERVE_METRICS_FILE:-/tmp/nerve-metrics.json}"
@@ -55,17 +56,19 @@ log() {
     echo "$line"
 }
 
-# Write metrics to JSON file
+# Write metrics to JSON file (atomic: write temp, then mv)
 metrics_update() {
     local depth="$1"
     local latency="$2"
     local errors="$3"
     local timestamp
     timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    local temp_file="${METRICS_FILE}.tmp"
 
-    cat > "$METRICS_FILE" <<EOF
+    cat > "$temp_file" <<EOF
 {"queue_depth":${depth},"latency_last":${latency},"error_count":${errors},"timestamp":"${timestamp}"}
 EOF
+    mv "$temp_file" "$METRICS_FILE"
 }
 
 # Log metrics periodically
@@ -76,8 +79,10 @@ metrics_log() {
 }
 
 # Acquire lock - prevent duplicate daemon instances
+# Uses atomic mkdir to prevent TOCTOU race condition
 acquire_lock() {
-    if [[ -f "$LOCKFILE" ]]; then
+    # Check for stale lock first
+    if [[ -d "$LOCK_DIR" ]]; then
         local existing_pid
         existing_pid="$(cat "$LOCKFILE" 2>/dev/null || echo "")"
 
@@ -85,11 +90,19 @@ acquire_lock() {
             log "DAEMON" "already running (PID: ${existing_pid})"
             return 1
         else
-            log "DAEMON" "cleaning stale lockfile (was PID: ${existing_pid})"
-            rm -f "$LOCKFILE"
+            log "DAEMON" "cleaning stale lock (was PID: ${existing_pid})"
+            rm -rf "$LOCK_DIR"
         fi
     fi
 
+    # Atomic lock acquisition using mkdir (POSIX atomic operation)
+    if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+        # Another process acquired the lock between our check and mkdir
+        log "DAEMON" "lock acquisition failed (race condition avoided)"
+        return 1
+    fi
+
+    # Write PID to lock directory
     echo "$$" > "$LOCKFILE"
     log "DAEMON" "started (PID: $$)"
     return 0
@@ -97,11 +110,11 @@ acquire_lock() {
 
 # Release lock on shutdown
 release_lock() {
-    if [[ -f "$LOCKFILE" ]]; then
+    if [[ -d "$LOCK_DIR" ]]; then
         local lock_pid
         lock_pid="$(cat "$LOCKFILE" 2>/dev/null || echo "")"
         if [[ "$lock_pid" == "$$" ]]; then
-            rm -f "$LOCKFILE"
+            rm -rf "$LOCK_DIR"
         fi
     fi
     log "DAEMON" "shutdown complete"
@@ -186,8 +199,8 @@ main() {
         exit 1
     fi
 
-    # Set up signal handlers
-    trap 'handle_shutdown' SIGTERM SIGINT
+    # Set up signal handlers (SIGHUP for terminal hangup)
+    trap 'handle_shutdown' SIGTERM SIGINT SIGHUP
     trap 'release_lock' EXIT
 
     # Initialize queue
