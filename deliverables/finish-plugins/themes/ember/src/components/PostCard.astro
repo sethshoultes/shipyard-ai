@@ -1,0 +1,95 @@
+---
+/**
+ * Ember Theme - Post Card Component
+ * Editorial-style card for posts
+ */
+
+interface Props {
+  title: string;
+  excerpt?: string;
+  category?: string;
+  image?: string;
+  href: string;
+}
+
+const { title, excerpt, category, image, href } = Astro.props;
+---
+
+<article class="post-card">
+  {image && (
+    <a href={href} class="post-card-image">
+      <img src={image} alt={title} />
+    </a>
+  )}
+  <div class="post-card-content">
+    {category && <span class="post-card-category">{category}</span>}
+    <h3><a href={href}>{title}</a></h3>
+    {excerpt && <p>{excerpt}</p>}
+  </div>
+</article>
+
+<style>
+  .post-card {
+    background: var(--color-surface);
+    border-radius: 2px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .post-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  .post-card-image {
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+  }
+
+  .post-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .post-card:hover .post-card-image img {
+    transform: scale(1.05);
+  }
+
+  .post-card-content {
+    padding: 1.5rem;
+  }
+
+  .post-card-category {
+    display: inline-block;
+    color: var(--color-accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .post-card h3 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .post-card h3 a {
+    color: var(--color-text);
+  }
+
+  .post-card h3 a:hover {
+    color: var(--color-accent);
+  }
+
+  .post-card p {
+    color: var(--color-muted);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+</style>

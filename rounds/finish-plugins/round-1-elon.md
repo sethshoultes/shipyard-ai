@@ -1,126 +1,129 @@
 # Round 1 — Elon Musk (Chief Product & Growth)
 
-## The Reality Check
+## The Brutal Truth
 
-7,607 lines of plugin code. 16 planning documents. Zero production deployments.
+We built 6 plugins against a **hallucinated API**. That's ~10,000 lines of code that literally cannot run. This isn't a bug fix — this is a rewrite dressed up as maintenance.
 
-We have achieved **negative velocity**. Every hour spent perfecting code no one uses is an hour we fall further behind shipping.
-
----
-
-## Architecture: Simplest System That Could Work
-
-**What we built:** Two 4,000-line monoliths with 60% shared code, JWT auth, KV storage, Stripe webhooks, email templates, drip content, group memberships, coupon engines, CSV export, developer webhooks.
-
-**What we needed:** `email → KV write → Stripe link → member yes/no`
-
-The simplest membership system is 200 lines. We built 4,000. That's 20x complexity for 0x customers.
-
-**First-principles reduction:**
-- Delete EventDash from v1 scope
-- Delete coupons, groups, drip content, CSV, webhooks
-- Delete everything except: register → pay → access
-
-**The cut:** 3,500 lines. Ship the remaining 500.
+The PRD says "fix the existing code, don't rewrite from scratch." That's optimistic thinking. When 114 instances of `throw new Response` need to become `throw new Error`, and you're touching every error path in 3,984 lines — you're rewriting. Call it what it is.
 
 ---
 
-## Performance: Where Are The Bottlenecks?
+## Architecture: First Principles
 
-**Fake bottlenecks (things that won't matter):**
-- KV read latency: ~5ms. Fine to 50K members.
-- Stripe webhook processing: Cloudflare Workers handle it.
-- JWT verification: Microseconds.
+**Simplest system that could work:**
+1. Build a lint script: `grep -r "throw new Response\|rc\.user\|rc\.pathParams" plugins/`
+2. Auto-fix mechanical patterns with sed
+3. Manual fix the 20% that requires reasoning
+4. Deploy. Test. Ship.
 
-**Real bottleneck:** Zero feedback from production. We don't know:
-- What error states actually occur
-- Which UX confuses actual users
-- Whether installation even works
+**What the PRD actually demands:**
+6 plugins × 7 success criteria × 4 test sites × Playwright screenshots × curl every route = 168+ verification checkboxes before "done."
 
-**10x path:** Deploy today. Replace all assumptions with data.
+**The PRD conflates two things:**
+- **Fixing broken code** (mechanical regex, 2 hours)
+- **Validating deployments** (infra work, 4+ hours)
+
+Separate them. Fix all 6 plugins first. Deploy and test in parallel second.
+
+---
+
+## Performance: Where Are the Bottlenecks?
+
+**The feedback loop kills velocity:**
+Fix → Build → Deploy → Curl → Screenshot → Check console = 10+ minute cycles. At 6 plugins × 3 iterations = **3+ hours just waiting**.
+
+**The 10x path:**
+1. **Local Emdash mock** — validate `throw new Error` without live Cloudflare
+2. **Parallel deploys** — fix all 6, deploy all 6, test all 6 simultaneously
+3. **Skip Playwright until fixes validated** — screenshots are proof-of-done, not debugging tools
+
+**The real blocker** (buried in PRD line 49):
+> "admin route returns valid JSON via curl but Emdash's PluginRegistry fails with `.map()` error"
+
+This is a **response shape mismatch**, not a code bug. Fix this once for EventDash, pattern transfers to all 6. This is a 1-hour investigation, not scattered across 6 plugins.
 
 ---
 
 ## Distribution: How Does This Reach 10,000 Users?
 
-**Hard truth:** EmDash's addressable market is unknown. 100 sites? 500? Let's be generous: 1,000.
+**It doesn't.** These are internal plugins for Emdash sites.
 
-At 20% plugin adoption: **200 users maximum**. Full stop.
+The real distribution question: **can future Shipyard agents fix plugins without this tribal knowledge?**
 
-**Path to 10,000:**
-1. EmDash grows to 50,000 sites (not our control)
-2. OR: Extract MemberShip as standalone SaaS (requires rebuild)
-3. OR: License to competing CMS platforms (requires partnerships)
+Answer: No. The PRD requires reading:
+- EMDASH-GUIDE.md (1750 lines)
+- Working sandbox-entry.ts example
+- Block Kit JSON format
+- Undocumented `rc.input` vs `rc.pathParams` differences
 
-**For v1:** Bundle with EmDash templates. Zero marketing spend. Let platform growth carry us. Measure before optimizing.
+**What would scale:** `npx emdash lint-plugin plugins/membership` that codifies the banned patterns and auto-suggests fixes. Ship the tool, not the documentation.
 
 ---
 
-## What to CUT (v2 Features Masquerading as v1)
+## What to CUT (v2 Masquerading as v1)
 
-| Feature | Lines | Rationale |
-|---------|-------|-----------|
-| EventDash (entire plugin) | 3,600 | Ship one plugin first. Learnings transfer. |
-| Group/corporate memberships | ~300 | Zero customers asked |
-| Coupon engine | ~200 | Zero customers asked |
-| Drip content | ~400 | Zero customers asked |
-| Developer webhooks | ~250 | Zero customers will use |
-| CSV import/export | ~150 | Manual onboarding for first 50 |
-| Multi-tier permissions | ~200 | Two tiers (free/paid) covers 99% |
-| Analytics dashboards | ~300 | Count = members. Sum = revenue. Done. |
+| Cut | Reason |
+|-----|--------|
+| **Playwright screenshots for every admin page** | One screenshot per plugin showing Block Kit renders = sufficient |
+| **"Wire into example sites" for P2 plugins** | FormForge and CommerceKit have no banned patterns. Test after P0/P1 done |
+| **EventDash admin UI debugging** | Different bug (PluginRegistry `.map()` error). Separate ticket |
+| **"Check browser console for JavaScript errors"** | Either Block Kit renders or it doesn't. Console errors are Emdash framework bugs |
 
-**Total cut:** ~5,400 lines across both plugins. Ship ~2,200.
+**Critical path:** MemberShip (P0) → ReviewPulse (P1) → SEODash (P1) → validate all three → then touch P2s.
+
+**Pure scope creep:** Testing 6 plugins on 4 different sites. One plugin on one site validates the pattern. The rest is copy-paste.
 
 ---
 
 ## Technical Feasibility: Can One Agent Session Build This?
 
-**Yes — IF scope is honest.**
+**The math:**
+- 3,984 + 2,051 + 969 = **7,004 lines** across P0/P1 plugins
+- 114 + 72 + 31 = **217 banned pattern instances**
+- Mechanical fixes: ~2 hours
+- Block Kit format debugging: ~1 hour
+- Deploy/test all 3: ~2 hours
+- **Total: ~5 hours**
 
-One session can:
-- Strip 114 `throw new Response` antipatterns
-- Deploy to Sunrise Yoga
-- Verify one Stripe transaction end-to-end
-- Write Installation.md
+**One agent session can do this IF:**
+1. It ignores P2 plugins (no banned patterns = no fix needed)
+2. It parallelizes deploys
+3. It uses grep/sed for mechanical fixes, not line-by-line manual edits
 
-One session cannot:
-- Test three real credit cards (requires human)
-- Write four complete docs
-- Review all copy for brand voice
-- Stress-test webhook failures
+**One agent session cannot do this IF:**
+- It reads every file character-by-character
+- It manually edits each `throw new Response`
+- It waits for sequential deploys
+- It debugs Playwright setup
 
-**Ship criteria:** One transaction. One README. One customer.
-
----
-
-## Scaling: What Breaks at 100x?
-
-| At 100x | Impact | When to Fix |
-|---------|--------|-------------|
-| KV `entries.query()` | Timeouts at 10K+ records | After 5,000 members |
-| Email rate limits | Resend caps at 1K/day | After 500 members |
-| Monolith complexity | Maintenance pain | After validation |
-
-**The honest answer:** We don't have 1x. We have 0x. Scaling concerns before shipping is masturbation disguised as engineering.
+Context limits will hit before completion.
 
 ---
 
-## The Decision
+## Scaling: What Breaks at 100x Usage?
 
-**Stop debating. Start deploying.**
+| Component | Now | At 100x | Risk |
+|-----------|-----|---------|------|
+| KV storage | ~1K records | ~100K records | `.query()` timeouts on large lists |
+| Stripe webhooks | 10/day | 1K/day | Cloudflare handles, no issue |
+| Plugin sandboxing | 6 plugins | 600 plugins | Worker isolate limits |
+| Block Kit rendering | 1 admin | 100 admins | Stateless, scales linearly |
 
-This week:
-1. Fix `/membership/status` auth (security blocker)
-2. Deploy to Sunrise Yoga
-3. Run one real payment
-4. Ship
+**The systemic failure:** Plugins were built against a hallucinated API because the SDK docs didn't exist or weren't enforced.
 
-**What doesn't happen:**
-- More board reviews
-- More retention roadmaps
-- More copy polish
-- More "comprehensive" solutions
+Fixing 6 plugins treats the symptom. The cure: `npx emdash validate-plugin` that fails at publish time, not fix-it-later.
 
-> "Perfect planning with zero execution is zero. Imperfect execution with one customer is infinity."
+**At 100 plugins**, you cannot manually grep for banned patterns. You need CI enforcement.
 
-Ship today. Learn tomorrow. Everything else is theater.
+---
+
+## Bottom Line
+
+This PRD is **80% mechanical regex work** disguised as "plugin fixing." The 20% that requires reasoning:
+1. Block Kit response shape (the `.map()` error)
+2. `rc.pathParams` → `rc.input` mapping logic
+3. Auth flow changes when `rc.user` is removed
+
+**Ship a lint script. Auto-fix the mechanical stuff. Focus human/AI effort on the 20% that requires reasoning.**
+
+Stop writing PRDs. Start deploying.

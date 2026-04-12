@@ -1,195 +1,169 @@
-# Finish Plugins — Build Phase Blueprint
-## Consolidated Decisions from the Great Minds Debate
+# Finish Plugins — Consolidated Decisions
+## Build Phase Blueprint
 
-**Document Status:** LOCKED FOR BUILD PHASE
-**Consolidated:** April 12, 2026
-**Zen Master:** Phil Jackson
+**Status:** LOCKED
+**Date:** April 12, 2026
+**Consolidated by:** Phil Jackson (Zen Master)
 
 ---
 
-## I. Decision Log
+## I. Decision Registry
 
 ### Decision 1: Product Naming
-| Proposed | Steve Jobs: "Belong" and "Moment" |
-|----------|-----------------------------------|
-| Counter | Elon Musk: Keep "MemberShip" and "EventDash" |
-| **Winner** | **Elon Musk** |
-| **Rationale** | SEO discoverability defeats elegance at zero users. "MemberShip EmDash plugin" returns search results. "Belong EmDash" returns self-help articles. Rebrand earned at 100+ paying customers. |
+| Proposed By | Position | Winner | Rationale |
+|-------------|----------|--------|-----------|
+| **Steve Jobs** | "Belong" and "Moment" — emotional, poetic, active | — | Elegance over utility |
+| **Elon Musk** | "MemberShip" and "EventDash" — searchable, functional | **ELON** | At zero users, SEO discoverability defeats poetry. "MemberShip EmDash plugin" returns search results. "Belong EmDash" returns self-help articles. Rebrand earned at 100 paying customers. |
 
 **LOCKED:** Names remain **MemberShip** and **EventDash**.
 
 ---
 
 ### Decision 2: Ship Sequence
-| Proposed | Steve Jobs: Ship both plugins together for coherent user journey |
-|----------|------------------------------------------------------------------|
-| Counter | Elon Musk: Ship MemberShip alone first, validate, then EventDash |
-| **Winner** | **Elon Musk** |
-| **Rationale** | Zero production deployments exist. One plugin to one customer teaches twice as much as two theoretical ones. EventDash inherits MemberShip learnings. |
+| Proposed By | Position | Winner | Rationale |
+|-------------|----------|--------|-----------|
+| **Steve Jobs** | Ship both plugins together for coherent user journey | — | Brand consistency |
+| **Elon Musk** | Ship MemberShip alone first, validate, then EventDash | **ELON** | Zero production deployments exist. One plugin to one customer teaches twice as much as two theoretical ones. Sequential shipping compresses learning cycles. |
 
-**LOCKED:** **MemberShip ships first, alone.** EventDash follows after production validation.
+**LOCKED:** **MemberShip ships first, alone.** EventDash inherits learnings.
 
 ---
 
 ### Decision 3: First-Run Experience
-| Proposed | Steve Jobs: Demo data on install (fake member "Sofia Chen" showing success) |
-|----------|-----------------------------------------------------------------------------|
-| Counter | Elon Musk: Empty state with clear CTA, no demo complexity |
-| **Winner** | **Elon Musk** |
-| **Rationale** | Demo data costs 2-3 weeks: mock generators, conditional rendering, fake avatars, cleanup flows. Empty state with "Your first member is waiting" CTA is honest and ships now. |
+| Proposed By | Position | Winner | Rationale |
+|-------------|----------|--------|-----------|
+| **Steve Jobs** | Demo data on install — fake member "Sofia Chen" showing success before configuration | — | Confidence before competence |
+| **Elon Musk** | Empty state with clear CTA — no demo complexity | **ELON** | Demo data costs 2-3 weeks: mock generators, conditional rendering, cleanup flows. Ship empty state with "Create Your First Member" CTA. Polish after revenue. |
 
-**Steve's Concession:** "Beauty can't run on broken infrastructure. Fix the plumbing, then decorate."
+**Steve's concession:** "Beauty can't run on broken infrastructure."
 
-**LOCKED:** **Empty state with clear CTA.** Demo data deferred to v1.1.
+**LOCKED:** Empty state with clear CTA. Demo data deferred to v1.1.
 
 ---
 
 ### Decision 4: Admin UI Quality
-| Proposed | Steve Jobs: Admin must be as beautiful as customer-facing UI |
-|----------|--------------------------------------------------------------|
-| Counter | None — Elon conceded completely |
-| **Winner** | **Steve Jobs** |
-| **Rationale** | Admins spend 80% of plugin time in the dashboard. For the first six months, the admin panel IS the product. The yoga instructor configuring her dashboard will never see the frontend if the backend makes her feel stupid. |
+| Proposed By | Position | Winner | Rationale |
+|-------------|----------|--------|-----------|
+| **Steve Jobs** | Admin must be as beautiful as customer-facing UI | **STEVE** | The yoga instructor configuring her dashboard IS the product for the first six months. No public-facing members exist yet. |
+| **Elon Musk** | *(Conceded completely)* | — | Admins spend 80% of plugin time in the dashboard. If the backend makes them feel stupid, they abandon before seeing the frontend. |
 
 **LOCKED:** Admin dashboard receives **equal design investment** as customer-facing UI.
 
 ---
 
 ### Decision 5: Brand Voice
-| Proposed | Steve Jobs: Terse, confident, warm. Three words where competitors use twelve. |
-|----------|-------------------------------------------------------------------------------|
-| Counter | Elon: Agreed, but apply after deployment, not before |
-| **Winner** | **Steve Jobs** (with timing concession) |
-| **Rationale** | Costs nothing to cut words. Maya Angelou validated: onboarding copy was "bloodless." Brand voice ships in v1, but 30-minute fixes only. |
+| Proposed By | Position | Winner | Rationale |
+|-------------|----------|--------|-----------|
+| **Steve Jobs** | Terse, confident, warm. Kill: "successfully," "submitted," "error occurred." Use: "Done," "Saved," "Live," "Oops." | **STEVE** | Costs nothing to cut words. |
+| **Elon Musk** | *(Conceded)* | — | Maya Angelou validated: "Feature lists read like inventory. The rhythm is a metronome — steady, predictable, numbing." |
 
-**Kill these words forever:** Successfully, submitted, confirmed, processing, unfortunately, please try again, error occurred.
-
-**Use these:** Done. Sent. Saved. Live. Oops.
-
-**Maya Angelou's adopted rewrites:**
-- One-liner: "You write what you want. We build it. Four weeks later, you're live."
-- Onboarding: "Right now, our architects are locked in a room arguing about how to make your site remarkable."
-- AdminPulse: "Your site's health, on your dashboard, before you have to ask."
+**Maya Angelou's rewrites adopted:**
+- "Email-based membership plugin..." → "Turn visitors into members. Gate your best content. Get paid."
+- "Welcome email — Sent on successful registration" → "The first hello. So members feel received, not processed."
 
 **LOCKED:** All copy follows **3-word principle** where possible.
 
 ---
 
 ### Decision 6: Permission Model
-| Proposed | Steve Jobs: Two tiers only — Free and Paid |
-|----------|-------------------------------------------|
-| Counter | None — unanimous agreement |
-| **Winner** | **Steve Jobs** |
-| **Rationale** | Both agreed. Seven permission levels means you're a corporation pretending to be a yoga studio. No Bronze/Silver/Gold. Members and non-members. Done. |
+| Proposed By | Position | Winner | Rationale |
+|-------------|----------|--------|-----------|
+| **Steve Jobs** | Two tiers only: Free and Paid. "If someone needs four tiers, they need Patreon." | **STEVE** | Both agreed. Deletes ~200 lines of tier management complexity. |
+| **Elon Musk** | *(Agreed)* | — | Seven permission levels = corporation pretending to be a yoga studio. |
 
-**LOCKED:** **Two permission tiers only.**
-
----
-
-### Decision 7: Calendar Views (EventDash)
-| Proposed | Steve Jobs: Month and List only. No week view. |
-|----------|-----------------------------------------------|
-| Counter | Elon Musk: Yoga studios with 20 classes/week may need week view. Taste without data is dangerous. |
-| **Winner** | **Unresolved** |
-| **Rationale** | Neither had evidence. Neither had spoken to a yoga instructor. Data decides, not debate. |
-
-**LOCKED:** Default to **month + list**. Week view added only if user research validates need.
+**LOCKED:** **Two permission tiers only.** Members and non-members.
 
 ---
 
-### Decision 8: Test Sites
-| Proposed | Elon Musk: One test site per plugin. Sunrise Yoga gets MemberShip. |
-|----------|-------------------------------------------------------------------|
-| Counter | None |
-| **Winner** | **Elon Musk** |
-| **Rationale** | Proving the same code works on 4 sites teaches nothing. One real deployment, one real customer. |
+### Decision 7: Test Sites
+| Proposed By | Position | Winner | Rationale |
+|-------------|----------|--------|-----------|
+| **Elon Musk** | One test site per plugin. Horizontal testing across 4 sites is waste. | **ELON** | Proving the same code works on 4 sites teaches nothing. One real deployment, one real customer. |
 
 **LOCKED:** **One test site per plugin.** MemberShip → Sunrise Yoga.
 
 ---
 
-### Decision 9: Documentation
-| Proposed | Elon Musk: Documentation is a ship blocker, not a follow-up |
-|----------|-------------------------------------------------------------|
-| Counter | None |
-| **Winner** | **Elon Musk** |
-| **Rationale** | QA declared "SHIP" while documentation was "PENDING." This contradiction is self-deception. Incomplete docs = incomplete product. |
+### Decision 8: Documentation
+| Proposed By | Position | Winner | Rationale |
+|-------------|----------|--------|-----------|
+| **Elon Musk** | Documentation is a ship blocker, not a follow-up. Cannot ship "PENDING." | **ELON** | QA found "SHIP" status while docs were "PENDING." Incomplete docs = incomplete product. |
 
-**LOCKED:** **Documentation complete before ship.**
+**LOCKED:** Documentation complete before ship. Four docs required.
 
 ---
 
-### Decision 10: Webhook Failure Handling
-| Proposed | Elon Musk: Must verify before ship — kill-test required |
-|----------|--------------------------------------------------------|
-| Counter | None |
-| **Winner** | **Elon Musk** |
-| **Rationale** | Payment succeeds in Stripe + failure in our system = customer pays, doesn't get access, rage-quits, demands refund. Support nightmare. |
+### Decision 9: Webhook Failure Handling
+| Proposed By | Position | Winner | Rationale |
+|-------------|----------|--------|-----------|
+| **Elon Musk** | Must verify before ship — kill-test required | **ELON** | Payment succeeds in Stripe + failure in our system = customer pays, doesn't get access, rage-quits, demands refund. |
 
-**LOCKED:** **Webhook failure recovery verified before ship.**
+**LOCKED:** Webhook failure recovery verified before ship.
+
+---
+
+### Decision 10: Playwright Screenshots
+| Proposed By | Position | Winner | Rationale |
+|-------------|----------|--------|-----------|
+| **Elon Musk** | Cut. Process theater. Curl + browser console sufficient. | **ELON** | Screenshot infrastructure is overhead for a plugin with zero users. |
+
+**LOCKED:** No Playwright screenshots. Manual verification for v1.
 
 ---
 
 ## II. MVP Feature Set
 
-### MemberShip v1 — SHIPS FIRST
+### MemberShip v1 — What Ships
 
-**What Ships:**
-
-| Feature | Notes |
-|---------|-------|
-| Stripe Checkout + webhooks | Core payment flow, HMAC signature verification |
+| Feature | Implementation Notes |
+|---------|---------------------|
+| Stripe Checkout + webhooks | HMAC signature verification, retry logic |
 | KV member storage | Status, plan, expiration |
 | Email confirmation (Resend) | Terse, warm copy per brand voice |
-| Admin dashboard | Beautiful, not spreadsheet-like |
-| Basic reporting | Members count + revenue sum. Nothing else. |
+| Admin dashboard | Beautiful. Equal investment to customer-facing. |
+| Basic reporting | Members and revenue only. No vanity metrics. |
 | Two permission tiers | Members vs everyone else |
-| Single-form registration | Email only. No password creation maze. |
+| Single-form registration | Email only. No password maze. |
 | JWT authentication | httpOnly cookies, 15-min access, 7-day refresh |
-| Documentation (4 docs) | Installation, Configuration, API Reference, Troubleshooting |
+| Documentation | Installation, Configuration, API Reference, Troubleshooting |
+| Admin authentication | Endpoint security verified |
+| Compassionate error messages | "We couldn't find your account" not "404: Member not found" |
 
-**What's Cut (v2 masquerading as v1):**
+### MemberShip v1 — What's Cut
 
-| Feature | Rationale | Cut By |
-|---------|-----------|--------|
-| EventDash (entire plugin) | Ship one plugin first. Learnings transfer. | Elon |
-| Group/corporate memberships | Zero customers asked | Elon |
-| Developer webhooks | Zero integrations exist | Elon |
-| Drip content scheduling | Zero content libraries exist | Elon |
-| Coupon engine | Premature optimization | Elon |
-| CSV import/export | Manual onboarding for first 50 customers | Elon |
-| Multi-tier permissions | Two tiers covers 99% | Steve |
-| Analytics dashboards | Members + revenue only. Chart.js can wait. | Steve |
-| Demo data on install | 2-3 weeks engineering for one-time experience | Elon |
-| Week calendar view | No data validating need | Steve |
-| Multi-payment gateways | Stripe is 95% of market | Elon |
+| Feature | Rationale | Deferred To |
+|---------|-----------|-------------|
+| Group/corporate memberships | Zero customers asked | v2+ |
+| Developer webhooks with HMAC | Zero integrations exist | v2 |
+| Drip content scheduling | Zero content libraries exist | v1.1 |
+| Multi-payment gateways (PayPal) | Stripe is 95% of market. PayPal stub is tech debt. | v2 |
+| Multi-step registration wizard | 90% of signups are single-form | Never |
+| Coupon engine | Premature optimization | v1.1 |
+| Content gating with rules | Ship basic gating | v2 |
+| Cohort analysis / LTV dashboards | Buffett: "Building Phase 5 before validating Phase 2" | v2 |
+| Analytics dashboards | Members and money only | v1.1 |
+| Demo data on install | Elon won. CTA sufficient. | v1.1 |
+| Week calendar view | No user research data. Default month+list. | Pending research |
 
----
-
-### EventDash v1 — SHIPS AFTER MEMBERSHIP VALIDATION
-
-**What Ships:**
+### EventDash v1 — Ships After MemberShip Validation
 
 | Feature | Notes |
 |---------|-------|
-| Event creation (single-day) | Multi-day uses "Part 1 of 3" in title |
+| Event creation (single-day) | |
 | Registration + Stripe payment | |
-| Calendar (month + list) | Week view deferred pending user research |
+| Calendar (month + list) | No week view |
 | Email confirmation | |
 | Admin dashboard | Beautiful |
-| Documentation (4 docs) | Complete |
+| Documentation | Complete |
 
-**What's Cut:**
+### Plugins Deferred (No Build This Phase)
 
-| Feature | Rationale |
-|---------|-----------|
-| Multi-day events | "Part 1 of 3" in title works |
-| Week calendar view | No data validating need |
-| CSV import/export | Manual onboarding for first 50 |
-| Event series | Build when someone pays for it |
-| Venue coordinates | Over-engineering |
-| Embeddable widgets | v2 |
-| Check-in features | Digital knows who registered |
+| Plugin | Disposition | Rationale |
+|--------|-------------|-----------|
+| ReviewPulse | Deferred | Zero evidence anyone uses review collection |
+| SEODash | Deferred | EmDash has `plugin-seo` in guide. Duplicate. |
+| CommerceKit | Cut | No customer demand |
+| FormForge | Monitor | No banned patterns. Validate after MemberShip. |
 
 ---
 
@@ -207,9 +181,9 @@ emdash-plugins/
 │   │   │   └── AdminDashboard.astro
 │   │   ├── api/
 │   │   │   ├── checkout.ts        # Stripe checkout session
-│   │   │   ├── webhook.ts         # Stripe webhook handler (HMAC verified)
+│   │   │   ├── webhook.ts         # Stripe webhook handler
 │   │   │   ├── members.ts         # CRUD operations
-│   │   │   └── reporting.ts       # Members count + revenue only
+│   │   │   └── reporting.ts       # Members + revenue only
 │   │   ├── lib/
 │   │   │   ├── stripe.ts          # Stripe client
 │   │   │   ├── email.ts           # Resend integration
@@ -217,11 +191,11 @@ emdash-plugins/
 │   │   │   └── kv.ts              # KV storage helpers
 │   │   └── styles/
 │   ├── docs/
-│   │   ├── installation.md        # REQUIRED before ship
-│   │   ├── configuration.md       # REQUIRED before ship
-│   │   ├── api-reference.md       # REQUIRED before ship
-│   │   └── troubleshooting.md     # REQUIRED before ship
-│   ├── sandbox-entry.ts           # ~4,000 lines (monolith accepted for v1)
+│   │   ├── installation.md        # REQUIRED
+│   │   ├── configuration.md       # REQUIRED
+│   │   ├── api-reference.md       # REQUIRED
+│   │   └── troubleshooting.md     # REQUIRED
+│   ├── sandbox-entry.ts           # ~4,000 lines — accept monolith for v1
 │   ├── wrangler.toml
 │   └── package.json
 │
@@ -229,7 +203,7 @@ emdash-plugins/
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── EventCard.astro
-│   │   │   ├── Calendar.astro     # Month + List only. No week view.
+│   │   │   ├── Calendar.astro     # Month + List only
 │   │   │   ├── RegistrationForm.astro
 │   │   │   └── AdminDashboard.astro
 │   │   ├── api/
@@ -243,122 +217,133 @@ emdash-plugins/
 │   │   │   └── kv.ts
 │   │   └── styles/
 │   ├── docs/
-│   │   ├── installation.md
-│   │   ├── configuration.md
-│   │   ├── api-reference.md
-│   │   └── troubleshooting.md
 │   ├── wrangler.toml
 │   └── package.json
 │
-└── shared/                         # Extraction target for v2
-    └── README.md                   # ~60% duplication accepted for v1
+└── shared/                         # ~60% duplication accepted for v1
+    └── README.md                   # Extraction target for v2
 ```
 
-**Architecture Debt Accepted for v1:**
+**Architecture Debt Accepted:**
 - 4,000-line `sandbox-entry.ts` monolith — refactor after revenue
 - ~60% code duplication between plugins — extract shared module in v2
-- 114 instances of `throw new Response` need replacement with EmDash API
+- 114 instances of `throw new Response` → must replace with EmDash API
 
 ---
 
 ## IV. Open Questions
 
-| # | Question | Owner | Blocking? | Resolution Path |
-|---|----------|-------|-----------|-----------------|
-| 1 | **Week view needed for EventDash?** | Design | **No** | User research after MemberShip ships. Default to month+list. |
-| 2 | **D1 vs KV at scale?** | Engineering | **No** | KV acceptable for <1,000 records. Migration path exists. |
-| 3 | **Shared module extraction timing?** | Engineering | **No** | Extract after both plugins validated in production. |
-| 4 | **Email queue for large events?** | Engineering | **Maybe** | Stress test 500-person event against Resend quota. |
-| 5 | **EmDash market size?** | Business | **YES** | Unknown. 100 sites? 500? Affects everything. Bundle in templates as mitigation. |
+| # | Question | Owner | Blocking? | Resolution |
+|---|----------|-------|-----------|------------|
+| 1 | Week view needed for EventDash? | Design | No | Default month+list. User research before adding. |
+| 2 | D1 vs KV at scale? | Engineering | No | KV for <1K records. Migration path exists. |
+| 3 | Shared module extraction timing? | Engineering | No | After both plugins validated. v2. |
+| 4 | Email queue for large events? | Engineering | Maybe | Stress test required. |
+| 5 | **EmDash market size?** | Business | **YES** | Unknown. Affects all economics. |
+| 6 | **Admin authentication?** | Engineering | **YES** | Security gap. Must fix before ship. |
+| 7 | **Status endpoint privacy?** | Engineering | **YES** | Exposes email→membership without auth. |
+| 8 | **Version number?** | Engineering | **YES** | Pick 1.0.0. Single source of truth. |
 
 ---
 
 ## V. Risk Register
 
-### Critical Risks — MUST FIX BEFORE SHIP
+### Critical (Ship Blockers)
 
-| Risk | Impact | Mitigation | Owner |
-|------|--------|------------|-------|
-| **Webhook failure loses payment** | Customer pays, doesn't get access, rage-quits | Kill-test before ship: kill webhook mid-transaction, verify recovery | Engineering |
-| **No production validation** | Zero learnings, all assumptions untested | Deploy to Sunrise Yoga this week, 3 real transactions | Engineering |
-| **No admin authentication** | Anyone with endpoint URL can modify members | Implement auth.ts before scaling | Engineering |
-| **Status endpoint exposes data** | `/membership/status?email=...` exposes membership without auth | Require authentication or remove email visibility | Engineering |
-| **Documentation incomplete** | Users cannot self-serve, support burden | Complete all 4 docs before ship | Documentation |
-| **Version inconsistency** | Three versions (3.0.0, 1.5.0, 1.0.0) erode trust | Unify to 1.0.0 everywhere | Engineering |
-| **114 banned API patterns** | `throw new Response` incompatible with EmDash | Mechanical find-and-replace | Engineering |
+| Risk | Likelihood | Mitigation | Owner |
+|------|------------|------------|-------|
+| **Webhook failure loses payment** | Medium | Kill-test before ship. Customer pays but doesn't get access = nightmare. | Engineering |
+| **No production validation** | High | Deploy to Sunrise Yoga this week. Three real transactions. | Engineering |
+| **No admin authentication** | High | Auth required before any scaling. | Engineering |
+| **Status endpoint exposes data** | High | Require auth or remove email visibility. | Engineering |
+| **Documentation incomplete** | Medium | All four docs complete before ship. | Docs |
+| **Version inconsistency** | High | Single source of truth: 1.0.0. | Engineering |
+| **Hallucinated API patterns** | High | 114 `throw new Response` → EmDash API. Mechanical fix. | Engineering |
 
-### Accepted Risks — MONITOR, DON'T BLOCK
+### Accepted (Monitor)
 
-| Risk | Impact | Mitigation | When to Address |
-|------|--------|------------|-----------------|
-| **KV list at 10K records** | Timeouts on `entries.query()` | D1 migration path exists | After 5,000 members |
-| **Resend rate limits** | Large events hit daily cap | Queue implementation | After stress test failure |
-| **EmDash market too small** | Distribution limited | Bundle in all EmDash templates | Platform's problem |
-| **4,000-line monolith** | Maintenance pain | Refactor | After revenue |
-| **~60% code duplication** | Change propagation burden | Extract shared module | v2 |
+| Risk | Likelihood | Impact | Notes |
+|------|------------|--------|-------|
+| KV list at 10K records | Medium | High | D1 migration path exists |
+| Resend rate limits on large events | Low | Medium | Queue implementation if needed |
+| EmDash market too small | Medium | High | Bundle in all EmDash templates |
+| 4,000-line monolith | High | Medium | Refactor after revenue |
+| ~60% code duplication | High | Medium | Extract in v2 |
 
 ---
 
-## VI. Ship Criteria — MemberShip v1 Gate
+## VI. Board Verdict Summary
 
-**ALL MUST PASS:**
+**Score:** 5.6/10 | **Verdict:** PROCEED (Conditional)
 
-- [ ] Deployed to one real EmDash site (Sunrise Yoga)
-- [ ] Three real Stripe transactions (production mode, real cards)
-- [ ] Webhook failure recovery verified (kill-test documented)
-- [ ] Admin authentication implemented and tested
-- [ ] Status endpoint secured (no unauthenticated email lookup)
-- [ ] 114 `throw new Response` patterns replaced
-- [ ] Version unified to 1.0.0 everywhere
-- [ ] Brand voice applied (terse, confident, warm)
-- [ ] Documentation complete:
-  - [ ] installation.md
-  - [ ] configuration.md
-  - [ ] api-reference.md
-  - [ ] troubleshooting.md
-- [ ] Admin dashboard is beautiful (not spreadsheet-like)
-- [ ] Error messages solve, never apologize
+| Reviewer | Score | Key Critique |
+|----------|-------|--------------|
+| **Jensen Huang** | 5/10 | "Competent commodity feature set. Zero AI leverage. No moat." |
+| **Warren Buffett** | 6/10 | "The engine exists; the fuel tank is empty. Zero production transactions." |
+| **Oprah Winfrey** | 6.5/10 | "Functional, not inspirational. Handles the transaction, doesn't honor the transformation." |
+| **Shonda Rhimes** | 5/10 | "A membership *system*, not a membership *experience*. No tomorrow hooks." |
+
+**Universal Agreement:**
+1. Technical foundation is solid
+2. No production validation exists
+3. Product lacks emotional/narrative layer
+4. Privacy concern: status endpoint exposes data without auth
+5. Version inconsistency erodes trust
 
 ---
 
 ## VII. Ship Sequence
 
 ```
-Phase 1: MemberShip v1 (THIS WEEK)
+PHASE 1: MemberShip v1 (THIS WEEK)
 ├── Fix 114 banned patterns (throw new Response → EmDash API)
-├── Implement admin authentication
+├── Secure admin endpoints
 ├── Secure status endpoint
-├── Deploy to Sunrise Yoga
-├── Execute 3 production transactions
-├── Kill-test webhook failure handling
-├── Complete all documentation
 ├── Unify version to 1.0.0
-├── Apply brand voice throughout
-└── SHIP
-
-Phase 2: Production Validation (30 DAYS)
-├── Monitor for breakage
-├── Document learnings
-├── Gather user feedback
-└── Apply critical fixes
-
-Phase 3: EventDash v1 (AFTER VALIDATION)
-├── Apply MemberShip learnings
 ├── Complete documentation
-├── Deploy to test site
+├── Deploy to Sunrise Yoga
+├── Three production transactions
+├── Verify webhook failure handling
 └── SHIP
 
-Phase 4: Retention Layer v1.1 (Shonda's Roadmap)
-├── Weekly digest email
+PHASE 2: Production Validation (30 DAYS)
+├── Monitor for what breaks
+├── Document learnings
+└── Apply fixes
+
+PHASE 3: EventDash v1 (AFTER VALIDATION)
+├── Apply learnings from MemberShip
+├── Complete documentation
+└── SHIP
+
+PHASE 4: Retention Layer (v1.1 — Shonda's Roadmap)
+├── "Aha moment" framework
+├── "New since your last visit" dashboard
+├── Episode-style drip notifications
 ├── Milestone celebrations
-├── One-click social sharing
-├── Simple progress dashboard
-└── Quick actions from dashboard
+└── Cliffhanger mechanics
 ```
 
 ---
 
-## VIII. The Essence
+## VIII. Ship Gate Checklist
+
+**ALL REQUIRED before MemberShip v1 ships:**
+
+- [ ] Deployed to one real EmDash site (Sunrise Yoga)
+- [ ] Three real Stripe transactions (production mode, real money)
+- [ ] Webhook failure recovery verified (kill-test completed)
+- [ ] Documentation complete (all four docs)
+- [ ] Admin dashboard is beautiful (equal investment to customer-facing)
+- [ ] Admin authentication exists (endpoint security verified)
+- [ ] Status endpoint secured (no public email → membership lookup)
+- [ ] Version number unified (1.0.0 everywhere)
+- [ ] Brand voice applied (terse, confident, warm)
+- [ ] Compassionate error messages throughout
+
+---
+
+## IX. The Essence
 
 **What is this product REALLY about?**
 > Making people who feel inadequate feel capable.
@@ -374,49 +359,48 @@ Phase 4: Retention Layer v1.1 (Shonda's Roadmap)
 
 ---
 
-## IX. Philosophy Summary
+## X. Philosophy Summary
 
 **Elon's Law:**
-> "Ship ugly. Listen. Improve. Repeat. Polish is earned by survival."
+> "Taste doesn't ship. Code ships."
 
 **Steve's Standard:**
 > "The metric isn't 'does it load.' The metric is: does the yoga instructor feel smarter after using it?"
 
 **Maya's Reminder:**
-> "People will forget your token counts. They will remember how you made them feel."
+> "On the other side of the screen is a human being — tired, frustrated, hoping this tool solves their problem."
 
-**The Synthesis:**
-> Speed without craft is just noise. Craft without speed is just art. We ship one thing, and we ship it right.
+**Buffett's Question:**
+> "How many active EmDash sites? Show me evidence, not assumptions."
 
----
+**Jensen's Challenge:**
+> "You've built a feature, not a flywheel. Where's the moat?"
 
-## X. Final Verdict
+**Shonda's Demand:**
+> "What makes them *need* to come back?"
 
-# PROCEED — CONDITIONAL
-
-**This Week:**
-1. Deploy MemberShip to Sunrise Yoga
-2. Complete three real Stripe transactions
-3. Verify webhook failure recovery
-4. Complete all documentation
-5. Secure all endpoints
-6. Unify version to 1.0.0
-7. Apply brand voice
-
-**What Does NOT Happen:**
-- Another planning round
-- More board reviews
-- Retention roadmaps for users that don't exist
-- Demo data implementations
-- Week view debates without data
+**Oprah's Test:**
+> "Does this make people feel empowered, not just processed?"
 
 ---
 
-> *"Planning without production is rehearsal without performance. The audience teaches things the mirror cannot."*
+## XI. Final Verdict
 
-**Build Phase Authorized. Ship MemberShip this week.**
+### PROCEED
+
+**Next Action:**
+> Ship MemberShip to one real EmDash customer. This week. Watch it break. Fix it. Then ship EventDash.
+
+**Key Learning from Retrospective:**
+> Verification reports are not verification. Only production contact with real customers reveals truth. The deliverables directory was empty while planning artifacts were polished. Planning without production is rehearsal without performance.
+
+---
+
+*"The strength of the team is each individual member. The strength of each member is the team."*
+
+— Phil Jackson
 
 ---
 
 **Document Locked:** April 12, 2026
-**Zen Master:** Phil Jackson
+**Build Phase Authorized**

@@ -1,25 +1,23 @@
-# Sara Blakely Gut-Check: Anchor
+# Sara Blakely Gut-Check: AgentBench Phase 1
 
 **Would a real customer pay for this?**
-
-Maybe. But not because of PageSpeed scores — nobody wakes up worried about Core Web Vitals. They worry their site is broken, their contact form ate a lead, or Google can't find them. "Someone's got my back" sells. Technical monitoring is what YOU care about, not them.
+No. Not yet. It's free (npm), which is right for v1. But would they *choose* it? Maybe. The "replace prayer with proof" hook is strong. Developers live in fear of AI agents breaking in production. That fear is real money. But they won't pay until they've felt the relief. First run has to nail it.
 
 **What's confusing? What would make someone bounce?**
-
-1. Basic vs Pro — the plan mentions two tiers but never says what Pro adds. If I can't tell in 5 seconds, I'm not upgrading.
-2. "Request Update" button — is that support? Website changes? Unclear = ignored.
-3. Five emails over a year is too sparse. Day 30 to Day 90 is two months of silence. They'll forget you exist.
+- "AgentBench" means nothing. It's jargon. Nobody wakes up wanting a "bench."
+- `matches_intent` requires an API key. That's friction. First-time user hits a wall unless they read everything.
+- HTTP endpoint example assumes they already have an agent running. Most don't.
+- "Evaluators" is engineer-speak. Call them "checks" or "expectations."
 
 **30-Second Elevator Pitch:**
+"You built an AI agent. It works on your laptop. You have no idea if it'll work tomorrow. AgentBench is one command that tells you: green means ship, red means fix. No dashboards, no logins, no setup. Write a YAML file with your test cases, run `npx agentbench`, get an answer."
 
-"You just launched your website. Now what? Anchor watches it so you don't have to. We'll tell you when something breaks, when performance dips, and when it's time to refresh. You run your business. We've got your back."
-
-**What would I test first with $0 budget?**
-
-Send the Week 1 email manually to 10 past clients. If nobody replies, the voice is wrong. If they reply "thanks, helpful" — you're onto something. If they reply with actual problems — now you're really onto something.
+**What would I test first with $0 marketing budget?**
+Post the YAML example in AI agent Discord servers (LangChain, AutoGPT, Claude). Say nothing else. "Here's how I test my agents." If people screenshot it and share — you're onto something. If they ask "how do I install?" — you win. Silence means the value prop isn't landing.
 
 **What's the retention hook?**
+Weak. Once tests pass, why come back? Need: (1) test file versioning showing regressions over time, (2) "last run" comparison, or (3) CI integration that makes it painful to remove. Right now it's one-and-done. Great for adoption, bad for habit.
 
-There isn't one. Anniversary email is "emotional peak" but that's 365 days away. What keeps them paying month 2, month 3? PageSpeed data? They don't care. You need a reason to OPEN those emails — something that makes them feel smart, not monitored.
+**Bottom line:** The insight is right — developers pray their agents work. The execution focuses too much on elegance (500 lines! batched LLM calls!) and not enough on the moment of relief. Ship it, but watch what happens AFTER the first run. That's where you'll learn what this actually needs to be.
 
-**Bottom line:** Bones are good. But 15 tasks for "send 5 emails and check PageSpeed" is over-engineered. Ship the emails. Prove people read them. THEN build the infrastructure.
+—Sara

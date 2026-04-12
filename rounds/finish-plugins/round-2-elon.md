@@ -1,64 +1,95 @@
 # Round 2 — Elon Musk
 
-## Where Beauty Is Blocking the Ship
+## Challenging Steve's Weakest Positions
 
-Steve, your Round 1 is poetry. It's also why we have zero customers.
+### The Naming Debate is a Distraction
 
-**"Belong" and "Moment" are naming exercises for plugins that don't exist.** You spent 500 words on why "MemberShip" lacks soul. Meanwhile, MemberShip has 4,000 lines of untested code rotting in staging. Soul doesn't matter if the body is dead.
+"Belong" and "Moment" — beautiful words, Steve. But we're fixing plugins built against a **hallucinated API**. 217 banned pattern instances. Code that literally cannot execute.
 
-**"Your first member is waiting"** — beautiful onboarding copy. For what? A `/membership/status` endpoint that leaks auth tokens? We're writing invitations to a party that will poison the guests.
+You want to debate whether we call it "MemberShip" or "Belong" while the deploy button returns a stack trace?
 
-The yoga instructor with 47 tabs open? She can't use our software at all right now. Zero tabs. Zero software. Because we haven't shipped.
+**The yoga instructor doesn't care what we call it if it doesn't load.**
 
-**Every hour spent on naming is an hour not spent on deploying.**
+Naming is a 30-minute decision after the software works. You're designing the font for a building with no foundation.
+
+### "First 30 Seconds" Requires a Working Product
+
+Your vision: "Sofia Chen — Member since today" as the first thing admins see. Delightful.
+
+Reality: The admin route returns JSON that crashes Emdash's `PluginRegistry` with a `.map()` error. They see nothing. White screen. Console errors.
+
+You're painting murals on walls we haven't built. **Ship first, then delight.**
+
+### "NO to Settings Pages with 5+ Options" — Cargo Cult Simplicity
+
+Real simplicity is making the code work correctly. Your simplicity is hiding features.
+
+You want 5 options max? Fine. But the current code has **zero options working** because `rc.user` doesn't exist, `throw new Response` crashes the handler, and `rc.pathParams` returns undefined.
+
+Constraint-based design requires a working baseline. We don't have one.
 
 ---
 
-## Why Technical Simplicity Wins
+## Defending My Positions
 
-You want disappearance. I want existence.
+### Technical Simplicity Wins Long-Term
 
-The iPhone didn't ship with emotional hooks — it shipped with a phone that worked. Then you polished. First the atoms, then the poetry.
+Steve wants to rename things. I want to ship a lint script: `npx emdash validate-plugin`.
 
-**My Round 1 cuts stand:**
-- 5,400 lines to 2,200. Not because beauty doesn't matter — because deployed ugly beats unshipped gorgeous.
-- One transaction. One customer. Then we've earned the right to debate names.
+**At 100 plugins, which scales?**
 
-**The 10x learning:** Sunrise Yoga will teach us more in 48 hours than 16 planning documents taught us in months.
+His approach: rebrand each plugin manually, craft artisanal error messages, design bespoke onboarding flows.
+
+My approach: automated validation catches banned patterns at CI time. No plugin ships broken. Ever.
+
+**Tools compound. Taste doesn't.**
+
+### Mechanical Fixes First, Polish Second
+
+The PRD is 80% regex work disguised as "plugin fixing." My position:
+
+1. `sed` the 217 banned patterns
+2. Deploy in parallel
+3. Validate Block Kit renders
+4. **Then** discuss naming and emotional hooks
+
+This isn't anti-design. It's **sequencing**. You don't upholster seats before the engine runs.
 
 ---
 
 ## Where Steve Is Right
 
-I'll concede three things:
+### Brand Voice Matters for User-Facing Copy
 
-1. **"Free/Paid only"** — Correct. Multi-tier is scope creep disguised as flexibility. Two tiers. Done.
-2. **"NO to analytics dashboards"** — Agreed. Members count. Revenue sum. Anything else is distraction.
-3. **Brand voice matters** — "Oops" > "Error 500". But we fix this in the copy pass AFTER deployment, not before.
+"Done. Saved. Live." beats "Operation completed successfully."
 
-Taste isn't wrong. Taste before traction is wrong.
+When we get to confirmation messages, success toasts, error states — I'll fight for Steve's voice. Clear, human, confident.
 
----
+### The Emotional Hook is the Product Moat
 
-## My Non-Negotiables (Locked)
+"We're selling the confidence that technology can actually serve them."
 
-### 1. Deploy MemberShip to Sunrise Yoga This Week
-Not next sprint. Not after naming review. This week. One real customer with real money or we've learned nothing.
+That's the real insight. Our users are burned by tools that made them feel stupid. When these plugins work seamlessly, that trust becomes word-of-mouth distribution.
 
-### 2. EventDash Is v2
-Ship one plugin. Learn. Transfer learnings. "Moment" can wait for momentum.
+The caveat: **working seamlessly** is the prerequisite. The emotion comes after the execution.
 
-### 3. Cut First, Polish Later
-2,200 lines ship. 5,400 lines wait. No feature survives without a paying customer requesting it.
+### Two Tiers Only
+
+Free and Paid. Delete Bronze/Silver/Gold complexity. This cuts code and decision fatigue. Steve's taste aligns with my deletion instinct here.
 
 ---
 
-## The Challenge Back
+## Locked Non-Negotiables
 
-Steve, answer this: **Would you rather have "Belong" in six months or "MemberShip" taking payments Tuesday?**
+### 1. Fix Code Before Renaming Anything
+Names are marketing. Working software is existential. MemberShip stays MemberShip until all 6 plugins deploy cleanly.
 
-Because right now, we're choosing neither. We're choosing perpetual planning. And that's the only outcome that's truly ugly.
+### 2. Ship Lint Tooling, Not Documentation
+`npx emdash validate-plugin` that fails at publish time. This prevents the next 100 plugins from repeating these mistakes. Tools scale. Taste audits don't.
 
-> "The best product is the one that exists."
+### 3. Parallel Deploy/Test, Sequential Polish
+Fix all 6 → Deploy all 6 → Test all 6 simultaneously. Then — and only then — optimize UX flows, craft onboarding, refine copy.
 
-Ship Tuesday. Rename Wednesday. Argue about souls when we have a heartbeat.
+---
+
+*Perfect is the enemy of shipped. Ship, measure, iterate.*
