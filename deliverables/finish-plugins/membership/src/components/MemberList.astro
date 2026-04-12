@@ -1,0 +1,216 @@
+---
+/**
+ * MemberList Component
+ * Version: 1.0.0
+ *
+ * Displays a paginated list of members with filtering.
+ * Used in admin dashboard.
+ */
+
+import MemberCard from './MemberCard.astro';
+
+interface Member {
+  id: string;
+  email: string;
+  name?: string;
+  status: 'active' | 'past_due' | 'canceled' | 'incomplete';
+  plan: string;
+  createdAt: string;
+  expiresAt?: string;
+}
+
+interface Props {
+  members: Member[];
+  showFilters?: boolean;
+  emptyMessage?: string;
+}
+
+const { members, showFilters = true, emptyMessage = 'No members yet' } = Astro.props;
+---
+
+<div class="member-list-container">
+  {showFilters && (
+    <div class="list-filters">
+      <div class="search-wrapper">
+        <input
+          type="search"
+          class="search-input"
+          placeholder="Search by email or name..."
+          id="member-search"
+        />
+      </div>
+      <div class="filter-wrapper">
+        <select class="status-filter" id="status-filter">
+          <option value="">All statuses</option>
+          <option value="active">Active</option>
+          <option value="past_due">Past Due</option>
+          <option value="canceled">Canceled</option>
+        </select>
+      </div>
+    </div>
+  )}
+
+  <div class="member-list" id="member-list">
+    {members.length > 0 ? (
+      members.map((member) => (
+        <MemberCard
+          id={member.id}
+          email={member.email}
+          name={member.name}
+          status={member.status}
+          plan={member.plan}
+          createdAt={member.createdAt}
+          expiresAt={member.expiresAt}
+        />
+      ))
+    ) : (
+      <div class="empty-state">
+        <p>{emptyMessage}</p>
+      </div>
+    )}
+  </div>
+
+  <div class="list-footer" id="list-footer" style="display: none;">
+    <button class="load-more-btn" id="load-more">
+      Load more
+    </button>
+  </div>
+</div>
+
+<script>
+  // Client-side filtering
+  const searchInput = document.getElementById('member-search') as HTMLInputElement;
+  const statusFilter = document.getElementById('status-filter') as HTMLSelectElement;
+  const memberList = document.getElementById('member-list');
+
+  function filterMembers() {
+    const searchTerm = searchInput?.value.toLowerCase() || '';
+    const statusValue = statusFilter?.value || '';
+    const cards = memberList?.querySelectorAll('.member-card');
+
+    cards?.forEach((card) => {
+      const cardEl = card as HTMLElement;
+      const email = cardEl.querySelector('.member-email')?.textContent?.toLowerCase() || '';
+      const name = cardEl.querySelector('.member-name')?.textContent?.toLowerCase() || '';
+      const status = cardEl.querySelector('.status-badge')?.textContent?.toLowerCase().replace(' ', '_') || '';
+
+      const matchesSearch = !searchTerm || email.includes(searchTerm) || name.includes(searchTerm);
+      const matchesStatus = !statusValue || status === statusValue;
+
+      cardEl.style.display = matchesSearch && matchesStatus ? '' : 'none';
+    });
+  }
+
+  searchInput?.addEventListener('input', filterMembers);
+  statusFilter?.addEventListener('change', filterMembers);
+</script>
+
+<style>
+  .member-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .list-filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .search-wrapper {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 8px;
+    background: var(--color-bg, white);
+    color: var(--color-text, #111827);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--color-primary, #4f46e5);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  }
+
+  .filter-wrapper {
+    flex-shrink: 0;
+  }
+
+  .status-filter {
+    padding: 0.625rem 2rem 0.625rem 1rem;
+    font-size: 0.875rem;
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 8px;
+    background: var(--color-bg, white);
+    color: var(--color-text, #111827);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+  }
+
+  .status-filter:focus {
+    outline: none;
+    border-color: var(--color-primary, #4f46e5);
+  }
+
+  .member-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .empty-state {
+    padding: 3rem;
+    text-align: center;
+    color: var(--color-muted, #6b7280);
+    background: var(--color-surface, #f9fafb);
+    border-radius: 8px;
+    border: 1px dashed var(--color-border, #e5e7eb);
+  }
+
+  .list-footer {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+  }
+
+  .load-more-btn {
+    padding: 0.625rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text, #111827);
+    background: var(--color-bg, white);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .load-more-btn:hover {
+    background: var(--color-surface, #f9fafb);
+  }
+
+  @media (max-width: 480px) {
+    .list-filters {
+      flex-direction: column;
+    }
+
+    .filter-wrapper {
+      width: 100%;
+    }
+
+    .status-filter {
+      width: 100%;
+    }
+  }
+</style>

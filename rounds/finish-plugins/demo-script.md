@@ -1,146 +1,119 @@
-# Emdash Plugins Demo Script
-## 2-Minute Product Walkthrough — Wardrobe + MemberShip
+# MemberShip Plugin Demo Script
+
+**Runtime:** 2 minutes
+**Tone:** Conversational, urgent, human
 
 ---
 
-**NARRATOR:**
-Okay. You built your site. You wrote the posts. Everything works.
+## THE PROBLEM
 
-[SCREEN: An Emdash blog. Clean. Functional. Default everything. The internet's most competent shrug.]
-
-**NARRATOR:**
-And you hate it.
-
-[SCREEN: The same site. We see it like she does now: generic, forgettable, one of ten thousand.]
+[SCREEN: A creator staring at their laptop at 2am. Coffee. Desperation.]
 
 **NARRATOR:**
-Not because it's broken. Because it looks like everyone else's. Like you ran out of opinions somewhere between "choose a font" and "pick a color." Like the person who made this doesn't have a voice.
+It's two in the morning. Sarah's been at this for six hours.
 
-[SCREEN: Her face. Reflected in the monitor. The frustration of almost.]
-
-**NARRATOR:**
-You know what comes next. You've done it before.
-
-[SCREEN: Browser tabs multiplying like rabbits. "Best Astro themes 2026." "How to customize CSS." "Why won't my fonts load." Stack Overflow. GitHub issues. A tutorial from 2019 that starts with "First, install Webpack."]
+[SCREEN: Browser tabs—Memberful, Ghost, Stripe docs, Stack Overflow]
 
 **NARRATOR:**
-Three hours. Maybe four. Wrestling with code you didn't write for a site you don't recognize anymore. And at the end? You'll probably just undo everything.
+She just wants to do one thing. One simple thing. Let her readers pay her. Subscribe to her work. That's it.
 
-[SCREEN: Code editor. Red squiggles. A terminal error that wraps onto four lines.]
-
-**NARRATOR:**
-Here's another way.
-
-[SCREEN: Cut to black. One beat. Then: a terminal. Clean. Empty. Cursor blinking like a heartbeat.]
+[SCREEN: Error message. Red text. "Webhook signature verification failed."]
 
 **NARRATOR:**
-Watch.
+But somewhere between "create a Stripe account" and "implement webhook signature verification," she lost the plot. She's not a developer. She's a writer. And she's got a newsletter to ship by morning.
 
-[SCREEN: She types: `npx wardrobe install ember`]
-
-[SCREEN: Download progress. Brief. Satisfying. Then: "✓ Installed in 2.3 seconds."]
+[SCREEN: Sarah closes the laptop. Hard.]
 
 **NARRATOR:**
-That's it. One command. Done.
-
-[SCREEN: Her site. But now—transformed. Dark navy. Burnt orange accents. Serif headlines that lean forward. Magazine energy. The same words, but now they *land*.]
-
-**NARRATOR:**
-Same posts. Same pages. Same everything. Except now it looks like her.
-
-[SCREEN: She clicks around. All her content. All there. Nothing broke.]
-
-**NARRATOR:**
-Your content doesn't move. Wardrobe just changes what people see. The clothes. Not the closet.
-
-[SCREEN: Terminal. Quick commands. The site flickers through themes:]
-- Forge: terminal green, monospace, built-for-builders dark
-- Slate: cool gray, trustworthy, "I read annual reports" professional
-- Drift: sage and air, the sound of wind through a window
-- Bloom: cream and terracotta, a coffee shop that remembers your name
-
-**NARRATOR:**
-Five themes. Five voices. Don't like one? Run the command again. Three seconds. New look.
-
-[SCREEN: She stops on Ember. Nods. This is the one.]
-
-**NARRATOR:**
-But here's what happens when your site finally looks good.
-
-[SCREEN: Analytics. A line going up. Then up again.]
-
-**NARRATOR:**
-People show up.
-
-[SCREEN: Comments. Emails. "How do I subscribe?" "Is there a paid tier?"]
-
-**NARRATOR:**
-And some of them want to pay you.
-
-[SCREEN: Cut to a different view. Same site. But now there's a gate—halfway through an article, the text fades to a prompt: "Become a member to keep reading."]
-
-**NARRATOR:**
-MemberShip.
-
-[SCREEN: Quick install—same one-command energy. "Members" appears in the sidebar.]
-
-**NARRATOR:**
-One install. Stripe connects in two clicks. No webhook configuration. No API keys. No documentation that assumes you've read other documentation first.
-
-[SCREEN: Creating a plan. Three fields: Name, Price, Cycle. That's it. She types "Full Access. $9. Monthly." Clicks Save.]
-
-**NARRATOR:**
-Membership tier. Ten seconds. The thing other plugins need forty-five minutes and a support ticket to explain.
-
-[SCREEN: Split screen. Left: a reader on his phone, scrolling her site. Right: her admin dashboard.]
-
-**NARRATOR:**
-Now watch what happens.
-
-[SCREEN: Left—reader hits the paywall. Clicks "Subscribe." Stripe checkout. Card. Submit. "Welcome."]
-
-[SCREEN: Right—her dashboard. MRR ticks from "$0" to "$9." Members: "1." She didn't have to do anything.]
-
-**NARRATOR:**
-He's in. She knows. The money moved. No one asked about webhooks.
-
-[SCREEN: Time lapse. Days pass. The numbers climb: MRR: $126. $441. $882. Members: 14. 49. 98.]
-
-**NARRATOR:**
-Weeks pass.
-
-[SCREEN: Her dashboard. MRR: "$1,247." Members: "139." A chart that only goes one direction.]
-
-**NARRATOR:**
-A hundred and thirty-nine people paying to read her words. Because she finally looks like someone worth paying.
-
-[SCREEN: Pull back. Her site on one side. Her dashboard on the other. The whole picture.]
-
-**NARRATOR:**
-One command for the design.
-One install for the business.
-
-[SCREEN: The Wardrobe CLI: `npx wardrobe install`. The MemberShip dashboard: revenue, members, all of it.]
-
-**NARRATOR:**
-This is what plugins should be. Not more work. Less. Not more decisions. Fewer. Not "powerful." *Useful*.
-
-[SCREEN: Her. Coffee. Morning light. Looking at her site like she's meeting someone she likes.]
-
-**NARRATOR:**
-Your voice. Your look. Your business.
-Finally.
-
-[SCREEN: Emdash logo. Clean. Below it: "Wardrobe + MemberShip — included."]
-
-[SCREEN: Fade to black.]
+This is the moment most creators give up. Not because they're not good enough. Because the tools aren't good enough.
 
 ---
 
-**RUNTIME:** 2:00
-**TONE:** Urgent. Human. The walk-and-talk rhythm of someone who's been there. Not selling—confiding.
-**MUSIC:** Sparse piano. Single notes. The sound of clicking into place.
+## THE WALKTHROUGH
+
+[SCREEN: EmDash dashboard. Clean. Calm. A plugin marketplace.]
+
+**NARRATOR:**
+Here's what it looks like when the tools get out of your way.
+
+[SCREEN: Searching "membership" in the plugin marketplace. One result: MemberShip.]
+
+**NARRATOR:**
+One search. One plugin. One click to install.
+
+[SCREEN: MemberShip plugin config panel. Three fields: Stripe API key, a webhook URL to copy, pricing tiers.]
+
+**NARRATOR:**
+No code. No maze. You paste your Stripe key—the one Stripe gives you, right there on their dashboard. You copy this webhook URL, drop it into Stripe. Done. That part? Ninety seconds.
+
+[SCREEN: Plan builder. "Monthly" selected, price field shows "$9", name field shows "Full Access"]
+
+**NARRATOR:**
+Now you build your plan. Pick a name. Pick a price. That's not configuration—that's just deciding what you want to charge.
+
+[SCREEN: The registration form component being dropped onto a page. Clean, minimal—just an email field and plan selector.]
+
+**NARRATOR:**
+Drag this component onto your pricing page. Look at what we're asking visitors: their email. That's it. No password. No username. No CAPTCHA. Just: *who are you, and what do you want?*
+
+[SCREEN: A simulated visitor types their email, selects "Full Access," clicks "Continue to payment"]
+
+**NARRATOR:**
+Click. Stripe Checkout opens. The visitor pays. Stripe handles all the scary stuff—the card numbers, the PCI compliance, the stuff that keeps security people up at night.
+
+[SCREEN: Stripe Checkout completing. Success screen.]
+
+**NARRATOR:**
+And then—
+
+[SCREEN: Webhook firing in real-time. Green checkmark. "Member created: sarah@example.com"]
+
+**NARRATOR:**
+—our webhook catches it. Verifies the signature. Creates the member. Sends the welcome email. All of it. Automatic.
+
+[SCREEN: Member portal. "Hey, Sarah. You're all set. Full access."]
+
+**NARRATOR:**
+Your new member lands here. Their portal. Their subscription. No support ticket. No "check your spam folder." It just... worked.
 
 ---
 
-*"The best software doesn't ask you to become a different person. It just gets out of the way."*
+## THE WOW MOMENT
+
+[SCREEN: Admin dashboard. Member list showing 3 members with green "Active" badges]
+
+**NARRATOR:**
+Fast-forward a week. You've got three paying members.
+
+[SCREEN: One member card shows "Past Due" in yellow]
+
+**NARRATOR:**
+One of them? Card declined. Happens all the time.
+
+[SCREEN: Zoom in on the member card. No panic. Just status.]
+
+**NARRATOR:**
+You didn't have to do anything. Stripe's already emailing them. The plugin already marked them "past due." When they update their card, you'll see "Active" again. You never had to write a single line of code to handle payment failures.
+
+[SCREEN: Sarah back at her laptop. Daytime now. She's writing. The laptop is open to her draft, not her dashboard.]
+
+**NARRATOR:**
+This is what we built. Not a membership platform. A membership plugin. The difference?
+
+[SCREEN: Word processor, full screen. Sarah typing.]
+
+**NARRATOR:**
+A platform asks you to move in. A plugin lets you stay home.
+
+[SCREEN: Fade to EmDash logo. Tagline: "Your site. Your members. Your rules."]
+
+**NARRATOR:**
+MemberShip. Now in the EmDash marketplace.
+
+**NARRATOR:**
+*(beat)*
+Go get paid.
+
+---
+
+**[END]**

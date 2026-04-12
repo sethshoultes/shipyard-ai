@@ -1,92 +1,82 @@
 # Steve Jobs — Chief Design & Brand Officer
-## Round 1 Positions: EmDash Plugin Suite
+## Round 1 Positions: Emdash Plugin Resurrection
 
 ---
 
 ### Product Naming
 
-**MemberShip** is a betrayal. You've taken the most human desire — *belonging* — and dressed it in corporate khakis.
+**Call the system "Pulse."**
 
-**The name is "Belong."**
+Not "Emdash Plugins." Not "Plugin Suite." *Pulse.* Because plugins are the heartbeat of every site they power. MemberShip becomes *Pulse Members*. ReviewPulse becomes *Pulse Reviews*. EventDash becomes *Pulse Events*.
 
-One word. A verb disguised as an invitation. When someone joins, they don't receive a membership card — they cross a threshold. They *belong* now. That feeling — that transformation — is what we're selling.
-
-**EventDash** sounds like analytics software. It sounds like something a project manager would put in a Jira ticket.
-
-**The name is "Moment."**
-
-Events are forgettable. Moments are forever. A yoga class isn't an event — it's a moment of stillness in chaos. A pottery workshop isn't an event — it's the moment someone touches clay and feels something shift. Name it what it creates.
+One word. One system. One unified brand. When someone asks "What powers your membership?" — "Pulse" is the answer. It beats. It's alive. It's essential.
 
 ---
 
 ### Design Philosophy
 
-The disease of modern software: complexity cosplaying as capability. Every button is a tax. Every option is cognitive debt.
+The API documentation failed these plugins. That's unforgivable. But here's the truth hiding inside this disaster:
 
-**Our philosophy is disappearance.** The best software becomes invisible — like a perfectly tuned instrument that lets the musician forget they're holding anything at all.
+**Every plugin must feel native to Emdash — not bolted on.**
 
-Design for the yoga instructor. She has 47 tabs open, a class in 20 minutes, and a student asking about parking. She doesn't have time to "learn your interface."
+Like AirPods connecting to an iPhone. No friction. No configuration theater. Just instant recognition.
 
-**Every click must earn its existence.**
+We're removing `throw new Response()` and `rc.user` not as "cleanup" — we're performing surgery to remove *tumors*. Every banned pattern was a plugin trying to be smarter than the platform. That arrogance shatters the magic.
+
+Plugins don't handle auth. Plugins don't manage responses. **The platform does that. A plugin's only job is delivering value.**
 
 ---
 
 ### User Experience — First 30 Seconds
 
-Install Belong. Open it.
+Picture this: A developer installs *Pulse Members* on Sunrise Yoga.
 
-What do you see? Not a settings panel. Not a wizard asking 17 questions about business logic. Not documentation links.
+They deploy. They open admin. They see a clean Block Kit dashboard — members, tiers, activity. No console errors. No "cannot read property of undefined." No Stack Overflow rabbit holes.
 
-You see: **"Your first member is waiting."**
+**It just works.**
 
-One button. One invitation. The entire system compressed into a single confident promise.
-
-This is the difference between tools that teach and tools that trust. We trust they'll figure it out — because we made figuring it out unnecessary.
+That's not a low bar. That *is* the bar. The moment "mostly works" enters the conversation — we've lost. Complexity is a bug, not a feature.
 
 ---
 
 ### Brand Voice
 
-We speak like a calm, confident friend who happens to know exactly what you need.
+Pulse speaks like a confident mechanic, not a corporate lawyer.
 
-**Kill these words forever:** Successfully, submitted, confirmed, processing, unfortunately, please try again.
+- "Member joined." Not "Membership instance successfully instantiated."
+- "Review flagged." Not "Review marked for administrative attention."
+- "SEO score: 73." Not "Optimization index calculated to seventy-three basis points."
 
-**Use these:** Done. Sent. Saved. Live. Oops.
-
-Every word is a toll booth. **We refuse to tax attention.**
-
-Error messages don't apologize — they solve. "We couldn't find that" not "Error 404: Resource not located."
+**Short. Declarative. Human.** Every admin message must pass this test: *Would you text this to a friend?*
 
 ---
 
 ### What to Say NO To
 
-**NO** to multiple membership tiers. Free. Paid. That's it. If you need Bronze, Silver, and Gold, you're a airline, not a yoga studio.
+**NO** to custom auth in plugins. The platform authenticates. Period.
 
-**NO** to week view in calendars. Month. List. Done. Every view is maintenance. Every option is confusion.
+**NO** to JSON.stringify/parse gymnastics. If your KV doesn't auto-serialize, it's not a wrapper — it's a burden.
 
-**NO** to settings pages with more than five options. If you need more, you failed at defaults.
+**NO** to "rewrite from scratch." This PRD says *fix*, not rebuild. Every engineer who wants to start fresh is admitting defeat. That's not engineering — that's surrender.
 
-**NO** to template editors. Ship one beautiful email. Make it perfect. Let the words do the work.
+**NO** to shipping without screenshots. If you can't prove it renders, it doesn't render.
 
-**NO** to analytics dashboards. Members. Revenue. That's it. Vanity metrics are for people avoiding real work.
+**NO** to "works in curl." Users don't use curl. They use browsers. They see console errors. They leave.
 
 ---
 
 ### The Emotional Hook
 
-Small business owners are *drowning* in software that makes them feel stupid.
+Here's why developers will *love* Pulse:
 
-Every tool has a learning curve. Every platform demands they become a part-time systems administrator. They started these businesses to teach yoga, to bake bread, to make pottery — not to debug webhook configurations.
+**It gives them their weekend back.**
 
-**Belong makes them feel like geniuses.**
+Every hour debugging broken response formats is an hour stolen from family, hobbies, sanity. Every hallucinated API that "seemed right" but crashed production? A trust violation.
 
-Install it. It works. Members join. Money arrives. They didn't watch a tutorial. They didn't read documentation. They just... won.
+When Pulse works — when EventDash admin actually renders, when MemberShip stops throwing Response objects into the void — developers feel *respected*. We're saying: "Your time matters. We tested this. We verified this. We screenshotted it working."
 
-That feeling — *I can do this* — is what they'll tell their friends about. It's what transforms software into a movement.
-
-We're not selling membership management. **We're selling the confidence that technology can finally, actually, serve them.**
+That respect? That's love. And love is the only competitive advantage that compounds.
 
 ---
 
-*Make something wonderful and put it out there.*
+**Ship it working, or don't ship it at all.**

@@ -1,0 +1,443 @@
+---
+/**
+ * MemberPortal Component
+ * Version: 1.0.0
+ *
+ * Self-service portal for members to view status and manage subscription.
+ * Brand voice: terse, warm, confident.
+ */
+
+interface Props {
+  email: string;
+  name?: string;
+  status: 'active' | 'past_due' | 'canceled' | 'incomplete';
+  plan: string;
+  memberSince: string;
+  expiresAt?: string;
+  apiEndpoint?: string;
+}
+
+const {
+  email,
+  name,
+  status,
+  plan,
+  memberSince,
+  expiresAt,
+  apiEndpoint = '/api/membership',
+} = Astro.props;
+
+const statusMessages = {
+  active: "You're all set. Full access.",
+  past_due: 'Payment issue. Please update your card.',
+  canceled: `Access until ${expiresAt ? new Date(expiresAt).toLocaleDateString() : 'end of billing period'}.`,
+  incomplete: 'Complete your signup to get access.',
+};
+
+const memberSinceFormatted = new Date(memberSince).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+});
+---
+
+<div class="portal-container">
+  <div class="portal-header">
+    <div class="member-greeting">
+      <h1 class="greeting-text">Hey{name ? `, ${name}` : ''}.</h1>
+      <p class="status-message">{statusMessages[status]}</p>
+    </div>
+    <div class="member-avatar">
+      {name ? name.charAt(0).toUpperCase() : email.charAt(0).toUpperCase()}
+    </div>
+  </div>
+
+  <div class="portal-cards">
+    <div class="portal-card">
+      <h2 class="card-title">Membership</h2>
+      <div class="card-content">
+        <div class="info-row">
+          <span class="info-label">Plan</span>
+          <span class="info-value">{plan}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Status</span>
+          <span class={`status-badge status-${status}`}>
+            {status === 'active' && 'Active'}
+            {status === 'past_due' && 'Past Due'}
+            {status === 'canceled' && 'Canceled'}
+            {status === 'incomplete' && 'Incomplete'}
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Member since</span>
+          <span class="info-value">{memberSinceFormatted}</span>
+        </div>
+        {expiresAt && status === 'canceled' && (
+          <div class="info-row">
+            <span class="info-label">Access until</span>
+            <span class="info-value">{new Date(expiresAt).toLocaleDateString()}</span>
+          </div>
+        )}
+      </div>
+    </div>
+
+    <div class="portal-card">
+      <h2 class="card-title">Account</h2>
+      <div class="card-content">
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span class="info-value">{email}</span>
+        </div>
+      </div>
+      <div class="card-actions">
+        {status === 'active' && (
+          <button
+            class="action-btn cancel-btn"
+            id="cancel-btn"
+            data-endpoint={`${apiEndpoint}/cancel`}
+          >
+            Cancel membership
+          </button>
+        )}
+        {status === 'canceled' && (
+          <a href="/membership/pricing" class="action-btn resubscribe-btn">
+            Resubscribe
+          </a>
+        )}
+        {status === 'past_due' && (
+          <a href="/membership/update-payment" class="action-btn update-btn">
+            Update payment method
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <div class="portal-footer">
+    <a href="/membership/logout" class="logout-link">Sign out</a>
+  </div>
+
+  <div class="modal-overlay" id="cancel-modal" style="display: none;">
+    <div class="modal-content">
+      <h3 class="modal-title">Cancel membership?</h3>
+      <p class="modal-text">
+        You'll keep access until the end of your billing period. You can resubscribe anytime.
+      </p>
+      <div class="modal-actions">
+        <button class="modal-btn modal-cancel" id="modal-cancel">Keep membership</button>
+        <button class="modal-btn modal-confirm" id="modal-confirm">Yes, cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const cancelBtn = document.getElementById('cancel-btn') as HTMLButtonElement;
+  const modal = document.getElementById('cancel-modal') as HTMLElement;
+  const modalCancel = document.getElementById('modal-cancel') as HTMLButtonElement;
+  const modalConfirm = document.getElementById('modal-confirm') as HTMLButtonElement;
+
+  cancelBtn?.addEventListener('click', () => {
+    modal.style.display = 'flex';
+  });
+
+  modalCancel?.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+
+  modalConfirm?.addEventListener('click', async () => {
+    modalConfirm.disabled = true;
+    modalConfirm.textContent = 'Canceling...';
+
+    const endpoint = cancelBtn.dataset.endpoint || '/api/membership/cancel';
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        window.location.reload();
+      } else {
+        alert(data.error || 'Failed to cancel. Please contact support.');
+        modal.style.display = 'none';
+        modalConfirm.disabled = false;
+        modalConfirm.textContent = 'Yes, cancel';
+      }
+    } catch {
+      alert('Something went wrong. Please try again.');
+      modal.style.display = 'none';
+      modalConfirm.disabled = false;
+      modalConfirm.textContent = 'Yes, cancel';
+    }
+  });
+</script>
+
+<style>
+  .portal-container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .portal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+  }
+
+  .greeting-text {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-text, #111827);
+    margin: 0;
+  }
+
+  .status-message {
+    font-size: 1rem;
+    color: var(--color-muted, #6b7280);
+    margin: 0.5rem 0 0;
+  }
+
+  .member-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-primary, #4f46e5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .portal-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .portal-card {
+    background: var(--color-bg, white);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  .card-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-muted, #6b7280);
+    margin: 0 0 1rem;
+  }
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .info-label {
+    font-size: 0.9375rem;
+    color: var(--color-muted, #6b7280);
+  }
+
+  .info-value {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-text, #111827);
+  }
+
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  .status-active {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .status-past_due {
+    background: #fef9c3;
+    color: #854d0e;
+  }
+
+  .status-canceled {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .status-incomplete {
+    background: #f3f4f6;
+    color: #4b5563;
+  }
+
+  .card-actions {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border, #e5e7eb);
+  }
+
+  .action-btn {
+    display: inline-block;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .cancel-btn {
+    background: transparent;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+
+  .cancel-btn:hover {
+    background: #fee2e2;
+  }
+
+  .resubscribe-btn,
+  .update-btn {
+    background: var(--color-primary, #4f46e5);
+    color: white;
+    border: none;
+  }
+
+  .resubscribe-btn:hover,
+  .update-btn:hover {
+    opacity: 0.9;
+  }
+
+  .portal-footer {
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .logout-link {
+    font-size: 0.875rem;
+    color: var(--color-muted, #6b7280);
+    text-decoration: none;
+  }
+
+  .logout-link:hover {
+    color: var(--color-text, #111827);
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background: var(--color-bg, white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    max-width: 400px;
+    width: 90%;
+  }
+
+  .modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text, #111827);
+    margin: 0 0 0.5rem;
+  }
+
+  .modal-text {
+    font-size: 0.9375rem;
+    color: var(--color-muted, #6b7280);
+    margin: 0 0 1.5rem;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+
+  .modal-btn {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .modal-cancel {
+    background: transparent;
+    color: var(--color-text, #111827);
+    border: 1px solid var(--color-border, #e5e7eb);
+  }
+
+  .modal-cancel:hover {
+    background: var(--color-surface, #f9fafb);
+  }
+
+  .modal-confirm {
+    background: #991b1b;
+    color: white;
+    border: none;
+  }
+
+  .modal-confirm:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  .modal-confirm:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 480px) {
+    .portal-header {
+      flex-direction: column-reverse;
+      gap: 1rem;
+      text-align: center;
+    }
+
+    .member-avatar {
+      margin: 0 auto;
+    }
+
+    .modal-actions {
+      flex-direction: column;
+    }
+
+    .modal-btn {
+      width: 100%;
+    }
+  }
+</style>

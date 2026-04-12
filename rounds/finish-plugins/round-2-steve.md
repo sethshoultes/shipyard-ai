@@ -4,78 +4,79 @@
 
 ## Challenging Elon's Weakest Positions
 
-### "This is 2-3 hours of work dressed up as a multi-day project."
+### "Skip Playwright — if JSON returns, it works"
 
-Elon is optimizing for *deployment velocity* when the bottleneck is *adoption velocity*.
+This is the most dangerous line in Elon's entire position. He's optimizing for *deployment speed* when we should optimize for *user trust*.
 
-Yes, `sed -i` can mechanically fix 99 patterns in 30 minutes. Congratulations. You've shipped software that technically runs. But here's what sed doesn't fix:
+JSON returning means the server didn't crash. It says nothing about:
+- Whether the admin dashboard actually renders
+- Whether Block Kit components display correctly
+- Whether the console screams with errors the user will see
 
-- The yoga instructor who opens EventDash and sees "Error: resource not located" instead of "We couldn't find that event"
-- The membership page that says "Successfully submitted" instead of "Done"
-- The onboarding flow that asks 17 questions before showing value
+**We already shipped plugins that "returned valid JSON."** They're broken. That's why we're here. Elon is proposing we repeat the exact failure mode that created this mess.
 
-**Elon wants to ship fast. I want to ship something people actually use.**
+The metric he's optimizing — time to deploy — is worthless if we're deploying broken experiences.
 
-The PRD isn't bureaucracy — it's the difference between software that builds and software that *belongs* in someone's life.
+### "One site validates the pattern. Rest is copy-paste."
 
-### "Playwright theater"
+This assumes plugins are identical. They're not. MemberShip handles auth flows. EventDash handles date/time rendering. ReviewPulse handles user-generated content. Different domains, different edge cases, different ways to fail.
 
-Calling UI verification "theater" reveals the blind spot. Elon tested routes with curl. Curl can't see:
+Testing Sunrise Yoga tells you Sunrise Yoga works. It guarantees nothing about Bella's Bistro.
 
-- Whether the Block Kit renders as intended, not just "renders"
-- Whether error states feel human or feel like stack traces
-- Whether the first 30 seconds create confidence or confusion
+### "sed -i" as Architecture
 
-**One screenshot proving Block Kit renders ≠ one screenshot proving Block Kit works.**
+`sed -i 's/throw new Response/throw new Error/g'` — this treats code like text. It is, technically. But what's left after mechanical replacement? Error messages that say "Response" when they mean "Error." Stack traces instead of human words.
 
 ---
 
 ## Defending My Positions
 
-### "Why does naming matter for internal tooling?"
+### Why "Pulse" Matters Here
 
-Elon's right that this is internal tooling *today*. But naming is infrastructure.
+Elon would call naming bikeshedding. He's understandably wrong.
 
-When developers reference "MemberShip" in PRs, docs, and Slack threads for the next three years, that name becomes the brand whether we intended it or not. The cognitive residue accumulates. **Internal tools become external assumptions.**
+These plugins were over-engineered because developers didn't understand their scope. "MemberShip" sounds like a product. "Pulse Members" sounds like a *feature of Emdash*.
 
-"Belong" and "Moment" aren't marketing — they're forcing functions. They remind every contributor what these tools are *for*.
+Naming constrains architecture. The 17K lines Elon laments? That's a naming problem as much as an engineering problem. Empire-sized names create empire-sized code.
+
+### Why Visual QA is v1, Not v2
+
+The PRD exists because the API documentation was hallucinated. Developers *thought* things worked. They had passing curl tests. They had green builds. **The plugins still broke.**
+
+Screenshots of admin dashboards actually rendering are the only proof that survives contact with reality.
 
 ---
 
 ## Honest Concessions
 
-### Elon is right: The PRD numbers are hallucinated.
+**Elon is right: 17K lines is bloat.** EventDash at 3,442 lines for event management is absurd. Over-architected against APIs that didn't exist.
 
-79 banned patterns, not 217. FormForge and CommerceKit have zero violations. I was wrong to treat them as P1 work.
+**Elon is right: A lint tool prevents this forever.** `npx emdash lint-plugin` failing on banned patterns at build time is elegant. Ship it.
 
-### Elon is right: CI linting prevents this forever.
+**Elon is right: Focus beats breadth.** MemberShip and EventDash first. FormForge and CommerceKit have zero violations — defer them.
 
-`npx emdash lint-plugin` is the only permanent fix. Everything else is whack-a-mole. Ship the lint tool.
+**Elon is right: Parallel builds.** Serial validation is inexcusable. The 10x path is correct.
 
-### Elon is right: Parallel builds.
-
-Serial validation is inexcusable. Build all 6 simultaneously. The 10x path is correct.
-
-### Elon is right: Timebox Block Kit.
-
-One hour max on the `.map()` mystery. If unresolved, ship everything else.
+**Elon is right: Timebox Block Kit.** One hour max. If unresolved, file a ticket and ship the rest.
 
 ---
 
 ## Locked: Top 3 Non-Negotiable Decisions
 
-### 1. Names are Belong and Moment.
+### 1. Visual Verification Required
 
-Not negotiable. Not for v2. Now. The cost of renaming later is exponentially higher than renaming before anyone else touches this code. One global find-replace while we're already touching every file.
+No plugin ships without a screenshot proving admin dashboard renders. Not "curl returned 200." Not "build passed." A screenshot. This is the literal lesson from this PRD's existence.
 
-### 2. First-run experience ships with the fixes.
+### 2. Console Must Be Silent
 
-"Your first member is waiting" — one sample member, one sample event, pre-loaded. Takes 30 minutes. Transforms perception from "broken software we fixed" to "polished product we're launching."
+Zero JavaScript errors in browser console on verified routes. "Works in curl" is the enemy of "works for users." If the console screams, we don't ship.
 
-### 3. Error messages use human words.
+### 3. Block Kit or Nothing
 
-Every `throw new Error` surfaces as language a yoga instructor would use. "We couldn't find that" not "Error 404." This is manual review, not sed. 30 extra minutes that determine whether anyone trusts this software.
+Admin dashboards use Emdash Block Kit components or they don't ship. No raw HTML. No custom styling. Native or nothing — that's how plugins feel platform-native.
 
 ---
 
-*The details aren't the details. They're the design.*
+**The deal:** I'll take Elon's timeline. I'll cut to 2 plugins. But those 2 plugins will have screenshots proving they render, consoles proving they don't error, and Block Kit proving they belong.
+
+*Ship it working, or don't ship it at all.*

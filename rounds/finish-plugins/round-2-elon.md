@@ -1,87 +1,72 @@
 # Round 2 — Elon Musk
 
-## Challenging Steve: Where Beauty Kills Velocity
+## Challenging Steve's Weakest Positions
 
-Steve, you spent 93 lines on poetry and zero lines on the actual problem: **79 instances of `throw new Response` that crash in production.**
+### "NO to rewrite from scratch" — This is ego, not strategy.
 
-Let's be specific:
+Steve says rewriting is "admitting defeat." No. *Rewriting is engineering.* When EventDash needs 3,442 lines for event management — something Calendly does in 800 — the code IS the problem. Patching hallucinated architecture creates technical debt that compounds forever.
 
-**"Belong" and "Moment" sound beautiful.** They also require:
-- Domain changes
-- Documentation rewrites
-- Import path refactoring
-- User communication about the rename
-- SEO redirect mapping
+The banned patterns aren't tumors to remove. They're symptoms of a bad skeleton. You can't surgery your way out of a broken foundation.
 
-That's a 2-week project *after* the plugins work. You're designing the album cover while the studio is on fire.
+### "NO to shipping without screenshots" — Process worship kills velocity.
 
-**"NO to week view"** — Have you asked a single yoga instructor? They schedule 12 classes across 7 days. Month view is a wall of colored rectangles. Week view is survival. You're imposing taste on people who need function.
+Playwright screenshots add 45+ minutes per plugin. For what? Proof that HTML rendered? If `curl` returns `{"members": [...]}` and the build passes, **it works**. Screenshots prove nothing that a 200 response doesn't already prove.
 
-**"NO to template editors"** — The "one beautiful email" you ship will say "Your membership has been renewed." What happens when they need Spanish? When they need a different tone for cancellations vs. welcomes? You've created a beautiful cage.
+Steve's "first 30 seconds" dream is beautiful. It's also blocking us from shipping at all. Perfect is the enemy of deployed.
 
-**Your philosophy is correct. Your timing is catastrophic.** You can't disappear an interface that throws runtime errors.
+### "Pulse" branding — Renaming before the thing works?
+
+We're debating what to call broken software. MemberShip doesn't need a rebrand. It needs `throw new Response` removed. Naming is a marketing exercise for v2. Right now? Ship the fix.
 
 ---
 
 ## Defending Technical Simplicity
 
-Steve asks: *"Why does it have to be ugly?"*
+### Sed wins because sed is done.
 
-It doesn't. But here's physics:
+Steve wants "surgery." I want `sed -i 's/throw new Response/throw new Error/g'`. My approach fixes 94 violations in 5 minutes. His approach turns each violation into a philosophical debate about "native feel."
 
-| Path | Time to Working | Time to Beautiful |
-|------|-----------------|-------------------|
-| Ship working, then refine | Day 1 | Week 2 |
-| Design perfect, then build | Never | Never |
+When Falcon 9 had bad welds, we didn't redesign the rocket. We fixed the welds and launched. Same principle.
 
-**The sed commands aren't beautiful. They're a forcing function.** Once plugins build cleanly:
-- We can rename them
-- We can redesign the onboarding
-- We can write "Your first member is waiting"
+### One site validates the pattern.
 
-But you cannot rename software that doesn't compile.
+Steve wants every plugin tested on its own site. Why? If MemberShip works on Sunrise Yoga, the `rc.input` pattern works everywhere. Testing 5 sites doesn't increase confidence — it increases cycle time.
 
-The PRD has 99 mechanical fixes. That's a test suite, not a design problem. Design comes after the foundation stops crumbling.
+### KV is the real bottleneck nobody's discussing.
+
+While Steve debates admin dashboard aesthetics, MemberShip probably makes 10+ KV calls per request. That's the actual scaling problem. Not console errors. Not screenshots. Cold. Hard. Latency.
 
 ---
 
 ## Where Steve Is Right
 
-I concede these:
+**Concession 1:** "Works in curl" isn't enough for admin pages. If the admin dashboard throws JS errors, site owners see it. The Block Kit responses need to actually render. I'll accept browser verification for admin routes only.
 
-1. **Error messages matter.** "Error 404: Resource not located" is a failure of empathy. When we fix the `throw new Response` patterns, we should use human language: "We couldn't find that" > `{"error": "NOT_FOUND"}`.
+**Concession 2:** Brand voice matters in error messages. "Member joined" beats "Membership instance instantiated." User-facing copy should be human. Agreed.
 
-2. **The emotional hook is real.** Small business owners *are* drowning. Once plugins work, the north star is "Install it. It works." That's a legitimate product vision.
-
-3. **Five settings max.** Constraints force clarity. When we ship the admin UI, this becomes a design requirement.
-
-**But these are v2 decisions.** Today's decision is: do plugins build? Do routes return JSON?
+**Concession 3:** The first 30 seconds do matter — eventually. Once the thing works, polish it. But we can't optimize onboarding for software that doesn't deploy.
 
 ---
 
 ## Locked Decisions (Non-Negotiable)
 
-### 1. Ship MemberShip + EventDash Today
-79 banned patterns. 1 Block Kit bug. 3 hours max. Everything else is scope creep.
+### 1. Mechanical fixes first, questions later.
+All 99 banned patterns get sed-replaced in one pass. No case-by-case review. No design committee. Grep. Sed. Done.
 
-### 2. FormForge + CommerceKit = Verified Build Only
-Zero banned patterns. Run `npm run build`. If it passes, they're done. No Playwright. No curl tests. No "wiring into example sites."
+### 2. One plugin, one site, then scale.
+MemberShip on Sunrise Yoga is the reference implementation. Everything else is copy-paste of validated patterns. Not parallel testing. Sequential proof.
 
-### 3. Naming Changes Are v2
-"Belong" and "Moment" are v2 branding decisions. Today we ship `membership` and `eventdash` because that's what's in the codebase, the imports, and the documentation. Renaming is a separate project with its own scope.
-
----
-
-## The Real Question
-
-Steve, I'm not asking you to abandon taste. I'm asking you to sequence it.
-
-**Today:** Plugins compile. Routes work. Admin renders.
-**This week:** Error messages, copy, microcopy.
-**Next week:** "Belong" rebrand, "Your first member is waiting" onboarding.
-
-Beauty built on a broken foundation is a lie. Let me fix the foundation. Then you can make it sing.
+### 3. 90-minute timebox.
+If we can't ship working plugins in 90 minutes, we've over-scoped. Block Kit mystery gets 1 hour max. After that, file a ticket, ship the rest.
 
 ---
 
-*The best product is the one that ships.*
+## The Fundamental Disagreement
+
+Steve believes shipping broken is worse than not shipping.
+
+I believe not shipping IS broken.
+
+The plugins have been broken for how long? While we debate "Pulse" branding and Playwright screenshots, developers can't use MemberShip AT ALL. A working-but-ugly plugin beats a perfect-but-imaginary one every time.
+
+**Ship today. Polish tomorrow. Brand next quarter.**

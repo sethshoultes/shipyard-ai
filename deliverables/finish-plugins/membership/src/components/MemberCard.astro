@@ -1,0 +1,227 @@
+---
+/**
+ * MemberCard Component
+ * Version: 1.0.0
+ *
+ * Displays individual member information in a card format.
+ * Used in admin dashboard for member management.
+ */
+
+interface Props {
+  id: string;
+  email: string;
+  name?: string;
+  status: 'active' | 'past_due' | 'canceled' | 'incomplete';
+  plan: string;
+  createdAt: string;
+  expiresAt?: string;
+  showActions?: boolean;
+}
+
+const { id, email, name, status, plan, createdAt, expiresAt, showActions = true } = Astro.props;
+
+const statusColors = {
+  active: { bg: '#dcfce7', text: '#166534', label: 'Active' },
+  past_due: { bg: '#fef9c3', text: '#854d0e', label: 'Past Due' },
+  canceled: { bg: '#fee2e2', text: '#991b1b', label: 'Canceled' },
+  incomplete: { bg: '#f3f4f6', text: '#4b5563', label: 'Incomplete' },
+};
+
+const statusStyle = statusColors[status];
+const memberSince = new Date(createdAt).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+});
+---
+
+<div class="member-card" data-member-id={id}>
+  <div class="member-info">
+    <div class="member-avatar">
+      {name ? name.charAt(0).toUpperCase() : email.charAt(0).toUpperCase()}
+    </div>
+    <div class="member-details">
+      <h3 class="member-name">{name || email}</h3>
+      {name && <p class="member-email">{email}</p>}
+      <div class="member-meta">
+        <span class="member-plan">{plan}</span>
+        <span class="member-divider">·</span>
+        <span class="member-since">Since {memberSince}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="member-status">
+    <span
+      class="status-badge"
+      style={`background: ${statusStyle.bg}; color: ${statusStyle.text}`}
+    >
+      {statusStyle.label}
+    </span>
+    {expiresAt && status === 'canceled' && (
+      <span class="expires-note">
+        Access until {new Date(expiresAt).toLocaleDateString()}
+      </span>
+    )}
+  </div>
+
+  {showActions && (
+    <div class="member-actions">
+      <button class="action-btn view-btn" data-action="view" data-member-id={id}>
+        View
+      </button>
+      <button class="action-btn edit-btn" data-action="edit" data-member-id={id}>
+        Edit
+      </button>
+    </div>
+  )}
+</div>
+
+<style>
+  .member-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--color-surface, #f9fafb);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: 8px;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .member-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .member-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .member-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-primary, #4f46e5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .member-details {
+    min-width: 0;
+  }
+
+  .member-name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-text, #111827);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .member-email {
+    font-size: 0.8125rem;
+    color: var(--color-muted, #6b7280);
+    margin: 0.125rem 0 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .member-meta {
+    font-size: 0.75rem;
+    color: var(--color-muted, #6b7280);
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .member-divider {
+    opacity: 0.5;
+  }
+
+  .member-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+    flex-shrink: 0;
+  }
+
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .expires-note {
+    font-size: 0.6875rem;
+    color: var(--color-muted, #6b7280);
+  }
+
+  .member-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .action-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .view-btn {
+    background: transparent;
+    color: var(--color-text, #111827);
+    border: 1px solid var(--color-border, #e5e7eb);
+  }
+
+  .view-btn:hover {
+    background: var(--color-surface, #f9fafb);
+  }
+
+  .edit-btn {
+    background: var(--color-primary, #4f46e5);
+    color: white;
+  }
+
+  .edit-btn:hover {
+    opacity: 0.9;
+  }
+
+  @media (max-width: 640px) {
+    .member-card {
+      flex-wrap: wrap;
+    }
+
+    .member-status {
+      align-items: flex-start;
+    }
+
+    .member-actions {
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
+    .action-btn {
+      flex: 1;
+    }
+  }
+</style>

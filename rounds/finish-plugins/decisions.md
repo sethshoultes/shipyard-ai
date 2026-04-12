@@ -9,130 +9,29 @@
 
 ## I. Decision Registry
 
-### Decision 1: Product Naming
-| Proposed By | Position | Winner | Rationale |
-|-------------|----------|--------|-----------|
-| **Steve Jobs** | "Belong" and "Moment" — emotional, poetic, active | — | Names should evoke transformation, not transaction |
-| **Elon Musk** | "MemberShip" and "EventDash" — searchable, functional | **WINNER** | At zero users, SEO discoverability defeats poetry. "MemberShip EmDash plugin" returns search results. "Belong EmDash" returns self-help articles. Rebrand earned at 100 paying customers. |
+| # | Decision | Steve's Position | Elon's Position | Winner | Rationale |
+|---|----------|-----------------|-----------------|--------|-----------|
+| 1 | **Product Naming** | "Pulse" branding — emotional, unified | Keep "MemberShip" / "EventDash" — searchable | **Elon** | Zero users = SEO defeats poetry. Rebrand at 100 customers. |
+| 2 | **Ship Sequence** | Both plugins together | MemberShip alone first | **Elon** | One plugin, one customer teaches twice as much. Sequential reduces blast radius. |
+| 3 | **First-Run Experience** | Demo data ("Sofia Chen") | Empty state + clear CTA | **Elon** | Demo data = 2-3 weeks. Steve conceded: "Beauty can't run on broken infrastructure." |
+| 4 | **Admin UI Quality** | Beautiful as customer-facing | — | **Steve** | Admin IS the product for 6 months. Elon conceded completely. |
+| 5 | **Brand Voice** | Terse, warm. "Done." not "Successfully completed." | — | **Steve** | Maya validated. Every word is a toll booth. |
+| 6 | **Permission Model** | Two tiers only | — | **Steve** | "Four tiers = Patreon." Deletes ~200 lines. Both agreed. |
+| 7 | **Test Sites** | — | One site per plugin | **Elon** | MemberShip → Sunrise Yoga only. |
+| 8 | **Documentation** | — | Ship blocker, not follow-up | **Elon** | Four docs required before ship. |
+| 9 | **Webhook Failure** | — | Kill-test required | **Elon** | Payment + failure = customer rage-quits. |
+| 10 | **Visual Testing** | Screenshots required | Cut Playwright | **Compromise** | Skip automation. Manual browser + silent console. |
+| 11 | **Fixing Approach** | Review every error for voice | Mechanical sed first | **Both** | Fix mechanically → review for voice → ship. |
+| 12 | **Retention Layer** | — | v2 (Shonda/Oprah disagreed) | **Deferred** | v1.1 priority. Ship working software first. |
 
-**LOCKED:** Names remain **MemberShip** and **EventDash**.
+### Copy Rewrites (Maya Angelou Approved)
 
----
-
-### Decision 2: Ship Sequence
-| Proposed By | Position | Winner | Rationale |
-|-------------|----------|--------|-----------|
-| **Steve Jobs** | Ship both plugins together for coherent user journey | — | Brand consistency matters |
-| **Elon Musk** | Ship MemberShip alone first, validate, then EventDash | **WINNER** | Zero production deployments exist. One plugin to one customer teaches twice as much as two theoretical ones. Sequential shipping compresses learning cycles and reduces blast radius. |
-
-**LOCKED:** **MemberShip ships first, alone.** EventDash inherits learnings.
-
----
-
-### Decision 3: First-Run Experience
-| Proposed By | Position | Winner | Rationale |
-|-------------|----------|--------|-----------|
-| **Steve Jobs** | Demo data on install — fake member "Sofia Chen" showing success before configuration | — | Confidence before competence |
-| **Elon Musk** | Empty state with clear CTA — no demo complexity | **WINNER** | Demo data costs 2-3 weeks: mock generators, conditional rendering, cleanup flows. Ship empty state with "Create Your First Member" CTA. Polish after revenue. |
-
-**Steve's concession:** "Beauty can't run on broken infrastructure."
-
-**LOCKED:** Empty state with clear CTA. Demo data deferred to v1.1.
-
----
-
-### Decision 4: Admin UI Quality
-| Proposed By | Position | Winner | Rationale |
-|-------------|----------|--------|-----------|
-| **Steve Jobs** | Admin must be as beautiful as customer-facing UI | **WINNER** | The yoga instructor configuring her dashboard IS the product for the first six months. No public-facing members exist yet. |
-| **Elon Musk** | *(Conceded completely)* | — | Admins spend 80% of plugin time in the dashboard. If the backend makes them feel stupid, they abandon before seeing the frontend. |
-
-**LOCKED:** Admin dashboard receives **equal design investment** as customer-facing UI.
-
----
-
-### Decision 5: Brand Voice
-| Proposed By | Position | Winner | Rationale |
-|-------------|----------|--------|-----------|
-| **Steve Jobs** | Terse, confident, warm. Kill: "successfully," "submitted," "error occurred." Use: "Done," "Saved," "Live," "Oops." | **WINNER** | Costs nothing to cut words. Every word is a toll booth. |
-| **Elon Musk** | *(Conceded)* | — | Maya Angelou validated: "Feature lists read like inventory. The rhythm is a metronome — steady, predictable, numbing." |
-
-**Maya Angelou's rewrites adopted:**
-- "Email-based membership plugin..." → "Turn visitors into members. Gate your best content. Get paid."
-- "We couldn't find your account" → not "404: Member not found"
-- "Welcome email — Sent on successful registration" → "The first hello. So members feel received, not processed."
-
-**LOCKED:** All copy follows **3-word principle** where possible.
-
----
-
-### Decision 6: Permission Model
-| Proposed By | Position | Winner | Rationale |
-|-------------|----------|--------|-----------|
-| **Steve Jobs** | Two tiers only: Free and Paid | **WINNER** | "If someone needs four tiers, they need Patreon." |
-| **Elon Musk** | *(Agreed)* | — | Seven permission levels = corporation pretending to be a yoga studio. Deletes ~200 lines of tier management complexity. |
-
-**LOCKED:** **Two permission tiers only.** Members and non-members.
-
----
-
-### Decision 7: Test Sites
-| Proposed By | Position | Winner | Rationale |
-|-------------|----------|--------|-----------|
-| **Elon Musk** | One test site per plugin validates the pattern. Horizontal testing across 4 sites is waste. | **WINNER** | One real deployment, one real customer teaches twice as much as four theoretical ones. |
-
-**LOCKED:** **One test site per plugin.** MemberShip → Sunrise Yoga.
-
----
-
-### Decision 8: Documentation Status
-| Proposed By | Position | Winner | Rationale |
-|-------------|----------|--------|-----------|
-| **Elon Musk** | Documentation is a ship blocker, not a follow-up | **WINNER** | Cannot ship "PENDING" status. Incomplete docs = incomplete product. |
-
-**LOCKED:** Documentation complete before ship. Four docs required.
-
----
-
-### Decision 9: Webhook Failure Handling
-| Proposed By | Position | Winner | Rationale |
-|-------------|----------|--------|-----------|
-| **Elon Musk** | Must verify before ship — kill-test required | **WINNER** | Payment succeeds in Stripe + failure in our system = customer pays, doesn't get access, rage-quits, demands refund. Nightmare scenario. |
-
-**LOCKED:** Webhook failure recovery verified before ship.
-
----
-
-### Decision 10: Testing Approach
-| Proposed By | Position | Winner | Rationale |
-|-------------|----------|--------|-----------|
-| **Elon Musk** | Cut Playwright. Curl + browser console sufficient for v1. | **WINNER** | Screenshot infrastructure is overhead for a plugin with zero users. |
-
-**LOCKED:** No Playwright screenshots. Manual verification for v1.
-
----
-
-### Decision 11: Fixing Cadence
-| Position | Advocate | Resolution |
-|----------|----------|------------|
-| Mechanical fixes first (sed/regex), polish second | Elon Musk | ✓ |
-| Every error message must be reviewed for voice | Steve Jobs | ✓ |
-
-**Resolution:** Both are right at different stages. Fix mechanically → review for voice → ship. Error messages speak like we speak.
-
-**LOCKED:** Fix fast, polish before ship.
-
----
-
-### Decision 12: Retention Layer
-| Position | Advocate | Resolution |
-|----------|----------|------------|
-| Product lacks emotional layer, needs "tomorrow hooks" | Shonda Rhimes, Oprah Winfrey | ✓ Validated |
-| Retention features are v2 | Elon Musk | ✓ Accepted |
-
-**Resolution:** Retention layer (Shonda's Roadmap) becomes v1.1 priority. Ship working software first.
-
-**LOCKED:** Retention features begin within 30 days of v1 ship.
+| Before | After |
+|--------|-------|
+| "Email-based membership plugin with full Stripe integration..." | "Turn visitors into members. Gate your best content. Get paid." |
+| "404: Member not found" | "We couldn't find your account" |
+| "Welcome email — Sent on successful registration" | "The first hello. So members feel received, not processed." |
+| "Error occurred during payment processing" | "The payment didn't go through. It happens. Here's what to do next." |
 
 ---
 
@@ -259,16 +158,23 @@ emdash-plugins/
 
 ## IV. Open Questions
 
-| # | Question | Owner | Blocking? | Status |
-|---|----------|-------|-----------|--------|
-| 1 | Week view needed for EventDash? | Design | No | Default month+list. User research before adding. |
-| 2 | D1 vs KV at scale? | Engineering | No | KV for <1K records. Migration path exists. |
-| 3 | Shared module extraction timing? | Engineering | No | After both plugins validated. v2. |
-| 4 | Email queue for large events? | Engineering | Maybe | Stress test required. |
-| 5 | **EmDash market size?** | Business | **YES** | Warren Buffett: "Show me evidence, not assumptions." Unknown. Affects all economics. |
-| 6 | **Admin authentication?** | Engineering | **YES** | Security gap. Must fix before ship. |
-| 7 | **Status endpoint privacy?** | Engineering | **YES** | Oprah flagged: exposes email→membership without auth. Privacy concern. |
-| 8 | **Version number inconsistency?** | Engineering | **YES** | Oprah flagged: README says 3.0.0, API Reference says 1.5.0, Installation says 1.0.0. Pick one. |
+### Blocking (Must Resolve Before Ship)
+
+| # | Question | Owner | Raised By | Resolution Path |
+|---|----------|-------|-----------|-----------------|
+| 1 | **Admin authentication architecture?** | Engineering | Board Review | Implement auth middleware. Verify all admin endpoints secured. |
+| 2 | **Status endpoint privacy?** | Engineering | Oprah | `/membership/status?email=...` exposes membership without auth. Require token or remove. |
+| 3 | **Version number inconsistency?** | Engineering | Oprah | README: 3.0.0, API: 1.5.0, Install: 1.0.0. **Lock to 1.0.0 everywhere.** |
+| 4 | **EmDash market size?** | Business | Buffett | "Show me evidence, not assumptions." **Unanswered. Affects all economics.** |
+
+### Non-Blocking (Monitor or Defer)
+
+| # | Question | Owner | Status |
+|---|----------|-------|--------|
+| 5 | Week view for EventDash? | Design | Default month+list. User research before adding. |
+| 6 | D1 vs KV at scale? | Engineering | KV for <1K records. Migration path exists. |
+| 7 | Shared module extraction? | Engineering | After both plugins validated. v2. |
+| 8 | Email queue for large events? | Engineering | Stress test required. |
 
 ---
 
@@ -321,7 +227,7 @@ emdash-plugins/
 | **Jensen Huang** | 5/10 | "Competent commodity feature set. Zero AI leverage. No compounding moat. You built plumbing when you could have built a member intelligence layer." |
 | **Warren Buffett** | 6/10 | "The engine exists; the fuel tank is empty. We built the Berkshire annual report before holding the annual meeting. Zero production transactions." |
 | **Oprah Winfrey** | 6.5/10 | "Functional, not inspirational. Handles the transaction, doesn't honor the transformation. The technical foundation is here. What's missing is the soul." |
-| **Shonda Rhimes** | 5/10 | "A membership *system*, not a membership *experience*. Exceptional plumbing, missing the pulse. This product ends every interaction with a period, never a question mark." |
+| **Shonda Rhimes** | 5/10 (MemberShip) / 7/10 (Wardrobe) | "A membership *system*, not a membership *experience*. Every interaction ends with a period, never a question mark. But Wardrobe proves the team *can* tell a satisfying story." |
 
 **Universal Agreement:**
 1. Technical foundation is solid — but untested
@@ -392,6 +298,7 @@ PHASE 4: Retention Layer v1.1 (SHONDA'S ROADMAP)
 - [ ] Admin dashboard is beautiful (equal investment to customer-facing)
 - [ ] Brand voice applied (terse, confident, warm)
 - [ ] Compassionate error messages throughout
+- [ ] Console silent on all admin routes (manual browser verification)
 
 ### Post-Ship Commitments
 - [ ] v1.1 Retention Roadmap begins within 30 days

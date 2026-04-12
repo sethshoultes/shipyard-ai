@@ -1,117 +1,129 @@
-# Round 1 — Elon Musk (Chief Product & Growth)
+# Round 1 — Elon Musk (Chief Product & Growth Officer)
 
-## The Brutal Truth
+## Architecture: What's the Simplest System That Could Work?
 
-PRD says 6 plugins with hundreds of banned patterns. I ran the grep. Reality:
-- `throw new Response`: **79 total** (only in membership + eventdash)
-- `rc.user`: **15 total** (only in membership + eventdash)
-- `rc.pathParams`: **5 total** (only in eventdash)
+The PRD claims 6 plugins need fixing. I ran the actual numbers:
+- **Total lines:** 16,979 across all plugins
+- **Banned patterns found:** 99 violations (79 `throw new Response`, 15 `rc.user`, 5 `rc.pathParams`)
 
-The PRD numbers are **hallucinated or stale**. Total banned patterns: ~99. Not 217.
-
-FormForge and CommerceKit? **Zero banned patterns.** Why are they in this PRD at all?
-
----
-
-## Architecture: First Principles
-
-**Simplest system that works:**
+The simplest fix is mechanical find-replace:
 ```bash
-sed -i 's/throw new Response/throw new Error/g' plugins/membership/src/*.ts
-sed -i 's/rc\.user//g' plugins/membership/src/*.ts
+sed -i 's/throw new Response/throw new Error/g' plugins/*/src/*.ts
+sed -i '/rc\.user/d' plugins/*/src/*.ts
 ```
-Run build. Fix the 5 edge cases that break. Deploy. Done.
 
-**What the PRD demands instead:**
-- Read EMDASH-GUIDE.md (1,754 lines)
-- Read BANNED-PATTERNS.md (doesn't exist — grep returns nothing)
-- Read eventdash as "working reference" (3,442 lines)
-- Curl every route, screenshot every page, check browser console
+That handles 94 of 99 violations. The remaining 5 `rc.pathParams` need manual `rc.input` rewrites.
 
-That's 5,000+ lines of documentation reading for 99 find-replace operations.
+**But here's the real question:** Why do we have 17K lines of plugin code?
 
----
+EventDash (the "working reference") is 3,442 lines. For event management. That's WordPress-level bloat. A clean implementation is 300-500 lines. These plugins were over-engineered against hallucinated APIs — the architecture itself is the problem.
 
-## Performance: Bottlenecks & 10x Path
-
-**Current bottleneck:** Serial validation. Each plugin needs build → deploy → curl → Playwright. At 10 min/plugin × 6 = 60 minutes of pure waiting.
-
-**10x path:**
-1. Fix all code in one pass (30 min)
-2. Build all 6 in parallel (`npm run build &` × 6) — 2 min
-3. Deploy all 6 in parallel — 5 min
-4. Curl all routes in a single bash script — 2 min
-5. Playwright only on P0s (membership, eventdash) — 10 min
-
-Total: **50 minutes**, not 3+ hours.
+**Verdict:** Fix the 99 violations mechanically. Don't polish. These plugins need eventual rewrites, not extensive QA.
 
 ---
 
-## Distribution: 10,000 Users Without Paid Ads
+## Performance: Where Are the Bottlenecks? What's the 10x Path?
 
-**Wrong question.** This is internal tooling, not a product.
+**Current bottleneck:** Serial validation theater.
 
-The right question: **How do we prevent hallucinated APIs from shipping again?**
+PRD demands: build → deploy → curl → Playwright screenshots → console check, for EACH plugin. That's ~15 min × 6 = 90 minutes of pure waiting.
 
-Answer: `npx emdash lint-plugin` that fails CI if it finds banned patterns. Ship that tool and you never write this PRD again.
+**The 10x path:**
+1. Fix all violations in one sed pass (5 min)
+2. Parallel build all 6 plugins (2 min with `&`)
+3. Parallel deploy (5 min)
+4. Single bash script curls all routes (2 min)
+5. Skip Playwright — if JSON returns, it works
 
----
+**Total: 15 minutes**, not 90+.
 
-## What to CUT
-
-| CUT NOW | REASON |
-|---------|--------|
-| **FormForge (P2)** | Zero banned patterns. Verify build only. |
-| **CommerceKit (P2)** | Zero banned patterns. No test site assigned. Defer. |
-| **Playwright for every plugin** | One screenshot proving Block Kit renders = done |
-| **"Wire into example sites"** | One site validates the pattern. The rest is copy-paste. |
-| **BANNED-PATTERNS.md** | File doesn't exist. Remove from PRD or create it. |
-
-**Keep:**
-- MemberShip (actual banned patterns)
-- EventDash admin Block Kit mystery (actual bug)
-- ReviewPulse/SEODash (small, batch-apply fixes from MemberShip)
+**Actual performance concern nobody mentions:** KV operations. MemberShip at 3,600 lines probably makes 10+ KV calls per request. That's the real scaling bottleneck, not banned patterns.
 
 ---
 
-## Technical Feasibility: One Agent Session?
+## Distribution: How Does This Reach 10,000 Users?
 
-**Yes, easily.**
+**This PRD has zero distribution angle.** It's tech debt remediation.
 
-12,288 total lines, but:
-- 99 mechanical replacements (sed/regex)
-- 1 Block Kit format investigation (read Emdash source)
-- 4 build/deploy cycles
+Plugins don't acquire users. Products do. The real question: What can we BUILD with working plugins that attracts 10K users?
 
-**Risk:** EventDash Block Kit debugging. PRD says "PluginRegistry fails with `.map()` error." That's a response shape mismatch. Could be 30 minutes or 3 hours depending on how documented the Block Kit spec is.
+Options:
+- **MemberShip** → Gated newsletter platform (compete with Substack)
+- **EventDash** → Local event aggregator (compete with Meetup)
+- **ReviewPulse** → SMB review management (compete with Yelp Business)
 
-**Mitigation:** Timebox Block Kit to 1 hour. If unresolved, ship everything else and file separate ticket.
+But we're testing on Sunrise Yoga and Bella's Bistro — demo sites with zero users.
+
+**Distribution strategy that works:**
+1. Pick ONE plugin (MemberShip)
+2. Build ONE product around it (paid newsletter toolkit)
+3. Launch on Product Hunt, write "How I Built X" posts
+4. The plugin is the means, not the end
+
+Fixing 6 plugins doesn't move distribution needle. Shipping ONE product does.
 
 ---
 
-## Scaling: What Breaks at 100x?
+## What to CUT: Scope Creep Masquerading as v1
 
-| At 100x... | What breaks | Fix |
-|------------|-------------|-----|
-| 100x events in EventDash | KV list queries timeout | Paginate with cursors |
-| 100x members in MemberShip | Same KV issue | Same fix |
-| 100 plugins total | Manual grep for banned patterns | CI lint tool |
-| 100 concurrent admins | Nothing — Block Kit is stateless | N/A |
+| CUT | REASON |
+|-----|--------|
+| **FormForge** | Zero banned patterns. Build-verify only. |
+| **CommerceKit** | Zero patterns, no test site assigned. Ghost feature. |
+| **Playwright screenshots** | JSON response = works. Visual QA is v2. |
+| **"Check browser console"** | If curl passes, you ship. Polish later. |
+| **5 different test sites** | ONE site validates the pattern. Rest is copy-paste. |
 
-**Systemic risk:** Plugins were built against hallucinated APIs because there was no validation at build time. Without `npx emdash lint-plugin`, you'll repeat this cycle for every new plugin.
+**Keep in v1:**
+- MemberShip (highest banned pattern count, P0)
+- EventDash Block Kit fix (actual unsolved bug)
+- ReviewPulse/SEODash (batch-apply MemberShip fixes)
+
+---
+
+## Technical Feasibility: Can One Agent Session Build This?
+
+**The full PRD? No.** Too many serial dependencies and validation steps.
+
+**A scoped version? Yes.**
+
+One session can:
+1. sed all 99 violations (5 min)
+2. Build MemberShip + EventDash (5 min)
+3. Deploy to one test site (5 min)
+4. Curl-validate happy paths (5 min)
+5. Debug EventDash Block Kit response shape (1 hour max)
+
+**Timebox:** 90 minutes total. If Block Kit mystery exceeds 1 hour, file separate ticket and ship the rest.
+
+**The trap:** PRD wants comprehensive QA across 6 plugins and 5 sites. That's 3+ sessions of context switching. One plugin, one site, ship it.
+
+---
+
+## Scaling: What Breaks at 100x Usage?
+
+| At 100x | What Breaks | Mitigation |
+|---------|-------------|------------|
+| 100x members | KV list queries timeout | Cursor pagination, not `.list()` |
+| 100x events | Same KV issue | Same fix |
+| 100x concurrent writes | D1 10ms write latency = 10s queues | Cloudflare Queues for async writes |
+| 100x plugins | Manual banned-pattern checking | Build-time lint tool (`npx emdash lint-plugin`) |
+
+**Systemic risk:** Plugins were built against hallucinated APIs because there's no build-time validation. Without CI that fails on banned patterns, you'll rewrite this PRD for every new plugin.
+
+**100x fix that matters:** Add grep check to CI pipeline. Costs 10 minutes. Prevents future PRDs like this.
 
 ---
 
 ## Bottom Line
 
-**This is 2-3 hours of work dressed up as a multi-day project.**
+**This is 90 minutes of work stretched into a multi-day project.**
 
-1. sed the banned patterns (30 min)
-2. Build all 6 in parallel (5 min)
-3. Debug the 3 edge cases that break (30 min)
-4. Deploy and curl-test P0s (30 min)
-5. Fix Block Kit shape for EventDash (1 hour max)
+The PRD's success criteria is process theater. The REAL success criteria:
+1. ✅ `npm run build` passes
+2. ✅ Routes return valid JSON
+3. ✅ Admin pages render (even if ugly)
 
-Cut FormForge/CommerceKit from scope. Cut Playwright theater. Ship by EOD.
+Everything else — Playwright, browser console, multi-site testing — is v2 polish.
 
-**The PRD's success criteria is bureaucracy. The real success criteria: plugins build, routes return JSON, admin pages render. Everything else is v2.**
+**My call:** Ship MemberShip and EventDash today. Defer the rest. Build the lint tool so we never write this PRD again.
