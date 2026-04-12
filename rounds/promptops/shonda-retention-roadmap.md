@@ -1,319 +1,345 @@
-<<<<<<< HEAD
 # Shonda Retention Roadmap: PromptOps v1.1
 
 **Author:** Based on Shonda Rhimes' Board Review
 **Focus:** What keeps users coming back
-**Version:** 1.1 Feature Planning
+**Version:** 1.1 Feature Roadmap
 
 ---
 
-## The Core Problem
+## The Retention Problem
 
-> "The retention model is implicit: 'You'll come back when you need to change a prompt.' That's not retention. That's hoping the user remembers you exist."
+> "A tool people use when they need it is not the same as a product people love."
+> — Shonda Rhimes
 
-Current state: Users interact with PromptOps episodically (deploy, forget, maybe return). No daily habit. No emotional investment. No story arc.
+**Current State:** Users interact with PromptOps only during deployment (`push`) or crisis (`rollback`). Between those moments: silence. No notifications. No digests. No reason to return.
 
----
-
-## Retention Philosophy
-
-Every great show makes you feel something: **Relief. Triumph. Anticipation. Belonging.**
-
-PromptOps currently makes you feel: "I guess I typed a command correctly."
-
-**Goal:** Transform PromptOps from a tool into a story users want to follow.
+**The Goal:** Transform PromptOps from "fire extinguisher" (use in emergency) to "fitness tracker" (check daily, feel progress).
 
 ---
 
-## v1.1 Retention Features
+## What Keeps Users Coming Back
 
-### 1. The Morning Check-In (Daily Touchpoint)
+### The Retention Hierarchy
 
-**What:** Daily digest delivered via email/Slack/dashboard
-
-**Content:**
 ```
-Good morning! Your prompts handled 2,340 requests yesterday.
-
-- system-prompt v5: 1,890 requests, avg latency 1.2s
-- error-handler v3: 450 requests, avg latency 0.8s
-
-No anomalies detected. Your AI is stable.
+Level 5: Community    → "Others are watching what I do"
+Level 4: Achievement  → "I've accomplished something"
+Level 3: Anticipation → "Something is happening soon"
+Level 2: Awareness    → "Something happened while I was away"
+Level 1: Utility      → "I need to fix something now"
 ```
 
-**Why It Retains:**
-- Creates a daily habit loop
-- Users check in even when nothing's wrong
-- Builds confidence and emotional connection
+**Current coverage:** Level 1 only (utility during crisis)
 
-**Implementation Notes:**
-- Requires proxy instrumentation (logging all requests)
-- Email/webhook integration for delivery
-- Dashboard view for on-demand access
+**v1.1 Target:** Levels 1-4
 
 ---
 
-### 2. The Alert Hook (Curiosity Driver)
+## v1.1 Feature Roadmap
 
-**What:** Proactive notifications when something interesting happens
+### Feature 1: Morning Digest Email
 
-**Examples:**
+**Retention Level:** 2 (Awareness)
+**Priority:** P0 - Ship First
+**Effort:** 2-3 days
+
+**What it does:**
+Daily email at 8 AM local time summarizing:
+- Total requests handled yesterday
+- Top-performing prompts by volume
+- Any anomalies detected
+- Version history (new pushes, rollbacks)
+
+**Example:**
 ```
-"system-prompt v5 is generating 23% longer responses than v4. Worth investigating?"
+Good morning from PromptOps
 
-"error-handler saw 3x normal traffic in the last hour. Everything's handling fine, but you should know."
+Yesterday's Stats
+- 3,247 requests handled across 4 prompts
+- checkout-prompt: 1,892 requests (58%)
+- support-agent: 891 requests (27%)
 
-"Your prompt hasn't been updated in 30 days. Want to review performance?"
+Highlights
+- system-prompt v4 is now your longest-running version (14 days)
+- No rollbacks needed this week
+
+See full dashboard →
 ```
 
-**Why It Retains:**
-- Creates open loops (unanswered questions)
-- Users *have* to check back to close the loop
-- Positions PromptOps as actively watching, not passive storage
-
-**Implementation Notes:**
-- Anomaly detection on response length, latency, error rates
-- Configurable thresholds (avoid alert fatigue)
-- "Interesting, not alarming" tone
+**Why it works:**
+- Creates daily touchpoint even when nothing needs action
+- Reinforces value ("we handled 3,247 requests for you")
+- Builds habit of checking PromptOps
 
 ---
 
-### 3. The Version Story (Narrative Over Time)
+### Feature 2: Post-Push "Watching" Message
 
-**What:** Performance comparison across versions, told as a narrative
+**Retention Level:** 3 (Anticipation)
+**Priority:** P0 - Ship First
+**Effort:** 1 day
 
-**Dashboard View:**
+**What it does:**
+After `drift push`, respond with forward-looking message:
+
+**Current:**
 ```
-system-prompt Version History
-
-v5 (current) - Deployed 3 days ago
-   - 15% faster than v4
-   - 8% longer responses
-   - 0 errors
-
-v4 - Deployed 2 weeks ago
-   - Your most stable version
-   - Lowest error rate in history
-
-v3 - Retired
-   - Had formatting issues
-   - Rolled back after 4 hours
-
-v2 - The hero version
-   - Saved production during the March incident
-   - Still your fallback
+Pushed system-prompt v4.
 ```
 
-**Why It Retains:**
-- Versions become characters with personalities
-- Users develop attachment to "reliable" versions
-- Creates a story worth following
+**v1.1:**
+```
+Pushed system-prompt v4.
 
-**Implementation Notes:**
-- Requires metrics per version (latency, error rate, response length)
-- Auto-generated "version personality" based on data
-- Highlight significant events (rollbacks, incidents, milestones)
+Now watching for:
+- Response latency vs v3
+- Error rate changes
+- Token usage patterns
+
+First performance report in 1 hour. Check your dashboard or wait for the digest.
+```
+
+**Why it works:**
+- Opens a loop ("what will the report say?")
+- Creates reason to return in 1 hour
+- User knows something is happening in the background
 
 ---
 
-### 4. The Stability Streak (Manufactured Continuity)
+### Feature 3: The Dashboard (Story Accumulator)
 
-**What:** Gamified stability tracking
+**Retention Level:** 4 (Achievement)
+**Priority:** P0 - Ship First
+**Effort:** 1-2 weeks
 
-**Display:**
+**What it shows:**
+- **Timeline view:** All pushes and rollbacks visualized
+- **Stats panel:** Total versions, total requests, total rollbacks
+- **Achievement badges:**
+  - "First Push" - Your journey began
+  - "Crisis Averted" - Your first successful rollback
+  - "Stability Master" - 30 days without a rollback
+  - "Prompt Veteran" - 10+ versions of a single prompt
+
+**Example dashboard header:**
+```
+Your PromptOps Journey
+━━━━━━━━━━━━━━━━━━━━━
+47 versions pushed | 3 rollbacks saved production | 89,412 requests served
+
+Achievements Unlocked
+[First Push] [Crisis Averted] [Week Warrior]
+```
+
+**Why it works:**
+- Users see themselves as protagonists in an unfolding story
+- Achievements create milestones to celebrate
+- History view shows "look how far I've come"
+
+---
+
+### Feature 4: Crisis Celebration
+
+**Retention Level:** 4 (Achievement)
+**Priority:** P1
+**Effort:** 1 day
+
+**What it does:**
+After successful rollback, acknowledge the save:
+
+**Current:**
+```
+Rolled back system-prompt from v4 to v3.
+Live now.
+```
+
+**v1.1:**
+```
+Rolled back system-prompt from v4 to v3.
+Live now.
+
+Crisis averted. Production is stable.
+
+What just happened:
+- v4 was live for 2 hours 14 minutes
+- 847 requests were served before rollback
+- v3 is now handling traffic normally
+
+[Generate incident report?] [Share this win?]
+```
+
+**Why it works:**
+- Treats rollback as the dramatic moment it is
+- "Share this win" opens content flywheel
+- Incident report creates artifact worth revisiting
+
+---
+
+### Feature 5: A/B Test Cliffhangers
+
+**Retention Level:** 3 (Anticipation)
+**Priority:** P1
+**Effort:** 1 week (requires A/B infrastructure)
+
+**What it does:**
+When A/B testing is enabled:
+
+```
+A/B test started: v4 vs v5
+
+Current split: 50/50
+Results finalize at: 1,000 total requests
+Progress: ████████░░ 847/1,000
+
+Current leader: v5 (+7% lower latency)
+Confidence: 78% (need 95% to declare winner)
+
+Next update in: 2 hours
+```
+
+**Why it works:**
+- Literal cliffhanger ("who will win?")
+- Progress bar creates urgency
+- "Next update in 2 hours" promises future engagement
+
+---
+
+### Feature 6: Performance Comparison Notifications
+
+**Retention Level:** 2 (Awareness)
+**Priority:** P1
+**Effort:** 3 days
+
+**What it does:**
+24 hours after a push, send comparison:
+
+```
+system-prompt v4: 24-Hour Report
+
+vs v3:
+- Latency: 1.1s → 0.9s (18% faster) ✓
+- Error rate: 0.5% → 0.3% (40% fewer errors) ✓
+- Token usage: 1,847 → 2,103 (14% more tokens) ⚠️
+
+Overall: v4 is performing better than v3
+
+[View details] [Share report]
+```
+
+**Why it works:**
+- Closes the loop opened during push
+- Provides concrete value ("your change made things better")
+- "Share report" creates social proof opportunity
+
+---
+
+### Feature 7: Anomaly Alerts
+
+**Retention Level:** 2 (Awareness) + Fear (Powerful Hook)
+**Priority:** P2
+**Effort:** 1 week
+
+**What it does:**
+When metrics deviate significantly:
+
+```
+⚠️ Anomaly Detected
+
+support-agent v3 showing unusual patterns:
+- Error rate: 0.2% → 3.1% (started 15 minutes ago)
+- Affected requests: ~47
+
+Suggested action:
+  drift rollback support-agent 2
+
+[Rollback now] [Investigate] [Dismiss]
+```
+
+**Why it works:**
+- Fear is a powerful retention hook (used responsibly)
+- Demonstrates active monitoring value
+- Direct path to resolution
+
+---
+
+### Feature 8: Stability Streaks
+
+**Retention Level:** 4 (Achievement)
+**Priority:** P2
+**Effort:** 2 days
+
+**What it does:**
+Track consecutive days without rollback:
+
 ```
 47 days of stable prompts. Keep it going.
 
-Longest streak: 89 days (ended March 15 - the v3 incident)
+Longest streak: 89 days (ended March 15)
 ```
 
-**Why It Retains:**
+**Why it works:**
 - Loss aversion (don't want to break the streak)
 - Pride in operational excellence
-- Reason to check in daily
-- "Ask Snapchat" - streaks work
-
-**Implementation Notes:**
-- Define "stable" (no rollbacks, error rate below threshold)
-- Track streak history
-- Celebrate milestones (30 days, 60 days, 100 days)
+- Daily reason to check in
 
 ---
 
-### 5. The Weekly Digest (Retention Email)
+## The Content Flywheel
 
-**What:** Weekly summary email with shareable metrics
-
-**Content:**
+### Current State: No Flywheel
 ```
-This week in PromptOps:
-
-Requests handled: 14,000
-Prompt changes: 3
-Rollbacks needed: 0
-Average latency: 1.1s (down 8% from last week)
-
-Your prompts are getting better.
-
-[View Full Report] [Share This Win]
+User pushes → Nothing happens → User forgets → Returns only in crisis
 ```
 
-**Why It Retains:**
-- Reason to remember PromptOps exists
-- Shareable content (organic marketing)
-- Progress narrative over time
-
-**Implementation Notes:**
-- Aggregated weekly metrics
-- Week-over-week comparisons
-- "Share" button generates social-ready image/link
-
----
-
-### 6. The Rollback War Story (Content Flywheel)
-
-**What:** When a rollback saves production, offer to generate a shareable post-mortem
-
-**Flow:**
+### v1.1 Flywheel
 ```
-User: drift rollback system-prompt 2
-
-CLI: Rolled back in 0.3s. Production is stable.
-
-      Your system-prompt v4 was live for 2 hours before rollback.
-      During that time: 340 requests, 12% error rate.
-
-      Want to generate a post-mortem?
-      [Y] Generate "What Went Wrong" report
-      [N] Skip
+User pushes → Performance data collected → Report generated →
+User sees improvement → User shares win → New user discovers →
+New user pushes → Cycle continues
 ```
 
-**Generated Report:**
-```
-# What Went Wrong: The v4 Incident
+### Shareable Artifacts
 
-**Timeline:**
-- 14:32 - v4 deployed
-- 14:45 - Error rate climbed from 0.5% to 12%
-- 16:28 - Rollback to v2 executed
-- 16:28 - Error rate returned to 0.5%
+1. **Performance Reports**
+   - "My prompt optimization reduced latency by 23%"
+   - Shareable card with PromptOps branding
 
-**Impact:**
-- 340 requests affected
-- ~40 likely experienced degraded responses
-- Recovery time: 0.3 seconds
+2. **Incident Reports**
+   - "How we caught a production issue in 3 minutes"
+   - War story format, shareable on Twitter/LinkedIn
 
-**What Changed:**
-[Diff between v4 and v2]
+3. **Achievement Cards**
+   - "100,000 requests served through PromptOps"
+   - Milestone celebration, naturally shareable
 
-**Lesson:**
-v4 added stricter formatting that caused edge cases to fail.
-Consider A/B testing formatting changes before full rollout.
-```
-
-**Why It Retains:**
-- Developers love sharing war stories
-- Creates organic content for community
-- Positions PromptOps as the hero
-
-**Implementation Notes:**
-- Track incident timeline automatically
-- Generate diff summaries
-- Optional sharing to dev.to/Twitter/internal docs
-
----
-
-### 7. The A/B Test Cliffhanger (Anticipation Builder)
-
-**What:** When running A/B tests, create deliberate waiting periods
-
-**Flow:**
-```
-User: drift ab-test system-prompt v4 v5 --split 50/50
-
-CLI: A/B test started: v4 vs v5
-
-     Results in 24 hours. We'll notify you.
-
-     Current status: 0 requests, too early to call.
-
-     [View live results →]
-```
-
-**24 hours later:**
-```
-A/B test complete: system-prompt
-
-Winner: v5
-- 15% faster responses
-- 3% shorter (more concise)
-- Same error rate
-
-Recommendation: Roll out v5 to 100%
-
-[Apply Winner] [Extend Test] [View Details]
-```
-
-**Why It Retains:**
-- Creates anticipation (must come back for results)
-- Open loop that demands closure
-- Scientific validation feels rewarding
-
-**Implementation Notes:**
-- A/B testing requires proxy (traffic splitting)
-- Statistical significance calculations
-- Push notifications when results ready
-
----
-
-### 8. The Milestone Approach (Progression System)
-
-**What:** Unlock features and recognition through usage
-
-**Levels:**
-```
-Prompt Rookie (0-2 prompts)
-- Basic versioning
-
-Prompt Pro (3-10 prompts)
-- Unlocks: Analytics dashboard
-
-Prompt Master (10+ prompts)
-- Unlocks: A/B testing, Team features
-
-Prompt Legend (50+ prompts, 100k+ requests)
-- Unlocks: Enterprise features, priority support
-- Badge: "Legend" displayed on profile
-```
-
-**Why It Retains:**
-- Progress creates investment
-- "3 prompts away from analytics" motivates action
-- Status display for internal pride
-
-**Implementation Notes:**
-- Track usage metrics per account
-- Feature gating by tier
-- Visual progress indicators
+4. **Comparison Cards**
+   - "v7 vs v1: 6 months of prompt evolution"
+   - Shows journey, demonstrates value
 
 ---
 
 ## Implementation Priority
 
-### Phase 1: Foundation (Week 1-2)
-1. **Instrument the proxy** - All retention features depend on data
-2. **Daily digest** - Lowest effort, highest retention impact
-3. **Version story on dashboard** - Makes existing data meaningful
+### Phase 1: Daily Engagement (Week 1-2)
+| Feature | Effort | Impact |
+|---------|--------|--------|
+| Post-Push "Watching" Message | 1 day | High |
+| Morning Digest Email | 2-3 days | High |
+| Dashboard (Basic) | 1 week | Critical |
 
-### Phase 2: Engagement (Week 3-4)
-4. **Stability streak** - Gamification hook
-5. **Alert system** - Curiosity driver
-6. **Weekly digest email** - Off-platform retention
+### Phase 2: Emotional Payoffs (Week 3-4)
+| Feature | Effort | Impact |
+|---------|--------|--------|
+| Crisis Celebration | 1 day | Medium |
+| Performance Comparison | 3 days | High |
+| Stability Streaks | 2 days | Medium |
 
-### Phase 3: Flywheel (Week 5-6)
-7. **Rollback war story generator** - Content creation
-8. **A/B test cliffhangers** - Anticipation builder
-9. **Milestone system** - Long-term progression
+### Phase 3: Advanced Hooks (Week 5-6)
+| Feature | Effort | Impact |
+|---------|--------|--------|
+| Anomaly Alerts | 1 week | High |
+| A/B Test Cliffhangers | 1 week | High |
+| Shareable Reports | 3 days | Medium |
 
 ---
 
@@ -321,15 +347,34 @@ Prompt Legend (50+ prompts, 100k+ requests)
 
 | Metric | Current | v1.1 Target |
 |--------|---------|-------------|
-| Daily Active Users | Unknown (no tracking) | Track + 20% DAU/MAU |
-| Return visits per week | ~1 (on deploy only) | 3+ (digest + dashboard) |
-| Time between visits | Weeks/months | Days |
-| Organic shares | 0 | 10+ war stories/month |
-| Streak participants | N/A | 30% of active users |
+| DAU/MAU ratio | Unknown (likely <5%) | 25% |
+| Return visits per user/week | ~1 (crisis only) | 5+ |
+| Time between sessions | Days/weeks | Daily |
+| Organic shares | 0 | 10+ per week |
+| Email open rate | N/A | 40%+ |
 
 ---
 
-## The Narrative Test
+## The Narrative Arc We're Building
+
+### Act 1: The Setup (Onboarding)
+> "You've just given your AI a safety net. Your first versioned prompt is live."
+
+### Act 2: Rising Action (Daily Use)
+> "Your prompts served 10,000 requests this week. v4 is outperforming v3 by 23%."
+
+### Act 3: The Crisis (When Things Break)
+> "Anomaly detected. But you have 6 stable versions to roll back to."
+
+### Act 4: The Resolution (After Rollback)
+> "Crisis averted. Production is stable. You've earned the Crisis Averted badge."
+
+### Act 5: The Continuation (Tomorrow)
+> "New day, new digest. Your prompts handled another 3,247 requests."
+
+---
+
+## The "Come Back Tomorrow" Test
 
 Before shipping any v1.1 feature, ask:
 
@@ -342,295 +387,17 @@ If the answer is "no" to all four, reconsider the feature.
 
 ---
 
-## Closing Thought
+## Final Word
 
-> "Every episode should end with the audience desperate to see what happens next. PromptOps ends every interaction with nothing but a version number."
+> "The best stories make you desperate to know what happens next."
 
-v1.1 goal: End every interaction with an open question.
+PromptOps v1.0 tells users what happened and then hangs up the phone.
 
-- "v5 has been live for 4 hours. How's it performing?"
-- "Your streak is at 47 days. Will it hold?"
-- "A/B results in 24 hours. Which version wins?"
-- "This week: 14,000 requests. Is that your best?"
+PromptOps v1.1 opens loops, creates anticipation, celebrates victories, and always leaves users wondering: "What will my prompts do tomorrow?"
 
-**That's a show people come back for.**
+That's not just retention. That's story.
 
 ---
 
-*Based on the board review by Shonda Rhimes, Board Member - Narrative & Retention, Great Minds Agency*
-=======
-# Tuned — Retention Roadmap v1.1
-
-*What Keeps Users Coming Back*
-
-*Authored by Shonda Rhimes, Chief Retention & Narrative*
-
----
-
-## The Retention Problem
-
-V1 of Tuned solves the "push problem" — getting prompts out of code and into version control. But Steve's concern is valid: *why does anyone come back after their first push?*
-
-A CLI that you run once and forget is not a product. It's a utility. Utilities don't build companies.
-
-**The question:** How do we turn a single `tuned push` into a daily habit?
-
----
-
-## The Emotional Arc of a Tuned User
-
-### Act 1: Discovery (Day 1)
-*"Oh, this is what I've been missing."*
-
-User discovers Tuned. Pushes their first prompt. Feels the relief of prompts being somewhere safe. Dopamine hit. End of engagement.
-
-**Current V1 problem:** There's no Act 2. The user got what they needed. They leave.
-
-### Act 2: Ownership (Days 2-14)
-*"These are MY prompts. I need to see how they're doing."*
-
-User starts thinking of Tuned as the home for their prompts. They push more. They check versions. They start caring about prompt performance.
-
-**V1.1 job:** Create reasons to return during this window.
-
-### Act 3: Mastery (Days 15-60)
-*"I'm getting better at this. I can see it."*
-
-User sees their progression. Earlier prompts look naive. New prompts are sharper. The tool helped them level up.
-
-**V2 job:** Make growth visible.
-
-### Act 4: Identity (Days 60+)
-*"I'm someone who tunes their prompts."*
-
-Tuned becomes part of professional identity. User recommends to others. They've internalized the practice.
-
-**V3 job:** Community, sharing, reputation.
-
----
-
-## V1.1 Features — The Retention Layer
-
-### 1. Push Streaks
-
-**What:** Track consecutive days with at least one prompt push. Display streak in CLI after every push.
-
-**Why:** Streaks create micro-commitments. Missing a day feels like losing something. Duolingo proved this works.
-
-**Implementation:**
-```
-$ tuned push "assistant-v3" -c "..."
-Pushed assistant-v3 v4. Live at edge.
-
-You're on a 7-day streak.
-```
-
-**Effort:** 2 hours. Store last-push timestamp per user. Simple streak logic.
-
-### 2. Weekly Prompt Digest (Email)
-
-**What:** Once a week, send a simple email:
-- How many prompts you pushed
-- Which prompt got updated most
-- Total versions across all prompts
-
-**Why:** Email brings users back. It's a touchpoint that doesn't require them to remember you exist.
-
-**Implementation:**
-- Opt-in at `tuned init`
-- Cloudflare Workers scheduled trigger
-- Simple text email (no HTML complexity)
-
-**Effort:** 4 hours. Scheduled worker + email service integration (Resend or similar).
-
-### 3. Prompt Age Indicator
-
-**What:** In `tuned list`, show how long since each prompt was updated. Flag prompts that haven't been touched in 14+ days.
-
-**Why:** Creates gentle pressure to revisit old prompts. "Is this still my best thinking?"
-
-**Implementation:**
-```
-$ tuned list
-
-NAME              VERSION   UPDATED         STATUS
-customer-support  v5 *      2 days ago
-onboarding        v2        3 weeks ago     Stale
-summarizer        v8        1 day ago
-```
-
-**Effort:** 1 hour. Add timestamp diff calculation to list command.
-
-### 4. Version Milestones
-
-**What:** Celebrate round-number versions. When a prompt hits v5, v10, v25, v50, v100 — surface it.
-
-**Why:** Progress markers create satisfaction. "I've iterated this prompt 25 times" feels like accomplishment.
-
-**Implementation:**
-```
-$ tuned push "main-assistant" -c "..."
-Pushed main-assistant v25. Live at edge.
-
-Milestone: 25 versions of main-assistant. You're a tuner.
-```
-
-**Effort:** 30 minutes. Conditional message on push.
-
-### 5. `tuned status` Command
-
-**What:** New command showing account-level stats:
-- Total prompts
-- Total versions pushed
-- Current streak
-- Most-iterated prompt
-
-**Why:** Gives users a reason to open the CLI even when they're not pushing. "How am I doing?"
-
-**Implementation:**
-```
-$ tuned status
-
-TUNED STATUS
-Prompts: 12
-Total versions: 87
-Current streak: 14 days
-Most iterated: main-assistant (v31)
-
-Keep tuning.
-```
-
-**Effort:** 2 hours. New command + API endpoint for stats.
-
-### 6. Prompt Activity in Dashboard
-
-**What:** Add a simple activity timeline to the dashboard. Last 20 actions across all prompts.
-
-**Why:** Makes the dashboard worth visiting. Currently it's just a list — no narrative, no motion.
-
-**Implementation:**
-- Timeline view: "2h ago — pushed customer-support v5"
-- Still read-only. No buttons.
-
-**Effort:** 3 hours. Additional D1 query + minimal UI addition.
-
----
-
-## V1.1 Feature Summary
-
-| Feature | Retention Hook | Effort |
-|---------|---------------|--------|
-| Push Streaks | Daily habit formation | 2h |
-| Weekly Digest | Email-driven return | 4h |
-| Prompt Age Indicator | Guilt/maintenance prompt | 1h |
-| Version Milestones | Progress celebration | 30m |
-| `tuned status` | CLI as destination | 2h |
-| Dashboard Activity | Web return visits | 3h |
-
-**Total V1.1 effort:** ~12 hours
-
----
-
-## The Retention Philosophy
-
-### We're Not Building Stickiness. We're Building a Practice.
-
-Cheap retention tricks (notifications, badges, gamification) feel hollow. Users see through them.
-
-**What actually works:** Making users better at something they care about.
-
-Every V1.1 feature answers: *"Am I getting better at prompting?"*
-
-- Streaks = "I'm showing up."
-- Milestones = "I'm iterating."
-- Age indicators = "I'm maintaining."
-- Status = "I'm growing."
-
-The habit isn't using Tuned. The habit is *improving prompts*. Tuned just makes that habit visible.
-
-### The "Come Back Tomorrow" Moment
-
-Every session should end with a reason to return:
-
-- **After first push:** "Push another prompt to start your streak."
-- **After reaching v5:** "You're at v5. Most Tuned users see their biggest improvements between v5 and v10."
-- **After a week:** "Your weekly digest is on its way."
-
-These aren't interruptions. They're invitations.
-
----
-
-## Metrics That Prove Retention
-
-### Leading Indicators (Track in V1.1)
-
-| Metric | Target | Why It Matters |
-|--------|--------|----------------|
-| DAU/MAU ratio | >15% | Daily engagement signal |
-| 7-day return rate | >40% | Week 1 retention |
-| Avg prompts per user | >3 | Breadth of adoption |
-| Avg versions per prompt | >4 | Depth of iteration |
-| Streak length median | >5 days | Habit formation |
-
-### Lagging Indicators (Track at 60 days)
-
-| Metric | Target | Why It Matters |
-|--------|--------|----------------|
-| 60-day retention | >25% | Long-term stickiness |
-| NPS | >50 | Would they recommend? |
-| Organic referrals | >10% of new users | Word of mouth working |
-
----
-
-## The V2 Tease: Making Growth Visible
-
-V1.1 creates return reasons. V2 shows users their journey.
-
-**Planned V2 retention features:**
-
-1. **Prompt Evolution View** — See how a prompt changed from v1 to v25. Celebrate the journey.
-
-2. **Personal Stats Page** — Total prompts improved, time saved, iteration patterns.
-
-3. **"Before Tuned" Comparison** — Show users what their workflow looked like before.
-
-4. **Prompt of the Week** — Opt-in showcase. Best iteration stories from the community.
-
-These features require more infrastructure (analytics, UI complexity) but they're the path to Act 3: Mastery.
-
----
-
-## Implementation Priority for V1.1
-
-### Week 1 (Ship with V1.1 launch)
-1. Push Streaks
-2. `tuned status`
-3. Prompt Age Indicator
-
-### Week 2
-4. Version Milestones
-5. Dashboard Activity Timeline
-
-### Week 3
-6. Weekly Digest (requires email service setup)
-
----
-
-## The Promise
-
-*"Every time you come back to Tuned, you'll see proof that you're getting better."*
-
-That's the retention hook that doesn't feel like a hook. It feels like value.
-
-Users don't return because we tricked them. They return because they're building something — and they want to see how far they've come.
-
----
-
-*"The best stories make you want to see what happens next."*
-
-V1 is the pilot episode. V1.1 is the cliffhanger that brings them back.
-
----
-
-*— Shonda Rhimes, Chief Retention & Narrative*
->>>>>>> feature/promptops-tuned
+*Roadmap derived from Shonda Rhimes' Board Review*
+*Great Minds Agency | PromptOps v1.1 Planning*

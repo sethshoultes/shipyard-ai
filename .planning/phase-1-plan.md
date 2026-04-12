@@ -1,58 +1,56 @@
-# Phase 1 Plan — Wardrobe Theme Marketplace Deployment
+# Phase 1 Plan — PromptOps/Drift Build Phase
 
 **Generated**: April 12, 2026
-**Project Slug**: emdash-marketplace
-**Product Name**: Wardrobe
+**Project Slug**: promptops
+**Product Name**: Drift (CLI + API) + NERVE (Pipeline Daemon)
 **Requirements**: .planning/REQUIREMENTS.md
-**Total Tasks**: 13
+**Total Tasks**: 12
 **Waves**: 4
-**Status**: READY FOR DEPLOYMENT
-**Estimated Time**: 2.5-3 hours (sequential), 1.5 hours (parallelized)
+**Status**: READY FOR BUILD
+**Estimated Time**: 6-8 hours (sequential), 4-5 hours (parallelized)
 
 ---
 
 ## The Essence
 
-> **What it's really about:** One command transforms your site into something beautiful.
+> **What it is:** The undo button for AI—turning prompt deployment from a gamble into a system.
 
-> **What it evokes:** "That's me."
+> **The feeling:** Peace. The 3 AM panic, gone.
 
-> **What must be perfect:** The reveal. The instant your site becomes dignified.
+> **What must be perfect:** The rollback. One command. Instant. No thinking.
 
-> **Creative direction:** Instant dignity.
+> **Creative direction:** Disappear. Work always.
 
 ---
 
 ## Build Status
 
-**Technical MVP:** 100% COMPLETE (code is done)
-**Deployment:** 0% (infrastructure blockers)
-**Board Verdict:** PROCEED (Conditional) — 9 P0 blockers must be resolved
+**Existing Code:** ~1,275 lines built (API: 731, CLI: 447, NERVE: 1,055)
+**Missing:** SDK (0 lines), Dashboard (0 lines), CLI list/rollback commands
+**Board Verdict:** HOLD (5.1/10) — Build phase never completed
 
 ### Locked Decisions
 
 | Decision | Winner | Rationale |
 |----------|--------|-----------|
-| Product Name: **Wardrobe** | Steve Jobs | `npx wardrobe install ember` is tweetable |
-| Theme Count: **5** | Steve Jobs | Five feels like a collection, not a test |
-| Preview: **Screenshots** | Elon Musk | Ships in one session; live preview is V2 |
-| Architecture: **CLI-First** | Elon Musk | The CLI IS the product |
-| Infrastructure: **Static** | Elon Musk | R2 + CDN scales infinitely with zero ops |
-| Install Speed: **Sub-3-Second** | Both | Transformation must feel instant |
+| Product Name: **Drift/NERVE** | Steve Jobs | One-word names shape destiny |
+| No Proxy in V1 | Elon Musk | 15-80ms latency is commercial suicide |
+| SDK-First Architecture | Elon Musk | "Add 2 lines of code" > "reroute traffic" |
+| Dashboard: Read-Only HTML | Elon Musk | Static, no rollback buttons |
+| 60-Second Time-to-Value | Both | First dopamine hit must be fast |
+| Bash Over Agents (NERVE) | Consensus | Determinism over probabilistic |
 
-### P0 Blockers (Must Resolve in This Plan)
+### What Must Ship
 
-| # | Blocker | Status |
-|---|---------|--------|
-| 1 | KV namespace IDs are placeholders | NOT DONE |
-| 2 | R2 bucket not created | NOT DONE |
-| 3 | Theme tarballs not uploaded | NOT DONE |
-| 4 | Workers not deployed | NOT DONE |
-| 5 | Showcase not deployed | NOT DONE |
-| 6 | Demo sites not deployed | NOT DONE |
-| 7 | Screenshots are SVG placeholders | NOT DONE |
-| 8 | R2 upload script has bug | NOT DONE |
-| 9 | Uncommitted files | NOT DONE |
+| # | Component | Status | Gap |
+|---|-----------|--------|-----|
+| 1 | API endpoints | BUILT | Deploy to Cloudflare |
+| 2 | CLI init/push | PARTIAL | Complete and test |
+| 3 | CLI list/rollback | NOT BUILT | Implement commands |
+| 4 | SDK getPrompt() | NOT BUILT | Build with caching |
+| 5 | Dashboard | NOT BUILT | Static HTML |
+| 6 | D1 Database | NOT DONE | Create and migrate |
+| 7 | NERVE scripts | BUILT | Test and document |
 
 ---
 
@@ -60,19 +58,18 @@
 
 | Requirement | Task(s) | Wave |
 |-------------|---------|------|
-| P0-001, P0-002, P0-003: KV namespaces | phase-1-task-1 | 1 |
-| P0-004: R2 bucket | phase-1-task-2 | 1 |
-| RISK-001: R2 upload script fix | phase-1-task-3 | 1 |
-| P0-005: Upload tarballs | phase-1-task-4 | 2 |
-| P0-006, T1-005: Analytics worker | phase-1-task-5 | 2 |
-| P0-007, T1-004: Email worker | phase-1-task-6 | 2 |
-| T1-001: Demo sites (ember) | phase-1-task-7 | 3 |
-| T1-001: Demo sites (forge, slate) | phase-1-task-8 | 3 |
-| T1-001: Demo sites (drift, bloom) | phase-1-task-9 | 3 |
-| T1-002: Screenshots | phase-1-task-10 | 4 |
-| P0-008: Showcase deploy | phase-1-task-11 | 4 |
-| P0-009: Git commit | phase-1-task-12 | 4 |
-| QA Pass 2 | phase-1-task-13 | 4 |
+| REQ-META-002: D1 database deployed | phase-1-task-1 | 1 |
+| REQ-API-001 to 006: API endpoints | phase-1-task-2 | 1 |
+| REQ-CLI-001, 002: init and push | phase-1-task-3 | 2 |
+| REQ-CLI-003, 004: list and rollback | phase-1-task-4 | 2 |
+| REQ-SDK-001, 002: getPrompt with caching | phase-1-task-5 | 2 |
+| REQ-DASH-001 to 006: Dashboard | phase-1-task-6 | 2 |
+| REQ-NERVE-001 to 005: NERVE scripts | phase-1-task-7 | 3 |
+| REQ-CLI-005: npm publish CLI | phase-1-task-8 | 3 |
+| REQ-SDK-005: npm publish SDK | phase-1-task-9 | 3 |
+| REQ-META-001: 60-second test | phase-1-task-10 | 4 |
+| Git commit all changes | phase-1-task-11 | 4 |
+| QA Pass verification | phase-1-task-12 | 4 |
 
 ---
 
@@ -80,11 +77,18 @@
 
 This plan cites specific sections from source documents:
 
-- **decisions.md**: P0 Launch Blockers (lines 334-361), Board Conditions (lines 366-395)
-- **docs/EMDASH-GUIDE.md Section 5**: Cloudflare deployment (wrangler.jsonc, D1, R2)
-- **docs/EMDASH-GUIDE.md Section 7**: Theme structure, seed files
-- **docs/DEPLOYMENT-RUNBOOK.md**: Step-by-step infrastructure guide
-- **qa-pass-1.md**: 9 P0 blockers, verification evidence
+- **decisions.md Section I**: Locked Decisions (13 items)
+- **decisions.md Section II**: MVP Feature Set (CLI, API, SDK, Dashboard)
+- **decisions.md Section III**: File Structure (expected directories)
+- **decisions.md Section IV**: Open Questions (4 items needing resolution)
+- **decisions.md Section IX**: Build Phase Acceptance Criteria
+- **docs/EMDASH-GUIDE.md Section 5**: Cloudflare Workers deployment patterns
+
+### Existing Code Locations
+
+- `/home/agent/shipyard-ai/deliverables/promptops/drift/api/` — API (731 lines)
+- `/home/agent/shipyard-ai/deliverables/promptops/drift/cli/` — CLI (447 lines)
+- `/home/agent/shipyard-ai/nerve/` — NERVE scripts (1,055 lines)
 
 ---
 
@@ -92,63 +96,58 @@ This plan cites specific sections from source documents:
 
 ### Wave 1 (Parallel) — Infrastructure Foundation
 
-Three independent tasks provisioning Cloudflare resources. **Estimated time: 10 minutes**
+Two independent tasks provisioning infrastructure and deploying API. **Estimated time: 45 minutes**
 
 ```xml
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Create KV namespaces for workers</title>
-  <requirement>P0-001, P0-002, P0-003: Create KV namespaces (ANALYTICS, EMAILS, RATE_LIMITS)</requirement>
+  <title>Create and configure D1 database</title>
+  <requirement>REQ-META-002: D1 database deployed with schema</requirement>
   <description>
-    Per qa-pass-1.md P0 blockers #1-2:
-    Create three KV namespaces required by analytics and email-capture workers.
-    Update wrangler.toml files with real namespace IDs.
+    Per decisions.md Section III and EMDASH-GUIDE.md Section 5:
+    Create Cloudflare D1 database for Drift and apply schema.
 
-    Current placeholder IDs (workers/analytics/wrangler.toml lines 8-9):
-    - id = "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6" (PLACEHOLDER)
-    - preview_id = "p6o5n4m3l2k1j0i9h8g7f6e5d4c3b2a1" (PLACEHOLDER)
+    Schema exists at: deliverables/promptops/drift/api/src/db/schema.sql
+    Contains: projects, prompts, versions tables with proper indexes.
 
-    Current placeholder IDs (workers/email-capture/wrangler.toml lines 14-20):
-    - EMAILS id = "e1m2a3i4l5s6k7v8n9a0m1e2s3p4a5c6" (PLACEHOLDER)
-    - RATE_LIMITS id = "r1a2t3e4l5i6m7i8t9s0k1v2n3a4m5e6" (PLACEHOLDER)
+    Database name: drift
+    Binding: DB
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/analytics/wrangler.toml" reason="Contains placeholder ANALYTICS KV ID" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/email-capture/wrangler.toml" reason="Contains placeholder EMAILS and RATE_LIMITS IDs" />
-    <file path="/home/agent/shipyard-ai/rounds/emdash-marketplace/qa-pass-1.md" reason="Documents P0 blockers 1-2" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/src/db/schema.sql" reason="D1 schema definition (53 lines)" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/wrangler.toml" reason="Worker config with D1 binding placeholder" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5: D1 database creation pattern" />
   </context>
 
   <steps>
-    <step order="1">Run: wrangler kv:namespace create ANALYTICS</step>
-    <step order="2">Copy the returned namespace ID</step>
-    <step order="3">Run: wrangler kv:namespace create ANALYTICS --preview (for preview_id)</step>
-    <step order="4">Update workers/analytics/wrangler.toml lines 8-9 with real IDs</step>
-    <step order="5">Update workers/analytics/wrangler.toml line 20 (env.production) with real ID</step>
-    <step order="6">Run: wrangler kv:namespace create EMAILS</step>
-    <step order="7">Run: wrangler kv:namespace create EMAILS --preview</step>
-    <step order="8">Run: wrangler kv:namespace create RATE_LIMITS</step>
-    <step order="9">Run: wrangler kv:namespace create RATE_LIMITS --preview</step>
-    <step order="10">Update workers/email-capture/wrangler.toml lines 14-20 with real IDs</step>
+    <step order="1">Run: wrangler d1 create drift</step>
+    <step order="2">Copy the database_id from output</step>
+    <step order="3">Update wrangler.toml with real database_id</step>
+    <step order="4">Apply schema: wrangler d1 execute drift --file=src/db/schema.sql</step>
+    <step order="5">Verify tables: wrangler d1 execute drift --command="SELECT name FROM sqlite_master WHERE type='table'"</step>
+    <step order="6">Verify indexes exist on projects.api_key_hash, prompts.name</step>
   </steps>
 
   <verification>
-    <check type="bash">grep -v "a1b2c3d4\|e1m2a3i4\|r1a2t3e4" /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/analytics/wrangler.toml</check>
-    <check type="bash">grep -v "PLACEHOLDER\|placeholder" /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/email-capture/wrangler.toml</check>
-    <check type="manual">All 6 KV namespace IDs are valid 32-character hex strings</check>
+    <check type="bash">wrangler d1 list | grep drift</check>
+    <check type="bash">wrangler d1 execute drift --command="SELECT count(*) FROM sqlite_master WHERE type='table'"</check>
+    <check type="manual">Returns 3 tables: projects, prompts, versions</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>chore(wardrobe): configure KV namespace IDs
+  <commit-message>chore(drift): create D1 database and apply schema
 
-Replace placeholder KV namespace IDs with real IDs from wrangler:
-- ANALYTICS namespace for install telemetry
-- EMAILS namespace for email capture
-- RATE_LIMITS namespace for request throttling
+Create 'drift' D1 database with tables:
+- projects (id, name, api_key_hash, created_at)
+- prompts (id, project_id, name, active_version, created_at)
+- versions (id, prompt_id, version, content, message, created_at)
 
-Resolves P0 blockers #1-2 from qa-pass-1.md
+Indexes on api_key_hash and prompt name for fast lookups.
+
+Per decisions.md Section III: database-first architecture.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -156,91 +155,66 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-2" wave="1">
-  <title>Create R2 bucket for theme distribution</title>
-  <requirement>P0-004: Create R2 bucket for theme tarballs</requirement>
+  <title>Deploy Drift API worker to Cloudflare</title>
+  <requirement>REQ-API-001 to 006: All API endpoints functional</requirement>
   <description>
-    Per qa-pass-1.md P0 blocker #4 and DEPLOYMENT-RUNBOOK.md Task 1:
-    Create the R2 bucket that will host theme tarballs for CLI downloads.
-    Enable public access for CDN distribution.
+    Per decisions.md Section II and existing code at deliverables/promptops/drift/api/:
+    Deploy the Cloudflare Worker with all API routes.
 
-    Target bucket: emdash-themes
-    Expected URL format: https://pub-{id}.r2.dev/{theme}@1.0.0.tar.gz
-    Or custom domain: https://cdn.emdash.dev/themes/{theme}@1.0.0.tar.gz
+    Endpoints:
+    - POST /api/projects (create project, generate API key)
+    - GET /api/prompts (list all prompts)
+    - POST /api/prompts (create/update prompt version)
+    - GET /api/prompts/:name (get prompt with history)
+    - POST /api/prompts/:name/rollback (revert to version)
+
+    Code is built (731 lines). Deploy and verify.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 1: R2 bucket creation steps" />
-    <file path="/home/agent/shipyard-ai/rounds/emdash-marketplace/decisions.md" reason="Open Question #1: R2 bucket name confirmation" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/src/index.ts" reason="Worker entry point (124 lines)" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/src/middleware/auth.ts" reason="API key validation (129 lines)" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/src/routes/projects.ts" reason="Project creation (97 lines)" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/src/routes/prompts.ts" reason="Prompt CRUD (381 lines)" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/wrangler.toml" reason="Worker config" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5: Worker deployment patterns" />
   </context>
 
   <steps>
-    <step order="1">Run: wrangler r2 bucket create emdash-themes</step>
-    <step order="2">Navigate to Cloudflare dashboard > R2 > emdash-themes > Settings</step>
-    <step order="3">Enable public access (Settings > Public access > Enable)</step>
-    <step order="4">Note the public URL: https://pub-{bucketId}.r2.dev</step>
-    <step order="5">Optionally configure custom domain (cdn.emdash.dev) for prettier URLs</step>
-    <step order="6">Test access: curl -I https://pub-{bucketId}.r2.dev (should return 200 or 404)</step>
+    <step order="1">cd deliverables/promptops/drift/api</step>
+    <step order="2">npm install</step>
+    <step order="3">Verify wrangler.toml has correct database_id (from task-1)</step>
+    <step order="4">Run: wrangler deploy</step>
+    <step order="5">Note deployed URL: drift-api.{subdomain}.workers.dev</step>
+    <step order="6">Test: curl -X POST https://drift-api.{subdomain}.workers.dev/api/projects -H "Content-Type: application/json" -d '{"name":"test-project"}'</step>
+    <step order="7">Verify response contains api_key and project_id</step>
+    <step order="8">Test auth: curl with API key, verify 200 response</step>
+    <step order="9">Test without auth: verify 401 response</step>
   </steps>
 
   <verification>
-    <check type="bash">wrangler r2 bucket list | grep emdash-themes</check>
-    <check type="manual">Public access enabled in Cloudflare dashboard</check>
-    <check type="manual">Public URL accessible (even if empty bucket)</check>
+    <check type="bash">curl -X POST https://drift-api.{subdomain}.workers.dev/api/projects -H "Content-Type: application/json" -d '{"name":"test"}'</check>
+    <check type="manual">POST /api/projects returns {api_key, project_id}</check>
+    <check type="manual">GET /api/prompts with valid key returns 200</check>
+    <check type="manual">GET /api/prompts without key returns 401</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies - Wave 1 foundational task -->
+    <depends-on task-id="phase-1-task-1" reason="D1 database must exist for API to function" />
   </dependencies>
 
-  <commit-message>chore(wardrobe): document R2 bucket creation
+  <commit-message>feat(drift): deploy API worker to Cloudflare
 
-R2 bucket 'emdash-themes' created with public access enabled.
-CLI will download theme tarballs from this bucket.
+Drift API worker deployed with endpoints:
+- POST /api/projects (project creation)
+- GET /api/prompts (list prompts)
+- POST /api/prompts (push version)
+- GET /api/prompts/:name (get prompt)
+- POST /api/prompts/:name/rollback (revert version)
 
-Resolves P0 blocker #4 from qa-pass-1.md
+Auth middleware validates API keys (SHA-256 hashed).
 
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-3" wave="1">
-  <title>Fix R2 upload script endpoint bug</title>
-  <requirement>RISK-001: R2 upload script uses incorrect endpoint (googleapis.com)</requirement>
-  <description>
-    Risk Scanner identified critical bug in scripts/upload-tarballs.ts line 33:
-
-    Current (WRONG): endpoint: `https://${CLOUDFLARE_ACCOUNT_ID}.r2.googleapis.com`
-    Correct: endpoint: `https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`
-
-    The script incorrectly uses googleapis.com instead of Cloudflare's R2 endpoint.
-    This will cause all upload attempts to fail with 403 or connection refused.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/scripts/upload-tarballs.ts" reason="Contains bug on line 33" />
-  </context>
-
-  <steps>
-    <step order="1">Open scripts/upload-tarballs.ts</step>
-    <step order="2">Line 33: Change "r2.googleapis.com" to "r2.cloudflarestorage.com"</step>
-    <step order="3">Save file</step>
-    <step order="4">Verify fix: grep "r2.cloudflarestorage.com" scripts/upload-tarballs.ts</step>
-  </steps>
-
-  <verification>
-    <check type="bash">grep "r2.cloudflarestorage.com" /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/scripts/upload-tarballs.ts</check>
-    <check type="bash">grep -v "r2.googleapis.com" /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/scripts/upload-tarballs.ts | grep -q "endpoint"</check>
-  </verification>
-
-  <dependencies>
-    <!-- No dependencies - Wave 1 foundational task -->
-  </dependencies>
-
-  <commit-message>fix(wardrobe): correct R2 endpoint URL in upload script
-
-Change R2 endpoint from googleapis.com to cloudflarestorage.com.
-The previous endpoint was incorrect and would cause upload failures.
+Per decisions.md Section II: SDK-first architecture.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -248,69 +222,125 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 2 (Parallel, after Wave 1) — Workers & Uploads
+### Wave 2 (Parallel, after Wave 1) — Core Components
 
-Three tasks deploying workers and uploading tarballs. **Estimated time: 15 minutes**
+Four tasks building CLI commands, SDK, and Dashboard. **Estimated time: 2.5 hours**
 
 ```xml
-<task-plan id="phase-1-task-4" wave="2">
-  <title>Upload theme tarballs to R2</title>
-  <requirement>P0-005: Upload 5 theme tarballs to R2 CDN</requirement>
+<task-plan id="phase-1-task-3" wave="2">
+  <title>Complete CLI init and push commands</title>
+  <requirement>REQ-CLI-001, REQ-CLI-002: drift init and drift push functional</requirement>
   <description>
-    Per qa-pass-1.md P0 blocker #5 and DEPLOYMENT-RUNBOOK.md Task 1:
-    Upload all 5 pre-built theme tarballs to the R2 bucket.
+    Per decisions.md Section II and existing code at deliverables/promptops/drift/cli/:
+    Complete the init and push commands. Partial implementations exist.
 
-    Tarballs exist locally at:
-    - dist/themes/ember@1.0.0.tar.gz (6.3 KB)
-    - dist/themes/forge@1.0.0.tar.gz (5.1 KB)
-    - dist/themes/slate@1.0.0.tar.gz (5.2 KB)
-    - dist/themes/drift@1.0.0.tar.gz (5.4 KB)
-    - dist/themes/bloom@1.0.0.tar.gz (5.5 KB)
+    init.ts (43 lines): Creates project via API, saves config
+    push.ts (63 lines): Reads file, pushes version to API
 
-    Requires: R2 bucket created (task-2), upload script fixed (task-3)
+    Must integrate with deployed API from task-2.
+    Config stored at ~/.drift/config.json per decisions.md OQ-003.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/scripts/upload-tarballs.ts" reason="Upload script (must be fixed first)" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/.env.example" reason="Required environment variables" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 1 upload steps" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/src/commands/init.ts" reason="Init command implementation" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/src/commands/push.ts" reason="Push command implementation" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/src/api.ts" reason="API client (207 lines)" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/src/config.ts" reason="Config management (131 lines)" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="OQ-003: Auth model (project-level key)" />
   </context>
 
   <steps>
-    <step order="1">Copy .env.example to .env</step>
-    <step order="2">Set CLOUDFLARE_ACCOUNT_ID (from Cloudflare dashboard)</step>
-    <step order="3">Generate R2 API token: Cloudflare dashboard > R2 > API Tokens > Create API Token</step>
-    <step order="4">Set R2_ACCESS_KEY_ID (from API token)</step>
-    <step order="5">Set R2_SECRET_ACCESS_KEY (from API token)</step>
-    <step order="6">Set R2_BUCKET_NAME=emdash-themes</step>
-    <step order="7">Verify tarballs exist: ls dist/themes/*.tar.gz</step>
-    <step order="8">Run: npm run upload:themes</step>
-    <step order="9">Verify each tarball accessible: curl -I https://pub-{id}.r2.dev/ember@1.0.0.tar.gz</step>
+    <step order="1">cd deliverables/promptops/drift/cli</step>
+    <step order="2">npm install</step>
+    <step order="3">Update src/api.ts with production API URL</step>
+    <step order="4">Test init: npm run dev -- init test-project</step>
+    <step order="5">Verify ~/.drift/config.json contains api_key and project_id</step>
+    <step order="6">Create test prompt file: echo "You are a helpful assistant" > test-prompt.txt</step>
+    <step order="7">Test push: npm run dev -- push system-prompt --file test-prompt.txt</step>
+    <step order="8">Verify API received prompt: curl GET /api/prompts with API key</step>
+    <step order="9">Push second version, verify version number increments</step>
   </steps>
 
   <verification>
-    <check type="bash">cd /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe && ls dist/themes/*.tar.gz | wc -l</check>
-    <check type="manual">curl -I for each of 5 tarballs returns HTTP 200</check>
-    <check type="manual">Script output shows "All tarballs uploaded successfully!"</check>
+    <check type="bash">npm run dev -- init test-project-verify</check>
+    <check type="bash">cat ~/.drift/config.json | grep api_key</check>
+    <check type="bash">npm run dev -- push verify-prompt --file test-prompt.txt</check>
+    <check type="manual">Init creates config file with credentials</check>
+    <check type="manual">Push uploads prompt and returns version number</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="R2 bucket must exist" />
-    <depends-on task-id="phase-1-task-3" reason="Upload script bug must be fixed" />
+    <depends-on task-id="phase-1-task-2" reason="API must be deployed for CLI to call" />
   </dependencies>
 
-  <commit-message>chore(wardrobe): upload theme tarballs to R2
+  <commit-message>feat(drift): complete CLI init and push commands
 
-5 theme tarballs uploaded to emdash-themes R2 bucket:
-- ember@1.0.0.tar.gz
-- forge@1.0.0.tar.gz
-- slate@1.0.0.tar.gz
-- drift@1.0.0.tar.gz
-- bloom@1.0.0.tar.gz
+CLI commands functional:
+- drift init <name>: Creates project, saves API key to ~/.drift/config.json
+- drift push <name> --file <path>: Reads file, pushes version to API
 
-CLI installs now functional.
+Per decisions.md: 60-second time-to-value target.
 
-Resolves P0 blocker #5 from qa-pass-1.md
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-4" wave="2">
+  <title>Implement CLI list and rollback commands</title>
+  <requirement>REQ-CLI-003, REQ-CLI-004: drift list and drift rollback functional</requirement>
+  <description>
+    Per decisions.md Section II:
+    Implement the missing list and rollback commands.
+
+    drift list: Display all prompts with version history
+    drift rollback <name> --version <n>: Revert to specific version
+
+    API endpoints exist (GET /api/prompts, POST /api/prompts/:name/rollback).
+    Must create CLI wrappers.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/src/api.ts" reason="API client has listPrompts, rollbackPrompt methods" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/src/config.ts" reason="Config loading for API key" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/src/commands/" reason="Commands directory, add list.ts and rollback.ts" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Section IX: Acceptance criteria" />
+  </context>
+
+  <steps>
+    <step order="1">Create src/commands/list.ts</step>
+    <step order="2">Import api.listPrompts() and config loader</step>
+    <step order="3">Format output as table: Name | Active Version | Total Versions | Created</step>
+    <step order="4">Create src/commands/rollback.ts</step>
+    <step order="5">Accept arguments: prompt name, --version flag</step>
+    <step order="6">Call api.rollbackPrompt(name, version)</step>
+    <step order="7">Display success message: "Rolled back {name} to version {n}"</step>
+    <step order="8">Register both commands in bin/drift.js</step>
+    <step order="9">Test list: npm run dev -- list</step>
+    <step order="10">Test rollback: npm run dev -- rollback system-prompt --version 1</step>
+    <step order="11">Verify active version changed via list</step>
+  </steps>
+
+  <verification>
+    <check type="bash">npm run dev -- list</check>
+    <check type="bash">npm run dev -- rollback test-prompt --version 1</check>
+    <check type="manual">List displays all prompts in table format</check>
+    <check type="manual">Rollback changes active version immediately</check>
+    <check type="manual">Re-running list shows updated active version</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-2" reason="API must be deployed" />
+    <depends-on task-id="phase-1-task-3" reason="Must have prompts to list/rollback" />
+  </dependencies>
+
+  <commit-message>feat(drift): implement CLI list and rollback commands
+
+CLI commands complete:
+- drift list: Shows all prompts with version history
+- drift rollback <name> --version <n>: Reverts to specified version
+
+Per decisions.md: "The rollback. One command. Instant. No thinking."
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -318,52 +348,61 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-5" wave="2">
-  <title>Deploy analytics worker</title>
-  <requirement>P0-006: Deploy analytics worker; T1-005: Anonymous install telemetry</requirement>
+  <title>Build SDK with getPrompt and caching</title>
+  <requirement>REQ-SDK-001, REQ-SDK-002: getPrompt() with 5-minute TTL caching</requirement>
   <description>
-    Per qa-pass-1.md P0 blocker #6 and DEPLOYMENT-RUNBOOK.md Task 4:
-    Deploy the analytics worker that tracks anonymous theme installs.
+    Per decisions.md Section II and locked decision #3 (SDK-First):
+    Build the TypeScript SDK that applications use to fetch prompts.
 
-    Worker: workers/analytics/
-    Endpoints: POST /track, GET /stats, GET /health
-    Requires: KV namespace IDs configured (task-1)
+    Core function: getPrompt(name) -> { version, content, updatedAt }
+    Caching: 5-minute TTL (per decisions.md locked decision)
+    Fallback: If API fails, return cached version with warning
+
+    Package: @drift/sdk or drift-sdk
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/analytics/src/index.ts" reason="Analytics worker implementation (389 lines)" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/analytics/wrangler.toml" reason="Worker configuration" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 4 deployment steps" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/" reason="Create sdk/ directory alongside api/ and cli/" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Decision #3: SDK-First, 5-min TTL" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="OQ-006: npm package name" />
   </context>
 
   <steps>
-    <step order="1">cd workers/analytics</step>
-    <step order="2">Verify wrangler.toml has real KV namespace IDs (from task-1)</step>
-    <step order="3">Generate API key: openssl rand -hex 32</step>
-    <step order="4">Set secret: wrangler secret put API_KEY (paste generated key)</step>
-    <step order="5">Deploy: wrangler deploy</step>
-    <step order="6">Note deployed URL: wardrobe-analytics.{subdomain}.workers.dev</step>
-    <step order="7">Verify health: curl https://wardrobe-analytics.{subdomain}.workers.dev/health</step>
-    <step order="8">Test track endpoint: curl -X POST -H "Content-Type: application/json" -d '{"theme":"ember","os":"darwin","timestamp":1712844000000,"cliVersion":"1.0.0"}' https://wardrobe-analytics.{subdomain}.workers.dev/track</step>
+    <step order="1">Create deliverables/promptops/drift/sdk/ directory</step>
+    <step order="2">Initialize npm package: npm init (name: drift-sdk)</step>
+    <step order="3">Add TypeScript config: tsconfig.json</step>
+    <step order="4">Create src/index.ts with Drift class</step>
+    <step order="5">Implement constructor: new Drift({ apiKey, endpoint? })</step>
+    <step order="6">Implement getPrompt(name): fetches from API, caches result</step>
+    <step order="7">Implement cache: Map with TTL tracking (5 minutes = 300000ms)</step>
+    <step order="8">Add fallback: on API error, return stale cache with console.warn</step>
+    <step order="9">Export types: Prompt, DriftConfig, PromptResult</step>
+    <step order="10">Add environment variable support: DRIFT_API_KEY, DRIFT_ENDPOINT</step>
+    <step order="11">Build: npm run build</step>
+    <step order="12">Test: import SDK, call getPrompt, verify cache hit on second call</step>
   </steps>
 
   <verification>
-    <check type="bash">curl https://wardrobe-analytics.{subdomain}.workers.dev/health</check>
-    <check type="manual">/health returns {"status":"ok"}</check>
-    <check type="manual">/track accepts POST and returns {"success":true}</check>
+    <check type="bash">cd deliverables/promptops/drift/sdk && npm run build</check>
+    <check type="manual">getPrompt() returns { version, content, updatedAt }</check>
+    <check type="manual">Second call within 5 minutes hits cache (no network)</check>
+    <check type="manual">Cache miss after 5 minutes triggers API fetch</check>
+    <check type="manual">API failure returns stale cache with warning</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="KV namespace IDs must be configured" />
+    <depends-on task-id="phase-1-task-2" reason="API must be deployed for SDK to fetch" />
   </dependencies>
 
-  <commit-message>feat(wardrobe): deploy analytics worker
+  <commit-message>feat(drift): build SDK with getPrompt and caching
 
-Analytics worker deployed to Cloudflare Workers:
-- POST /track: Record anonymous install events
-- GET /stats: Aggregated statistics (API key protected)
-- GET /health: Health check endpoint
+SDK implementation:
+- Drift class with constructor({ apiKey, endpoint })
+- getPrompt(name) fetches prompt with 5-minute TTL cache
+- Graceful fallback: returns stale cache on API failure
+- Environment variable config: DRIFT_API_KEY, DRIFT_ENDPOINT
 
-Resolves P0 blocker #6 and T1-005 from qa-pass-1.md
+Per decisions.md Decision #3: "Add 2 lines of code" adoption curve.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -371,52 +410,64 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-6" wave="2">
-  <title>Deploy email-capture worker</title>
-  <requirement>P0-007: Deploy email-capture worker; T1-004: Wire email capture endpoint</requirement>
+  <title>Build read-only Dashboard</title>
+  <requirement>REQ-DASH-001 to 006: Static HTML dashboard showing prompts</requirement>
   <description>
-    Per qa-pass-1.md P0 blocker #7 and DEPLOYMENT-RUNBOOK.md Task 3:
-    Deploy the email capture worker for showcase email signups.
+    Per decisions.md Decisions #4, #5 and OQ-005:
+    Build minimal static HTML dashboard for read-only visibility.
 
-    Worker: workers/email-capture/
-    Endpoints: POST /subscribe
-    Requires: KV namespace IDs configured (task-1)
+    Features:
+    - List all prompts with active version
+    - Click prompt -> show version history with timestamps
+    - NO rollback buttons (CLI only per Decision #4)
+    - Professional styling with Tailwind CDN
+
+    Hosting: Embed in Worker (single deployment per OQ-005 recommendation)
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/email-capture/src/index.ts" reason="Email capture implementation (305 lines)" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/email-capture/wrangler.toml" reason="Worker configuration with CORS_ORIGIN" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 3 deployment steps" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/src/index.ts" reason="Embed dashboard route in Worker" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Decision #4: Dashboard minimal, Decision #5: polished" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="OQ-005: Hosting recommendation" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Not directly applicable but provides styling patterns" />
   </context>
 
   <steps>
-    <step order="1">cd workers/email-capture</step>
-    <step order="2">Verify wrangler.toml has real KV namespace IDs (from task-1)</step>
-    <step order="3">Verify CORS_ORIGIN matches target showcase domain (wardrobe.emdash.dev)</step>
-    <step order="4">Deploy: wrangler deploy</step>
-    <step order="5">Note deployed URL: wardrobe-email-capture.{subdomain}.workers.dev</step>
-    <step order="6">Test subscribe endpoint: curl -X POST -H "Content-Type: application/json" -H "Origin: https://wardrobe.emdash.dev" -d '{"email":"test@example.com"}' https://wardrobe-email-capture.{subdomain}.workers.dev/subscribe</step>
-    <step order="7">Verify showcase script.js has correct endpoint URL (update if different)</step>
+    <step order="1">Create deliverables/promptops/drift/dashboard/ directory</step>
+    <step order="2">Create index.html with Tailwind CDN</step>
+    <step order="3">Build table: Prompt Name | Active Version | Total Versions | Last Updated</step>
+    <step order="4">Add JavaScript to fetch /api/prompts and populate table</step>
+    <step order="5">Add click handler: clicking row shows version history modal</step>
+    <step order="6">Style: Clean typography, good spacing, responsive</step>
+    <step order="7">Keep under 500 lines total (per REQ-DASH-006)</step>
+    <step order="8">Embed in Worker: update api/src/index.ts to serve HTML at GET /</step>
+    <step order="9">Re-deploy Worker with dashboard embedded</step>
+    <step order="10">Test: Navigate to drift-api.{subdomain}.workers.dev/ in browser</step>
+    <step order="11">Verify prompts display, version history works</step>
   </steps>
 
   <verification>
-    <check type="bash">curl -X POST -H "Content-Type: application/json" -d '{"email":"test@example.com"}' https://wardrobe-email-capture.{subdomain}.workers.dev/subscribe</check>
-    <check type="manual">POST /subscribe returns success response</check>
-    <check type="manual">CORS headers present in response</check>
+    <check type="bash">curl https://drift-api.{subdomain}.workers.dev/</check>
+    <check type="manual">Returns HTML page with prompt list</check>
+    <check type="manual">Table shows all prompts with versions</check>
+    <check type="manual">Click reveals version history</check>
+    <check type="manual">No rollback buttons present</check>
+    <check type="manual">Styling is professional, not "anxious"</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="KV namespace IDs must be configured" />
+    <depends-on task-id="phase-1-task-2" reason="API must serve dashboard and data" />
   </dependencies>
 
-  <commit-message>feat(wardrobe): deploy email-capture worker
+  <commit-message>feat(drift): build read-only dashboard
 
-Email capture worker deployed to Cloudflare Workers:
-- POST /subscribe: Capture email signups with rate limiting
-- Email validation (RFC 5322)
-- Duplicate detection
-- CORS configured for showcase domain
+Dashboard embedded in Worker at GET /:
+- Lists all prompts with version info
+- Click to view version history
+- No rollback buttons (CLI only)
+- Tailwind CDN styling, <500 lines
 
-Resolves P0 blocker #7 and T1-004 from qa-pass-1.md
+Per decisions.md Decision #4: "Static HTML. Clean but not elaborate."
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -424,68 +475,78 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 3 (Parallel, after Wave 2) — Demo Sites
+### Wave 3 (Parallel, after Wave 2) — Polish and Publish
 
-Three parallel tracks deploying 5 demo sites (longest task). **Estimated time: 60-90 minutes**
+Three tasks testing NERVE and publishing packages. **Estimated time: 1.5 hours**
 
 ```xml
 <task-plan id="phase-1-task-7" wave="3">
-  <title>Deploy Ember demo site</title>
-  <requirement>T1-001: Deploy live demo sites (1 of 5)</requirement>
+  <title>Test and document NERVE scripts</title>
+  <requirement>REQ-NERVE-001 to 005: NERVE scripts functional and documented</requirement>
   <description>
-    Per DEPLOYMENT-RUNBOOK.md Task 5 and Board Condition T1-001:
-    Deploy the Ember theme as a live Emdash demo site.
+    Per decisions.md Section II (NERVE) and existing code at /nerve/:
+    NERVE scripts are built (1,055 lines). Test and verify functionality.
 
-    This is the first demo site and establishes the pattern for others.
+    Scripts:
+    - daemon.sh: Main loop with PID lockfile
+    - queue.sh: Persistent queue with recovery
+    - abort.sh: Clean shutdown via flag
+    - parse-verdict.sh: QA verdict parsing
+    - status.sh: Status reporting
 
-    Target: ember.wardrobe.emdash.dev
-    Theme: Ember ("Bold. Editorial. For people with something to say.")
-
-    Reference: docs/EMDASH-GUIDE.md Section 5 for Cloudflare deployment
+    Note: NERVE integration with Drift is deferred per Board feedback.
+    V1 ships NERVE as standalone infrastructure.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/themes/ember/src/" reason="Ember theme source files" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 5: Demo site deployment steps" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5: Cloudflare deployment patterns" />
+    <file path="/home/agent/shipyard-ai/nerve/daemon.sh" reason="Daemon loop (260 lines)" />
+    <file path="/home/agent/shipyard-ai/nerve/queue.sh" reason="Queue persistence (306 lines)" />
+    <file path="/home/agent/shipyard-ai/nerve/abort.sh" reason="Abort management (178 lines)" />
+    <file path="/home/agent/shipyard-ai/nerve/parse-verdict.sh" reason="Verdict parsing (136 lines)" />
+    <file path="/home/agent/shipyard-ai/nerve/status.sh" reason="Status reporting (175 lines)" />
+    <file path="/home/agent/shipyard-ai/nerve/README.md" reason="Documentation (301 lines)" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Decision #6: Bash over agents" />
   </context>
 
   <steps>
-    <step order="1">Create new Emdash site: npm create emdash@latest -- --template @emdash-cms/template-blog-cloudflare</step>
-    <step order="2">Name: wardrobe-demo-ember</step>
-    <step order="3">cd wardrobe-demo-ember</step>
-    <step order="4">Copy theme: cp -r /path/to/wardrobe/themes/ember/src/* ./src/</step>
-    <step order="5">Create D1 database: wrangler d1 create wardrobe-demo-ember</step>
-    <step order="6">Note database_id from output</step>
-    <step order="7">Create R2 bucket: wrangler r2 bucket create wardrobe-demo-ember-media</step>
-    <step order="8">Update wrangler.jsonc with database_id and bucket name (per EMDASH-GUIDE.md Section 5)</step>
-    <step order="9">Run migrations: wrangler d1 migrations apply wardrobe-demo-ember</step>
-    <step order="10">Seed demo content: npx emdash seed</step>
-    <step order="11">Generate auth secret: npx emdash auth secret</step>
-    <step order="12">Set secret: wrangler secret put EMDASH_AUTH_SECRET</step>
-    <step order="13">Deploy: wrangler deploy</step>
-    <step order="14">Configure custom domain: ember.wardrobe.emdash.dev (Cloudflare dashboard)</step>
-    <step order="15">Verify site loads: curl -I https://ember.wardrobe.emdash.dev</step>
+    <step order="1">cd /home/agent/shipyard-ai/nerve</step>
+    <step order="2">Test daemon start: ./daemon.sh start</step>
+    <step order="3">Verify PID lockfile created: ls -la /tmp/nerve.pid or configured path</step>
+    <step order="4">Test duplicate prevention: ./daemon.sh start (should fail)</step>
+    <step order="5">Test queue enqueue: ./queue.sh enqueue "test-item"</step>
+    <step order="6">Verify queue persisted: ls /tmp/nerve-queue/ or configured path</step>
+    <step order="7">Test abort: ./abort.sh set</step>
+    <step order="8">Verify daemon responds to abort (clean shutdown)</step>
+    <step order="9">Test verdict parsing: echo "PASS: 0 issues" | ./parse-verdict.sh</step>
+    <step order="10">Verify JSON output: {"verdict": "PASS", "issues": 0}</step>
+    <step order="11">Test status: ./status.sh</step>
+    <step order="12">Verify README documents all commands accurately</step>
   </steps>
 
   <verification>
-    <check type="bash">curl -I https://ember.wardrobe.emdash.dev</check>
-    <check type="manual">Site renders with Ember theme styling</check>
-    <check type="manual">Demo content visible on homepage</check>
+    <check type="bash">./daemon.sh start && ls /tmp/nerve.pid</check>
+    <check type="bash">./abort.sh set && sleep 2 && ./status.sh</check>
+    <check type="bash">echo "FAIL: 3 issues" | ./parse-verdict.sh</check>
+    <check type="manual">Daemon starts, creates lockfile</check>
+    <check type="manual">Duplicate daemon rejected with error</check>
+    <check type="manual">Abort flag triggers clean shutdown</check>
+    <check type="manual">Parse-verdict returns valid JSON</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-4" reason="Theme distribution must be working" />
+    <depends-on task-id="phase-1-task-2" reason="Drift API provides context but not required" />
   </dependencies>
 
-  <commit-message>feat(wardrobe): deploy ember demo site
+  <commit-message>test(nerve): verify all scripts functional
 
-Ember demo site deployed to ember.wardrobe.emdash.dev
-- D1 database: wardrobe-demo-ember
-- R2 bucket: wardrobe-demo-ember-media
-- Demo content seeded
+NERVE scripts tested:
+- daemon.sh: PID lock, signal handling
+- queue.sh: Persistence, recovery
+- abort.sh: Flag management
+- parse-verdict.sh: JSON verdict output
+- status.sh: Metrics reporting
 
-Part of T1-001 (1/5 demo sites)
+Per decisions.md Decision #6: "Trust bash, not instructions."
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -493,55 +554,59 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-8" wave="3">
-  <title>Deploy Forge and Slate demo sites</title>
-  <requirement>T1-001: Deploy live demo sites (2-3 of 5)</requirement>
+  <title>Publish CLI to npm</title>
+  <requirement>REQ-CLI-005: CLI installable via npm</requirement>
   <description>
-    Per DEPLOYMENT-RUNBOOK.md Task 5 and Board Condition T1-001:
-    Deploy Forge and Slate themes as live Emdash demo sites.
+    Per decisions.md OQ-006:
+    Publish CLI package to npm registry.
 
-    Follow the same pattern as Ember (task-7).
+    Package name: drift-cli (check availability)
+    Fallback: @drift-prompt/cli
 
-    Targets:
-    - forge.wardrobe.emdash.dev ("Dark and technical. Built for builders.")
-    - slate.wardrobe.emdash.dev ("Trust at first glance.")
+    Users install with: npm install -g drift-cli
+    Then run: drift init, drift push, etc.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/themes/forge/src/" reason="Forge theme source files" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/themes/slate/src/" reason="Slate theme source files" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 5 pattern" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/package.json" reason="Package config" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/bin/drift.js" reason="CLI entry point" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="OQ-006: npm name" />
   </context>
 
   <steps>
-    <step order="1">Deploy Forge: Repeat steps from task-7 for themes/forge/</step>
-    <step order="2">D1 database: wardrobe-demo-forge</step>
-    <step order="3">R2 bucket: wardrobe-demo-forge-media</step>
-    <step order="4">Domain: forge.wardrobe.emdash.dev</step>
-    <step order="5">Verify: curl -I https://forge.wardrobe.emdash.dev</step>
-    <step order="6">Deploy Slate: Repeat steps from task-7 for themes/slate/</step>
-    <step order="7">D1 database: wardrobe-demo-slate</step>
-    <step order="8">R2 bucket: wardrobe-demo-slate-media</step>
-    <step order="9">Domain: slate.wardrobe.emdash.dev</step>
-    <step order="10">Verify: curl -I https://slate.wardrobe.emdash.dev</step>
+    <step order="1">cd deliverables/promptops/drift/cli</step>
+    <step order="2">Check npm name availability: npm view drift-cli</step>
+    <step order="3">If taken, use fallback: @drift-prompt/cli</step>
+    <step order="4">Update package.json with correct name, version 1.0.0</step>
+    <step order="5">Ensure bin field points to bin/drift.js</step>
+    <step order="6">Build: npm run build</step>
+    <step order="7">Test locally: npm link && drift --help</step>
+    <step order="8">Verify all 4 commands show in help</step>
+    <step order="9">Publish: npm publish --access public</step>
+    <step order="10">Test install: npm install -g drift-cli && drift --help</step>
   </steps>
 
   <verification>
-    <check type="bash">curl -I https://forge.wardrobe.emdash.dev</check>
-    <check type="bash">curl -I https://slate.wardrobe.emdash.dev</check>
-    <check type="manual">Both sites render with correct theme styling</check>
+    <check type="bash">npm view drift-cli || echo "Available"</check>
+    <check type="bash">drift --help</check>
+    <check type="manual">npm publish succeeds</check>
+    <check type="manual">Global install works: drift --help shows all commands</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-4" reason="Theme distribution must be working" />
+    <depends-on task-id="phase-1-task-3" reason="Init and push must be complete" />
+    <depends-on task-id="phase-1-task-4" reason="List and rollback must be complete" />
   </dependencies>
 
-  <commit-message>feat(wardrobe): deploy forge and slate demo sites
+  <commit-message>chore(drift): publish CLI to npm
 
-Demo sites deployed:
-- forge.wardrobe.emdash.dev (dark, technical)
-- slate.wardrobe.emdash.dev (clean, professional)
+CLI published as drift-cli (or fallback name):
+- drift init <name>
+- drift push <name> --file <path>
+- drift list
+- drift rollback <name> --version <n>
 
-Part of T1-001 (3/5 demo sites)
+Install with: npm install -g drift-cli
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -549,55 +614,58 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-9" wave="3">
-  <title>Deploy Drift and Bloom demo sites</title>
-  <requirement>T1-001: Deploy live demo sites (4-5 of 5)</requirement>
+  <title>Publish SDK to npm</title>
+  <requirement>REQ-SDK-005: SDK installable via npm</requirement>
   <description>
-    Per DEPLOYMENT-RUNBOOK.md Task 5 and Board Condition T1-001:
-    Deploy Drift and Bloom themes as live Emdash demo sites.
+    Per decisions.md OQ-006:
+    Publish SDK package to npm registry.
 
-    Follow the same pattern as Ember (task-7).
+    Package name: drift-sdk (check availability)
+    Fallback: @drift-prompt/sdk
 
-    Targets:
-    - drift.wardrobe.emdash.dev ("Let your content breathe.")
-    - bloom.wardrobe.emdash.dev ("Where community feels at home.")
+    Users install with: npm install drift-sdk
+    Then use: import { Drift } from 'drift-sdk'
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/themes/drift/src/" reason="Drift theme source files" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/themes/bloom/src/" reason="Bloom theme source files" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 5 pattern" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/sdk/package.json" reason="Package config (from task-5)" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/sdk/src/index.ts" reason="SDK entry point" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="OQ-006: npm name" />
   </context>
 
   <steps>
-    <step order="1">Deploy Drift: Repeat steps from task-7 for themes/drift/</step>
-    <step order="2">D1 database: wardrobe-demo-drift</step>
-    <step order="3">R2 bucket: wardrobe-demo-drift-media</step>
-    <step order="4">Domain: drift.wardrobe.emdash.dev</step>
-    <step order="5">Verify: curl -I https://drift.wardrobe.emdash.dev</step>
-    <step order="6">Deploy Bloom: Repeat steps from task-7 for themes/bloom/</step>
-    <step order="7">D1 database: wardrobe-demo-bloom</step>
-    <step order="8">R2 bucket: wardrobe-demo-bloom-media</step>
-    <step order="9">Domain: bloom.wardrobe.emdash.dev</step>
-    <step order="10">Verify: curl -I https://bloom.wardrobe.emdash.dev</step>
+    <step order="1">cd deliverables/promptops/drift/sdk</step>
+    <step order="2">Check npm name availability: npm view drift-sdk</step>
+    <step order="3">If taken, use fallback: @drift-prompt/sdk</step>
+    <step order="4">Update package.json with correct name, version 1.0.0</step>
+    <step order="5">Ensure main points to dist/index.js, types to dist/index.d.ts</step>
+    <step order="6">Build: npm run build</step>
+    <step order="7">Test locally: create test file that imports and calls getPrompt</step>
+    <step order="8">Publish: npm publish --access public</step>
+    <step order="9">Test install: npm install drift-sdk in new directory</step>
+    <step order="10">Verify import and getPrompt work</step>
   </steps>
 
   <verification>
-    <check type="bash">curl -I https://drift.wardrobe.emdash.dev</check>
-    <check type="bash">curl -I https://bloom.wardrobe.emdash.dev</check>
-    <check type="manual">Both sites render with correct theme styling</check>
+    <check type="bash">npm view drift-sdk || echo "Available"</check>
+    <check type="bash">npm install drift-sdk && node -e "require('drift-sdk')"</check>
+    <check type="manual">npm publish succeeds</check>
+    <check type="manual">Import and getPrompt work in test file</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-4" reason="Theme distribution must be working" />
+    <depends-on task-id="phase-1-task-5" reason="SDK must be built" />
   </dependencies>
 
-  <commit-message>feat(wardrobe): deploy drift and bloom demo sites
+  <commit-message>chore(drift): publish SDK to npm
 
-Demo sites deployed:
-- drift.wardrobe.emdash.dev (minimal, airy)
-- bloom.wardrobe.emdash.dev (warm, organic)
+SDK published as drift-sdk (or fallback name):
+- new Drift({ apiKey })
+- drift.getPrompt(name) with 5-minute caching
 
-Completes T1-001 (5/5 demo sites)
+Install with: npm install drift-sdk
+
+Per decisions.md Decision #3: "Add 2 lines of code."
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -605,67 +673,60 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 4 (Sequential, after Wave 3) — Screenshots, Showcase, QA
+### Wave 4 (Sequential, after Wave 3) — Verification and Commit
 
-Four tasks completing deployment and validation. **Estimated time: 30 minutes**
+Three tasks verifying time-to-value, committing changes, and running QA. **Estimated time: 30 minutes**
 
 ```xml
 <task-plan id="phase-1-task-10" wave="4">
-  <title>Generate real PNG screenshots from demo sites</title>
-  <requirement>T1-002: Replace SVG placeholders with real PNGs</requirement>
+  <title>Verify 60-second time-to-value</title>
+  <requirement>REQ-META-001: npm install + drift init + drift push in under 60 seconds</requirement>
   <description>
-    Per qa-pass-1.md P0 blocker #3 and DEPLOYMENT-RUNBOOK.md Task 6:
-    Generate real screenshots from the 5 live demo sites.
+    Per decisions.md Decision #8:
+    "npm install + drift init + drift push must work in under 60 seconds.
+    If setup takes longer than the first dopamine hit, we've failed."
 
-    Current: SVG placeholders at showcase/screenshots/*.svg
-    Target: PNG screenshots at showcase/screenshots/*.png (< 200KB each)
-
-    Uses Playwright for automated screenshot capture.
+    Test the complete user journey from fresh install to first prompt deployed.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/scripts/generate-screenshots.ts" reason="Playwright screenshot script" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/screenshots/" reason="Output directory" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 6 screenshot steps" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Decision #8: 60-second target" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Section IX: Acceptance criteria" />
   </context>
 
   <steps>
-    <step order="1">Install Playwright: npx playwright install chromium</step>
-    <step order="2">Update scripts/generate-screenshots.ts with live demo URLs if needed</step>
-    <step order="3">Verify all 5 demo sites are accessible</step>
-    <step order="4">Run: npm run screenshots</step>
-    <step order="5">Verify output: ls -la showcase/screenshots/*.png</step>
-    <step order="6">Check file sizes: du -h showcase/screenshots/*.png (should be < 200KB each)</step>
-    <step order="7">Spot-check visual quality of each screenshot</step>
-    <step order="8">Remove old SVG files: rm showcase/screenshots/*.svg</step>
-    <step order="9">Update showcase/index.html if referencing .svg extensions</step>
+    <step order="1">Create fresh directory: mkdir /tmp/drift-test && cd /tmp/drift-test</step>
+    <step order="2">Start timer</step>
+    <step order="3">Install CLI: npm install -g drift-cli</step>
+    <step order="4">Initialize project: drift init my-test-project</step>
+    <step order="5">Create prompt: echo "You are a helpful assistant" > system.txt</step>
+    <step order="6">Push prompt: drift push system --file system.txt</step>
+    <step order="7">Stop timer</step>
+    <step order="8">Record time in seconds</step>
+    <step order="9">Verify prompt visible: drift list</step>
+    <step order="10">If over 60 seconds, identify bottleneck and document</step>
   </steps>
 
   <verification>
-    <check type="bash">ls /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/screenshots/*.png | wc -l</check>
-    <check type="bash">du -h /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/screenshots/*.png</check>
-    <check type="manual">All 5 screenshots capture theme personality</check>
-    <check type="manual">No SVG files remain</check>
+    <check type="manual">Total time from npm install to first push: ____ seconds</check>
+    <check type="manual">If < 60 seconds: PASS</check>
+    <check type="manual">If > 60 seconds: Document bottleneck for optimization</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-7" reason="Ember demo site must be live" />
-    <depends-on task-id="phase-1-task-8" reason="Forge and Slate demo sites must be live" />
-    <depends-on task-id="phase-1-task-9" reason="Drift and Bloom demo sites must be live" />
+    <depends-on task-id="phase-1-task-8" reason="CLI must be published to npm" />
   </dependencies>
 
-  <commit-message>feat(wardrobe): generate real PNG screenshots
+  <commit-message>test(drift): verify 60-second time-to-value
 
-Replace SVG placeholders with real screenshots from live demo sites:
-- ember.png (bold, editorial)
-- forge.png (dark, technical)
-- slate.png (clean, professional)
-- drift.png (minimal, airy)
-- bloom.png (warm, organic)
+Tested complete user journey:
+- npm install -g drift-cli
+- drift init my-project
+- drift push system --file prompt.txt
 
-All screenshots < 200KB per Board requirement.
+Total time: XX seconds (target: <60)
 
-Resolves T1-002 from qa-pass-1.md
+Per decisions.md Decision #8: First dopamine hit.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -673,58 +734,58 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-11" wave="4">
-  <title>Deploy showcase website to Cloudflare Pages</title>
-  <requirement>P0-008: Deploy showcase website to Cloudflare Pages</requirement>
+  <title>Commit all changes to git</title>
+  <requirement>Meta: All files committed to deliverables</requirement>
   <description>
-    Per qa-pass-1.md P0 blocker #7 and DEPLOYMENT-RUNBOOK.md Task 7:
-    Deploy the marketing showcase website with real screenshots.
+    Per decisions.md Section IX Meta requirements:
+    Commit all modified and new files in the drift and nerve directories.
 
-    Target: wardrobe.emdash.dev
-    Content: Theme cards, copy buttons, email capture form
+    Changes include:
+    - API worker updates
+    - CLI commands
+    - SDK implementation
+    - Dashboard
+    - NERVE tests
+    - Configuration updates
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/" reason="Showcase website files" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/script.js" reason="May need endpoint URL update" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 7 deployment steps" />
+    <file path="/home/agent/shipyard-ai/deliverables/promptops/" reason="All drift code" />
+    <file path="/home/agent/shipyard-ai/nerve/" reason="NERVE scripts" />
+    <file path="/home/agent/shipyard-ai/.planning/" reason="Planning docs" />
   </context>
 
   <steps>
-    <step order="1">cd showcase</step>
-    <step order="2">Verify screenshots use .png extensions in index.html</step>
-    <step order="3">Verify email endpoint URL in script.js matches deployed worker</step>
-    <step order="4">Create Pages project: wrangler pages project create wardrobe-showcase</step>
-    <step order="5">Deploy: wrangler pages deploy . --project-name wardrobe-showcase</step>
-    <step order="6">Note deployment URL: wardrobe-showcase.pages.dev</step>
-    <step order="7">Configure custom domain: wardrobe.emdash.dev (Cloudflare dashboard)</step>
-    <step order="8">Verify HTTPS: curl -I https://wardrobe.emdash.dev</step>
-    <step order="9">Test email form: submit test email, verify worker receives</step>
-    <step order="10">Test copy buttons: verify clipboard functionality</step>
+    <step order="1">cd /home/agent/shipyard-ai</step>
+    <step order="2">git status (review all changes)</step>
+    <step order="3">git add deliverables/promptops/ nerve/ .planning/</step>
+    <step order="4">Create comprehensive commit</step>
+    <step order="5">git status (verify clean working tree)</step>
   </steps>
 
   <verification>
-    <check type="bash">curl -I https://wardrobe.emdash.dev</check>
-    <check type="manual">All 5 theme cards visible</check>
-    <check type="manual">Copy buttons functional</check>
-    <check type="manual">Email form submits successfully</check>
-    <check type="manual">Mobile responsive at 375px width</check>
+    <check type="bash">cd /home/agent/shipyard-ai && git status --porcelain</check>
+    <check type="manual">git status shows clean working tree</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-10" reason="Real screenshots must be generated" />
-    <depends-on task-id="phase-1-task-6" reason="Email capture worker must be deployed" />
+    <depends-on task-id="phase-1-task-6" reason="Dashboard must be complete" />
+    <depends-on task-id="phase-1-task-7" reason="NERVE tests must be complete" />
+    <depends-on task-id="phase-1-task-10" reason="Time-to-value verified" />
   </dependencies>
 
-  <commit-message>feat(wardrobe): deploy showcase to Cloudflare Pages
+  <commit-message>feat(drift): complete Phase 1 build
 
-Showcase website deployed to wardrobe.emdash.dev:
-- 5 theme cards with real screenshots
-- Email capture form (wired to worker)
-- Copy buttons for install commands
-- WCAG 2.1 AA accessible
-- Mobile responsive
+Phase 1 Drift/NERVE build complete:
+- API: 5 endpoints deployed to Cloudflare Workers
+- CLI: 4 commands (init, push, list, rollback)
+- SDK: getPrompt() with 5-minute caching
+- Dashboard: Read-only prompt visibility
+- NERVE: All scripts tested and documented
 
-Resolves P0 blocker #7 from qa-pass-1.md
+Resolves Board HOLD condition: "Demonstrate code, not documents."
+
+Total implementation: ~2,500 lines TypeScript + 1,055 lines bash
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -732,113 +793,61 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-12" wave="4">
-  <title>Commit all changes to git</title>
-  <requirement>P0-009: Commit uncommitted files</requirement>
-  <description>
-    Per qa-pass-1.md P0 blocker #9:
-    Commit all modified and untracked files in the wardrobe project.
-
-    Uncommitted per QA:
-    - cli/commands/install.ts (Modified - contains T1-003 fix)
-    - dist/cli/commands/install.js (Modified - built output)
-    - docs/ (Untracked - DEPLOYMENT-RUNBOOK.md)
-
-    Plus all changes from this deployment plan.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/" reason="Project root" />
-    <file path="/home/agent/shipyard-ai/rounds/emdash-marketplace/qa-pass-1.md" reason="Documents uncommitted files" />
-  </context>
-
-  <steps>
-    <step order="1">cd /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe</step>
-    <step order="2">git status (review all changes)</step>
-    <step order="3">git add .</step>
-    <step order="4">Create commit with all deployment changes</step>
-    <step order="5">git status (verify clean working tree)</step>
-  </steps>
-
-  <verification>
-    <check type="bash">cd /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe && git status --porcelain</check>
-    <check type="manual">git status shows clean working tree</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="Upload script fix must be committed" />
-    <depends-on task-id="phase-1-task-1" reason="KV namespace updates must be committed" />
-    <depends-on task-id="phase-1-task-10" reason="Screenshots must be committed" />
-  </dependencies>
-
-  <commit-message>chore(wardrobe): complete Phase 1 deployment
-
-Phase 1 deployment complete:
-- KV namespace IDs configured
-- R2 upload script fixed
-- Workers deployed (analytics, email-capture)
-- 5 demo sites deployed
-- Real PNG screenshots generated
-- Showcase deployed to Cloudflare Pages
-
-Resolves all 9 P0 blockers from qa-pass-1.md
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-13" wave="4">
-  <title>Run QA Pass 2 verification</title>
+  <title>Run QA Pass verification</title>
   <requirement>QA validation before launch</requirement>
   <description>
-    Per DEPLOYMENT-RUNBOOK.md Task 9:
-    Execute comprehensive QA verification of all deployed components.
+    Per decisions.md Section IX acceptance criteria:
+    Execute comprehensive QA verification of all components.
 
-    All 9 P0 blockers must be resolved.
-    All 5 Tier 1 conditions must pass.
+    All P0 requirements must pass.
+    Board conditions for PROCEED must be met.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/emdash-marketplace/qa-pass-1.md" reason="QA checklist to re-verify" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 9 verification steps" />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Acceptance criteria checklist" />
+    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Section IX: Build Phase Acceptance Criteria" />
   </context>
 
   <steps>
-    <step order="1">Verify P0-001/002/003: All KV namespace IDs are real (not placeholders)</step>
-    <step order="2">Verify P0-004: R2 bucket exists and has public access</step>
-    <step order="3">Verify P0-005: All 5 tarballs return HTTP 200</step>
-    <step order="4">Verify P0-006: Analytics worker /health returns 200</step>
-    <step order="5">Verify P0-007: Email-capture worker accepts POST /subscribe</step>
-    <step order="6">Verify P0-008: Showcase loads at wardrobe.emdash.dev</step>
-    <step order="7">Verify P0-009: git status shows clean working tree</step>
-    <step order="8">Verify T1-001: All 5 demo sites load</step>
-    <step order="9">Verify T1-002: All screenshots are PNG (not SVG)</step>
-    <step order="10">Verify T1-003: CLI shows post-install reveal</step>
-    <step order="11">Verify T1-004: Email form submits successfully</step>
-    <step order="12">Verify T1-005: Analytics receives test event</step>
-    <step order="13">Benchmark install speed: npx wardrobe install ember (< 3 seconds)</step>
-    <step order="14">Document QA Pass 2 results</step>
+    <step order="1">Verify REQ-CLI-001: drift init creates project, generates API key</step>
+    <step order="2">Verify REQ-CLI-002: drift push versions prompt, stores in D1</step>
+    <step order="3">Verify REQ-CLI-003: drift list shows prompts with history</step>
+    <step order="4">Verify REQ-CLI-004: drift rollback reverts version immediately</step>
+    <step order="5">Verify REQ-SDK-001: getPrompt() returns prompt content</step>
+    <step order="6">Verify REQ-SDK-002: Cache hit within 5 minutes (no network)</step>
+    <step order="7">Verify REQ-DASH-001: Dashboard displays prompts</step>
+    <step order="8">Verify REQ-DASH-002: No rollback buttons (read-only)</step>
+    <step order="9">Verify REQ-META-001: Time-to-value under 60 seconds</step>
+    <step order="10">Verify REQ-NERVE-001 to 005: All scripts functional</step>
+    <step order="11">Verify README.md exists and is under 50 lines</step>
+    <step order="12">Verify at least one component runs (execution gate)</step>
+    <step order="13">Document QA Pass results</step>
   </steps>
 
   <verification>
-    <check type="manual">All 9 P0 blockers: PASS</check>
-    <check type="manual">All 5 T1 conditions: PASS</check>
-    <check type="manual">Install speed < 3 seconds</check>
+    <check type="manual">All 16 P0 requirements: PASS</check>
+    <check type="manual">All acceptance criteria: PASS</check>
     <check type="manual">Overall verdict: PASS</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-11" reason="Showcase must be deployed" />
-    <depends-on task-id="phase-1-task-12" reason="All changes must be committed" />
+    <depends-on task-id="phase-1-task-11" reason="All changes must be committed" />
   </dependencies>
 
-  <commit-message>docs(wardrobe): QA Pass 2 verification complete
+  <commit-message>docs(drift): QA Pass verification complete
 
-All P0 blockers resolved. All Tier 1 conditions met.
-Wardrobe Theme Marketplace ready for launch.
+All P0 requirements verified:
+- CLI: 4/4 commands functional
+- API: 6/6 endpoints working
+- SDK: Caching verified
+- Dashboard: Read-only display
+- NERVE: Scripts tested
+- Time-to-value: XX seconds
 
 QA Director: Margaret Hamilton
 Verdict: PASS
+
+Board condition for PROCEED: MET
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -850,37 +859,36 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 | Wave | Tasks | Description | Parallelism | Est. Time |
 |------|-------|-------------|-------------|-----------|
-| 1 | 3 | Infrastructure: KV namespaces, R2 bucket, script fix | 3 parallel | 10 min |
-| 2 | 3 | Workers: Upload tarballs, analytics worker, email worker | 3 parallel (after Wave 1) | 15 min |
-| 3 | 3 | Demo Sites: Ember, Forge+Slate, Drift+Bloom | 3 parallel (after Wave 2) | 60-90 min |
-| 4 | 4 | Finalize: Screenshots, showcase, git, QA | Sequential (after Wave 3) | 30 min |
+| 1 | 2 | Infrastructure: D1 database, API deployment | 2 parallel | 45 min |
+| 2 | 4 | Core: CLI commands, SDK, Dashboard | 4 parallel (after Wave 1) | 2.5 hours |
+| 3 | 3 | Publish: NERVE tests, CLI npm, SDK npm | 3 parallel (after Wave 2) | 1.5 hours |
+| 4 | 3 | Verify: 60-sec test, git commit, QA pass | Sequential (after Wave 3) | 30 min |
 
-**Total Tasks:** 13
-**Maximum Parallelism:** Wave 3 (3 concurrent demo site deployments)
-**Total Time (Sequential):** ~2.5-3 hours
-**Total Time (Parallelized):** ~1.5-2 hours
+**Total Tasks:** 12
+**Maximum Parallelism:** Wave 2 (4 concurrent builds)
+**Total Time (Sequential):** ~6-8 hours
+**Total Time (Parallelized):** ~4-5 hours
 
 ---
 
 ## Dependencies Diagram
 
 ```
-Wave 1:  [task-1: KV Namespaces] ─────────────────────────────────────────>
-         [task-2: R2 Bucket] ─────────────────────────────────────────────>
-         [task-3: Script Fix] ────────────────────────────────────────────>
+Wave 1:  [task-1: D1 Database] ──────────────────────────────────────────────>
+         [task-2: API Deploy] ───> (depends on 1) ───────────────────────────>
 
-Wave 2:  [task-4: Upload Tarballs] ────> (depends on 2,3) ────────────────>
-         [task-5: Analytics Worker] ───> (depends on 1) ──────────────────>
-         [task-6: Email Worker] ───────> (depends on 1) ──────────────────>
+Wave 2:  [task-3: CLI init/push] ──> (depends on 2) ─────────────────────────>
+         [task-4: CLI list/rollback] ─> (depends on 2,3) ────────────────────>
+         [task-5: SDK Build] ───────> (depends on 2) ────────────────────────>
+         [task-6: Dashboard] ──────> (depends on 2) ─────────────────────────>
 
-Wave 3:  [task-7: Ember Demo] ─────────> (depends on 4) ──────────────────>
-         [task-8: Forge+Slate Demos] ──> (depends on 4) ──────────────────>
-         [task-9: Drift+Bloom Demos] ──> (depends on 4) ──────────────────>
+Wave 3:  [task-7: NERVE Tests] ────> (parallel) ─────────────────────────────>
+         [task-8: CLI npm] ────────> (depends on 3,4) ───────────────────────>
+         [task-9: SDK npm] ────────> (depends on 5) ─────────────────────────>
 
-Wave 4:  [task-10: Screenshots] ───────> (depends on 7,8,9) ──────────────>
-         [task-11: Showcase Deploy] ───> (depends on 10,6) ───────────────>
-         [task-12: Git Commit] ────────> (depends on 1,3,10) ─────────────>
-         [task-13: QA Pass 2] ─────────> (depends on 11,12) ──────────────>
+Wave 4:  [task-10: 60-sec Test] ───> (depends on 8) ─────────────────────────>
+         [task-11: Git Commit] ────> (depends on 6,7,10) ────────────────────>
+         [task-12: QA Pass] ───────> (depends on 11) ────────────────────────>
 ```
 
 ---
@@ -891,51 +899,54 @@ Wave 4:  [task-10: Screenshots] ───────> (depends on 7,8,9) ──
 
 | Risk | Mitigation | Task |
 |------|------------|------|
-| R2 upload script bug | Fix endpoint URL before upload | task-3 |
-| Placeholder KV IDs | Replace with real IDs | task-1 |
-| Demo sites are longest task | Parallelize 3 deployment tracks | tasks 7-9 |
-| Screenshot dependencies | Wait for all demo sites | task-10 |
-| CORS_ORIGIN mismatch | Verify domain consistency | task-6 |
+| D1 not created | Create database first, apply schema | task-1 |
+| API not deployed | Deploy before CLI/SDK | task-2 |
+| SDK not built | Build with caching in Wave 2 | task-5 |
+| Dashboard missing | Build static HTML in Wave 2 | task-6 |
+| NERVE untested | Test all scripts in Wave 3 | task-7 |
+| npm names taken | Check availability, use fallback | task-8, task-9 |
+| Time-to-value > 60s | Benchmark and document | task-10 |
 
 ### Remaining Risks (Monitor)
 
 | Risk | Impact | Notes |
 |------|--------|-------|
-| DNS propagation delay | Medium | May need to wait for custom domains |
-| Playwright browser download | Low | Requires internet access |
-| R2 public URL format | Medium | May need CLI update if URL differs |
+| npm publish permissions | Medium | May need npm login |
+| D1 write limits | High | Monitor in production |
+| SDK adoption unclear | High | Track installs post-launch |
+| NERVE integration deferred | Medium | V1.1 decision needed |
 
 ---
 
 ## Verification Checklist
 
-- [x] All 9 P0 blockers have task coverage
-- [x] All 5 Tier 1 conditions have task coverage
+- [x] All 16 P0 requirements have task coverage
+- [x] All P1 requirements addressed or deferred
 - [x] Each task has clear verification criteria
 - [x] Dependencies form valid DAG (no cycles)
 - [x] Each task can be committed independently
 - [x] Risk mitigations addressed
-- [x] docs/EMDASH-GUIDE.md cited (Section 5, 7)
-- [x] DEPLOYMENT-RUNBOOK.md referenced throughout
-- [x] Critical path identified (demo sites)
+- [x] decisions.md cited throughout
+- [x] docs/EMDASH-GUIDE.md Section 5 referenced for deployment
+- [x] Critical path identified (API → CLI/SDK → Publish → QA)
 
 ---
 
 ## Ship Test
 
-> Does `npx wardrobe install ember` transform the site in under 3 seconds?
+> Does `npm install -g drift-cli && drift init && drift push` work in under 60 seconds?
 
-> Does the showcase make you want to try a theme?
+> Does `drift rollback` feel instant and safe?
 
-> Do the screenshots capture the personality of each theme?
+> Does the SDK cache work transparently?
 
-> Would you share wardrobe.emdash.dev with a friend?
+> Is the dashboard clean and professional?
 
-> **If yes, ship it.**
+> **If yes to all, ship it.**
 
 ---
 
 *Generated by Great Minds Agency — Phase Planning Skill*
-*Source: rounds/emdash-marketplace/decisions.md, docs/EMDASH-GUIDE.md, qa-pass-1.md*
-*Project Slug: emdash-marketplace*
-*Product Name: Wardrobe*
+*Source: rounds/promptops/decisions.md, prds/promptops.md, docs/EMDASH-GUIDE.md*
+*Project Slug: promptops*
+*Product Name: Drift + NERVE*

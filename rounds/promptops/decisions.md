@@ -1,13 +1,13 @@
-<<<<<<< HEAD
-# NERVE — Final Decisions Document
+# PromptOps — Consolidated Decisions Document
 
-**Project:** Autonomous Pipeline Daemon for Operations Hardening
-**Arbiter:** Phil Jackson
+**Arbiter:** Phil Jackson, The Zen Master
 **Debate Participants:** Steve Jobs (Design & Brand), Elon Musk (Product & Growth)
-**Reviewers:** Jony Ive (Design), Maya Angelou (Copy), Margaret Hamilton (QA)
-**Board:** Warren Buffett, Jensen Huang, Oprah Winfrey
-**Date:** 2026-04-11
-**Status:** READY FOR BUILD
+**Design Reviewer:** Jony Ive
+**Copy Reviewer:** Maya Angelou
+**QA Director:** Margaret Hamilton
+**Board:** Warren Buffett, Jensen Huang, Oprah Winfrey, Shonda Rhimes
+**Date:** 2026-04-12
+**Status:** HOLD — Build Phase Not Completed
 
 ---
 
@@ -15,58 +15,105 @@
 
 | # | Decision | Proposed By | Winner | Rationale |
 |---|----------|-------------|--------|-----------|
-| 1 | **Name: NERVE** | Steve | **Steve** | One word, four letters. Communicates function (central nervous system). "PromptOps" describes a ticket; NERVE describes what it *feels* like—essential, alive, connected. Names shape destiny. |
-| 2 | **No Proxy in v1** | Elon | **Elon** | Proxy adds 90% of the risk for 30% of the value. Streaming complexity, provider compatibility, security surface—all deferred. SDK fetch-on-boot handles 95% of use cases. |
-| 3 | **No Dashboards v1** | Steve | **Steve** | "If you need a chart to know if it works, it doesn't work simply enough." Dashboard is read-only observation theater—deferred to v2. |
-| 4 | **Bash Over Agent Prompts** | Both | **Consensus** | "Trust bash, not instructions." Deterministic execution is the architectural contract. When something must happen, code makes it happen. No probabilistic operations for critical paths. |
-| 5 | **Zero Configuration** | Steve | **Steve** | Every option is a failure to decide. Opinionated defaults, no config sprawl. Users trust; we decide. |
-| 6 | **Rate Limiting Per API Key** | Elon | **Elon** | One bad actor shouldn't kill everyone. Non-negotiable before any external exposure. |
-| 7 | **CLI-First Architecture** | Both | **Consensus** | Dashboard is read-only v1. CLI handles all operations including rollback. `nerve push`, `nerve status`, `nerve abort`—these are the verbs. |
-| 8 | **Observability Before Scale** | Elon | **Elon** | Three metrics (queue depth, latency, error count) must exist before any sharding work. Numbers before features. |
-| 9 | **PRD Required Before v2** | Elon | **Elon** | Technical debt acknowledged. Process discipline for future work. |
-| 10 | **Clinical Voice** | Both | **Consensus** | `[QUEUE] 47 items processed. 2.3s elapsed.` No exclamation marks. No emoji. No "Oops!" Competent systems report and move on. |
+| 1 | **Name: Drift/NERVE** | Steve | **Steve** | "PromptOps" describes a Jira ticket, not a feeling. "Drift" evokes version drift—prompts drift over time. CLI becomes `drift push`, `drift rollback`. The daemon subsystem is "NERVE"—central nervous system, essential, alive. One word names shape destiny. |
+| 2 | **No Proxy in V1** | Elon | **Elon** | Proxy adds 15-80ms latency to every LLM call. That's commercial suicide. It's also a single point of failure, a security target (holds API keys), and requires trust before value is demonstrated. SDK-first: fetch prompt, cache locally (5-min TTL), inject. Zero latency impact. "Value first, trust second." |
+| 3 | **SDK-First Architecture** | Elon | **Elon** | LaunchDarkly started with a client SDK, not a proxy. The adoption curve for "add 2 lines of code" is 10x better than "reroute your traffic." The proxy is v2, after trust is earned. Steve conceded in Round 2: "Critical path dependency is commercial suicide." |
+| 4 | **Dashboard Minimal (Read-Only)** | Elon | **Elon** | Static HTML. Shows prompt name, version, timestamp. No rollback button (CLI handles that). "Raw HTML with Tailwind CDN is fine" for MVP. Steve pushed back: "A developer's first impression shapes trust." Compromise: clean but not elaborate. Polish is v1.1. |
+| 5 | **Polished Dashboard Ships** | Steve | **Partial Steve** | Not elaborate, but not embarrassing. Clean type. Clear hierarchy. Professional appearance. "The dashboard that manages developer anxiety cannot look anxious itself." Static HTML, but considered static HTML. |
+| 6 | **Bash Over Agent Prompts (NERVE)** | Both | **Consensus** | "Trust bash, not instructions." Deterministic execution is the architectural contract. When something must happen, code makes it happen. No probabilistic operations for critical paths. |
+| 7 | **Zero Configuration** | Steve | **Steve** | Every option is a failure to decide. Opinionated defaults. Users trust; we decide. The product should work the moment you run it. |
+| 8 | **60-Second Time-to-Value** | Both | **Consensus** | `npm install` + `drift init` + `drift push` must work in under 60 seconds. If setup takes longer than the first dopamine hit, we've failed. |
+| 9 | **CLI-First, Dashboard Second** | Both | **Consensus** | Developers discover via terminal, not web UI. The CLI is the product. Dashboard is "read-only visibility" not "the product." |
+| 10 | **Brand Voice: Confident, Not Clever** | Steve | **Steve** | "This prompt has a problem. Here's the fix." Not "Perhaps you might consider..." Short sentences. Active voice. No adjectives unless they add information. The voice is a senior engineer who respects your time. |
+| 11 | **Cut A/B Testing from V1** | Both | **Consensus** | Adoption before optimization. A/B testing is v2 scope. |
+| 12 | **Cut `diff` Command from V1** | Both | **Consensus** | Nice but not essential. Users can eyeball versions. Ship lean. |
+| 13 | **One Pricing Tier** | Steve | **Steve** | No feature walls. No pricing anxiety. Full product with usage limits only. Aligns with adoption-first strategy. |
 
 ---
 
-## II. MVP Feature Set (What Ships in v1)
+## II. MVP Feature Set (What Ships in V1)
 
-### Core Components
+### Core Product: Drift (Prompt Versioning)
 
 | Component | Description | Implementation |
 |-----------|-------------|----------------|
-| **PID Lockfile** | Prevents duplicate daemon instances | `daemon.sh` checks/creates `/tmp/nerve.pid` |
-| **Queue Persistence** | Survives crashes, no lost state | `queue.sh` writes to `/tmp/nerve-queue/` directory |
-| **Abort Flag** | Stops runaway pipelines cleanly | `abort.sh` manages `/tmp/nerve.abort` file |
-| **Strict Verdict Parsing** | Unambiguous QA results (PASS/FAIL/BLOCKED) | `parse-verdict.sh` returns JSON with verdict, issue counts |
-| **Deterministic Commits** | Bash execution, not agent requests | All operations are shell commands, not LLM prompts |
-| **Crash Recovery** | Moves in-progress items back to pending on restart | `queue.sh` handles state recovery on init |
+| **CLI** | Four commands: `init`, `push`, `list`, `rollback` | Node.js, commander.js |
+| **API** | CRUD for prompts and versions | Cloudflare Worker + D1 |
+| **SDK** | `getPrompt(name)` with aggressive caching | TypeScript, 5-min TTL |
+| **Dashboard** | Read-only visibility of prompts/versions | Static HTML |
 
-### User Experience
+### CLI Commands
 
-**First 30 seconds:** Nothing happens that the user notices. That's the point.
+| Command | Function |
+|---------|----------|
+| `drift init` | Initialize project, generate API key. No signup wall. |
+| `drift push <name> --file <path>` | Push prompt version. Auto-increment version number. |
+| `drift list` | List all prompts with version history |
+| `drift rollback <name> --version <n>` | Revert to specific version. Live immediately. |
 
-- Daemon starts silently
-- Queue persists automatically
-- Pipelines complete without drama
-- No duplicate runs, no hung processes, no lost state
+### Supporting Infrastructure: NERVE (Pipeline Daemon)
 
-**The product is the absence of friction.**
+| Component | Description | Implementation |
+|-----------|-------------|----------------|
+| **PID Lockfile** | Prevents duplicate daemon instances | `daemon.sh` with `/tmp/nerve.pid` |
+| **Queue Persistence** | Survives crashes, no lost state | `queue.sh` with `/tmp/nerve-queue/` |
+| **Abort Flag** | Stops runaway pipelines cleanly | `abort.sh` with `/tmp/nerve.abort` |
+| **Verdict Parsing** | Unambiguous QA results (PASS/FAIL/BLOCKED) | `parse-verdict.sh` returns JSON |
 
-### Explicitly Deferred (v2+)
+### Explicitly Deferred (V2+)
 
-- Metrics/observability dashboard
-- Multi-daemon coordination
-- Distributed locking (Redis/etcd)
-- Queue partitioning
-- Automated recovery beyond abort flags
-- LLM-powered verdict parsing (Jensen's recommendation)
-- Execution history persistence for training data
-- API/SDK for external access
-- Chronicle, Health Score, and retention features (Shonda's roadmap)
+| Feature | Reason | Target |
+|---------|--------|--------|
+| Proxy architecture | Latency killer, trust requirement | V2+ |
+| A/B testing | Adoption before optimization | V2 |
+| `diff` command | Nice-to-have, not essential | V2 |
+| Dashboard rollback button | CLI sufficient | V2 |
+| Semantic diff (AI-powered) | Requires LLM integration | V2 |
+| Analytics dashboards | "Charts are a crutch" | V2+ |
+| Team collaboration | One developer, one project first | V2 |
+| Prompt marketplace | Network effects play | V3 |
+| Retention features (Chronicle, Streaks, Digests) | Shonda's roadmap | V1.1 |
 
 ---
 
 ## III. File Structure (What Gets Built)
+
+### Drift (Prompt Versioning Service)
+
+```
+drift/
+├── worker/
+│   ├── index.ts              # Cloudflare Worker entry
+│   ├── routes/
+│   │   ├── prompts.ts        # CRUD endpoints
+│   │   └── auth.ts           # API key validation
+│   └── wrangler.toml         # Worker config
+│
+├── cli/
+│   ├── bin/drift.ts          # CLI entry point
+│   ├── commands/
+│   │   ├── init.ts           # drift init
+│   │   ├── push.ts           # drift push
+│   │   ├── list.ts           # drift list
+│   │   └── rollback.ts       # drift rollback
+│   └── package.json
+│
+├── sdk/
+│   ├── index.ts              # getPrompt() export
+│   ├── cache.ts              # 5-min TTL caching
+│   └── package.json
+│
+├── dashboard/
+│   ├── index.html            # Static HTML
+│   └── styles.css            # Minimal professional styling
+│
+├── schema/
+│   └── d1.sql                # D1 database schema
+│
+└── README.md                 # <50 lines, setup in 60 seconds
+```
+
+### NERVE (Pipeline Daemon)
 
 ```
 nerve/
@@ -77,49 +124,18 @@ nerve/
 └── README.md              # Documentation
 ```
 
-**Constraints:**
-- Four executable scripts + one README
-- No external dependencies beyond bash
-- All files fit in `/tmp/nerve-*` namespace
-- Each script is independently runnable
-
-### Implementation Specifications
-
-| File | Key Functions | Exit Codes |
-|------|---------------|------------|
-| `daemon.sh` | `start`, `stop`, `status` | 0=success, 1=error, 2=already running |
-| `queue.sh` | `push`, `pop`, `peek`, `depth`, `metrics` | 0=success, 1=error, 2=empty queue |
-| `abort.sh` | `set`, `clear`, `status`, `force-kill` | 0=success, 1=error |
-| `parse-verdict.sh` | `report`, `batch`, `metrics` | 0=success, 1=parse error, 2=file not found |
-
 ---
 
 ## IV. Open Questions (Require Resolution Before Build)
 
-| # | Question | Blocking? | Recommended Resolution |
-|---|----------|-----------|------------------------|
-| OQ-001 | **Log format specification** — Steve wants "clinical surgeon," Elon wants greppable. Both agree on no emoji. | **YES** | `[TIMESTAMP] [COMPONENT] message` where TIMESTAMP is ISO8601 UTC, COMPONENT is DAEMON/QUEUE/ABORT/VERDICT |
-| OQ-002 | **Process naming** — Should `ps aux \| grep nerve` work, or `ps aux \| grep promptops`? | **YES** | Use `nerve` consistently. PID file at `/tmp/nerve.pid`, not `/tmp/promptops.pid` |
-| OQ-003 | **Metrics timing** — When do we add the three metrics? Before v2 features, or as first v2 feature? | No | Sequencing only. Metrics are first v2 item per Elon's recommendation. |
-| OQ-004 | **Retrospective PRD location** — Where does the post-build PRD get filed? | No | `/home/agent/shipyard-ai/rounds/promptops/PRD.md` after v1 ships |
-
-### Resolution for Blocking Questions
-
-**OQ-001 RESOLVED:** Log format is `[TIMESTAMP] [COMPONENT] message`
-
-Examples:
-```
-[2026-04-11T14:22:33Z] [DAEMON] started (PID: 12345)
-[2026-04-11T14:22:34Z] [QUEUE] pushed item a1b2c3d4 (type: qa-pass)
-[2026-04-11T14:22:35Z] [ABORT] shutdown requested
-```
-
-**OQ-002 RESOLVED:** Process naming uses `nerve` prefix
-
-- PID file: `/tmp/nerve.pid`
-- Abort flag: `/tmp/nerve.abort`
-- Queue directory: `/tmp/nerve-queue/`
-- `ps aux | grep nerve` works
+| # | Question | Status | Resolution |
+|---|----------|--------|------------|
+| OQ-001 | **Log format specification** — What format for NERVE logs? | **RESOLVED** | `[TIMESTAMP] [COMPONENT] message` where TIMESTAMP is ISO8601 UTC, COMPONENT is DAEMON/QUEUE/ABORT/VERDICT. Clinical, greppable, no emoji. |
+| OQ-002 | **Process naming** — `nerve` or `promptops` in file paths? | **RESOLVED** | Use `nerve` consistently. PID at `/tmp/nerve.pid`. |
+| OQ-003 | **Authentication model** — API keys per project? Per user? | **OPEN** | Likely: project-level API key, generated on `drift init`, hashed with SHA-256 for storage. |
+| OQ-004 | **Logging backend** — D1 can't handle write volume at scale | **OPEN** | Likely: Workers Analytics Engine or Logpush. D1 for prompts only, not logs. |
+| OQ-005 | **Dashboard hosting** — Cloudflare Pages? Embedded in Worker? | **OPEN** | Decision needed at build phase. Static HTML simplifies options. |
+| OQ-006 | **SDK distribution** — npm package name availability? | **OPEN** | Check `@drift/cli` and `@drift/sdk` availability. Backup: scoped packages. |
 
 ---
 
@@ -127,333 +143,141 @@ Examples:
 
 | Risk | Likelihood | Impact | Mitigation | Owner |
 |------|------------|--------|------------|-------|
-| **Single-machine architecture breaks at scale** | Medium | High | Known limitation. Sharding path is clear: partition queue, run multiple workers. Not a v1 problem. | Elon |
-| **No automated testing for infra that manages tests** | Low | Medium | "Testing infrastructure that manages tests creates infinite regress." Accept risk. Ship proves correctness. | Steve |
-| **Documentation debt compounds** | High | Medium | PRD must exist before v2. README ships with v1. | Elon |
-| **Observability gap masks failures** | Low | High | Three metrics added before any scale work. Acceptable blind spot for v1 single-machine. | Elon |
-| **No competitive moat** | High | Medium | Board consensus: this is commodity infrastructure. Acceptable for internal tooling. External product requires differentiation (AI layer). | Board |
-| **No revenue path** | High | High | NERVE is overhead, not product. Justified only if preventing demonstrable operational failures. Track before/after metrics. | Buffett |
-| **PromptOps name has zero prompts** | Medium | Low | Renamed to NERVE. Credibility gap closed. | Jensen |
-| **Process naming ambiguity** | Medium | Low | RESOLVED: Use `nerve` consistently. | Both |
-| **Queue corruption on crash during write** | Low | High | Atomic file writes: write to temp file, then `mv` to final location. | Build |
-| **Orphan processes on unclean shutdown** | Medium | Medium | Abort escalation: SIGTERM → 5 second wait → SIGKILL. | Build |
+| **No competitive moat** | High | Critical | This is a weekend project for a competent dev. LangSmith, Helicone already exist with more features. Only moat is if we pivot to intelligence (Jensen). | Board |
+| **Proxy skipped = value unclear** | Medium | High | The "aha moment" (change prompt, see it live) is weaker without proxy. SDK-first means user still deploys code to use new prompts. Tradeoff accepted for adoption. | Elon |
+| **No revenue mechanism** | High | High | No billing integration built. "Hobby wearing a business plan" (Buffett). Must add Stripe before product validation is real. | Buffett |
+| **7-hour scope creep** | High | Critical | Ruthless cuts. Static HTML only. No React. No AI features. If it can't be built in one session, it's cut. | Elon |
+| **Build phase never completed** | **REALIZED** | Critical | QA Pass 1 found 0/5 deliverables. 17 documents generated, 0 lines of code. Process collapsed at execution. | All |
+| **Documentation-to-code ratio** | **REALIZED** | Medium | ~31,500 words of process documentation for ~550 lines of bash that should have shipped. "McKinsey for garage organization" (Buffett). | All |
+| **No customer validation** | High | High | Zero external users. Zero revenue. Zero validated demand. Two internal tools, no customer-facing product. | Buffett |
+| **D1 write limits at scale** | High | High | Logging to Analytics Engine from day 1. D1 for prompts only. | Build |
+| **Edge KV cold start latency** | Medium | High | Aggressive SDK caching. 5-min TTL is floor. | Build |
+| **Trust before value (proxy model)** | High | Critical | MITIGATED by SDK-first decision. Users never route traffic through us in v1. | Elon |
+| **NERVE is premature optimization** | High | Medium | "40% of effort on infrastructure for 0 users" (Buffett). "B-plot that never gets screen time" (Shonda). Either integrate with Drift or kill. | Board |
 
 ---
 
-## VI. Board Conditions (From Board Verdict)
+## VI. Board Verdict Summary
 
-**Overall Board Score:** 4.7/10
-**Verdict:** HOLD — with conditions for proceeding
+### Scores
 
-### To Move from HOLD to PROCEED, Pick One Path:
+| Reviewer | Score | Lens | Key Critique |
+|----------|-------|------|--------------|
+| Warren Buffett | 4/10 | Durable Value | "Commodity infrastructure with no moat. A weekend project competing with well-funded competitors." |
+| Jensen Huang | 5/10 | AI Leverage | "Zero AI in an AI tool. Stop building storage, start building intelligence." |
+| Shonda Rhimes | 5/10 | Retention | "The pilot that never aired. Every interaction ends with a version number, not a cliffhanger." |
+| Oprah Winfrey | 6.5/10 | Human Experience | "The soul exists but got buried. Built by experts for experts." |
 
-**Path A: Make It a Product**
-- [ ] Define external customer segment
-- [ ] Build API/SDK for programmatic access
-- [ ] Establish pricing model
-- [ ] Ship one paying customer
+**Average Score: 5.1/10**
+**Verdict: HOLD**
 
-**Path B: Add the AI** (Jensen's recommendation)
-- [ ] LLM-powered verdict parsing
-- [ ] Execution history persistence for training data
-- [ ] At minimum one predictive capability
-- [ ] Rename if AI doesn't ship (DONE: renamed to NERVE)
+### Points of Agreement (All Four Reviewers)
 
-**Path C: Validate Internal ROI** (Buffett's recommendation)
-- [ ] Document baseline metrics before NERVE
-- [ ] Document post-NERVE metrics
-- [ ] Prove that NERVE prevented X failures worth $Y
+1. **Engineering quality is solid** — When code exists, it's well-crafted
+2. **The proxy is the real product** — And it wasn't built
+3. **Dashboard not built** — Critical gap for non-CLI users
+4. **NERVE is premature** — Infrastructure for infrastructure's sake
+5. **No moat** — Easily replicable in a weekend
+6. **No revenue mechanism** — Can't validate willingness to pay without ability to pay
+7. **Accessibility too narrow** — Built by experts, for experts
 
-### Recommended Regardless of Path:
-- [ ] Add human introduction to documentation explaining WHY (Oprah)
-- [ ] Reduce process overhead for internal tooling (Buffett)
-- [ ] Do not build another internal tool until one customer-facing product ships (Buffett)
+### Conditions for PROCEED
+
+**Must Have:**
+1. Ship the proxy OR validate SDK-only adoption with real users
+2. Ship the dashboard (visual interface for non-CLI users)
+3. Add billing integration (Stripe, 30 minutes)
+4. Talk to 10 companies with prompt management pain—confirm willingness to pay
+
+**Should Have:**
+5. Instrument proxy/SDK for data collection (future intelligence layer)
+6. Connect NERVE to Drift (auto-rollback on metrics) OR kill NERVE entirely
+7. Build retention layer (daily/weekly touchpoints)
 
 ---
 
-## VII. Consensus Principles
+## VII. Retrospective Findings (Marcus Aurelius)
 
-Both Steve and Elon agreed on these foundational truths:
+### What Worked
+- Dialectic process produced genuine insight
+- Scope discipline held (conceptually)
+- Essence document served as north star
+- QA was uncompromising (correctly blocked)
 
-1. **Determinism over elegance.** When something must happen, it happens. No asking. No hoping.
-2. **Invisible architecture.** The best infra is infra you forget exists.
-3. **Resist scope creep.** Could have rewritten entire pipeline. Didn't.
-4. **Clinical voice.** Professional tools speak like professionals.
-5. **Leverage work.** This isn't a product—it's the foundation for products.
+### What Failed
+- **Build phase never happened** — 17 documents, 0 lines of code
+- Process cost vastly exceeded output value (~31,500 words for ~550 lines of bash)
+- No customer, no revenue, no moat after two projects
+- "PromptOps with zero prompts" credibility gap
+
+### Key Learning
+> "A thousand pages of strategy cannot move one soldier one mile. The agency generates exceptional strategy but has not yet demonstrated it can execute."
+
+**Process Adherence Score: 4/10**
+- Planning: 8/10
+- Build: 0/10
+- Ship: 0/10
 
 ---
 
 ## VIII. The Essence
 
-**What it is:** The invisible backbone that makes everything else possible.
+**What it is:** The undo button for AI—turning prompt deployment from a gamble into a system.
 
-**The feeling:** Peace. The absence of the 3 AM knot in your stomach.
+**The feeling:** Peace. The 3 AM panic, gone.
 
-**The one thing that must be perfect:** Determinism. When something must happen, it happens.
+**The one thing that must be perfect:** The rollback. One command. Instant. No thinking.
 
-**Creative direction:** Disappear completely. Work always.
+**Creative direction:** Disappear. Work always.
 
 ---
 
 ## IX. Build Phase Acceptance Criteria
 
-For v1 to be considered COMPLETE:
+For V1 to be considered COMPLETE:
 
-- [ ] `daemon.sh` starts, creates PID lockfile, prevents duplicate instances
+### Drift
+- [ ] `drift init` creates project, generates API key, no signup wall
+- [ ] `drift push` versions prompt, stores in D1, updates edge KV
+- [ ] `drift list` shows all prompts with version history
+- [ ] `drift rollback` reverts to specified version, live immediately
+- [ ] SDK `getPrompt()` fetches from edge, caches locally, zero latency impact
+- [ ] Dashboard displays prompts/versions (read-only)
+- [ ] README.md <50 lines, explains setup in 60 seconds
+
+### NERVE
+- [ ] `daemon.sh` starts, creates PID lockfile, prevents duplicates
 - [ ] `queue.sh` persists queue to disk, recovers state on restart
-- [ ] `abort.sh` sets flag, daemon responds, shutdown is clean
-- [ ] `parse-verdict.sh` returns JSON with verdict (PASS/FAIL/BLOCKED) and issue counts
-- [ ] All scripts use consistent log format: `[TIMESTAMP] [COMPONENT] message`
-- [ ] All scripts use `nerve` prefix for file paths
-- [ ] README.md documents all commands with examples
+- [ ] `abort.sh` sets flag, daemon responds, clean shutdown
+- [ ] `parse-verdict.sh` returns JSON with verdict and issue counts
+- [ ] All scripts use `[TIMESTAMP] [COMPONENT] message` log format
+- [ ] README.md documents all commands
+
+### Meta
 - [ ] All files committed to deliverables directory
 - [ ] QA Pass confirms zero P0 issues
+- [ ] At least one component actually runs
+
+---
+
+## X. Path Forward
+
+**The Central Truth:** The agency has demonstrated it can design. It has not demonstrated it can build.
+
+**Next Action:** Build. Ship. Then reflect.
+
+The debates are over. The decisions are locked. The risks are documented. The board has ruled.
+
+**Now execute.**
 
 ---
 
 *"Real artists ship."* — Steve Jobs
 *"The best part is no part."* — Elon Musk
-*"When the floor is solid, the dance is free."* — Phil Jackson
+*"Paths are not walked by documenting them. They are walked by walking."* — Marcus Aurelius
 
 ---
 
-**Status:** READY FOR BUILD PHASE
-=======
-# Tuned — Final Decisions Document
-*Consolidated by Phil Jackson, The Zen Master*
-
----
-
-## Locked Decisions
-
-### 1. Product Name: **Tuned**
-- **Proposed by:** Steve Jobs (Round 1)
-- **Winner:** Steve Jobs
-- **Why:** "PromptOps" sounds like IT middleware. "Tuned" is one word, musical, works as verb and noun. "My prompts are Tuned." It evokes mastery, not infrastructure. Elon conceded in Round 2: "genuinely better... memorable, verbs naturally, doesn't scream enterprise middleware."
-
-### 2. Architecture: **SDK-Only, No Proxy**
-- **Proposed by:** Elon Musk (Round 1)
-- **Winner:** Elon Musk
-- **Why:** Proxy adds 15-80ms latency to every LLM call — commercial suicide. SDK fetches from edge KV, caches locally (5-min TTL), injects prompt. Logging happens async AFTER call completes. Zero latency impact. Steve conceded in Round 2: "Critical path dependency is commercial suicide... I was wrong to ignore this."
-
-### 3. Time Constraint: **Ship in One Session (7 Hours)**
-- **Proposed by:** Elon Musk (Round 1)
-- **Winner:** Elon Musk
-- **Why:** If it can't be built in 7 hours, it's cut. No AI-powered analysis. No React. No side-by-side comparisons. Steve agreed: "Works in <5 minutes is the right bar."
-
-### 4. CLI Is The Product
-- **Proposed by:** Elon Musk (Round 2)
-- **Winner:** Elon Musk
-- **Why:** `tuned push` must work in under 60 seconds from install. Developers discover via `npm install`, not dashboards. Dashboard is read-only visibility. SDK is silent. CLI is the experience.
-
-### 5. Brand Voice: Direct, Confident, Not Robotic
-- **Proposed by:** Steve Jobs (Round 1)
-- **Winner:** Steve Jobs
-- **Why:** "This prompt has a problem. Here's the fix." — not "Perhaps you might consider..." Elon endorsed: "This costs us nothing and differentiates us from AWS-style documentation."
-
-### 6. Pricing: One Tier, Usage Limits Only
-- **Proposed by:** Steve Jobs (Round 1)
-- **Winner:** Steve Jobs (Elon agreed)
-- **Why:** No feature walls. No pricing anxiety. One price, full product. Aligns with adoption-first strategy.
-
-### 7. First Experience: Value Before Effort
-- **Proposed by:** Steve Jobs (Round 2)
-- **Winner:** Contested — Partially Deferred
-- **Why:** Steve's vision (no signup wall, prompt analysis before commitment) requires AI features outside 7-hour scope. The *principle* is locked (value in <60 seconds), but implementation is MVP-scoped: immediate CLI utility, not AI-powered analysis.
-
----
-
-## MVP Feature Set (What Ships in V1)
-
-### CLI Commands
-| Command | Description |
-|---------|-------------|
-| `tuned init` | Initialize project, create config |
-| `tuned push` | Push prompt to registry with auto-versioning |
-| `tuned list` | List all prompts and versions |
-| `tuned rollback` | Revert to previous version |
-
-### API (Cloudflare Worker + D1)
-- CRUD operations for prompts and versions
-- Edge KV for active prompt reads (<5ms latency)
-- D1 for writes and dashboard reads only
-- Async logging endpoint (fire-and-forget to queue)
-
-### SDK
-- `getPrompt(name)` — single function
-- Aggressive caching (5-min TTL)
-- Local injection, no proxy in request path
-
-### Dashboard
-- Static HTML (no React)
-- Read-only visibility
-- Shows: prompt name, version number, timestamp, content
-- No buttons, no actions
-
----
-
-## What's CUT from V1
-
-| Feature | Reason | Target Version |
-|---------|--------|----------------|
-| A/B testing | Adoption before optimization | V2 |
-| Dashboard rollback button | CLI is sufficient | V2 |
-| Proxy architecture | Latency killer | Never (SDK-only) |
-| `tuned diff` | Nice-to-have | V2 |
-| Prompt analysis/parsing | Requires AI layer | V2/V3 |
-| Side-by-side comparison UI | React complexity | V2 |
-| React dashboard | 7-hour constraint | V2 |
-| Collaboration/teams | Individuals first | V2 |
-| Integrations (Slack, OAuth) | Copy-paste is MVP | V2 |
-| Prompt libraries/templates | Users want *their* prompts better | Never |
-| Analytics dashboards | "Charts are a crutch" | V2+ |
-| npm publish automation | Do manually post-build | V1.1 |
-
----
-
-## File Structure (What Gets Built)
-
-```
-tuned/
-├── worker/
-│   ├── index.ts              # Cloudflare Worker entry
-│   ├── routes/
-│   │   ├── prompts.ts        # CRUD endpoints
-│   │   └── log.ts            # Async logging endpoint
-│   └── wrangler.toml         # Worker config
-│
-├── cli/
-│   ├── bin/tuned.ts          # CLI entry point
-│   ├── commands/
-│   │   ├── init.ts           # tuned init
-│   │   ├── push.ts           # tuned push
-│   │   ├── list.ts           # tuned list
-│   │   └── rollback.ts       # tuned rollback
-│   ├── config.ts             # Local config handling
-│   └── package.json
-│
-├── sdk/
-│   ├── index.ts              # getPrompt() export
-│   ├── cache.ts              # 5-min TTL caching
-│   └── package.json
-│
-├── dashboard/
-│   ├── index.html            # Static HTML
-│   ├── styles.css            # Minimal styling
-│   └── script.js             # Fetch and render prompts
-│
-├── schema/
-│   └── d1.sql                # D1 database schema
-│
-└── docs/
-    └── quickstart.md         # 60-second setup guide
-```
-
-### Database Schema (D1)
-```sql
--- Prompts table
-prompts (
-  id TEXT PRIMARY KEY,
-  name TEXT UNIQUE NOT NULL,
-  created_at TIMESTAMP,
-  updated_at TIMESTAMP
-)
-
--- Versions table
-versions (
-  id TEXT PRIMARY KEY,
-  prompt_id TEXT REFERENCES prompts(id),
-  version INTEGER NOT NULL,
-  content TEXT NOT NULL,
-  is_active BOOLEAN DEFAULT false,
-  created_at TIMESTAMP
-)
-```
-
-### Edge KV Structure
-```
-Key: prompt:{name}
-Value: { version: number, content: string }
-```
-
----
-
-## Open Questions (Need Resolution)
-
-### 1. Logging Backend
-- **Question:** Workers Analytics Engine vs. Logpush vs. external service?
-- **Context:** D1 cannot handle write volume at scale (1000+ writes/day). Elon flagged this breaks at 100x usage.
-- **Needed by:** Build phase
-
-### 2. Authentication Model
-- **Question:** API keys per project? Per user? How generated/stored?
-- **Context:** Neither debate addressed auth specifics. Required for push/SDK operations.
-- **Needed by:** Build phase
-
-### 3. SDK Distribution
-- **Question:** npm publish timing? Package name availability?
-- **Context:** Elon cut automated npm publish. Manual process needs definition.
-- **Needed by:** Post-build
-
-### 4. Dashboard Hosting
-- **Question:** Cloudflare Pages? Embedded in Worker? Separate static hosting?
-- **Context:** Static HTML simplifies options. Decision affects deploy config.
-- **Needed by:** Build phase
-
-### 5. Steve's "First Experience" Vision
-- **Question:** How much of the "value before effort" UX can fit in 7 hours?
-- **Context:** No signup wall is achievable. Prompt analysis is not. What's the middle ground?
-- **Needed by:** Build phase
-
-### 6. CLI Error Messages
-- **Question:** Who writes the copy? What's the voice guide?
-- **Context:** Steve mandated brand voice. Need concrete examples for implementation.
-- **Needed by:** Build phase
-
----
-
-## Risk Register
-
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| **7-hour scope creep** | High | Critical | Ruthless cuts. Static HTML only. No React. No AI features. |
-| **Edge KV cold start latency** | Medium | High | Aggressive SDK caching. 5-min TTL is floor, not ceiling. |
-| **D1 write limits at scale** | High | High | Logging to Analytics Engine/Logpush from day 1. D1 for prompts only. |
-| **Name collision ("tuned" npm)** | Medium | Medium | Check availability before build. Have backup: `@tuned/sdk` |
-| **Auth complexity explosion** | High | High | Simplest possible: project-level API key, generated on init. |
-| **Developer trust (latency concerns)** | Medium | Critical | Zero-latency architecture is non-negotiable. Prove with benchmarks in docs. |
-| **First impression failure** | Medium | Critical | 60-second rule. If setup fails, users leave forever. |
-| **Steve's vision vs. Elon's scope** | High | Medium | Principle locked (value fast), implementation scoped to 7 hours. |
-
----
-
-## Build Phase Priorities
-
-1. **Worker + D1 Schema** — Foundation (2 hours)
-2. **CLI (4 commands)** — The product (2 hours)
-3. **SDK skeleton** — `getPrompt()` with caching (1 hour)
-4. **Static Dashboard** — Read-only visibility (1 hour)
-5. **Polish/Deploy** — Docs, error messages, voice (1 hour)
-
----
-
-## The Essence (From essence.md)
-
-> **What it's really about:** Closing the gap between knowing AI is powerful and knowing how to wield it.
->
-> **The feeling:** Competence. The relief of finally understanding what you're saying.
->
-> **The one thing that must be perfect:** First touch — value before effort, in under 60 seconds.
->
-> **Creative direction:** Instrument, not control panel.
-
----
-
-*"The strength of the team is each individual member. The strength of each member is the team."*
-
-*Steve brought the soul. Elon brought the scalpel. The product is better for the tension.*
-
-*Now we build.*
-
-— Phil Jackson
->>>>>>> feature/promptops-tuned
+**Document Status:** Blueprint for Build Phase
+**Last Updated:** 2026-04-12
+**Arbiter:** Phil Jackson

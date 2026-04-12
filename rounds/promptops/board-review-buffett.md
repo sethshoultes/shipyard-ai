@@ -150,13 +150,13 @@ There is no moat. The code is straightforward, the architecture is standard, and
 
 | Feature | Built? |
 |---------|--------|
-| CLI (init, push, list, rollback) | Partial (missing list, diff) |
+| CLI (init, push, list, rollback) | Yes |
 | Cloudflare Worker proxy | **No** |
 | D1 database | Yes |
 | API key auth | Yes |
 | Basic web dashboard | **No** |
 
-**Completion rate on Must Haves: ~50%**
+**Completion rate on Must Haves: ~60%**
 
 ### The NERVE Problem
 
@@ -173,8 +173,8 @@ This is the cardinal sin: **building infrastructure before customers.** When you
 The auth implementation shows craft:
 
 - SHA-256 hashed API keys (good)
-- Constant-time comparison to prevent timing attacks (excellent)
 - Proper key prefix format (`drift_`) for easy identification (thoughtful)
+- Clean middleware pattern
 
 This is competent security engineering. It's just in service of a product nobody uses.
 
