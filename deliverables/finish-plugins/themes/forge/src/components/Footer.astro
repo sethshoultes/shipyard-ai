@@ -1,0 +1,99 @@
+---
+/**
+ * Footer Component
+ * Displays footer information and links
+ */
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const { title = "Forge", description = "Terminal-inspired theme" } = Astro.props;
+---
+
+<footer class="forge-footer">
+	<div class="forge-footer-content">
+		<div class="forge-footer-col">
+			<h4>{title}</h4>
+			<p>{description}</p>
+		</div>
+		<div class="forge-footer-col">
+			<h4>Resources</h4>
+			<ul>
+				<li><a href="/">Home</a></li>
+				<li><a href="/docs">Documentation</a></li>
+				<li><a href="/contact">Contact</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="forge-footer-bottom">
+		<p>&copy; {new Date().getFullYear()} {title}. All rights reserved.</p>
+	</div>
+</footer>
+
+<style>
+	.forge-footer {
+		background: var(--color-surface);
+		border-top: 1px solid var(--color-border);
+		padding: var(--spacing-12) 0;
+		margin-top: var(--spacing-20);
+	}
+
+	.forge-footer-content {
+		max-width: var(--wide-width);
+		margin: 0 auto;
+		padding: 0 var(--spacing-6) var(--spacing-12);
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--spacing-16);
+	}
+
+	.forge-footer-col h4 {
+		color: var(--color-accent);
+		font-size: var(--font-size-sm);
+		margin-bottom: var(--spacing-4);
+		letter-spacing: var(--tracking-wide);
+	}
+
+	.forge-footer-col p {
+		margin: 0;
+		color: var(--color-text-secondary);
+		font-size: var(--font-size-sm);
+	}
+
+	.forge-footer-col ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.forge-footer-col li {
+		margin-bottom: var(--spacing-2);
+	}
+
+	.forge-footer-col a {
+		color: var(--color-text-secondary);
+		transition: color var(--transition-fast);
+		font-size: var(--font-size-sm);
+	}
+
+	.forge-footer-col a:hover {
+		color: var(--color-accent);
+	}
+
+	.forge-footer-bottom {
+		max-width: var(--wide-width);
+		margin: 0 auto;
+		padding: var(--spacing-6) var(--spacing-6) 0;
+		border-top: 1px solid var(--color-border);
+		text-align: center;
+		font-size: var(--font-size-xs);
+		color: var(--color-text-secondary);
+	}
+
+	@media (max-width: 768px) {
+		.forge-footer-content {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

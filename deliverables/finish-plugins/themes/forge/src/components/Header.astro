@@ -1,0 +1,38 @@
+---
+/**
+ * Header Component
+ * Displays the main site header with navigation
+ */
+interface Props {
+	title?: string;
+}
+
+const { title = "Forge" } = Astro.props;
+---
+
+<header class="forge-header">
+	<div class="forge-header-content">
+		<h2 class="forge-header-title">{title}</h2>
+	</div>
+</header>
+
+<style>
+	.forge-header {
+		background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+		border-bottom: 2px solid var(--color-accent);
+		padding: var(--spacing-12) var(--spacing-6);
+		margin-bottom: var(--spacing-12);
+	}
+
+	.forge-header-content {
+		max-width: var(--content-width);
+		margin: 0 auto;
+	}
+
+	.forge-header-title {
+		margin: 0;
+		font-size: var(--font-size-3xl);
+		color: var(--color-accent);
+		text-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+	}
+</style>

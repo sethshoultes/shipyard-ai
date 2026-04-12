@@ -1,186 +1,146 @@
-# MemberShip Demo Script
-## 2-Minute Product Walkthrough
+# Emdash Plugins Demo Script
+## 2-Minute Product Walkthrough — Wardrobe + MemberShip
 
 ---
 
 **NARRATOR:**
-11:47 PM.
+Okay. You built your site. You wrote the posts. Everything works.
 
-[SCREEN: Dark room. Laptop glow. Elena, late 30s. Yoga mat in the corner. Cold coffee.]
-
-**NARRATOR:**
-Elena teaches yoga. Twenty-three students. Good ones. The kind who show up when it rains.
-
-[SCREEN: Browser tab hell. "WordPress membership plugins." "MemberPress vs Paid Memberships Pro." "Plugin won't activate help."]
+[SCREEN: An Emdash blog. Clean. Functional. Default everything. The internet's most competent shrug.]
 
 **NARRATOR:**
-Four hours she's been at this.
+And you hate it.
 
-[SCREEN: MemberPress admin. Settings nested inside settings. Red error: "Enter valid license key."]
-
-**NARRATOR:**
-Four hours to do one thing: let her students pay her.
-
-[SCREEN: Her face. Tired. The kind that sleep won't fix.]
+[SCREEN: The same site. We see it like she does now: generic, forgettable, one of ten thousand.]
 
 **NARRATOR:**
-She opened this studio because teaching changed people's lives. Now she's Googling "what is a webhook" at midnight because some software is asking her to configure one.
+Not because it's broken. Because it looks like everyone else's. Like you ran out of opinions somewhere between "choose a font" and "pick a color." Like the person who made this doesn't have a voice.
 
-[SCREEN: Google. "In web development, a webhook is an HTTP callback that—"]
-
-**NARRATOR:**
-She doesn't need to know what a webhook is. She needs to get paid.
-
-[SCREEN: Cut to black. Beat.]
+[SCREEN: Her face. Reflected in the monitor. The frustration of almost.]
 
 **NARRATOR:**
-What if that was the only question?
+You know what comes next. You've done it before.
 
-[SCREEN: White. Clean. Emdash dashboard. Three sidebar items. Air.]
-
-**NARRATOR:**
-This is Elena's site. She built it last week. Today she's adding memberships. Not "trying to add." Adding.
-
-[SCREEN: Mouse to "Plugins." Click.]
-
-[SCREEN: Marketplace. MemberShip. Blue button: "Install."]
+[SCREEN: Browser tabs multiplying like rabbits. "Best Astro themes 2026." "How to customize CSS." "Why won't my fonts load." Stack Overflow. GitHub issues. A tutorial from 2019 that starts with "First, install Webpack."]
 
 **NARRATOR:**
-One button.
+Three hours. Maybe four. Wrestling with code you didn't write for a site you don't recognize anymore. And at the end? You'll probably just undo everything.
 
-[SCREEN: Click. Progress bar. Three seconds.]
-
-**NARRATOR:**
-Done.
-
-[SCREEN: "Members" appears in sidebar. Click.]
+[SCREEN: Code editor. Red squiggles. A terminal error that wraps onto four lines.]
 
 **NARRATOR:**
-No wizard. No twenty questions. No "complete your profile."
+Here's another way.
 
-[SCREEN: Dashboard. One button: "Create your first plan." Three cards below—MRR, Members, Churn. All zeros. But ready zeros.]
-
-**NARRATOR:**
-Just this. Four words. And for the first time tonight, she's not lost.
-
-[SCREEN: Click. Form. Three fields. Name. Price. Cycle.]
+[SCREEN: Cut to black. One beat. Then: a terminal. Clean. Empty. Cursor blinking like a heartbeat.]
 
 **NARRATOR:**
-"Unlimited Classes." Forty a month.
+Watch.
 
-[SCREEN: Text fills. Dropdown shows "Monthly."]
+[SCREEN: She types: `npx wardrobe install ember`]
 
-**NARRATOR:**
-Save.
-
-[SCREEN: Click. Toast: "Saved." Plan appears in list. Ten seconds total.]
+[SCREEN: Download progress. Brief. Satisfying. Then: "✓ Installed in 2.3 seconds."]
 
 **NARRATOR:**
-That's it. Her membership tier. The thing that ate four hours last night? Gone.
+That's it. One command. Done.
 
-[SCREEN: "Connect Stripe." Click. OAuth redirect. Authorize. Back. Four seconds.]
-
-**NARRATOR:**
-Stripe connects in two clicks. No API keys. No webhook configuration. No reading docs that assume you've read other docs first.
-
-[SCREEN: Dashboard. "Stripe Connected." Green check.]
+[SCREEN: Her site. But now—transformed. Dark navy. Burnt orange accents. Serif headlines that lean forward. Magazine energy. The same words, but now they *land*.]
 
 **NARRATOR:**
-Now here's what matters.
+Same posts. Same pages. Same everything. Except now it looks like her.
 
-[SCREEN: Cut to morning. Phone screen. Marcus, 20s, on a bus.]
-
-**NARRATOR:**
-Marcus has meant to sign up for three weeks. Always something.
-
-[SCREEN: Elena's site on his phone. "Become a Member."]
+[SCREEN: She clicks around. All her content. All there. Nothing broke.]
 
 **NARRATOR:**
-Today, somewhere between Flushing and Times Square, he does.
+Your content doesn't move. Wardrobe just changes what people see. The clothes. Not the closet.
 
-[SCREEN: Click. Form. Name. Email. Card. That's it.]
-
-**NARRATOR:**
-He's done before his stop.
-
-[SCREEN: Brief loading. Then: "Welcome to the practice, Marcus."]
-
-**NARRATOR:**
-No verification email. No password to forget. No "click to confirm." He's in.
-
-[SCREEN: Cut to Elena. Studio. Morning light. Phone in hand before first class.]
+[SCREEN: Terminal. Quick commands. The site flickers through themes:]
+- Forge: terminal green, monospace, built-for-builders dark
+- Slate: cool gray, trustworthy, "I read annual reports" professional
+- Drift: sage and air, the sound of wind through a window
+- Bloom: cream and terracotta, a coffee shop that remembers your name
 
 **NARRATOR:**
-Three boroughs away—
+Five themes. Five voices. Don't like one? Run the command again. Three seconds. New look.
 
-[SCREEN: Her dashboard. MRR: "$40". Members: "1".]
-
-**NARRATOR:**
-Elena sees it happen.
-
-[SCREEN: Tap. Member list. Marcus. "Active."]
+[SCREEN: She stops on Ember. Nods. This is the one.]
 
 **NARRATOR:**
-Her first paying member. Right there. While she was unrolling mats.
+But here's what happens when your site finally looks good.
 
-[SCREEN: She smiles. Not at the tech. Because the tech got out of her way.]
-
-**NARRATOR:**
-Here's what MemberShip doesn't have.
-
-[SCREEN: Quick cuts—competitor UIs. Gray. Dense. Seventeen tabs. Permission matrices. Config screens that scroll forever.]
+[SCREEN: Analytics. A line going up. Then up again.]
 
 **NARRATOR:**
-No Bronze tier. No Silver tier. No "granular permissions." No drip schedules. Nothing built for a corporation pretending to be a yoga studio.
+People show up.
 
-[SCREEN: Back to Elena's dashboard. Clean.]
-
-**NARRATOR:**
-Two tiers. Members and everyone else. That's what she needs.
-
-[SCREEN: Marcus at home. Logging in. Gated content unlocks. Class schedule. Videos. Welcome message.]
+[SCREEN: Comments. Emails. "How do I subscribe?" "Is there a paid tier?"]
 
 **NARRATOR:**
-When Marcus comes back, he's in. No configuration. The plugin just knows.
+And some of them want to pay you.
 
-[SCREEN: Time lapse. Dashboard numbers climbing.]
+[SCREEN: Cut to a different view. Same site. But now there's a gate—halfway through an article, the text fades to a prompt: "Become a member to keep reading."]
+
+**NARRATOR:**
+MemberShip.
+
+[SCREEN: Quick install—same one-command energy. "Members" appears in the sidebar.]
+
+**NARRATOR:**
+One install. Stripe connects in two clicks. No webhook configuration. No API keys. No documentation that assumes you've read other documentation first.
+
+[SCREEN: Creating a plan. Three fields: Name, Price, Cycle. That's it. She types "Full Access. $9. Monthly." Clicks Save.]
+
+**NARRATOR:**
+Membership tier. Ten seconds. The thing other plugins need forty-five minutes and a support ticket to explain.
+
+[SCREEN: Split screen. Left: a reader on his phone, scrolling her site. Right: her admin dashboard.]
+
+**NARRATOR:**
+Now watch what happens.
+
+[SCREEN: Left—reader hits the paywall. Clicks "Subscribe." Stripe checkout. Card. Submit. "Welcome."]
+
+[SCREEN: Right—her dashboard. MRR ticks from "$0" to "$9." Members: "1." She didn't have to do anything.]
+
+**NARRATOR:**
+He's in. She knows. The money moved. No one asked about webhooks.
+
+[SCREEN: Time lapse. Days pass. The numbers climb: MRR: $126. $441. $882. Members: 14. 49. 98.]
 
 **NARRATOR:**
 Weeks pass.
 
-[SCREEN: MRR: "$1,640". Members: "41". Line going up.]
+[SCREEN: Her dashboard. MRR: "$1,247." Members: "139." A chart that only goes one direction.]
 
 **NARRATOR:**
-This happens.
+A hundred and thirty-nine people paying to read her words. Because she finally looks like someone worth paying.
 
-[SCREEN: Elena. Studio. End of class. Students rolling mats. She's smiling.]
-
-**NARRATOR:**
-Not because she learned what a webhook is. Because she never had to.
-
-[SCREEN: Dashboard numbers. Clean type. Honest data.]
+[SCREEN: Pull back. Her site on one side. Her dashboard on the other. The whole picture.]
 
 **NARRATOR:**
-Small business owners don't want powerful software.
+One command for the design.
+One install for the business.
 
-[SCREEN: Elena closes laptop. Grabs mat. Walks toward students.]
-
-**NARRATOR:**
-They want to feel powerful.
-
-[SCREEN: Logo. "MemberShip — for Emdash." Below: "You built that."]
+[SCREEN: The Wardrobe CLI: `npx wardrobe install`. The MemberShip dashboard: revenue, members, all of it.]
 
 **NARRATOR:**
-Now go teach yoga.
+This is what plugins should be. Not more work. Less. Not more decisions. Fewer. Not "powerful." *Useful*.
 
-[SCREEN: Black.]
+[SCREEN: Her. Coffee. Morning light. Looking at her site like she's meeting someone she likes.]
+
+**NARRATOR:**
+Your voice. Your look. Your business.
+Finally.
+
+[SCREEN: Emdash logo. Clean. Below it: "Wardrobe + MemberShip — included."]
+
+[SCREEN: Fade to black.]
 
 ---
 
 **RUNTIME:** 2:00
-**TONE:** Urgent. Human. Walk-and-talk rhythm. A story that moves.
-**MUSIC:** Minimal piano. Single notes building like a heartbeat. The moment before something good happens.
+**TONE:** Urgent. Human. The walk-and-talk rhythm of someone who's been there. Not selling—confiding.
+**MUSIC:** Sparse piano. Single notes. The sound of clicking into place.
 
 ---
 
-*"People will forget your feature list. They will remember how you made them feel."*
+*"The best software doesn't ask you to become a different person. It just gets out of the way."*

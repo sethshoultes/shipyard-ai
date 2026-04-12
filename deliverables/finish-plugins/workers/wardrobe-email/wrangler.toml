@@ -1,0 +1,16 @@
+name = "wardrobe-email"
+main = "src/index.ts"
+compatibility_date = "2026-03-29"
+compatibility_flags = ["nodejs_compat"]
+
+# KV Namespace for storing email subscribers
+# Created via: wrangler kv:namespace create EMAILS
+[[kv_namespaces]]
+binding = "EMAILS"
+id = "29a8b94cad87fb6c789a5dd88d1a9a47"
+preview_id = "a14a7404124553339290654d323045db"
+
+[env.production]
+[[env.production.kv_namespaces]]
+binding = "EMAILS"
+id = "29a8b94cad87fb6c789a5dd88d1a9a47"

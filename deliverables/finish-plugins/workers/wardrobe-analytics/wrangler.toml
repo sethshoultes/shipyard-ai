@@ -1,0 +1,22 @@
+name = "wardrobe-analytics"
+main = "src/index.ts"
+compatibility_date = "2026-03-29"
+compatibility_flags = ["nodejs_compat"]
+
+# KV namespace for storing analytics events and aggregated stats
+# Created via: wrangler kv:namespace create ANALYTICS
+[[kv_namespaces]]
+binding = "ANALYTICS"
+id = "501ca8a74075b6eb1ccde44b6a7826d5"
+preview_id = "b0d7a870e649ed51ec9af992278c30b8"
+
+# Environment variables
+[vars]
+CORS_ORIGIN = "https://wardrobe.emdash.dev"
+ENVIRONMENT = "production"
+
+[env.production]
+name = "wardrobe-analytics"
+[[env.production.kv_namespaces]]
+binding = "ANALYTICS"
+id = "501ca8a74075b6eb1ccde44b6a7826d5"

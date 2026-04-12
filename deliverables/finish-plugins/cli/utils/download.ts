@@ -1,42 +1,71 @@
 /**
- * Download Utility
- * Downloads theme tarballs with integrity verification
+ * Download tarball with progress indicator
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
-import * as crypto from 'crypto';
+import { createWriteStream, readFileSync } from 'fs';
+import { promises as fs } from 'fs';
+import { join } from 'path';
+import { createHash } from 'crypto';
 
-export async function downloadTarball(
+/**
+ * Download a file from URL and save to disk
+ */
+export async function downloadFile(
   url: string,
-  expectedHash?: string
+  targetPath: string,
+  onProgress?: (progress: number) => void
 ): Promise<string> {
   const response = await fetch(url);
 
   if (!response.ok) {
-    throw new Error(`Download failed: ${response.status} ${response.statusText}`);
+    throw new Error(`Failed to download: ${response.statusText}`);
   }
 
-  const buffer = await response.arrayBuffer();
-  const data = Buffer.from(buffer);
+  const contentLength = response.headers.get('content-length');
+  const totalSize = contentLength ? parseInt(contentLength, 10) : 0;
+  let downloadedSize = 0;
 
-  // Verify integrity if hash provided
-  if (expectedHash) {
-    const actualHash = crypto.createHash('sha256').update(data).digest('hex');
-    if (actualHash !== expectedHash) {
-      throw new Error(
-        'Download integrity check failed. The file may be corrupted or tampered with.'
-      );
+  // Ensure directory exists
+  const dir = targetPath.substring(0, targetPath.lastIndexOf('/'));
+  await fs.mkdir(dir, { recursive: true });
+
+  const fileStream = createWriteStream(targetPath);
+
+  const reader = response.body?.getReader();
+  if (!reader) {
+    throw new Error('Response body is empty');
+  }
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    downloadedSize += value.length;
+    if (onProgress && totalSize > 0) {
+      onProgress((downloadedSize / totalSize) * 100);
     }
+
+    fileStream.write(value);
   }
 
-  // Write to temp file
-  const tempDir = os.tmpdir();
-  const filename = path.basename(new URL(url).pathname);
-  const tarballPath = path.join(tempDir, `wardrobe-${Date.now()}-${filename}`);
+  return new Promise((resolve, reject) => {
+    fileStream.on('finish', () => resolve(targetPath));
+    fileStream.on('error', (error) => reject(error));
+    fileStream.end();
+  });
+}
 
-  await fs.promises.writeFile(tarballPath, data);
+/**
+ * Verify file integrity using sha256 hash
+ */
+export async function verifyFileSha256(
+  filePath: string,
+  expectedSha256: string
+): Promise<boolean> {
+  const fileContent = readFileSync(filePath);
+  const hash = createHash('sha256');
+  hash.update(fileContent);
+  const computedSha256 = hash.digest('hex');
 
-  return tarballPath;
+  return computedSha256 === expectedSha256;
 }

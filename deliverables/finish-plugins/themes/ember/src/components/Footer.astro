@@ -1,0 +1,217 @@
+---
+interface Props {
+	siteTitle: string;
+	settings?: any;
+}
+
+const { siteTitle, settings } = Astro.props;
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+	<div class="footer-content">
+		<div class="footer-brand">
+			<h3 class="footer-logo">{siteTitle}</h3>
+			<p class="footer-tagline">
+				{settings?.tagline || "Bold. Editorial. For people with something to say."}
+			</p>
+		</div>
+		<div class="footer-links">
+			<div class="footer-col">
+				<h4>Company</h4>
+				<a href="/">Home</a>
+				<a href="/contact">Contact</a>
+				<a href="#privacy">Privacy</a>
+			</div>
+			<div class="footer-col">
+				<h4>Resources</h4>
+				<a href="#about">About</a>
+				<a href="#blog">Blog</a>
+				<a href="#portfolio">Portfolio</a>
+			</div>
+			<div class="footer-col">
+				<h4>Connect</h4>
+				<a href="#twitter">Twitter</a>
+				<a href="#linkedin">LinkedIn</a>
+				<a href="#instagram">Instagram</a>
+			</div>
+		</div>
+	</div>
+	<div class="footer-bottom">
+		<p>&copy; {currentYear} {siteTitle}. All rights reserved.</p>
+		<div class="theme-switcher">
+			<button type="button" class="theme-btn" data-theme="light" aria-label="Light mode"
+				>Light</button
+			>
+			<button type="button" class="theme-btn" data-theme="dark" aria-label="Dark mode"
+				>Dark</button
+			>
+			<button type="button" class="theme-btn" data-theme="system" aria-label="System theme"
+				>System</button
+			>
+		</div>
+		<p class="footer-powered">
+			Powered by <a href="https://emdashcms.com">EmDash</a>
+		</p>
+	</div>
+</footer>
+
+<style>
+	.site-footer {
+		background: var(--color-surface);
+		border-top: 3px solid var(--color-accent);
+		margin-top: auto;
+	}
+
+	.footer-content {
+		max-width: var(--wide-width);
+		margin: 0 auto;
+		padding: var(--spacing-4xl) var(--spacing-lg) var(--spacing-2xl);
+		display: grid;
+		grid-template-columns: 1fr 2fr;
+		gap: var(--spacing-4xl);
+	}
+
+	.footer-brand {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-md);
+	}
+
+	.footer-logo {
+		font-family: var(--font-heading);
+		font-size: var(--font-size-2xl);
+		font-weight: 700;
+		letter-spacing: -0.03em;
+		color: var(--color-primary);
+		margin: 0;
+	}
+
+	.footer-tagline {
+		font-size: var(--font-size-sm);
+		color: var(--color-muted);
+		line-height: 1.6;
+	}
+
+	.footer-links {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--spacing-2xl);
+	}
+
+	.footer-col h4 {
+		font-size: var(--font-size-sm);
+		font-weight: 700;
+		margin-bottom: var(--spacing-md);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--color-primary);
+	}
+
+	.footer-col a {
+		display: block;
+		font-size: var(--font-size-sm);
+		color: var(--color-muted);
+		padding: var(--spacing-xs) 0;
+		transition: color var(--transition-fast);
+		position: relative;
+		padding-left: var(--spacing-md);
+	}
+
+	.footer-col a::before {
+		content: "→";
+		position: absolute;
+		left: 0;
+		opacity: 0;
+		transition: opacity var(--transition-fast);
+	}
+
+	.footer-col a:hover {
+		color: var(--color-accent);
+	}
+
+	.footer-col a:hover::before {
+		opacity: 1;
+	}
+
+	.footer-bottom {
+		max-width: var(--wide-width);
+		margin: 0 auto;
+		padding: var(--spacing-lg);
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-size: var(--font-size-sm);
+		color: var(--color-muted);
+		border-top: 1px solid var(--color-border);
+		gap: var(--spacing-lg);
+	}
+
+	.footer-powered a {
+		color: var(--color-accent);
+		font-weight: 600;
+	}
+
+	.theme-switcher {
+		display: flex;
+		gap: var(--spacing-xs);
+	}
+
+	.theme-btn {
+		background: transparent;
+		border: 1px solid var(--color-border);
+		color: var(--color-muted);
+		font-family: var(--font-sans);
+		font-size: var(--font-size-xs);
+		padding: var(--spacing-xs) var(--spacing-sm);
+		border-radius: var(--radius-sm);
+		cursor: pointer;
+		transition: all var(--transition-fast);
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.theme-btn:hover {
+		color: var(--color-text);
+		border-color: var(--color-accent);
+	}
+
+	.theme-btn.active {
+		background: var(--color-accent);
+		color: white;
+		border-color: var(--color-accent);
+	}
+
+	@media (max-width: 768px) {
+		.footer-content {
+			grid-template-columns: 1fr;
+			gap: var(--spacing-2xl);
+		}
+
+		.footer-links {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		.footer-bottom {
+			flex-direction: column;
+			gap: var(--spacing-md);
+			text-align: center;
+		}
+
+		.theme-switcher {
+			order: -1;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.footer-bottom {
+			flex-wrap: wrap;
+			justify-content: center;
+		}
+
+		.footer-links {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

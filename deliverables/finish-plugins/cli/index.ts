@@ -1,111 +1,93 @@
 #!/usr/bin/env node
 /**
- * Wardrobe CLI
- * Theme marketplace for Emdash CMS
+ * CLI for Wardrobe theme marketplace.
  *
- * One command transforms your site into something beautiful.
- * Your content stays, only the skin changes.
+ * Usage:
+ *   wardrobe list              # Display available themes
+ *   wardrobe install [theme]   # Install a theme
+ *   wardrobe preview [theme]   # Open theme preview in browser
  */
 
-import { listCommand } from './commands/list';
-import { installCommand } from './commands/install';
-import { previewCommand } from './commands/preview';
+import { Command } from 'commander';
+import { fetchThemesRegistry } from './utils/fetch-registry.js';
+import { installTheme } from './commands/install.js';
+import { previewCommand } from './commands/preview.js';
 
-const VERSION = '1.0.0';
-const PRODUCT_NAME = 'Wardrobe';
+// ── CLI ────────────────────────────────────────────────────────────────────
 
-interface Command {
-  name: string;
-  description: string;
-  usage: string;
-  execute: (args: string[]) => Promise<void>;
-}
+const program = new Command();
 
-const commands: Record<string, Command> = {
-  list: {
-    name: 'list',
-    description: 'List all available themes',
-    usage: 'npx wardrobe list',
-    execute: listCommand,
-  },
-  install: {
-    name: 'install',
-    description: 'Install a theme',
-    usage: 'npx wardrobe install <theme-name>',
-    execute: installCommand,
-  },
-  preview: {
-    name: 'preview',
-    description: 'Preview a theme in your browser',
-    usage: 'npx wardrobe preview <theme-name>',
-    execute: previewCommand,
-  },
-};
+program
+  .name('wardrobe')
+  .description('Theme marketplace for Emdash — install themes instantly')
+  .version('1.0.0');
 
-function showHelp(): void {
-  console.log(`
-${PRODUCT_NAME} v${VERSION}
-One command. Your content stays. Only the skin changes.
+// ── list ────────────────────────────────────────────────────────────────────
 
-Usage:
-  npx wardrobe <command> [options]
+program
+  .command('list')
+  .description('List available themes')
+  .action(async () => {
+    try {
+      const themes = await fetchThemesRegistry();
 
-Commands:
-  list              List all available themes
-  install <theme>   Install a theme (backs up your current src/)
-  preview <theme>   Open theme preview in browser
+      if (!themes || themes.length === 0) {
+        console.log('No themes available.');
+        return;
+      }
 
-Examples:
-  npx wardrobe list
-  npx wardrobe install ember
-  npx wardrobe preview forge
+      console.log('\nAvailable themes:\n');
 
-Options:
-  --help, -h        Show this help message
-  --version, -v     Show version number
+      // Separate active themes from coming soon themes
+      const activeThemes = themes.filter((t) => !(t as any).comingSoon);
+      const comingSoonThemes = themes.filter((t) => (t as any).comingSoon);
 
-Learn more: https://wardrobe.shipyard.company
-`);
-}
+      // Display active themes
+      for (const theme of activeThemes) {
+        console.log(`  ${theme.name.toUpperCase()}`);
+        console.log(`    ${theme.description}`);
+        console.log(`    npx wardrobe install ${theme.name}`);
+        console.log();
+      }
 
-function showVersion(): void {
-  console.log(`${PRODUCT_NAME} v${VERSION}`);
-}
+      // Display coming soon themes
+      if (comingSoonThemes.length > 0) {
+        console.log('Coming Soon:\n');
+        for (const theme of comingSoonThemes) {
+          console.log(`  ${theme.name.toUpperCase()} — ${(theme as any).estimatedRelease}`);
+          console.log(`    ${theme.description}`);
+          console.log();
+        }
+      }
 
-async function main(): Promise<void> {
-  const args = process.argv.slice(2);
-
-  if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
-    showHelp();
-    process.exit(0);
-  }
-
-  if (args.includes('--version') || args.includes('-v')) {
-    showVersion();
-    process.exit(0);
-  }
-
-  const commandName = args[0];
-  const commandArgs = args.slice(1);
-
-  const command = commands[commandName];
-
-  if (!command) {
-    console.error(`Unknown command: ${commandName}`);
-    console.log('Run "npx wardrobe --help" to see available commands.');
-    process.exit(1);
-  }
-
-  try {
-    await command.execute(commandArgs);
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(`\nOops. Something went wrong: ${error.message}`);
-    } else {
-      console.error('\nOops. Something unexpected happened.');
+      console.log(`Total: ${themes.length} theme(s) (${activeThemes.length} available, ${comingSoonThemes.length} coming soon)\n`);
+    } catch (error) {
+      console.error(
+        'Failed to fetch themes. Please check your internet connection and try again.'
+      );
+      process.exit(1);
     }
-    process.exit(1);
-  }
-}
+  });
 
-main();
+// ── install ──────────────────────────────────────────────────────────────────
+
+program
+  .command('install <theme>')
+  .option('-v, --verbose', 'Show detailed output')
+  .description('Install a theme')
+  .action(async (theme: string, options: { verbose?: boolean }) => {
+    await installTheme(theme, options);
+  });
+
+// ── preview ──────────────────────────────────────────────────────────────────
+
+program
+  .command('preview <theme>')
+  .description('Open theme preview in browser')
+  .action(async (theme: string) => {
+    await previewCommand(theme);
+  });
+
+// ── run ────────────────────────────────────────────────────────────────────
+
+program.parse();

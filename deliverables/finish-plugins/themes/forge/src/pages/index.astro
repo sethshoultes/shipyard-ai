@@ -1,0 +1,53 @@
+---
+import { getSiteSettings, getMenu } from "emdash";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const settings = await getSiteSettings();
+const siteTitle = settings?.title || "Forge";
+const siteDescription = settings?.tagline || "Dark mode, monospace, neon green accents, terminal-inspired";
+
+const menu = await getMenu("primary");
+---
+
+<BaseLayout title={siteTitle} description={siteDescription}>
+	<div class="hero">
+		<div class="hero-content">
+			<h1 class="hero-title">{siteTitle}</h1>
+			<p class="hero-tagline">{siteDescription}</p>
+			<a href="/contact" class="hero-cta">Get Started</a>
+		</div>
+	</div>
+
+	<section class="features">
+		<div class="features-grid">
+			<article class="feature-card">
+				<h3>Dark Mode</h3>
+				<p>Built for the night. High contrast, easy on the eyes. The terminal never sleeps.</p>
+			</article>
+			<article class="feature-card">
+				<h3>Monospace Typography</h3>
+				<p>Every character matters. Clean, technical, precise. JetBrains Mono gets to work.</p>
+			</article>
+			<article class="feature-card">
+				<h3>Neon Accents</h3>
+				<p>Bright green brings energy. Inspired by command lines and hacker aesthetics.</p>
+			</article>
+			<article class="feature-card">
+				<h3>Data-Dense Layout</h3>
+				<p>More information per pixel. Structured grids. Organized. Built for builders.</p>
+			</article>
+			<article class="feature-card">
+				<h3>Terminal Inspired</h3>
+				<p>The aesthetic of code. Borders. Boxes. Signals that this means business.</p>
+			</article>
+			<article class="feature-card">
+				<h3>Your Content</h3>
+				<p>Install Forge and your content stays. We just swap the shell. No migration. No loss.</p>
+			</article>
+		</div>
+	</section>
+
+	<style is:global>
+		@import "../styles/theme.css";
+	</style>
+</BaseLayout>

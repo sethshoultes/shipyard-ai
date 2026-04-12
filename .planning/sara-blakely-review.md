@@ -2,35 +2,36 @@
 
 ## Would a real customer pay for this?
 
-**Maybe.** But not because of anything in this plan. This is an infrastructure deployment checklist, not a product. I see KV namespaces and R2 buckets. Where's the customer? Where's the pain?
+**No. Not for this plan.** They'd pay for the RESULT: "my blog went from forgettable to 'wait, who designed this?'" This plan is 940 lines of infrastructure. The customer doesn't care about KV namespaces. They care about looking good.
 
-The buried truth: "One command transforms your site into something beautiful" — THAT's the product. Everything else is plumbing.
+The magic moment is buried: "One command transforms your site." Everything else is backstage.
 
-## What's confusing / What makes someone bounce?
+## What's confusing? What would make someone bounce?
 
-1. **"Wardrobe Theme Marketplace"** — Is this a marketplace? I don't see pricing, browsing, or purchasing anywhere. Don't call it a marketplace if it's not one.
-2. **5 themes** — Why would I try this instead of just picking a theme from the million others out there? What makes these special?
-3. **The reveal** — You keep saying the reveal must be perfect. I don't see any plan to MAKE it perfect. Where's the before/after? The dopamine hit?
+1. **"Marketplace"** with no prices, no browsing, no cart. Call it what it is: a theme collection.
+2. **5 themes, no comparison.** I have to visit 5 separate URLs? Show me a side-by-side.
+3. **Email capture before value.** You're asking for my email before I've felt the transformation.
+4. **CLI-first for non-CLI people.** Half your audience doesn't live in terminal. The screenshots must do ALL the selling.
 
 ## 30-Second Elevator Pitch
 
-*Your website looks like everyone else's. Run one command, pick a theme, and in 3 seconds your site looks like YOU hired a designer. No config files. No breaking changes. Just instant dignity.*
+*Your Emdash blog looks like a template because it IS a template. One command — `npx wardrobe install ember` — and 3 seconds later it looks like you. Five designer themes. No config. No breaking changes. Just instant dignity.*
 
-## What would I test first with $0 marketing budget?
+## What would I test first with $0 budget?
 
-Screenshot before/after and post it in one Emdash Discord or Slack. DM 5 real users. Ask: "Which theme fits you?" Watch if they actually run the command. If they don't, you learned something way more valuable than your KV namespace IDs.
+Deploy Ember. ONE theme. Screenshot before/after. Post in 3 places where Emdash users hang out. DM 10 people: "Would you use this?" If 7+ say yes, build the other four. If not, your positioning is wrong — and you just saved 60-90 minutes of demo site deployment.
 
 ## What's the retention hook?
 
-**I don't see one.** They install a theme once and leave. Where's the:
-- Theme updates that make them come back?
-- Community showcase ("sites using Ember")?
-- Seasonal drops ("Fall collection just shipped")?
+**There isn't one.** This is a one-and-done product. That's okay for V1, but plan for:
+- Theme drops ("Winter collection is live")
+- Social proof feed ("2,847 sites transformed")
+- Customization prompts ("Want to tweak Ember's colors?")
 
-You're building a one-night-stand, not a relationship.
+The email capture has no reason to exist without future drops.
 
 ---
 
-**Bottom line:** The plan is technically solid. But it's all foundation, no house. Ship it, then immediately figure out why someone would come back.
+**Verdict:** Technically solid. Customer-obsessed? Not yet. Ship Wave 1-2, get ONE demo live, validate before building four more themes nobody asked for.
 
 —Sara

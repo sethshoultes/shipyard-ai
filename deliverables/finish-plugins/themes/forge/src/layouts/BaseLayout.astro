@@ -1,0 +1,123 @@
+---
+import { getMenu, getSiteSettings } from "emdash";
+import { EmDashHead } from "emdash/ui";
+import { createPublicPageContext } from "emdash/page";
+
+interface Props {
+	title?: string;
+	description?: string;
+	image?: string;
+}
+
+const { title, description, image } = Astro.props;
+const settings = await getSiteSettings();
+const siteTitle = settings?.title || "Forge";
+const fullTitle = title ? `${title} — ${siteTitle}` : siteTitle;
+const siteDescription = settings?.tagline || "Dark mode, monospace, neon green accents, terminal-inspired";
+
+const menu = await getMenu("primary");
+
+const pageCtx = createPublicPageContext({
+	Astro,
+	kind: "custom",
+	pageType: "website",
+	title: fullTitle,
+	description: description || siteDescription,
+	canonical: Astro.url.href,
+	image,
+	seo: { ogImage: image },
+	siteName: siteTitle,
+});
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{fullTitle}</title>
+		<EmDashHead page={pageCtx} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="preload"
+			as="style"
+			href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://unpkg.com/@phosphor-icons/web@2.1.2/src/regular/style.css"
+			rel="stylesheet"
+		/>
+		<script is:inline>
+			// Apply theme immediately to prevent flash
+			(function () {
+				var c = document.cookie;
+				var i = c.indexOf("theme=");
+				var theme = i >= 0 ? c.slice(i + 6).split(";")[0] : null;
+				if (theme === "dark" || theme === "light") {
+					document.documentElement.classList.add(theme);
+				} else {
+					document.documentElement.classList.add("dark");
+				}
+			})();
+		</script>
+	</head>
+	<body>
+		<header class="site-header">
+			<nav class="nav">
+				<a href="/" class="site-title">{siteTitle}</a>
+				<div class="nav-links">
+					{
+						menu?.items.map((item) => (
+							<a href={item.url} target={item.target}>
+								{item.label}
+							</a>
+						))
+					}
+				</div>
+			</nav>
+		</header>
+
+		<main>
+			<slot />
+		</main>
+
+		<footer class="site-footer">
+			<div class="footer-content">
+				<div class="footer-col">
+					<h4>{siteTitle}</h4>
+					<p style="margin: 0; line-height: 1.5;">
+						{siteDescription}
+					</p>
+				</div>
+				<div class="footer-col">
+					<h4>Links</h4>
+					{
+						menu?.items.map((item) => (
+							<a href={item.url} target={item.target}>
+								{item.label}
+							</a>
+						))
+					}
+				</div>
+			</div>
+			<div class="footer-bottom">
+				<p>
+					&copy; {new Date().getFullYear()}
+					{siteTitle}. All rights reserved.
+				</p>
+				<p style="margin: 0;">
+					Powered by <a href="https://emdashcms.com">EmDash</a> + <a href="https://wardrobe.sh">Wardrobe</a>
+				</p>
+			</div>
+		</footer>
+
+		<style is:global>
+			@import "../styles/theme.css";
+		</style>
+	</body>
+</html>

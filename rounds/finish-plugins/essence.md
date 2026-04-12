@@ -1,7 +1,7 @@
 # Essence
 
 **What is this product REALLY about?**
-Making people who feel stupid feel capable.
+Making people who feel inadequate feel capable.
 
 **The feeling:**
 "I built that."
@@ -11,3 +11,7 @@ The first 30 seconds.
 
 **Creative direction:**
 Disappear.
+
+---
+
+*Strip away the features. What remains is confidence.*

@@ -1,71 +1,96 @@
 /**
- * Preview Command
- * Opens theme preview in the default browser
+ * Preview command — opens theme preview in browser
+ *
+ * Usage:
+ *   wardrobe preview [theme]
+ *
+ * Cross-platform browser opening:
+ *   - macOS: 'open' command
+ *   - Windows: 'start' command
+ *   - Linux: 'xdg-open' command
  */
 
-import { fetchRegistry } from '../utils/fetch-registry';
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import { execSync } from 'child_process';
+import { fetchThemesRegistry } from '../utils/fetch-registry.js';
 
-const execAsync = promisify(exec);
+interface ThemeWithPreview {
+  name: string;
+  description: string;
+  version: string;
+  url?: string;
+  previewUrl?: string;
+}
 
-export async function previewCommand(args: string[]): Promise<void> {
-  const themeName = args[0];
+/**
+ * Open preview URL in browser (cross-platform)
+ */
+function openBrowserUrl(url: string): void {
+  const platform = process.platform;
 
-  if (!themeName) {
-    // No theme specified, open showcase
-    console.log('\nOpening Wardrobe showcase...');
-    await openBrowser('https://wardrobe.shipyard.company');
-    return;
+  try {
+    if (platform === 'darwin') {
+      // macOS
+      execSync(`open "${url}"`);
+    } else if (platform === 'win32') {
+      // Windows
+      execSync(`start "${url}"`);
+    } else {
+      // Linux and other Unix-like systems
+      execSync(`xdg-open "${url}"`);
+    }
+  } catch (error) {
+    // If browser open fails, print URL as fallback
+    console.log(`\nCouldn't open browser automatically.`);
+    console.log(`Open this URL in your browser:\n  ${url}\n`);
   }
+}
 
-  console.log(`\nFetching preview for ${themeName}...\n`);
-
-  const registry = await fetchRegistry();
-  const theme = registry.themes.find(
-    t => t.slug.toLowerCase() === themeName.toLowerCase()
-  );
-
-  if (!theme) {
-    console.error(`Theme "${themeName}" not found.`);
-    console.log('Run "npx wardrobe list" to see available themes.');
+/**
+ * Preview command action
+ */
+export async function previewCommand(themeName?: string): Promise<void> {
+  // Validate that a theme name was provided
+  if (!themeName) {
+    console.error('Error: Please specify a theme name.');
+    console.error('Usage: wardrobe preview [theme]');
+    console.error('\nExample: wardrobe preview ember');
     process.exit(1);
   }
 
-  if (theme.comingSoon) {
-    console.log(`"${theme.name}" is coming soon (${theme.estimatedRelease || 'TBD'}).`);
-    console.log('\nOpening preview anyway...');
-  }
-
-  console.log(`Opening preview for ${theme.name}...`);
-  console.log(`"${theme.tagline}"`);
-  console.log('');
-
-  await openBrowser(theme.previewUrl);
-}
-
-async function openBrowser(url: string): Promise<void> {
-  const platform = process.platform;
-
-  let command: string;
-
-  switch (platform) {
-    case 'darwin':
-      command = `open "${url}"`;
-      break;
-    case 'win32':
-      command = `start "" "${url}"`;
-      break;
-    default:
-      // Linux and others
-      command = `xdg-open "${url}"`;
-      break;
-  }
-
   try {
-    await execAsync(command);
+    // Fetch the themes registry
+    const themes = (await fetchThemesRegistry()) as ThemeWithPreview[];
+
+    // Validate theme name against registry
+    const theme = themes.find(
+      (t) => t.name.toLowerCase() === themeName.toLowerCase()
+    );
+
+    if (!theme) {
+      console.error(`Error: Theme "${themeName}" not found.`);
+      console.error(
+        `Available themes: ${themes.map((t) => t.name).join(', ')}`
+      );
+      process.exit(1);
+    }
+
+    // Get preview URL from registry
+    const previewUrl = theme.previewUrl;
+
+    if (!previewUrl) {
+      console.error(`Error: No preview URL available for theme "${themeName}".`);
+      process.exit(1);
+    }
+
+    // Display success message
+    console.log(`Opening preview for ${theme.name}...`);
+
+    // Open browser
+    openBrowserUrl(previewUrl);
   } catch (error) {
-    console.log(`Could not open browser automatically.`);
-    console.log(`Visit: ${url}`);
+    console.error(
+      'Failed to fetch themes. Please check your internet connection and try again.'
+    );
+    process.exit(1);
   }
 }

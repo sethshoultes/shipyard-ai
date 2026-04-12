@@ -1,0 +1,398 @@
+---
+import { getMenu, getSiteSettings } from "emdash";
+import { EmDashHead } from "emdash/ui";
+import { createPublicPageContext } from "emdash/page";
+import "../styles/theme.css";
+
+interface Props {
+	title?: string;
+	description?: string;
+	image?: string;
+}
+
+const { title, description, image } = Astro.props;
+const settings = await getSiteSettings();
+const siteTitle = settings?.title || "Site";
+const fullTitle = title ? `${title} — ${siteTitle}` : siteTitle;
+const siteDescription = settings?.tagline || "Welcome";
+
+const menu = await getMenu("primary");
+
+const pageCtx = createPublicPageContext({
+	Astro,
+	kind: "custom",
+	pageType: "website",
+	title: fullTitle,
+	description: description || siteDescription,
+	canonical: Astro.url.href,
+	image,
+	seo: { ogImage: image },
+	siteName: siteTitle,
+});
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{fullTitle}</title>
+		<EmDashHead page={pageCtx} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="preload"
+			as="style"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://unpkg.com/@phosphor-icons/web@2.1.2/src/regular/style.css"
+			rel="stylesheet"
+		/>
+		<style>
+			@font-face {
+				font-family: "Inter Fallback";
+				src: local("Arial");
+				size-adjust: 107%;
+				ascent-override: 90%;
+				descent-override: 25%;
+				line-gap-override: 0%;
+			}
+		</style>
+		<script is:inline>
+			(function () {
+				var c = document.cookie;
+				var i = c.indexOf("theme=");
+				var theme = i >= 0 ? c.slice(i + 6).split(";")[0] : null;
+				if (theme === "dark" || theme === "light") {
+					document.documentElement.classList.add(theme);
+				} else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+					document.documentElement.classList.add("dark");
+				}
+			})();
+		</script>
+	</head>
+	<body>
+		<header class="site-header">
+			<nav class="nav">
+				<a href="/" class="site-logo">{siteTitle}</a>
+				<div class="nav-links">
+					{
+						menu?.items.map((item) => (
+							<a href={item.url} target={item.target}>
+								{item.label}
+							</a>
+						))
+					}
+				</div>
+				<div class="nav-actions">
+					<a href="/contact" class="nav-cta">Contact</a>
+				</div>
+			</nav>
+		</header>
+
+		<main class="main-content">
+			<slot />
+		</main>
+
+		<footer class="site-footer">
+			<div class="footer-content">
+				<div class="footer-brand">
+					<span class="footer-logo">{siteTitle}</span>
+					<p class="footer-tagline">{settings?.tagline || "Welcome"}</p>
+				</div>
+				<div class="footer-links">
+					<div class="footer-col">
+						<h4>Explore</h4>
+						<a href="/">Home</a>
+						<a href="/contact">Contact</a>
+					</div>
+					<div class="footer-col">
+						<h4>About</h4>
+						<a href="/">Visit</a>
+						<a href="/contact">Get in Touch</a>
+					</div>
+				</div>
+			</div>
+			<div class="footer-bottom">
+				<p>&copy; {new Date().getFullYear()} {siteTitle}. All rights reserved.</p>
+				<div class="theme-switcher">
+					<button type="button" class="theme-btn" data-theme="light" aria-label="Light mode">Light</button>
+					<button type="button" class="theme-btn" data-theme="dark" aria-label="Dark mode">Dark</button>
+					<button type="button" class="theme-btn" data-theme="system" aria-label="System theme">System</button>
+				</div>
+				<p class="footer-powered">
+					Powered by <a href="https://emdashcms.com">EmDash</a>
+				</p>
+			</div>
+		</footer>
+
+		<script>
+			const THEME_REGEX = /theme=([^;]+)/;
+			const themeBtns = document.querySelectorAll<HTMLButtonElement>(".theme-btn");
+			const root = document.documentElement;
+
+			function setTheme(theme: string) {
+				const secure = location.protocol === "https:" ? "; Secure" : "";
+				if (theme === "system") {
+					document.cookie = `theme=; path=/; max-age=0; SameSite=Lax${secure}`;
+					root.classList.remove("light", "dark");
+					if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+						root.classList.add("dark");
+					}
+				} else {
+					document.cookie = `theme=${theme}; path=/; max-age=31536000; SameSite=Lax${secure}`;
+					root.classList.remove("light", "dark");
+					root.classList.add(theme);
+				}
+				updateActiveBtn(theme);
+			}
+
+			function updateActiveBtn(theme: string) {
+				themeBtns.forEach((btn) => {
+					btn.classList.toggle("active", btn.dataset.theme === theme);
+				});
+			}
+
+			function getStoredTheme(): string {
+				const match = document.cookie.match(THEME_REGEX);
+				return match ? match[1] : "system";
+			}
+
+			const storedTheme = getStoredTheme();
+			setTheme(storedTheme);
+
+			themeBtns.forEach((btn) => {
+				btn.addEventListener("click", () => {
+					setTheme(btn.dataset.theme || "system");
+				});
+			});
+
+			window
+				.matchMedia("(prefers-color-scheme: dark)")
+				.addEventListener("change", (e) => {
+					if (getStoredTheme() === "system") {
+						root.classList.toggle("dark", e.matches);
+					}
+				});
+		</script>
+
+		<style is:global>
+			.site-header {
+				position: sticky;
+				top: 0;
+				z-index: 100;
+				background: var(--color-background);
+				border-bottom: 1px solid var(--color-border);
+				padding: var(--spacing-lg) 0;
+			}
+
+			.nav {
+				max-width: var(--wide-width);
+				margin: 0 auto;
+				padding: 0 var(--spacing-lg);
+				display: flex;
+				flex-wrap: nowrap;
+				align-items: center;
+				gap: var(--spacing-xl);
+			}
+
+			.site-logo {
+				font-family: var(--font-heading);
+				font-size: var(--font-size-lg);
+				font-weight: 300;
+				letter-spacing: 1px;
+				color: var(--color-accent);
+				text-transform: uppercase;
+			}
+
+			.nav-links {
+				display: flex;
+				flex-wrap: wrap;
+				gap: var(--spacing-xl);
+				margin-left: auto;
+			}
+
+			.nav-links a {
+				font-size: var(--font-size-sm);
+				font-weight: 400;
+				color: var(--color-text);
+				transition: color var(--transition-fast);
+			}
+
+			.nav-links a:hover {
+				color: var(--color-accent);
+			}
+
+			.nav-actions {
+				display: flex;
+				align-items: center;
+				gap: var(--spacing-lg);
+			}
+
+			.nav-cta {
+				padding: var(--spacing-xs) var(--spacing-md);
+				font-size: var(--font-size-sm);
+				font-weight: 400;
+				color: var(--color-accent);
+				border: 1px solid var(--color-accent);
+				border-radius: var(--radius);
+				transition: all var(--transition-fast);
+			}
+
+			.nav-cta:hover {
+				background: var(--color-accent);
+				color: var(--color-background);
+			}
+
+			.main-content {
+				min-height: calc(100vh - 200px);
+				padding: var(--spacing-4xl) 0;
+			}
+
+			.site-footer {
+				background: var(--color-surface);
+				border-top: 1px solid var(--color-border);
+				margin-top: var(--spacing-5xl);
+			}
+
+			.footer-content {
+				max-width: var(--wide-width);
+				margin: 0 auto;
+				padding: var(--spacing-4xl) var(--spacing-lg) var(--spacing-2xl);
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: var(--spacing-4xl);
+			}
+
+			.footer-logo {
+				font-size: var(--font-size-base);
+				font-weight: 400;
+				letter-spacing: 1px;
+				text-transform: uppercase;
+				color: var(--color-accent);
+			}
+
+			.footer-tagline {
+				margin-top: var(--spacing-sm);
+				font-size: var(--font-size-sm);
+				color: var(--color-muted);
+				font-weight: 300;
+			}
+
+			.footer-links {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: var(--spacing-2xl);
+			}
+
+			.footer-col h4 {
+				font-size: var(--font-size-sm);
+				font-weight: 500;
+				margin-bottom: var(--spacing-md);
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+
+			.footer-col a {
+				display: block;
+				font-size: var(--font-size-sm);
+				color: var(--color-text);
+				padding: var(--spacing-xs) 0;
+				transition: color var(--transition-fast);
+			}
+
+			.footer-col a:hover {
+				color: var(--color-accent);
+			}
+
+			.footer-bottom {
+				max-width: var(--wide-width);
+				margin: 0 auto;
+				padding: var(--spacing-lg);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				font-size: var(--font-size-xs);
+				color: var(--color-muted);
+				border-top: 1px solid var(--color-border);
+				gap: var(--spacing-md);
+			}
+
+			.footer-powered a {
+				color: var(--color-accent);
+			}
+
+			.theme-switcher {
+				display: flex;
+				gap: var(--spacing-xs);
+			}
+
+			.theme-btn {
+				background: transparent;
+				border: 1px solid var(--color-border);
+				color: var(--color-muted);
+				font-family: var(--font-sans);
+				font-size: var(--font-size-xs);
+				padding: var(--spacing-xs) var(--spacing-sm);
+				border-radius: var(--radius);
+				cursor: pointer;
+				transition: all var(--transition-fast);
+				font-weight: 400;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+
+			.theme-btn:hover {
+				color: var(--color-text);
+				border-color: var(--color-text);
+			}
+
+			.theme-btn.active {
+				background: var(--color-text);
+				color: var(--color-background);
+				border-color: var(--color-text);
+			}
+
+			@media (max-width: 768px) {
+				.footer-content {
+					grid-template-columns: 1fr;
+					gap: var(--spacing-2xl);
+				}
+
+				.footer-bottom {
+					flex-direction: column;
+					gap: var(--spacing-md);
+					text-align: center;
+				}
+
+				.theme-switcher {
+					order: -1;
+				}
+			}
+
+			@media (max-width: 540px) {
+				.nav {
+					flex-wrap: wrap;
+					row-gap: var(--spacing-md);
+					justify-content: space-between;
+				}
+
+				.nav-links {
+					order: 3;
+					width: 100%;
+					justify-content: flex-end;
+					margin-left: 0;
+				}
+
+				.footer-links {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
+	</body>
+</html>

@@ -1,190 +1,42 @@
 ---
-/**
- * Ember Theme - Home Page
- * Magazine-style editorial layout
- */
+import { getSiteSettings, getMenu } from "emdash";
+import BaseLayout from "../layouts/BaseLayout.astro";
 
-import Base from '../layouts/Base.astro';
+const settings = await getSiteSettings();
+const siteTitle = settings?.title || "Ember";
+const siteDescription = settings?.tagline || "Bold. Editorial. For people with something to say.";
+
+const menu = await getMenu("primary");
 ---
 
-<Base title="Ember - Bold Editorial Theme">
-  <section class="hero">
-    <div class="container">
-      <div class="hero-content">
-        <span class="hero-tag">Editorial</span>
-        <h1>Bold stories deserve bold design.</h1>
-        <p class="hero-lead">
-          Ember is for people with something to say. Magazine-style layouts that make your content impossible to ignore.
-        </p>
-        <a href="/posts" class="btn-primary">Read the latest</a>
-      </div>
-    </div>
-  </section>
+<BaseLayout title={siteTitle} description={siteDescription}>
+	<div class="hero">
+		<div class="hero-content">
+			<h1 class="hero-title">{siteTitle}</h1>
+			<p class="hero-tagline">{siteDescription}</p>
+			<a href="/contact" class="hero-cta">Get Started</a>
+		</div>
+		<div class="hero-accent"></div>
+	</div>
 
-  <section class="featured">
-    <div class="container">
-      <h2 class="section-title">Featured</h2>
-      <div class="asymmetric-grid">
-        <article class="card card-large">
-          <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800');"></div>
-          <div class="card-content">
-            <span class="card-category">Feature</span>
-            <h3>The art of saying more with less</h3>
-            <p>How minimalism in design amplifies your message.</p>
-          </div>
-        </article>
-        <article class="card card-small">
-          <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400');"></div>
-          <div class="card-content">
-            <span class="card-category">Opinion</span>
-            <h3>Why your brand needs a voice</h3>
-          </div>
-        </article>
-        <article class="card card-small">
-          <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1504805572947-34fad45aed93?w=400');"></div>
-          <div class="card-content">
-            <span class="card-category">Review</span>
-            <h3>Tools that shape stories</h3>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
+	<section class="features">
+		<div class="features-grid">
+			<article class="feature-card">
+				<h3>Bold Design</h3>
+				<p>Magazine-style layouts with serif headings that command attention. Asymmetric grids create visual tension and intrigue.</p>
+			</article>
+			<article class="feature-card">
+				<h3>Editorial Voice</h3>
+				<p>Dark navy and burnt orange palette. Typography that speaks. Every detail matters to the story you're telling.</p>
+			</article>
+			<article class="feature-card">
+				<h3>Your Content</h3>
+				<p>Install Ember and your content is already there. No migration, no loss. Just a new skin that fits better.</p>
+			</article>
+		</div>
+	</section>
 
-  <style>
-    .hero {
-      padding: 6rem 0;
-      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-background) 100%);
-    }
-
-    .hero-content {
-      max-width: 700px;
-    }
-
-    .hero-tag {
-      display: inline-block;
-      background: var(--color-accent);
-      color: white;
-      padding: 0.25rem 0.75rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 1.5rem;
-    }
-
-    .hero h1 {
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      margin-bottom: 1.5rem;
-      line-height: 1.1;
-    }
-
-    .hero-lead {
-      font-size: 1.25rem;
-      color: var(--color-muted);
-      margin-bottom: 2rem;
-      max-width: 500px;
-    }
-
-    .btn-primary {
-      display: inline-block;
-      background: var(--color-accent);
-      color: white;
-      padding: 0.875rem 2rem;
-      font-weight: 600;
-      border-radius: 2px;
-      transition: transform 0.2s ease, background 0.2s ease;
-    }
-
-    .btn-primary:hover {
-      background: #e8814a;
-      transform: translateY(-2px);
-      color: white;
-    }
-
-    .featured {
-      padding: 4rem 0;
-    }
-
-    .section-title {
-      font-size: 0.875rem;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--color-accent);
-      margin-bottom: 2rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px solid var(--color-surface);
-    }
-
-    .asymmetric-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 1.5rem;
-    }
-
-    .card {
-      background: var(--color-surface);
-      overflow: hidden;
-      border-radius: 2px;
-      transition: transform 0.3s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-    }
-
-    .card-large {
-      grid-row: span 2;
-    }
-
-    .card-image {
-      height: 200px;
-      background-size: cover;
-      background-position: center;
-    }
-
-    .card-large .card-image {
-      height: 300px;
-    }
-
-    .card-content {
-      padding: 1.5rem;
-    }
-
-    .card-category {
-      display: inline-block;
-      color: var(--color-accent);
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 0.5rem;
-    }
-
-    .card h3 {
-      font-size: 1.25rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .card-large h3 {
-      font-size: 1.75rem;
-    }
-
-    .card p {
-      color: var(--color-muted);
-      font-size: 0.9375rem;
-    }
-
-    @media (max-width: 768px) {
-      .asymmetric-grid {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
-      }
-
-      .card-large {
-        grid-row: auto;
-      }
-    }
-  </style>
-</Base>
+	<style is:global>
+		@import "../styles/theme.css";
+	</style>
+</BaseLayout>

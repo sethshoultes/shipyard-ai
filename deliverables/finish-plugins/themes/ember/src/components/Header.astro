@@ -1,0 +1,150 @@
+---
+interface Props {
+	siteTitle: string;
+	menu?: any;
+}
+
+const { siteTitle, menu } = Astro.props;
+---
+
+<header class="site-header">
+	<nav class="nav">
+		<a href="/" class="site-logo">{siteTitle}</a>
+		<div class="nav-links">
+			{
+				menu?.items?.map((item: any) => (
+					<a href={item.url} target={item.target}>
+						{item.label}
+					</a>
+				))
+			}
+		</div>
+		<div class="nav-actions">
+			<a href="/contact" class="nav-cta">Contact</a>
+		</div>
+	</nav>
+</header>
+
+<style>
+	.site-header {
+		position: sticky;
+		top: 0;
+		z-index: 100;
+		background: var(--color-bg);
+		border-bottom: 3px solid var(--color-accent);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.nav {
+		max-width: var(--wide-width);
+		margin: 0 auto;
+		padding: var(--spacing-lg) var(--spacing-lg);
+		display: flex;
+		flex-wrap: nowrap;
+		align-items: center;
+		gap: var(--spacing-2xl);
+	}
+
+	.site-logo {
+		font-family: var(--font-heading);
+		font-size: var(--font-size-3xl);
+		font-weight: 700;
+		letter-spacing: -0.03em;
+		color: var(--color-primary);
+		text-decoration: none;
+		flex-shrink: 0;
+	}
+
+	.nav-links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-2xl);
+		margin-left: auto;
+	}
+
+	.nav-links a {
+		font-size: var(--font-size-sm);
+		font-weight: 600;
+		color: var(--color-text);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		transition: color var(--transition-fast);
+		position: relative;
+	}
+
+	.nav-links a::after {
+		content: "";
+		position: absolute;
+		bottom: -4px;
+		left: 0;
+		width: 0;
+		height: 2px;
+		background: var(--color-accent);
+		transition: width var(--transition-base);
+	}
+
+	.nav-links a:hover::after {
+		width: 100%;
+	}
+
+	.nav-actions {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-lg);
+		flex-shrink: 0;
+	}
+
+	.nav-cta {
+		padding: var(--spacing-sm) var(--spacing-lg);
+		font-size: var(--font-size-sm);
+		font-weight: 700;
+		color: white;
+		background: var(--color-accent);
+		border-radius: var(--radius-sm);
+		transition: background var(--transition-fast), transform var(--transition-fast);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.nav-cta:hover {
+		background: #a84a20;
+		transform: translateY(-2px);
+	}
+
+	@media (max-width: 768px) {
+		.nav {
+			gap: var(--spacing-lg);
+			padding: var(--spacing-md) var(--spacing-lg);
+		}
+
+		.site-logo {
+			font-size: var(--font-size-xl);
+		}
+
+		.nav-links {
+			gap: var(--spacing-lg);
+		}
+
+		.nav-links a {
+			font-size: var(--font-size-xs);
+		}
+	}
+
+	@media (max-width: 540px) {
+		.nav {
+			flex-wrap: wrap;
+			row-gap: var(--spacing-md);
+			justify-content: space-between;
+		}
+
+		.nav-links {
+			order: 3;
+			width: 100%;
+			margin-left: 0;
+		}
+
+		.nav-actions {
+			order: 2;
+		}
+	}
+</style>

@@ -1,94 +1,49 @@
 /**
- * Extract Utility
- * Tarball extraction with security validation
+ * Extract tarball handling utilities
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
-import * as zlib from 'zlib';
-import { pipeline } from 'stream/promises';
 import { createReadStream } from 'fs';
-import { Extract } from 'tar';
+import { createGunzip } from 'zlib';
+import * as tar from 'tar';
+import { createTempDir, removeTempDir } from './fs-utils.js';
 
-const REQUIRED_FILES = [
-  'live.config.ts',
-  'pages/index.astro',
-  'layouts/Base.astro',
-];
-
-export async function extractTarball(
-  tarballPath: string,
-  extractPath: string
-): Promise<void> {
-  // Create extraction directory
-  await fs.promises.mkdir(extractPath, { recursive: true });
-
-  // Extract tarball
-  await pipeline(
-    createReadStream(tarballPath),
-    zlib.createGunzip(),
-    Extract({
-      cwd: extractPath,
-      strict: true,
-      // Security: prevent zip slip attacks
-      filter: (filePath: string) => {
-        const normalized = path.normalize(filePath);
-        return !normalized.startsWith('..') && !path.isAbsolute(normalized);
-      },
-    })
-  );
+export interface ExtractOptions {
+  tarballPath: string;
+  targetDir: string;
 }
 
-export async function validateTheme(extractPath: string): Promise<boolean> {
-  // Find the src directory (might be nested)
-  const srcPath = await findSrcDirectory(extractPath);
+/**
+ * Extract a tar.gz file to a target directory
+ */
+export async function extractTarball(options: ExtractOptions): Promise<void> {
+  const { tarballPath, targetDir } = options;
 
-  if (!srcPath) {
-    console.error('Theme is missing src/ directory');
-    return false;
-  }
+  return new Promise((resolve, reject) => {
+    const gunzip = createGunzip();
+    const source = createReadStream(tarballPath);
 
-  // Check for required files
-  for (const requiredFile of REQUIRED_FILES) {
-    const filePath = path.join(srcPath, requiredFile);
-    try {
-      await fs.promises.access(filePath);
-    } catch {
-      console.error(`Theme is missing required file: ${requiredFile}`);
-      return false;
-    }
-  }
+    source
+      .pipe(gunzip)
+      .pipe(
+        tar.extract({
+          cwd: targetDir,
+        })
+      )
+      .on('finish', () => {
+        resolve();
+      })
+      .on('error', (error) => {
+        reject(error);
+      });
 
-  return true;
+    source.on('error', (error) => {
+      reject(error);
+    });
+
+    gunzip.on('error', (error) => {
+      reject(error);
+    });
+  });
 }
 
-async function findSrcDirectory(basePath: string): Promise<string | null> {
-  // Check if src/ exists directly
-  const directSrc = path.join(basePath, 'src');
-  try {
-    const stat = await fs.promises.stat(directSrc);
-    if (stat.isDirectory()) {
-      return directSrc;
-    }
-  } catch {
-    // Not found at root
-  }
-
-  // Check one level deep (e.g., theme-name/src/)
-  const entries = await fs.promises.readdir(basePath, { withFileTypes: true });
-  for (const entry of entries) {
-    if (entry.isDirectory()) {
-      const nestedSrc = path.join(basePath, entry.name, 'src');
-      try {
-        const stat = await fs.promises.stat(nestedSrc);
-        if (stat.isDirectory()) {
-          return nestedSrc;
-        }
-      } catch {
-        // Not found
-      }
-    }
-  }
-
-  return null;
-}
+export { createTempDir, removeTempDir };

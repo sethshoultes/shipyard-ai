@@ -1,0 +1,20 @@
+name = "wardrobe-email-capture"
+main = "src/index.ts"
+compatibility_date = "2026-04-01"
+
+[vars]
+CORS_ORIGIN = "https://wardrobe.emdash.dev"
+
+# KV Namespace bindings
+# Create these namespaces before deploying:
+#   wrangler kv:namespace create "EMAILS"
+#   wrangler kv:namespace create "RATE_LIMITS"
+[[kv_namespaces]]
+binding = "EMAILS"
+id = "29a8b94cad87fb6c789a5dd88d1a9a47"
+preview_id = "a14a7404124553339290654d323045db"
+
+[[kv_namespaces]]
+binding = "RATE_LIMITS"
+id = "5b065bc4a2d1063e0ed3bea8ae6a21cc"
+preview_id = "b0d7a870e649ed51ec9af992278c30b8"

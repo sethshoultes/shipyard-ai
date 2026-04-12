@@ -1,0 +1,76 @@
+---
+import { getEmDashEntry } from "emdash";
+import Base from "../layouts/Base.astro";
+
+const { entry: page, cacheHint } = await getEmDashEntry("pages", "home");
+
+try {
+	Astro.cache.set(cacheHint);
+} catch {}
+
+const pageTitle = page?.data.title;
+const pageContent = page?.data.content;
+---
+
+<Base title={pageTitle !== "Home" ? pageTitle : undefined}>
+	{
+		pageContent ? (
+			<div class="content-wrapper">
+				<div class="content-float" set:html={pageContent} />
+			</div>
+		) : (
+			<div class="empty-state">
+				<h1>Welcome</h1>
+				<p>Drift through your content with elegance and space.</p>
+				<a href="/_emdash/admin" class="btn btn-primary">
+					Edit Content
+				</a>
+			</div>
+		)
+	}
+</Base>
+
+<style>
+	.content-wrapper {
+		max-width: var(--max-width);
+		margin: 0 auto;
+		padding: 0 var(--spacing-lg);
+	}
+
+	.content-float {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-3xl);
+		line-height: 1.8;
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: var(--spacing-4xl) var(--spacing-lg);
+		max-width: var(--max-width);
+		margin: 0 auto;
+	}
+
+	.empty-state h1 {
+		margin-bottom: var(--spacing-md);
+		font-weight: 300;
+		letter-spacing: -0.5px;
+	}
+
+	.empty-state p {
+		color: var(--color-muted);
+		margin-bottom: var(--spacing-xl);
+		font-weight: 300;
+		font-size: var(--font-size-lg);
+	}
+
+	@media (max-width: 768px) {
+		.content-wrapper {
+			padding: 0 var(--spacing-md);
+		}
+
+		.content-float {
+			gap: var(--spacing-2xl);
+		}
+	}
+</style>

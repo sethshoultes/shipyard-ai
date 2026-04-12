@@ -1,0 +1,34 @@
+{
+  "name": "wardrobe-analytics",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for anonymous Wardrobe theme install analytics",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:production": "wrangler deploy --env production",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260401.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.4.0",
+    "wrangler": "^3.50.0"
+  },
+  "keywords": [
+    "cloudflare",
+    "worker",
+    "analytics",
+    "wardrobe",
+    "emdash"
+  ],
+  "license": "MIT"
+}

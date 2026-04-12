@@ -1,118 +1,96 @@
 /**
- * File System Utilities
- * Backup, restore, and replace operations
+ * File system utilities for install operations
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import {
+  promises as fs,
+  existsSync,
+  renameSync,
+  rmSync,
+  cpSync,
+} from 'fs';
+import { join } from 'path';
+import { tmpdir } from 'os';
+import { randomBytes } from 'crypto';
 
 /**
- * Creates a timestamped backup of the src/ directory
- * Returns the backup path, or null if src/ doesn't exist
+ * Create a temporary directory for extraction
  */
-export async function backupSrc(srcPath: string): Promise<string | null> {
-  try {
-    await fs.promises.access(srcPath);
-  } catch {
-    // src/ doesn't exist, nothing to backup
-    return null;
-  }
-
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const backupPath = `${srcPath}.backup.${timestamp}`;
-
-  await copyDirectory(srcPath, backupPath);
-
-  return backupPath;
+export async function createTempDir(): Promise<string> {
+  const tempName = `wardrobe-${randomBytes(8).toString('hex')}`;
+  const tempPath = join(tmpdir(), tempName);
+  await fs.mkdir(tempPath, { recursive: true });
+  return tempPath;
 }
 
 /**
- * Swaps the src/ directory with the new theme
+ * Remove a temporary directory
  */
-export async function swapSrc(srcPath: string, newThemePath: string): Promise<void> {
-  // Find the src directory in the extracted theme
-  const newSrcPath = await findSrcInPath(newThemePath);
-
-  if (!newSrcPath) {
-    throw new Error('Could not find src/ directory in theme');
-  }
-
-  // Remove existing src/ if it exists
+export async function removeTempDir(tempPath: string): Promise<void> {
   try {
-    await fs.promises.rm(srcPath, { recursive: true, force: true });
-  } catch {
-    // Might not exist
+    rmSync(tempPath, { recursive: true, force: true });
+  } catch (error) {
+    // Ignore errors when removing temp directory
   }
-
-  // Copy new theme src/ to project
-  await copyDirectory(newSrcPath, srcPath);
 }
 
 /**
- * Rolls back to the backup
+ * Backup existing directory
  */
-export async function rollback(srcPath: string, backupPath: string): Promise<void> {
-  // Remove failed src/
-  try {
-    await fs.promises.rm(srcPath, { recursive: true, force: true });
-  } catch {
-    // Might not exist
-  }
-
-  // Restore backup
-  await copyDirectory(backupPath, srcPath);
-}
-
-/**
- * Recursively copies a directory
- */
-async function copyDirectory(src: string, dest: string): Promise<void> {
-  await fs.promises.mkdir(dest, { recursive: true });
-
-  const entries = await fs.promises.readdir(src, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-
-    if (entry.isDirectory()) {
-      await copyDirectory(srcPath, destPath);
-    } else {
-      await fs.promises.copyFile(srcPath, destPath);
+export function backupDirectory(
+  sourcePath: string,
+  backupPath: string
+): void {
+  if (existsSync(sourcePath)) {
+    // Remove old backup if it exists
+    if (existsSync(backupPath)) {
+      rmSync(backupPath, { recursive: true, force: true });
     }
+    cpSync(sourcePath, backupPath, { recursive: true });
   }
 }
 
 /**
- * Finds the src/ directory in an extracted theme path
+ * Restore backup directory
  */
-async function findSrcInPath(basePath: string): Promise<string | null> {
-  // Check direct src/
-  const directSrc = path.join(basePath, 'src');
+export function restoreBackup(backupPath: string, targetPath: string): void {
+  if (existsSync(backupPath)) {
+    // Remove failed install
+    if (existsSync(targetPath)) {
+      rmSync(targetPath, { recursive: true, force: true });
+    }
+    cpSync(backupPath, targetPath, { recursive: true });
+  }
+}
+
+/**
+ * Replace directory with new content
+ */
+export function replaceDirectory(
+  sourcePath: string,
+  targetPath: string
+): void {
+  // Remove target if it exists
+  if (existsSync(targetPath)) {
+    rmSync(targetPath, { recursive: true, force: true });
+  }
+  // Move source to target
+  renameSync(sourcePath, targetPath);
+}
+
+/**
+ * Check if critical files exist
+ */
+export async function checkCriticalFiles(srcPath: string): Promise<boolean> {
   try {
-    const stat = await fs.promises.stat(directSrc);
-    if (stat.isDirectory()) {
-      return directSrc;
-    }
+    const liveConfigPath = join(srcPath, 'live.config.ts');
+    const pagesIndexPath = join(srcPath, 'pages', 'index.astro');
+
+    const liveConfigExists = existsSync(liveConfigPath);
+    const pagesIndexExists = existsSync(pagesIndexPath);
+
+    return liveConfigExists && pagesIndexExists;
   } catch {
-    // Not found
+    return false;
   }
-
-  // Check one level deep
-  const entries = await fs.promises.readdir(basePath, { withFileTypes: true });
-  for (const entry of entries) {
-    if (entry.isDirectory()) {
-      const nestedSrc = path.join(basePath, entry.name, 'src');
-      try {
-        const stat = await fs.promises.stat(nestedSrc);
-        if (stat.isDirectory()) {
-          return nestedSrc;
-        }
-      } catch {
-        // Not found
-      }
-    }
-  }
-
-  return null;
 }

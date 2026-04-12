@@ -1,95 +1,87 @@
 # Round 2 — Elon Musk
 
-## Challenging Steve's Weakest Positions
+## Challenging Steve: Where Beauty Kills Velocity
 
-### The Naming Debate is a Distraction
+Steve, you spent 93 lines on poetry and zero lines on the actual problem: **79 instances of `throw new Response` that crash in production.**
 
-"Belong" and "Moment" — beautiful words, Steve. But we're fixing plugins built against a **hallucinated API**. 217 banned pattern instances. Code that literally cannot execute.
+Let's be specific:
 
-You want to debate whether we call it "MemberShip" or "Belong" while the deploy button returns a stack trace?
+**"Belong" and "Moment" sound beautiful.** They also require:
+- Domain changes
+- Documentation rewrites
+- Import path refactoring
+- User communication about the rename
+- SEO redirect mapping
 
-**The yoga instructor doesn't care what we call it if it doesn't load.**
+That's a 2-week project *after* the plugins work. You're designing the album cover while the studio is on fire.
 
-Naming is a 30-minute decision after the software works. You're designing the font for a building with no foundation.
+**"NO to week view"** — Have you asked a single yoga instructor? They schedule 12 classes across 7 days. Month view is a wall of colored rectangles. Week view is survival. You're imposing taste on people who need function.
 
-### "First 30 Seconds" Requires a Working Product
+**"NO to template editors"** — The "one beautiful email" you ship will say "Your membership has been renewed." What happens when they need Spanish? When they need a different tone for cancellations vs. welcomes? You've created a beautiful cage.
 
-Your vision: "Sofia Chen — Member since today" as the first thing admins see. Delightful.
-
-Reality: The admin route returns JSON that crashes Emdash's `PluginRegistry` with a `.map()` error. They see nothing. White screen. Console errors.
-
-You're painting murals on walls we haven't built. **Ship first, then delight.**
-
-### "NO to Settings Pages with 5+ Options" — Cargo Cult Simplicity
-
-Real simplicity is making the code work correctly. Your simplicity is hiding features.
-
-You want 5 options max? Fine. But the current code has **zero options working** because `rc.user` doesn't exist, `throw new Response` crashes the handler, and `rc.pathParams` returns undefined.
-
-Constraint-based design requires a working baseline. We don't have one.
+**Your philosophy is correct. Your timing is catastrophic.** You can't disappear an interface that throws runtime errors.
 
 ---
 
-## Defending My Positions
+## Defending Technical Simplicity
 
-### Technical Simplicity Wins Long-Term
+Steve asks: *"Why does it have to be ugly?"*
 
-Steve wants to rename things. I want to ship a lint script: `npx emdash validate-plugin`.
+It doesn't. But here's physics:
 
-**At 100 plugins, which scales?**
+| Path | Time to Working | Time to Beautiful |
+|------|-----------------|-------------------|
+| Ship working, then refine | Day 1 | Week 2 |
+| Design perfect, then build | Never | Never |
 
-His approach: rebrand each plugin manually, craft artisanal error messages, design bespoke onboarding flows.
+**The sed commands aren't beautiful. They're a forcing function.** Once plugins build cleanly:
+- We can rename them
+- We can redesign the onboarding
+- We can write "Your first member is waiting"
 
-My approach: automated validation catches banned patterns at CI time. No plugin ships broken. Ever.
+But you cannot rename software that doesn't compile.
 
-**Tools compound. Taste doesn't.**
-
-### Mechanical Fixes First, Polish Second
-
-The PRD is 80% regex work disguised as "plugin fixing." My position:
-
-1. `sed` the 217 banned patterns
-2. Deploy in parallel
-3. Validate Block Kit renders
-4. **Then** discuss naming and emotional hooks
-
-This isn't anti-design. It's **sequencing**. You don't upholster seats before the engine runs.
+The PRD has 99 mechanical fixes. That's a test suite, not a design problem. Design comes after the foundation stops crumbling.
 
 ---
 
 ## Where Steve Is Right
 
-### Brand Voice Matters for User-Facing Copy
+I concede these:
 
-"Done. Saved. Live." beats "Operation completed successfully."
+1. **Error messages matter.** "Error 404: Resource not located" is a failure of empathy. When we fix the `throw new Response` patterns, we should use human language: "We couldn't find that" > `{"error": "NOT_FOUND"}`.
 
-When we get to confirmation messages, success toasts, error states — I'll fight for Steve's voice. Clear, human, confident.
+2. **The emotional hook is real.** Small business owners *are* drowning. Once plugins work, the north star is "Install it. It works." That's a legitimate product vision.
 
-### The Emotional Hook is the Product Moat
+3. **Five settings max.** Constraints force clarity. When we ship the admin UI, this becomes a design requirement.
 
-"We're selling the confidence that technology can actually serve them."
-
-That's the real insight. Our users are burned by tools that made them feel stupid. When these plugins work seamlessly, that trust becomes word-of-mouth distribution.
-
-The caveat: **working seamlessly** is the prerequisite. The emotion comes after the execution.
-
-### Two Tiers Only
-
-Free and Paid. Delete Bronze/Silver/Gold complexity. This cuts code and decision fatigue. Steve's taste aligns with my deletion instinct here.
+**But these are v2 decisions.** Today's decision is: do plugins build? Do routes return JSON?
 
 ---
 
-## Locked Non-Negotiables
+## Locked Decisions (Non-Negotiable)
 
-### 1. Fix Code Before Renaming Anything
-Names are marketing. Working software is existential. MemberShip stays MemberShip until all 6 plugins deploy cleanly.
+### 1. Ship MemberShip + EventDash Today
+79 banned patterns. 1 Block Kit bug. 3 hours max. Everything else is scope creep.
 
-### 2. Ship Lint Tooling, Not Documentation
-`npx emdash validate-plugin` that fails at publish time. This prevents the next 100 plugins from repeating these mistakes. Tools scale. Taste audits don't.
+### 2. FormForge + CommerceKit = Verified Build Only
+Zero banned patterns. Run `npm run build`. If it passes, they're done. No Playwright. No curl tests. No "wiring into example sites."
 
-### 3. Parallel Deploy/Test, Sequential Polish
-Fix all 6 → Deploy all 6 → Test all 6 simultaneously. Then — and only then — optimize UX flows, craft onboarding, refine copy.
+### 3. Naming Changes Are v2
+"Belong" and "Moment" are v2 branding decisions. Today we ship `membership` and `eventdash` because that's what's in the codebase, the imports, and the documentation. Renaming is a separate project with its own scope.
 
 ---
 
-*Perfect is the enemy of shipped. Ship, measure, iterate.*
+## The Real Question
+
+Steve, I'm not asking you to abandon taste. I'm asking you to sequence it.
+
+**Today:** Plugins compile. Routes work. Admin renders.
+**This week:** Error messages, copy, microcopy.
+**Next week:** "Belong" rebrand, "Your first member is waiting" onboarding.
+
+Beauty built on a broken foundation is a lie. Let me fix the foundation. Then you can make it sing.
+
+---
+
+*The best product is the one that ships.*

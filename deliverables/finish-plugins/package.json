@@ -1,23 +1,28 @@
 {
-  "name": "@shipyard/membership",
+  "name": "wardrobe",
   "version": "1.0.0",
+  "description": "Theme marketplace CLI for Emdash — install themes instantly",
   "type": "module",
-  "description": "Email-based membership and gated content plugin for EmDash CMS. Integrates with Stripe Payment Links.",
-  "exports": {
-    ".": "./src/index.ts",
-    "./sandbox": "./src/sandbox-entry.ts",
-    "./astro": "./src/astro/index.ts"
+  "bin": {
+    "wardrobe": "./bin/wardrobe"
   },
-  "files": [
-    "src",
-    "README.md"
-  ],
-  "peerDependencies": {
-    "emdash": "^0.1.0"
+  "scripts": {
+    "cli": "tsx cli/index.ts",
+    "build": "tsc",
+    "build:tarballs": "tsx scripts/build-tarballs.ts",
+    "upload:themes": "tsx scripts/upload-tarballs.ts",
+    "screenshots": "tsx scripts/generate-screenshots.ts"
+  },
+  "dependencies": {
+    "commander": "^13.1.0",
+    "tar": "^7.5.13"
   },
   "devDependencies": {
-    "emdash": "^0.1.0",
-    "typescript": "^5.5",
-    "vitest": "^4.1.2"
+    "@types/node": "^22.10.0",
+    "@types/tar": "^6.1.13",
+    "playwright": "^1.48.0",
+    "sharp": "^0.33.5",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
   }
 }
