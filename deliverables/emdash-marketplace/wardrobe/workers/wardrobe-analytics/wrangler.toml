@@ -3,20 +3,20 @@ main = "src/index.ts"
 compatibility_date = "2026-03-29"
 compatibility_flags = ["nodejs_compat"]
 
-# D1 Database binding for analytics
-d1_databases = [
-  {
-    binding = "ANALYTICS_DB",
-    database_name = "wardrobe-analytics",
-    database_id = "your-database-id-here"
-  }
-]
+# KV namespace for storing analytics events and aggregated stats
+# Created via: wrangler kv:namespace create ANALYTICS
+[[kv_namespaces]]
+binding = "ANALYTICS"
+id = "501ca8a74075b6eb1ccde44b6a7826d5"
+preview_id = "b0d7a870e649ed51ec9af992278c30b8"
 
 # Environment variables
-vars = { ENVIRONMENT = "production" }
+[vars]
+CORS_ORIGIN = "https://wardrobe.emdash.dev"
+ENVIRONMENT = "production"
 
-# Rate limiting and security
-limits = {
-  cpu_max_ms = 100,
-  request_body_size_mb = 1
-}
+[env.production]
+name = "wardrobe-analytics"
+[[env.production.kv_namespaces]]
+binding = "ANALYTICS"
+id = "501ca8a74075b6eb1ccde44b6a7826d5"

@@ -21,24 +21,15 @@ This Worker provides three simple endpoints for analytics:
 
 The Worker uses:
 - **Cloudflare Workers** for serverless computation
-- **D1 Database** for persistent storage (SQLite)
+- **KV Storage** for persistent key-value storage
 - **CF-IPCountry header** to detect geographic region (no extra API calls)
 
-## Database Schema
+## Data Model
 
-```sql
-CREATE TABLE installs (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  theme TEXT NOT NULL,
-  os TEXT,
-  country TEXT,
-  timestamp TEXT NOT NULL,
-  cli_version TEXT
-);
-
-CREATE INDEX idx_theme ON installs(theme);
-CREATE INDEX idx_timestamp ON installs(timestamp);
-```
+Analytics events are stored in KV with the following key patterns:
+- `install:{timestamp}:{uuid}` — Individual install events
+- `count:{theme}` — Aggregated install counts per theme
+- `stats` — Cached statistics blob (refreshed every 5 minutes)
 
 No PII fields. Only aggregation-friendly data.
 
@@ -137,23 +128,18 @@ if (!apiKey || !isValidApiKey(apiKey)) {
 
 ### Setup Steps
 
-1. **Create D1 Database**
+1. **Create KV Namespace**
    ```bash
-   wrangler d1 create wardrobe-analytics
-   # Note the database_id from output
+   wrangler kv:namespace create ANALYTICS
+   # Note the namespace ID from output
    ```
 
 2. **Update wrangler.toml**
-   Replace `your-database-id-here` with the actual database ID from step 1.
+   The wrangler.toml has been pre-configured with KV namespace IDs:
+   - Production: `501ca8a74075b6eb1ccde44b6a7826d5`
+   - Preview: `b0d7a870e649ed51ec9af992278c30b8`
 
-3. **Apply Schema Migration**
-   ```bash
-   wrangler d1 migrations create wardrobe-analytics 0001_schema
-   # Copy the SQL from migrations/0001_schema.sql
-   wrangler d1 migrations apply wardrobe-analytics
-   ```
-
-4. **Deploy Worker**
+3. **Deploy Worker**
    ```bash
    wrangler deploy
    ```
@@ -202,10 +188,10 @@ const response = await fetch(`${ANALYTICS_URL}/api/install`, {
 
 ## Monitoring
 
-### View Database
+### View KV Data
 
 ```bash
-wrangler d1 query wardrobe-analytics "SELECT * FROM installs LIMIT 10"
+wrangler kv:key list --namespace-id=501ca8a74075b6eb1ccde44b6a7826d5
 ```
 
 ### Check Recent Installs
