@@ -1,0 +1,41 @@
+{
+  "name": "@emdash/membership",
+  "version": "1.0.0",
+  "description": "Turn visitors into members. Gate your best content. Get paid.",
+  "type": "module",
+  "main": "./sandbox-entry.ts",
+  "exports": {
+    ".": "./sandbox-entry.ts",
+    "./components/*": "./src/components/*",
+    "./api/*": "./src/api/*",
+    "./lib/*": "./src/lib/*"
+  },
+  "scripts": {
+    "build": "astro build",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "astro": "^4.0.0",
+    "stripe": "^14.0.0",
+    "resend": "^2.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.0.0",
+    "typescript": "^5.3.0",
+    "wrangler": "^3.0.0"
+  },
+  "peerDependencies": {
+    "emdash": "^1.0.0"
+  },
+  "keywords": [
+    "emdash",
+    "plugin",
+    "membership",
+    "stripe",
+    "subscriptions"
+  ],
+  "author": "EmDash",
+  "license": "MIT"
+}
