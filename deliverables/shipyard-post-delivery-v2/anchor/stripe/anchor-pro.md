@@ -114,7 +114,7 @@ Replace `{{MAINTENANCE_LINK}}` in email templates with a landing page showing bo
 
 ---
 
-## Payment Link Placeholder
+## Payment Link Configuration
 
 ```
 {{ANCHOR_PRO_LINK}}

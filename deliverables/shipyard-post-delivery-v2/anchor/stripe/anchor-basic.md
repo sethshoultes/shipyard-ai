@@ -95,7 +95,7 @@ Replace `{{MAINTENANCE_LINK}}` in email templates with:
 
 ---
 
-## Payment Link Placeholder
+## Payment Link Configuration
 
 ```
 {{ANCHOR_BASIC_LINK}}

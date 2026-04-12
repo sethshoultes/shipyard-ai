@@ -30,9 +30,9 @@ If something needs adjusting, just reply to this email. We read everything and w
 
 Here if you need us.
 
-— Shipyard
+P.S. At one month, we'll help you refresh what's already feeling dated.
 
-P.S. Want ongoing support? Anchor Basic is $79/month. {{MAINTENANCE_LINK}}
+— Shipyard
 
 ---
 
@@ -42,7 +42,15 @@ P.S. Want ongoing support? Anchor Basic is $79/month. {{MAINTENANCE_LINK}}
 |-------|-------------|---------|
 | `{{NAME}}` | Client's first name | Sarah |
 | `{{URL}}` | Live site URL | bellabistro.com |
-| `{{MAINTENANCE_LINK}}` | Stripe payment link | https://buy.stripe.com/... |
+
+**Note:** No payment links in this email — Day 7 is Soft CTA (relationship-building, no sales pitch per Decision 8).
+
+**Banned merge fields (do NOT use):**
+- `{{TOKENS_USED}}` — Tokens are internal accounting
+- `{{PAGE_COUNT}}` — Not in approved list
+- `{{MAINTENANCE_LINK}}` — No sales in Soft CTA emails
+- `{{FEATURE_LIST}}` — Use generic features
+- `{{REFRESH_SUGGESTION}}` — Not applicable
 
 ---
 

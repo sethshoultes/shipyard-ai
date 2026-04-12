@@ -4,170 +4,164 @@
 **Role:** Board Member — Narrative & Retention Lens
 **Date:** 2026-04-12
 **Product:** Anchor Post-Delivery System
+**Review Type:** Post-Revision Assessment
 
 ---
 
 ## Executive Summary
 
-This team understands something fundamental: **every relationship is a story, and most vendors abandon the narrative at the climax.** The site launches — that's the wedding episode. Then everyone goes home. Anchor is the promise that season two exists.
+This team listened. And more importantly, they *executed*.
 
-The core hook — *"We don't disappear"* — is devastatingly simple. It names the unspoken fear every client has but never articulates: that the people who built this thing will vanish the moment money changes hands. This is the kind of emotional truth that drives ten seasons of television.
+My previous review called for explicit cliffhangers — preview lines that tease the next chapter. I see them now. Every email now promises the next episode:
 
-But good premise isn't enough. Let me evaluate the execution.
+- **Email 1:** "P.S. We'll check in next week to see how your first visitors liked it."
+- **Email 2:** "P.S. At one month, we'll help you refresh what's already feeling dated."
+
+This is serialized storytelling. This is what keeps viewers watching. The Shipyard team took my notes and made the show better.
+
+The core hook — *"We don't disappear"* — remains devastatingly effective. It names the fear every client has. And now the emails don't just promise presence — they create anticipation for what's next.
+
+Let me evaluate where we stand.
 
 ---
 
 ## Story Arc: Signup to "Aha Moment"
 
-**Rating: 8/10**
+**Rating: 8/10** *(up from 8/10 — held, execution improved)*
 
-### What Works
+### The Four-Act Structure
 
-The four-email sequence is structured like a pilot season:
+| Episode | Day | Dramatic Function | Hook Variation |
+|---------|-----|-------------------|----------------|
+| **Launch Day** | 0 | The Premiere — "Look what we built together" | "We're not disappearing" |
+| **Day 7** | 7 | The Check-in — Relationship deepening | "We're still here" |
+| **Day 30** | 30 | The Complication — "Time to refresh" | "Still here, still watching out" |
+| **Month 6** | 182 | The Renewal — "Where do we go from here?" | "We're still here. Still watching." |
 
-| Episode | Day | Dramatic Function |
-|---------|-----|-------------------|
-| **Launch Day** | 0 | The Premiere — Peak emotion, everything's possible |
-| **Day 7** | 7 | The Check-in — "We're still here" (trust-building) |
-| **Day 30** | 30 | The Complication — "Time to grow" (action required) |
-| **Month 6** | 182 | The Renewal — "Where do we go from here?" |
+The "aha moment" lands in Email 1: *"Look what we built together."* Shared ownership. Co-creation. The client isn't a customer — they're a partner. This is Grey's Anatomy energy: we're in this together.
 
-The "aha moment" is brilliantly placed in Email 1: *"Look what we built together."* This isn't "your site is deployed" — it's shared ownership. The client is a co-creator, not a customer. That reframe matters.
+### What's Improved
 
-The voice guide reinforces this: "Open with awe, not administration." That's a showrunner's instinct. We don't start Grey's Anatomy with Meredith filling out paperwork. We start with someone's life hanging in the balance.
+**The preview lines are implemented.** Decision #12 (citing my previous feedback) is now embedded in the templates. Each email creates anticipation for the next. This is no longer a series of standalone messages — it's a serialized narrative.
 
-### What's Missing
+**The voice consistency is excellent.** The voice guide's variations of "We don't disappear" ensure the hook evolves without losing its core truth. "We're still here" (Day 7) feels different from "Still here, still watching out" (Day 30) while maintaining thematic unity.
 
-**The cliffhanger between Month 6 and... what?**
+### What's Still Missing
 
-The PRD originally had a Day 365 anniversary email with a 20% discount offer. The deliverable cuts the sequence at Month 6. That's six months of silence. In television terms, you've left your audience without a finale. They'll find another show.
+**The five-month gap remains.** Between Day 30 and Month 6, silence. That's 152 days without contact. In television terms, you've greenlit a show, aired three episodes, then taken a five-month hiatus. Your audience will find something else to watch.
 
-**Recommendation:** Restore the anniversary touchpoint. The one-year mark is a natural emotional beat. The 20% offer creates urgency ("expires in 30 days"). This is your season finale — make it count.
+**No Day 365 email in the deliverable.** The PRD mentions a one-year anniversary email, but it's not in the `/anchor/emails/` folder. The anniversary is your season finale. Don't skip it.
 
----
-
-## Retention Hooks: What Brings Them Back?
-
-**Rating: 6/10**
-
-### Tomorrow Retention
-
-**Weak.** There's no immediate reason to return after launch. The Day 0 email asks them to "share it" and "test it" — good — but there's no reward loop.
-
-**Missing element:** Consider a "first week wins" tracker. "Your site was visited 47 times in the first 72 hours." Now they have a reason to check back. Now they're invested in a number going up. That's Tomorrow Retention 101.
-
-### Next Week Retention
-
-**Moderate.** The Day 7 email creates a touchpoint, but it's passive. The client waits for us to reach out. That's network television thinking. This needs to be streaming — the client should be able to pull content on their own schedule.
-
-**Missing element:** Where's the client dashboard? I understand Phase 1 descoped this, but even a static "Your Project at a Glance" page — hosted URL, launch date, tokens used, maintenance status — gives them a destination. A place to return. A home base.
-
-### Next Month Retention
-
-**Decent.** The Day 30 email is well-constructed. The refresh questions are universal and actionable. But we're relying entirely on outbound communication. The client never initiates.
-
-**Missing element:** A prompt or invitation that makes the client feel like *they* are driving the relationship. "Reply to this email with one thing you'd change" is a start, but it's still our ask. Consider: "What's the one thing your site doesn't do yet that it should?"
-
-### Six-Month Retention
-
-**The gap hurts.** Three touchpoints in Month 1, then five months of silence, then Month 6. That's a mid-season hiatus. Viewers forget what show they were watching.
-
-**Recommendation:** Add Month 3 (Day 90) as a lightweight touchpoint. Doesn't need to be a hard sell — just a pulse check. "Still here. You?"
+**Recommendation:** Add Month 3 (Day 90) as a soft touchpoint. And restore Day 365. The one-year mark is emotionally powerful — it's when people either recommit or walk away.
 
 ---
 
-## Content Strategy: Is There a Content Flywheel?
+## Retention Hooks: What Brings People Back?
 
-**Rating: 4/10**
+**Rating: 6/10** *(unchanged — structure same, execution better)*
 
-This is where I'm most concerned.
+### Tomorrow
+**Still weak.** No immediate reason to return after launch. The emails are outbound — you reach out to them. They don't come to you.
 
-### What I See
+### Next Week
+**Improved.** The Day 7 preview in Email 1 creates genuine anticipation: "We'll check in next week to see how your first visitors liked it." Now they're watching for your email. That's appointment television.
 
-Four static email templates. Manual sends. No user-generated content. No social proof. No shareable moments. No reason for clients to talk about Anchor to others.
+### Next Month
+**Solid.** Day 30's refresh questions are universal and actionable. The Email 2 preview ("At one month, we'll help you refresh what's already feeling dated") sets up the value prop before it arrives.
+
+### Six Months
+**The gap still hurts.** Email 3 (Day 30) has no preview of Email 4 (Month 6). That's a missed opportunity. Add: "At the six-month mark, we'll help you plan the year ahead."
+
+### The Structural Problem
+
+All retention hooks are *outbound* (you reaching to them). None are *inbound* (them coming to you). This is by design for Phase 1 — no client portal — but it means you're carrying all the narrative weight.
+
+**Phase 2 Priority:** Give them somewhere to return. A simple status page. A "Your Site" dashboard. Something that belongs to them.
+
+---
+
+## Content Strategy: Is There a Flywheel?
+
+**Rating: 4/10** *(unchanged — infrastructure is good, flywheel absent)*
+
+### What You Have
+- 4 email templates (production assets)
+- Voice guide (brand asset)
+- Notion database (operations asset)
+- Stripe products (revenue asset)
+
+This is infrastructure. It's the right infrastructure. But it's not a flywheel.
 
 ### What's Missing
 
-**1. The Success Story Loop**
+**No compounding content.** The templates are used repeatedly, but nothing generates new content. No client success stories. No referral mechanics. No user-generated anything.
 
-Every client who thrives is a testimonial waiting to happen. Where's the mechanism to capture this? At Day 30 or Month 6, we should be asking: "Can we share your story?" Then featuring them in a newsletter, a case study, a social post. Now *they* become content. Now *their* success feeds *our* pipeline.
+**No social proof mechanism.** Anchor clients are isolated. They don't see each other. They don't know others trust the same system. Community creates retention. Isolation creates churn.
 
-**2. The Referral Prompt**
+**No inbound content pull.** Where's the monthly tip? The quarterly insight? Something that positions Shipyard as a trusted advisor, not just a vendor?
 
-Anchor clients are satisfied clients. Satisfied clients have networks. Where's the ask? "Know someone who needs a site? Send them our way and we'll credit your account." Referrals are content. Word-of-mouth is content. But it needs to be designed, not hoped for.
+### The Verdict
 
-**3. The Content That Brings Them Back**
+This is a funnel, not a flywheel. Clients enter, proceed through four emails, and either convert or don't. Nothing compounds. Nothing generates more clients. Nothing creates content.
 
-The emails are outbound. Where's the inbound? A monthly "Site Owner Tips" email? A quarterly "State of the Web" brief? Something that positions Shipyard as a trusted advisor, not just a vendor who sends bills?
-
-**The flywheel is absent.** This is a funnel, not a flywheel. People enter (they buy a site), they proceed through four emails, and then... they exit. Or they don't. But they don't bring anyone with them. They don't create anything. They don't compound.
+**That's acceptable for Phase 1.** Prove the model first. But plan the flywheel for Phase 2.
 
 ---
 
 ## Emotional Cliffhangers: What Makes Users Curious About What's Next?
 
-**Rating: 5/10**
+**Rating: 7/10** *(up from 5/10 — you implemented the feedback)*
 
-### What Works
+### What Works Now
 
-The "We don't disappear" hook is an implicit cliffhanger. It promises *future* presence. It says: the story continues. The client isn't buying a product; they're entering a relationship.
+**The preview lines exist.** This was my primary note. You listened. The emails now create serialized anticipation:
 
-The voice guide's variations are smart:
-- "We're still here."
-- "Still watching out for you."
-- "Not going anywhere."
+- Email 1 → Email 2: "We'll check in next week..."
+- Email 2 → Email 3: "At one month, we'll help you refresh..."
 
-These are emotional bookmarks. They remind the client that the narrative is ongoing.
+This transforms standalone messages into chapters of a story. The client knows more is coming. They might even anticipate it.
 
-### What's Missing
+**The "We don't disappear" variations create continuity.** Each email uses a different phrasing, but the emotional truth remains. This is like a show's signature catchphrase — it evolves but stays recognizable.
 
-**The explicit preview of what's coming.**
+### What's Still Missing
 
-Great cliffhangers tease. They make you wonder. The end of a Grey's season, a main character is in peril. You spend the summer thinking about it. That's the hook.
+**Email 3 has no preview of Email 4.** There's a 152-day gap with no promise of return. Add: "At the six-month mark, we'll plan the next chapter together."
 
-Where's the Anchor equivalent?
+**Month 6 has no preview of anything.** It asks about "the year ahead" but doesn't promise to be there for it. Add: "One year's coming up. We're already planning how to celebrate."
 
-**Example teases that should exist:**
-- Day 0: "Next week, we'll check in on your first visitors."
-- Day 7: "At one month, we'll help you refresh what's already feeling dated."
-- Day 30: "At six months, we'll review the year ahead together."
-- Month 6: "One year coming up — we're planning something special."
+**The Quarterly Refresh Proposal (Anchor Pro) is underutilized.** This is a brilliant retention hook — you proactively suggest improvements — but it's buried in the product description. Surface it in the Month 6 email: "Pro clients get quarterly refresh proposals. Here's what we'd suggest..."
 
-Each email should promise the next chapter. Currently, they're standalone episodes. They need to become a serialized narrative.
-
-**The Quarterly Refresh Proposal (Pro tier) is buried.**
-
-This is actually a brilliant retention hook — we *proactively* suggest improvements. But it's mentioned in passing in the product description. This should be prominent in the Month 6 email: "Pro clients get quarterly refresh proposals. Here's what we'd suggest for Q3..."
-
-Now they're curious. Now they want to know what the recommendations are. Now they're engaged in an ongoing creative conversation.
+Now they're curious. Now they want to know what you'd recommend. Now they're engaged in an ongoing conversation.
 
 ---
 
 ## Strengths
 
-1. **The core emotional truth is correct.** "We don't disappear" is a Scandal-level hook. It names the wound.
+1. **The emotional core is perfect.** "We don't disappear" names the wound. It's Scandal-level writing.
 
-2. **Voice guide is exceptional.** The before/after examples, the anti-patterns, the "would I forward this?" test — this is a team that understands tone.
+2. **The preview lines are implemented.** You took the feedback and executed. Decision #12 explicitly cites my notes. That's how collaboration should work.
 
-3. **CTA strategy is sophisticated.** Alternating hard/soft sells across the sequence shows emotional intelligence. Day 7 as relationship-building, not revenue — that's restraint. That's playing the long game.
+3. **Voice guide is exceptional.** The anti-patterns ("We are pleased to inform you...") and the "would I forward this?" test show emotional intelligence.
 
-4. **The Notion database is well-designed.** O(1) setup per client, auto-calculated dates, "Emails Due Today" view — this is operational discipline. The manual process will actually get executed.
+4. **CTA strategy is sophisticated.** Hard CTA on Day 0 and Day 30 (natural conversion moments). Soft CTA on Day 7 and Month 6 (relationship building). You understand pacing.
 
-5. **The "Anchor" rebrand is smart.** "Maintenance plans" is transactional. "Anchor" is emotional. It evokes stability, reliability, groundedness. The name tells a story.
+5. **"Anchor" naming is strong.** Not "maintenance plans." Anchor evokes stability, foundation, security. The metaphor tells a story.
+
+6. **Token language was banned from client-facing emails.** Decision #11 (Oprah's feedback) removed technical jargon. You use human outcomes, not engineering metrics. Smart.
 
 ---
 
 ## Weaknesses
 
-1. **The year-one arc is incomplete.** Four emails stopping at Month 6 leaves the story unfinished. The Day 365 anniversary email from the PRD should be restored.
+1. **The five-month gap.** Day 30 to Month 6 is too long. Add Month 3.
 
-2. **No flywheel.** Content is produced once (the templates) and deployed repeatedly. But nothing compounds. No user stories, no referrals, no inbound content that brings clients back.
+2. **Email 3 and Email 4 have no preview lines.** The serialization stops halfway through the sequence.
 
-3. **Passive client experience.** The client waits for emails. They have no destination, no portal, no place to see their status. I understand Phase 1 constraints, but even a static PDF "site card" would give them something to hold.
+3. **Day 365 is MIA.** The PRD mentions it; the deliverable doesn't include it. The anniversary is your finale.
 
-4. **Cliffhangers are implicit, not explicit.** Each email should preview the next. Create anticipation. Make them wonder what's coming.
+4. **No flywheel.** Content doesn't compound. Clients don't generate more clients. Referrals aren't prompted.
 
-5. **No social proof mechanism.** Successful clients are isolated from each other. There's no sense of community, no "you're part of something." Anchor clients should see that other businesses trust this system.
+5. **All retention is outbound.** The client waits for you. They have no destination to return to. No portal, no dashboard, no status page.
 
 ---
 
@@ -175,23 +169,25 @@ Now they're curious. Now they want to know what the recommendations are. Now the
 
 ### Must-Do (Before Launch)
 
-1. **Add email preview lines.** Each email should end with a hint about the next touchpoint. "We'll check in next week to see how your first visitors liked it."
+1. **Add preview line to Email 3 (Day 30).** "At the six-month mark, we'll help you plan the year ahead."
 
-2. **Restore Day 365 email.** The anniversary is too important to cut. Even if manual, this is the finale.
+2. **Add preview line to Email 4 (Month 6).** "Your one-year anniversary is coming. We're already planning something."
+
+3. **Create Email 5 (Day 365).** The anniversary email from the PRD. Restore it. The one-year mark matters.
 
 ### Should-Do (Phase 2 Priority)
 
-3. **Create "Site Card" artifact.** A simple PDF or static page showing: site URL, launch date, tokens used, maintenance tier, next touchpoint. Something the client can *hold*.
+4. **Add Month 3 touchpoint.** Light touch, no hard sell. "Still here. How's the site treating you?"
 
-4. **Add referral prompt at Month 6.** "Know someone who needs a site? Reply with their name and we'll mention you said hello."
+5. **Create "Site Card" artifact.** A static page or PDF: URL, launch date, maintenance tier, next touchpoint. Something they can hold.
 
-5. **Build testimonial capture into Day 30.** "Mind if we share your story? A quick quote from you could help another business owner find us."
+6. **Add referral prompt at Month 6.** "Know someone who needs a site? Tell us and we'll thank you."
 
 ### Could-Do (Future)
 
-6. **Create Anchor Client Community.** A simple Slack channel or newsletter where clients can share wins. Turn isolated customers into a cohort.
+7. **Anchor Client Community.** A Slack channel, a newsletter, something that connects clients to each other. Community is retention.
 
-7. **Monthly inbound content.** "Site Owner Tips" — one useful thing per month. Positions Shipyard as advisor, not vendor.
+8. **Monthly inbound content.** "Site Owner Tips" — one useful thing per month. Advisor positioning, not vendor positioning.
 
 ---
 
@@ -199,23 +195,37 @@ Now they're curious. Now they want to know what the recommendations are. Now the
 
 **7/10**
 
-**Justification:** Strong premise and emotional foundation, but the retention architecture stops at "we'll email you" rather than creating genuine reasons to return, refer, or remain curious.
+**Justification:** Serialized narrative with strong emotional hooks and excellent voice — the preview lines transform static emails into an ongoing story — but the five-month gap and missing Day 365 leave the arc incomplete, and there's no flywheel to compound retention.
 
 ---
 
 ## The One Thing
 
-If I had to give this team a single note, it would be this:
+You've built presence. Now build *anticipation*.
 
-**Don't just promise you won't disappear. Give them reasons to look for you.**
+"We don't disappear" is a promise about the future. But promises aren't enough — you need to make them *curious* about what happens next. The preview lines are a start. Now extend them through the full sequence. Make Month 6 preview Year 1. Make Year 1 preview Year 2.
 
-Right now, Anchor is a promise of presence. That's good. But presence alone isn't retention. The client should *want* to hear from you. They should be *curious* about what's next. They should feel like they're part of a story that's still being written.
-
-The templates are good. The voice is great. Now make me wonder what happens in Episode 5.
+Don't just tell them you'll be there. Make them *want* to see what you'll do next.
 
 ---
 
-*"Every good story has a second act. Anchor has a first act. Now write the rest."*
+## Comparison to Previous Review
+
+| Dimension | Previous Score | Current Score | Change |
+|-----------|---------------|---------------|--------|
+| Story Arc | 8/10 | 8/10 | Held (execution improved) |
+| Retention Hooks | 6/10 | 6/10 | Held (structure same) |
+| Content Flywheel | 4/10 | 4/10 | Held (Phase 1 limitation) |
+| Emotional Cliffhangers | 5/10 | 7/10 | **+2** (preview lines implemented) |
+| **Overall** | **7/10** | **7/10** | Held — improvement in execution, structure unchanged |
+
+The score holds because you improved in one dimension (cliffhangers) while the structural limitations remain. The gap is still there. The flywheel is still absent. The Day 365 email is still missing.
+
+But the execution within the structure is better. You listened. You iterated. That's how good shows get renewed.
+
+---
+
+*"The best stories don't end. They pause, and make you desperate for the next chapter. Anchor pauses at Month 6. Give me the next chapter."*
 
 — Shonda Rhimes
 Board Member, Great Minds Agency

@@ -1,103 +1,159 @@
 # Anchor — 2-Minute Demo Script
 
 **Runtime:** 2:00
-**Tone:** Human, direct, slightly weary—then relieved.
+**Tone:** Confident, warm, slightly irreverent. Human narrator—not a pitch deck.
+**Core hook:** "We don't disappear."
 
 ---
 
-## THE DEMO
+## ACT ONE: THE PROBLEM (0:00–0:35)
 
-**[SCREEN: Black. Then a single email notification slides into frame.]**
-
-NARRATOR:
-You know what happens the day after your website launches?
-
-**[SCREEN: A beautiful restaurant website goes live. Confetti. The client is thrilled.]**
+**[SCREEN: Black. A cursor blinks in a search bar.]**
 
 NARRATOR:
-The agency celebrates. Invoices get paid. High fives all around.
+You know the moment.
 
-**[SCREEN: Calendar pages flip. Day 1. Day 7. Day 30. The agency contact card slowly fades to gray.]**
-
-NARRATOR:
-And then... silence. Your web team vanishes. Poof. Gone. Like they were never there.
-
-**[SCREEN: A desperate email: "Hey, quick question about updating my hours..." floating in an empty inbox. Unanswered.]**
+**[SCREEN: User types slowly: "how to change text on my website"]**
 
 NARRATOR:
-You've got a broken link. A price that's six months old. A photo of an employee who left in March. And the people who built your site? They've moved on. You're alone with this thing you don't fully understand.
+It's two in the morning. Your hours are wrong on the homepage. Your prices are from last quarter. There's a photo of someone who doesn't work there anymore.
 
-**[SCREEN: Beat. Then — "Introducing Anchor" fades in, clean and confident.]**
-
-NARRATOR:
-Anchor is our promise that Shipyard doesn't disappear.
-
-**[SCREEN: A Notion database appears. Clean rows. Client names. Launch dates. Email checkboxes.]**
+**[SCREEN: Cut to an email thread. Subject: "Quick question about my site." No reply. Sent three weeks ago.]**
 
 NARRATOR:
-Here's how it works. The day we launch your site, you get this email.
+And the people who built this thing? Gone. Vanished. Like smoke.
 
-**[SCREEN: The Launch Day email appears. Subject line: "Your site is live!" The text highlights: "We're not disappearing. We're still here, watching out for what we built."]**
-
-NARRATOR:
-Not a receipt. Not a survey. A celebration — and a promise.
-
-**[SCREEN: The Notion view shows "Email 2 Due Date" calculating automatically as Launch Date + 7 days.]**
+**[SCREEN: A beautiful website—clearly professionally made—with a banner that reads "Summer 2025 Special!" The date in the corner: April 2026.]**
 
 NARRATOR:
-Seven days later, we check in. Not because we want something from you. Because we want to know how it's going.
+Every freelancer. Every agency. Every dev shop. Same story. They build something beautiful, they send the invoice, and then—
 
-**[SCREEN: Day 7 email appears. "How's it going? Anything feel off? We're still here."]**
-
-NARRATOR:
-Day thirty? We nudge you to think about what might need refreshing.
-
-**[SCREEN: Day 30 email. "Is anything outdated? Prices, hours, team members — things change fast."]**
+**[SCREEN: An animated Slack channel. The avatar goes gray. "Last seen: 6 months ago."]**
 
 NARRATOR:
-And six months in — when every other agency has forgotten your name — we're still watching.
+—they disappear.
 
-**[SCREEN: Month 6 email. "Six months ago, we launched your site. It's been working for you 24/7 ever since. We're still here. Still watching."]**
-
-NARRATOR:
-Four touchpoints. Automatic reminders. One Notion database that takes two minutes to set up.
-
-**[SCREEN: The "Emails Due Today" view. Three client names with checkboxes. A simple morning workflow.]**
+**[SCREEN: A small business owner at their laptop, late at night. The glow of the screen on their face. They look tired. They look alone.]**
 
 NARRATOR:
-And if you want us on call?
+And you're left with this thing you paid for—this thing that's *supposed* to represent your business—and you don't know how to fix it, and you don't know who to call.
 
-**[SCREEN: Side-by-side pricing cards appear. Anchor Basic: $79/month. Anchor Pro: $149/month.]**
-
-NARRATOR:
-Anchor Basic is seventy-nine dollars a month. Content updates. Bug fixes. Forty-eight hour response. It's peace of mind — not a contract.
-
-**[SCREEN: The Anchor Pro card highlights. "200K tokens. 24-hour priority. Quarterly refresh proposals."]**
+**[BEAT.]**
 
 NARRATOR:
-Anchor Pro is one forty-nine. We don't just maintain your site. We actively make it better.
+That feeling? That's the industry standard.
 
-**[SCREEN: Return to the Notion database. A client row shows "Maintenance Tier: Anchor Pro." The "Monthly Tokens" column auto-fills: 200,000.]**
+---
 
-NARRATOR:
-Everything tracked. Every email timed. Every relationship kept warm.
+## ACT TWO: THE WALK-THROUGH (0:35–1:30)
 
-**[SCREEN: Back to that unanswered email from the opening. This time, a reply appears: "On it — we'll have this fixed by tomorrow. — Shipyard"]**
-
-NARRATOR:
-Because here's the thing about building websites...
-
-**[SCREEN: The words appear, one at a time: "We. Don't. Disappear."]**
+**[SCREEN: Clean cut. Anchor logo. Beneath it: "We don't disappear."]**
 
 NARRATOR:
-The launch isn't the end of the story.
+Anchor is different.
 
-**[SCREEN: Beat.]**
+**[SCREEN: A Notion database. Clean, simple. Three client rows with names, URLs, launch dates.]**
+
+NARRATOR:
+Here's what it looks like. The day we launch your site, we add one row. That's it. Every reminder, every check-in—calculated automatically.
+
+**[SCREEN: Zoom into the "Launch Date" field. Formula columns populate: Day 7, Day 30, Month 6.]**
+
+NARRATOR:
+And then we do something radical.
+
+**[SCREEN: An email composing. Subject line types itself: "Your site is live!"]**
+
+NARRATOR:
+We reach out first.
+
+**[SCREEN: The email body appears, line by line. "Look what we built together." Then: "We're not disappearing."]**
+
+NARRATOR:
+Day zero. Not a receipt. Not "please find attached your deliverables." Just—hey. We made something. And we're still here.
+
+**[SCREEN: Calendar animation. Seven days pass.]**
+
+NARRATOR:
+Day seven. We check in. "How's it going? Anything feel off?"
+
+**[SCREEN: Day 7 email. The line glows: "We're still here—just reply if you need us."]**
+
+NARRATOR:
+No sales pitch. Just presence.
+
+**[SCREEN: Calendar. Thirty days.]**
+
+NARRATOR:
+Day thirty. We ask the questions nobody else asks.
+
+**[SCREEN: Day 30 email. Bullet points appear: "Is anything outdated?" "New services to add?" "Seasonal updates needed?"]**
+
+NARRATOR:
+Because a month in, things have changed. Your business moved. Your site should keep up.
+
+**[SCREEN: Stripe checkout. "Anchor Basic — $79/month." Simple, clean.]**
+
+NARRATOR:
+And if they want us to handle it? Seventy-nine bucks a month. Content updates. Bug fixes. We're on call. They email, we build.
+
+**[SCREEN: Calendar. Six months.]**
+
+NARRATOR:
+Month six. Most agencies? They've forgotten your name by now.
+
+**[SCREEN: Month 6 email. The words glow: "We're still here. Still watching."]**
+
+NARRATOR:
+We're sending an anniversary card.
+
+---
+
+## ACT THREE: THE WOW (1:30–2:00)
+
+**[SCREEN: The Notion "Emails Due Today" view. Two client names. Two checkboxes. Clean.]**
+
+NARRATOR:
+Four touchpoints. One five-minute morning check. The whole system.
+
+**[SCREEN: Side-by-side comparison. Left: "Every Other Agency." One email, then a flatline. Right: "Anchor." Four heartbeats across six months.]**
+
+NARRATOR:
+Here's what we learned.
+
+**[SCREEN: A metric appears: "20-25% conversion to maintenance."]**
+
+NARRATOR:
+Twenty to twenty-five percent of clients sign up for ongoing care. Not because we pitched them. Because we showed up.
+
+**[SCREEN: Pull back to reveal the full Notion database. Several rows show "Anchor Basic" and "Anchor Pro" in the Maintenance Tier column. Revenue visible.]**
+
+NARRATOR:
+Recurring revenue. Long-term relationships. Built on the radical act of not disappearing.
+
+**[SCREEN: Return to the small business owner from the opening. But now—different. They're reading an email. A small smile. The subject line: "Still here. Need anything?"]**
+
+NARRATOR:
+Because here's the thing about websites.
+
+**[SCREEN: The words appear, bold, one at a time: "The launch isn't the end."]**
+
+NARRATOR:
+The launch isn't the end.
+
+**[SCREEN: "It's where the relationship begins."]**
 
 NARRATOR:
 It's where the relationship begins.
 
-**[SCREEN: Anchor logo. "shipyard.ai/anchor" underneath. Fade to black.]**
+**[SCREEN: Anchor logo. Beneath it: "We don't disappear." Below that: "shipyard.ai/anchor"]**
+
+**[BEAT.]**
+
+NARRATOR:
+Anchor.
+
+**[FADE TO BLACK.]**
 
 ---
 
@@ -105,5 +161,11 @@ It's where the relationship begins.
 
 ---
 
+*Runtime: 2:00*
+*Voice: Human, not corporate. The person talking has built things. They know what it feels like to be left behind.*
+*Core emotional beat: Relief. The quiet comfort of knowing someone stayed.*
+
+---
+
 *"The first email sets everything. Open with awe, not administration."*
-*— Anchor Design Principles*
+— Anchor Design Principles

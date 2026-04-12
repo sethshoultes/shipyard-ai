@@ -1,216 +1,220 @@
-# Board Review: Anchor Post-Delivery System
+# Board Review: Anchor (shipyard-post-delivery-v2)
 
 **Reviewer:** Oprah Winfrey
-**Date:** 2026-04-12
-**Deliverable:** shipyard-post-delivery-v2 (Anchor)
 **Role:** Board Member, Great Minds Agency
+**Date:** 2026-04-12
+**Review Cycle:** Final Review
 
 ---
 
-## The Big Picture
+## Executive Summary
 
-I've spent my career understanding what makes people trust, what makes them feel seen, and what makes them come back. Let me tell you something: this Anchor system gets something right that most tech products miss entirely.
+This is what happens when people actually listen. When I said "normal people don't think in tokens" in the last cycle, this team heard me. They removed the technical jargon from client-facing emails. They led with feelings, not features. They built something that respects the person receiving it.
 
-**It's not about the emails. It's about the promise.**
-
-> "We don't disappear."
-
-Four words. That's the whole thing. And it lands because it names a wound every small business owner carries: the freelancer who ghosted them, the agency that cashed the check and vanished, the developer who's "no longer available."
-
-This product is built on an emotional truth, and that's rare.
+Anchor isn't a maintenance product. It's a promise. And promises matter.
 
 ---
 
 ## First-5-Minutes Experience
 
-**Verdict: Welcoming, not overwhelming.**
+**Would a new user feel welcomed or overwhelmed?**
 
-If I were a client receiving that Launch Day email the moment my site goes live, here's what I'd feel:
+*Welcomed. Genuinely welcomed.*
 
-1. **Pride** — "Look what we built together." Not "your deliverable has been deployed." They're celebrating *with* me.
+The Launch Day email opens with "Look what we built together." Not "Your project ID is XYZ-123" or "Please find attached your deliverables." Those four words—*Look what we built together*—tell the client: you were part of this. You matter. This is ours.
 
-2. **Relief** — "We're not disappearing." Someone's still there. I'm not alone with this thing I don't fully understand.
+Then immediately: "We're not disappearing."
 
-3. **Clarity** — Three things to do next. Share it. Test it. Stay covered. Simple.
+In five seconds, the client knows two things:
+1. This is a celebration, not a transaction
+2. Someone is still there
 
-The upsell doesn't hit until paragraph four. That's restraint. That's respect. They're not leading with their hand out — they're leading with their heart.
+The maintenance offer doesn't appear until paragraph four. That's restraint. That's knowing when to sell and when to serve. The first three paragraphs are pure relationship-building. By the time the ask comes, the client already trusts you.
 
-**What works:**
-- Opening with celebration, not logistics
-- "We don't disappear" appears immediately (first paragraph, always)
-- Merge fields are minimal and practical
-- Voice guide prevents corporate-speak infection
+The structure is clean:
+- **Share it.** Post on social, tell the world.
+- **Test it.** Click around, report issues.
+- **Stay covered.** Here's how we help going forward.
 
-**What could strengthen it:**
-- Consider adding a personal note option for high-value clients — a sentence that references something specific from the build process
-- The templates are warm but could occasionally feel templated if the client receives all four without variation in opener
+This gives the client agency. They have a role. They're not just a recipient—they're a participant.
 
-**First-impression score: 9/10** — You feel welcomed into a relationship, not processed through a system.
+**Verdict:** A new user would feel proud, supported, and respected. That's rare.
 
 ---
 
 ## Emotional Resonance
 
-**The question I always ask: "Does this make people feel something?"**
+**Does this make people feel something?**
 
-Yes. And I'll tell you exactly what.
+Yes. The core emotion here is *relief*.
 
-### The Core Emotion: Relief
+The voice guide names it explicitly: "The quiet comfort of knowing you're not alone with this thing you don't fully understand."
 
-The voice guide names it explicitly: *"The quiet comfort of knowing you're not alone with this thing you don't fully understand."*
+That's so specific. That's so true. Most small business owners getting a website don't fully understand what they just paid for. They nod along, approve the designs, sign off on launch—and then they're alone with a thing they can't fix themselves.
 
-That's not marketing copy. That's empathy. That's understanding your audience.
-
-Small business owners building websites are often scared. They don't know if they're being overcharged. They don't know if the site will break. They don't know who to call when something goes wrong at 9 PM on a Thursday.
-
-This system tells them: **We're still here.**
+"We don't disappear" lands because it addresses a fear most clients never articulate: *What happens when something breaks?*
 
 ### The Emotional Arc
 
-| Email | Timing | Feeling Evoked |
-|-------|--------|----------------|
-| Launch Day | Day 0 | Pride + Relief |
-| Day 7 Check-in | Day 7 | Care + Connection |
-| Day 30 Refresh | Day 30 | Agency + Momentum |
-| Month 6 Review | Month 6 | Nostalgia + Future-thinking |
+| Email | Day | Feeling |
+|-------|-----|---------|
+| Launch Day | 0 | Pride + Relief |
+| Day 7 Check-in | 7 | Care + Connection |
+| Day 30 Refresh | 30 | Agency + Momentum |
+| Month 6 Review | 182 | Nostalgia + Partnership |
 
-This is a well-designed emotional journey. They start with celebration, move through care, prompt action, and end with reflection. That's a story arc. That's good storytelling.
+The Day 7 email reinforces the core promise: "We're still here." Not selling. Just... present. Like a friend checking in.
 
-### What's Missing Emotionally
+The Day 30 email asks the right questions: "Is anything outdated? New services to add? Seasonal updates needed?" These are the thoughts clients have at 2am when they can't sleep. Shipyard is saying: *We know what you're worried about.*
 
-The one thing I'd add: **acknowledgment of what they've overcome.**
+The Month 6 email: "It's been working for you 24/7 ever since." That line. The site has been laboring on your behalf while you slept, ate dinner, lived your life. That's emotional. That's showing value without saying "value."
 
-By Month 6, the client has been running a business with this website for half a year. They've probably faced challenges, won customers, learned things. The email could touch on that journey — not just "your site has been working 24/7" but "look how far you've come."
-
-Human beings want to be witnessed. We want someone to notice our growth. There's an opportunity here.
-
-**Emotional resonance score: 8/10** — The relief is real, the care is genuine. Room to deepen the "witnessing" element.
+**What's missing:** There's no Day 365 email. The original PRD mentioned an anniversary offer with 20% off. Anniversaries are emotional milestones. The one-year mark is when clients reflect on what the site has done for their business. That's a natural moment for deepening the relationship. Consider adding this in Phase 2.
 
 ---
 
-## Trust Analysis
+## Trust
 
-**The question: Would I recommend this to my audience?**
+**Would I recommend this to my audience?**
 
-Let me put this in context. My audience — book club readers, Super Soul Sunday viewers, people who show up for real conversations — they're discerning. They've been burned by false promises. They can smell inauthenticity from a mile away.
+Yes. Without hesitation.
 
-### What Builds Trust Here
+Here's what I look for when recommending any service:
 
-1. **No-contract positioning.** "Peace of mind, not a contract. Cancel anytime." That's respecting autonomy.
+**1. Do they respect people's time?**
+The emails are short. No padding. The Send Process is 5 minutes daily. The Notion database takes 2 minutes per client. Everything is designed for sustainability.
 
-2. **Reply-to-email simplicity.** No ticket systems, no portals, no "please fill out this form." Just... reply. Human.
+**2. Do they tell the truth?**
+The banned merge fields decision is brilliant. {{FEATURE_LIST}} and {{REFRESH_SUGGESTION}} were cut because "Nobody writes custom suggestions anyway, and empty fields become lies." That's integrity. Don't promise personalization you won't deliver.
 
-3. **Honest pricing.** $79 and $149 — stated clearly, no hidden fees, no "starting at" tricks.
+**3. Do they know their limits?**
+The escalation protocol says: manual process works until ~25 clients. At 50+, transition to full CRM. They're not pretending this scales infinitely. They know when the system will break.
 
-4. **Token transparency.** They tell you what you used and what you get. That's unusual in services.
+**4. Is the money fair?**
+$79/month for ongoing site care is reasonable. The "peace of mind, not a contract" positioning is honest—you can cancel anytime. No hidden fees, no gotchas. The Pro tier at $149 offers real additional value (4x tokens, quarterly proposals) rather than artificial upsells.
 
-5. **Manual-first approach.** The decision to stay manual until they have 25 clients shows wisdom. They're prioritizing relationship quality over automation efficiency.
+**5. Do they care about the relationship?**
+The alternating CTA strategy (hard-soft-hard-soft) shows sophistication. They know when to ask and when to serve. Not every email is a sales pitch. That builds trust over time.
 
-### What Could Undermine Trust
-
-1. **"Tokens" as a metric.** Normal people don't think in tokens. They think in outcomes. "50,000 tokens" means nothing to a restaurant owner. Consider translating: "Enough for about 5-10 content updates per month" or similar.
-
-2. **No testimonials or social proof.** The system is new, so this makes sense. But trust deepens when others vouch for you.
-
-3. **Cancellation friction is unclear.** The docs say "Stripe customer portal" — but does the client know that's easy? Make it explicit: "Cancel in two clicks."
-
-**Trust score: 8.5/10** — The foundation is strong. The relationship-first approach is right. Just translate technical concepts into human terms.
+**I would recommend this to:** Small business owners who just launched a site and feel overwhelmed. Service professionals who need their site to work but don't want to think about it. Anyone who's been ghosted by a developer after launch.
 
 ---
 
-## Accessibility Audit
+## Accessibility
 
-**The question: Who's being left out?**
+**Who's being left out?**
 
-This is where I always look hardest. Every system excludes someone. The question is whether you know who and whether you've thought about it.
+Let me be direct about the gaps:
 
-### Who This System Serves Well
+### 1. Language Accessibility
+All templates are English-only. For a significant portion of small business owners in America—and globally—English is not their first language.
 
-- Small business owners with moderate tech comfort
-- Clients who prefer email communication
-- English speakers
-- People who check email regularly
-- Businesses with websites that need occasional updates
+**Recommendation:** Spanish language versions as Phase 2 priority.
 
-### Who Might Be Left Out
+### 2. Technical Literacy Assumptions
+The emails are much improved from the PRD's original "245K tokens used" language. I was pleased to see Decision 11 cited in the Launch Day email: "Per Decision 11 (Oprah), 'Normal people don't think in tokens.'" They listened.
 
-| Group | Barrier | Impact |
-|-------|---------|--------|
-| **Non-English speakers** | All templates are English-only | High — excludes entire markets |
-| **Low-email clients** | System is 100% email-based | Medium — some demographics barely use email |
-| **Screen reader users** | No alt-text guidance for any images sent | Medium — if emails include images |
-| **Overwhelmed clients** | 4 emails may feel like too much | Low — but worth monitoring unsubscribe rates |
-| **Budget-constrained** | $79/month is entry price | Medium — no lower tier or pay-per-request option |
+But some technical assumptions remain:
+- "Mobile responsive" may not mean anything to some clients
+- "SEO optimized" is industry jargon
+- The Stripe product descriptions still mention "50K tokens" and "200K tokens"
 
-### Specific Recommendations
+**Recommendation:** Translate token language in Stripe descriptions too. Try: "Regular updates included" vs. "Extensive updates included."
 
-1. **Add a "No Email" path.** Some clients would prefer a quarterly text or phone call. Document an alternative process for these clients.
+### 3. Payment Method Limitations
+Stripe is US/Europe-centric.
 
-2. **Consider language localization.** If Shipyard serves Spanish-speaking markets, translate the templates.
+**Consider for Phase 2:**
+- International payment options
+- Invoice/NET-30 for larger organizations
+- One-time update quotes for commitment-averse clients
 
-3. **Create a one-pager summary.** For clients who don't read long emails, offer a condensed "here's what you need to know" option.
+### 4. The Digitally Disconnected
+Some clients—especially older business owners or those in trades—check email infrequently.
 
-4. **Lower-commitment option.** Consider a pay-per-update model for clients who can't commit to monthly — $50 per request with 72-hour turnaround. This catches the clients who'd otherwise say no to everything.
+**Consider:**
+- SMS option for critical milestones (Phase 2)
+- Phone call option for Month 6 check-in
+- Physical card for one-year anniversary (radical, memorable)
 
-**Accessibility score: 7/10** — Good for the primary audience. Room to expand reach.
+### 5. Screen Reader Accessibility
+No mention of plain-text email alternatives or alt-text guidance. If emails become HTML-styled, this matters.
+
+**Who's being well-served:** English-speaking, digitally-comfortable small business owners in the US who pay by credit card and check email regularly. That's a large audience—but let's not pretend it's everyone.
 
 ---
 
 ## What I Love
 
-Let me name the moments of genius here:
+1. **"We don't disappear" as the core emotional hook.** This is brilliant positioning. It's specific, memorable, and addresses a real pain point. Every competitor vanishes. You stay. That's the whole pitch.
 
-1. **"We don't disappear" as core hook.** This is positioning that sticks because it names a real pain.
+2. **Celebration before transaction.** The Launch Day email leads with pride, not payment. Four paragraphs of relationship before one paragraph of ask.
 
-2. **Hard CTA / Soft CTA strategy.** Day 0 and Day 30 sell. Day 7 and Month 6 nurture. That's emotional intelligence in system design.
+3. **Banned merge fields.** Knowing what NOT to build is as important as knowing what to build. Cutting the lie-generators shows maturity.
 
-3. **Voice guide with before/after examples.** Too many companies write tone guidelines nobody follows. The concrete examples make this usable.
+4. **Alternating CTA strategy.** Hard-soft-hard-soft is sophisticated. It treats the client as a human to be nurtured, not a wallet to be extracted.
 
-4. **"Would I forward this to a friend?"** As the email quality test — brilliant. If no, rewrite.
+5. **The voice guide.** "Confident, warm, slightly irreverent." Before/after examples. Banned phrases ("We hope this email finds you well"). This ensures consistency even as the team grows.
 
-5. **Notion over spreadsheet.** The decision to use Notion with auto-calculating dates shows respect for the humans operating this system. Sustainable processes matter.
+6. **Human-readable language.** No tokens in client emails. No project codes. No UTC timestamps. Just outcomes they care about.
 
-6. **Product naming.** "Anchor" is so much better than "Maintenance Plans." It's a metaphor that evokes stability, grounding, relationship. Names matter.
+7. **Preview lines.** Each email hints at the next one. "We'll check in next week." "At one month, we'll help you refresh." This is serialized storytelling. Shonda would approve.
 
 ---
 
 ## What Concerns Me
 
-1. **5 emails became 4 — where's the anniversary?** The PRD specified Day 365. The deliverable stops at Month 6. That anniversary email was the most emotionally resonant in the original spec: "Happy 1 year!" with a discount offer. I'd bring it back.
+1. **No Day 365 email.** The anniversary is an emotional milestone. You're leaving connection on the table.
 
-2. **Token language everywhere.** Your clients don't speak in tokens. Translate.
+2. **Month 6 feels like a long silence.** From Day 30 to Month 6 is five months with no touchpoint. For some clients, that's too long. Consider a Day 90 optional check-in.
 
-3. **No escalation for unhappy clients.** What happens when someone replies with a complaint? The process docs don't address service recovery.
+3. **Token language in Stripe descriptions.** If tokens are banned from emails, they should be reconsidered in payment contexts too. Clients see these.
 
-4. **Month 6 is a long gap.** From Day 30 to Month 6 is 152 days of silence. Consider adding a Day 90 light touch — even just an automated "thinking of you" note.
+4. **No service recovery protocol.** The Send Process documents what to do when emails are late, but not what to do when a client replies unhappy. Document an escalation path for complaints.
 
----
-
-## Final Score
-
-| Criterion | Score | Notes |
-|-----------|-------|-------|
-| First-5-Minutes | 9/10 | Welcoming, warm, clear |
-| Emotional Resonance | 8/10 | Relief is real; could deepen witnessing |
-| Trust | 8.5/10 | Relationship-first; translate tech terms |
-| Accessibility | 7/10 | Good for primary audience; expand reach |
-| **Overall** | **8/10** | **A system with soul. Ship it, then iterate.** |
+5. **Manual process risk.** One sick day, one vacation, and emails get missed. Consider implementing Notion automations from day one rather than waiting for 15+ clients.
 
 ---
 
-## One-Line Justification
+## The Oprah Question
 
-**8/10 — This system understands that post-delivery isn't about maintenance; it's about making people feel they matter after the transaction is done.**
+*What would you tell your audience about this?*
+
+I would say:
+
+"You know what happens after you launch a website? Usually nothing. The developer gets paid, the site goes live, and you never hear from them again. Until something breaks. And then you're searching through old emails trying to remember who built it and whether they're still in business.
+
+Anchor is the opposite of that. It's Shipyard saying: we're not going anywhere. We built this with you, and we're staying to help you make it work.
+
+That's what every business owner needs. Not just a website. A partner."
 
 ---
 
-## My Recommendation to the Board
+## Score: 8/10
+
+**Justification:** A system with soul that understands post-delivery isn't about maintenance—it's about making people feel they matter after the transaction is done.
+
+---
+
+## Recommendations for Phase 2
+
+1. **Add Day 365 anniversary email** with genuine celebration and renewal offer
+2. **Implement Notion automations immediately** rather than waiting for scale triggers
+3. **Consider Day 90 light touchpoint** to bridge the Day 30 to Month 6 gap
+4. **Spanish language versions** of all templates
+5. **Remove token language from Stripe descriptions** for consistency
+6. **Add service recovery protocol** for unhappy client replies
+7. **Lower-commitment option** for clients who can't do monthly
+
+---
+
+## Final Verdict
 
 **Ship it.**
 
-This isn't perfect — nothing ever is. But it has something most systems don't have: heart. It starts from an emotional truth, builds toward relief, and respects both the client's intelligence and their anxiety.
+This isn't perfect—nothing ever is. But it has something most systems don't have: heart. It starts from an emotional truth, builds toward relief, and respects both the client's intelligence and their anxiety.
 
-The technical gaps (token language, missing Day 365, accessibility expansion) are all solvable. The soul is not something you can add later. This has it.
+The technical gaps (missing Day 365, accessibility expansion, Stripe descriptions) are all solvable. The soul is not something you can add later. This has it.
 
 I've interviewed thousands of entrepreneurs. The ones who build lasting businesses understand what this system understands: **the transaction is just the beginning of the relationship.**
 
@@ -218,7 +222,7 @@ Shipyard is learning to stay. That's everything.
 
 ---
 
-*"The goal is to make people feel that they have been seen and heard. That's what this Anchor system does at its best."*
+*"The goal is to make people feel that they have been seen and heard. That's what Anchor does at its best."*
 
 — Oprah Winfrey
 Board Member, Great Minds Agency
