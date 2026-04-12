@@ -1,56 +1,23 @@
-# Phase 1 Plan — PromptOps/Drift Build Phase
+# Phase 1 Plan — MemberShip Fix
 
-**Generated**: April 12, 2026
-**Project Slug**: promptops
-**Product Name**: Drift (CLI + API) + NERVE (Pipeline Daemon)
-**Requirements**: .planning/REQUIREMENTS.md
-**Total Tasks**: 12
-**Waves**: 4
-**Status**: READY FOR BUILD
-**Estimated Time**: 6-8 hours (sequential), 4-5 hours (parallelized)
+**Generated:** 2026-04-12
+**Project Slug:** membership-fix
+**Requirements:** .planning/REQUIREMENTS.md
+**Total Tasks:** 15
+**Waves:** 5
 
 ---
 
 ## The Essence
 
-> **What it is:** The undo button for AI—turning prompt deployment from a gamble into a system.
+> **What is this product REALLY about?**
+> Giving creators the gift of invisibility — tools that work so well they disappear.
 
-> **The feeling:** Peace. The 3 AM panic, gone.
+> **What's the feeling it should evoke?**
+> Belonging. Not managing. Not configuring. Belonging.
 
-> **What must be perfect:** The rollback. One command. Instant. No thinking.
-
-> **Creative direction:** Disappear. Work always.
-
----
-
-## Build Status
-
-**Existing Code:** ~1,275 lines built (API: 731, CLI: 447, NERVE: 1,055)
-**Missing:** SDK (0 lines), Dashboard (0 lines), CLI list/rollback commands
-**Board Verdict:** HOLD (5.1/10) — Build phase never completed
-
-### Locked Decisions
-
-| Decision | Winner | Rationale |
-|----------|--------|-----------|
-| Product Name: **Drift/NERVE** | Steve Jobs | One-word names shape destiny |
-| No Proxy in V1 | Elon Musk | 15-80ms latency is commercial suicide |
-| SDK-First Architecture | Elon Musk | "Add 2 lines of code" > "reroute traffic" |
-| Dashboard: Read-Only HTML | Elon Musk | Static, no rollback buttons |
-| 60-Second Time-to-Value | Both | First dopamine hit must be fast |
-| Bash Over Agents (NERVE) | Consensus | Determinism over probabilistic |
-
-### What Must Ship
-
-| # | Component | Status | Gap |
-|---|-----------|--------|-----|
-| 1 | API endpoints | BUILT | Deploy to Cloudflare |
-| 2 | CLI init/push | PARTIAL | Complete and test |
-| 3 | CLI list/rollback | NOT BUILT | Implement commands |
-| 4 | SDK getPrompt() | NOT BUILT | Build with caching |
-| 5 | Dashboard | NOT BUILT | Static HTML |
-| 6 | D1 Database | NOT DONE | Create and migrate |
-| 7 | NERVE scripts | BUILT | Test and document |
+> **What's the one thing that must be perfect?**
+> The first 30 seconds.
 
 ---
 
@@ -58,895 +25,663 @@
 
 | Requirement | Task(s) | Wave |
 |-------------|---------|------|
-| REQ-META-002: D1 database deployed | phase-1-task-1 | 1 |
-| REQ-API-001 to 006: API endpoints | phase-1-task-2 | 1 |
-| REQ-CLI-001, 002: init and push | phase-1-task-3 | 2 |
-| REQ-CLI-003, 004: list and rollback | phase-1-task-4 | 2 |
-| REQ-SDK-001, 002: getPrompt with caching | phase-1-task-5 | 2 |
-| REQ-DASH-001 to 006: Dashboard | phase-1-task-6 | 2 |
-| REQ-NERVE-001 to 005: NERVE scripts | phase-1-task-7 | 3 |
-| REQ-CLI-005: npm publish CLI | phase-1-task-8 | 3 |
-| REQ-SDK-005: npm publish SDK | phase-1-task-9 | 3 |
-| REQ-META-001: 60-second test | phase-1-task-10 | 4 |
-| Git commit all changes | phase-1-task-11 | 4 |
-| QA Pass verification | phase-1-task-12 | 4 |
-
----
-
-## Documentation References
-
-This plan cites specific sections from source documents:
-
-- **decisions.md Section I**: Locked Decisions (13 items)
-- **decisions.md Section II**: MVP Feature Set (CLI, API, SDK, Dashboard)
-- **decisions.md Section III**: File Structure (expected directories)
-- **decisions.md Section IV**: Open Questions (4 items needing resolution)
-- **decisions.md Section IX**: Build Phase Acceptance Criteria
-- **docs/EMDASH-GUIDE.md Section 5**: Cloudflare Workers deployment patterns
-
-### Existing Code Locations
-
-- `/home/agent/shipyard-ai/deliverables/promptops/drift/api/` — API (731 lines)
-- `/home/agent/shipyard-ai/deliverables/promptops/drift/cli/` — CLI (447 lines)
-- `/home/agent/shipyard-ai/nerve/` — NERVE scripts (1,055 lines)
+| REQ-001: Replace throw new Response | phase-1-task-1, phase-1-task-2 | 1 |
+| REQ-002: Remove JSON.stringify from kv.set | phase-1-task-3 | 1 |
+| REQ-003: Remove JSON.parse from kv.get | phase-1-task-4 | 1 |
+| REQ-004: Delete rc.user checks | phase-1-task-5 | 1 |
+| REQ-005: Audit auth.ts | phase-1-task-6 | 1 |
+| REQ-006: Audit email.ts | phase-1-task-7 | 1 |
+| REQ-007: KV pagination schema | phase-1-task-8 | 2 |
+| REQ-008: Admin pagination routes | phase-1-task-9 | 2 |
+| REQ-009: Chunk size constant | phase-1-task-8 | 2 |
+| REQ-010: Human-first error messages | phase-1-task-1, phase-1-task-2 | 1 |
+| REQ-013: tsc --noEmit passes | phase-1-task-10 | 3 |
+| REQ-014: Typed KV operations | phase-1-task-3, phase-1-task-4 | 1 |
+| REQ-017: Register in Sunrise Yoga | phase-1-task-11 | 4 |
+| REQ-018-022: Smoke tests | phase-1-task-12, phase-1-task-13, phase-1-task-14, phase-1-task-15 | 5 |
 
 ---
 
 ## Wave Execution Order
 
-### Wave 1 (Parallel) — Infrastructure Foundation
+### Wave 1 (Parallel) — Pattern Corrections
 
-Two independent tasks provisioning infrastructure and deploying API. **Estimated time: 45 minutes**
+All 7 tasks in Wave 1 can run in parallel because they target different code regions or different files.
 
 ```xml
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Create and configure D1 database</title>
-  <requirement>REQ-META-002: D1 database deployed with schema</requirement>
+  <title>Fix throw new Response (routes 1-6)</title>
+  <requirement>REQ-001, REQ-010: Replace throw new Response with throw new Error using human-first error messages</requirement>
   <description>
-    Per decisions.md Section III and EMDASH-GUIDE.md Section 5:
-    Create Cloudflare D1 database for Drift and apply schema.
-
-    Schema exists at: deliverables/promptops/drift/api/src/db/schema.sql
-    Contains: projects, prompts, versions tables with proper indexes.
-
-    Database name: drift
-    Binding: DB
+    Replace throw new Response patterns in the first half of route handlers (register, status, plans, approve, revoke, webhook).
+    Convert JSON.stringify({ error: "..." }) to plain string messages.
+    Rewrite error text with warm, human-first tone per Decision 5.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/src/db/schema.sql" reason="D1 schema definition (53 lines)" />
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/wrangler.toml" reason="Worker config with D1 binding placeholder" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5: D1 database creation pattern" />
+    <file path="plugins/membership/src/sandbox-entry.ts" reason="Contains all 114 throw new Response instances" />
+    <file path="docs/EMDASH-GUIDE.md" reason="Section 6 shows correct error return patterns" />
+    <file path="rounds/membership-fix/decisions.md" reason="Decision 5 specifies error voice" />
   </context>
 
   <steps>
-    <step order="1">Run: wrangler d1 create drift</step>
-    <step order="2">Copy the database_id from output</step>
-    <step order="3">Update wrangler.toml with real database_id</step>
-    <step order="4">Apply schema: wrangler d1 execute drift --file=src/db/schema.sql</step>
-    <step order="5">Verify tables: wrangler d1 execute drift --command="SELECT name FROM sqlite_master WHERE type='table'"</step>
-    <step order="6">Verify indexes exist on projects.api_key_hash, prompts.name</step>
+    <step order="1">Open sandbox-entry.ts and locate routes: register (lines 967-1130), status (1138-1211), plans (1219-1231), approve (1240-1287), revoke (1296-1342), webhook (1351-1455)</step>
+    <step order="2">For each throw new Response, replace with: throw new Error("Human-readable message") OR return { error: "message", status: N }</step>
+    <step order="3">Remove JSON.stringify wrapper from error payloads</step>
+    <step order="4">Rewrite error messages: "Email is required" → "We need your email to continue"; "Invalid email format" → "That email doesn't look right"</step>
+    <step order="5">Verify each replacement preserves the intended HTTP status code semantics (4xx for client errors, 5xx for server errors)</step>
   </steps>
 
   <verification>
-    <check type="bash">wrangler d1 list | grep drift</check>
-    <check type="bash">wrangler d1 execute drift --command="SELECT count(*) FROM sqlite_master WHERE type='table'"</check>
-    <check type="manual">Returns 3 tables: projects, prompts, versions</check>
+    <check type="grep">grep -c "throw new Response" plugins/membership/src/sandbox-entry.ts | verify count decreased</check>
+    <check type="manual">Spot-check 5 error messages for human-first tone</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies - Wave 1 foundational task -->
+    <!-- Wave 1: no dependencies -->
   </dependencies>
 
-  <commit-message>chore(drift): create D1 database and apply schema
-
-Create 'drift' D1 database with tables:
-- projects (id, name, api_key_hash, created_at)
-- prompts (id, project_id, name, active_version, created_at)
-- versions (id, prompt_id, version, content, message, created_at)
-
-Indexes on api_key_hash and prompt name for fast lookups.
-
-Per decisions.md Section III: database-first architecture.
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+  <commit-message>fix(membership): replace throw new Response in routes 1-6 with human-friendly errors</commit-message>
 </task-plan>
 ```
 
 ```xml
 <task-plan id="phase-1-task-2" wave="1">
-  <title>Deploy Drift API worker to Cloudflare</title>
-  <requirement>REQ-API-001 to 006: All API endpoints functional</requirement>
+  <title>Fix throw new Response (routes 7-11+)</title>
+  <requirement>REQ-001, REQ-010: Replace throw new Response with throw new Error using human-first error messages</requirement>
   <description>
-    Per decisions.md Section II and existing code at deliverables/promptops/drift/api/:
-    Deploy the Cloudflare Worker with all API routes.
-
-    Endpoints:
-    - POST /api/projects (create project, generate API key)
-    - GET /api/prompts (list all prompts)
-    - POST /api/prompts (create/update prompt version)
-    - GET /api/prompts/:name (get prompt with history)
-    - POST /api/prompts/:name/rollback (revert to version)
-
-    Code is built (731 lines). Deploy and verify.
+    Replace throw new Response patterns in remaining route handlers (checkoutCreate, checkoutSuccess, dashboard, dashboardCancel, dashboardUpgrade, couponCreate, and all admin routes).
+    Focus on Stripe integration errors and admin panel errors.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/src/index.ts" reason="Worker entry point (124 lines)" />
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/src/middleware/auth.ts" reason="API key validation (129 lines)" />
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/src/routes/projects.ts" reason="Project creation (97 lines)" />
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/src/routes/prompts.ts" reason="Prompt CRUD (381 lines)" />
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/wrangler.toml" reason="Worker config" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5: Worker deployment patterns" />
+    <file path="plugins/membership/src/sandbox-entry.ts" reason="Contains remaining ~60 throw new Response instances" />
+    <file path="docs/EMDASH-GUIDE.md" reason="Section 6 shows correct error return patterns" />
   </context>
 
   <steps>
-    <step order="1">cd deliverables/promptops/drift/api</step>
-    <step order="2">npm install</step>
-    <step order="3">Verify wrangler.toml has correct database_id (from task-1)</step>
-    <step order="4">Run: wrangler deploy</step>
-    <step order="5">Note deployed URL: drift-api.{subdomain}.workers.dev</step>
-    <step order="6">Test: curl -X POST https://drift-api.{subdomain}.workers.dev/api/projects -H "Content-Type: application/json" -d '{"name":"test-project"}'</step>
-    <step order="7">Verify response contains api_key and project_id</step>
-    <step order="8">Test auth: curl with API key, verify 200 response</step>
-    <step order="9">Test without auth: verify 401 response</step>
+    <step order="1">Locate remaining routes: checkoutCreate (1463-1662), checkoutSuccess (1664-1826), dashboard (1835-1932), dashboardCancel (1941-2026), dashboardUpgrade (2036-2154), couponCreate (2163+), admin routes (2200-3984)</step>
+    <step order="2">For each throw new Response, replace with: throw new Error("message") OR return { error: "message", status: N }</step>
+    <step order="3">Special handling for Stripe errors: preserve diagnostic info in message but use friendly framing ("We couldn't process your payment" not "Stripe API error")</step>
+    <step order="4">Admin route errors can be slightly more technical but still human-readable ("Couldn't find that member" not "Error: Member lookup failed")</step>
+    <step order="5">Handle the error re-throw pattern: if (error instanceof Response) throw error; — DELETE these blocks entirely (they're checking for the banned pattern)</step>
   </steps>
 
   <verification>
-    <check type="bash">curl -X POST https://drift-api.{subdomain}.workers.dev/api/projects -H "Content-Type: application/json" -d '{"name":"test"}'</check>
-    <check type="manual">POST /api/projects returns {api_key, project_id}</check>
-    <check type="manual">GET /api/prompts with valid key returns 200</check>
-    <check type="manual">GET /api/prompts without key returns 401</check>
+    <check type="grep">grep -c "throw new Response" plugins/membership/src/sandbox-entry.ts → should be 0</check>
+    <check type="grep">grep "instanceof Response" plugins/membership/src/sandbox-entry.ts → should be 0</check>
+    <check type="manual">Review Stripe error messages for customer-friendliness</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="D1 database must exist for API to function" />
+    <!-- Wave 1: no dependencies, runs parallel with task-1 -->
   </dependencies>
 
-  <commit-message>feat(drift): deploy API worker to Cloudflare
+  <commit-message>fix(membership): replace remaining throw new Response with human-friendly errors</commit-message>
+</task-plan>
+```
 
-Drift API worker deployed with endpoints:
-- POST /api/projects (project creation)
-- GET /api/prompts (list prompts)
-- POST /api/prompts (push version)
-- GET /api/prompts/:name (get prompt)
-- POST /api/prompts/:name/rollback (revert version)
+```xml
+<task-plan id="phase-1-task-3" wave="1">
+  <title>Remove JSON.stringify from kv.set calls</title>
+  <requirement>REQ-002, REQ-014: Remove JSON.stringify from kv.set; verify typed operations</requirement>
+  <description>
+    Remove all JSON.stringify() wrapping values passed to ctx.kv.set().
+    Emdash KV auto-serializes objects (per docs/EMDASH-GUIDE.md Section 6).
+    Pass typed values directly.
+  </description>
 
-Auth middleware validates API keys (SHA-256 hashed).
+  <context>
+    <file path="plugins/membership/src/sandbox-entry.ts" reason="Contains ~50 JSON.stringify in kv.set calls" />
+    <file path="docs/EMDASH-GUIDE.md" reason="Section 6 confirms KV auto-serializes" />
+  </context>
 
-Per decisions.md Section II: SDK-first architecture.
+  <steps>
+    <step order="1">Search for pattern: ctx.kv.set\(.*,\s*JSON\.stringify\(</step>
+    <step order="2">For each match, remove JSON.stringify wrapper: ctx.kv.set(key, JSON.stringify(obj)) → ctx.kv.set(key, obj)</step>
+    <step order="3">Update member storage: ctx.kv.set(`member:${email}`, JSON.stringify(member)) → ctx.kv.set(`member:${email}`, member)</step>
+    <step order="4">Update webhook storage: ctx.kv.set(`webhook:log:${id}`, JSON.stringify(log)) → ctx.kv.set(`webhook:log:${id}`, log)</step>
+    <step order="5">Update lists: ctx.kv.set("members:list", JSON.stringify(list)) → ctx.kv.set("members:list", list)</step>
+    <step order="6">Update settings: ctx.kv.set("plans", JSON.stringify(plans)) → ctx.kv.set("plans", plans)</step>
+    <step order="7">Do NOT change JSON.stringify used for webhook payloads to external endpoints (fireWebhook function) — that's network serialization, not KV</step>
+  </steps>
 
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+  <verification>
+    <check type="grep">grep "ctx.kv.set.*JSON.stringify" plugins/membership/src/sandbox-entry.ts → should be 0</check>
+    <check type="manual">Verify fireWebhook still uses JSON.stringify for HTTP payload (line ~187)</check>
+  </verification>
+
+  <dependencies>
+    <!-- Wave 1: no dependencies -->
+  </dependencies>
+
+  <commit-message>fix(membership): remove JSON.stringify from KV storage calls</commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-4" wave="1">
+  <title>Remove JSON.parse from kv.get results</title>
+  <requirement>REQ-003, REQ-014: Remove JSON.parse from kv.get; use typed returns</requirement>
+  <description>
+    Remove all JSON.parse() wrapping results from ctx.kv.get().
+    Use typed generic parameters: ctx.kv.get&lt;MemberRecord&gt;(key).
+    Delete the parseJSON utility function after all usages removed.
+  </description>
+
+  <context>
+    <file path="plugins/membership/src/sandbox-entry.ts" reason="Contains parseJSON utility and ~50 parse calls" />
+    <file path="docs/EMDASH-GUIDE.md" reason="Section 6 confirms typed KV returns" />
+  </context>
+
+  <steps>
+    <step order="1">Locate parseJSON utility function (lines 259-266) — this will be deleted at end</step>
+    <step order="2">Find all parseJSON&lt;T&gt;(await ctx.kv.get(...)) patterns</step>
+    <step order="3">Replace with: const result = await ctx.kv.get&lt;T&gt;(key); Add null check if needed</step>
+    <step order="4">Example: parseJSON&lt;MemberRecord&gt;(memberJson, null) → const member = await ctx.kv.get&lt;MemberRecord&gt;(key); if (!member) ...</step>
+    <step order="5">Update getMemberByStripeCustomerId: remove parseJSON, use typed get</step>
+    <step order="6">Update all route handlers: status, register, dashboard, etc.</step>
+    <step order="7">After all usages removed, delete parseJSON function definition</step>
+    <step order="8">Note: Keep JSON.parse for Stripe webhook raw body (line 1389) — that's HTTP parsing, not KV</step>
+  </steps>
+
+  <verification>
+    <check type="grep">grep "parseJSON" plugins/membership/src/sandbox-entry.ts → should be 0</check>
+    <check type="grep">grep "JSON.parse.*kv.get" plugins/membership/src/sandbox-entry.ts → should be 0</check>
+    <check type="manual">Verify Stripe webhook body parsing preserved</check>
+  </verification>
+
+  <dependencies>
+    <!-- Wave 1: no dependencies -->
+  </dependencies>
+
+  <commit-message>fix(membership): remove JSON.parse from KV get operations, use typed returns</commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-5" wave="1">
+  <title>Delete rc.user auth checks</title>
+  <requirement>REQ-004: Delete all 14 rc.user defensive checks</requirement>
+  <description>
+    Remove all rc.user auth guard blocks from admin routes.
+    Emdash handles authentication before handler runs — these checks are redundant.
+    Delete entire if-blocks, not just the condition.
+  </description>
+
+  <context>
+    <file path="plugins/membership/src/sandbox-entry.ts" reason="Contains 14 rc.user check instances" />
+    <file path="rounds/membership-fix/decisions.md" reason="Decision 6: unanimous agreement to delete" />
+  </context>
+
+  <steps>
+    <step order="1">Search for pattern: rc\.user</step>
+    <step order="2">For each match, identify the full guard block structure:
+      const adminUser = rc.user as Record&lt;string, unknown&gt; | undefined;
+      if (!adminUser || !adminUser.isAdmin) { ... throw/return ... }</step>
+    <step order="3">Delete the entire block (variable declaration + if statement + error handling)</step>
+    <step order="4">Verify no other code depends on the deleted adminUser variable</step>
+    <step order="5">Known locations: lines ~2167, 2267, 2399, 3160, 3237, 3303, 3388, 3455, 3534, 3597, 3737, 3811, 3863, 3904</step>
+    <step order="6">After deletion, check for orphaned closing braces or indentation issues</step>
+  </steps>
+
+  <verification>
+    <check type="grep">grep "rc.user" plugins/membership/src/sandbox-entry.ts → should be 0</check>
+    <check type="grep">grep "adminUser" plugins/membership/src/sandbox-entry.ts → should be 0</check>
+    <check type="grep">grep "isAdmin" plugins/membership/src/sandbox-entry.ts → should be 0</check>
+  </verification>
+
+  <dependencies>
+    <!-- Wave 1: no dependencies -->
+  </dependencies>
+
+  <commit-message>fix(membership): remove redundant rc.user auth checks (platform handles auth)</commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-6" wave="1">
+  <title>Audit auth.ts for banned patterns</title>
+  <requirement>REQ-005: Check auth.ts for banned patterns</requirement>
+  <description>
+    Review auth.ts for any throw new Response, JSON.stringify in KV, JSON.parse from KV, or rc.user patterns.
+    Fix if found. Do NOT restructure the file.
+  </description>
+
+  <context>
+    <file path="plugins/membership/src/auth.ts" reason="Must audit for banned patterns" />
+  </context>
+
+  <steps>
+    <step order="1">Read auth.ts completely</step>
+    <step order="2">Search for: throw new Response — likely 0 (auth returns null on failure)</step>
+    <step order="3">Search for: ctx.kv — likely 0 (auth is stateless JWT)</step>
+    <step order="4">Search for: rc.user — likely 0 (auth provides user, doesn't check it)</step>
+    <step order="5">If any found, apply same fixes as sandbox-entry.ts</step>
+    <step order="6">Document findings: "auth.ts: [X patterns found, Y fixed]" or "auth.ts: clean"</step>
+  </steps>
+
+  <verification>
+    <check type="grep">grep -c "throw new Response" plugins/membership/src/auth.ts → 0</check>
+    <check type="grep">grep -c "rc.user" plugins/membership/src/auth.ts → 0</check>
+    <check type="manual">Confirm file reviewed; document any changes</check>
+  </verification>
+
+  <dependencies>
+    <!-- Wave 1: no dependencies -->
+  </dependencies>
+
+  <commit-message>chore(membership): audit auth.ts for banned patterns (no changes needed)</commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-7" wave="1">
+  <title>Audit email.ts for banned patterns</title>
+  <requirement>REQ-006: Check email.ts for banned patterns</requirement>
+  <description>
+    Review email.ts for any throw new Response, JSON.stringify in KV, JSON.parse from KV, or rc.user patterns.
+    Fix if found. Do NOT restructure the file.
+  </description>
+
+  <context>
+    <file path="plugins/membership/src/email.ts" reason="Must audit for banned patterns" />
+  </context>
+
+  <steps>
+    <step order="1">Read email.ts completely</step>
+    <step order="2">Search for: throw new Response — likely 0</step>
+    <step order="3">Search for: ctx.kv — may find rate limiting storage</step>
+    <step order="4">If ctx.kv uses JSON.stringify/parse, apply fixes</step>
+    <step order="5">Search for: rc.user — likely 0</step>
+    <step order="6">Document findings</step>
+  </steps>
+
+  <verification>
+    <check type="grep">grep -c "throw new Response" plugins/membership/src/email.ts → 0</check>
+    <check type="grep">grep "ctx.kv.*JSON" plugins/membership/src/email.ts → 0</check>
+    <check type="manual">Confirm file reviewed; document any changes</check>
+  </verification>
+
+  <dependencies>
+    <!-- Wave 1: no dependencies -->
+  </dependencies>
+
+  <commit-message>chore(membership): audit email.ts for banned patterns</commit-message>
 </task-plan>
 ```
 
 ---
 
-### Wave 2 (Parallel, after Wave 1) — Core Components
-
-Four tasks building CLI commands, SDK, and Dashboard. **Estimated time: 2.5 hours**
+### Wave 2 (After Wave 1) — KV Pagination
 
 ```xml
-<task-plan id="phase-1-task-3" wave="2">
-  <title>Complete CLI init and push commands</title>
-  <requirement>REQ-CLI-001, REQ-CLI-002: drift init and drift push functional</requirement>
+<task-plan id="phase-1-task-8" wave="2">
+  <title>Implement members:list pagination schema</title>
+  <requirement>REQ-007, REQ-009: Chunked pagination with configurable size</requirement>
   <description>
-    Per decisions.md Section II and existing code at deliverables/promptops/drift/cli/:
-    Complete the init and push commands. Partial implementations exist.
-
-    init.ts (43 lines): Creates project via API, saves config
-    push.ts (63 lines): Reads file, pushes version to API
-
-    Must integrate with deployed API from task-2.
-    Config stored at ~/.drift/config.json per decisions.md OQ-003.
+    Split members:list into 100-member chunks.
+    Keys: members:list:0, members:list:1, etc.
+    Add members:count key for total.
+    Define MEMBERS_CHUNK_SIZE constant.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/src/commands/init.ts" reason="Init command implementation" />
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/src/commands/push.ts" reason="Push command implementation" />
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/src/api.ts" reason="API client (207 lines)" />
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/src/config.ts" reason="Config management (131 lines)" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="OQ-003: Auth model (project-level key)" />
+    <file path="plugins/membership/src/sandbox-entry.ts" reason="KV schema changes" />
+    <file path="rounds/membership-fix/decisions.md" reason="Decision 4 requires pagination in v1" />
   </context>
 
   <steps>
-    <step order="1">cd deliverables/promptops/drift/cli</step>
-    <step order="2">npm install</step>
-    <step order="3">Update src/api.ts with production API URL</step>
-    <step order="4">Test init: npm run dev -- init test-project</step>
-    <step order="5">Verify ~/.drift/config.json contains api_key and project_id</step>
-    <step order="6">Create test prompt file: echo "You are a helpful assistant" > test-prompt.txt</step>
-    <step order="7">Test push: npm run dev -- push system-prompt --file test-prompt.txt</step>
-    <step order="8">Verify API received prompt: curl GET /api/prompts with API key</step>
-    <step order="9">Push second version, verify version number increments</step>
+    <step order="1">Add constant at file top: const MEMBERS_CHUNK_SIZE = 100;</step>
+    <step order="2">Create helper: async function addMemberToList(email: string, ctx: PluginContext)</step>
+    <step order="3">In addMemberToList: get current count, calculate chunk index, append to correct chunk, increment count</step>
+    <step order="4">Create helper: async function getAllMemberEmails(ctx: PluginContext): Promise&lt;string[]&gt;</step>
+    <step order="5">In getAllMemberEmails: get count, calculate chunks needed, fetch all chunks, flatten</step>
+    <step order="6">Create helper: async function getMembersPaginated(page: number, ctx: PluginContext)</step>
+    <step order="7">Update register route: use addMemberToList instead of direct list manipulation</step>
+    <step order="8">Preserve backward compatibility: if members:list exists without :N suffix, migrate on first access</step>
   </steps>
 
   <verification>
-    <check type="bash">npm run dev -- init test-project-verify</check>
-    <check type="bash">cat ~/.drift/config.json | grep api_key</check>
-    <check type="bash">npm run dev -- push verify-prompt --file test-prompt.txt</check>
-    <check type="manual">Init creates config file with credentials</check>
-    <check type="manual">Push uploads prompt and returns version number</check>
+    <check type="grep">grep "MEMBERS_CHUNK_SIZE" plugins/membership/src/sandbox-entry.ts → 1 definition</check>
+    <check type="grep">grep "members:list:" plugins/membership/src/sandbox-entry.ts → pagination keys used</check>
+    <check type="manual">Verify chunk math: 150 members → chunks 0 and 1</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="API must be deployed for CLI to call" />
+    <depends-on task-id="phase-1-task-3" reason="KV storage must be fixed before pagination" />
+    <depends-on task-id="phase-1-task-4" reason="KV retrieval must be fixed before pagination" />
   </dependencies>
 
-  <commit-message>feat(drift): complete CLI init and push commands
-
-CLI commands functional:
-- drift init <name>: Creates project, saves API key to ~/.drift/config.json
-- drift push <name> --file <path>: Reads file, pushes version to API
-
-Per decisions.md: 60-second time-to-value target.
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+  <commit-message>feat(membership): implement paginated members:list schema (100-member chunks)</commit-message>
 </task-plan>
 ```
 
 ```xml
-<task-plan id="phase-1-task-4" wave="2">
-  <title>Implement CLI list and rollback commands</title>
-  <requirement>REQ-CLI-003, REQ-CLI-004: drift list and drift rollback functional</requirement>
+<task-plan id="phase-1-task-9" wave="2">
+  <title>Update admin routes for pagination</title>
+  <requirement>REQ-008: Admin routes use paginated chunks</requirement>
   <description>
-    Per decisions.md Section II:
-    Implement the missing list and rollback commands.
-
-    drift list: Display all prompts with version history
-    drift rollback <name> --version <n>: Revert to specific version
-
-    API endpoints exist (GET /api/prompts, POST /api/prompts/:name/rollback).
-    Must create CLI wrappers.
+    Update admin routes that enumerate members to use pagination helpers.
+    Fetch paginated chunks for large lists.
+    Add pagination controls to Block Kit UI.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/src/api.ts" reason="API client has listPrompts, rollbackPrompt methods" />
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/src/config.ts" reason="Config loading for API key" />
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/src/commands/" reason="Commands directory, add list.ts and rollback.ts" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Section IX: Acceptance criteria" />
+    <file path="plugins/membership/src/sandbox-entry.ts" reason="Admin routes need pagination" />
+    <file path="docs/EMDASH-GUIDE.md" reason="Block Kit table/pagination patterns" />
   </context>
 
   <steps>
-    <step order="1">Create src/commands/list.ts</step>
-    <step order="2">Import api.listPrompts() and config loader</step>
-    <step order="3">Format output as table: Name | Active Version | Total Versions | Created</step>
-    <step order="4">Create src/commands/rollback.ts</step>
-    <step order="5">Accept arguments: prompt name, --version flag</step>
-    <step order="6">Call api.rollbackPrompt(name, version)</step>
-    <step order="7">Display success message: "Rolled back {name} to version {n}"</step>
-    <step order="8">Register both commands in bin/drift.js</step>
-    <step order="9">Test list: npm run dev -- list</step>
-    <step order="10">Test rollback: npm run dev -- rollback system-prompt --version 1</step>
-    <step order="11">Verify active version changed via list</step>
+    <step order="1">Locate admin page_load handler that displays member list</step>
+    <step order="2">Replace: ctx.kv.get("members:list") with getMembersPaginated(page, ctx)</step>
+    <step order="3">Add page parameter from Block Kit interaction: const page = input.page ?? 0</step>
+    <step order="4">Update stats block: use members:count for total, not list.length</step>
+    <step order="5">Add pagination actions to Block Kit response:
+      { type: "button", text: "Previous", action_id: "members_prev", disabled: page === 0 }
+      { type: "button", text: "Next", action_id: "members_next", disabled: noMorePages }</step>
+    <step order="6">Handle members_prev/members_next action_ids to change page</step>
   </steps>
 
   <verification>
-    <check type="bash">npm run dev -- list</check>
-    <check type="bash">npm run dev -- rollback test-prompt --version 1</check>
-    <check type="manual">List displays all prompts in table format</check>
-    <check type="manual">Rollback changes active version immediately</check>
-    <check type="manual">Re-running list shows updated active version</check>
+    <check type="manual">Admin page loads with 10 members (no pagination needed)</check>
+    <check type="manual">Admin page loads with 150 members (pagination controls visible)</check>
+    <check type="manual">Previous/Next buttons work correctly</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="API must be deployed" />
-    <depends-on task-id="phase-1-task-3" reason="Must have prompts to list/rollback" />
+    <depends-on task-id="phase-1-task-8" reason="Pagination helpers must exist" />
   </dependencies>
 
-  <commit-message>feat(drift): implement CLI list and rollback commands
-
-CLI commands complete:
-- drift list: Shows all prompts with version history
-- drift rollback <name> --version <n>: Reverts to specified version
-
-Per decisions.md: "The rollback. One command. Instant. No thinking."
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-5" wave="2">
-  <title>Build SDK with getPrompt and caching</title>
-  <requirement>REQ-SDK-001, REQ-SDK-002: getPrompt() with 5-minute TTL caching</requirement>
-  <description>
-    Per decisions.md Section II and locked decision #3 (SDK-First):
-    Build the TypeScript SDK that applications use to fetch prompts.
-
-    Core function: getPrompt(name) -> { version, content, updatedAt }
-    Caching: 5-minute TTL (per decisions.md locked decision)
-    Fallback: If API fails, return cached version with warning
-
-    Package: @drift/sdk or drift-sdk
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/" reason="Create sdk/ directory alongside api/ and cli/" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Decision #3: SDK-First, 5-min TTL" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="OQ-006: npm package name" />
-  </context>
-
-  <steps>
-    <step order="1">Create deliverables/promptops/drift/sdk/ directory</step>
-    <step order="2">Initialize npm package: npm init (name: drift-sdk)</step>
-    <step order="3">Add TypeScript config: tsconfig.json</step>
-    <step order="4">Create src/index.ts with Drift class</step>
-    <step order="5">Implement constructor: new Drift({ apiKey, endpoint? })</step>
-    <step order="6">Implement getPrompt(name): fetches from API, caches result</step>
-    <step order="7">Implement cache: Map with TTL tracking (5 minutes = 300000ms)</step>
-    <step order="8">Add fallback: on API error, return stale cache with console.warn</step>
-    <step order="9">Export types: Prompt, DriftConfig, PromptResult</step>
-    <step order="10">Add environment variable support: DRIFT_API_KEY, DRIFT_ENDPOINT</step>
-    <step order="11">Build: npm run build</step>
-    <step order="12">Test: import SDK, call getPrompt, verify cache hit on second call</step>
-  </steps>
-
-  <verification>
-    <check type="bash">cd deliverables/promptops/drift/sdk && npm run build</check>
-    <check type="manual">getPrompt() returns { version, content, updatedAt }</check>
-    <check type="manual">Second call within 5 minutes hits cache (no network)</check>
-    <check type="manual">Cache miss after 5 minutes triggers API fetch</check>
-    <check type="manual">API failure returns stale cache with warning</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="API must be deployed for SDK to fetch" />
-  </dependencies>
-
-  <commit-message>feat(drift): build SDK with getPrompt and caching
-
-SDK implementation:
-- Drift class with constructor({ apiKey, endpoint })
-- getPrompt(name) fetches prompt with 5-minute TTL cache
-- Graceful fallback: returns stale cache on API failure
-- Environment variable config: DRIFT_API_KEY, DRIFT_ENDPOINT
-
-Per decisions.md Decision #3: "Add 2 lines of code" adoption curve.
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-6" wave="2">
-  <title>Build read-only Dashboard</title>
-  <requirement>REQ-DASH-001 to 006: Static HTML dashboard showing prompts</requirement>
-  <description>
-    Per decisions.md Decisions #4, #5 and OQ-005:
-    Build minimal static HTML dashboard for read-only visibility.
-
-    Features:
-    - List all prompts with active version
-    - Click prompt -> show version history with timestamps
-    - NO rollback buttons (CLI only per Decision #4)
-    - Professional styling with Tailwind CDN
-
-    Hosting: Embed in Worker (single deployment per OQ-005 recommendation)
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/api/src/index.ts" reason="Embed dashboard route in Worker" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Decision #4: Dashboard minimal, Decision #5: polished" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="OQ-005: Hosting recommendation" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Not directly applicable but provides styling patterns" />
-  </context>
-
-  <steps>
-    <step order="1">Create deliverables/promptops/drift/dashboard/ directory</step>
-    <step order="2">Create index.html with Tailwind CDN</step>
-    <step order="3">Build table: Prompt Name | Active Version | Total Versions | Last Updated</step>
-    <step order="4">Add JavaScript to fetch /api/prompts and populate table</step>
-    <step order="5">Add click handler: clicking row shows version history modal</step>
-    <step order="6">Style: Clean typography, good spacing, responsive</step>
-    <step order="7">Keep under 500 lines total (per REQ-DASH-006)</step>
-    <step order="8">Embed in Worker: update api/src/index.ts to serve HTML at GET /</step>
-    <step order="9">Re-deploy Worker with dashboard embedded</step>
-    <step order="10">Test: Navigate to drift-api.{subdomain}.workers.dev/ in browser</step>
-    <step order="11">Verify prompts display, version history works</step>
-  </steps>
-
-  <verification>
-    <check type="bash">curl https://drift-api.{subdomain}.workers.dev/</check>
-    <check type="manual">Returns HTML page with prompt list</check>
-    <check type="manual">Table shows all prompts with versions</check>
-    <check type="manual">Click reveals version history</check>
-    <check type="manual">No rollback buttons present</check>
-    <check type="manual">Styling is professional, not "anxious"</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="API must serve dashboard and data" />
-  </dependencies>
-
-  <commit-message>feat(drift): build read-only dashboard
-
-Dashboard embedded in Worker at GET /:
-- Lists all prompts with version info
-- Click to view version history
-- No rollback buttons (CLI only)
-- Tailwind CDN styling, <500 lines
-
-Per decisions.md Decision #4: "Static HTML. Clean but not elaborate."
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+  <commit-message>feat(membership): add pagination to admin member list view</commit-message>
 </task-plan>
 ```
 
 ---
 
-### Wave 3 (Parallel, after Wave 2) — Polish and Publish
-
-Three tasks testing NERVE and publishing packages. **Estimated time: 1.5 hours**
+### Wave 3 (After Wave 2) — TypeScript Compilation
 
 ```xml
-<task-plan id="phase-1-task-7" wave="3">
-  <title>Test and document NERVE scripts</title>
-  <requirement>REQ-NERVE-001 to 005: NERVE scripts functional and documented</requirement>
+<task-plan id="phase-1-task-10" wave="3">
+  <title>Verify TypeScript compilation</title>
+  <requirement>REQ-013, REQ-014, REQ-015: tsc --noEmit passes clean</requirement>
   <description>
-    Per decisions.md Section II (NERVE) and existing code at /nerve/:
-    NERVE scripts are built (1,055 lines). Test and verify functionality.
-
-    Scripts:
-    - daemon.sh: Main loop with PID lockfile
-    - queue.sh: Persistent queue with recovery
-    - abort.sh: Clean shutdown via flag
-    - parse-verdict.sh: QA verdict parsing
-    - status.sh: Status reporting
-
-    Note: NERVE integration with Drift is deferred per Board feedback.
-    V1 ships NERVE as standalone infrastructure.
+    Run TypeScript compiler on entire plugin.
+    Fix any type errors from pattern changes.
+    Verify all KV operations have correct generic types.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/nerve/daemon.sh" reason="Daemon loop (260 lines)" />
-    <file path="/home/agent/shipyard-ai/nerve/queue.sh" reason="Queue persistence (306 lines)" />
-    <file path="/home/agent/shipyard-ai/nerve/abort.sh" reason="Abort management (178 lines)" />
-    <file path="/home/agent/shipyard-ai/nerve/parse-verdict.sh" reason="Verdict parsing (136 lines)" />
-    <file path="/home/agent/shipyard-ai/nerve/status.sh" reason="Status reporting (175 lines)" />
-    <file path="/home/agent/shipyard-ai/nerve/README.md" reason="Documentation (301 lines)" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Decision #6: Bash over agents" />
+    <file path="plugins/membership/src/sandbox-entry.ts" reason="Main file to compile" />
+    <file path="plugins/membership/src/auth.ts" reason="Must also compile" />
+    <file path="plugins/membership/src/email.ts" reason="Must also compile" />
+    <file path="plugins/membership/tsconfig.json" reason="Compiler config" />
   </context>
 
   <steps>
-    <step order="1">cd /home/agent/shipyard-ai/nerve</step>
-    <step order="2">Test daemon start: ./daemon.sh start</step>
-    <step order="3">Verify PID lockfile created: ls -la /tmp/nerve.pid or configured path</step>
-    <step order="4">Test duplicate prevention: ./daemon.sh start (should fail)</step>
-    <step order="5">Test queue enqueue: ./queue.sh enqueue "test-item"</step>
-    <step order="6">Verify queue persisted: ls /tmp/nerve-queue/ or configured path</step>
-    <step order="7">Test abort: ./abort.sh set</step>
-    <step order="8">Verify daemon responds to abort (clean shutdown)</step>
-    <step order="9">Test verdict parsing: echo "PASS: 0 issues" | ./parse-verdict.sh</step>
-    <step order="10">Verify JSON output: {"verdict": "PASS", "issues": 0}</step>
-    <step order="11">Test status: ./status.sh</step>
-    <step order="12">Verify README documents all commands accurately</step>
+    <step order="1">Run: cd plugins/membership && npx tsc --noEmit</step>
+    <step order="2">If errors, categorize: type mismatch, missing property, unreachable code, implicit any</step>
+    <step order="3">Fix type mismatches from JSON.parse removal: add explicit type annotations</step>
+    <step order="4">Fix null handling: add null checks where ctx.kv.get may return undefined</step>
+    <step order="5">Fix dead code from rc.user deletion: remove any orphaned else branches</step>
+    <step order="6">Re-run tsc --noEmit until exit code 0</step>
   </steps>
 
   <verification>
-    <check type="bash">./daemon.sh start && ls /tmp/nerve.pid</check>
-    <check type="bash">./abort.sh set && sleep 2 && ./status.sh</check>
-    <check type="bash">echo "FAIL: 3 issues" | ./parse-verdict.sh</check>
-    <check type="manual">Daemon starts, creates lockfile</check>
-    <check type="manual">Duplicate daemon rejected with error</check>
-    <check type="manual">Abort flag triggers clean shutdown</check>
-    <check type="manual">Parse-verdict returns valid JSON</check>
+    <check type="build">cd plugins/membership && npx tsc --noEmit → exit code 0</check>
+    <check type="grep">grep "// @ts-ignore" plugins/membership/src/*.ts → should be 0 (no suppressions)</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Drift API provides context but not required" />
+    <depends-on task-id="phase-1-task-1" reason="Error handling must be fixed" />
+    <depends-on task-id="phase-1-task-2" reason="Error handling must be fixed" />
+    <depends-on task-id="phase-1-task-3" reason="KV storage must be fixed" />
+    <depends-on task-id="phase-1-task-4" reason="KV retrieval must be fixed" />
+    <depends-on task-id="phase-1-task-5" reason="Auth checks must be removed" />
+    <depends-on task-id="phase-1-task-8" reason="Pagination must be implemented" />
+    <depends-on task-id="phase-1-task-9" reason="Admin routes must be updated" />
   </dependencies>
 
-  <commit-message>test(nerve): verify all scripts functional
-
-NERVE scripts tested:
-- daemon.sh: PID lock, signal handling
-- queue.sh: Persistence, recovery
-- abort.sh: Flag management
-- parse-verdict.sh: JSON verdict output
-- status.sh: Metrics reporting
-
-Per decisions.md Decision #6: "Trust bash, not instructions."
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-8" wave="3">
-  <title>Publish CLI to npm</title>
-  <requirement>REQ-CLI-005: CLI installable via npm</requirement>
-  <description>
-    Per decisions.md OQ-006:
-    Publish CLI package to npm registry.
-
-    Package name: drift-cli (check availability)
-    Fallback: @drift-prompt/cli
-
-    Users install with: npm install -g drift-cli
-    Then run: drift init, drift push, etc.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/package.json" reason="Package config" />
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/cli/bin/drift.js" reason="CLI entry point" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="OQ-006: npm name" />
-  </context>
-
-  <steps>
-    <step order="1">cd deliverables/promptops/drift/cli</step>
-    <step order="2">Check npm name availability: npm view drift-cli</step>
-    <step order="3">If taken, use fallback: @drift-prompt/cli</step>
-    <step order="4">Update package.json with correct name, version 1.0.0</step>
-    <step order="5">Ensure bin field points to bin/drift.js</step>
-    <step order="6">Build: npm run build</step>
-    <step order="7">Test locally: npm link && drift --help</step>
-    <step order="8">Verify all 4 commands show in help</step>
-    <step order="9">Publish: npm publish --access public</step>
-    <step order="10">Test install: npm install -g drift-cli && drift --help</step>
-  </steps>
-
-  <verification>
-    <check type="bash">npm view drift-cli || echo "Available"</check>
-    <check type="bash">drift --help</check>
-    <check type="manual">npm publish succeeds</check>
-    <check type="manual">Global install works: drift --help shows all commands</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="Init and push must be complete" />
-    <depends-on task-id="phase-1-task-4" reason="List and rollback must be complete" />
-  </dependencies>
-
-  <commit-message>chore(drift): publish CLI to npm
-
-CLI published as drift-cli (or fallback name):
-- drift init <name>
-- drift push <name> --file <path>
-- drift list
-- drift rollback <name> --version <n>
-
-Install with: npm install -g drift-cli
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-9" wave="3">
-  <title>Publish SDK to npm</title>
-  <requirement>REQ-SDK-005: SDK installable via npm</requirement>
-  <description>
-    Per decisions.md OQ-006:
-    Publish SDK package to npm registry.
-
-    Package name: drift-sdk (check availability)
-    Fallback: @drift-prompt/sdk
-
-    Users install with: npm install drift-sdk
-    Then use: import { Drift } from 'drift-sdk'
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/sdk/package.json" reason="Package config (from task-5)" />
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/drift/sdk/src/index.ts" reason="SDK entry point" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="OQ-006: npm name" />
-  </context>
-
-  <steps>
-    <step order="1">cd deliverables/promptops/drift/sdk</step>
-    <step order="2">Check npm name availability: npm view drift-sdk</step>
-    <step order="3">If taken, use fallback: @drift-prompt/sdk</step>
-    <step order="4">Update package.json with correct name, version 1.0.0</step>
-    <step order="5">Ensure main points to dist/index.js, types to dist/index.d.ts</step>
-    <step order="6">Build: npm run build</step>
-    <step order="7">Test locally: create test file that imports and calls getPrompt</step>
-    <step order="8">Publish: npm publish --access public</step>
-    <step order="9">Test install: npm install drift-sdk in new directory</step>
-    <step order="10">Verify import and getPrompt work</step>
-  </steps>
-
-  <verification>
-    <check type="bash">npm view drift-sdk || echo "Available"</check>
-    <check type="bash">npm install drift-sdk && node -e "require('drift-sdk')"</check>
-    <check type="manual">npm publish succeeds</check>
-    <check type="manual">Import and getPrompt work in test file</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="SDK must be built" />
-  </dependencies>
-
-  <commit-message>chore(drift): publish SDK to npm
-
-SDK published as drift-sdk (or fallback name):
-- new Drift({ apiKey })
-- drift.getPrompt(name) with 5-minute caching
-
-Install with: npm install drift-sdk
-
-Per decisions.md Decision #3: "Add 2 lines of code."
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+  <commit-message>fix(membership): resolve all TypeScript errors after pattern fixes</commit-message>
 </task-plan>
 ```
 
 ---
 
-### Wave 4 (Sequential, after Wave 3) — Verification and Commit
-
-Three tasks verifying time-to-value, committing changes, and running QA. **Estimated time: 30 minutes**
-
-```xml
-<task-plan id="phase-1-task-10" wave="4">
-  <title>Verify 60-second time-to-value</title>
-  <requirement>REQ-META-001: npm install + drift init + drift push in under 60 seconds</requirement>
-  <description>
-    Per decisions.md Decision #8:
-    "npm install + drift init + drift push must work in under 60 seconds.
-    If setup takes longer than the first dopamine hit, we've failed."
-
-    Test the complete user journey from fresh install to first prompt deployed.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Decision #8: 60-second target" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Section IX: Acceptance criteria" />
-  </context>
-
-  <steps>
-    <step order="1">Create fresh directory: mkdir /tmp/drift-test && cd /tmp/drift-test</step>
-    <step order="2">Start timer</step>
-    <step order="3">Install CLI: npm install -g drift-cli</step>
-    <step order="4">Initialize project: drift init my-test-project</step>
-    <step order="5">Create prompt: echo "You are a helpful assistant" > system.txt</step>
-    <step order="6">Push prompt: drift push system --file system.txt</step>
-    <step order="7">Stop timer</step>
-    <step order="8">Record time in seconds</step>
-    <step order="9">Verify prompt visible: drift list</step>
-    <step order="10">If over 60 seconds, identify bottleneck and document</step>
-  </steps>
-
-  <verification>
-    <check type="manual">Total time from npm install to first push: ____ seconds</check>
-    <check type="manual">If < 60 seconds: PASS</check>
-    <check type="manual">If > 60 seconds: Document bottleneck for optimization</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-8" reason="CLI must be published to npm" />
-  </dependencies>
-
-  <commit-message>test(drift): verify 60-second time-to-value
-
-Tested complete user journey:
-- npm install -g drift-cli
-- drift init my-project
-- drift push system --file prompt.txt
-
-Total time: XX seconds (target: <60)
-
-Per decisions.md Decision #8: First dopamine hit.
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
+### Wave 4 (After Wave 3) — Integration
 
 ```xml
 <task-plan id="phase-1-task-11" wave="4">
-  <title>Commit all changes to git</title>
-  <requirement>Meta: All files committed to deliverables</requirement>
+  <title>Register plugin in Sunrise Yoga</title>
+  <requirement>REQ-017: Add MemberShip plugin to Sunrise Yoga astro.config.mjs</requirement>
   <description>
-    Per decisions.md Section IX Meta requirements:
-    Commit all modified and new files in the drift and nerve directories.
-
-    Changes include:
-    - API worker updates
-    - CLI commands
-    - SDK implementation
-    - Dashboard
-    - NERVE tests
-    - Configuration updates
+    Add the MemberShip plugin to Sunrise Yoga's Astro configuration.
+    Verify the site builds with the plugin registered.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/promptops/" reason="All drift code" />
-    <file path="/home/agent/shipyard-ai/nerve/" reason="NERVE scripts" />
-    <file path="/home/agent/shipyard-ai/.planning/" reason="Planning docs" />
+    <file path="plugins/membership/src/index.ts" reason="Plugin descriptor export" />
+    <file path="docs/EMDASH-GUIDE.md" reason="Section 6 shows plugin registration pattern" />
   </context>
 
   <steps>
-    <step order="1">cd /home/agent/shipyard-ai</step>
-    <step order="2">git status (review all changes)</step>
-    <step order="3">git add deliverables/promptops/ nerve/ .planning/</step>
-    <step order="4">Create comprehensive commit</step>
-    <step order="5">git status (verify clean working tree)</step>
+    <step order="1">Locate Sunrise Yoga project directory (likely projects/sunrise-yoga or sites/sunrise-yoga)</step>
+    <step order="2">Open astro.config.mjs</step>
+    <step order="3">Import plugin descriptor: import membershipPlugin from "@shipyard/membership" or relative path</step>
+    <step order="4">Add to emdash plugins array:
+      emdash({
+        plugins: [membershipPlugin()],
+        ...
+      })</step>
+    <step order="5">Run: npm run build to verify plugin loads</step>
+    <step order="6">Check build output for plugin initialization errors</step>
   </steps>
 
   <verification>
-    <check type="bash">cd /home/agent/shipyard-ai && git status --porcelain</check>
-    <check type="manual">git status shows clean working tree</check>
+    <check type="build">cd [sunrise-yoga] && npm run build → success</check>
+    <check type="grep">grep "membershipPlugin" [sunrise-yoga]/astro.config.mjs → 1 match</check>
+    <check type="manual">No "plugin failed to initialize" errors in build log</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-6" reason="Dashboard must be complete" />
-    <depends-on task-id="phase-1-task-7" reason="NERVE tests must be complete" />
-    <depends-on task-id="phase-1-task-10" reason="Time-to-value verified" />
+    <depends-on task-id="phase-1-task-10" reason="Plugin must compile before registration" />
   </dependencies>
 
-  <commit-message>feat(drift): complete Phase 1 build
+  <commit-message>feat(sunrise-yoga): register MemberShip plugin</commit-message>
+</task-plan>
+```
 
-Phase 1 Drift/NERVE build complete:
-- API: 5 endpoints deployed to Cloudflare Workers
-- CLI: 4 commands (init, push, list, rollback)
-- SDK: getPrompt() with 5-minute caching
-- Dashboard: Read-only prompt visibility
-- NERVE: All scripts tested and documented
+---
 
-Resolves Board HOLD condition: "Demonstrate code, not documents."
+### Wave 5 (After Wave 4) — Smoke Tests
 
-Total implementation: ~2,500 lines TypeScript + 1,055 lines bash
+```xml
+<task-plan id="phase-1-task-12" wave="5">
+  <title>Verify admin page loads</title>
+  <requirement>REQ-018, REQ-022: Admin page returns valid Block Kit</requirement>
+  <description>
+    Start Sunrise Yoga dev server.
+    Navigate to admin plugin page.
+    Verify HTTP 200 with valid blocks array.
+    Check stats show member and plan counts.
+  </description>
 
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+  <context>
+    <file path="plugins/membership/src/sandbox-entry.ts" reason="Admin route handler" />
+  </context>
+
+  <steps>
+    <step order="1">Start dev server: cd [sunrise-yoga] && npm run dev</step>
+    <step order="2">Navigate to: http://localhost:4321/_emdash/admin/plugins/membership</step>
+    <step order="3">Verify page loads without error (HTTP 200)</step>
+    <step order="4">Open browser dev tools → Network tab → find plugin API call</step>
+    <step order="5">Verify response has "blocks" array</step>
+    <step order="6">Verify stats block shows member count and plan count</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Admin page loads without console errors</check>
+    <check type="manual">Stats block visible with counts</check>
+    <check type="manual">No "undefined" or "null" displayed in UI</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-11" reason="Plugin must be registered" />
+  </dependencies>
+
+  <commit-message>test(membership): verify admin page loads correctly</commit-message>
 </task-plan>
 ```
 
 ```xml
-<task-plan id="phase-1-task-12" wave="4">
-  <title>Run QA Pass verification</title>
-  <requirement>QA validation before launch</requirement>
+<task-plan id="phase-1-task-13" wave="5">
+  <title>Verify member registration returns typed response</title>
+  <requirement>REQ-019, REQ-021: Registration returns object, KV stores object</requirement>
   <description>
-    Per decisions.md Section IX acceptance criteria:
-    Execute comprehensive QA verification of all components.
-
-    All P0 requirements must pass.
-    Board conditions for PROCEED must be met.
+    POST to register endpoint.
+    Verify response is JavaScript object, not double-encoded string.
+    Verify KV stores object directly.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Acceptance criteria checklist" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Section IX: Build Phase Acceptance Criteria" />
+    <file path="plugins/membership/src/sandbox-entry.ts" reason="Register route handler" />
   </context>
 
   <steps>
-    <step order="1">Verify REQ-CLI-001: drift init creates project, generates API key</step>
-    <step order="2">Verify REQ-CLI-002: drift push versions prompt, stores in D1</step>
-    <step order="3">Verify REQ-CLI-003: drift list shows prompts with history</step>
-    <step order="4">Verify REQ-CLI-004: drift rollback reverts version immediately</step>
-    <step order="5">Verify REQ-SDK-001: getPrompt() returns prompt content</step>
-    <step order="6">Verify REQ-SDK-002: Cache hit within 5 minutes (no network)</step>
-    <step order="7">Verify REQ-DASH-001: Dashboard displays prompts</step>
-    <step order="8">Verify REQ-DASH-002: No rollback buttons (read-only)</step>
-    <step order="9">Verify REQ-META-001: Time-to-value under 60 seconds</step>
-    <step order="10">Verify REQ-NERVE-001 to 005: All scripts functional</step>
-    <step order="11">Verify README.md exists and is under 50 lines</step>
-    <step order="12">Verify at least one component runs (execution gate)</step>
-    <step order="13">Document QA Pass results</step>
+    <step order="1">Use curl or Postman to POST to register endpoint:
+      curl -X POST http://localhost:4321/_emdash/api/plugins/membership/register \
+        -H "Content-Type: application/json" \
+        -d '{"email":"test@example.com","plan":"basic"}'</step>
+    <step order="2">Verify response Content-Type is application/json</step>
+    <step order="3">Verify response body is { success: true, ... } not "{\"success\":true,...}"</step>
+    <step order="4">Check KV directly (via admin debug or test): ctx.kv.get("member:test%40example.com")</step>
+    <step order="5">Verify KV returns object with email, plan, status properties (not a string)</step>
   </steps>
 
   <verification>
-    <check type="manual">All 16 P0 requirements: PASS</check>
-    <check type="manual">All acceptance criteria: PASS</check>
-    <check type="manual">Overall verdict: PASS</check>
+    <check type="manual">curl response is valid JSON object</check>
+    <check type="manual">typeof response.success === "boolean" (not string)</check>
+    <check type="manual">KV get returns object directly</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-11" reason="All changes must be committed" />
+    <depends-on task-id="phase-1-task-11" reason="Plugin must be registered" />
   </dependencies>
 
-  <commit-message>docs(drift): QA Pass verification complete
-
-All P0 requirements verified:
-- CLI: 4/4 commands functional
-- API: 6/6 endpoints working
-- SDK: Caching verified
-- Dashboard: Read-only display
-- NERVE: Scripts tested
-- Time-to-value: XX seconds
-
-QA Director: Margaret Hamilton
-Verdict: PASS
-
-Board condition for PROCEED: MET
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+  <commit-message>test(membership): verify registration returns typed response</commit-message>
 </task-plan>
 ```
 
----
+```xml
+<task-plan id="phase-1-task-14" wave="5">
+  <title>Verify member status returns typed object</title>
+  <requirement>REQ-020: Status endpoint returns MemberRecord object</requirement>
+  <description>
+    GET status endpoint with test email.
+    Verify response is MemberRecord object.
+    Check all expected properties present.
+  </description>
 
-## Wave Summary
+  <context>
+    <file path="plugins/membership/src/sandbox-entry.ts" reason="Status route handler" />
+  </context>
 
-| Wave | Tasks | Description | Parallelism | Est. Time |
-|------|-------|-------------|-------------|-----------|
-| 1 | 2 | Infrastructure: D1 database, API deployment | 2 parallel | 45 min |
-| 2 | 4 | Core: CLI commands, SDK, Dashboard | 4 parallel (after Wave 1) | 2.5 hours |
-| 3 | 3 | Publish: NERVE tests, CLI npm, SDK npm | 3 parallel (after Wave 2) | 1.5 hours |
-| 4 | 3 | Verify: 60-sec test, git commit, QA pass | Sequential (after Wave 3) | 30 min |
+  <steps>
+    <step order="1">First register a test member (if not already done in task-13)</step>
+    <step order="2">GET status endpoint:
+      curl http://localhost:4321/_emdash/api/plugins/membership/status?email=test@example.com</step>
+    <step order="3">Verify response is JSON object with: email, plan, status, createdAt</step>
+    <step order="4">Verify email matches request</step>
+    <step order="5">Verify status is one of: pending, active, revoked, cancelled, past_due</step>
+  </steps>
 
-**Total Tasks:** 12
-**Maximum Parallelism:** Wave 2 (4 concurrent builds)
-**Total Time (Sequential):** ~6-8 hours
-**Total Time (Parallelized):** ~4-5 hours
+  <verification>
+    <check type="manual">Response is valid MemberRecord object</check>
+    <check type="manual">All required properties present</check>
+    <check type="manual">No double-encoding (response.email is string, not escaped JSON)</check>
+  </verification>
 
----
+  <dependencies>
+    <depends-on task-id="phase-1-task-13" reason="Must have registered member" />
+  </dependencies>
 
-## Dependencies Diagram
-
+  <commit-message>test(membership): verify status endpoint returns typed MemberRecord</commit-message>
+</task-plan>
 ```
-Wave 1:  [task-1: D1 Database] ──────────────────────────────────────────────>
-         [task-2: API Deploy] ───> (depends on 1) ───────────────────────────>
 
-Wave 2:  [task-3: CLI init/push] ──> (depends on 2) ─────────────────────────>
-         [task-4: CLI list/rollback] ─> (depends on 2,3) ────────────────────>
-         [task-5: SDK Build] ───────> (depends on 2) ────────────────────────>
-         [task-6: Dashboard] ──────> (depends on 2) ─────────────────────────>
+```xml
+<task-plan id="phase-1-task-15" wave="5">
+  <title>Verify signup → payment → access flow</title>
+  <requirement>REQ-016: End-to-end flow works without crash</requirement>
+  <description>
+    Complete full signup flow with Stripe test mode.
+    Verify member record created.
+    Verify access granted.
+    This is the primary success criterion from decisions.md.
+  </description>
 
-Wave 3:  [task-7: NERVE Tests] ────> (parallel) ─────────────────────────────>
-         [task-8: CLI npm] ────────> (depends on 3,4) ───────────────────────>
-         [task-9: SDK npm] ────────> (depends on 5) ─────────────────────────>
+  <context>
+    <file path="plugins/membership/src/sandbox-entry.ts" reason="All routes involved" />
+    <file path="rounds/membership-fix/decisions.md" reason="Success Criteria #2" />
+  </context>
 
-Wave 4:  [task-10: 60-sec Test] ───> (depends on 8) ─────────────────────────>
-         [task-11: Git Commit] ────> (depends on 6,7,10) ────────────────────>
-         [task-12: QA Pass] ───────> (depends on 11) ────────────────────────>
+  <steps>
+    <step order="1">Ensure Stripe test mode keys configured in environment</step>
+    <step order="2">Register new member with paid plan</step>
+    <step order="3">Follow payment link to Stripe Checkout (test mode)</step>
+    <step order="4">Complete payment with test card: 4242 4242 4242 4242</step>
+    <step order="5">Verify redirect to success page</step>
+    <step order="6">Check member status: should be "active"</step>
+    <step order="7">Verify Stripe fields populated: stripeCustomerId, stripeSubscriptionId</step>
+    <step order="8">Test gated content access (if applicable)</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Complete flow without any crashes or errors</check>
+    <check type="manual">Member status = "active" after payment</check>
+    <check type="manual">Stripe webhook received and processed</check>
+    <check type="manual">No 500 errors in server logs</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-12" reason="Admin must load first" />
+    <depends-on task-id="phase-1-task-13" reason="Registration must work" />
+    <depends-on task-id="phase-1-task-14" reason="Status must work" />
+  </dependencies>
+
+  <commit-message>test(membership): verify complete signup → payment → access flow</commit-message>
+</task-plan>
 ```
 
 ---
 
 ## Risk Notes
 
-### Mitigated in This Plan
+From Risk Scanner analysis:
 
-| Risk | Mitigation | Task |
-|------|------------|------|
-| D1 not created | Create database first, apply schema | task-1 |
-| API not deployed | Deploy before CLI/SDK | task-2 |
-| SDK not built | Build with caching in Wave 2 | task-5 |
-| Dashboard missing | Build static HTML in Wave 2 | task-6 |
-| NERVE untested | Test all scripts in Wave 3 | task-7 |
-| npm names taken | Check availability, use fallback | task-8, task-9 |
-| Time-to-value > 60s | Benchmark and document | task-10 |
+1. **RISK-001: 114 throw new Response instances** — High likelihood of breaking on mechanical replacement. Tasks 1-2 require careful manual review, especially for error re-throw patterns (`if (error instanceof Response) throw error;`).
 
-### Remaining Risks (Monitor)
+2. **RISK-002: High-churn 4,000-line file** — Agent context window may bloat. Batch fixes by pattern type (tasks split into 1-2 for errors, 3-4 for JSON, 5 for auth). Verify TypeScript after each batch.
 
-| Risk | Impact | Notes |
-|------|--------|-------|
-| npm publish permissions | Medium | May need npm login |
-| D1 write limits | High | Monitor in production |
-| SDK adoption unclear | High | Track installs post-launch |
-| NERVE integration deferred | Medium | V1.1 decision needed |
+3. **RISK-003: Webhook payload serialization** — JSON.stringify in `fireWebhook` is CORRECT (network serialization, not KV). Task 3 explicitly excludes this.
+
+4. **RISK-004: Email rate limiting JSON** — email.ts may have incorrect JSON handling. Task 7 will audit and fix if needed.
+
+5. **RISK-005: Pagination migration** — Existing members:list must be migrated. Task 8 includes backward compatibility step.
 
 ---
 
-## Verification Checklist
+## Summary
 
-- [x] All 16 P0 requirements have task coverage
-- [x] All P1 requirements addressed or deferred
-- [x] Each task has clear verification criteria
-- [x] Dependencies form valid DAG (no cycles)
-- [x] Each task can be committed independently
-- [x] Risk mitigations addressed
-- [x] decisions.md cited throughout
-- [x] docs/EMDASH-GUIDE.md Section 5 referenced for deployment
-- [x] Critical path identified (API → CLI/SDK → Publish → QA)
+| Wave | Tasks | Total |
+|------|-------|-------|
+| Wave 1 (Parallel) | 7 tasks (pattern corrections + audits) | 7 |
+| Wave 2 (After 1) | 2 tasks (pagination) | 2 |
+| Wave 3 (After 2) | 1 task (TypeScript) | 1 |
+| Wave 4 (After 3) | 1 task (integration) | 1 |
+| Wave 5 (After 4) | 4 tasks (smoke tests) | 4 |
+| **Total** | | **15** |
 
----
+**Critical Path:** Wave 1 → Wave 2 → Wave 3 → Wave 4 → Wave 5
 
-## Ship Test
-
-> Does `npm install -g drift-cli && drift init && drift push` work in under 60 seconds?
-
-> Does `drift rollback` feel instant and safe?
-
-> Does the SDK cache work transparently?
-
-> Is the dashboard clean and professional?
-
-> **If yes to all, ship it.**
-
----
-
-*Generated by Great Minds Agency — Phase Planning Skill*
-*Source: rounds/promptops/decisions.md, prds/promptops.md, docs/EMDASH-GUIDE.md*
-*Project Slug: promptops*
-*Product Name: Drift + NERVE*
+**Parallelization:** Wave 1 tasks can all run in parallel. Wave 5 tasks can mostly run in parallel.

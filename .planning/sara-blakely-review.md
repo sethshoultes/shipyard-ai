@@ -1,27 +1,32 @@
-# Sara Blakely Gut Check — Drift Phase 1
+# Sara Blakely Gut-Check — MemberShip Fix
 
 ## Would a real customer pay for this?
 
-**Maybe.** The pain is real — prompt deployment anxiety exists. But you're selling peace of mind to developers who already have git. "The undo button for AI" is clever, but git is free. Why can't they just version prompts in their repo? The plan never answers this. If a customer asks that in a demo and you hesitate, you've lost them.
+**No.** This isn't a product plan. It's a cleanup of tech debt. You can't sell "we removed JSON.stringify." The plan says the feeling should be "Belonging" but then lists 15 tasks about error message formatting and TypeScript compilation. Where's the belonging?
 
 ## What's confusing? What would make someone bounce?
 
-- **Drift vs NERVE** — Two names, unclear relationship. NERVE is "deferred" but still in the plan? Pick one thing.
-- **SDK-first but CLI-focused demo** — You say "add 2 lines of code" but the 60-second test is all CLI. Which path are you betting on?
-- **Read-only dashboard** — Why visit a dashboard I can't act from? That's a monitoring page pretending to be a product.
+1. **The "Essence" lies.** It promises magic ("tools that disappear") then delivers plumbing.
+2. **No user journey.** I have no idea what a member actually *does* after signup.
+3. **"Sunrise Yoga" appears once.** Is that the customer? The demo? Who's paying?
+4. **15 tasks, 5 waves, XML everywhere.** This feels like enterprise software, not creator tools.
 
 ## 30-Second Elevator Pitch
 
-*"You push a bad prompt to production at 2 AM. With git, you're SSHing into servers, redeploying, praying. With Drift, you type `drift rollback` and go back to sleep. One command. Version control for the prompts your AI actually uses in production."*
+*"We're fixing bugs so the membership plugin stops crashing when people try to pay."*
 
-## What would you test first with $0 budget?
+That's honest. But it's not a pitch. A real pitch: *"MemberShip lets any creator add paid subscriptions in 5 minutes—no code, no Stripe nightmare. Paste and get paid."* I don't know if that's true because this plan doesn't talk about what the product IS.
 
-Post in one Slack community (AI Engineers, LLM Ops): **"Who's broken production with a prompt change? DM me."** Get 5 people on calls. Watch them use it. If they don't finish setup, the 60-second claim is a lie. If they finish but shrug, the pain isn't sharp enough.
+## What would I test first with $0 budget?
+
+DM 10 yoga teachers on Instagram. Ask: "Would you pay $29/month if I handled all your membership tech—signups, payments, cancellations—so you just teach?" If 7+ say yes without blinking, you have something. This plan tests TypeScript. TypeScript doesn't pay rent.
 
 ## What's the retention hook?
 
-**There isn't one.** People install, push a prompt, maybe rollback once. Then what? You need a reason to come back — weekly digest ("Your prompt was fetched 4,200 times"), alerts ("Version 3 has 40% more errors"), something that makes Drift part of their workflow, not a safety net they forget.
+**None visible.** What does MemberShip do on day 30 that makes creators stay? Where's the "you earned $X this week" email? The engagement dashboard? The community features? This plan ends at "signup works." That's table stakes, not retention.
 
 ---
 
-**Bottom line:** Ship it, but know you're shipping a feature, not a product. The rollback is sharp. Everything else is fuzzy. Find 10 people who will die without this and learn from them fast.
+**Bottom line:** Solid engineering cleanup. Not a product plan. Before writing more code: *Who is the creator, what do they desperately need, and why will they tell their friends?*
+
+— Sara

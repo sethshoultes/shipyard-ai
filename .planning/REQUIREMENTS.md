@@ -1,247 +1,316 @@
-# REQUIREMENTS — PromptOps/Drift Phase 1 (Build)
+# MemberShip Fix — Requirements Specification
 
-> *Atomic requirements extracted from decisions.md and promptops.md*
-> *Source: /home/agent/shipyard-ai/rounds/promptops/decisions.md*
-> *Product: Drift (CLI + API) + NERVE (Pipeline Daemon)*
+**Project Slug:** membership-fix
+**Generated:** 2026-04-12
+**Sources:** prds/membership-fix.md, rounds/membership-fix/decisions.md
+**Documentation Verified:** docs/EMDASH-GUIDE.md (Section 6: Plugin System)
 
 ---
 
 ## Summary
 
-**Total Requirements: 33**
-- **P0 (Must Ship): 16** — Core product functionality
-- **P1 (Should Ship): 17** — Quality and polish
-- **Deferred (V2+): 10** — Explicitly cut from scope
+The MemberShip plugin (~4,000 lines) was built against a hallucinated Emdash API and contains 228 pattern violations that prevent it from functioning in the sandboxed plugin environment. This document extracts atomic requirements for the fix.
 
-**Build Status:** Code exists (~1,275 lines) but incomplete
-- API: ~731 lines (ready)
-- CLI: ~447 lines (partial — list/rollback missing)
-- SDK: 0 lines (NOT BUILT)
-- Dashboard: 0 lines (NOT BUILT)
-- NERVE: ~1,055 lines (ready, integration undefined)
-
-**Board Verdict:** HOLD (5.1/10) — Build phase never completed
+**Total Violations:**
+- 114 instances of `throw new Response` (banned)
+- ~50 instances of `JSON.stringify` in `kv.set()` (banned — double-encoding)
+- ~50 instances of `JSON.parse` on `kv.get()` results (banned — unnecessary)
+- 14 instances of `rc.user` checks (banned — Emdash handles auth)
 
 ---
 
-## 1. P0 Requirements (MUST Ship in V1)
+## Phase 1: Pattern Corrections
 
-### CLI Commands
+### REQ-001: Replace throw new Response with throw new Error
+| Field | Value |
+|-------|-------|
+| **Source** | PRD |
+| **Priority** | P0 |
+| **Count** | 114 instances |
+| **File** | plugins/membership/src/sandbox-entry.ts |
+| **Description** | Replace all `throw new Response(JSON.stringify({error: "..."}), {status, headers})` with either `throw new Error("message")` or `return { error: "message", status: N }`. Remove JSON.stringify wrapping. |
+| **Acceptance** | `grep "throw new Response" sandbox-entry.ts` returns 0 matches; TypeScript compiles |
 
-| ID | Requirement | Acceptance Criteria | Status |
-|----|-------------|---------------------|--------|
-| REQ-CLI-001 | `drift init` creates project | Generates API key, saves to `~/.drift/config.json`, no signup wall | PARTIAL |
-| REQ-CLI-002 | `drift push <name> --file <path>` | Reads file, auto-increments version, stores in D1 | PARTIAL |
-| REQ-CLI-003 | `drift list` shows prompts | Displays all prompts with version history, timestamps | NOT BUILT |
-| REQ-CLI-004 | `drift rollback <name> --version <n>` | Sets specified version active, live immediately | NOT BUILT |
+### REQ-002: Remove JSON.stringify from kv.set() calls
+| Field | Value |
+|-------|-------|
+| **Source** | PRD |
+| **Priority** | P0 |
+| **Count** | ~50 instances |
+| **File** | plugins/membership/src/sandbox-entry.ts |
+| **Description** | Remove JSON.stringify() wrapping values passed to ctx.kv.set(). Pass typed values directly. Emdash KV auto-serializes objects. |
+| **Acceptance** | No `ctx.kv.set(..., JSON.stringify(...))` patterns; TypeScript compiles |
 
-### API Endpoints (Cloudflare Worker)
+**Correct Pattern (from docs/EMDASH-GUIDE.md Section 6):**
+```typescript
+// WRONG (banned — double-encodes)
+await ctx.kv.set(`member:${email}`, JSON.stringify(member));
 
-| ID | Requirement | Acceptance Criteria | Status |
-|----|-------------|---------------------|--------|
-| REQ-API-001 | `POST /api/projects` | Creates project, generates API key, returns project_id | BUILT |
-| REQ-API-002 | `GET /api/prompts` | Returns all prompts for authenticated project | BUILT |
-| REQ-API-003 | `POST /api/prompts` | Creates new version, auto-increments version_number | BUILT |
-| REQ-API-004 | `GET /api/prompts/:name` | Returns prompt with full version history | BUILT |
-| REQ-API-005 | `POST /api/prompts/:name/rollback` | Updates active_version, returns success | BUILT |
-| REQ-API-006 | API key validation middleware | Validates Authorization header, rejects invalid keys (401) | BUILT |
+// CORRECT
+await ctx.kv.set(`member:${email}`, member);
+```
 
-### SDK
+### REQ-003: Remove JSON.parse from kv.get() results
+| Field | Value |
+|-------|-------|
+| **Source** | PRD |
+| **Priority** | P0 |
+| **Count** | ~50 instances |
+| **File** | plugins/membership/src/sandbox-entry.ts |
+| **Description** | Remove JSON.parse() wrapping results from ctx.kv.get(). Use typed generic parameters. Emdash KV auto-deserializes. |
+| **Acceptance** | No `JSON.parse(await ctx.kv.get(...))` patterns; TypeScript compiles |
 
-| ID | Requirement | Acceptance Criteria | Status |
-|----|-------------|---------------------|--------|
-| REQ-SDK-001 | `getPrompt(name)` exported | TypeScript function returns prompt content | NOT BUILT |
-| REQ-SDK-002 | 5-minute TTL caching | Cache hits return <1ms, API fallback <50ms | NOT BUILT |
+**Correct Pattern (from docs/EMDASH-GUIDE.md Section 6):**
+```typescript
+// WRONG (banned — double-decodes)
+const json = await ctx.kv.get<string>(`member:${email}`);
+const member = JSON.parse(json) as MemberRecord;
 
-### Dashboard
+// CORRECT
+const member = await ctx.kv.get<MemberRecord>(`member:${email}`);
+if (!member) return { error: "Member not found", status: 404 };
+```
 
-| ID | Requirement | Acceptance Criteria | Status |
-|----|-------------|---------------------|--------|
-| REQ-DASH-001 | Dashboard displays prompts | Static HTML table: name, version, timestamp | NOT BUILT |
-| REQ-DASH-002 | Read-only interface | No rollback buttons (CLI only) | NOT BUILT |
+### REQ-004: Delete rc.user defensive checks
+| Field | Value |
+|-------|-------|
+| **Source** | PRD, Decisions (Decision 6) |
+| **Priority** | P0 |
+| **Count** | 14 instances |
+| **File** | plugins/membership/src/sandbox-entry.ts |
+| **Description** | Remove all `rc.user` auth checks. Delete entire guard blocks like `if (!adminUser || !adminUser.isAdmin) { throw ... }`. Emdash handles authentication before handler runs. |
+| **Acceptance** | `grep "rc.user" sandbox-entry.ts` returns 0 matches |
 
-### Meta Requirements
+**Decision Quote:** "Delete all 14 rc.user checks. Trust the platform — Emdash handles auth."
 
-| ID | Requirement | Acceptance Criteria | Status |
-|----|-------------|---------------------|--------|
-| REQ-META-001 | 60-second time-to-value | `npm install` + `drift init` + `drift push` < 60 seconds | NOT TESTED |
-| REQ-META-002 | D1 database deployed | Schema applied, migrations run | NOT DONE |
+### REQ-005: Audit auth.ts for banned patterns
+| Field | Value |
+|-------|-------|
+| **Source** | PRD |
+| **Priority** | P0 |
+| **File** | plugins/membership/src/auth.ts |
+| **Description** | Check auth.ts for throw new Response, JSON.stringify in KV, JSON.parse from KV, and rc.user patterns. Fix if present. Do NOT restructure the file. |
+| **Acceptance** | File reviewed; any banned patterns documented and fixed |
 
----
-
-## 2. P1 Requirements (Should Ship in V1)
-
-### CLI Quality
-
-| ID | Requirement | Acceptance Criteria | Priority |
-|----|-------------|---------------------|----------|
-| REQ-CLI-005 | npm package published | Installable as `drift` or `@drift/cli` | P1 |
-| REQ-CLI-006 | Config file management | Reads from `~/.drift/config.json`, survives restarts | P1 |
-| REQ-CLI-007 | Clear error messages | Network errors return actionable messages | P1 |
-| REQ-CLI-008 | Uses commander.js | Tech stack locked per decisions | P1 |
-
-### SDK Quality
-
-| ID | Requirement | Acceptance Criteria | Priority |
-|----|-------------|---------------------|----------|
-| REQ-SDK-003 | Zero latency overhead | Cache hits <1ms, never blocks app | P1 |
-| REQ-SDK-004 | Graceful fallback | If API fails, returns cached version, logs warning | P1 |
-| REQ-SDK-005 | npm package published | Installable as `drift-sdk` or `@drift/sdk` | P1 |
-| REQ-SDK-006 | Environment variable config | Accepts `DRIFT_API_KEY`, `DRIFT_ENDPOINT` | P1 |
-
-### Dashboard Quality
-
-| ID | Requirement | Acceptance Criteria | Priority |
-|----|-------------|---------------------|----------|
-| REQ-DASH-003 | Version history view | Click prompt → shows timeline with timestamps | P1 |
-| REQ-DASH-004 | Professional styling | Tailwind CDN, clean typography | P1 |
-| REQ-DASH-005 | Hosted and accessible | Deployed to Cloudflare (Pages or Worker) | P1 |
-| REQ-DASH-006 | No React framework | Pure HTML/CSS/Vanilla JS, <500 LOC | P1 |
-
-### API Quality
-
-| ID | Requirement | Acceptance Criteria | Priority |
-|----|-------------|---------------------|----------|
-| REQ-API-007 | D1 transactions | No data loss on concurrent writes | P1 |
-
-### NERVE (Conditional — Recommend Defer)
-
-| ID | Requirement | Acceptance Criteria | Priority |
-|----|-------------|---------------------|----------|
-| REQ-NERVE-001 | PID lockfile management | Prevents duplicate instances | P1 |
-| REQ-NERVE-002 | Queue persistence | Survives daemon restart | P1 |
-| REQ-NERVE-003 | Abort flag handling | Clean shutdown on flag | P1 |
-| REQ-NERVE-004 | Verdict parsing (JSON) | Returns structured QA results | P1 |
-| REQ-NERVE-005 | Standard log format | `[TIMESTAMP] [COMPONENT] message` | P1 |
-| REQ-NERVE-006 | Drift integration | Auto-rollback on metrics (TBD) | P2 |
+### REQ-006: Audit email.ts for banned patterns
+| Field | Value |
+|-------|-------|
+| **Source** | PRD |
+| **Priority** | P0 |
+| **File** | plugins/membership/src/email.ts |
+| **Description** | Check email.ts for throw new Response, JSON.stringify in KV, JSON.parse from KV, and rc.user patterns. Fix if present. Do NOT restructure the file. |
+| **Acceptance** | File reviewed; any banned patterns documented and fixed |
 
 ---
 
-## 3. Deferred Requirements (V2+)
+## Phase 2: KV Pagination
 
-| ID | Feature | Reason | Target |
-|----|---------|--------|--------|
-| DEFER-001 | Proxy architecture | Latency killer, trust barrier | V2+ |
-| DEFER-002 | A/B testing | Adoption before optimization | V2 |
-| DEFER-003 | `drift diff` command | Nice-to-have, not essential | V2 |
-| DEFER-004 | Dashboard rollback button | CLI sufficient for V1 | V2 |
-| DEFER-005 | Semantic diff (AI-powered) | Requires LLM integration | V2 |
-| DEFER-006 | Analytics dashboards | Charts are a crutch | V2+ |
-| DEFER-007 | Team collaboration | Single developer first | V2 |
-| DEFER-008 | Prompt marketplace | Network effects play | V3 |
-| DEFER-009 | Retention features | Shonda's roadmap | V1.1 |
-| DEFER-010 | Billing (Stripe) | After market validation | Post-V1 |
+### REQ-007: Implement chunked members:list pagination
+| Field | Value |
+|-------|-------|
+| **Source** | Decisions (Decision 4) |
+| **Priority** | P0 |
+| **Description** | Split members list into 100-member chunks. Keys: `members:list:0`, `members:list:1`, etc. Add `members:count` key for total. |
+| **Acceptance** | KV schema supports pagination; member lookups via `member:{email}` unchanged |
 
----
+**Decision Quote:** "members:list pagination ships in v1, not v2... when the yoga instructor hits 500 members and her dashboard freezes, she doesn't care that the error messages are warm."
 
-## 4. Locked Design Decisions
+### REQ-008: Update admin routes for pagination
+| Field | Value |
+|-------|-------|
+| **Source** | Decisions |
+| **Priority** | P0 |
+| **Description** | Update admin routes that enumerate members to fetch paginated chunks instead of single monolithic list. |
+| **Acceptance** | Admin member list loads without freezing at 500+ members |
 
-Per Steve Jobs / Elon Musk debate (decisions.md):
-
-| # | Decision | Winner | Rationale |
-|---|----------|--------|-----------|
-| 1 | **Name: Drift/NERVE** | Steve Jobs | One-word names shape destiny |
-| 2 | **No Proxy in V1** | Elon Musk | 15-80ms latency is commercial suicide |
-| 3 | **SDK-First Architecture** | Elon Musk | "Add 2 lines of code" > "reroute traffic" |
-| 4 | **Dashboard Minimal** | Elon Musk | Static HTML, read-only |
-| 5 | **Polished Dashboard** | Steve Jobs (partial) | Clean but not elaborate |
-| 6 | **Bash Over Agents** | Consensus | Determinism over probabilistic instructions |
-| 7 | **Zero Configuration** | Steve Jobs | Every option is a failure to decide |
-| 8 | **60-Second Time-to-Value** | Consensus | First dopamine hit must be fast |
-| 9 | **CLI-First** | Consensus | Terminal discovery > web UI |
-| 10 | **Confident Voice** | Steve Jobs | "This prompt has a problem. Here's the fix." |
-| 11 | **Cut A/B Testing** | Consensus | V2 scope |
-| 12 | **Cut diff Command** | Consensus | Ship lean |
-| 13 | **One Pricing Tier** | Steve Jobs | No feature walls |
+### REQ-009: Make chunk size configurable
+| Field | Value |
+|-------|-------|
+| **Source** | Decisions (Risk Register) |
+| **Priority** | P1 |
+| **Description** | Define pagination chunk size (100) as a constant at file top. Not hard-coded inline. |
+| **Acceptance** | Constant `MEMBERS_CHUNK_SIZE = 100` defined at top of file |
 
 ---
 
-## 5. Open Questions (Require Resolution)
+## Phase 3: Error Message Voice
 
-| ID | Question | Status | Recommended Resolution |
-|----|----------|--------|------------------------|
-| OQ-003 | Authentication model | **OPEN** | Project-level API key, SHA-256 hashed |
-| OQ-004 | Logging backend | **OPEN** | D1 for prompts, Analytics Engine for logs |
-| OQ-005 | Dashboard hosting | **OPEN** | Embed in Worker (single deployment) |
-| OQ-006 | SDK distribution | **OPEN** | Reserve `drift-sdk` on npm |
+### REQ-010: Rewrite errors with human-first tone
+| Field | Value |
+|-------|-------|
+| **Source** | Decisions (Decision 5) |
+| **Priority** | P0 |
+| **Description** | Convert all error strings to warm, confident, human-readable copy. Example: "That email doesn't look right" not "Error: Invalid email format detected." |
+| **Acceptance** | All 114 error messages use human-first language; no jargon |
 
----
+**Decision Quote:** "Human-readable error messages ship in v1... since we're touching every throw new Response anyway, the marginal cost of humane copy is near-zero."
 
-## 6. Risk Register
+### REQ-011: Audit interpolated error messages
+| Field | Value |
+|-------|-------|
+| **Source** | Decisions (Risk Register) |
+| **Priority** | P1 |
+| **Description** | Review error messages with variable interpolation to ensure rewrite doesn't change behavior. |
+| **Acceptance** | Interpolated messages verified; behavior unchanged |
 
-| ID | Risk | Likelihood | Impact | Mitigation |
-|----|------|------------|--------|------------|
-| RISK-001 | No competitive moat | High | Critical | Moat is adoption speed, pivot to intelligence (V2) |
-| RISK-002 | SDK adoption unclear | Medium | High | Ship SDK, track adoption, iterate |
-| RISK-003 | No revenue mechanism | High | High | Stripe integration (30 min) |
-| RISK-004 | Build phase never completed | **REALIZED** | Critical | Execute now |
-| RISK-005 | Doc-to-code ratio | **REALIZED** | Medium | Ship code, document later |
-| RISK-006 | NERVE premature | High | Medium | Kill or integrate with Drift |
-| RISK-007 | D1 write limits | High | High | Test under load, Analytics Engine fallback |
-| RISK-008 | KV cold start latency | Medium | High | Benchmark, document SLA |
-
----
-
-## 7. Acceptance Criteria (V1 Complete)
-
-### Drift Core
-- [ ] `drift init` creates project, generates API key, no signup wall
-- [ ] `drift push` versions prompt, stores in D1
-- [ ] `drift list` shows all prompts with version history
-- [ ] `drift rollback` reverts to specified version, live immediately
-- [ ] SDK `getPrompt()` fetches with caching, zero latency impact
-- [ ] Dashboard displays prompts/versions (read-only)
-- [ ] README.md <50 lines, setup in 60 seconds
-
-### NERVE (If Ships)
-- [ ] `daemon.sh` creates PID lockfile, prevents duplicates
-- [ ] `queue.sh` persists queue, recovers on restart
-- [ ] `abort.sh` sets flag, daemon clean-shuts
-- [ ] `parse-verdict.sh` returns JSON with verdict
-- [ ] All scripts use standard log format
-- [ ] README.md documents all commands
-
-### Meta
-- [ ] All files committed to deliverables
-- [ ] QA Pass confirms zero P0 issues
-- [ ] At least one component actually runs
+### REQ-012: Create error messages reference
+| Field | Value |
+|-------|-------|
+| **Source** | Decisions (File Structure) |
+| **Priority** | P2 |
+| **Description** | Document all human-readable error messages in implementation/error-messages.md. |
+| **Acceptance** | Reference document exists with all error strings catalogued |
 
 ---
 
-## 8. Documentation References
+## Phase 4: TypeScript Compilation
 
-### decisions.md Key Sections
-- **Locked Decisions** (Section I): 13 decisions locked
-- **MVP Feature Set** (Section II): CLI, API, SDK, Dashboard scope
-- **File Structure** (Section III): Expected directory layout
-- **Open Questions** (Section IV): 4 unresolved items
-- **Risk Register** (Section V): 12 identified risks
-- **Board Verdict** (Section VI): 5.1/10 average, HOLD
+### REQ-013: Pass tsc --noEmit
+| Field | Value |
+|-------|-------|
+| **Source** | Decisions (Success Criteria) |
+| **Priority** | P0 |
+| **Description** | Run `tsc --noEmit` on entire codebase. All pattern fixes must compile cleanly. |
+| **Acceptance** | Exit code 0; no errors or warnings |
 
-### docs/EMDASH-GUIDE.md Key Sections
-- **Section 5: Deployment** — Cloudflare Workers + D1 + R2 patterns
-- **Section 6: Plugin System** — Not applicable to Drift
-- Not directly applicable but provides Worker deployment patterns
+**Decision Quote:** "The fix ships when: (1) tsc --noEmit passes..."
 
-### Existing Codebase
-- `/home/agent/shipyard-ai/deliverables/promptops/drift/api/` — API implementation
-- `/home/agent/shipyard-ai/deliverables/promptops/drift/cli/` — CLI implementation
-- `/home/agent/shipyard-ai/nerve/` — NERVE scripts (source of truth)
+### REQ-014: Verify typed KV operations
+| Field | Value |
+|-------|-------|
+| **Source** | PRD |
+| **Priority** | P0 |
+| **Description** | After removing JSON.stringify/parse, verify all KV operations have correct type annotations. |
+| **Acceptance** | All `ctx.kv.get<T>` calls have correct generic types |
 
----
-
-## Verification Checklist
-
-- [x] All P0 requirements identified (16 total)
-- [x] All P1 requirements extracted (17 total)
-- [x] Deferred features documented (10 total)
-- [x] Risk register populated (8 risks)
-- [x] Open questions documented (4 items)
-- [x] Acceptance criteria defined
-- [x] Documentation references cited
+### REQ-015: Resolve type errors from rc.user deletion
+| Field | Value |
+|-------|-------|
+| **Source** | REQ-004 |
+| **Priority** | P0 |
+| **Description** | After deleting rc.user checks, fix any type narrowing or unreachable code issues. |
+| **Acceptance** | TypeScript compiles; no dead code warnings |
 
 ---
 
-*Generated: April 12, 2026*
-*Project Slug: promptops*
-*Product Name: Drift + NERVE*
+## Phase 5: Core Flow Verification
+
+### REQ-016: Verify signup → payment → access flow
+| Field | Value |
+|-------|-------|
+| **Source** | Decisions (Success Criteria) |
+| **Priority** | P0 |
+| **Description** | End-to-end test: user signs up → Stripe payment → member record created → access granted. |
+| **Acceptance** | Flow completes without crash; member stored correctly in KV |
+
+**Decision Quote:** "(2) signup → payment → access flow completes without crash."
+
+### REQ-017: Register plugin in Sunrise Yoga
+| Field | Value |
+|-------|-------|
+| **Source** | PRD |
+| **Priority** | P0 |
+| **Description** | Add MemberShip plugin to Sunrise Yoga's astro.config.mjs. |
+| **Acceptance** | Plugin entry exists; build succeeds; plugin initializes without errors |
+
+### REQ-018: Admin page loads at /_emdash/admin/plugins/membership
+| Field | Value |
+|-------|-------|
+| **Source** | PRD (Smoke Test) |
+| **Priority** | P0 |
+| **Description** | Admin page must return HTTP 200 with valid Block Kit blocks array. |
+| **Acceptance** | No errors in logs; valid JSON response with `blocks` array |
+
+### REQ-019: Member registration returns typed response
+| Field | Value |
+|-------|-------|
+| **Source** | PRD (Smoke Test) |
+| **Priority** | P0 |
+| **Description** | POST to register endpoint returns `{ success: true }` as object, not double-encoded string. |
+| **Acceptance** | Response is JavaScript object; no double-encoding |
+
+### REQ-020: Member status returns typed object
+| Field | Value |
+|-------|-------|
+| **Source** | PRD (Smoke Test) |
+| **Priority** | P0 |
+| **Description** | GET status endpoint returns MemberRecord as object, not JSON string. |
+| **Acceptance** | Response has all MemberRecord properties; correctly typed |
+
+### REQ-021: KV stores objects, not strings
+| Field | Value |
+|-------|-------|
+| **Source** | PRD (Smoke Test) |
+| **Priority** | P0 |
+| **Description** | After registration, KV storage contains native objects, not JSON-encoded strings. |
+| **Acceptance** | `ctx.kv.get()` returns object directly; no JSON.parse needed |
+
+### REQ-022: Admin shows member and plan counts
+| Field | Value |
+|-------|-------|
+| **Source** | PRD |
+| **Priority** | P0 |
+| **Description** | Admin page_load returns Block Kit with stats block showing member/plan counts. |
+| **Acceptance** | Stats block present with correct counts |
+
+### REQ-023: view_members interaction works
+| Field | Value |
+|-------|-------|
+| **Source** | PRD (Phase 2) |
+| **Priority** | P1 |
+| **Description** | Admin action_id "view_members" returns paginated member table. |
+| **Acceptance** | Table displays members; pagination visible if 100+ members |
+
+### REQ-024: view_plans interaction works
+| Field | Value |
+|-------|-------|
+| **Source** | PRD (Phase 2) |
+| **Priority** | P1 |
+| **Description** | Admin action_id "view_plans" returns plan list with name, price, interval. |
+| **Acceptance** | Plans displayed with correct data |
+
+---
+
+## Files to Modify
+
+| File | Phase | Changes |
+|------|-------|---------|
+| `plugins/membership/src/sandbox-entry.ts` | 1, 2, 3 | All pattern fixes, pagination, error messages |
+| `plugins/membership/src/auth.ts` | 1 | Audit only (likely no changes) |
+| `plugins/membership/src/email.ts` | 1 | Audit only (likely no changes) |
+| Sunrise Yoga `astro.config.mjs` | 5 | Plugin registration |
+
+---
+
+## Success Criteria (from Decisions)
+
+1. `tsc --noEmit` passes clean
+2. signup → payment → access flow completes without crash
+3. Zero `throw new Response` in codebase
+4. Zero `JSON.stringify`/`JSON.parse` in KV calls
+5. Zero `rc.user` references
+6. Admin page loads without error
+7. Member registration returns typed response
+8. Member status lookup returns typed object
+
+---
+
+## Risk Mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| Regex replacement introduces new bugs | TypeScript compilation gate; human review for nested cases |
+| KV pagination breaks member lookups | `member:{email}` key unchanged; only list enumeration affected |
+| Agent context window bloat | Batch fixes by pattern type; verify after each batch |
+| Error message rewrites change behavior | Review interpolated messages; text-only changes |
+| Scope creep | decisions.md is the contract; reject unlisted changes |
+
+---
+
+## Out of Scope (v2)
+
+- Product rename to "Belong"
+- Admin Block Kit redesign ("three glances" UX)
+- Drip content UI polish
+- Webhook log TTL / cleanup
+- emdash-plugin-validator lint tooling
