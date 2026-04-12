@@ -1,0 +1,31 @@
+{
+  "name": "agentbench",
+  "version": "1.0.0",
+  "description": "Test your AI agents in one command. Replace prayer with proof.",
+  "main": "src/config.js",
+  "bin": {
+    "agentbench": "./bin/agentbench.js"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "testing",
+    "benchmark",
+    "llm",
+    "claude"
+  ],
+  "author": "Shipyard AI",
+  "license": "MIT",
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
