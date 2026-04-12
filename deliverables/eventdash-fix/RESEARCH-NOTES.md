@@ -217,7 +217,7 @@ Available element types: `button`, `text_input`, `number_input`, `select`, `togg
       action_id: string,   // Required
       label: string,       // Required
       initial_value?: any, // Optional
-      placeholder?: string // Optional
+      hint?: string         // Optional input hint text (e.g., "Enter event name")
     }
   ],
   submit: {
