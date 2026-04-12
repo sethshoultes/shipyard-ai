@@ -1,10 +1,10 @@
-# Phase 1 Plan — Wardrobe Launch (Tier 1 Blockers)
+# Phase 1 Plan — AgentBench Core MVP
 
-**Generated:** April 11, 2026
-**Project Slug:** emdash-marketplace
-**Product Name:** Wardrobe (Theme Marketplace for Emdash)
+**Generated:** April 12, 2026
+**Project Slug:** agentbench
+**Product Name:** AgentBench (working title — per decisions.md, name remains OPEN)
 **Requirements:** .planning/REQUIREMENTS.md
-**Total Tasks:** 10
+**Total Tasks:** 9
 **Waves:** 3
 **Status:** READY FOR BUILD
 
@@ -12,31 +12,26 @@
 
 ## The Essence
 
-> **What it is:** One command transforms your site into something beautiful — your content stays, only the skin changes.
+> **What this is really about:** Giving developers the confidence to ship AI agents — replacing prayer with proof.
 
-> **The feeling:** "I can't believe I just did that."
+> **The feeling:** Relief. The exhale after uncertainty.
 
-> **The one thing that must be perfect:** Seeing YOUR content wearing a new theme.
-
-> **Creative direction:** Instant dignity.
+> **The one thing that must be perfect:** The first test run. One command. Green checkmark. Done.
 
 ---
 
 ## Build Status
 
-**Technical MVP:** Feature-complete (CLI, 5 themes, showcase, workers all built)
-**Board Verdict:** PROCEED (Conditional) — 6/10 aggregate score
-**Current State:** Code exists but infrastructure not deployed; 0/5 Tier 1 conditions met
+**Current State:** Greenfield — no code exists yet
+**Build Reference:** `/home/agent/shipyard-ai/memory-store/` for CLI patterns (Commander.js, TypeScript, Vitest)
+**Architecture:** Three core modules (~500 lines total per Decisions #5)
 
-| Component | Lines | Status | Gap |
-|-----------|-------|--------|-----|
-| CLI (install.ts) | 262 | Complete | Post-install reveal missing |
-| 5 Themes | ~150 each | Complete | None |
-| Showcase HTML | 341 | Complete | SVG placeholders, not deployed |
-| Email Worker | ~300 | Complete | Not deployed, KV not provisioned |
-| Analytics Worker | ~389 | Complete | Not deployed, KV not provisioned |
-| Theme Tarballs | 5 files | Complete | Not uploaded to R2 |
-| Demo Sites | 0 | NOT STARTED | Board blocker #1 |
+| Component | Target Lines | Status | Dependencies |
+|-----------|-------------|--------|--------------|
+| src/config.js | ~100 | NOT STARTED | js-yaml |
+| src/executor.js | ~100 | NOT STARTED | Node child_process, fetch |
+| src/evaluators.js | ~200 | NOT STARTED | Claude API |
+| bin/agentbench.js | ~50 | NOT STARTED | None (process.argv) |
 
 ---
 
@@ -44,16 +39,15 @@
 
 | Requirement | Task(s) | Wave |
 |-------------|---------|------|
-| REQ-T1-007: R2 Theme Upload | phase-1-task-1 | 1 |
-| REQ-T1-003: Post-Install Reveal | phase-1-task-2 | 1 |
-| REQ-T1-004: Email Worker Deployment | phase-1-task-3 | 1 |
-| REQ-T1-005: Analytics Worker Deployment | phase-1-task-4 | 1 |
-| REQ-T1-001: Live Demo Sites | phase-1-task-5 | 2 |
-| REQ-T1-002: Real Screenshots | phase-1-task-6 | 2 |
-| REQ-T1-006: Showcase Deployment | phase-1-task-7 | 2 |
-| Install Speed Benchmark | phase-1-task-8 | 3 |
-| QA Pass | phase-1-task-9 | 3 |
-| Sara Blakely Review | phase-1-task-10 | 3 |
+| REQ-MVP-001: YAML Config Parsing | phase-1-task-1 | 1 |
+| REQ-MVP-002: Agent Executor | phase-1-task-2 | 1 |
+| REQ-MVP-003: Evaluators | phase-1-task-3 | 1 |
+| REQ-MVP-004: CLI Runner | phase-1-task-4 | 2 |
+| REQ-INFRA-002: README | phase-1-task-5 | 2 |
+| REQ-INFRA-003: Example Config | phase-1-task-6 | 2 |
+| REQ-INFRA-004: Dogfooding Tests | phase-1-task-7 | 3 |
+| REQ-INFRA-001: npm Package | phase-1-task-8 | 3 |
+| Sara Blakely Review | phase-1-task-9 | 3 |
 
 ---
 
@@ -61,70 +55,73 @@
 
 This plan cites specific sections from the source documents:
 
-- **decisions.md Section "Board Conditions for Launch":** Tier 1 conditions #1-5
-- **decisions.md Section "MVP Feature Set":** CLI commands, install experience
-- **decisions.md Section "File Structure":** Theme and worker paths
-- **decisions.md Section "Risk Register":** Screenshot quality, install speed
-- **docs/EMDASH-GUIDE.md Section 1:** Getting Started, port 4321
-- **docs/EMDASH-GUIDE.md Section 5:** Cloudflare deployment (D1, R2, Workers)
-- **docs/EMDASH-GUIDE.md Section 7:** Theming, seed files, theme structure
+- **decisions.md Section "Locked Decisions":** Architecture (#5), Output format (#4), Default evaluation (#3)
+- **decisions.md Section "MVP Feature Set":** CLI commands, evaluators, output format
+- **decisions.md Section "File Structure":** Three files, ~500 lines total
+- **decisions.md Section "Risk Register":** API rate limits, error messaging
+- **prds/agentbench.md Section 1:** Test Definition Format (YAML schema)
+- **prds/agentbench.md Section 2:** Expectation Types (contains, does_not_contain, matches_intent)
+- **prds/agentbench.md Section 3:** CLI Interface (npx agentbench)
+- **prds/agentbench.md Section 4:** Output Report (human-readable format)
+- **memory-store/src/cli.ts:** Reference CLI implementation (~450 lines, Commander.js pattern)
 
 ---
 
 ## Wave Execution Order
 
-### Wave 1 (Parallel) — Infrastructure Foundation
+### Wave 1 (Parallel) — Core Modules
 
-Four independent tasks deploying infrastructure. No dependencies on each other.
+Three independent modules that can be built simultaneously. No dependencies on each other.
 
 ```xml
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Upload theme tarballs to Cloudflare R2</title>
-  <requirement>REQ-T1-007: R2 Theme Upload (P0-Blocker)</requirement>
+  <title>Implement YAML config loader and validator</title>
+  <requirement>REQ-MVP-001: YAML Config Parsing (P0-Blocker)</requirement>
   <description>
-    Per decisions.md Decision #4: CLI downloads tarball from R2.
-    Tarballs are built but not uploaded. Without R2 hosting,
-    `npx wardrobe install ember` fails immediately.
+    Per decisions.md #5 and #8: Config loader parses YAML and validates schema.
+    Target ~100 lines. Uses js-yaml library. Supports version: 1 field for
+    future schema evolution per decisions.md Open Questions #4.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/dist/themes/" reason="Built tarballs to upload" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/registry/themes.json" reason="CDN URLs to verify" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/scripts/upload-tarballs.ts" reason="Upload script" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/.env.example" reason="Required env vars" />
+    <file path="/home/agent/shipyard-ai/prds/agentbench.md" reason="YAML schema definition (Section 1)" />
+    <file path="/home/agent/shipyard-ai/rounds/agentbench/decisions.md" reason="Architecture decisions (#5, #8)" />
+    <file path="/home/agent/shipyard-ai/memory-store/src/cli.ts" reason="Reference pattern for file loading" />
   </context>
 
   <steps>
-    <step order="1">Create R2 bucket: `wrangler r2 bucket create emdash-themes`</step>
-    <step order="2">Enable public access on bucket via Cloudflare dashboard or wrangler</step>
-    <step order="3">Create R2 API token with Object Read/Write permissions</step>
-    <step order="4">Set environment variables: CLOUDFLARE_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY</step>
-    <step order="5">Run upload script: `npm run upload:themes` (in wardrobe directory)</step>
-    <step order="6">Verify each tarball accessible: curl https://cdn.emdash.dev/themes/ember@1.0.0.tar.gz</step>
-    <step order="7">If using custom domain, configure R2 custom domain in Cloudflare dashboard</step>
-    <step order="8">Update themes.json if CDN URL differs from placeholder</step>
+    <step order="1">Create project directory: mkdir -p projects/agentbench/src</step>
+    <step order="2">Initialize package.json with name, version, bin entry</step>
+    <step order="3">Add dependency: js-yaml</step>
+    <step order="4">Create src/config.js with loadConfig(filePath) function</step>
+    <step order="5">Implement YAML parsing with js-yaml.load()</step>
+    <step order="6">Validate required fields: name, agent (command OR endpoint), tests[]</step>
+    <step order="7">Validate each test has: name, input, expect[]</step>
+    <step order="8">Support optional version: 1 field</step>
+    <step order="9">Return clear error messages for validation failures</step>
+    <step order="10">Export loadConfig function</step>
   </steps>
 
   <verification>
-    <check type="bash">curl -I https://cdn.emdash.dev/themes/ember@1.0.0.tar.gz | grep "200 OK"</check>
-    <check type="bash">curl -I https://cdn.emdash.dev/themes/forge@1.0.0.tar.gz | grep "200 OK"</check>
-    <check type="bash">curl -I https://cdn.emdash.dev/themes/slate@1.0.0.tar.gz | grep "200 OK"</check>
-    <check type="bash">curl -I https://cdn.emdash.dev/themes/drift@1.0.0.tar.gz | grep "200 OK"</check>
-    <check type="bash">curl -I https://cdn.emdash.dev/themes/bloom@1.0.0.tar.gz | grep "200 OK"</check>
-    <check type="test">All 5 tarballs return HTTP 200</check>
+    <check type="test">Unit test: valid YAML loads correctly</check>
+    <check type="test">Unit test: invalid YAML returns actionable error</check>
+    <check type="test">Unit test: missing required field detected</check>
+    <check type="test">Unit test: both command AND endpoint rejected</check>
+    <check type="bash">wc -l src/config.js | verify under 100 lines</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>infra(wardrobe): upload theme tarballs to R2
+  <commit-message>feat(config): implement YAML config loader with validation
 
-Per decisions.md Decision #4:
-- R2 bucket created: emdash-themes
-- 5 theme tarballs uploaded
-- Public CDN access verified
-- CLI installs now functional
+Per decisions.md #5:
+- YAML parsing with js-yaml
+- Schema validation for required fields
+- Clear error messages on validation failure
+- Support for version: 1 field
+- Target: ~100 lines
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -132,49 +129,54 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-2" wave="1">
-  <title>Add post-install reveal to CLI</title>
-  <requirement>REQ-T1-003: Post-Install Reveal (P0-Blocker, Shonda)</requirement>
+  <title>Implement agent executor (subprocess + HTTP)</title>
+  <requirement>REQ-MVP-002: Agent Executor (P0-Blocker)</requirement>
   <description>
-    Per Board Condition Tier 1 #3: "CLI offers to open transformed site
-    or prints clear localhost URL." Current install.ts shows success
-    message but no dev server hint. Per docs/EMDASH-GUIDE.md Section 1,
-    Emdash runs on port 4321.
+    Per decisions.md #5: "Two if-statements, not a plugin system."
+    Subprocess via child_process.spawn, HTTP via native fetch.
+    Target ~100 lines. No adapter abstraction.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/cli/commands/install.ts" reason="File to modify (lines 197-202)" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Port 4321 reference (Section 1)" />
+    <file path="/home/agent/shipyard-ai/prds/agentbench.md" reason="Agent execution modes (Section 3)" />
+    <file path="/home/agent/shipyard-ai/rounds/agentbench/decisions.md" reason="Architecture decision (#5)" />
   </context>
 
   <steps>
-    <step order="1">Read install.ts and locate success message block (lines 197-202)</step>
-    <step order="2">Add line after "Installed in X.XXs": "Run `npm run dev` to see your transformed site"</step>
-    <step order="3">Add line: "Then open http://localhost:4321"</step>
-    <step order="4">Add line: "Admin panel: http://localhost:4321/_emdash/admin"</step>
-    <step order="5">Maintain Steve Jobs voice style (short sentences, no jargon)</step>
-    <step order="6">Run TypeScript compile: `npm run build` in wardrobe directory</step>
-    <step order="7">Test: Run `npx wardrobe install ember` in a test Emdash project</step>
-    <step order="8">Verify new lines appear in success output</step>
+    <step order="1">Create src/executor.js</step>
+    <step order="2">Implement executeAgent(agentConfig, input) function</step>
+    <step order="3">If agent.command: spawn subprocess, write input to stdin, capture stdout</step>
+    <step order="4">If agent.endpoint: POST to URL with JSON body { input }</step>
+    <step order="5">Implement timeout handling (default 30s, configurable)</step>
+    <step order="6">Handle subprocess errors: non-zero exit → "Agent exited with code X"</step>
+    <step order="7">Handle HTTP errors: 4xx/5xx → "Agent endpoint returned HTTP X"</step>
+    <step order="8">Handle connection refused → "Agent endpoint unreachable"</step>
+    <step order="9">Return { output, error, executionTime } object</step>
+    <step order="10">Export executeAgent function</step>
   </steps>
 
   <verification>
-    <check type="bash">grep -q "npm run dev" cli/commands/install.ts</check>
-    <check type="bash">grep -q "localhost:4321" cli/commands/install.ts</check>
-    <check type="bash">grep -q "_emdash/admin" cli/commands/install.ts</check>
-    <check type="manual">Success message shows dev server hint</check>
+    <check type="test">Unit test: subprocess execution with stdin/stdout</check>
+    <check type="test">Unit test: HTTP POST with JSON body</check>
+    <check type="test">Unit test: timeout triggers error (not hang)</check>
+    <check type="test">Unit test: non-zero exit captured as error</check>
+    <check type="test">Unit test: connection refused captured as error</check>
+    <check type="bash">wc -l src/executor.js | verify under 100 lines</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>feat(cli): add post-install reveal with dev server hint
+  <commit-message>feat(executor): implement subprocess and HTTP agent execution
 
-Per Board Condition Tier 1 #3 (Shonda):
-- Show "Run npm run dev to see your transformed site"
-- Print localhost:4321 URL
-- Print admin panel URL
-- Maintains Steve Jobs voice style
+Per decisions.md #5:
+- Two if-statements, not a plugin system
+- Subprocess via child_process.spawn
+- HTTP via native fetch
+- Timeout handling (30s default)
+- Clear error messages for failures
+- Target: ~100 lines
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -182,106 +184,58 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-3" wave="1">
-  <title>Deploy email capture worker to Cloudflare</title>
-  <requirement>REQ-T1-004: Wire Email Capture Worker (P0-Blocker, Shonda/Oprah)</requirement>
+  <title>Implement evaluators (string matching + LLM batched)</title>
+  <requirement>REQ-MVP-003: Evaluators (P0-Blocker)</requirement>
   <description>
-    Per Board Condition Tier 1 #4: "Wire worker before launch.
-    Placeholder URLs are lies dressed as features." Worker code is
-    complete but KV namespaces not provisioned.
+    Per decisions.md #3 and #6: String matching is default, LLM is opt-in.
+    Batch all semantic evaluations into single Claude API call.
+    Target ~200 lines. Graceful degradation when LLM unavailable.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/email-capture/src/index.ts" reason="Worker code to deploy" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/email-capture/wrangler.toml" reason="Config to update with KV IDs" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/script.js" reason="Update with real endpoint URL" />
+    <file path="/home/agent/shipyard-ai/prds/agentbench.md" reason="Evaluator types (Section 2)" />
+    <file path="/home/agent/shipyard-ai/rounds/agentbench/decisions.md" reason="Evaluation strategy (#3, #6)" />
   </context>
 
   <steps>
-    <step order="1">cd to workers/email-capture/ directory</step>
-    <step order="2">Create KV namespace for emails: `wrangler kv:namespace create EMAILS`</step>
-    <step order="3">Create KV namespace for rate limits: `wrangler kv:namespace create RATE_LIMITS`</step>
-    <step order="4">Note the namespace IDs from command output</step>
-    <step order="5">Update wrangler.toml with real namespace IDs (replace placeholders)</step>
-    <step order="6">Deploy worker: `wrangler deploy`</step>
-    <step order="7">Note deployed URL (wardrobe-email.emdash.workers.dev or similar)</step>
-    <step order="8">Update showcase/script.js with real endpoint URL</step>
-    <step order="9">Test: Submit email via curl to POST /subscribe endpoint</step>
-    <step order="10">Verify email stored: `wrangler kv:key list --namespace-id=EMAILS_ID`</step>
+    <step order="1">Create src/evaluators.js</step>
+    <step order="2">Implement contains(output, expected) - case-insensitive substring check</step>
+    <step order="3">Handle contains with array: any match = pass</step>
+    <step order="4">Implement doesNotContain(output, forbidden) - substring exclusion</step>
+    <step order="5">Handle doesNotContain with array: any match = fail</step>
+    <step order="6">Implement collectSemanticChecks(tests) - gather all matches_intent</step>
+    <step order="7">Implement batchEvaluateSemantic(checks) - single Claude API call</step>
+    <step order="8">Format prompt: list all intents + outputs, ask for pass/fail per check</step>
+    <step order="9">Parse Claude response into individual results</step>
+    <step order="10">Implement graceful degradation: if API error, mark as skipped</step>
+    <step order="11">Return { passed, error, skipped } for each check</step>
+    <step order="12">Export evaluate(output, expectation) function</step>
   </steps>
 
   <verification>
-    <check type="bash">curl -X POST https://wardrobe-email.emdash.workers.dev/subscribe -H "Content-Type: application/json" -d '{"email":"test@example.com"}'</check>
-    <check type="test">Response is 200 with success message</check>
-    <check type="test">Email appears in KV namespace</check>
-    <check type="manual">Showcase form submits successfully</check>
+    <check type="test">Unit test: contains single string</check>
+    <check type="test">Unit test: contains array (any match)</check>
+    <check type="test">Unit test: does_not_contain single string</check>
+    <check type="test">Unit test: does_not_contain array (any match fails)</check>
+    <check type="test">Unit test: matches_intent with mock Claude response</check>
+    <check type="test">Unit test: LLM unavailable → skipped, not failed</check>
+    <check type="test">Unit test: batched evaluation with multiple intents</check>
+    <check type="bash">wc -l src/evaluators.js | verify under 200 lines</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>infra(wardrobe): deploy email capture worker
+  <commit-message>feat(evaluators): implement string matching and batched LLM evaluation
 
-Per Board Condition Tier 1 #4 (Shonda/Oprah):
-- KV namespaces created: EMAILS, RATE_LIMITS
-- Worker deployed to production
-- Showcase form wired to real endpoint
-- Email persistence verified
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-4" wave="1">
-  <title>Deploy analytics telemetry worker to Cloudflare</title>
-  <requirement>REQ-T1-005: Deploy Analytics Worker (P0-Blocker, Buffett)</requirement>
-  <description>
-    Per Board Condition Tier 1 #5: "Track which themes are installed."
-    CLI already calls telemetry endpoint (install.ts line 34) but worker
-    not deployed. Analytics enable data-driven decisions.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/analytics/src/index.ts" reason="Worker code to deploy" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/analytics/wrangler.toml" reason="Config to update" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/cli/commands/install.ts" reason="Telemetry call at line 34" />
-  </context>
-
-  <steps>
-    <step order="1">cd to workers/analytics/ directory</step>
-    <step order="2">Create KV namespace: `wrangler kv:namespace create ANALYTICS`</step>
-    <step order="3">Note the namespace ID from command output</step>
-    <step order="4">Update wrangler.toml with real namespace ID</step>
-    <step order="5">Generate API key for stats endpoint: `openssl rand -hex 32`</step>
-    <step order="6">Set API key secret: `wrangler secret put API_KEY`</step>
-    <step order="7">Deploy worker: `wrangler deploy`</step>
-    <step order="8">Verify deployment URL matches CLI constant (line 20 in install.ts)</step>
-    <step order="9">Test track endpoint: curl POST /track with theme payload</step>
-    <step order="10">Test stats endpoint: curl GET /stats with X-API-Key header</step>
-    <step order="11">Document telemetry opt-out: WARDROBE_TELEMETRY_DISABLED=1</step>
-  </steps>
-
-  <verification>
-    <check type="bash">curl -X POST https://wardrobe-analytics.emdash.workers.dev/track -H "Content-Type: application/json" -d '{"theme":"ember","os":"darwin","timestamp":1234567890,"cliVersion":"1.0.0"}'</check>
-    <check type="bash">curl https://wardrobe-analytics.emdash.workers.dev/health</check>
-    <check type="test">Track endpoint returns 200</check>
-    <check type="test">Health endpoint returns 200</check>
-    <check type="test">Stats endpoint works with API key</check>
-  </verification>
-
-  <dependencies>
-    <!-- No dependencies - Wave 1 foundational task -->
-  </dependencies>
-
-  <commit-message>infra(wardrobe): deploy analytics telemetry worker
-
-Per Board Condition Tier 1 #5 (Buffett):
-- KV namespace created: ANALYTICS
-- API key secret configured
-- Worker deployed to production
-- CLI telemetry now functional
-- Opt-out documented: WARDROBE_TELEMETRY_DISABLED=1
+Per decisions.md #3, #6:
+- String matching is default (contains, does_not_contain)
+- LLM evaluation is opt-in (matches_intent)
+- Batched Claude API call for all semantic checks
+- Graceful degradation when LLM unavailable
+- Binary pass/fail (no confidence scores in v1)
+- Target: ~200 lines
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -289,65 +243,124 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 2 (Parallel, after Wave 1) — Demo Sites & Showcase
+### Wave 2 (Parallel, after Wave 1) — Integration and Documentation
 
-Three tasks for demo sites, screenshots, and showcase deployment.
+Three tasks that integrate the core modules and create documentation.
 
 ```xml
-<task-plan id="phase-1-task-5" wave="2">
-  <title>Deploy 5 live demo sites to Cloudflare</title>
-  <requirement>REQ-T1-001: Deploy Live Demo Sites (P0-Blocker, Oprah/Shonda)</requirement>
+<task-plan id="phase-1-task-4" wave="2">
+  <title>Implement CLI runner with human-first output</title>
+  <requirement>REQ-MVP-004: CLI Runner with Output (P0-Blocker)</requirement>
   <description>
-    Per Board Condition Tier 1 #1: "Each theme must have a working preview URL."
-    This is the highest-impact blocker. Per docs/EMDASH-GUIDE.md Section 5,
-    each site needs D1 database and R2 bucket.
+    Per decisions.md #4 and #8: Human-first output, --json for CI.
+    Entry point at bin/agentbench.js with shebang.
+    Integrates config, executor, evaluators modules.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/themes/" reason="Theme source files" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5: Cloudflare deployment, Section 7: Seed files" />
+    <file path="/home/agent/shipyard-ai/rounds/agentbench/decisions.md" reason="Output format (#4), architecture (#8)" />
+    <file path="/home/agent/shipyard-ai/prds/agentbench.md" reason="Output report format (Section 4)" />
+    <file path="/home/agent/shipyard-ai/memory-store/bin/memory" reason="Reference bin wrapper pattern" />
   </context>
 
   <steps>
-    <step order="1">For each theme (ember, forge, slate, drift, bloom), create new Emdash site:</step>
-    <step order="2">  `npm create emdash@latest` → name: wardrobe-demo-{theme}</step>
-    <step order="3">  Copy theme's src/ directory over the starter src/</step>
-    <step order="4">  Create D1 database: `wrangler d1 create wardrobe-demo-{theme}`</step>
-    <step order="5">  Create R2 bucket: `wrangler r2 bucket create wardrobe-demo-{theme}-media`</step>
-    <step order="6">  Configure wrangler.jsonc with binding names</step>
-    <step order="7">  Run migrations: `wrangler d1 migrations apply wardrobe-demo-{theme}`</step>
-    <step order="8">  Seed demo content: `npx emdash seed` (or import sample posts)</step>
-    <step order="9">  Deploy: `wrangler deploy`</step>
-    <step order="10">  Configure custom domain: {theme}.wardrobe.emdash.dev</step>
-    <step order="11">Repeat for all 5 themes</step>
-    <step order="12">Update showcase index.html with live demo URLs</step>
-    <step order="13">Update themes.json previewUrl fields if needed</step>
+    <step order="1">Create bin/agentbench.js with #!/usr/bin/env node shebang</step>
+    <step order="2">Parse process.argv for: config file path, --json flag, --help</step>
+    <step order="3">Load config using src/config.js</step>
+    <step order="4">For each test: execute agent, evaluate expectations</step>
+    <step order="5">Track timing per test and total</step>
+    <step order="6">Implement human output: checkmarks, test names, timing</step>
+    <step order="7">Implement failure details: indented, shows expected vs actual</step>
+    <step order="8">Implement summary line: "Results: X passed, Y failed"</step>
+    <step order="9">Implement --json flag: structured JSON output</step>
+    <step order="10">Implement exit codes: 0 (all pass), 1 (any fail), 2 (config error)</step>
+    <step order="11">Add color output (green/red) if terminal supports</step>
+    <step order="12">Update package.json bin entry</step>
   </steps>
 
   <verification>
-    <check type="bash">curl -I https://ember.wardrobe.emdash.dev | grep "200 OK"</check>
-    <check type="bash">curl -I https://forge.wardrobe.emdash.dev | grep "200 OK"</check>
-    <check type="bash">curl -I https://slate.wardrobe.emdash.dev | grep "200 OK"</check>
-    <check type="bash">curl -I https://drift.wardrobe.emdash.dev | grep "200 OK"</check>
-    <check type="bash">curl -I https://bloom.wardrobe.emdash.dev | grep "200 OK"</check>
-    <check type="manual">Each demo site renders with sample content</check>
-    <check type="manual">Each demo site reflects its theme's personality</check>
+    <check type="bash">./bin/agentbench.js --help shows usage</check>
+    <check type="bash">./bin/agentbench.js examples/basic.yaml runs tests</check>
+    <check type="bash">./bin/agentbench.js --json outputs valid JSON</check>
+    <check type="test">Integration test: full test run with pass/fail</check>
+    <check type="test">Exit code 0 when all pass</check>
+    <check type="test">Exit code 1 when any fail</check>
+    <check type="test">Exit code 2 when config invalid</check>
+    <check type="manual">Output matches PRD Section 4 format</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="R2 must be working for theme downloads" />
+    <depends-on task-id="phase-1-task-1" reason="Needs config loader" />
+    <depends-on task-id="phase-1-task-2" reason="Needs executor" />
+    <depends-on task-id="phase-1-task-3" reason="Needs evaluators" />
   </dependencies>
 
-  <commit-message>infra(wardrobe): deploy 5 live demo sites
+  <commit-message>feat(cli): implement human-first CLI runner with --json flag
 
-Per Board Condition Tier 1 #1 (Oprah/Shonda):
-- ember.wardrobe.emdash.dev deployed
-- forge.wardrobe.emdash.dev deployed
-- slate.wardrobe.emdash.dev deployed
-- drift.wardrobe.emdash.dev deployed
-- bloom.wardrobe.emdash.dev deployed
-- Each site has D1 database and R2 storage
-- Sample content seeded for fair comparison
+Per decisions.md #4, #8:
+- Human-readable output with checkmarks
+- Failure details indented under test name
+- --json flag for CI pipelines
+- Exit codes: 0 (pass), 1 (fail), 2 (error)
+- Color output for terminal
+- Summary line with timing
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-5" wave="2">
+  <title>Write immaculate README with copy-paste examples</title>
+  <requirement>REQ-INFRA-002: README with Examples (P1-Must)</requirement>
+  <description>
+    Per decisions.md #2 and #8: Steve owns brand voice.
+    "Manifesto, not manual." Confident, spare, defiant.
+    Copy-paste YAML examples that work immediately.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/rounds/agentbench/decisions.md" reason="Brand voice (#8), onboarding (#2)" />
+    <file path="/home/agent/shipyard-ai/prds/agentbench.md" reason="Example YAML (Section 1)" />
+  </context>
+
+  <steps>
+    <step order="1">Create README.md in project root</step>
+    <step order="2">Write headline: "AgentBench — Replace prayer with proof."</step>
+    <step order="3">Write one-line pitch: "Test your AI agents in one command."</step>
+    <step order="4">Write Installation section: npm install -g agentbench</step>
+    <step order="5">Write Quick Start with copy-paste YAML example</step>
+    <step order="6">Show CLI subprocess example (command: "node ./agent.js")</step>
+    <step order="7">Show HTTP endpoint example (endpoint: "http://...")</step>
+    <step order="8">Document evaluators: contains, does_not_contain, matches_intent</step>
+    <step order="9">Document --json flag for CI</step>
+    <step order="10">Document ANTHROPIC_API_KEY requirement for semantic checks</step>
+    <step order="11">Write "Why AgentBench?" section with confidence</step>
+    <step order="12">Review for Steve Jobs voice: short sentences, no hedging</step>
+  </steps>
+
+  <verification>
+    <check type="manual">README reads like a manifesto, not a manual</check>
+    <check type="manual">Copy-paste YAML is syntactically valid</check>
+    <check type="manual">No hedging language ("might", "could", "try to")</check>
+    <check type="manual">Brand voice is confident, spare, defiant</check>
+    <check type="manual">Installation is one command</check>
+    <check type="manual">External user test: can run first test in 5 minutes</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-4" reason="Need working CLI to verify examples" />
+  </dependencies>
+
+  <commit-message>docs: write immaculate README with copy-paste examples
+
+Per decisions.md #2, #8:
+- Steve Jobs voice: confident, spare, defiant
+- "Manifesto, not manual"
+- Copy-paste YAML that works immediately
+- One-command installation
+- Clear evaluator documentation
+- No hedging, promises we keep
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -355,111 +368,51 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-6" wave="2">
-  <title>Generate real screenshots from live demo sites</title>
-  <requirement>REQ-T1-002: Replace SVG Placeholders (P0-Blocker, Oprah)</requirement>
+  <title>Create example configuration files</title>
+  <requirement>REQ-INFRA-003: Example Configuration (P1-Must)</requirement>
   <description>
-    Per Board Condition Tier 1 #2: "People can't see themselves in placeholders."
-    Currently showcase has SVG files. Generate real screenshots using Playwright
-    script that exists at scripts/generate-screenshots.ts.
+    Per decisions.md #2: Copy-paste onboarding via examples.
+    Create examples/basic.yaml demonstrating all evaluators.
+    Include example agent scripts for testing.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/scripts/generate-screenshots.ts" reason="Screenshot generation script" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/screenshots/" reason="Output directory (currently SVGs)" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/index.html" reason="Update img src if format changes" />
+    <file path="/home/agent/shipyard-ai/prds/agentbench.md" reason="Example YAML (Section 1, Appendix)" />
+    <file path="/home/agent/shipyard-ai/rounds/agentbench/decisions.md" reason="Onboarding (#2)" />
   </context>
 
   <steps>
-    <step order="1">Verify demo sites are deployed and accessible (depends on task-5)</step>
-    <step order="2">Install Playwright if needed: `npx playwright install`</step>
-    <step order="3">Update generate-screenshots.ts with live demo URLs if hardcoded differently</step>
-    <step order="4">Run screenshot script: `npm run screenshots`</step>
-    <step order="5">Verify output files exist: ember.png, forge.png, slate.png, drift.png, bloom.png</step>
-    <step order="6">Optimize images with Sharp if not done by script (< 100KB each)</step>
-    <step order="7">Remove old SVG files from screenshots/ directory</step>
-    <step order="8">Update showcase/index.html img src to use .png instead of .svg</step>
-    <step order="9">Review screenshots for quality - must "capture the magic"</step>
-    <step order="10">Consider GIFs showing transformation (optional per Risk Register)</step>
+    <step order="1">Create examples/ directory</step>
+    <step order="2">Create examples/basic.yaml with full working example</step>
+    <step order="3">Include name, agent.command, and 3+ tests</step>
+    <step order="4">Demonstrate contains evaluator</step>
+    <step order="5">Demonstrate does_not_contain evaluator</step>
+    <step order="6">Demonstrate matches_intent evaluator</step>
+    <step order="7">Create examples/http-agent.yaml for HTTP endpoint example</step>
+    <step order="8">Create examples/mock-agent.js - simple echo agent for testing</step>
+    <step order="9">Verify examples run without modification</step>
+    <step order="10">Add comments in YAML explaining each section</step>
   </steps>
 
   <verification>
-    <check type="bash">ls -la showcase/screenshots/*.png</check>
-    <check type="bash">file showcase/screenshots/ember.png | grep "PNG image"</check>
-    <check type="test">All 5 PNG files exist and are valid images</check>
-    <check type="test">Each image is under 200KB</check>
-    <check type="manual">Screenshots convey theme personality</check>
+    <check type="bash">./bin/agentbench.js examples/basic.yaml runs successfully</check>
+    <check type="bash">node examples/mock-agent.js echoes input</check>
+    <check type="manual">YAML is self-documenting with comments</check>
+    <check type="manual">Examples demonstrate all shipped evaluators</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="Need live demo sites to capture screenshots" />
+    <depends-on task-id="phase-1-task-4" reason="Need working CLI to verify examples" />
   </dependencies>
 
-  <commit-message>feat(showcase): replace SVG placeholders with real screenshots
+  <commit-message>docs(examples): add working example configurations
 
-Per Board Condition Tier 1 #2 (Oprah):
-- Generated 1200x800 PNG screenshots for all 5 themes
-- Captured from live demo sites with sample content
-- Optimized for web (< 200KB each)
-- Removed placeholder SVGs
-- Screenshots show actual Emdash content
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-7" wave="2">
-  <title>Deploy showcase website to Cloudflare Pages</title>
-  <requirement>REQ-T1-006: Deploy Showcase Website (P0-Blocker)</requirement>
-  <description>
-    Per decisions.md Decision #8 and Board Override: "All four board members
-    require a deployed showcase website before launch." Showcase code is
-    complete but not deployed. Must wire to email worker endpoint.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/" reason="Static files to deploy" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/wrangler.toml" reason="Pages config" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/script.js" reason="Email endpoint URL" />
-  </context>
-
-  <steps>
-    <step order="1">Verify showcase/script.js has correct email worker endpoint (from task-3)</step>
-    <step order="2">Verify showcase/index.html uses .png screenshots (from task-6)</step>
-    <step order="3">Create Pages project: `wrangler pages project create wardrobe-showcase`</step>
-    <step order="4">Deploy: `wrangler pages deploy showcase/ --project-name wardrobe-showcase`</step>
-    <step order="5">Note deployment URL (wardrobe-showcase.pages.dev)</step>
-    <step order="6">Configure custom domain: wardrobe.emdash.dev (or wardrobe.emdash.app)</step>
-    <step order="7">Verify HTTPS working on custom domain</step>
-    <step order="8">Test all theme cards render with screenshots</step>
-    <step order="9">Test copy-to-clipboard buttons work</step>
-    <step order="10">Test email capture form submits successfully</step>
-    <step order="11">Test mobile responsiveness (iPhone, Android viewports)</step>
-    <step order="12">Run accessibility check (WCAG 2.1 AA)</step>
-  </steps>
-
-  <verification>
-    <check type="bash">curl -I https://wardrobe.emdash.dev | grep "200 OK"</check>
-    <check type="manual">All 5 theme cards visible with real screenshots</check>
-    <check type="manual">Copy buttons work (click and verify clipboard)</check>
-    <check type="manual">Email form submits without error</check>
-    <check type="manual">Mobile layout correct at 375px width</check>
-    <check type="test">Page loads in under 3 seconds on 4G</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="Email worker must be deployed first" />
-    <depends-on task-id="phase-1-task-6" reason="Real screenshots must be generated first" />
-  </dependencies>
-
-  <commit-message>infra(wardrobe): deploy showcase to Cloudflare Pages
-
-Per decisions.md Decision #8 and Board Override:
-- Showcase deployed to wardrobe.emdash.dev
-- All 5 theme cards with real screenshots
-- Email capture wired to production worker
-- Mobile-responsive verified
-- WCAG 2.1 AA accessible
+Per decisions.md #2:
+- examples/basic.yaml - CLI subprocess agent
+- examples/http-agent.yaml - HTTP endpoint agent
+- examples/mock-agent.js - Echo agent for testing
+- All evaluators demonstrated
+- Self-documenting with comments
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -467,60 +420,115 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 3 (Sequential, after Wave 2) — Validation & Review
+### Wave 3 (Sequential, after Wave 2) — Testing, Publishing, and Review
 
-Three tasks for benchmarking, QA, and customer review.
+Three tasks for final validation and release.
 
 ```xml
-<task-plan id="phase-1-task-8" wave="3">
-  <title>Benchmark install speed (sub-3-second target)</title>
-  <requirement>decisions.md Decision #5: Install Speed Target</requirement>
+<task-plan id="phase-1-task-7" wave="3">
+  <title>Create dogfooding test suite</title>
+  <requirement>REQ-INFRA-004: Dogfooding Tests (P1-Must)</requirement>
   <description>
-    Per Decision #5: "30-second install kills the magic. The transformation
-    must feel instant." Target is sub-3-second install. Now that R2 is live,
-    benchmark actual install time.
+    Per decisions.md #8: "Dogfood: test the tester."
+    Use Vitest (per ecosystem pattern in memory-store).
+    Test config parsing, execution, evaluation.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/cli/commands/install.ts" reason="Install timing code" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/dist/themes/" reason="Tarball sizes" />
+    <file path="/home/agent/shipyard-ai/rounds/agentbench/decisions.md" reason="Dogfooding requirement (#8)" />
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/vitest.config.ts" reason="Vitest config pattern" />
   </context>
 
   <steps>
-    <step order="1">Create fresh Emdash test project: `npm create emdash@latest` → test-benchmark</step>
-    <step order="2">Install wardrobe CLI in test project</step>
-    <step order="3">Run timed install: `time npx wardrobe install ember`</step>
-    <step order="4">Record: download time, extraction time, total time</step>
-    <step order="5">Repeat for all 5 themes</step>
-    <step order="6">Test on simulated slow connection (throttle to 4G)</step>
-    <step order="7">Document results in benchmark report</step>
-    <step order="8">If any theme exceeds 3 seconds, investigate tarball size optimization</step>
-    <step order="9">Verify tarball sizes are reasonable (< 100KB each)</step>
+    <step order="1">Add vitest as devDependency</step>
+    <step order="2">Create vitest.config.ts with globals enabled</step>
+    <step order="3">Create tests/ directory</step>
+    <step order="4">Create tests/config.test.js - test YAML parsing</step>
+    <step order="5">Create tests/executor.test.js - test subprocess and HTTP</step>
+    <step order="6">Create tests/evaluators.test.js - test all evaluators</step>
+    <step order="7">Create tests/integration.test.js - end-to-end test run</step>
+    <step order="8">Mock Claude API for deterministic semantic tests</step>
+    <step order="9">Add npm test script: "vitest run"</step>
+    <step order="10">Verify all tests pass before proceeding to publish</step>
   </steps>
 
   <verification>
-    <check type="bash">ls -lh dist/themes/*.tar.gz</check>
-    <check type="test">All tarballs under 100KB</check>
-    <check type="test">Ember install < 3 seconds on broadband</check>
-    <check type="test">All themes install < 3 seconds on broadband</check>
-    <check type="test">All themes install < 5 seconds on 4G</check>
+    <check type="bash">npm test passes with 0 failures</check>
+    <check type="test">Config tests cover: valid YAML, invalid YAML, missing fields</check>
+    <check type="test">Executor tests cover: subprocess, HTTP, timeout, errors</check>
+    <check type="test">Evaluator tests cover: contains, does_not_contain, matches_intent</check>
+    <check type="test">Integration tests cover: full test run, exit codes</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="R2 must be live for real benchmarks" />
-    <depends-on task-id="phase-1-task-5" reason="Demo sites confirm themes work" />
+    <depends-on task-id="phase-1-task-4" reason="Need working CLI to test" />
+    <depends-on task-id="phase-1-task-6" reason="Need examples for integration tests" />
   </dependencies>
 
-  <commit-message>test(wardrobe): benchmark install speed - all themes sub-3s
+  <commit-message>test: add dogfooding test suite with vitest
 
-Per decisions.md Decision #5:
-- Ember: X.XXs
-- Forge: X.XXs
-- Slate: X.XXs
-- Drift: X.XXs
-- Bloom: X.XXs
-- All themes meet sub-3-second target on broadband
-- 4G performance acceptable (< 5s)
+Per decisions.md #8:
+- Vitest framework (ecosystem standard)
+- Config parsing tests
+- Executor tests (subprocess + HTTP)
+- Evaluator tests (string + LLM mock)
+- Integration tests (full run, exit codes)
+- All tests pass before publish
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-8" wave="3">
+  <title>Prepare and publish npm package</title>
+  <requirement>REQ-INFRA-001: npm Package (P1-Must)</requirement>
+  <description>
+    Per decisions.md #7 and PRD Section 5: Publish to npm.
+    Package name: agentbench (working title per decisions.md #1).
+    Verify npx agentbench works after publish.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/rounds/agentbench/decisions.md" reason="npm publish (#7)" />
+    <file path="/home/agent/shipyard-ai/prds/agentbench.md" reason="Distribution channel (PRD)" />
+    <file path="/home/agent/shipyard-ai/memory-store/package.json" reason="Reference package.json structure" />
+  </context>
+
+  <steps>
+    <step order="1">Verify package.json has correct metadata: name, version, description</step>
+    <step order="2">Verify bin entry points to bin/agentbench.js</step>
+    <step order="3">Verify dependencies are minimal (js-yaml only)</step>
+    <step order="4">Create .npmignore to exclude tests, examples (keep examples for docs)</step>
+    <step order="5">Run npm pack to verify package contents</step>
+    <step order="6">Run npm publish --dry-run to verify before real publish</step>
+    <step order="7">Authenticate with npm: npm login</step>
+    <step order="8">Publish: npm publish</step>
+    <step order="9">Verify: npx agentbench --help works</step>
+    <step order="10">Verify: npx agentbench examples/basic.yaml works</step>
+    <step order="11">Tag git release: git tag v1.0.0</step>
+  </steps>
+
+  <verification>
+    <check type="bash">npm pack --dry-run shows correct files</check>
+    <check type="bash">npm publish --dry-run succeeds</check>
+    <check type="bash">npx agentbench --help shows usage (after publish)</check>
+    <check type="bash">npx agentbench --version shows 1.0.0</check>
+    <check type="manual">Package visible on npmjs.com</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-5" reason="README must be complete" />
+    <depends-on task-id="phase-1-task-7" reason="All tests must pass" />
+  </dependencies>
+
+  <commit-message>chore: publish agentbench v1.0.0 to npm
+
+Per decisions.md #7, PRD Section 5:
+- npm package published
+- npx agentbench works immediately
+- Minimal dependencies (js-yaml only)
+- Version 1.0.0
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -528,86 +536,28 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-9" wave="3">
-  <title>QA Pass - Verify all Tier 1 conditions met</title>
-  <requirement>All Tier 1 Board Conditions (P0-Blockers)</requirement>
-  <description>
-    Final verification that all 5 Tier 1 launch conditions are met.
-    This is the gate before board re-review.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Full requirements list" />
-    <file path="/home/agent/shipyard-ai/rounds/emdash-marketplace/decisions.md" reason="Board conditions source" />
-  </context>
-
-  <steps>
-    <step order="1">Tier 1 #1: Verify all 5 demo sites accessible and content-rich</step>
-    <step order="2">Tier 1 #2: Verify all screenshots are real PNGs (not SVGs)</step>
-    <step order="3">Tier 1 #3: Verify CLI shows dev server hint after install</step>
-    <step order="4">Tier 1 #4: Verify email capture works end-to-end (submit, store, no errors)</step>
-    <step order="5">Tier 1 #5: Verify analytics telemetry records install events</step>
-    <step order="6">Verify showcase deployed and functional</step>
-    <step order="7">Verify R2 tarballs downloadable</step>
-    <step order="8">Verify full install flow: `npx wardrobe install ember` in fresh project</step>
-    <step order="9">Verify `npm run dev` starts site successfully after install</step>
-    <step order="10">Document any issues found</step>
-    <step order="11">Create QA report: wardrobe-qa-report.md</step>
-    <step order="12">Pass/Fail verdict for each Tier 1 condition</step>
-  </steps>
-
-  <verification>
-    <check type="manual">Tier 1 #1: Demo sites PASS/FAIL</check>
-    <check type="manual">Tier 1 #2: Screenshots PASS/FAIL</check>
-    <check type="manual">Tier 1 #3: Post-install reveal PASS/FAIL</check>
-    <check type="manual">Tier 1 #4: Email capture PASS/FAIL</check>
-    <check type="manual">Tier 1 #5: Analytics telemetry PASS/FAIL</check>
-    <check type="manual">All 5 conditions PASS = LAUNCH READY</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-7" reason="Showcase must be deployed" />
-    <depends-on task-id="phase-1-task-8" reason="Install speed must be verified" />
-  </dependencies>
-
-  <commit-message>qa(wardrobe): verify all Tier 1 board conditions
-
-QA Pass Results:
-- Tier 1 #1 Demo Sites: PASS
-- Tier 1 #2 Screenshots: PASS
-- Tier 1 #3 Post-Install Reveal: PASS
-- Tier 1 #4 Email Capture: PASS
-- Tier 1 #5 Analytics: PASS
-
-VERDICT: LAUNCH READY for board re-review
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-10" wave="3">
   <title>Sara Blakely customer gut-check</title>
   <requirement>SKILL.md Step 7: Customer value validation</requirement>
   <description>
     Per skill instructions: Spawn Sara Blakely agent for customer perspective.
-    Wardrobe customers are developers and site owners using Emdash.
+    AgentBench customers are AI engineers building agents.
     "Would they pay for this? What feels like engineering vanity?"
   </description>
 
   <context>
     <file path="/home/agent/shipyard-ai/.planning/phase-1-plan.md" reason="This plan" />
-    <file path="/home/agent/shipyard-ai/rounds/emdash-marketplace/decisions.md" reason="Board decisions and essence" />
-    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/README.md" reason="Product documentation" />
+    <file path="/home/agent/shipyard-ai/rounds/agentbench/decisions.md" reason="Product decisions and essence" />
+    <file path="/home/agent/shipyard-ai/prds/agentbench.md" reason="Product requirements" />
   </context>
 
   <steps>
     <step order="1">Spawn haiku sub-agent as Sara Blakely</step>
-    <step order="2">Prompt: Read phase plan and Wardrobe showcase</step>
-    <step order="3">Answer: Would a developer actually use Wardrobe?</step>
-    <step order="4">Answer: What would make them say "I can't believe I just did that"?</step>
+    <step order="2">Prompt: Read phase plan and AgentBench README</step>
+    <step order="3">Answer: Would a developer actually use AgentBench?</step>
+    <step order="4">Answer: What would make them say "finally, I can ship with confidence"?</step>
     <step order="5">Answer: What feels like engineering vanity vs. real value?</step>
-    <step order="6">Answer: Is "instant dignity" delivered or just promised?</step>
-    <step order="7">Answer: Does the 3-second install actually feel instant?</step>
+    <step order="6">Answer: Is "replace prayer with proof" delivered or just promised?</step>
+    <step order="7">Answer: Does the first test run feel like relief?</step>
     <step order="8">Answer: Would they tell a friend about it?</step>
     <step order="9">Write findings to .planning/sara-blakely-review.md</step>
     <step order="10">Review and address major gaps if any</step>
@@ -620,13 +570,13 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-9" reason="Review after QA pass" />
+    <depends-on task-id="phase-1-task-8" reason="Review after npm publish" />
   </dependencies>
 
-  <commit-message>docs(wardrobe): add Sara Blakely customer gut-check
+  <commit-message>docs(planning): add Sara Blakely customer gut-check
 
 Per SKILL.md: Validate customer value.
-Would developers choose Wardrobe?
+Would AI engineers choose AgentBench?
 Engineering vanity vs. real value analysis.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
@@ -639,31 +589,30 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 | Wave | Tasks | Description | Parallelism |
 |------|-------|-------------|-------------|
-| 1 | 4 | Infrastructure foundation (R2, CLI, workers) | 4 parallel |
-| 2 | 3 | Demo sites, screenshots, showcase | 3 parallel (after Wave 1) |
-| 3 | 3 | Validation (benchmark, QA, Sara review) | Sequential (after Wave 2) |
+| 1 | 3 | Core modules (config, executor, evaluators) | 3 parallel |
+| 2 | 3 | CLI integration, README, examples | 3 parallel (after Wave 1) |
+| 3 | 3 | Tests, npm publish, Sara review | Sequential (after Wave 2) |
 
-**Total Tasks:** 10
-**Maximum Parallelism:** Wave 1 (4 concurrent tasks)
-**Timeline:** 5-7 days (infrastructure focus, minimal code changes)
+**Total Tasks:** 9
+**Maximum Parallelism:** Wave 1 (3 concurrent tasks)
+**Timeline:** 3-5 days (greenfield build, ~500 lines total)
 
 ---
 
 ## Dependencies Diagram
 
 ```
-Wave 1:  [task-1: R2 Upload] ──────────────────────────────────────────────>
-         [task-2: CLI Reveal] ─────────────────────────────────────────────>
-         [task-3: Email Worker] ───────────────────────────────────────────>
-         [task-4: Analytics Worker] ───────────────────────────────────────>
+Wave 1:  [task-1: Config] ──────────────────────────────────────────────────>
+         [task-2: Executor] ────────────────────────────────────────────────>
+         [task-3: Evaluators] ──────────────────────────────────────────────>
 
-Wave 2:  [task-5: Demo Sites] ───> (depends on task-1) ────────────────────>
-         [task-6: Screenshots] ───> (depends on task-5) ───────────────────>
-         [task-7: Showcase] ───> (depends on tasks 3,6) ───────────────────>
+Wave 2:  [task-4: CLI] ───> (depends on 1,2,3) ─────────────────────────────>
+         [task-5: README] ───> (depends on 4) ──────────────────────────────>
+         [task-6: Examples] ───> (depends on 4) ────────────────────────────>
 
-Wave 3:  [task-8: Benchmark] ───> (depends on tasks 1,5) ──────────────────>
-         [task-9: QA Pass] ───> (depends on tasks 7,8) ────────────────────>
-         [task-10: Sara] ───> (depends on task-9) ─────────────────────────>
+Wave 3:  [task-7: Tests] ───> (depends on 4,6) ─────────────────────────────>
+         [task-8: npm Publish] ───> (depends on 5,7) ───────────────────────>
+         [task-9: Sara Review] ───> (depends on 8) ─────────────────────────>
 ```
 
 ---
@@ -674,50 +623,51 @@ Wave 3:  [task-8: Benchmark] ───> (depends on tasks 1,5) ─────�
 
 | Risk | Mitigation | Task |
 |------|------------|------|
-| R2 CDN not configured | Create bucket, upload tarballs, verify access | task-1 |
-| Email endpoint not wired | Deploy worker, provision KV, update showcase | task-3 |
-| No post-install reveal | Add dev server hint to CLI | task-2 |
-| Screenshots are placeholders | Generate from live demo sites | task-6 |
-| No analytics | Deploy telemetry worker | task-4 |
+| LLM evaluation reliability | Graceful degradation, batched calls | task-3 |
+| API down breaks tests | Clear error messages, skip vs fail | task-3, task-4 |
+| Schema evolution | version: 1 field from day one | task-1 |
+| Copy-paste friction | Immaculate README, working examples | task-5, task-6 |
+| No telemetry | Deferred to v1.1 (acknowledged risk) | — |
 
 ### Accepted for v1 (Not Blocking)
 
 | Risk | Impact | Notes |
 |------|--------|-------|
-| 5 themes shipped at once | Medium | Board acknowledged, mitigation not followed |
-| No version pinning | Low | V2 feature per decisions.md |
-| CLI-only excludes non-technical users | Medium | V2 web install flow planned |
-| No Emdash core integration | Low | Open question, not blocking launch |
+| Name confusion | Medium | Ship with "agentbench", rebrand later |
+| No watch mode | Low | Explicitly cut per decisions.md |
+| No custom evaluators | Low | Explicitly cut per decisions.md |
+| No parallel execution | Low | Explicitly cut per decisions.md |
 
 ---
 
 ## Verification Checklist
 
 - [x] All P0 requirements have task coverage
+- [x] All P1 requirements have task coverage
 - [x] Each task has clear verification criteria
 - [x] Dependencies form valid DAG (no cycles)
 - [x] Each task can be committed independently
-- [x] Risk mitigations addressed (R2, workers, screenshots)
-- [x] Board conditions mapped to tasks
-- [x] Emdash docs cited for technical accuracy (Section 1, 5, 7)
-- [x] 5-7 day timeline achievable
-- [x] Ship test defined: "I can't believe I just did that"
-- [x] Sara Blakely customer gut-check scheduled (task-10)
+- [x] Architecture follows decisions.md #5 (~500 lines)
+- [x] Output format follows decisions.md #4 (human-first)
+- [x] Evaluation follows decisions.md #3 (string default)
+- [x] 3-5 day timeline achievable
+- [x] Ship test defined: first test run feels like relief
+- [x] Sara Blakely customer gut-check scheduled (task-9)
 
 ---
 
 ## Ship Test
 
-> Does `npx wardrobe install ember` transform a site in under 3 seconds?
+> Does `npx agentbench run` execute tests with clear pass/fail output?
 >
-> Does seeing the transformed site make the user feel "I can't believe I just did that"?
+> Does the first test run feel like relief instead of frustration?
 >
-> Does the showcase make you want to try it immediately?
+> Does the README make you want to try it immediately?
 >
 > **If yes, ship it.**
 
 ---
 
 *Generated by Great Minds Agency — Phase Planning Skill*
-*Source: rounds/emdash-marketplace/decisions.md, docs/EMDASH-GUIDE.md*
-*Project Slug: emdash-marketplace*
+*Source: prds/agentbench.md, rounds/agentbench/decisions.md*
+*Project Slug: agentbench*

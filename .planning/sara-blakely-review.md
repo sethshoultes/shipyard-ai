@@ -1,32 +1,29 @@
-# Sara Blakely Gut-Check: Wardrobe
+# Sara Blakely Gut-Check: AgentBench Phase 1
 
 ## Would a real customer pay for this?
 
-**Yes, but not yet.** The install is genuinely magic — 3 seconds to look professional. Developers with ugly default sites will use this TODAY. But there's nothing to pay FOR. Five free themes, no premium tier, no path to "I need more." You built a free sample table at Costco with no store behind it.
+**Yes — but for the RELIEF, not the tool.** Developers shipping AI agents are terrified. Every deploy is a prayer. You're selling permission to ship. That's worth money. But they won't pay until they've felt the relief. First run has to be frictionless.
 
 ## What's confusing? What would make someone bounce?
 
-1. **Screenshots are SVG placeholders.** I can't see myself in a gray rectangle. This is like selling Spanx with mannequin photos. KILLER.
-2. **No demo sites.** "Trust me, it looks great" doesn't work. Show me.
-3. **CLI-only.** The person who most needs "instant dignity" — the bakery owner, the consultant — can't use a terminal. You're selling to builders who could build their own.
+1. **`matches_intent` requires an API key.** Friction at the exact moment they're excited. First run should work WITHOUT Claude.
+2. **Three evaluators = three things to learn.** Lead with ONE: `contains`. That's it. Everything else is "advanced."
+3. **No cost visibility.** Someone will run 100 semantic checks and get a surprise bill. Tell them upfront.
 
-## 30-Second Elevator Pitch
+## The 30-second elevator pitch:
 
-"Your website looks generic and you know it. Wardrobe gives you a pro look in 3 seconds. One command: `npx wardrobe install ember`. Your content stays, only the skin changes. Like getting dressed — except your site actually looks good."
+> "Your AI agent works in your terminal. Does it work in production? One command tells you — green checkmark or red X. No setup. No dashboard. No prayers."
 
 ## What would I test first with $0 marketing budget?
 
-Tweet the before/after. Not the command — the TRANSFORMATION. Screenshot of ugly default, arrow, screenshot of Ember. "3 seconds." If nobody retweets, the product doesn't have legs. If they do, you've got something.
+**Twitter/X thread.** 30-second video of running `npx agentbench` on a real agent. Show the output. Tag three AI engineers: "Would this save you time?" The tool sells itself or it doesn't.
 
 ## What's the retention hook?
 
-**There isn't one.** Once I pick a theme, I'm done. No updates. No "new season." No reason to return. You need:
-- "Coming Soon: Aurora" — drops next month, notify me
-- "Sites wearing Ember" gallery — social proof
-- Theme updates I want — "Ember 1.1: dark mode toggle"
+**The fear never goes away.** Every new feature, every model update — they'll run AgentBench again. The hook is the anxiety loop: build, test, breathe, repeat. Make that loop feel GOOD.
 
-## Honest Verdict
+## Bottom line:
 
-The copy is beautiful. Architecture is sound. But you built the dressing room before the store. Fix demos and screenshots BEFORE launch — that's where the sale happens.
+This solves a real problem. But the magic is in the FIRST RUN. Nail that or nothing else matters. Ship it, watch what breaks, fix fast.
 
-**Ship when:** Real screenshots and live demos exist. Not before.
+—Sara
