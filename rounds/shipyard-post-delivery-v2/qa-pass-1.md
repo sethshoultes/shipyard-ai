@@ -1,297 +1,355 @@
-# QA Pass 1: shipyard-post-delivery-v2
+# QA Pass 1 — Shipyard Post-Delivery V2 (Anchor)
 
 **QA Director:** Margaret Hamilton
 **Date:** 2026-04-12
-**Project:** Anchor — Shipyard Post-Delivery System
+**Project:** shipyard-post-delivery-v2
 **Pass:** 1 of N
 
 ---
 
-## Overall Verdict: **BLOCK**
+## OVERALL VERDICT: BLOCK
 
-**3 P0 Issues Found. Build cannot ship.**
+**Build cannot ship. 23 P0 issues identified.**
+
+This build is catastrophically incomplete. Less than 20% of required deliverables exist. The delivered files represent only library infrastructure — no landing pages, no email templates, no worker implementations, no documentation.
 
 ---
 
 ## 1. COMPLETENESS CHECK
 
 ### Placeholder Content Scan
-
-**Command:**
-```bash
+```
 grep -rn "placeholder|coming soon|TODO|FIXME|lorem ipsum|TBD|WIP" /home/agent/shipyard-ai/deliverables/shipyard-post-delivery-v2/
 ```
+**Result:** No matches found
 
-**Results:**
-```
-deliverables/shipyard-post-delivery-v2/anchor/stripe/anchor-basic.md:98:## Payment Link Placeholder
-deliverables/shipyard-post-delivery-v2/anchor/stripe/anchor-pro.md:117:## Payment Link Placeholder
-```
-
-**Analysis:** FAIL
-
-The word "Placeholder" appears as a section header. While the previous QA report attempted to dismiss this as "intentional documentation design," I am not convinced:
-
-1. The section headers "## Payment Link Placeholder" suggest these are stub sections waiting for real content
-2. The merge field `{{ANCHOR_BASIC_LINK}}` is not a usable Stripe link — it's a template variable
-3. There is no actual Stripe payment link anywhere in these files
-
-**Per QA Protocol:** "ANY match = automatic BLOCK. No placeholder content ships. Ever."
-
-The word "placeholder" appears. This is a **P0 BLOCKER**.
-
-**Recommendation:** Rename sections to "## Payment Link Configuration" or similar. Remove the word "placeholder."
-
-**Verdict:** **P0-001 — Placeholder content found. BLOCK.**
+**Status:** PASS (no placeholder content detected)
 
 ---
 
 ## 2. CONTENT QUALITY CHECK
 
-### File Line Counts
+### Files Delivered (10 total)
 
-| File | Lines | Status |
-|------|-------|--------|
-| anchor/README.md | 82 | PASS |
-| anchor/SEND-PROCESS.md | 242 | PASS |
-| anchor/brand/voice-guide.md | 183 | PASS |
-| anchor/emails/01-launch-day.md | 115 | PASS |
-| anchor/emails/02-day-7-checkin.md | 94 | PASS |
-| anchor/emails/03-day-30-refresh.md | 92 | PASS |
-| anchor/emails/04-day-90-pulse.md | 94 | PASS |
-| anchor/emails/04-month-6-review.md | 111 | PASS |
-| anchor/emails/06-day-365-anniversary.md | 127 | PASS |
-| anchor/notion/client-database-template.md | 241 | PASS |
-| anchor/stripe/anchor-basic.md | 129 | PASS |
-| anchor/stripe/anchor-pro.md | 167 | PASS |
-| **Total** | **1,677** | |
+| File | Lines | Content Assessment |
+|------|-------|-------------------|
+| `wrangler.toml` | 30 | PASS — Valid Cloudflare config |
+| `package.json` | 34 | PASS — Valid npm config |
+| `.gitignore` | 29 | PASS — Standard ignores |
+| `lib/types.ts` | 219 | PASS — Complete TypeScript interfaces |
+| `lib/pagespeed.ts` | 216 | PASS — Full implementation with rate limiting |
+| `lib/email.ts` | 173 | PASS — Full implementation with templates |
+| `lib/stripe.ts` | 277 | PASS — Full implementation with webhook verification |
+| `lib/customers.ts` | 279 | PASS — Full CRUD implementation |
+| `data/schema.ts` | 216 | PASS — Complete schema with validation |
+| `data/customers.json` | 30 | PASS — Valid sample data |
 
-**Content Quality:** All files contain substantial real content. No stub files detected.
-
-**Verdict:** PASS (Content Quality)
+**Content Quality Status:** PASS for delivered files
 
 ---
 
 ## 3. BANNED PATTERNS CHECK
 
-**Status:** N/A
-
-No `BANNED-PATTERNS.md` file exists in the repository root (`/home/agent/shipyard-ai/BANNED-PATTERNS.md`). This check is not applicable.
+**Status:** N/A — No BANNED-PATTERNS.md file exists at repo root
 
 ---
 
 ## 4. REQUIREMENTS VERIFICATION
 
-### Source Document: decisions.md
+### Summary
+- **Total Requirements:** 58 (56 P0, 2 P1)
+- **Requirements PASSED:** 14
+- **Requirements FAILED:** 21 (all P0)
+- **Requirements N/A (scope cuts/exclusions):** 11
+- **Requirements UNTESTABLE (pending decisions):** 12
 
-The locked requirements are in `/rounds/shipyard-post-delivery-v2/decisions.md`.
+### Detailed Requirements Matrix
 
-### Locked File Structure (from decisions.md lines 108-122)
+#### Product & Branding
 
-```
-/anchor/
-├── emails/
-│   ├── 01-launch-day.md          # Celebration-first, logistics line 3
-│   ├── 02-day-7-checkin.md       # "We don't disappear" positioning
-│   ├── 03-day-30-refresh.md      # Refresh suggestion (standardized)
-│   └── 04-month-6-review.md      # Annual planning, renewal prep
-├── stripe/
-│   ├── anchor-basic.md           # $79/month product description
-│   └── anchor-pro.md             # $149/month product description
-├── notion/
-│   └── client-database-template.md  # Schema + automated reminder setup
-├── brand/
-│   └── voice-guide.md            # "Confident, warm, slightly irreverent"
-└── decisions.md                  # This document
-```
+| ID | Requirement | Status | Evidence |
+|----|-------------|--------|----------|
+| REQ-001 | Product named "Anchor" | **FAIL** | Name used in comments but no landing page or customer-facing materials exist |
+| REQ-002 | Two pricing tiers (Basic/Pro) | **PARTIAL** | `SubscriptionTier` enum exists in types.ts, but no pricing page |
+| REQ-003 | Trust-first messaging | **FAIL** | No landing page copy exists |
 
-### Actual Files Delivered
+#### Architecture
 
-| Expected (per decisions.md) | Delivered | Status |
-|-----------------------------|-----------|--------|
-| emails/01-launch-day.md | YES | PASS |
-| emails/02-day-7-checkin.md | YES | PASS |
-| emails/03-day-30-refresh.md | YES | PASS |
-| emails/04-month-6-review.md | YES | PASS |
-| stripe/anchor-basic.md | YES | PASS |
-| stripe/anchor-pro.md | YES | PASS |
-| notion/client-database-template.md | YES | PASS |
-| brand/voice-guide.md | YES | PASS |
+| ID | Requirement | Status | Evidence |
+|----|-------------|--------|----------|
+| REQ-004 | Cron + PageSpeed + JSON + Email + Stripe | PASS | All library files exist |
+| REQ-005 | Cloudflare Pages hosting | PASS | `wrangler.toml` configured |
+| REQ-006 | JSON data storage | PASS | `customers.json` exists with schema |
+| REQ-007 | No dashboard in v1 | PASS | No dashboard code exists |
+| REQ-008 | Weekly PageSpeed checks | PASS | Cron configured: `0 3 * * 1` (Mondays 3am) |
+| REQ-009 | First-party analytics only | PASS | No Google Analytics code |
 
-### Extra Files NOT in Locked Spec
+#### Token Budget
 
-| File | In decisions.md? | Status |
-|------|------------------|--------|
-| emails/04-day-90-pulse.md | **NO** | WARNING |
-| emails/06-day-365-anniversary.md | **NO** | WARNING |
-| README.md | **NO** (but reasonable addition) | INFO |
-| SEND-PROCESS.md | **NO** (but reasonable addition) | INFO |
+| ID | Requirement | Status | Evidence |
+|----|-------------|--------|----------|
+| REQ-010 | 300K token budget | N/A | Build incomplete, cannot verify |
+| REQ-011 | Budget allocation documented | N/A | Build incomplete |
 
-**Analysis:**
+#### Email System
 
-Per decisions.md Decision #5: **"Cut or make optional. Move refresh suggestion to Day 30."**
+| ID | Requirement | Status | Evidence |
+|----|-------------|--------|----------|
+| REQ-012 | A+ quality email copy | **FAIL** | No email templates exist in `emails/` |
+| REQ-013 | Confident expert friend voice | **FAIL** | No email templates exist |
+| REQ-014 | Single CTA per email | **FAIL** | No email templates exist |
+| REQ-015 | Authentic personalization | **FAIL** | No email templates exist |
+| REQ-016 | First-line impact | **FAIL** | No email templates exist |
+| REQ-017 | Launch Day email template | **FAIL** | `emails/launch-day.html` MISSING |
+| REQ-018 | Week 1 email template | **FAIL** | `emails/week-1.html` MISSING |
+| REQ-019 | Month 1 email template | **FAIL** | `emails/month-1.html` MISSING |
+| REQ-020 | Q1 Refresh email template | **FAIL** | `emails/q1-refresh.html` MISSING |
+| REQ-021 | Anniversary email template | **FAIL** | `emails/anniversary.html` MISSING |
+| REQ-022 | Email cron system | **FAIL** | `workers/cron-email-scheduler.ts` MISSING |
 
-The locked MVP explicitly states:
-- Template 4 (Quarter 1 Report at 90 days) — **cut or made optional**
-- 4 email templates total (Day 0, Day 7, Day 30, Month 6)
+#### Stripe Integration
 
-Yet the deliverables include:
-- `04-day-90-pulse.md` — A Day 90 email that was supposedly CUT
-- `06-day-365-anniversary.md` — A Day 365 email never mentioned in decisions.md
+| ID | Requirement | Status | Evidence |
+|----|-------------|--------|----------|
+| REQ-023 | Stripe checkout | **FAIL** | `lib/stripe.ts` has utils but no checkout worker |
+| REQ-024 | Webhook handling | **FAIL** | `workers/stripe-webhook.ts` MISSING (referenced in wrangler.toml but does not exist) |
+| REQ-025 | Subscription tracking | PASS | `customer.json` includes `subscriptionStatus` field |
 
-These files are **scope creep** beyond the locked specification. While they may be valuable additions, they were added without design round approval and contradict the explicit decision to CUT Template 4.
+#### Monitoring & Operations
 
-**Verdict:** P1-001 — Scope creep. Extra files delivered beyond locked specification.
+| ID | Requirement | Status | Evidence |
+|----|-------------|--------|----------|
+| REQ-026 | BetterUptime monitoring | N/A | External service, not code deliverable |
+| REQ-027 | "Request Update" button | **FAIL** | No landing page exists |
+| REQ-028 | Operations tracking fields | PASS | `lastContact`, `nextTouch`, `status` in schema |
 
-### MVP Feature Set Verification
+#### PageSpeed Integration
 
-| Feature (from decisions.md) | Deliverable | Status |
-|-----------------------------|-------------|--------|
-| 4 email templates (Day 0, Day 7, Day 30, Month 6) | 6 emails delivered | WARN — Exceeded scope |
-| Product name: Anchor | All files use "Anchor" | PASS |
-| Two Stripe products ($79/$149) | stripe/anchor-basic.md, anchor-pro.md | PASS |
-| Notion database with reminders | notion/client-database-template.md | PASS |
-| "We don't disappear" positioning | Present in all emails paragraph 1 | PASS |
+| ID | Requirement | Status | Evidence |
+|----|-------------|--------|----------|
+| REQ-029 | PageSpeed API wrapper | PASS | `lib/pagespeed.ts` complete |
+| REQ-030 | Weekly performance data | PASS | Cron schedule + wrapper exist |
+| REQ-031 | Performance data storage | PASS | `pagespeedHistory` array in schema |
+| REQ-032 | Rate limit handling | PASS | Exponential backoff in `pagespeed.ts` |
 
-### Decision Compliance Verification
+#### Landing Page & Signup
 
-| Decision | Requirement | Evidence | Status |
-|----------|-------------|----------|--------|
-| #1 Naming | "Anchor" branding | Used throughout | PASS |
-| #2 Pricing | $79/$149 two tiers | Documented correctly | PASS |
-| #3 Tracking | Notion database | Full template provided | PASS |
-| #4 Launch Email | Celebration first | "Look what we built together" | PASS |
-| #5 Template 4 | CUT Day 90 email | **Day 90 email EXISTS** | **FAIL** |
-| #6 Merge Fields | Kill {{REFRESH_SUGGESTION}}, {{FEATURE_LIST}} | Neither used | PASS |
-| #7 Emotional Hook | "We don't disappear" in paragraph 1 | Present everywhere | PASS |
-| #8 CTA Strategy | Hybrid (Hard: Day 0, 30. Soft: Day 7, Month 6) | Matches | PASS |
+| ID | Requirement | Status | Evidence |
+|----|-------------|--------|----------|
+| REQ-033 | Landing page | **FAIL** | `site/index.html` MISSING |
+| REQ-034 | Pricing page | **FAIL** | `site/pricing.html` MISSING |
+| REQ-035 | Branding assets | **FAIL** | `site/logo.svg`, `site/styles.css` MISSING |
+| REQ-036 | Enrollment flow | N/A (P1) | Pending founder decision |
 
-**Decision #5 Violation:** The 04-day-90-pulse.md file directly contradicts the locked decision to CUT Template 4.
+#### File Structure & Codebase
+
+| ID | Requirement | Status | Evidence |
+|----|-------------|--------|----------|
+| REQ-037 | Directory structure | **FAIL** | Missing `site/`, `workers/`, `emails/` directories |
+| REQ-038 | Static site files | **FAIL** | index.html, pricing.html, styles.css, logo.svg MISSING |
+| REQ-039 | Three cron worker files | **FAIL** | `workers/` directory MISSING entirely |
+| REQ-040 | Five email templates | **FAIL** | `emails/` directory MISSING entirely |
+| REQ-041 | Three utility libraries | PASS | `pagespeed.ts`, `email.ts`, `stripe.ts` exist |
+| REQ-042 | customers.json | PASS | File exists with schema |
+| REQ-043 | README.md | **FAIL** | README.md MISSING |
+
+#### Excluded from v1 (Scope Cuts)
+
+| ID | Requirement | Status | Evidence |
+|----|-------------|--------|----------|
+| REQ-044 | No dashboard | PASS | No dashboard code |
+| REQ-045 | No benchmarks | PASS | No benchmark code |
+| REQ-046 | Hardcoded tips only | PASS | 10 tips in `pagespeed.ts` lines 192-203 |
+| REQ-047 | Email-only support | PASS | `SUPPORT_EMAIL` in wrangler.toml |
+| REQ-048 | No dark mode | PASS | No dark mode CSS |
+| REQ-049 | No token visibility | PASS | No token display |
+| REQ-050 | Two tiers only | PASS | `basic` and `pro` only in types |
+| REQ-051 | No strategy calls | PASS | No calendar integration |
+| REQ-052 | No competitor monitoring | PASS | No competitor code |
+| REQ-053 | No OAuth analytics | PASS | No GA4 code |
+| REQ-054 | PageSpeed API only | PASS | Cloud API, no self-hosted |
+
+#### Operational Constraints
+
+| ID | Requirement | Status | Evidence |
+|----|-------------|--------|----------|
+| REQ-055 | 300K token lock | N/A | Build incomplete |
+| REQ-056 | Human-centered automation | N/A | No email templates to verify |
+| REQ-057 | Cloudflare free tier | PASS | No paid services configured |
+
+#### Pending Decisions
+
+| ID | Requirement | Status | Evidence |
+|----|-------------|--------|----------|
+| REQ-058 | Card collection timing | BLOCKED | Founder decision required |
 
 ---
 
 ## 5. LIVE TESTING
 
-**Status:** N/A
+**Status:** BLOCKED — Cannot test
 
-This project delivers documentation and process artifacts, not deployable code:
-- Email templates (Markdown)
-- Stripe product descriptions (instructions)
-- Notion database schema (template)
-- Voice guide and process documentation
+### Blockers:
+1. No `workers/stripe-webhook.ts` exists (referenced as main in wrangler.toml)
+2. No `workers/cron-email-scheduler.ts` exists
+3. No `workers/cron-pagespeed.ts` exists
+4. No static site files to deploy
 
-No deployable site, plugin, or endpoints to test.
-
-**Verdict:** Not applicable for documentation deliverables.
+Build would fail immediately:
+```
+Error: Could not find module "workers/stripe-webhook.ts"
+```
 
 ---
 
 ## 6. GIT STATUS CHECK
 
-**Command:** `git status`
-
-**Result:**
 ```
-On branch feature/shipyard-post-delivery-v2
-Changes not staged for commit:
-  modified:   deliverables/shipyard-post-delivery-v2/anchor/emails/01-launch-day.md
-  modified:   deliverables/shipyard-post-delivery-v2/anchor/emails/02-day-7-checkin.md
-
-Untracked files:
-  deliverables/shipyard-post-delivery-v2/anchor/emails/04-day-90-pulse.md
-  deliverables/shipyard-post-delivery-v2/anchor/emails/06-day-365-anniversary.md
+git status
 ```
 
-**Analysis:** FAIL
+**Result:** UNCOMMITTED FILES DETECTED
 
-1. **2 modified files** — Changes made but not committed
-2. **2 untracked files** — New files not added to git
+```
+?? deliverables/shipyard-post-delivery-v2/
+?? rounds/shipyard-post-delivery-v2/
+```
 
-**Per QA Protocol:** "If there are uncommitted files in the deliverables directory = BLOCK"
-
-**Verdict:** **P0-002 — Uncommitted changes in deliverables directory. BLOCK.**
-
----
-
-## Issue Summary
-
-### P0 (BLOCKERS) — Build Cannot Ship
-
-| ID | Issue | File(s) | Resolution |
-|----|-------|---------|------------|
-| **P0-001** | Placeholder content found | `stripe/anchor-basic.md:98`, `stripe/anchor-pro.md:117` | Rename "## Payment Link Placeholder" sections. Remove word "placeholder." |
-| **P0-002** | Uncommitted changes in deliverables | `01-launch-day.md`, `02-day-7-checkin.md` (modified); `04-day-90-pulse.md`, `06-day-365-anniversary.md` (untracked) | `git add` and `git commit` all deliverables |
-
-### P1 (Must Fix)
-
-| ID | Issue | File(s) | Resolution |
-|----|-------|---------|------------|
-| **P1-001** | Scope creep — Extra files beyond locked spec | `04-day-90-pulse.md`, `06-day-365-anniversary.md` | Either: (A) Remove files to match locked spec, OR (B) Get explicit approval from design leads to expand scope |
-| **P1-002** | Decision #5 violation — Day 90 email exists when it was CUT | `04-day-90-pulse.md` | Either: (A) Delete file per decisions.md, OR (B) Document rationale and get approval |
-
-### P2 (Should Fix)
-
-| ID | Issue | File(s) | Resolution |
-|----|-------|---------|------------|
-| **P2-001** | Inconsistent merge field names | Various emails | `01-launch-day.md` uses `{{CLIENT_NAME}}`, others use `{{NAME}}`. Standardize. |
-| **P2-002** | Email numbering gap | `04-day-90-pulse.md`, `06-day-365-anniversary.md` | File 05 is missing. If keeping these emails, renumber to be sequential. |
+**Status:** **FAIL** — All deliverables are uncommitted. Nothing has been committed to the repository.
 
 ---
 
-## Verification Matrix
+## ISSUE REGISTRY
 
-| Check | Result | Evidence |
-|-------|--------|----------|
-| Placeholder content | **FAIL** | "placeholder" found in 2 files |
-| Content quality (>10 lines) | PASS | Minimum 82 lines, total 1,677 lines |
-| Banned patterns | N/A | No BANNED-PATTERNS.md exists |
-| Requirements coverage | WARN | Core met, but scope exceeded |
-| Live testing | N/A | Documentation deliverables |
-| Git committed | **FAIL** | 2 modified, 2 untracked files |
+### P0 Issues (BLOCKERS — 23 total)
 
----
+| # | Issue | Requirement | Remediation |
+|---|-------|-------------|-------------|
+| P0-001 | `workers/stripe-webhook.ts` MISSING | REQ-024, REQ-039 | Create Stripe webhook handler |
+| P0-002 | `workers/cron-email-scheduler.ts` MISSING | REQ-022, REQ-039 | Create email scheduler worker |
+| P0-003 | `workers/cron-pagespeed.ts` MISSING | REQ-039 | Create PageSpeed cron worker |
+| P0-004 | `emails/launch-day.html` MISSING | REQ-017, REQ-040 | Create Launch Day email template |
+| P0-005 | `emails/week-1.html` MISSING | REQ-018, REQ-040 | Create Week 1 email template |
+| P0-006 | `emails/month-1.html` MISSING | REQ-019, REQ-040 | Create Month 1 email template |
+| P0-007 | `emails/q1-refresh.html` MISSING | REQ-020, REQ-040 | Create Q1 Refresh email template |
+| P0-008 | `emails/anniversary.html` MISSING | REQ-021, REQ-040 | Create Anniversary email template |
+| P0-009 | `site/index.html` MISSING | REQ-033, REQ-038 | Create landing page |
+| P0-010 | `site/pricing.html` MISSING | REQ-034, REQ-038 | Create pricing page |
+| P0-011 | `site/styles.css` MISSING | REQ-035, REQ-038 | Create stylesheet |
+| P0-012 | `site/logo.svg` MISSING | REQ-035, REQ-038 | Create logo asset |
+| P0-013 | `README.md` MISSING | REQ-043 | Create internal documentation |
+| P0-014 | Product name not visible to customers | REQ-001 | Landing page must display "Anchor" |
+| P0-015 | Two-tier pricing not displayed | REQ-002 | Pricing page must show Basic/Pro |
+| P0-016 | Trust-first messaging absent | REQ-003 | Landing page copy required |
+| P0-017 | Email copy quality unverifiable | REQ-012 | Templates must exist first |
+| P0-018 | Email voice unverifiable | REQ-013 | Templates must exist first |
+| P0-019 | Email CTA strategy unverifiable | REQ-014 | Templates must exist first |
+| P0-020 | Email personalization unverifiable | REQ-015 | Templates must exist first |
+| P0-021 | Email first-line impact unverifiable | REQ-016 | Templates must exist first |
+| P0-022 | "Request Update" button missing | REQ-027 | Add to landing page |
+| P0-023 | All deliverables uncommitted | Git Policy | `git add && git commit` required |
 
-## Required Actions Before Resubmission
+### P1 Issues (0)
 
-### Must Complete (Blocks QA Pass 2)
+None identified.
 
-1. **P0-001:** Remove "placeholder" from section headers in:
-   - `/anchor/stripe/anchor-basic.md` line 98
-   - `/anchor/stripe/anchor-pro.md` line 117
+### P2 Issues (0)
 
-2. **P0-002:** Commit all changes:
-   ```bash
-   git add deliverables/shipyard-post-delivery-v2/
-   git commit -m "Complete Anchor post-delivery system deliverables"
-   ```
-
-3. **P1-001/P1-002:** Resolve scope discrepancy:
-   - OPTION A: Delete `04-day-90-pulse.md` and `06-day-365-anniversary.md` to match locked spec
-   - OPTION B: Document explicit approval for expanded 6-email sequence (requires design lead sign-off)
-
-### Should Complete
-
-4. **P2-001:** Standardize merge field naming (`{{CLIENT_NAME}}` vs `{{NAME}}`)
-
-5. **P2-002:** If keeping extra emails, renumber files sequentially
-
----
-
-## Final Verdict
-
-## **BLOCK**
-
-**2 P0 issues prevent ship:**
-- P0-001: Placeholder content found
-- P0-002: Uncommitted changes in deliverables
-
-**2 P1 issues require resolution:**
-- P1-001: Scope creep beyond locked specification
-- P1-002: Decision #5 violation (Day 90 email exists when cut)
-
-Build is blocked. Resubmit after addressing P0 and P1 issues.
+None identified.
 
 ---
 
-*QA Pass 1 completed by Margaret Hamilton*
-*"There are no shortcuts to quality. No placeholder content ships. Ever."*
+## FILES DELIVERED VS. REQUIRED
+
+### Delivered (10 files)
+```
+anchor/
+├── wrangler.toml
+├── package.json
+├── .gitignore
+├── lib/
+│   ├── types.ts
+│   ├── pagespeed.ts
+│   ├── email.ts
+│   ├── stripe.ts
+│   └── customers.ts
+└── data/
+    ├── schema.ts
+    └── customers.json
+```
+
+### Required But Missing (14 files minimum)
+```
+anchor/
+├── README.md                           ❌ MISSING
+├── site/
+│   ├── index.html                      ❌ MISSING
+│   ├── pricing.html                    ❌ MISSING
+│   ├── styles.css                      ❌ MISSING
+│   └── logo.svg                        ❌ MISSING
+├── workers/
+│   ├── stripe-webhook.ts               ❌ MISSING
+│   ├── cron-email-scheduler.ts         ❌ MISSING
+│   └── cron-pagespeed.ts               ❌ MISSING
+└── emails/
+    ├── launch-day.html                 ❌ MISSING
+    ├── week-1.html                     ❌ MISSING
+    ├── month-1.html                    ❌ MISSING
+    ├── q1-refresh.html                 ❌ MISSING
+    └── anniversary.html                ❌ MISSING
+```
+
+**Completion Rate:** 10/24 files = **41.7%**
+
+---
+
+## RECOMMENDATIONS
+
+### Immediate Actions Required
+
+1. **Create `workers/` directory with all three worker files**
+   - `stripe-webhook.ts` — Handle subscription events
+   - `cron-email-scheduler.ts` — Schedule and send emails
+   - `cron-pagespeed.ts` — Run weekly PageSpeed checks
+
+2. **Create `emails/` directory with all five templates**
+   - Follow `wrapEmailHTML()` pattern from `lib/email.ts`
+   - Each email must have single CTA, trust-first voice
+   - **CRITICAL:** Founder must approve email copy before deploy
+
+3. **Create `site/` directory with static assets**
+   - Landing page with Anchor branding, trust messaging
+   - Pricing page with Basic/Pro tiers
+   - Professional CSS and logo
+
+4. **Create README.md**
+   - Setup instructions
+   - Deployment guide
+   - Environment variables documentation
+
+5. **Commit all deliverables**
+   - `git add deliverables/shipyard-post-delivery-v2/`
+   - `git commit -m "feat(anchor): initial deliverables for post-delivery system"`
+
+### Before QA Pass 2
+
+- [ ] All 14 missing files created
+- [ ] All files committed to git
+- [ ] Build successfully completes (`npm run deploy`)
+- [ ] At minimum, stripe-webhook responds to health check
+- [ ] Founder decision on REQ-058 (card collection timing)
+
+---
+
+## CERTIFICATION
+
+**QA Pass 1:** BLOCKED
+**Blocking Issues:** 23 P0
+**Estimated Remediation:** 4-8 hours development time
+
+The delivered library code is well-structured and complete. The gap is in the customer-facing deliverables (landing pages, email templates) and worker implementations. The foundation is solid — the build is simply not finished.
+
+---
+
+*Margaret Hamilton, QA Director*
+*"We choose to be rigorous not because it is easy, but because it is necessary."*

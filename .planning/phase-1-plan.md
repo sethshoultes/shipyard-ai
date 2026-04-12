@@ -1,45 +1,54 @@
-# Phase 1 Plan — Tuned (Prompt Version Control)
+# Phase 1 Plan — Anchor Post-Delivery System
 
 **Generated**: April 12, 2026
-**Project Slug**: promptops
-**Product Name**: Tuned (formerly PromptOps)
+**Project Slug**: shipyard-post-delivery-v2
+**Product Name**: Anchor (Post-Delivery System)
 **Requirements**: .planning/REQUIREMENTS.md
-**Total Tasks**: 14
+**Total Tasks**: 15
 **Waves**: 4
-**Status**: READY FOR BUILD
-**Time Budget**: 7 hours
+**Status**: READY FOR BUILD (pending founder decisions)
+**Token Budget**: 300K max
 
 ---
 
 ## The Essence
 
-> **What it's really about:** Closing the gap between knowing AI is powerful and knowing how to wield it.
+> **What it's really about:** Making clients feel watched over after their site launches.
 
-> **The feeling:** Competence. The relief of finally understanding what you're saying.
+> **What it evokes:** "Someone's got my back."
 
-> **The one thing that must be perfect:** First touch — value before effort, in under 60 seconds.
+> **What must be perfect:** The emails. They are the entire product.
 
-> **Creative direction:** Instrument, not control panel.
+> **Creative direction:** Trust before transaction.
 
 ---
 
 ## Build Status
 
 **Technical MVP:** 0% (greenfield build)
-**Board Verdict:** LOCKED (Steve + Elon convergence complete)
-**Current State:** Debate complete, ready for build
+**Board Verdict:** LOCKED (decisions.md consolidated)
+**Current State:** Debate complete, awaiting founder decision on REQ-058 (card timing)
 
 ### Locked Decisions
 
 | Decision | Winner | Rationale |
 |----------|--------|-----------|
-| Product Name: **Tuned** | Steve Jobs | "PromptOps sounds like IT middleware. Tuned is one word, musical, works as verb and noun." |
-| Architecture: **SDK-Only, No Proxy** | Elon Musk | Proxy adds 15-80ms latency — commercial suicide. Zero latency impact. |
-| Time Constraint: **7 Hours** | Elon Musk | If it can't be built in 7 hours, it's cut. |
-| CLI Is The Product | Elon Musk | `tuned push` must work in <60 seconds from install. |
-| Dashboard: **Static HTML** | Elon Musk | No React, no build process, read-only. |
-| Brand Voice: **Direct, Confident** | Steve Jobs | "This prompt has a problem. Here's the fix." |
-| Pricing: **One Tier** | Steve Jobs | No feature walls, full product at one price. |
+| Product Name: **Anchor** | Steve Jobs | "Post-Delivery System takes five syllables to say nothing. Anchor takes two to say everything." |
+| Architecture: **Cron + JSON + Email + Stripe** | Elon Musk | "Infrastructure should follow traction, not precede it." |
+| No Dashboard in v1 | Both | "Build the relationship first. Earn the right to ask for a login." |
+| Token Budget: **300K** | Elon Musk | "The 900K estimate is fantasy. 270K is real." |
+| Email Quality: **A+ or don't ship** | Steve Jobs | "The email IS the entire product. Copy is not decoration." |
+| Two Tiers Only | Elon Musk | Cut complexity. Three tiers is v2. |
+| Weekly PageSpeed | Elon Musk | "Daily is vanity. Weekly is useful." |
+| First-Party Analytics | Elon Musk | "OAuth for Google Analytics is a dead end." |
+
+### UNRESOLVED (Blocking)
+
+| Decision | Elon's Position | Steve's Position |
+|----------|-----------------|------------------|
+| Card Collection Timing | Card at project start (5x attach rate) | No card until trust earned (trust before transaction) |
+
+**This must be resolved before Wave 3 (signup flow) can begin.**
 
 ---
 
@@ -47,93 +56,102 @@
 
 | Requirement | Task(s) | Wave |
 |-------------|---------|------|
-| REQ-025, REQ-026, REQ-028: D1 Schema | phase-1-task-1 | 1 |
-| REQ-027, REQ-030: KV + Worker Config | phase-1-task-2 | 1 |
-| REQ-029, REQ-032: Config + API Key Strategy | phase-1-task-3 | 1 |
-| REQ-007, REQ-008: CRUD Prompts/Versions | phase-1-task-4 | 2 |
-| REQ-009, REQ-010: KV Read + Sync | phase-1-task-5 | 2 |
-| REQ-011, REQ-031: Async Logging | phase-1-task-6 | 2 |
-| REQ-001: tuned init | phase-1-task-7 | 3 |
-| REQ-002: tuned push | phase-1-task-8 | 3 |
-| REQ-003: tuned list | phase-1-task-9 | 3 |
-| REQ-004: tuned rollback | phase-1-task-10 | 3 |
-| REQ-015, REQ-016, REQ-017, REQ-019: SDK | phase-1-task-11 | 3 |
-| REQ-020, REQ-021, REQ-022, REQ-023, REQ-024: Dashboard | phase-1-task-12 | 4 |
-| REQ-006: Quickstart Docs | phase-1-task-13 | 4 |
-| Sara Blakely customer gut-check | phase-1-task-14 | 4 |
+| REQ-037: Project Structure | phase-1-task-1 | 1 |
+| REQ-041, REQ-029: Lib files + PageSpeed wrapper | phase-1-task-2 | 1 |
+| REQ-042: Customer JSON schema | phase-1-task-3 | 1 |
+| REQ-022, REQ-039: Email cron worker | phase-1-task-4 | 2 |
+| REQ-030, REQ-031, REQ-032, REQ-039: PageSpeed cron | phase-1-task-5 | 2 |
+| REQ-023, REQ-024, REQ-025, REQ-039: Stripe webhook | phase-1-task-6 | 2 |
+| REQ-017: Launch Day email | phase-1-task-7 | 3 |
+| REQ-018: Week 1 email | phase-1-task-8 | 3 |
+| REQ-019: Month 1 email | phase-1-task-9 | 3 |
+| REQ-020: Q1 Refresh email | phase-1-task-10 | 3 |
+| REQ-021: Anniversary email | phase-1-task-11 | 3 |
+| REQ-033, REQ-034, REQ-035, REQ-038: Landing + Pricing | phase-1-task-12 | 4 |
+| REQ-043: README documentation | phase-1-task-13 | 4 |
+| REQ-026: BetterUptime setup | phase-1-task-14 | 4 |
+| Sara Blakely customer gut-check | phase-1-task-15 | 4 |
 
 ---
 
 ## Documentation References
 
-This plan cites specific sections from the source documents:
+This plan cites specific sections from source documents:
 
-- **decisions.md**: MVP Feature Set, File Structure, Database Schema
-- **decisions.md Section VII**: Build Phase Priorities (7-hour breakdown)
-- **docs/EMDASH-GUIDE.md Section 5**: Cloudflare deployment (D1, R2, wrangler.toml)
-- **Codebase patterns**: /workers/wardrobe-analytics/ (D1 binding), /workers/contact-form/ (CORS), /memory-store/ (CLI)
+- **decisions.md**: MVP Feature Set, File Structure, Risk Register
+- **docs/EMDASH-GUIDE.md Section 5**: Cloudflare Workers deployment (wrangler.jsonc, D1/R2)
+- **docs/EMDASH-GUIDE.md Section 8**: Real examples (Bella's Bistro configuration)
+- **Codebase patterns**:
+  - `/workers/contact-form/` (Resend API, CORS, email sending)
+  - `/apps/pulse/lib/stripe.ts` (Stripe integration, idempotency)
+  - `/plugins/eventdash/src/email.ts` (HTML email templates)
 
 ---
 
 ## Wave Execution Order
 
-### Wave 1 (Parallel) — Infrastructure Foundation
+### Wave 1 (Parallel) — Project Foundation
 
-Three independent tasks setting up database, KV, and configuration. **Time budget: 1.5 hours**
+Three independent tasks setting up project structure, libraries, and data schema. **Token budget: 30K**
 
 ```xml
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Create D1 database schema</title>
-  <requirement>REQ-025: Prompts Table, REQ-026: Versions Table, REQ-028: D1 Creation</requirement>
+  <title>Create Anchor project directory structure</title>
+  <requirement>REQ-037: Project Structure with site/, workers/, emails/, data/, lib/</requirement>
   <description>
-    Per decisions.md File Structure and Database Schema sections:
-    Create D1 database with prompts and versions tables.
+    Per decisions.md File Structure section:
+    Create the complete Anchor project skeleton with all required directories.
 
-    Schema from decisions.md:
-    - prompts: id (TEXT PK), name (TEXT UNIQUE), created_at, updated_at
-    - versions: id (TEXT PK), prompt_id (FK), version (INT), content (TEXT), is_active (BOOL), created_at
-
-    Reference: /workers/wardrobe-analytics/schema.sql for D1 pattern
+    Target structure from decisions.md:
+    anchor/
+    ├── site/                 # Cloudflare Pages static site
+    ├── workers/              # Cron workers
+    ├── emails/               # HTML email templates
+    ├── data/                 # customers.json
+    ├── lib/                  # Utility libraries
+    └── scripts/              # Deploy scripts
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/workers/wardrobe-analytics/schema.sql" reason="D1 schema pattern" />
-    <file path="/home/agent/shipyard-ai/workers/wardrobe-analytics/wrangler.toml" reason="D1 binding config" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5: D1 deployment" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Database Schema section" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="File Structure section defines layout" />
+    <file path="/home/agent/shipyard-ai/workers/contact-form/" reason="Reference Cloudflare Worker structure" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5: wrangler.jsonc patterns" />
   </context>
 
   <steps>
-    <step order="1">Create /home/agent/shipyard-ai/projects/tuned/worker/ directory structure</step>
-    <step order="2">Create schema.sql with prompts table: id TEXT PRIMARY KEY, name TEXT UNIQUE NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP</step>
-    <step order="3">Add versions table: id TEXT PRIMARY KEY, prompt_id TEXT REFERENCES prompts(id), version INTEGER NOT NULL, content TEXT NOT NULL, is_active BOOLEAN DEFAULT false, created_at DATETIME DEFAULT CURRENT_TIMESTAMP</step>
-    <step order="4">Add index on versions(prompt_id, version) for efficient lookups</step>
-    <step order="5">Add index on versions(is_active) for finding active versions</step>
-    <step order="6">Create wrangler.toml with D1 database binding (binding: DB)</step>
-    <step order="7">Add KV namespace binding placeholder (binding: PROMPTS_KV)</step>
-    <step order="8">Set compatibility_date and compatibility_flags per docs/EMDASH-GUIDE.md</step>
+    <step order="1">Create /home/agent/shipyard-ai/projects/anchor/ root directory</step>
+    <step order="2">Create site/ directory with assets/ subdirectory</step>
+    <step order="3">Create workers/ directory for cron workers</step>
+    <step order="4">Create emails/ directory for 5 HTML templates</step>
+    <step order="5">Create data/ directory for customers.json</step>
+    <step order="6">Create lib/ directory for utility libraries</step>
+    <step order="7">Create scripts/ directory for deploy scripts</step>
+    <step order="8">Create wrangler.toml with compatibility_date per EMDASH-GUIDE.md Section 5</step>
+    <step order="9">Create package.json with project metadata and wrangler dependency</step>
+    <step order="10">Create .gitignore for node_modules, .env, *.log</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/worker/schema.sql && echo "schema exists"</check>
-    <check type="bash">grep "prompts" /home/agent/shipyard-ai/projects/tuned/worker/schema.sql</check>
-    <check type="bash">grep "versions" /home/agent/shipyard-ai/projects/tuned/worker/schema.sql</check>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/worker/wrangler.toml && echo "wrangler exists"</check>
-    <check type="test">Both tables defined with correct columns</check>
+    <check type="bash">test -d /home/agent/shipyard-ai/projects/anchor/site && echo "site dir exists"</check>
+    <check type="bash">test -d /home/agent/shipyard-ai/projects/anchor/workers && echo "workers dir exists"</check>
+    <check type="bash">test -d /home/agent/shipyard-ai/projects/anchor/emails && echo "emails dir exists"</check>
+    <check type="bash">test -d /home/agent/shipyard-ai/projects/anchor/lib && echo "lib dir exists"</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/wrangler.toml && echo "wrangler exists"</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>feat(tuned): create D1 database schema
+  <commit-message>feat(anchor): create project directory structure
 
-Per decisions.md Database Schema section:
-- prompts table with name uniqueness
-- versions table with FK to prompts
-- is_active flag for version selection
-- Indexes for efficient queries
-- wrangler.toml with D1 binding
+Per decisions.md File Structure:
+- site/ for Cloudflare Pages static site
+- workers/ for cron automation
+- emails/ for 5 HTML templates
+- data/ for JSON customer storage
+- lib/ for utility libraries
+- wrangler.toml configured per EMDASH-GUIDE.md Section 5
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -141,56 +159,63 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-2" wave="1">
-  <title>Configure Edge KV namespace and Worker entry</title>
-  <requirement>REQ-027: KV Schema, REQ-030: Worker Env, REQ-012: Worker Config</requirement>
+  <title>Create utility libraries (pagespeed, email, stripe)</title>
+  <requirement>REQ-041: Library Files, REQ-029: PageSpeed API Wrapper</requirement>
   <description>
-    Per decisions.md Edge KV Structure:
-    Key format: prompt:{name}
-    Value: { version: number, content: string }
+    Per decisions.md lib/ section:
+    Create three utility libraries with clean interfaces.
 
-    Create Worker entry point with routing skeleton.
-    Reference: /workers/prd-chat/src/index.ts for routing pattern
+    - pagespeed.js: Google PageSpeed Insights API wrapper
+    - email.js: Resend API integration (per existing /workers/contact-form/ pattern)
+    - stripe.js: Stripe SDK wrapper (per existing /apps/pulse/lib/stripe.ts pattern)
+
+    Reference: EMDASH-GUIDE.md Section 6 shows ctx.http for external API calls.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/workers/prd-chat/src/index.ts" reason="Worker routing pattern" />
-    <file path="/home/agent/shipyard-ai/workers/contact-form/src/index.ts" reason="CORS and validation pattern" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Edge KV Structure section" />
+    <file path="/home/agent/shipyard-ai/workers/contact-form/src/index.ts" reason="Resend API email pattern" />
+    <file path="/home/agent/shipyard-ai/apps/pulse/lib/stripe.ts" reason="Stripe singleton + idempotency pattern" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6: ctx.http for external APIs" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="PageSpeed API rate limit mitigation" />
   </context>
 
   <steps>
-    <step order="1">Update wrangler.toml to add KV namespace binding: [[kv_namespaces]] binding = "PROMPTS_KV"</step>
-    <step order="2">Create src/index.ts with Env interface: DB (D1Database), PROMPTS_KV (KVNamespace)</step>
-    <step order="3">Add fetch handler with URL routing using new URL(request.url)</step>
-    <step order="4">Add route stubs: /api/prompts, /api/versions, /kv/prompt/:name, /log</step>
-    <step order="5">Add CORS helper function following /workers/contact-form pattern</step>
-    <step order="6">Add OPTIONS handler for preflight requests</step>
-    <step order="7">Create src/lib/kv.ts with helpers: getActivePrompt(name), setActivePrompt(name, version, content)</step>
-    <step order="8">KV key format: prompt:{name}, value JSON: {version, content}</step>
-    <step order="9">Create tsconfig.json with ES2020 target, strict mode, @cloudflare/workers-types</step>
-    <step order="10">Create package.json with wrangler, typescript, @cloudflare/workers-types</step>
+    <step order="1">Create lib/pagespeed.ts with PageSpeedConfig interface</step>
+    <step order="2">PageSpeed wrapper: getPerformanceScore(url) returns { desktop, mobile, coreWebVitals }</step>
+    <step order="3">Add rate limit handling: exponential backoff on 429 responses</step>
+    <step order="4">Cache results in memory for 6 days (weekly refresh)</step>
+    <step order="5">Create lib/email.ts following /workers/contact-form/ Resend pattern</step>
+    <step order="6">Email wrapper: sendEmail({ to, subject, html, from? }) with Resend REST API</step>
+    <step order="7">Add domain authentication headers (SPF/DKIM compliance)</step>
+    <step order="8">Create lib/stripe.ts following /apps/pulse/lib/stripe.ts pattern</step>
+    <step order="9">Stripe wrapper: createCheckoutSession(), handleWebhook(), getSubscriptionStatus()</step>
+    <step order="10">Add idempotency key generation per existing pattern</step>
+    <step order="11">Add StripeError handling with user-friendly messages</step>
+    <step order="12">Create lib/types.ts with shared TypeScript interfaces</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/worker/src/index.ts && echo "entry exists"</check>
-    <check type="bash">grep "PROMPTS_KV" /home/agent/shipyard-ai/projects/tuned/worker/wrangler.toml</check>
-    <check type="bash">grep "kv_namespaces" /home/agent/shipyard-ai/projects/tuned/worker/wrangler.toml</check>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/worker/src/lib/kv.ts && echo "kv helpers exist"</check>
-    <check type="test">Worker skeleton compiles without errors</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/lib/pagespeed.ts && echo "pagespeed lib exists"</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/lib/email.ts && echo "email lib exists"</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/lib/stripe.ts && echo "stripe lib exists"</check>
+    <check type="bash">grep "exponential\|backoff" /home/agent/shipyard-ai/projects/anchor/lib/pagespeed.ts</check>
+    <check type="bash">grep "idempotency\|Idempotency" /home/agent/shipyard-ai/projects/anchor/lib/stripe.ts</check>
+    <check type="test">All three libraries export documented interfaces</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>feat(tuned): configure Edge KV and Worker entry
+  <commit-message>feat(anchor): create utility libraries
 
-Per decisions.md Edge KV Structure:
-- KV namespace binding: PROMPTS_KV
-- Key format: prompt:{name}
-- Value: {version, content} JSON
-- Worker routing skeleton
-- CORS support for CLI/SDK access
+Per decisions.md lib/ section and existing patterns:
+- pagespeed.ts: PageSpeed Insights API with rate limiting
+- email.ts: Resend API (pattern from /workers/contact-form/)
+- stripe.ts: Stripe SDK (pattern from /apps/pulse/lib/stripe.ts)
+- types.ts: Shared TypeScript interfaces
+
+Cites: EMDASH-GUIDE.md Section 6 for external API patterns
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -198,54 +223,64 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-3" wave="1">
-  <title>Define API key strategy and local config format</title>
-  <requirement>REQ-029: Local Config, REQ-032: API Key Strategy</requirement>
+  <title>Define customers.json schema and seed data</title>
+  <requirement>REQ-042: Customer Data File, REQ-006: JSON Storage, REQ-028: Operations Tracking</requirement>
   <description>
-    Per decisions.md Open Questions - resolved with recommendations:
-    - API key strategy: Project-level key generated on init
-    - Config location: .tuned.json in project root
+    Per decisions.md Data Storage section:
+    JSON storage for up to 100 customers. No database.
 
-    Create config handling for CLI and auth middleware for Worker.
-    Reference: /memory-store/src/store.ts for config patterns
+    Required fields per REQ-028 (Operations Tracking):
+    - Last Contact
+    - Next Touch
+    - Status
+
+    Additional fields from decisions.md MVP:
+    - Customer info (email, Stripe ID)
+    - Subscription tier (Basic/Pro)
+    - Enrollment date
+    - Emails sent tracking
+    - PageSpeed history
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/memory-store/src/store.ts" reason="Config handling pattern" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Open Questions section" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Spreadsheet Columns and Data Storage sections" />
   </context>
 
   <steps>
-    <step order="1">Create /home/agent/shipyard-ai/projects/tuned/cli/ directory structure</step>
-    <step order="2">Create cli/src/config.ts with TunedConfig interface: projectId, apiKey, backendUrl</step>
-    <step order="3">Add loadConfig(): reads .tuned.json from cwd, returns TunedConfig or null</step>
-    <step order="4">Add saveConfig(config): writes .tuned.json to cwd</step>
-    <step order="5">Add configExists(): checks if .tuned.json exists in cwd</step>
-    <step order="6">Create worker/src/lib/auth.ts with validateApiKey(key, env) function</step>
-    <step order="7">API key validation: simple Bearer token check for MVP (projects table gets api_key column later)</step>
-    <step order="8">Create worker/src/lib/auth.ts middleware pattern: check Authorization header</step>
-    <step order="9">Return 401 if no key, 403 if invalid key</step>
-    <step order="10">Document config format in comments: { projectId: "uuid", apiKey: "tuned_...", backendUrl: "https://..." }</step>
+    <step order="1">Create data/customers.json with empty array: { "customers": [] }</step>
+    <step order="2">Create data/schema.ts with TypeScript Customer interface</step>
+    <step order="3">Customer fields: id, email, name, siteUrl, stripeCustomerId, stripeSubscriptionId</step>
+    <step order="4">Operations fields: lastContact, nextTouch, status (active/paused/cancelled)</step>
+    <step order="5">Subscription fields: tier (basic/pro), enrollmentDate, subscriptionStatus</step>
+    <step order="6">Email tracking: emailsSent object with boolean flags for each of 5 emails</step>
+    <step order="7">PageSpeed fields: pagespeedHistory array with { date, desktop, mobile, vitals }</step>
+    <step order="8">Add sample customer record for testing (marked as test: true)</step>
+    <step order="9">Create lib/customers.ts with CRUD helpers: loadCustomers(), saveCustomers(), addCustomer(), updateCustomer()</step>
+    <step order="10">Add atomic write pattern: write to temp file, then rename (prevents corruption)</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/cli/src/config.ts && echo "config module exists"</check>
-    <check type="bash">grep "loadConfig" /home/agent/shipyard-ai/projects/tuned/cli/src/config.ts</check>
-    <check type="bash">grep "saveConfig" /home/agent/shipyard-ai/projects/tuned/cli/src/config.ts</check>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/worker/src/lib/auth.ts && echo "auth module exists"</check>
-    <check type="test">Config and auth modules have correct exports</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/data/customers.json && echo "customers.json exists"</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/data/schema.ts && echo "schema exists"</check>
+    <check type="bash">grep "lastContact" /home/agent/shipyard-ai/projects/anchor/data/schema.ts</check>
+    <check type="bash">grep "nextTouch" /home/agent/shipyard-ai/projects/anchor/data/schema.ts</check>
+    <check type="bash">grep "emailsSent" /home/agent/shipyard-ai/projects/anchor/data/schema.ts</check>
+    <check type="test">Schema includes all required fields from decisions.md</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>feat(tuned): define API key strategy and config format
+  <commit-message>feat(anchor): define customers.json schema and helpers
 
-Per decisions.md Open Questions (resolved):
-- API key: Project-level, generated on init
-- Config: .tuned.json in project root
-- Format: {projectId, apiKey, backendUrl}
-- Auth middleware for Worker API
+Per decisions.md Data Storage:
+- JSON storage until 100 customers (no database)
+- Three required tracking fields: lastContact, nextTouch, status
+- Email send tracking for 5 scheduled emails
+- PageSpeed history array
+- Atomic write pattern for data safety
+- Sample test customer included
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -253,66 +288,76 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 2 (Parallel, after Wave 1) — Worker API Implementation
+### Wave 2 (Parallel, after Wave 1) — Cloudflare Workers
 
-Three tasks implementing the API layer. **Time budget: 1.5 hours**
+Three workers implementing cron automation and webhook handling. **Token budget: 80K**
 
 ```xml
 <task-plan id="phase-1-task-4" wave="2">
-  <title>Implement CRUD endpoints for prompts and versions</title>
-  <requirement>REQ-007: CRUD Prompts, REQ-008: CRUD Versions</requirement>
+  <title>Implement email scheduler cron worker</title>
+  <requirement>REQ-022: Email Cron System, REQ-039: Worker Files</requirement>
   <description>
-    Per decisions.md API section:
-    - CRUD operations for prompts and versions
-    - D1 for writes and dashboard reads
-    - Auto-versioning on push
+    Per decisions.md workers/cron-email-scheduler.js:
+    Daily cron that checks which emails are due and sends them.
 
-    Reference: /workers/wardrobe-analytics for D1 prepared statements
+    Email schedule from decisions.md MVP:
+    - Launch Day: Day 0 (enrollment day)
+    - Week 1: Day 7
+    - Month 1: Day 30
+    - Q1 Refresh: Day 90
+    - Anniversary: Day 365
+
+    Reference: /workers/contact-form/ for Resend API pattern
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/projects/tuned/worker/src/index.ts" reason="Add routes here" />
-    <file path="/home/agent/shipyard-ai/projects/tuned/worker/schema.sql" reason="Table structure" />
-    <file path="/home/agent/shipyard-ai/workers/wardrobe-analytics/src/index.ts" reason="D1 query pattern" />
+    <file path="/home/agent/shipyard-ai/projects/anchor/lib/email.ts" reason="Email sending utility" />
+    <file path="/home/agent/shipyard-ai/projects/anchor/lib/customers.ts" reason="Customer data CRUD" />
+    <file path="/home/agent/shipyard-ai/workers/contact-form/src/index.ts" reason="Resend API pattern" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Five core emails schedule" />
   </context>
 
   <steps>
-    <step order="1">Create worker/src/routes/prompts.ts</step>
-    <step order="2">Implement POST /api/prompts: create new prompt with uuid, name, timestamps</step>
-    <step order="3">Implement GET /api/prompts: list all prompts (for dashboard)</step>
-    <step order="4">Implement GET /api/prompts/:name: get prompt by name with active version</step>
-    <step order="5">Create worker/src/routes/versions.ts</step>
-    <step order="6">Implement POST /api/prompts/:name/versions: create version with auto-increment</step>
-    <step order="7">Auto-increment: SELECT MAX(version) FROM versions WHERE prompt_id = ?, then +1</step>
-    <step order="8">Set is_active = false on all existing versions, is_active = true on new version</step>
-    <step order="9">Implement GET /api/prompts/:name/versions: list all versions for prompt</step>
-    <step order="10">Implement PUT /api/prompts/:name/versions/:version/activate: set version as active (for rollback)</step>
-    <step order="11">Add auth middleware check to all write endpoints</step>
-    <step order="12">Wire routes into index.ts fetch handler</step>
+    <step order="1">Create workers/cron-email-scheduler.ts</step>
+    <step order="2">Add scheduled handler: export default { scheduled(event, env, ctx) {} }</step>
+    <step order="3">Configure wrangler.toml: [[triggers.crons]] cron = "0 8 * * *" (daily at 8am UTC)</step>
+    <step order="4">Load customers.json at start of cron run</step>
+    <step order="5">For each active customer, calculate days since enrollment</step>
+    <step order="6">Check which email is due based on daysSinceEnrollment: 0=launchDay, 7=week1, 30=month1, 90=q1Refresh, 365=anniversary</step>
+    <step order="7">Skip if email already marked sent in emailsSent object</step>
+    <step order="8">Load email template from emails/ directory</step>
+    <step order="9">Send via lib/email.ts sendEmail() function</step>
+    <step order="10">Update customer.emailsSent flag to true</step>
+    <step order="11">Update customer.lastContact to current date</step>
+    <step order="12">Calculate customer.nextTouch for next scheduled email</step>
+    <step order="13">Save updated customers.json</step>
+    <step order="14">Log success/failure for each send (console.log for MVP)</step>
+    <step order="15">Add error handling: continue on single failure, don't stop entire cron</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/worker/src/routes/prompts.ts && echo "prompts route exists"</check>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/worker/src/routes/versions.ts && echo "versions route exists"</check>
-    <check type="bash">grep "POST" /home/agent/shipyard-ai/projects/tuned/worker/src/routes/prompts.ts</check>
-    <check type="bash">grep "auto-increment\|MAX(version)" /home/agent/shipyard-ai/projects/tuned/worker/src/routes/versions.ts</check>
-    <check type="test">CRUD operations use D1 prepared statements</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/workers/cron-email-scheduler.ts && echo "email cron exists"</check>
+    <check type="bash">grep "scheduled" /home/agent/shipyard-ai/projects/anchor/workers/cron-email-scheduler.ts</check>
+    <check type="bash">grep "crons" /home/agent/shipyard-ai/projects/anchor/wrangler.toml</check>
+    <check type="bash">grep "daysSinceEnrollment\|enrollment" /home/agent/shipyard-ai/projects/anchor/workers/cron-email-scheduler.ts</check>
+    <check type="test">Email scheduling logic handles all 5 email types</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="D1 schema must exist" />
-    <depends-on task-id="phase-1-task-2" reason="Worker entry and routing must exist" />
-    <depends-on task-id="phase-1-task-3" reason="Auth middleware must exist" />
+    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
+    <depends-on task-id="phase-1-task-2" reason="Email library must exist" />
+    <depends-on task-id="phase-1-task-3" reason="Customer schema must exist" />
   </dependencies>
 
-  <commit-message>feat(tuned): implement CRUD endpoints for prompts/versions
+  <commit-message>feat(anchor): implement email scheduler cron worker
 
-Per decisions.md API section:
-- POST/GET prompts endpoints
-- POST/GET versions endpoints
-- Auto-versioning (MAX(version) + 1)
-- is_active flag management
-- Auth middleware on write operations
+Per decisions.md email schedule:
+- Daily cron at 8am UTC
+- Checks days since enrollment: 0, 7, 30, 90, 365
+- Sends appropriate email template
+- Updates lastContact and nextTouch
+- Error handling continues on single failure
+- Uses Resend API via lib/email.ts
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -320,53 +365,69 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-5" wave="2">
-  <title>Implement KV read endpoint and active version sync</title>
-  <requirement>REQ-009: KV Read Endpoint, REQ-010: Active Version Sync</requirement>
+  <title>Implement PageSpeed cron worker</title>
+  <requirement>REQ-030: Weekly Performance Data, REQ-031: Storage, REQ-032: Rate Limit Handling, REQ-039: Worker Files</requirement>
   <description>
-    Per decisions.md:
-    - Edge KV for active prompt reads (<5ms latency)
-    - Sync active version to KV on push/rollback
+    Per decisions.md workers/cron-pagespeed.js:
+    Weekly cron that fetches PageSpeed scores for all customer sites.
 
-    This is the critical path for SDK reads - must be fast.
+    Constraints from decisions.md:
+    - Once per week (not daily)
+    - Run at 3am (low traffic)
+    - Cache aggressively
+    - Handle rate limits gracefully
+
+    Reference: EMDASH-GUIDE.md Section 6 for external API patterns
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/projects/tuned/worker/src/lib/kv.ts" reason="KV helpers" />
-    <file path="/home/agent/shipyard-ai/projects/tuned/worker/src/routes/versions.ts" reason="Integrate sync" />
+    <file path="/home/agent/shipyard-ai/projects/anchor/lib/pagespeed.ts" reason="PageSpeed API wrapper" />
+    <file path="/home/agent/shipyard-ai/projects/anchor/lib/customers.ts" reason="Customer data CRUD" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="PageSpeed frequency and rate limit mitigation" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6: external API calls" />
   </context>
 
   <steps>
-    <step order="1">Create worker/src/routes/kv.ts for KV read endpoint</step>
-    <step order="2">Implement GET /kv/prompt/:name: read from KV, return {version, content}</step>
-    <step order="3">Return 404 if key not found: { error: "Prompt not found" }</step>
-    <step order="4">No auth required for KV read (SDK must read without auth token per design)</step>
-    <step order="5">Update versions.ts POST handler: after D1 write, call setActivePrompt(name, version, content)</step>
-    <step order="6">Update versions.ts PUT activate handler: after D1 update, sync to KV</step>
-    <step order="7">KV sync is fire-and-forget (waitUntil pattern) to not block response</step>
-    <step order="8">Add error logging if KV sync fails (but don't fail the request)</step>
-    <step order="9">Wire /kv/prompt/:name route into index.ts</step>
-    <step order="10">Test KV read latency target: <5ms (document in comments)</step>
+    <step order="1">Create workers/cron-pagespeed.ts</step>
+    <step order="2">Add scheduled handler for weekly execution</step>
+    <step order="3">Configure wrangler.toml: [[triggers.crons]] cron = "0 3 * * 1" (Mondays at 3am UTC)</step>
+    <step order="4">Load customers.json at start</step>
+    <step order="5">For each active customer, get siteUrl</step>
+    <step order="6">Check if last PageSpeed run was >6 days ago (skip if recent)</step>
+    <step order="7">Call lib/pagespeed.ts getPerformanceScore(siteUrl)</step>
+    <step order="8">Handle rate limit: if 429, wait 60 seconds, retry once</step>
+    <step order="9">Store result in customer.pagespeedHistory array: { date, desktop, mobile, vitals }</step>
+    <step order="10">Keep last 52 weeks of history (1 year rolling window)</step>
+    <step order="11">Update customer.lastPagespeedRun timestamp</step>
+    <step order="12">Save updated customers.json</step>
+    <step order="13">Add delay between requests: 500ms to avoid burst rate limits</step>
+    <step order="14">Log completion: "PageSpeed: {n} sites checked, {m} updated"</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/worker/src/routes/kv.ts && echo "kv route exists"</check>
-    <check type="bash">grep "setActivePrompt" /home/agent/shipyard-ai/projects/tuned/worker/src/routes/versions.ts</check>
-    <check type="bash">grep "waitUntil\|fire-and-forget" /home/agent/shipyard-ai/projects/tuned/worker/src/routes/versions.ts</check>
-    <check type="test">KV sync happens after D1 write</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/workers/cron-pagespeed.ts && echo "pagespeed cron exists"</check>
+    <check type="bash">grep "scheduled" /home/agent/shipyard-ai/projects/anchor/workers/cron-pagespeed.ts</check>
+    <check type="bash">grep "0 3 \* \* 1\|Monday" /home/agent/shipyard-ai/projects/anchor/wrangler.toml</check>
+    <check type="bash">grep "rate\|429\|retry" /home/agent/shipyard-ai/projects/anchor/workers/cron-pagespeed.ts</check>
+    <check type="test">PageSpeed cron handles rate limits per decisions.md</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="D1 schema for version data" />
-    <depends-on task-id="phase-1-task-2" reason="KV namespace and helpers" />
+    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
+    <depends-on task-id="phase-1-task-2" reason="PageSpeed library must exist" />
+    <depends-on task-id="phase-1-task-3" reason="Customer schema must exist" />
   </dependencies>
 
-  <commit-message>feat(tuned): implement KV read and active version sync
+  <commit-message>feat(anchor): implement PageSpeed cron worker
 
-Per decisions.md latency requirements:
-- GET /kv/prompt/:name for SDK reads
-- <5ms target latency
-- Fire-and-forget sync on version create/activate
-- No auth on KV read (SDK design)
+Per decisions.md PageSpeed requirements:
+- Weekly run on Mondays at 3am UTC (not daily)
+- Rate limit handling: 429 → wait 60s, retry
+- 500ms delay between requests
+- 52-week rolling history
+- Skip if last run <6 days ago
+
+Cites: EMDASH-GUIDE.md Section 6 for external API patterns
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -374,53 +435,70 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-6" wave="2">
-  <title>Implement async logging endpoint</title>
-  <requirement>REQ-011: Async Logging, REQ-031: Logging Backend</requirement>
+  <title>Implement Stripe webhook handler</title>
+  <requirement>REQ-023: Stripe Checkout, REQ-024: Webhook Handling, REQ-025: Subscription Management, REQ-039: Worker Files</requirement>
   <description>
-    Per decisions.md Open Questions (resolved):
-    - Use Cloudflare Analytics Engine for volume writes
-    - D1 cannot handle 1000+ writes/day at scale
-    - Logging is fire-and-forget, never blocks prompt delivery
+    Per decisions.md workers/stripe-webhook.js:
+    Handle Stripe webhook events for subscription lifecycle.
 
-    Reference: /workers/wardrobe-analytics for fire-and-forget pattern
+    Events to handle:
+    - customer.subscription.created → Add to customers.json
+    - customer.subscription.updated → Update status
+    - customer.subscription.deleted → Mark cancelled
+
+    Reference: /apps/pulse/lib/stripe.ts for webhook pattern
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/workers/wardrobe-analytics/src/index.ts" reason="Fire-and-forget pattern" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Logging Backend question" />
+    <file path="/home/agent/shipyard-ai/projects/anchor/lib/stripe.ts" reason="Stripe utilities" />
+    <file path="/home/agent/shipyard-ai/projects/anchor/lib/customers.ts" reason="Customer data CRUD" />
+    <file path="/home/agent/shipyard-ai/apps/pulse/lib/stripe.ts" reason="Stripe webhook verification pattern" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Two-tier subscriptions" />
   </context>
 
   <steps>
-    <step order="1">Create worker/src/routes/log.ts</step>
-    <step order="2">Implement POST /log: accept log event payload</step>
-    <step order="3">Log event schema: { promptName, version, timestamp, event: "read"|"error" }</step>
-    <step order="4">Return 200 immediately (fire-and-forget)</step>
-    <step order="5">Use ctx.waitUntil to process log async</step>
-    <step order="6">For MVP: console.log the event (Analytics Engine integration in v1.1)</step>
-    <step order="7">Add Analytics Engine binding placeholder in wrangler.toml (commented)</step>
-    <step order="8">Document Analytics Engine migration path in comments</step>
-    <step order="9">Wire /log route into index.ts</step>
-    <step order="10">No auth on /log endpoint (SDK sends logs without blocking)</step>
+    <step order="1">Create workers/stripe-webhook.ts</step>
+    <step order="2">Add fetch handler for POST /webhook endpoint</step>
+    <step order="3">Verify webhook signature using Stripe SDK (STRIPE_WEBHOOK_SECRET env)</step>
+    <step order="4">Return 400 if signature invalid</step>
+    <step order="5">Parse event.type from webhook payload</step>
+    <step order="6">Handle customer.subscription.created: create new customer in JSON</step>
+    <step order="7">Extract: email, name from customer; tier from price_id; siteUrl from metadata</step>
+    <step order="8">Set enrollmentDate = now, status = 'active', nextTouch = 7 days</step>
+    <step order="9">Handle customer.subscription.updated: update subscription status</step>
+    <step order="10">Handle customer.subscription.deleted: set status = 'cancelled'</step>
+    <step order="11">Handle invoice.payment_failed: set status = 'past_due'</step>
+    <step order="12">Save updated customers.json after each event</step>
+    <step order="13">Return 200 immediately for unhandled events (Stripe requires)</step>
+    <step order="14">Add idempotency: check event.id hasn't been processed before</step>
+    <step order="15">Add env vars to wrangler.toml: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/worker/src/routes/log.ts && echo "log route exists"</check>
-    <check type="bash">grep "waitUntil" /home/agent/shipyard-ai/projects/tuned/worker/src/routes/log.ts</check>
-    <check type="bash">grep "fire-and-forget\|Analytics Engine" /home/agent/shipyard-ai/projects/tuned/worker/src/routes/log.ts</check>
-    <check type="test">Logging does not block response</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/workers/stripe-webhook.ts && echo "webhook exists"</check>
+    <check type="bash">grep "signature\|verify" /home/agent/shipyard-ai/projects/anchor/workers/stripe-webhook.ts</check>
+    <check type="bash">grep "subscription.created\|subscription.deleted" /home/agent/shipyard-ai/projects/anchor/workers/stripe-webhook.ts</check>
+    <check type="bash">grep "STRIPE_WEBHOOK_SECRET" /home/agent/shipyard-ai/projects/anchor/wrangler.toml</check>
+    <check type="test">Webhook handles all subscription lifecycle events</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Worker entry and routing" />
+    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
+    <depends-on task-id="phase-1-task-2" reason="Stripe library must exist" />
+    <depends-on task-id="phase-1-task-3" reason="Customer schema must exist" />
   </dependencies>
 
-  <commit-message>feat(tuned): implement async logging endpoint
+  <commit-message>feat(anchor): implement Stripe webhook handler
 
-Per decisions.md logging requirements:
-- POST /log for SDK telemetry
-- Fire-and-forget via waitUntil
-- Console.log for MVP (Analytics Engine in v1.1)
-- Never blocks prompt delivery
+Per decisions.md Stripe integration:
+- Webhook signature verification
+- Handle subscription.created → add customer
+- Handle subscription.updated → update status
+- Handle subscription.deleted → mark cancelled
+- Handle invoice.payment_failed → mark past_due
+- Idempotency check on event.id
+
+Pattern from: /apps/pulse/lib/stripe.ts
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -428,64 +506,71 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 3 (Parallel, after Wave 2) — CLI and SDK Implementation
+### Wave 3 (Parallel, after Wave 2) — Email Templates
 
-Five tasks implementing CLI commands and SDK. **Time budget: 2.5 hours**
+Five A+ quality email templates. **Token budget: 100K**
+
+**CRITICAL: Per Steve Jobs (REQ-012): "The email IS the entire product. Copy is not decoration."**
 
 ```xml
 <task-plan id="phase-1-task-7" wave="3">
-  <title>Implement tuned init command</title>
-  <requirement>REQ-001: tuned init</requirement>
+  <title>Create Launch Day email template</title>
+  <requirement>REQ-017: Launch Day Email, REQ-012: A+ Quality, REQ-013: Voice, REQ-014: Single CTA, REQ-016: First-Line Impact</requirement>
   <description>
-    Per decisions.md CLI Commands:
-    - Initialize project, create config
-    - Must complete in <60 seconds
-    - Generate project-level API key
+    Per decisions.md email requirements:
+    - A+ copy or don't ship
+    - Confident friend voice, not salesy
+    - One CTA, embedded naturally
+    - First line makes recipient feel SEEN
 
-    Reference: /memory-store/src/cli.ts for commander.js pattern
+    Launch Day is the first impression. Per Steve:
+    "Not 'Your site is live' but 'You built something real.'"
+
+    Reference: /plugins/eventdash/src/email.ts for HTML template structure
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/memory-store/src/cli.ts" reason="Commander.js CLI pattern" />
-    <file path="/home/agent/shipyard-ai/memory-store/bin/memory" reason="Bin entry script" />
-    <file path="/home/agent/shipyard-ai/projects/tuned/cli/src/config.ts" reason="Config module" />
+    <file path="/home/agent/shipyard-ai/plugins/eventdash/src/email.ts" reason="HTML email template pattern" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Email quality requirements" />
   </context>
 
   <steps>
-    <step order="1">Create cli/src/cli.ts with commander.js setup</step>
-    <step order="2">Create cli/src/commands/init.ts</step>
-    <step order="3">init command: Check if .tuned.json already exists, warn if so</step>
-    <step order="4">Generate UUID for projectId</step>
-    <step order="5">Generate API key: tuned_{random32chars}</step>
-    <step order="6">Set default backendUrl (placeholder for now: https://tuned-api.workers.dev)</step>
-    <step order="7">Call saveConfig() to write .tuned.json</step>
-    <step order="8">Print success message with brand voice: "Tuned. Ready to push prompts."</step>
-    <step order="9">Create cli/bin/tuned bash wrapper script using tsx</step>
-    <step order="10">Create cli/package.json with bin entry, commander, tsx dependencies</step>
-    <step order="11">Add --help with description: "Initialize Tuned in this project"</step>
+    <step order="1">Create emails/launch-day.html</step>
+    <step order="2">Use responsive HTML email template (600px max-width container)</step>
+    <step order="3">Use inline CSS (email clients strip external CSS)</step>
+    <step order="4">First line: "You built something real."</step>
+    <step order="5">Body: Acknowledge the work, not just the technical completion</step>
+    <step order="6">Include: What Anchor does for them (watching performance, catching issues)</step>
+    <step order="7">Single CTA: "Reply if you have questions" (not a button, natural in text)</step>
+    <step order="8">Tone: Confident expert friend (not "Congratulations!" or corporate)</step>
+    <step order="9">Include {{customerName}} and {{siteName}} variables</step>
+    <step order="10">Add plain text fallback version</step>
+    <step order="11">Test rendering in major email clients (Gmail, Outlook, Apple Mail)</step>
+    <step order="12">No P.S. lines (per Steve: "desperate")</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/cli/src/commands/init.ts && echo "init command exists"</check>
-    <check type="bash">grep "tuned_" /home/agent/shipyard-ai/projects/tuned/cli/src/commands/init.ts</check>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/cli/bin/tuned && echo "bin entry exists"</check>
-    <check type="bash">grep '"bin"' /home/agent/shipyard-ai/projects/tuned/cli/package.json</check>
-    <check type="test">init command creates .tuned.json with correct structure</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/emails/launch-day.html && echo "launch-day exists"</check>
+    <check type="bash">grep "You built something real" /home/agent/shipyard-ai/projects/anchor/emails/launch-day.html</check>
+    <check type="bash">grep -v "Congratulations\|P.S." /home/agent/shipyard-ai/projects/anchor/emails/launch-day.html</check>
+    <check type="manual">Email passes Steve Jobs A+ quality review</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="Config module must exist" />
-    <depends-on task-id="phase-1-task-4" reason="API must exist to validate against (optional)" />
+    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
+    <depends-on task-id="phase-1-task-4" reason="Email cron needs templates" />
   </dependencies>
 
-  <commit-message>feat(tuned): implement tuned init command
+  <commit-message>feat(anchor): create Launch Day email template
 
-Per decisions.md CLI Commands:
-- Creates .tuned.json in project root
-- Generates projectId (UUID)
-- Generates API key (tuned_xxx)
-- Brand voice: "Tuned. Ready to push prompts."
-- <60 second target
+Per decisions.md email requirements:
+- First line: "You built something real."
+- Confident expert friend voice
+- Single natural CTA: "Reply if you have questions"
+- No P.S. lines, no corporate congratulations
+- Responsive HTML with inline CSS
+
+Pattern from: /plugins/eventdash/src/email.ts
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -493,56 +578,49 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-8" wave="3">
-  <title>Implement tuned push command</title>
-  <requirement>REQ-002: tuned push</requirement>
+  <title>Create Week 1 check-in email template</title>
+  <requirement>REQ-018: Week 1 Email, REQ-012: A+ Quality</requirement>
   <description>
-    Per decisions.md CLI Commands:
-    - Push prompt to registry with auto-versioning
-    - Must complete in <60 seconds
+    Week 1 email: First check-in after launch.
 
-    This is the core workflow: `tuned push "my-prompt" -c "prompt content"`
+    Purpose: Show we're paying attention. Reference something specific.
+    Tone: Like a text from a friend who remembered to check in.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/projects/tuned/cli/src/cli.ts" reason="Add command here" />
-    <file path="/home/agent/shipyard-ai/projects/tuned/cli/src/config.ts" reason="Load config for API key" />
+    <file path="/home/agent/shipyard-ai/projects/anchor/emails/launch-day.html" reason="Template structure reference" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Email quality requirements" />
   </context>
 
   <steps>
-    <step order="1">Create cli/src/commands/push.ts</step>
-    <step order="2">Add push command to cli.ts: tuned push <name> -c <content> or tuned push <name> -f <file></step>
-    <step order="3">Load config with loadConfig(), error if not initialized</step>
-    <step order="4">If -f flag, read content from file</step>
-    <step order="5">If -c flag, use content directly</step>
-    <step order="6">If neither, read from stdin (pipe support)</step>
-    <step order="7">Create cli/src/api.ts with API client functions</step>
-    <step order="8">API client: createPrompt(name), createVersion(name, content) using fetch()</step>
-    <step order="9">Push logic: check if prompt exists (GET), create if not (POST), then create version</step>
-    <step order="10">Print success: "Pushed {name} v{version}. Live at edge."</step>
-    <step order="11">Print error with brand voice: "Push failed. Check your connection."</step>
-    <step order="12">Add -m flag for optional version message (stored in versions table)</step>
+    <step order="1">Create emails/week-1.html</step>
+    <step order="2">First line: "One week in. How's it going?"</step>
+    <step order="3">Body: Brief check-in, not a long report</step>
+    <step order="4">Optional: Include first PageSpeed score if available</step>
+    <step order="5">Single CTA: "Hit reply if anything's not working"</step>
+    <step order="6">Keep it short (under 100 words)</step>
+    <step order="7">Include {{customerName}} variable</step>
+    <step order="8">Add plain text fallback</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/cli/src/commands/push.ts && echo "push command exists"</check>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/cli/src/api.ts && echo "api client exists"</check>
-    <check type="bash">grep "createVersion" /home/agent/shipyard-ai/projects/tuned/cli/src/api.ts</check>
-    <check type="bash">grep "Live at edge" /home/agent/shipyard-ai/projects/tuned/cli/src/commands/push.ts</check>
-    <check type="test">Push creates prompt and version via API</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/emails/week-1.html && echo "week-1 exists"</check>
+    <check type="bash">grep "week\|Week" /home/agent/shipyard-ai/projects/anchor/emails/week-1.html</check>
+    <check type="manual">Email is brief and feels like a friend checking in</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-4" reason="CRUD API must exist" />
-    <depends-on task-id="phase-1-task-7" reason="init must exist for config" />
+    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
+    <depends-on task-id="phase-1-task-4" reason="Email cron needs templates" />
   </dependencies>
 
-  <commit-message>feat(tuned): implement tuned push command
+  <commit-message>feat(anchor): create Week 1 check-in email template
 
-Per decisions.md CLI Commands:
-- tuned push <name> -c "content" or -f file.txt
-- Auto-versioning (version number from API)
-- Brand voice: "Pushed {name} v{version}. Live at edge."
-- API client with fetch()
+Per decisions.md email requirements:
+- Brief check-in after first week
+- "One week in. How's it going?"
+- Under 100 words
+- Single natural CTA
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -550,50 +628,51 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-9" wave="3">
-  <title>Implement tuned list command</title>
-  <requirement>REQ-003: tuned list</requirement>
+  <title>Create Month 1 report email template</title>
+  <requirement>REQ-019: Month 1 Email, REQ-012: A+ Quality</requirement>
   <description>
-    Per decisions.md CLI Commands:
-    - List all prompts and versions
-    - Show name, version number, timestamp
+    Month 1 email: First performance report.
+
+    Purpose: Show the value of monitoring. Include PageSpeed data.
+    Per decisions.md: Use hardcoded tips (10 max), not AI recommendations.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/projects/tuned/cli/src/cli.ts" reason="Add command here" />
-    <file path="/home/agent/shipyard-ai/projects/tuned/cli/src/api.ts" reason="Add list API call" />
+    <file path="/home/agent/shipyard-ai/projects/anchor/emails/launch-day.html" reason="Template structure" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="REQ-046: 10 hardcoded tips, no recommendation engine" />
   </context>
 
   <steps>
-    <step order="1">Create cli/src/commands/list.ts</step>
-    <step order="2">Add list command to cli.ts: tuned list [name]</step>
-    <step order="3">If name provided, list versions for that prompt</step>
-    <step order="4">If no name, list all prompts with their active version</step>
-    <step order="5">Add listPrompts() and listVersions(name) to api.ts</step>
-    <step order="6">Format output as table: NAME | VERSION | UPDATED</step>
-    <step order="7">Mark active version with * or highlight</step>
-    <step order="8">Print "No prompts yet. Run tuned push to create one." if empty</step>
-    <step order="9">Add -j flag for JSON output (machine-readable)</step>
+    <step order="1">Create emails/month-1.html</step>
+    <step order="2">First line: "Your first month, by the numbers."</step>
+    <step order="3">Include PageSpeed scores: {{desktopScore}}, {{mobileScore}}</step>
+    <step order="4">Include uptime if available: {{uptimePercent}}%</step>
+    <step order="5">Add one generic optimization tip (from list of 10 hardcoded)</step>
+    <step order="6">Tip selection: Based on lowest score area (mobile vs desktop)</step>
+    <step order="7">Single CTA: "Questions about these numbers?"</step>
+    <step order="8">Celebrate wins: "Mobile performance: strong" if score >80</step>
+    <step order="9">Keep it factual, not over-hyped</step>
+    <step order="10">Add plain text fallback</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/cli/src/commands/list.ts && echo "list command exists"</check>
-    <check type="bash">grep "listPrompts" /home/agent/shipyard-ai/projects/tuned/cli/src/api.ts</check>
-    <check type="bash">grep "NAME.*VERSION\|table" /home/agent/shipyard-ai/projects/tuned/cli/src/commands/list.ts</check>
-    <check type="test">List shows prompts in table format</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/emails/month-1.html && echo "month-1 exists"</check>
+    <check type="bash">grep "desktopScore\|mobileScore" /home/agent/shipyard-ai/projects/anchor/emails/month-1.html</check>
+    <check type="manual">Email presents data clearly without hype</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-4" reason="List API must exist" />
-    <depends-on task-id="phase-1-task-7" reason="init must exist for config" />
+    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
+    <depends-on task-id="phase-1-task-4" reason="Email cron needs templates" />
   </dependencies>
 
-  <commit-message>feat(tuned): implement tuned list command
+  <commit-message>feat(anchor): create Month 1 report email template
 
-Per decisions.md CLI Commands:
-- tuned list (all prompts)
-- tuned list <name> (versions for prompt)
-- Table format: NAME | VERSION | UPDATED
-- -j flag for JSON output
+Per decisions.md Month 1 Report:
+- First performance data email
+- PageSpeed scores (desktop + mobile)
+- One hardcoded optimization tip (REQ-046)
+- Factual tone, not over-hyped
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -601,51 +680,50 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-10" wave="3">
-  <title>Implement tuned rollback command</title>
-  <requirement>REQ-004: tuned rollback</requirement>
+  <title>Create Q1 Refresh Prompt email template</title>
+  <requirement>REQ-020: Q1 Refresh Email, REQ-012: A+ Quality</requirement>
   <description>
-    Per decisions.md CLI Commands:
-    - Revert to previous version
-    - Updates active version in D1 and Edge KV
+    Q1 (90 day) email: Prompt for site refresh.
+
+    Purpose: Gentle nudge to consider updates. Not pushy upsell.
+    Per Steve: "Trust before transaction."
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/projects/tuned/cli/src/cli.ts" reason="Add command here" />
-    <file path="/home/agent/shipyard-ai/projects/tuned/cli/src/api.ts" reason="Add activate API call" />
+    <file path="/home/agent/shipyard-ai/projects/anchor/emails/launch-day.html" reason="Template structure" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Trust before transaction positioning" />
   </context>
 
   <steps>
-    <step order="1">Create cli/src/commands/rollback.ts</step>
-    <step order="2">Add rollback command: tuned rollback <name> [version]</step>
-    <step order="3">If version specified, rollback to that version</step>
-    <step order="4">If no version, rollback to previous version (current - 1)</step>
-    <step order="5">Add activateVersion(name, version) to api.ts</step>
-    <step order="6">Call PUT /api/prompts/:name/versions/:version/activate</step>
-    <step order="7">Print success: "Rolled back {name} to v{version}. Live at edge."</step>
-    <step order="8">Print error if version doesn't exist: "Version {v} not found for {name}."</step>
-    <step order="9">Confirm before rollback: "Roll back {name} to v{version}? [y/N]" (unless --yes flag)</step>
+    <step order="1">Create emails/q1-refresh.html</step>
+    <step order="2">First line: "Three months. Sites evolve."</step>
+    <step order="3">Body: Gentle observation that content often needs refreshing</step>
+    <step order="4">Include performance trend: "Performance: {{trend}}" (improving/stable/declining)</step>
+    <step order="5">Suggest common refresh items: new testimonials, updated hours, seasonal content</step>
+    <step order="6">Single CTA: "Reply if you'd like to discuss updates"</step>
+    <step order="7">NOT an upsell: No "upgrade to Pro" pitch</step>
+    <step order="8">Keep it helpful, not salesy</step>
+    <step order="9">Add plain text fallback</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/cli/src/commands/rollback.ts && echo "rollback command exists"</check>
-    <check type="bash">grep "activateVersion" /home/agent/shipyard-ai/projects/tuned/cli/src/api.ts</check>
-    <check type="bash">grep "Rolled back" /home/agent/shipyard-ai/projects/tuned/cli/src/commands/rollback.ts</check>
-    <check type="test">Rollback activates specified version</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/emails/q1-refresh.html && echo "q1-refresh exists"</check>
+    <check type="bash">grep -v "upgrade\|Upgrade\|Pro" /home/agent/shipyard-ai/projects/anchor/emails/q1-refresh.html</check>
+    <check type="manual">Email is helpful, not salesy</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-4" reason="Activate API must exist" />
-    <depends-on task-id="phase-1-task-5" reason="KV sync must work" />
-    <depends-on task-id="phase-1-task-7" reason="init must exist for config" />
+    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
+    <depends-on task-id="phase-1-task-4" reason="Email cron needs templates" />
   </dependencies>
 
-  <commit-message>feat(tuned): implement tuned rollback command
+  <commit-message>feat(anchor): create Q1 Refresh email template
 
-Per decisions.md CLI Commands:
-- tuned rollback <name> [version]
-- Defaults to previous version
-- Confirmation prompt (--yes to skip)
-- Syncs to Edge KV via API
+Per decisions.md Q1 Refresh:
+- 90-day nudge for content refresh
+- "Three months. Sites evolve."
+- Helpful suggestions, not upsell
+- Trust before transaction positioning
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -653,60 +731,55 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-11" wave="3">
-  <title>Implement SDK with getPrompt() and 5-min cache</title>
-  <requirement>REQ-015: getPrompt(), REQ-016: 5-min TTL Cache, REQ-017: Zero-Latency, REQ-019: SDK Auth</requirement>
+  <title>Create Anniversary email template</title>
+  <requirement>REQ-021: Anniversary Email (emotional peak), REQ-012: A+ Quality</requirement>
   <description>
-    Per decisions.md SDK section:
-    - getPrompt(name) — single function
-    - Aggressive caching (5-min TTL)
-    - Local injection, no proxy in request path
+    Anniversary (365 day) email: The emotional peak.
 
-    This is the SDK developers import into their apps.
+    Per decisions.md: This is marked as "emotional peak" —
+    the most important email of the sequence.
+
+    Purpose: Celebrate the milestone. Acknowledge the journey.
+    Tone: Warm, reflective, genuinely proud of their success.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/memory-store/src/store.ts" reason="Caching pattern" />
-    <file path="/home/agent/shipyard-ai/plugins/eventdash/package.json" reason="SDK package.json structure" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="SDK section" />
+    <file path="/home/agent/shipyard-ai/projects/anchor/emails/launch-day.html" reason="Template structure" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Anniversary = emotional peak" />
   </context>
 
   <steps>
-    <step order="1">Create /home/agent/shipyard-ai/projects/tuned/sdk/ directory</step>
-    <step order="2">Create sdk/src/cache.ts with in-memory Map: { key: { content, expiresAt } }</step>
-    <step order="3">TTL: 5 minutes (300000ms)</step>
-    <step order="4">getFromCache(key): return cached if not expired, null otherwise</step>
-    <step order="5">setInCache(key, content): store with expiresAt = Date.now() + TTL</step>
-    <step order="6">Create sdk/src/index.ts with getPrompt(name, options?) export</step>
-    <step order="7">Options: { apiKey?, baseUrl? } for configuration</step>
-    <step order="8">getPrompt flow: check cache, if miss fetch from /kv/prompt/:name, cache result</step>
-    <step order="9">Return type: Promise<{ version: number, content: string } | null></step>
-    <step order="10">Create sdk/package.json with "type": "module", exports field</step>
-    <step order="11">Package name: @tuned/sdk (backup if "tuned" taken per REQ-033)</step>
-    <step order="12">Add TypeScript types in sdk/src/types.ts</step>
-    <step order="13">Add sdk/tsconfig.json for ES module output</step>
+    <step order="1">Create emails/anniversary.html</step>
+    <step order="2">First line: "One year. Still standing. Still growing."</step>
+    <step order="3">Body: Reflect on the journey, not just the metrics</step>
+    <step order="4">Include year-over-year data if meaningful: {{totalUptime}}, {{avgPagespeed}}</step>
+    <step order="5">Acknowledge the human behind the site</step>
+    <step order="6">Single CTA: "Here's to year two."</step>
+    <step order="7">Warm and genuine, not corporate</step>
+    <step order="8">Shorter is better — emotional impact, not info dump</step>
+    <step order="9">Add plain text fallback</step>
+    <step order="10">This email should make them feel proud</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/sdk/src/index.ts && echo "sdk entry exists"</check>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/sdk/src/cache.ts && echo "cache module exists"</check>
-    <check type="bash">grep "getPrompt" /home/agent/shipyard-ai/projects/tuned/sdk/src/index.ts</check>
-    <check type="bash">grep "5.*minute\|300000\|TTL" /home/agent/shipyard-ai/projects/tuned/sdk/src/cache.ts</check>
-    <check type="bash">grep '"type": "module"' /home/agent/shipyard-ai/projects/tuned/sdk/package.json</check>
-    <check type="test">SDK exports getPrompt function with caching</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/emails/anniversary.html && echo "anniversary exists"</check>
+    <check type="bash">grep "year\|Year" /home/agent/shipyard-ai/projects/anchor/emails/anniversary.html</check>
+    <check type="manual">Email achieves emotional resonance (Steve Jobs approval required)</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="KV read endpoint must exist" />
+    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
+    <depends-on task-id="phase-1-task-4" reason="Email cron needs templates" />
   </dependencies>
 
-  <commit-message>feat(tuned): implement SDK with getPrompt() and 5-min cache
+  <commit-message>feat(anchor): create Anniversary email template
 
-Per decisions.md SDK section:
-- getPrompt(name) single exported function
-- 5-minute TTL local cache
-- Zero latency impact (cached reads)
-- @tuned/sdk package structure
-- TypeScript types included
+Per decisions.md: Anniversary is "emotional peak"
+- One year celebration
+- "One year. Still standing. Still growing."
+- Warm, reflective tone
+- Shorter is better — emotional impact
+- Must pass Steve Jobs A+ quality review
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -714,65 +787,67 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 4 (Parallel, after Wave 3) — Dashboard, Docs, Review
+### Wave 4 (Parallel, after Wave 3) — Landing Page, Docs, Review
 
-Three final tasks. **Time budget: 1.5 hours**
+Final tasks: static site, documentation, and customer gut-check. **Token budget: 50K**
 
 ```xml
 <task-plan id="phase-1-task-12" wave="4">
-  <title>Create static HTML dashboard</title>
-  <requirement>REQ-020: Static HTML, REQ-021: Read-Only View, REQ-022: CSS, REQ-023: Fetch Script, REQ-024: Hosting</requirement>
+  <title>Create landing page and pricing page</title>
+  <requirement>REQ-033: Landing Page, REQ-034: Pricing Page, REQ-035: Assets, REQ-038: Static Site Files</requirement>
   <description>
-    Per decisions.md Dashboard section:
-    - Static HTML (no React)
-    - Read-only visibility
-    - Shows: prompt name, version number, timestamp, content
-    - No buttons, no actions
+    Per decisions.md site/ structure:
+    - index.html: Landing page explaining Anchor
+    - pricing.html: Two-tier breakdown (Basic Anchor / Pro Anchor)
+
+    Per Steve: "Trust before transaction."
+
+    NOTE: Pricing amounts are UNRESOLVED. Use placeholder {{BASIC_PRICE}} and {{PRO_PRICE}}.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Dashboard section" />
-    <file path="/home/agent/shipyard-ai/website/src/app/" reason="Reference for styling patterns" />
+    <file path="/home/agent/shipyard-ai/website/src/app/" reason="Reference styling patterns" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Two tiers, trust-first positioning" />
   </context>
 
   <steps>
-    <step order="1">Create /home/agent/shipyard-ai/projects/tuned/dashboard/ directory</step>
-    <step order="2">Create dashboard/index.html with semantic HTML structure</step>
-    <step order="3">Header: "Tuned Dashboard", no navigation (read-only)</step>
-    <step order="4">Main: prompts table container with id="prompts-list"</step>
-    <step order="5">Table columns: Name | Active Version | Last Updated | Content Preview</step>
-    <step order="6">Create dashboard/styles.css with minimal, professional styling</step>
-    <step order="7">Use CSS custom properties for consistent colors</step>
-    <step order="8">Mobile-responsive table (horizontal scroll on small screens)</step>
-    <step order="9">Create dashboard/script.js with vanilla fetch()</step>
-    <step order="10">Fetch GET /api/prompts on page load</step>
-    <step order="11">Render prompts into table using textContent (not innerHTML for XSS safety)</step>
-    <step order="12">Content preview: truncate to 100 chars with ellipsis</step>
-    <step order="13">Empty state: "No prompts yet. Use tuned push to create one."</step>
-    <step order="14">Error handling: "Unable to load prompts. Check your connection."</step>
-    <step order="15">Add wrangler.toml for Cloudflare Pages deployment (or serve from Worker)</step>
+    <step order="1">Create site/index.html with semantic HTML</step>
+    <step order="2">Hero: "Someone's got your back." (per decisions.md positioning)</step>
+    <step order="3">Explain what Anchor does: performance monitoring, proactive emails, peace of mind</step>
+    <step order="4">Include "Request Update" button (REQ-027)</step>
+    <step order="5">Link to pricing.html</step>
+    <step order="6">Create site/pricing.html</step>
+    <step order="7">Two tiers only: Basic Anchor, Pro Anchor</step>
+    <step order="8">Use placeholder prices: {{BASIC_PRICE}}/mo, {{PRO_PRICE}}/mo</step>
+    <step order="9">Include Stripe checkout buttons (integration pending)</step>
+    <step order="10">Create site/assets/styles.css with Tailwind-style utility classes</step>
+    <step order="11">Mobile-responsive design (flexbox/grid)</step>
+    <step order="12">Create site/assets/logo.svg placeholder</step>
+    <step order="13">Add Cloudflare Analytics snippet (first-party, per REQ-009)</step>
+    <step order="14">No OAuth, no Google Analytics (per decisions.md)</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/dashboard/index.html && echo "dashboard exists"</check>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/dashboard/styles.css && echo "styles exist"</check>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/dashboard/script.js && echo "script exists"</check>
-    <check type="bash">grep -v "innerHTML" /home/agent/shipyard-ai/projects/tuned/dashboard/script.js | grep "textContent"</check>
-    <check type="test">No edit/delete buttons in HTML</check>
-    <check type="manual">Dashboard renders prompts table correctly</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/site/index.html && echo "index exists"</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/site/pricing.html && echo "pricing exists"</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/site/assets/styles.css && echo "styles exist"</check>
+    <check type="bash">grep "Request Update" /home/agent/shipyard-ai/projects/anchor/site/index.html</check>
+    <check type="bash">grep -v "google-analytics\|gtag" /home/agent/shipyard-ai/projects/anchor/site/index.html</check>
+    <check type="manual">Landing page communicates trust-first positioning</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-4" reason="API must exist to fetch prompts" />
+    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
   </dependencies>
 
-  <commit-message>feat(tuned): create static HTML dashboard
+  <commit-message>feat(anchor): create landing and pricing pages
 
-Per decisions.md Dashboard section:
-- Static HTML, no React
-- Read-only prompt list
-- Vanilla JS fetch()
-- XSS-safe (textContent, not innerHTML)
+Per decisions.md site structure:
+- index.html: "Someone's got your back" positioning
+- pricing.html: Two tiers (Basic/Pro, prices TBD)
+- Request Update button for support
+- Cloudflare Analytics (first-party)
+- No Google Analytics, no OAuth
 - Mobile-responsive CSS
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
@@ -781,57 +856,54 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-13" wave="4">
-  <title>Create quickstart documentation</title>
-  <requirement>REQ-006: Quickstart Docs</requirement>
+  <title>Create README documentation</title>
+  <requirement>REQ-043: Internal Documentation</requirement>
   <description>
-    Per decisions.md:
-    - 60-second setup guide
-    - "Works in <5 minutes is the right bar"
+    Per decisions.md: README.md is internal-only documentation.
 
-    Document the complete flow: install → init → push → SDK usage
+    Include: Setup, deployment, operational procedures.
+    Do NOT include: Customer-facing documentation.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/projects/tuned/cli/" reason="CLI commands to document" />
-    <file path="/home/agent/shipyard-ai/projects/tuned/sdk/" reason="SDK usage to document" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Value before effort principle" />
+    <file path="/home/agent/shipyard-ai/projects/anchor/" reason="Document this project" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Architecture and operational decisions" />
   </context>
 
   <steps>
-    <step order="1">Create /home/agent/shipyard-ai/projects/tuned/docs/ directory</step>
-    <step order="2">Create docs/quickstart.md</step>
-    <step order="3">Title: "Quickstart: 60 seconds to your first prompt"</step>
-    <step order="4">Step 1: Install CLI (npm install -g @tuned/cli)</step>
-    <step order="5">Step 2: Initialize project (tuned init)</step>
-    <step order="6">Step 3: Push first prompt (tuned push "greeting" -c "You are a helpful assistant.")</step>
-    <step order="7">Step 4: Install SDK (npm install @tuned/sdk)</step>
-    <step order="8">Step 5: Use in code (import { getPrompt } from '@tuned/sdk')</step>
-    <step order="9">Include complete code example with OpenAI integration</step>
-    <step order="10">Apply brand voice: direct, confident, not robotic</step>
-    <step order="11">No "Getting Started" fluff — straight to the commands</step>
-    <step order="12">Time the full workflow to verify <60 seconds claim</step>
+    <step order="1">Create README.md at project root</step>
+    <step order="2">Title: "Anchor — Post-Delivery System (Internal)"</step>
+    <step order="3">Section: Overview (what Anchor does)</step>
+    <step order="4">Section: Architecture (Cloudflare Workers + JSON + Stripe + Resend)</step>
+    <step order="5">Section: Setup (wrangler login, environment variables)</step>
+    <step order="6">Section: Deployment (wrangler deploy commands)</step>
+    <step order="7">Section: Cron schedules (email daily at 8am, PageSpeed weekly at 3am)</step>
+    <step order="8">Section: Adding a customer manually (for testing)</step>
+    <step order="9">Section: Troubleshooting common issues</step>
+    <step order="10">Mark as INTERNAL ONLY in header</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/tuned/docs/quickstart.md && echo "quickstart exists"</check>
-    <check type="bash">grep "60 seconds\|npm install" /home/agent/shipyard-ai/projects/tuned/docs/quickstart.md</check>
-    <check type="bash">grep "getPrompt" /home/agent/shipyard-ai/projects/tuned/docs/quickstart.md</check>
-    <check type="manual">Workflow completes in under 60 seconds following docs</check>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/README.md && echo "README exists"</check>
+    <check type="bash">grep "INTERNAL\|Internal" /home/agent/shipyard-ai/projects/anchor/README.md</check>
+    <check type="bash">grep "wrangler" /home/agent/shipyard-ai/projects/anchor/README.md</check>
+    <check type="manual">Documentation covers setup and deployment</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-7" reason="init command documented" />
-    <depends-on task-id="phase-1-task-8" reason="push command documented" />
-    <depends-on task-id="phase-1-task-11" reason="SDK documented" />
+    <depends-on task-id="phase-1-task-1" reason="Project must exist to document" />
+    <depends-on task-id="phase-1-task-4" reason="Cron workers must exist" />
+    <depends-on task-id="phase-1-task-6" reason="Stripe webhook must exist" />
   </dependencies>
 
-  <commit-message>docs(tuned): add quickstart guide
+  <commit-message>docs(anchor): add internal README
 
-Per decisions.md value before effort:
-- 60-second workflow: install → init → push → use
-- Complete code example with OpenAI
-- Direct voice, no fluff
-- Time-verified flow
+Per decisions.md:
+- Internal-only documentation
+- Setup and deployment instructions
+- Cron schedules documented
+- Troubleshooting section
+- Marked INTERNAL ONLY
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -839,30 +911,82 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-14" wave="4">
+  <title>Document BetterUptime setup</title>
+  <requirement>REQ-026: Uptime Monitoring via BetterUptime</requirement>
+  <description>
+    Per decisions.md MVP: "Uptime monitoring via free BetterUptime"
+
+    This is a manual setup task — document the process.
+    NOTE: BetterUptime configuration details are UNRESOLVED.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="BetterUptime requirement" />
+  </context>
+
+  <steps>
+    <step order="1">Create docs/betteruptime-setup.md</step>
+    <step order="2">Document: Create BetterUptime account (free tier)</step>
+    <step order="3">Document: Add monitor for Anchor landing page</step>
+    <step order="4">Document: Configure alert email (support@anchor)</step>
+    <step order="5">Document: How to add customer sites to monitoring (manual process)</step>
+    <step order="6">Note: Alert thresholds TBD (mark as open question)</step>
+    <step order="7">Note: Per-customer monitoring costs TBD at scale</step>
+    <step order="8">Add link to BetterUptime dashboard in README.md</step>
+  </steps>
+
+  <verification>
+    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/docs/betteruptime-setup.md && echo "betteruptime docs exist"</check>
+    <check type="bash">grep "BetterUptime" /home/agent/shipyard-ai/projects/anchor/docs/betteruptime-setup.md</check>
+    <check type="manual">Documentation provides clear setup steps</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
+  </dependencies>
+
+  <commit-message>docs(anchor): add BetterUptime setup guide
+
+Per decisions.md REQ-026:
+- Free BetterUptime for uptime monitoring
+- Manual setup documentation
+- Alert thresholds TBD (open question)
+- Per-customer monitoring process
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-15" wave="4">
   <title>Sara Blakely customer gut-check</title>
   <requirement>SKILL.md Step 7: Customer value validation</requirement>
   <description>
     Per SKILL.md Step 7:
     Spawn Sara Blakely agent for customer perspective.
-    Tuned customers are developers using AI APIs.
-    "Would they pay for this? What feels like engineering vanity?"
+    Anchor customers are small business owners who just launched a website.
+
+    Questions to answer:
+    - Would a real customer pay for this?
+    - What would make them say "shut up and take my money"?
+    - What feels like engineering vanity vs. customer value?
   </description>
 
   <context>
     <file path="/home/agent/shipyard-ai/.planning/phase-1-plan.md" reason="This plan" />
-    <file path="/home/agent/shipyard-ai/rounds/promptops/decisions.md" reason="Product essence" />
-    <file path="/home/agent/shipyard-ai/projects/tuned/docs/quickstart.md" reason="User experience" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Product essence" />
+    <file path="/home/agent/shipyard-ai/projects/anchor/emails/" reason="Email templates" />
   </context>
 
   <steps>
     <step order="1">Spawn haiku sub-agent as Sara Blakely</step>
-    <step order="2">Prompt: Read phase plan and quickstart docs</step>
-    <step order="3">Answer: Would a developer actually switch from hardcoded prompts?</step>
-    <step order="4">Answer: What would make them say "I need this"?</step>
-    <step order="5">Answer: Does the 60-second quickstart feel achievable or intimidating?</step>
-    <step order="6">Answer: Is "Tuned" memorable? Would they tell a coworker?</step>
-    <step order="7">Answer: What's missing that a real user would notice immediately?</step>
-    <step order="8">Answer: Does the SDK feel like it adds value or just complexity?</step>
+    <step order="2">Prompt: Read phase plan and email templates</step>
+    <step order="3">Answer: Would a small business owner pay for this?</step>
+    <step order="4">Answer: Does "someone's got my back" resonate?</step>
+    <step order="5">Answer: Are the emails helpful or annoying?</step>
+    <step order="6">Answer: Is Basic vs Pro distinction clear and compelling?</step>
+    <step order="7">Answer: What would make them recommend to a friend?</step>
+    <step order="8">Answer: What's missing that would kill the deal?</step>
     <step order="9">Write findings to .planning/sara-blakely-review.md</step>
     <step order="10">Review and address major gaps if any</step>
   </steps>
@@ -874,16 +998,18 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-13" reason="Quickstart must exist for review" />
+    <depends-on task-id="phase-1-task-7" reason="Emails must exist for review" />
+    <depends-on task-id="phase-1-task-12" reason="Landing page must exist for review" />
   </dependencies>
 
-  <commit-message>docs(tuned): add Sara Blakely customer gut-check
+  <commit-message>docs(anchor): add Sara Blakely customer gut-check
 
 Per SKILL.md Step 7:
 - Customer perspective validation
-- Developer adoption barriers assessed
-- 60-second promise evaluated
-- SDK value proposition reviewed
+- Small business owner lens
+- Email value assessment
+- Pricing tier clarity
+- Recommendation likelihood
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -893,39 +1019,40 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ## Wave Summary
 
-| Wave | Tasks | Description | Parallelism | Time Budget |
-|------|-------|-------------|-------------|-------------|
-| 1 | 3 | Infrastructure: D1 schema, KV config, auth strategy | 3 parallel | 1.5 hours |
-| 2 | 3 | Worker API: CRUD, KV sync, logging | 3 parallel (after Wave 1) | 1.5 hours |
-| 3 | 5 | CLI + SDK: init, push, list, rollback, getPrompt | 5 parallel (after Wave 2) | 2.5 hours |
-| 4 | 3 | Dashboard, docs, review | 3 parallel (after Wave 3) | 1.5 hours |
+| Wave | Tasks | Description | Parallelism | Token Budget |
+|------|-------|-------------|-------------|--------------|
+| 1 | 3 | Foundation: structure, libs, schema | 3 parallel | 30K |
+| 2 | 3 | Workers: email cron, PageSpeed cron, Stripe webhook | 3 parallel (after Wave 1) | 80K |
+| 3 | 5 | Email Templates: 5 A+ quality emails | 5 parallel (after Wave 2) | 100K |
+| 4 | 4 | Landing page, docs, BetterUptime, review | 4 parallel (after Wave 3) | 50K |
 
-**Total Tasks:** 14
+**Total Tasks:** 15
 **Maximum Parallelism:** Wave 3 (5 concurrent tasks)
-**Total Time Budget:** 7 hours
+**Total Token Budget:** 260K (within 300K limit, with 40K buffer)
 
 ---
 
 ## Dependencies Diagram
 
 ```
-Wave 1:  [task-1: D1 Schema] ───────────────────────────────────────────────>
-         [task-2: KV + Worker] ─────────────────────────────────────────────>
-         [task-3: Config + Auth] ───────────────────────────────────────────>
+Wave 1:  [task-1: Structure] ─────────────────────────────────────────────>
+         [task-2: Libraries] ─────────────────────────────────────────────>
+         [task-3: Schema] ────────────────────────────────────────────────>
 
-Wave 2:  [task-4: CRUD API] ──────> (depends on 1,2,3) ─────────────────────>
-         [task-5: KV Sync] ───────> (depends on 1,2) ───────────────────────>
-         [task-6: Logging] ───────> (depends on 2) ─────────────────────────>
+Wave 2:  [task-4: Email Cron] ────> (depends on 1,2,3) ───────────────────>
+         [task-5: PageSpeed Cron] ─> (depends on 1,2,3) ──────────────────>
+         [task-6: Stripe Webhook] ─> (depends on 1,2,3) ──────────────────>
 
-Wave 3:  [task-7: init] ──────────> (depends on 3,4) ───────────────────────>
-         [task-8: push] ──────────> (depends on 4,7) ───────────────────────>
-         [task-9: list] ──────────> (depends on 4,7) ───────────────────────>
-         [task-10: rollback] ─────> (depends on 4,5,7) ─────────────────────>
-         [task-11: SDK] ──────────> (depends on 5) ─────────────────────────>
+Wave 3:  [task-7: Launch Day] ────> (depends on 1,4) ─────────────────────>
+         [task-8: Week 1] ────────> (depends on 1,4) ─────────────────────>
+         [task-9: Month 1] ───────> (depends on 1,4) ─────────────────────>
+         [task-10: Q1 Refresh] ───> (depends on 1,4) ─────────────────────>
+         [task-11: Anniversary] ──> (depends on 1,4) ─────────────────────>
 
-Wave 4:  [task-12: Dashboard] ────> (depends on 4) ─────────────────────────>
-         [task-13: Docs] ─────────> (depends on 7,8,11) ────────────────────>
-         [task-14: Sara Review] ──> (depends on 13) ────────────────────────>
+Wave 4:  [task-12: Landing Page] ─> (depends on 1) ───────────────────────>
+         [task-13: README] ───────> (depends on 1,4,6) ───────────────────>
+         [task-14: BetterUptime] ─> (depends on 1) ───────────────────────>
+         [task-15: Sara Review] ──> (depends on 7,12) ────────────────────>
 ```
 
 ---
@@ -936,21 +1063,29 @@ Wave 4:  [task-12: Dashboard] ────> (depends on 4) ───────
 
 | Risk | Mitigation | Task |
 |------|------------|------|
-| Scope creep | 7-hour hard cap, ruthless cuts | All |
-| npm name collision | @tuned/sdk as backup | task-11 |
-| D1 cold start | KV for reads, D1 for writes only | task-5 |
-| Cache staleness | Version-based cache in SDK | task-11 |
-| CLI >60 seconds | Minimal dependencies, no prompts | task-7,8 |
-| Auth complexity | Project-level key, simple validation | task-3 |
+| Scope creep | 300K token budget, 15 tasks max | All |
+| Email quality | A+ requirement, Steve Jobs approval | tasks 7-11 |
+| PageSpeed rate limits | 3am runs, weekly frequency, 500ms delays | task-5 |
+| JSON corruption | Atomic write pattern | task-3 |
+| Stripe failures | Webhook signature verification, idempotency | task-6 |
+
+### BLOCKERS (Must Resolve Before Build)
+
+| Risk | Status | Resolution Required |
+|------|--------|---------------------|
+| Card collection timing | DEADLOCKED | Founder decision |
+| Stripe pricing amounts | UNRESOLVED | Product decision |
+| Email copy approval | PENDING | Steve Jobs review |
+| Support email address | UNRESOLVED | Ops decision |
+| Email service provider | UNRESOLVED | Tech lead decision (Resend recommended) |
 
 ### Accepted for v1 (Not Blocking)
 
 | Risk | Impact | Notes |
 |------|--------|-------|
-| Manual npm publish | Low | Document process, automate in v1.1 |
-| Analytics Engine integration | Medium | Console.log for MVP, migrate later |
-| No A/B testing | Low | Cut per decisions.md |
-| No prompt diff | Low | Cut per decisions.md |
+| No dashboard | Low | Intentional cut, v2 scope |
+| JSON at scale | Low | Monitor at 100 customers |
+| Manual BetterUptime | Low | Document process |
 
 ---
 
@@ -958,42 +1093,43 @@ Wave 4:  [task-12: Dashboard] ────> (depends on 4) ───────
 
 | Question | Resolution | Rationale |
 |----------|------------|-----------|
-| Logging backend | Analytics Engine (console.log for MVP) | Native to Workers, scales |
-| API key strategy | Project-level, generated on init | Simplest, fits 7h scope |
-| Config location | .tuned.json in project root | Project-local, git-ignorable |
-| Dashboard hosting | Serve from Worker or Pages | Decision during build |
-| npm package name | @tuned/sdk | Safe fallback |
+| Email service | Resend API | Existing pattern in /workers/contact-form/ |
+| Project location | /projects/anchor/ | Follows existing project structure |
+| Cron schedules | 8am (email), 3am Mon (PageSpeed) | Per decisions.md |
+| HTML vs React | Static HTML | Per decisions.md: no dashboard |
 
 ---
 
 ## Verification Checklist
 
-- [x] All requirements have task coverage (38 requirements → 14 tasks)
+- [x] All 58 requirements have task coverage
 - [x] Each task has clear verification criteria
 - [x] Dependencies form valid DAG (no cycles)
 - [x] Each task can be committed independently
 - [x] Risk mitigations addressed
-- [x] 7-hour timeline achievable with parallelism
-- [x] Sara Blakely customer gut-check scheduled (task-14)
-- [x] docs/EMDASH-GUIDE.md cited for Cloudflare patterns (Section 5)
-- [x] Codebase patterns cited (workers/wardrobe-analytics, memory-store)
+- [x] 300K token budget achievable (260K estimated)
+- [x] Sara Blakely customer gut-check scheduled (task-15)
+- [x] docs/EMDASH-GUIDE.md cited (Section 5, 6, 8)
+- [x] Codebase patterns cited (/workers/contact-form/, /apps/pulse/lib/stripe.ts)
+- [x] Blocking decisions identified and escalated
 
 ---
 
 ## Ship Test
 
-> Does the developer feel in control after using Tuned?
+> Does the client feel watched over after their site launches?
 
-> Does `tuned push` feel as natural as `git push`?
+> Does "someone's got my back" come through in every email?
 
-> Does the SDK add value without adding complexity?
+> Are the emails helpful or annoying?
 
-> Can someone go from npm install to live prompt in 60 seconds?
+> Would you pay for this if you just launched a website?
 
 > **If yes, ship it.**
 
 ---
 
 *Generated by Great Minds Agency — Phase Planning Skill*
-*Source: rounds/promptops/decisions.md, docs/EMDASH-GUIDE.md*
-*Project Slug: promptops*
+*Source: rounds/shipyard-post-delivery-v2/decisions.md, docs/EMDASH-GUIDE.md*
+*Project Slug: shipyard-post-delivery-v2*
+*Product Name: Anchor*

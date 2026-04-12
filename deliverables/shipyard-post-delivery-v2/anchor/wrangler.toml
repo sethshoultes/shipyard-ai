@@ -1,0 +1,29 @@
+# Anchor — Post-Delivery System
+# Cloudflare Workers configuration
+
+name = "anchor"
+main = "workers/stripe-webhook.ts"
+compatibility_date = "2026-03-29"
+compatibility_flags = ["nodejs_compat"]
+
+# Environment variables (secrets set via wrangler secret put)
+[vars]
+FROM_EMAIL = "anchor@shipyard.company"
+SUPPORT_EMAIL = "support@shipyard.company"
+
+# Cron triggers for scheduled workers
+[[triggers.crons]]
+# Email scheduler - daily at 8am UTC
+cron = "0 8 * * *"
+# Handler: workers/cron-email-scheduler.ts
+
+[[triggers.crons]]
+# PageSpeed checker - Mondays at 3am UTC
+cron = "0 3 * * 1"
+# Handler: workers/cron-pagespeed.ts
+
+# Secrets to configure (via wrangler secret put):
+# - RESEND_API_KEY: Resend API key for email delivery
+# - STRIPE_SECRET_KEY: Stripe secret key for payment processing
+# - STRIPE_WEBHOOK_SECRET: Stripe webhook signing secret
+# - PAGESPEED_API_KEY: Google PageSpeed Insights API key

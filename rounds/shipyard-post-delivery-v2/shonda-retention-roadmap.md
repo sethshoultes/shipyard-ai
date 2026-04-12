@@ -1,318 +1,332 @@
-# Shonda Retention Roadmap: What Keeps Users Coming Back
+# Retention Roadmap: Anchor v1.1
 
-**Product:** Anchor Post-Delivery System
-**Version:** 1.1 Feature Roadmap
-**Author:** Based on Shonda Rhimes Board Review
+**Author:** Shonda Rhimes (Board Member, Great Minds Agency)
+**Focus:** What Keeps Users Coming Back
 **Date:** 2026-04-12
 
 ---
 
-## The Core Insight
+## The Retention Problem
 
-> "The best stories don't end. They pause, and make you desperate for the next chapter."
+Anchor's current structure creates two dangerous gaps:
 
-Retention isn't about reminding people you exist. It's about making them **curious** what happens next. Every touchpoint should create anticipation for the following one.
+1. **The Onboarding Gap:** 7 days of silence between signup and first report
+2. **The Mid-Journey Gap:** 60 days of silence between Month 1 and Q1 Refresh
 
----
-
-## What Keeps Users Coming Back (Current State)
-
-### Working Today
-
-| Hook | Timing | Mechanism | Strength |
-|------|--------|-----------|----------|
-| Launch celebration | Day 0 | Shared ownership ("Look what we built together") | Strong |
-| Preview of next chapter | Day 0 → Day 7 | "We'll check in next week..." | Strong |
-| Relationship deepening | Day 7 | Care without selling | Moderate |
-| Preview of refresh | Day 7 → Day 30 | "At one month, we'll help you refresh..." | Strong |
-| Agency & momentum | Day 30 | Actionable questions they're already thinking | Moderate |
-| Anniversary nostalgia | Month 6 | "It's been working for you 24/7..." | Moderate |
-
-### Broken Today
-
-| Gap | Problem | Impact |
-|-----|---------|--------|
-| Day 30 → Month 6 | 152 days of silence | Clients forget, seek alternatives |
-| Email 3 has no preview | Serialization stops | Anticipation dies at Day 30 |
-| Email 4 has no preview | No promise of Year 1 | Relationship feels finite |
-| No Day 365 | Anniversary unused | Emotional milestone wasted |
-| All retention is outbound | Client waits for you | No destination to return to |
-| No flywheel | Content doesn't compound | Every client is standalone |
+These gaps are churn triggers. Users forget they're paying. They question the value. They cancel.
 
 ---
 
-## V1.1 Features: The Serialization Fix
+## The Retention Philosophy
 
-### Priority 1: Complete the Preview Chain
+**Episodic to Serialized:** Transform Anchor from a service that sends occasional updates into a show users don't want to miss.
 
-**Goal:** Every email promises the next chapter.
-
-| Email | Current Preview | Add Preview |
-|-------|-----------------|-------------|
-| Email 1 (Day 0) | ✓ "We'll check in next week..." | — |
-| Email 2 (Day 7) | ✓ "At one month, we'll help you refresh..." | — |
-| Email 3 (Day 30) | ✗ None | "At the six-month mark, we'll help you plan the year ahead." |
-| Email 4 (Month 6) | ✗ None | "Your one-year anniversary is coming. We're already planning how to celebrate." |
-
-**Effort:** 30 minutes
-**Impact:** High — transforms static emails into serialized narrative
+The goal isn't more emails. It's **more anticipation**.
 
 ---
 
-### Priority 2: Bridge the Five-Month Gap
+## v1.1 Feature Roadmap
 
-**Goal:** Maintain presence between Day 30 and Month 6.
+### Phase 1: Fill the Gaps (Week 1-2)
 
-**Add: Email 3.5 — Day 90 Check-in**
+#### 1.1 Day 3 "First Scan Coming" Email
+**Purpose:** Build anticipation, reduce early churn
 
 ```
-Subject: Quick check-in (no action needed)
+Subject: Your first Anchor check is scheduled
 
-Hey {{NAME}},
+Hi {{FIRST_NAME}},
 
-Three months with {{SITENAME}}.com live. Just wanted to pop in.
+Quick note: your first performance scan is scheduled for Monday.
 
-Everything still working? Anything feel different than you expected?
+You'll get a report showing how your site performs on mobile and desktop,
+plus how fast it loads for visitors.
 
-No action needed on your end—we're just making sure the foundation is solid.
+Until then, you don't need to do anything. We're on it.
 
-Talk soon,
-{{SENDER}}
-
-P.S. Six-month mark is coming up. We're already thinking about your refresh.
+— The Anchor Team
 ```
 
-**Characteristics:**
-- Light touch, no CTA
-- Reinforces "We don't disappear" without selling
-- Creates anticipation for Month 6
-
-**Effort:** 1 hour (write, review, add to sequence)
-**Impact:** High — cuts silence from 152 days to 62 days max
+**Why it works:** Creates a cliffhanger. Users now EXPECT Monday's email.
 
 ---
 
-### Priority 3: Restore Day 365 Anniversary Email
-
-**Goal:** Emotional milestone that deepens relationship.
-
-**Add: Email 5 — One Year Anniversary**
+#### 1.2 Month 2 "Still Watching" Email
+**Purpose:** Maintain presence during the 60-day gap
 
 ```
-Subject: One year with {{SITENAME}}.com
+Subject: Month 2 with Anchor — everything's running smoothly
 
-Hey {{NAME}},
+Hi {{FIRST_NAME}},
 
-One year ago today, we launched {{SITENAME}}.com together.
+Two months in. Here's where things stand:
 
-Since then:
-- Your site has been live for 8,760 hours
-- It's been working while you slept, traveled, and lived your life
-- And we've been here the whole time
+Your site has been scanned {{SCAN_COUNT}} times since you joined.
+Current mobile score: {{MOBILE_SCORE}}
+Trend: {{TREND_DIRECTION}}
 
-We don't have a card or a cake. But we do have this: 20% off your next project with Shipyard. Same team. Same care. Same promise.
+No issues detected. No action needed.
 
-You've built something that lasts. We're proud to have been part of it.
+We'll check in again next month with your quarterly summary.
 
-Here's to year two,
-{{SENDER}}
-
-P.S. Know someone starting out who needs a site they can trust? We'd love to meet them.
+— The Anchor Team
 ```
 
-**Characteristics:**
-- Celebration, not transaction
-- Emotional milestone language ("8,760 hours")
-- Soft referral prompt
-- Renewal offer embedded naturally
-
-**Effort:** 1 hour
-**Impact:** High — captures emotional anniversary moment, drives referrals
+**Why it works:** Proves value without demanding attention. "We're still here."
 
 ---
 
-### Priority 4: Surface Pro Tier Value in Month 6
-
-**Goal:** Make quarterly refresh proposals a retention hook, not a buried feature.
-
-**Add to Email 4 (Month 6):**
+#### 1.3 Month 3 "Q1 Preview" Email
+**Purpose:** Build anticipation for Q1 Refresh
 
 ```
-If you're on Anchor Pro, your first quarterly refresh proposal is ready.
-Here's what we'd suggest based on six months of watching your site evolve:
+Subject: Your quarterly report is almost ready
 
-[AI-generated refresh recommendations]
+Hi {{FIRST_NAME}},
 
-Not on Pro yet? Reply "interested" and we'll share what we'd recommend.
+Next week marks 3 months with Anchor.
+
+We're compiling your quarterly performance summary — 13 weeks of data,
+trends, and insights about your site.
+
+Look for it on {{QUARTERLY_DATE}}.
+
+— The Anchor Team
 ```
 
-**Effort:** 2 hours (template update + process for generating proposals)
-**Impact:** Medium — upsell opportunity + curiosity hook
+**Why it works:** Teases the quarterly report instead of dropping it cold.
 
 ---
 
-## V1.1 Feature Summary
+### Phase 2: Create Hooks (Week 3-4)
 
-| Feature | Type | Effort | Impact | Priority |
-|---------|------|--------|--------|----------|
-| Preview line in Email 3 | Copy update | 30 min | High | P1 |
-| Preview line in Email 4 | Copy update | 30 min | High | P1 |
-| Day 90 check-in email | New template | 1 hr | High | P2 |
-| Day 365 anniversary email | New template | 1 hr | High | P2 |
-| Pro tier callout in Month 6 | Copy update | 2 hr | Medium | P3 |
+#### 2.1 Performance Alert System
+**Purpose:** Prove the "someone's got your back" promise
 
-**Total V1.1 Effort:** ~5 hours
-**Total V1.1 Impact:** Transforms incomplete serialization into full narrative arc
-
----
-
-## V1.2 Features: The Flywheel Foundation
-
-### What's a Flywheel?
-
-A flywheel is a system where each action generates more actions. Currently, Anchor is a funnel:
+**Trigger:** Mobile or desktop score drops >10 points from previous week
 
 ```
-Client enters → 4 emails → converts or doesn't → end
+Subject: Heads up — we noticed something on {{SITE_URL}}
+
+Hi {{FIRST_NAME}},
+
+Your mobile performance score dropped from {{PREVIOUS_SCORE}} to {{CURRENT_SCORE}} this week.
+
+This could be temporary (heavy traffic, server hiccup) or something worth looking into.
+
+Here's what we'd suggest checking:
+- Recent changes to your site (new images, plugins, scripts)
+- Your hosting provider's status page
+- Whether any new features were added
+
+If you'd like us to dig deeper, just reply to this email.
+
+We'll keep monitoring and let you know if it recovers.
+
+— The Anchor Team
 ```
 
-A flywheel looks like:
+**Why it works:** This is the moment Anchor earns its subscription. When something goes wrong, YOU told them first.
+
+---
+
+#### 2.2 Recovery Celebration Email
+**Purpose:** Close the loop on alerts, reinforce value
+
+**Trigger:** Score recovers after a previous alert
 
 ```
-Client enters → emails → converts → success → referral → new client enters
-                                      ↓
-                              content generated
-                                      ↓
-                              attracts new clients
+Subject: Good news — your site bounced back
+
+Hi {{FIRST_NAME}},
+
+Remember that performance dip we flagged last week?
+
+Your mobile score is back up to {{CURRENT_SCORE}}.
+Whatever happened, your site recovered.
+
+We'll keep watching.
+
+— The Anchor Team
 ```
 
-### Flywheel Components to Build
-
-#### 1. Referral Mechanics
-**Where:** Month 6 and Day 365 emails
-**How:** Soft prompt: "Know someone who needs a site? Tell us and we'll thank you."
-**Incentive:** $100 credit toward next project
-**Effort:** 2 hours
-
-#### 2. Client Success Stories
-**Where:** Internal capture after Month 6
-**How:** Ask high-engagement clients for 2-sentence testimonial
-**Use:** Social proof in Day 0 emails for new clients
-**Effort:** Ongoing process
-
-#### 3. Monthly Inbound Content
-**What:** "Site Owner Tips" — one useful thing per month
-**Examples:**
-- "3 things to update on your site before the holidays"
-- "How to tell if your site needs a refresh"
-- "What your competitors just changed (and what it means)"
-
-**Goal:** Position Shipyard as trusted advisor, not vendor
-**Effort:** 2-4 hours/month
-
-#### 4. Site Card Artifact
-**What:** Static page or PDF showing site status
-**Contents:** URL, launch date, maintenance tier, last update, next touchpoint
-**Goal:** Something the client can hold — makes relationship tangible
-**Effort:** 4-8 hours to build template
+**Why it works:** Completes the story arc. Problem > Alert > Resolution.
 
 ---
 
-## V1.3 Features: Inbound Retention
+### Phase 3: Make It Shareable (Week 5-6)
 
-### The Problem
+#### 3.1 Shareable Performance Badge
+**Purpose:** Turn happy users into ambassadors
 
-All V1 retention is **outbound**: Shipyard reaches to client. Client waits passively.
+**Implementation:** Generate a simple badge image users can share
 
-### The Solution
+```
++----------------------------------+
+|         Monitored by Anchor      |
+|     Performance Score: 92/100    |
+|     Updated Weekly               |
++----------------------------------+
+```
 
-Give clients somewhere to **return to**:
+**Delivery:** Include in quarterly and anniversary emails
 
-| Feature | Description | Retention Mechanism |
-|---------|-------------|---------------------|
-| Site Card page | Simple status page per client | Bookmark, check occasionally |
-| Request portal | "Submit update request here" | Habit formation |
-| Health dashboard | Uptime, speed score, traffic basics | Reason to log in |
+```
+Want to show off your site's health? Here's your performance badge:
+[View Badge] [Download Image]
+```
 
-### Why This Matters
-
-> "The client waits for you. They have no destination to return to."
-
-When clients have a place that's "theirs," they visit. Visits create habit. Habit creates retention. Retention creates lifetime value.
-
-### Implementation Approach
-
-**Phase 1:** Static Site Card (PDF or simple page)
-**Phase 2:** Basic portal (submit requests, view status)
-**Phase 3:** Full dashboard (analytics, health scores, recommendations)
+**Why it works:** Pride creates sharing. Sharing creates social proof.
 
 ---
 
-## The Serialized Narrative Arc (Complete)
+#### 3.2 "Your Site vs. Average" Benchmark
+**Purpose:** Create comparison context and bragging rights
 
-### Before V1.1
+**Add to quarterly emails:**
+```
+How you compare:
+- Your mobile score: 87
+- Average Anchor site: 72
+- You're faster than 78% of sites we monitor
+```
 
-| Day | Episode | Preview | Gap |
-|-----|---------|---------|-----|
-| 0 | Launch | ✓ Day 7 | — |
-| 7 | Check-in | ✓ Day 30 | — |
-| 30 | Refresh | ✗ | 152 days |
-| 182 | Review | ✗ | 183 days |
-| 365 | ✗ Missing | — | — |
-
-### After V1.1
-
-| Day | Episode | Preview | Gap |
-|-----|---------|---------|-----|
-| 0 | Launch | ✓ Day 7 | — |
-| 7 | Check-in | ✓ Day 30 | — |
-| 30 | Refresh | ✓ Day 90 | — |
-| 90 | Light touch | ✓ Month 6 | — |
-| 182 | Review | ✓ Day 365 | — |
-| 365 | Anniversary | ✓ Year 2 | — |
-
-**Result:** Complete serialized narrative with no silence longer than 92 days.
+**Why it works:** "Better than average" is a shareable stat.
 
 ---
 
-## Success Metrics
+### Phase 4: Active Participation (Week 7-8)
 
-| Metric | Current | V1.1 Target | V1.2 Target |
-|--------|---------|-------------|-------------|
-| Reply rate (Day 30) | TBD | +20% | +30% |
-| Churn rate (Month 6) | TBD | <10% | <5% |
-| Referral rate | 0% | 5% | 15% |
-| Client content generated | 0 | 2/month | 5/month |
-| Inbound site visits | 0 | N/A | Track |
+#### 4.1 Simple Status Page
+**Purpose:** Let users check their story on-demand
 
----
+**URL:** `anchor.dev/status/{{SITE_ID}}`
 
-## The One Thing
+**Features:**
+- Current mobile/desktop scores
+- 12-week trend chart
+- Last scan date + next scheduled scan
+- "Everything's running smoothly" or "We spotted an issue" status
 
-> "You've built presence. Now build anticipation."
-
-**V1.1 Goal:** Make every email promise the next chapter.
-**V1.2 Goal:** Make clients generate content and referrals.
-**V1.3 Goal:** Give clients a destination to return to.
-
-Each version compounds on the previous. By V1.3, Anchor isn't just a retention system—it's a relationship platform.
+**Why it works:** Supplements (doesn't replace) email-first philosophy. Users can peek without logging into a dashboard.
 
 ---
 
-*"Don't just tell them you'll be there. Make them want to see what you'll do next."*
+#### 4.2 "Request a Check" Button
+**Purpose:** Give users agency
+
+**Add to status page:**
+```
+Your next scheduled scan is Monday.
+[Request Early Check]
+```
+
+**Limit:** 1 on-demand check per week (Basic) / 4 per week (Pro)
+
+**Why it works:** Transforms passive recipients into active participants.
+
+---
+
+### Phase 5: Pro Tier Differentiation (Week 9-10)
+
+#### 5.1 Visual Monthly Report (Pro Only)
+**Purpose:** Justify the Pro price premium
+
+**Delivery:** PDF attachment or web page link
+
+**Contents:**
+- Visual score chart (12-week trend)
+- Mobile vs. desktop comparison
+- Core Web Vitals breakdown (LCP, FID, CLS) with plain-English explanations
+- "Issues avoided this month" section
+- Optimization suggestions with priority ranking
+
+**Why it works:** Pro users see the story behind the numbers.
+
+---
+
+#### 5.2 "Behind the Scenes" Email (Pro Only)
+**Purpose:** Create exclusive narrative content
+
+**Monthly email:**
+```
+Subject: Your site's month — behind the scenes
+
+Hi {{FIRST_NAME}},
+
+Here's what happened behind the scenes this month:
+
+- We ran {{SCAN_COUNT}} performance checks
+- Your site was reachable 100% of the time
+- Fastest load time this month: {{FASTEST_TIME}} on {{FASTEST_DATE}}
+- Slowest load time: {{SLOWEST_TIME}} on {{SLOWEST_DATE}}
+
+One thing we noticed:
+[Personalized insight based on their data]
+
+Keep doing what you're doing.
+
+— The Anchor Team
+```
+
+**Why it works:** Pro users feel like insiders, not just premium payers.
+
+---
+
+## Retention Email Calendar: v1.1
+
+| Day | Email | Purpose |
+|-----|-------|---------|
+| 0 | Welcome | Relationship begins |
+| 3 | **First Scan Coming** | Build anticipation |
+| 7 | Week 1 Report | First proof of value |
+| 14 | Week 2 Report | Consistency |
+| 21 | Week 3 Report | Consistency |
+| 28 | Week 4 Report | Consistency |
+| 30 | Month 1 Summary | First milestone |
+| 60 | **Month 2 Check-in** | Maintain presence |
+| 83 | **Q1 Preview** | Build anticipation |
+| 90 | Q1 Refresh | Quarterly milestone |
+| 120 | **Month 4 Check-in** | Maintain presence |
+| 150 | **Month 5 Check-in** | Maintain presence |
+| 173 | **Q2 Preview** | Build anticipation |
+| 180 | Q2 Refresh | Quarterly milestone |
+| ... | ... | ... |
+| 365 | Anniversary | Loyalty celebration |
+
+**Plus:**
+- Alert emails (triggered by performance drops)
+- Recovery emails (triggered by score recovery)
+
+---
+
+## Metrics to Track
+
+| Metric | Current Baseline | v1.1 Target |
+|--------|------------------|-------------|
+| 30-day retention | Unknown | >90% |
+| 90-day retention | Unknown | >75% |
+| 180-day retention | Unknown | >60% |
+| Email open rate | Unknown | >50% |
+| Alert email engagement | N/A | >80% open |
+| Status page visits | N/A | 2+ visits/month |
+| Badge shares | N/A | 10% of users |
+
+---
+
+## Summary: What Keeps Users Coming Back
+
+1. **Anticipation** — Tease what's coming (Day 3, Q1 Preview)
+2. **Presence** — Never disappear for 60 days (Month 2, Month 5)
+3. **Proof** — Alert them BEFORE they notice problems (Alert system)
+4. **Pride** — Give them something to share (Badges, benchmarks)
+5. **Participation** — Let them act, not just receive (Status page, request checks)
+6. **Premium Story** — Make Pro users feel like insiders (Visual reports, behind-the-scenes)
+
+---
+
+*"In television, you can't let your audience forget about you for 60 days. In subscription services, the same rule applies. Every silence is an invitation to cancel."*
+
+*Now let's make sure they never forget about us.*
+
 — Shonda Rhimes
-
----
-
-## Appendix: Full Email Sequence (V1.1)
-
-1. **Day 0 — Launch Day** (existing + no changes)
-2. **Day 7 — Check-in** (existing + no changes)
-3. **Day 30 — Refresh** (add preview line)
-4. **Day 90 — Light Touch** (NEW)
-5. **Month 6 — Review** (add preview line + Pro callout)
-6. **Day 365 — Anniversary** (NEW)
-
-Total emails: 6 (up from 4)
-Maximum silence: 92 days (down from 152)
-Serialization: Complete

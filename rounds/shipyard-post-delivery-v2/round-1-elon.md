@@ -1,93 +1,56 @@
-# Round 1 Review: Shipyard Post-Delivery V2
+# Round 1 Review: Elon Musk — Chief Product & Growth Officer
 
-**Reviewer:** Elon Musk — Chief Product & Growth Officer
-**Date:** 2026-04-12
+## Architecture: Simplest System That Works
 
----
+Both PRDs over-engineer this. First principles: customer wants proof their site works.
 
-## Architecture: The Simplest System That Works
+**Minimum viable architecture:**
+```
+Cron job → PageSpeed Insights API → JSON → Email template → Stripe link
+```
 
-**Verdict: This IS the simplest system.** Phil learned from V1's failure. Email templates + Stripe links + spreadsheet = zero engineering dependencies. Ship it.
+No database. No dashboard. Store data in JSON until 100 customers. The dashboard is a trap—400K tokens for something 8% of customers visit monthly. Build an email so good they don't *need* a dashboard.
 
-One refinement: Kill the spreadsheet. Use Notion. It's free, it has reminders built-in, and you can create a database that pings you automatically. Don't set 5 separate calendar reminders per client. That's O(n) manual work that breaks at 20 clients.
+**v1:** Static site on Cloudflare Pages + Cron worker + Stripe checkout. Zero servers.
 
----
+## Performance: Bottlenecks & 10x Path
 
-## Performance: Where Are the Bottlenecks?
+**Bottleneck 1:** Both PRDs assume Google Analytics access. OAuth, user action, token refresh = 60% won't do it. Use Cloudflare Analytics (you already host there) or first-party Plausible.
 
-The bottleneck isn't technical. It's **human bandwidth.**
+**Bottleneck 2:** Self-hosted Lighthouse = 6 min/site. 1,000 sites = $500/month compute. PageSpeed Insights API = free. Use the free API.
 
-- 5 emails × 20 clients = 100 manual sends in year one
-- Each email requires merge field editing (6-8 fields)
-- Estimated 5 minutes per email = 8+ hours/year just on email sends
+**10x path:** Batch at 3am. Cache aggressively. One Lighthouse run/week—nobody's site changes daily.
 
-**10x path:** Mailchimp, Loops, or Resend with a simple CSV upload. You template once, upload client data, schedule all 5 emails on day 0. No calendar reminders. No forgetting. This is 2 hours of setup vs. 8+ hours of ongoing manual work.
+## Distribution: Path to 10,000 Users
 
-Why isn't this in V1? It should be. It's not "automation complexity." It's basic batch operations.
+"Email existing customers" isn't distribution.
 
----
-
-## Distribution: How Does This Reach 10,000 Users?
-
-This doesn't reach 10,000 users. **It reaches 10,000 maintenance contracts.** Different game.
-
-Math:
-- Target: 25% attach rate on maintenance
-- 10,000 contracts requires 40,000 project deliveries
-- At current volume (implied ~7 projects), that's 5,700x growth
-
-**Realistic V1 impact:** If we close 20 projects/month and hit 25% attach, that's 5 maintenance contracts/month = $395-995 MRR added monthly.
-
-Distribution isn't the play here. **Conversion is.** The 25% target is aggressive. Industry SaaS maintenance attach rates are 15-20%. The emails are good but the CTA could be sharper. "P.S. Want us to handle ongoing updates?" is weak. Try: "80% of sites need their first update within 30 days. Lock in your support now."
-
----
+1. **Default-on trial:** Every completed site auto-enrolls in 30-day Care. Card collected at project start. Preventing cancellation > closing sales. 5x attach rate.
+2. **Shareable report:** Monthly email includes "Share your site's stats" button. Customers flex. Their network sees Shipyard branding.
+3. **Agency channel:** 10K users = 200 agencies × 50 sites. They white-label $99 at $249. Build reseller dashboard before customer dashboard.
 
 ## What to CUT
 
-1. **Template 4 (Quarter 1 Report)** — 90 days is too long. Client has forgotten you. Move the "refresh suggestion" to Day 30. Cut this email entirely or make it optional.
+**v2 pretending to be v1:** Benchmark comparison, recommendation engine (write 10 hardcoded tips), support tickets (use email), dark mode, dashboard (all pages), token visibility, three tiers (two max), quarterly strategy calls, competitor monitoring (with what data?).
 
-2. **{{REFRESH_SUGGESTION}} merge field** — Who's writing custom refresh suggestions for each client? Nobody. This will get skipped and feel hollow. Remove it or standardize it.
+**What stays:** Stripe subscriptions, monthly email, uptime monitoring (free BetterUptime), one "Request update" button.
 
-3. **Token tracking in spreadsheet** — You're not actually using tokens yet. Why track them? Track "Requests Made" and "Hours Used" if anything. Token tracking is V2 theater.
+## Technical Feasibility: One Agent Session?
 
-4. **Two tiers at launch** — Launch with ONE tier. $99/month. Test demand. Split into tiers when you have 10 paying customers and data on usage patterns. Two tiers before any customers is premature optimization.
+**PRD estimate:** 900K tokens. **Reality:** 1.5M+ tokens.
 
----
+**What one session ships:** Landing page (50K) + Stripe (100K) + Email cron (80K) + PageSpeed API (40K) = 270K tokens.
 
-## Technical Feasibility: Can One Agent Session Build This?
+Scope v1 to 300K max. Ship one session. Iterate on real feedback.
 
-**Yes, but barely.** The "build" is:
-1. Copy-paste 5 email templates (10 min)
-2. Create 2 Stripe products + payment links (20 min)
-3. Create Notion/Sheet tracking database (15 min)
-4. Backfill existing clients (variable)
+## Scaling: What Breaks at 100x
 
-This is a 1-hour task, not 5 days. The 5-day timeline suggests hidden work: stakeholder alignment, template iteration, existing client outreach. Be honest about what "build" means here.
+**At 10K customers:** PageSpeed API rate limits (cache/batch). Support load = 500 tickets/month = 2 FTEs. Enterprise tier (8 hrs/month) × 100 customers = 800 hours = 5 FTEs. Margin trap.
 
-An agent session could scaffold the Notion database, prep the Stripe product descriptions, and draft the emails — in under 30 minutes. The hard part is adoption, not creation.
-
----
-
-## Scaling: What Breaks at 100x?
-
-At 100x current volume (700 active clients):
-- **Manual email sending breaks** — You cannot manually send 3,500 emails/year
-- **Spreadsheet becomes unmaintainable** — 700 rows, 10 columns, multiple people editing = chaos
-- **Calendar reminders explode** — 3,500 reminders/year = 10/day
-- **Token tracking collapses** — Manual token counting for 700 clients is impossible
-
-**When to automate:** The PRD says "50+ active clients" is the breaking point. I'd say 25. Start evaluating automation tools at 15 clients. Have them ready to deploy at 25. The transition cost grows exponentially with client count.
-
----
+Calculate support cost per tier before launch. If Enterprise margin <50% after support, raise prices or cut scope.
 
 ## Final Verdict
 
-**Ship it.** But ship it in 1 day, not 5. Cut the second tier. Cut Template 4. Use Notion with database automations instead of calendar reminders.
+Maintenance System PRD was a SaaS platform wearing a feature costume. Care is better but still over-scoped. **v2 must be:** Stripe + Email + One API. Ship in one session.
 
-The real risk isn't complexity — it's that nobody follows through on manual processes. The best system is the one that actually gets executed.
-
-**Priority fix:** Change the CTA from "P.S." afterthought to primary email purpose. Every email should be a maintenance pitch with value-add framing, not a value-add with maintenance as P.S.
-
----
-
-*"If you're not embarrassed by the first version, you launched too late." — This PRD gets it. Ship.*
+**One metric that matters:** Current attach rate from completed project → maintenance signup. Don't know it? Email 20 past customers. Offer $99/month. That experiment is worth more than any PRD.

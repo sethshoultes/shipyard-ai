@@ -1,201 +1,208 @@
-# Shipyard Post-Delivery V2: Final Decisions
+# Consolidated Decisions — Post-Delivery System (Anchor)
 
-**Consolidated by:** Phil Jackson — Zen Master, Great Minds Agency
-**Date:** 2026-04-12
-**Status:** LOCKED FOR BUILD
-
----
-
-## Decision Register
-
-### DECISION 1: Product Naming
-| Aspect | Detail |
-|--------|--------|
-| **Proposed by** | Steve Jobs |
-| **Winner** | Steve Jobs |
-| **Decision** | Product is named **"Anchor"** (Anchor Basic, Anchor Pro) |
-| **Rationale** | "Maintenance plans" is corporate furniture. "Anchor" carries emotional weight, fits nautical brand, sounds like a club not an insurance pitch. Elon's counter (rename in V2) overruled — names set positioning from day one. |
-
-### DECISION 2: Pricing Tiers
-| Aspect | Detail |
-|--------|--------|
-| **Proposed by** | Elon (1 tier @ $99) vs Steve (2 tiers @ $79/$149) |
-| **Winner** | Steve Jobs |
-| **Decision** | **Two tiers from day one: $79/month (Basic) and $149/month (Pro)** |
-| **Rationale** | Psychological anchoring. The existence of Pro makes Basic feel accessible. Apple doesn't sell one iPhone. This isn't premature optimization — it's positioning. |
-
-### DECISION 3: Tracking System
-| Aspect | Detail |
-|--------|--------|
-| **Proposed by** | Elon Musk |
-| **Winner** | Elon Musk |
-| **Decision** | **Notion database, not spreadsheet + calendar reminders** |
-| **Rationale** | O(1) setup per client vs O(n) calendar events. Built-in automated reminders. Single source of truth. Steve conceded. |
-
-### DECISION 4: Launch Day Email Structure
-| Aspect | Detail |
-|--------|--------|
-| **Proposed by** | Steve Jobs |
-| **Winner** | Steve Jobs (Elon conceded) |
-| **Decision** | **Launch Day email leads with celebration, not administration** |
-| **Rationale** | First 30 seconds set the relationship. Open with awe. "Look what we built together." Maintenance upsell moves to paragraph three. Both parties agreed. |
-
-### DECISION 5: Template 4 (Quarter 1 Report)
-| Aspect | Detail |
-|--------|--------|
-| **Proposed by** | Elon Musk |
-| **Winner** | Elon Musk (Steve conceded) |
-| **Decision** | **Cut or make optional. Move refresh suggestion to Day 30.** |
-| **Rationale** | 90 days is too long — client has forgotten you. Day 30 maintains momentum. Steve conceded. |
-
-### DECISION 6: Merge Fields
-| Aspect | Detail |
-|--------|--------|
-| **Proposed by** | Both (convergent) |
-| **Winner** | Consensus |
-| **Decision** | **Kill {{REFRESH_SUGGESTION}} and {{FEATURE_LIST}} merge fields** |
-| **Rationale** | Nobody writes custom suggestions. These fields become lies or grocery receipts. Write one generic sentence that works for 80% of projects. Edge cases get manual edits. |
-
-### DECISION 7: Emotional Positioning
-| Aspect | Detail |
-|--------|--------|
-| **Proposed by** | Steve Jobs |
-| **Winner** | Steve Jobs (Elon adopted) |
-| **Decision** | **"We don't disappear" is the core emotional hook** |
-| **Rationale** | Every freelancer, agency, dev shop vanishes after launch. Anchor is the promise that Shipyard stays. Lead every email with this positioning. Elon agreed — first line, not buried. |
-
-### DECISION 8: CTA Strategy
-| Aspect | Detail |
-|--------|--------|
-| **Proposed by** | Steve (restrained P.S.) vs Elon (every email sells) |
-| **Winner** | CONTESTED — Requires resolution |
-| **Decision** | **Unresolved. See Open Questions.** |
-| **Rationale** | Steve argues P.S. placement is intentional restraint that builds trust. Elon argues every touchpoint should convert. Neither conceded. |
-
-### DECISION 9: Build Timeline
-| Aspect | Detail |
-|--------|--------|
-| **Proposed by** | Elon (1 day) vs Steve (5 days) |
-| **Winner** | CONTESTED — Requires resolution |
-| **Decision** | **Unresolved. See Open Questions.** |
-| **Rationale** | Elon: actual build is 1 hour, rest is procrastination theater. Steve: emails ARE the product, 5 days is minimum viable craft. Neither conceded. |
+> *Blueprint for Build Phase*
+> *Consolidated by Phil Jackson, The Zen Master*
 
 ---
 
-## MVP Feature Set (What Ships in V1)
+## Product Essence
 
-### SHIPPING
-- [ ] 4 email templates (Launch Day, Day 7, Day 30, Month 6) — Template 4 cut/optional
-- [ ] Product name: **Anchor** (Anchor Basic, Anchor Pro)
-- [ ] Two Stripe products with payment links ($79/month, $149/month)
-- [ ] Notion database for client tracking with automated reminders
-- [ ] Emotional hook: "We don't disappear" — lead positioning in all emails
+**What it is:** Making clients feel watched over after their site launches.
+**What it evokes:** "Someone's got my back."
+**What must be perfect:** The emails. They are the entire product.
+**Creative direction:** Trust before transaction.
 
-### NOT SHIPPING (Explicitly Cut)
-- Dashboard
-- Automations
-- Token tracking system
-- Email scheduling automation (Mailchimp/Loops/Resend) — deferred to 25+ clients
-- Analytics
-- {{REFRESH_SUGGESTION}} merge field
-- {{FEATURE_LIST}} merge field
-- Template 4 (Quarter 1 Report at 90 days) — cut or made optional
+---
+
+## Locked Decisions
+
+### 1. Product Name
+
+| Aspect | Decision | Proposed By | Won By | Reasoning |
+|--------|----------|-------------|--------|-----------|
+| Name | **Anchor** | Steve Jobs | Steve Jobs | "Post-Delivery System" takes five syllables to say nothing. "Anchor" takes two syllables to say everything. The thing that keeps ships from drifting away. Elon conceded: "Anchor is a better name." |
+| Tier Names | Basic Anchor / Pro Anchor | Steve Jobs | Steve Jobs | Consistent naming hierarchy |
+| Implementation Timing | Use internally now, brand publicly at v2 | Elon Musk | Compromise | Ship v1 first, rename at v2 launch after model is proven |
+
+### 2. Architecture (v1)
+
+| Aspect | Decision | Proposed By | Won By | Reasoning |
+|--------|----------|-------------|--------|-----------|
+| Stack | Cron + PageSpeed API + JSON + Email + Stripe | Elon Musk | Elon Musk | Steve conceded: "Infrastructure should follow traction, not precede it." |
+| Database | **None until 100 customers** — Store data in JSON | Elon Musk | Elon Musk | Steve agreed explicitly |
+| Dashboard | **No dashboard in v1** | Both (consensus) | Both | Steve: "Build the relationship first. Earn the right to ask for a login." Elon: "Email so good they don't need a dashboard." |
+| Hosting | Static site on Cloudflare Pages + Cron worker | Elon Musk | Elon Musk | Zero servers, minimal cost |
+| Lighthouse Frequency | **Once per week** | Elon Musk | Elon Musk | Steve conceded: "Daily is vanity. Weekly is useful." |
+| Analytics | **First-party only** (Cloudflare Analytics or Plausible) | Elon Musk | Elon Musk | Steve conceded: "OAuth for Google Analytics is a dead end. 60% won't complete it." |
+
+### 3. Token Budget
+
+| Aspect | Decision | Proposed By | Won By | Reasoning |
+|--------|----------|-------------|--------|-----------|
+| v1 Scope | **300K tokens max** in one Claude session | Elon Musk | Elon Musk | Steve conceded: "The 900K token estimate is fantasy. 270K is real." |
+| Breakdown | Landing page (50K) + Stripe (100K) + Email cron (80K) + PageSpeed API (40K) | Elon Musk | Elon Musk | Feasible in single session |
+
+### 4. Email Design
+
+| Aspect | Decision | Proposed By | Won By | Reasoning |
+|--------|----------|-------------|--------|-----------|
+| Quality Bar | **A+ copy or don't ship** | Steve Jobs | Steve Jobs | "The email IS the entire product. Copy is not decoration." |
+| Voice | Confident friend who's also an expert. Not salesy, not corporate, not desperate. | Steve Jobs | Steve Jobs | Uncontested |
+| CTAs | **One CTA per email, embedded naturally** | Steve Jobs | Both (consensus) | Elon agreed: "The P.S. lines are desperate." |
+| Personalization | Real personalization or none — no half-automated merge fields | Steve Jobs | Steve Jobs | "{{REFRESH_SUGGESTION}} requires creativity. Half-automated feels worse than manual." |
+| First Line Test | Must make recipient feel *seen*, not processed | Steve Jobs | Steve Jobs | Example: Not "Your site is live" but "You built something real." |
+
+### 5. Tracking & Operations
+
+| Aspect | Decision | Proposed By | Won By | Reasoning |
+|--------|----------|-------------|--------|-----------|
+| Spreadsheet Columns | Three only: **Last Contact / Next Touch / Status** | Steve Jobs | Steve Jobs | "Five emails don't need five checkbox columns. Bureaucracy vs. instinct." |
+| Operations | Automation for scale, human warmth in copy | Compromise | Compromise | Steve wanted rituals; Elon proved at 200+ customers, manual breaks |
+
+### 6. Pricing Tiers
+
+| Aspect | Decision | Proposed By | Won By | Reasoning |
+|--------|----------|-------------|--------|-----------|
+| Number of Tiers | **Two maximum** | Elon Musk | Elon Musk | Cut complexity. Three tiers is v2 complexity. |
+
+---
+
+## Unresolved: Card Collection Timing
+
+| Position | Advocate | Argument |
+|----------|----------|----------|
+| **Card at project start** (default-on trial) | Elon Musk | "This is the distribution unlock. Preventing cancellation > closing sales. 5x attach rate." |
+| **No card until trust is earned** | Steve Jobs | "Collecting a card when trust is lowest plants the seed of extraction. That's not a relationship. That's a hostage situation with a countdown. Trust before transaction—always." |
+
+**Status:** DEADLOCKED. This is a fundamental philosophical disagreement about trust vs. conversion optimization. Requires founder decision.
+
+---
+
+## MVP Feature Set (What Ships in v1)
+
+### Included
+1. **Landing page** — Explains Anchor, shows tiers
+2. **Stripe checkout** — Two-tier subscription (Basic/Pro)
+3. **Email cron system** — Automated sends on schedule
+4. **PageSpeed Insights API integration** — Weekly performance data
+5. **Five core emails:**
+   - Launch Day email
+   - Week 1 check-in
+   - Month 1 report
+   - Q1 refresh prompt
+   - Anniversary email
+6. **Uptime monitoring** — Via free BetterUptime
+7. **One "Request Update" button** — Simple support path
+
+### Explicitly Cut (v2 or Later)
+- Dashboard (all pages)
+- Benchmark comparison
+- Recommendation engine (use 10 hardcoded tips instead)
+- Support ticket system (use email)
+- Dark mode
+- Token visibility in client-facing materials
+- Third tier
+- Quarterly strategy calls
+- Competitor monitoring
+- OAuth-based Google Analytics
+- Self-hosted Lighthouse
 
 ---
 
 ## File Structure (What Gets Built)
 
 ```
-/anchor/
+anchor/
+├── site/                          # Cloudflare Pages static site
+│   ├── index.html                 # Landing page
+│   ├── pricing.html               # Two-tier breakdown
+│   └── assets/
+│       ├── styles.css
+│       └── logo.svg
+│
+├── workers/
+│   ├── cron-pagespeed.js          # Weekly PageSpeed API calls
+│   ├── cron-email-scheduler.js    # Checks due emails, triggers sends
+│   └── stripe-webhook.js          # Handles subscription events
+│
 ├── emails/
-│   ├── 01-launch-day.md          # Celebration-first, logistics line 3
-│   ├── 02-day-7-checkin.md       # "We don't disappear" positioning
-│   ├── 03-day-30-refresh.md      # Refresh suggestion (standardized)
-│   └── 04-month-6-review.md      # Annual planning, renewal prep
-├── stripe/
-│   ├── anchor-basic.md           # $79/month product description
-│   └── anchor-pro.md             # $149/month product description
-├── notion/
-│   └── client-database-template.md  # Schema + automated reminder setup
-├── brand/
-│   └── voice-guide.md            # "Confident, warm, slightly irreverent"
-└── decisions.md                  # This document
+│   ├── launch-day.html            # A+ copy required
+│   ├── week-1.html                # A+ copy required
+│   ├── month-1.html               # A+ copy required
+│   ├── q1-refresh.html            # A+ copy required
+│   └── anniversary.html           # A+ copy required (emotional peak)
+│
+├── data/
+│   └── customers.json             # No database until 100 customers
+│
+├── lib/
+│   ├── pagespeed.js               # PageSpeed API wrapper
+│   ├── email.js                   # Email sending logic
+│   └── stripe.js                  # Stripe API wrapper
+│
+└── README.md                      # Internal docs only
 ```
 
 ---
 
-## Open Questions (Requires Resolution Before Build)
+## Open Questions (Need Resolution Before Build)
 
-### 1. CTA Strategy: Restrained vs. Assertive
-- **Steve's position:** P.S. placement is intentional restraint. Pick 2 emails for the ask. Let others breathe. Trust builds conversion.
-- **Elon's position:** Every touchpoint is a conversion opportunity. Make CTAs feel like value, not asks. "You're covered" framing.
-- **Impact:** Directly affects email template content
-- **Recommended path:** Hybrid — Lead with value in every email, but hard CTA in only Launch Day and Day 30. Others use soft "Here if you need us" close.
-
-### 2. Build Timeline: 1 Day vs. 5 Days
-- **Steve's position:** 5 days minimum. Emails are the entire product. Craft matters.
-- **Elon's position:** 1-day build. 30-minute polish. Don't let perfect kill shipped.
-- **Impact:** Sprint planning, stakeholder expectations
-- **Recommended path:** 2-day sprint. Day 1: infrastructure (Notion, Stripe). Day 2: email craft with voice. Ship by EOD Day 2.
-
-### 3. When to Automate Email Sends
-- **Elon's position:** Now. Batch upload to Mailchimp/Loops saves 8+ hours/year.
-- **Steve's position (implied):** Manual preserves intentionality
-- **PRD position:** 50+ clients
-- **Elon's counter:** Start evaluating at 15, deploy at 25
-- **Impact:** Operational scalability
-- **Recommended path:** Manual for first 15 clients. Evaluate automation tooling at client 15. Deploy at client 25.
+| # | Question | Context | Impact |
+|---|----------|---------|--------|
+| 1 | **Card collection timing** | Elon: project start. Steve: after trust earned. | Fundamentally changes signup flow and conversion funnel |
+| 2 | **Email service provider** | Not specified in debates | Affects email delivery, templating, analytics |
+| 3 | **Exact copy for 5 emails** | Steve demands A+ quality. Who writes them? | Build cannot proceed without final copy |
+| 4 | **Support email address** | "Use email" for support — what address? | Customer communication channel |
+| 5 | **BetterUptime configuration** | How many sites per account? Alert thresholds? | Affects monitoring costs and noise |
+| 6 | **Stripe pricing** | Exact dollar amounts for Basic Anchor / Pro Anchor | Cannot build checkout without prices |
+| 7 | **PageSpeed API key management** | Free tier rate limits at scale | May need batching strategy documented |
+| 8 | **What triggers enrollment?** | Manual? Auto on project completion? | Affects cron logic and data entry |
 
 ---
 
 ## Risk Register
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| **Manual emails don't get sent** | HIGH | HIGH | Notion automated reminders. Daily task view. No willpower required. |
-| **Emails feel robotic despite intentions** | MEDIUM | HIGH | Brand voice guide. "Confident, warm, slightly irreverent." Test reads before send. |
-| **25% attach rate is too aggressive** | MEDIUM | MEDIUM | Industry baseline is 15-20%. Target 20% in projections. Celebrate 25%+. |
-| **Two tiers create confusion** | LOW | MEDIUM | Clear feature differentiation. Anchor Basic = updates. Anchor Pro = updates + strategy. |
-| **Notion database becomes unmaintainable at scale** | MEDIUM | HIGH | Transition plan at 50 clients. Evaluate Airtable or custom tooling at 100. |
-| **"Anchor" name creates domain/trademark issues** | LOW | MEDIUM | Check availability before launch. Fallback: "Steady" or "Harbor" |
-| **Client forgets Shipyard exists by Day 30** | MEDIUM | HIGH | Move refresh suggestion from Day 90 to Day 30 (already decided). |
-| **Template polish takes longer than planned** | MEDIUM | LOW | Time-box to Day 2. Ship professional, iterate to perfect. |
-| **No one follows through on manual processes** | HIGH | CRITICAL | This is Elon's core concern. Notion reminders + single daily task view is the entire mitigation strategy. If this fails, nothing else matters. |
+| # | Risk | Likelihood | Impact | Mitigation | Owner |
+|---|------|------------|--------|------------|-------|
+| 1 | **PageSpeed API rate limits at scale** | High (at 1000+ sites) | Medium | Batch at 3am, cache aggressively, one run/week | Engineering |
+| 2 | **Email deliverability** | Medium | High | Use established ESP, warm up domain, monitor spam scores | Engineering |
+| 3 | **B+ copy ships anyway** | Medium | High (per Steve: kills the product) | Steve reviews all templates before launch | Steve Jobs |
+| 4 | **Support volume overwhelms** | Medium (at scale) | High | Calculate support cost per tier pre-launch. If margin <50% after support, raise prices or cut scope | Operations |
+| 5 | **JSON storage fails at scale** | Low (v1 scope is 100 customers) | Medium | Monitor file size, plan database migration trigger | Engineering |
+| 6 | **Card-at-start damages trust** | Medium (if Elon wins) | High (per Steve) | A/B test with subset before full rollout | Growth |
+| 7 | **No card = low conversion** | Medium (if Steve wins) | High (per Elon) | Track attach rate obsessively, pivot quickly if <10% | Growth |
+| 8 | **Scope creep during build** | High | High (delays ship) | Hard lock at 300K tokens. Everything else is v2. No exceptions. | Phil Jackson |
+| 9 | **Enterprise tier margin trap** | High (at scale) | High | 8 hrs/month × 100 customers = 800 hours = 5 FTEs. Model economics before offering | Finance |
+| 10 | **Name confusion during transition** | Low | Low | Use "Anchor" internally now, brand publicly at v2 | Marketing |
 
 ---
 
-## Essence (Guiding Principles for Build)
+## The Bottom Line
 
-From `/essence.md`:
+**What we agree on:**
+- No dashboard in v1
+- Email-only relationship
+- JSON storage until 100 customers
+- Cloudflare + Stripe + Cron architecture
+- Weekly PageSpeed runs
+- First-party analytics only
+- 300K token budget
+- Two pricing tiers
+- A+ copy is mandatory
 
-> **What is this product REALLY about?**
-> The promise that someone stays after the work is done.
+**What we disagree on:**
+- When to collect the card (trust vs. conversion)
 
-> **What feeling should it evoke?**
-> Relief. The quiet comfort of knowing you're not alone with this thing you don't fully understand.
+**What ships:**
+Landing page + Stripe checkout + Email cron + PageSpeed API + 5 emails + BetterUptime integration
 
-> **What's the one thing that must be perfect?**
-> The first email. It sets everything. Open with awe, not administration.
-
-> **Creative direction:**
-> We don't disappear.
-
----
-
-## Sign-Off
-
-This document represents the consolidated decisions from:
-- Steve Jobs (Chief Design & Brand Officer) — Rounds 1 & 2
-- Elon Musk (Chief Product & Growth Officer) — Rounds 1 & 2
-
-**Locked decisions:** 7 of 9
-**Open questions:** 3 (require Phil's executive decision)
-**Recommended build timeline:** 2 days
-**Target ship date:** EOD Day 2
+**What doesn't ship:**
+Everything else.
 
 ---
 
 *"The strength of the team is each individual member. The strength of each member is the team."*
-— Phil Jackson
 
-**Now we build.**
+*Steve brings the soul. Elon brings the speed. The product needs both—but v1 needs to exist before it can be perfected.*
+
+*— Phil Jackson*

@@ -1,0 +1,29 @@
+{
+  "customers": [
+    {
+      "id": "test-customer-001",
+      "email": "test@example.com",
+      "name": "Test Customer",
+      "siteUrl": "https://example.com",
+      "stripeCustomerId": "cus_test_123",
+      "stripeSubscriptionId": "sub_test_456",
+      "tier": "basic",
+      "enrollmentDate": "2026-04-12",
+      "subscriptionStatus": "active",
+      "lastContact": "2026-04-12",
+      "nextTouch": "2026-04-19",
+      "status": "active",
+      "emailsSent": {
+        "launchDay": false,
+        "week1": false,
+        "month1": false,
+        "q1Refresh": false,
+        "anniversary": false
+      },
+      "pagespeedHistory": [],
+      "test": true
+    }
+  ],
+  "lastUpdated": "2026-04-12T00:00:00.000Z",
+  "version": "1.0.0"
+}

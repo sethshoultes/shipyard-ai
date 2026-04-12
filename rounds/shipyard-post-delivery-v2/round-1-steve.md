@@ -1,81 +1,90 @@
-# Steve Jobs — Chief Design & Brand Officer
-## Shipyard Post-Delivery V2 Review
+# Round 1 — Steve Jobs Review
+
+## The Verdict
+
+This PRD understands something most companies never learn: **the relationship begins at delivery, not before it.** The previous attempt failed because it was engineered. This one will succeed because it's human.
 
 ---
 
-### Product Naming
+## Product Naming
 
-**"Shipyard"** is fine for the company. But this post-delivery system needs its own name. "Maintenance plans" is corporate furniture. Nobody wakes up excited about *maintenance*.
+**Kill "Post-Delivery System."** Nobody falls in love with a system.
 
-Call it **"Anchor."**
+Call it **Anchor**.
 
-An anchor keeps things steady. It's what holds your ship after it's built. It's one word, it's nautical (it fits), and it carries emotional weight. "Are you on Anchor?" sounds like a club. "Do you have a maintenance plan?" sounds like an insurance pitch.
+One word. The thing that keeps ships from drifting away. It's what we do—we anchor clients to us after launch. The maintenance tiers? Basic Anchor and Pro Anchor. The anniversary email? "One year at anchor."
 
-*Anchor Basic. Anchor Pro.* Now we're speaking to humans.
-
----
-
-### Design Philosophy
-
-The philosophy here is correct: **manual before automated.** This is rare wisdom. Most teams would build the dashboard, the automations, the analytics—and ship nothing.
-
-But the emails themselves? They're forgettable. They read like a chatbot wrote them at 3 AM. "How's it going?" is not a hook. It's noise.
-
-**Every touchpoint is a product.** These five emails ARE the product right now. Treat them with the same obsession you'd treat an interface. Each email should feel like a handwritten note from someone who actually cares—not a reminder from a ticket system.
+A name isn't decoration. It's compression. "Post-Delivery System" takes five syllables to say nothing. "Anchor" takes two syllables to say everything.
 
 ---
 
-### User Experience — The First 30 Seconds
+## Design Philosophy
 
-When a client opens that Launch Day email, what do they FEEL?
+This is insanely great because **it respects the messy reality of phase one.**
 
-Right now? They feel *processed.* Here's your stuff, here's how to buy more stuff.
+Most companies would build the dashboard first, then realize nobody logs in. You're building the relationship first—five emails, two links, one spreadsheet. That's not minimalism by accident. That's minimalism by wisdom.
 
-Instead, the first 30 seconds should feel like **celebration.** You just shipped something together. Start there. The email should make them want to forward it to someone and say, "Look what we built."
-
-Open with awe, not administration. The maintenance upsell can wait until paragraph three.
+The design philosophy is: **Trust the email inbox.** Email is where busy people live. Dashboards are where metrics go to die. Meeting clients where they already are? That's design thinking.
 
 ---
 
-### Brand Voice
+## User Experience — The First 30 Seconds
 
-The current emails have no voice. They're professional wallpaper.
+The first 30 seconds happen when they open the Launch Day email.
 
-Shipyard should sound **confident, warm, and slightly irreverent.** Like a builder who loves their craft but doesn't take themselves too seriously. Think: the friend who happens to be brilliant at what they do.
+Here's what they should feel: **"These people actually care about what happens next."**
 
-"Your site has been working for you 24/7" is weak. Try: "While you slept, your site was closing deals." That's voice.
+Right now the email reads like a receipt. Change that. The first line shouldn't be "Your site is live"—they already know that. The first line should be: *"You built something real."*
 
-Every email should pass the "Would I actually read this?" test. Most fail it.
-
----
-
-### What to Say NO To
-
-The PRD already says no to automations, dashboards, and token tracking systems. Good.
-
-Now say no to these in the emails:
-- **No "quick tips" lists.** You're not a blog. You're a partner.
-- **No "P.S." upsells on every email.** It's desperate. Pick two emails for the ask. Let the others breathe.
-- **No merge fields that feel robotic.** "{{FEATURE_LIST}}" will read like a grocery receipt. Write actual sentences.
-
-Simplicity isn't about features. It's about removing everything that doesn't make someone feel something.
+Then: page count, features, what's next. The tokens used line? Bury it. Accountants care about tokens. Humans care about results.
 
 ---
 
-### The Emotional Hook
+## Brand Voice
 
-Why will people LOVE this? Right now, they won't. They'll tolerate it.
+The emails are too transactional. They read like a software company, not a creative partner.
 
-Here's the hook you're missing: **"We don't disappear."**
+**Shipyard's voice should sound like a confident friend who also happens to be an expert.** Not salesy. Not corporate. Not desperate.
 
-Every freelancer, every agency, every dev shop—they vanish after launch. The client is left holding something they don't fully understand, wondering who to call when something breaks.
+The P.S. lines pushing maintenance in every email? Desperate. One mention per email, maximum. Embedded in genuine helpfulness, not bolted on like an afterthought.
 
-Anchor is the promise that Shipyard stays. That's the emotional position. Not "maintenance," not "tokens," not "response times."
-
-*We built this together. We're not going anywhere.*
-
-Lead with that, and the $79/month sells itself.
+The Week 1 email asks "How's it going?" — too generic. Ask something specific: *"Has anyone mentioned the [specific feature] yet? That's usually the first thing people notice."*
 
 ---
 
-**Final Word:** This PRD is the right scope. Now make the words worthy of the strategy.
+## What to Say NO To
+
+**Say no to the tracking spreadsheet columns.** Five emails don't need five checkbox columns. You're creating bureaucracy where you need instinct.
+
+One column: "Last Contact." One column: "Next Touch." One column: "Status." That's it.
+
+**Say no to "merge fields."** You have {{NAME}} and {{URL}} in every template. But {{REFRESH_SUGGESTION}} in the Q1 email? That requires creativity. Either commit to real personalization or don't pretend. Half-automated feels worse than manual.
+
+**Say no to calendar reminders.** You'll ignore them. Instead: every Monday morning, open the spreadsheet, send the emails that are due. Make it a ritual, not a notification.
+
+---
+
+## The Emotional Hook
+
+People won't love this because of the maintenance plans. They'll love it because **it feels like someone is watching out for them.**
+
+The anniversary email is the emotional peak—but it's currently the weakest template. "You've come a long way" is empty. Instead:
+
+*"One year ago, this was just an idea. Now {{URL}} has been working for you every single day—while you slept, while you traveled, while you built the rest of your business. That's 365 days of your brand showing up. That's not a website. That's a teammate."*
+
+**That's the hook.** Not the discount. Not the upsell. The recognition that we helped them build something that matters.
+
+---
+
+## The Bottom Line
+
+This PRD gets the fundamentals right. It's achievable. It's human-first. It doesn't over-engineer.
+
+But the copy is B+ when it needs to be A+. The emails are the product. Treat every sentence like a design decision.
+
+Ship it. But rewrite the templates with the heart they deserve.
+
+---
+
+*"People don't know what they want until you show it to them."*
+*But they know how you made them feel. Forever.*
