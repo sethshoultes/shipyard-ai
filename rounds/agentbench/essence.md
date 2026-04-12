@@ -1,13 +1,13 @@
 # Essence
 
 **What it's really about:**
-The ability to sleep at night knowing your AI won't break.
+Replacing prayer with proof when you ship AI.
 
 **The feeling:**
-Confidence. The exhale after all tests pass.
+The exhale.
 
 **The one thing that must be perfect:**
-First 30 seconds — from install to passing test.
+The first run. One command. Truth.
 
 **Creative direction:**
-Calm certainty. No fear.
+Quiet certainty.

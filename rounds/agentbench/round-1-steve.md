@@ -1,78 +1,78 @@
-# Chief Design & Brand Officer: Steve Jobs
-## Positions on AgentBench
+# Steve Jobs — Chief Design & Brand Officer
+## AgentBench: Round 1 Positions
 
 ---
 
-### Product Naming
+### Product Naming: **Pulse**
 
-**Kill "AgentBench."** It's forgettable. It sounds like a park bench for robots.
+"AgentBench" is what engineers name products. It's descriptive, safe, and instantly forgettable. It sounds like a government form.
 
-The name should be **"Proof."**
+The name should be **Pulse**.
 
-One word. Powerful. It says exactly what you get: proof that your agent works. "Did you run Proof?" becomes the question every team asks before shipping. When your tests pass, you have *proof*. When they fail, you don't have proof—you have work to do.
+Pulse is what you check when you need to know if something is alive. That's exactly what this product does — it tells you whether your agent has a heartbeat or is brain-dead before you ship it. One word. One syllable. Visceral. When your CI pipeline runs Pulse, you *feel* it.
 
-`npx proof` — that's beautiful. That's a verb and a noun. That's confidence in five characters.
-
----
-
-### Design Philosophy
-
-What makes this insanely great? **The YAML file is the product.**
-
-Most testing frameworks make you feel like a software archaeologist—digging through docs, writing boilerplate, configuring eight things before you test one thing. Proof inverts this entirely: you write plain English expectations, and the machine figures out how to evaluate them.
-
-This is the same insight that made the iPhone great: the interface *is* the product. There are no layers between intention and execution. You don't configure Proof. You don't "set it up." You describe what should happen, and it tells you if it did.
+"Run Pulse before you push." Say it out loud. Now say "Run AgentBench before you push." One is a verb. One is furniture.
 
 ---
 
-### User Experience: The First 30 Seconds
+### Design Philosophy: The Confidence Score is Everything
 
-Thirty seconds. That's all we get to change someone's mind.
+The PRD buries the most revolutionary feature in a table row: **confidence scores**.
 
-The experience should be: `npm init proof`, see an example test for a greeting, run `npx proof`, watch a beautiful checkmark appear with a confidence score. Done. You understand everything.
+Every test runner gives you pass/fail. That's binary thinking from a bygone era. AI isn't deterministic — it's probabilistic. A 0.94 confidence and a 0.52 confidence are both technically "passes," but one should make you sleep well and the other should keep you up at night.
 
-No signup. No API key prompt on first run. No "welcome wizard." The product earns the right to ask for things by delivering value *first*. Configure Claude later when you need semantic evaluation. The first thirty seconds should feel like magic, not homework.
+The confidence score should be the *hero* of every screen, every output, every report. Make it large. Make it colored. Make it impossible to ignore. This is the thermometer for AI behavior — and we're going to make people obsessed with taking the temperature.
 
 ---
 
-### Brand Voice
+### User Experience: 60 Seconds to Revelation
 
-**Confident. Terse. Zero apologies.**
+Forget 30 seconds — I want revelation in 60.
 
-Proof doesn't say "Oops, something went wrong!" It says: "Test failed. Here's why." It doesn't say "You might want to consider..." It says: "Your agent said X. You expected Y."
+`npm init pulse` → one question: "Where's your agent?" → scaffolds a test file → runs it → shows them their agent failing a test they didn't know existed.
 
-The voice is a senior engineer at 2am who has no patience for fluff. Direct. Useful. Occasionally witty in that dry way that only works when you've earned respect. Never cute. Never corporate.
+That moment of failure is the magic. Most tools promise success. We deliver *useful failure*. The user thinks their agent works. Pulse shows them the edge case they missed. Their jaw drops. They're hooked.
 
-Error messages should be haikus of clarity, not novels of excuses.
+The first-run experience must feel like a doctor who finds the problem you didn't know you had — and tells you exactly how to fix it.
+
+---
+
+### Brand Voice: Clinical Precision with Quiet Confidence
+
+Pulse speaks like a senior engineer who's seen a thousand failures. Not panicked. Not casual. *Precise*.
+
+- "1 failure detected. Sentiment expected: firm. Actual: apologetic."
+- Not: "Oops! Something went wrong! :("
+- Not: "ERROR: ASSERTION_FAILED_CHECK_LOGS"
+
+The voice is diagnostic. It respects the user's intelligence. It tells them what happened, why it matters, and implicitly — what to do. We are the MRI machine, not the wellness app.
 
 ---
 
 ### What to Say NO To
 
-**No visual dashboard in v1.** I know it's tempting. A dashboard feels like "real" software. But dashboards are where focus goes to die. The terminal is sacred space—it's where developers actually work. Own that space completely before you dilute yourself with web UIs.
+**No to dashboards in v1.** The PRD already says this — good. The terminal is sacred ground. Every pixel on a dashboard is a pixel that distracts from the result. Ship the CLI. Ship it clean.
 
-**No multi-turn conversations.** Not yet. Single turns force clarity. Multi-turn is a crutch for fuzzy thinking about what you're actually testing.
+**No to multi-turn in v1.** The temptation will be enormous. Resist it. Single-turn testing is hard enough. Multi-turn is a tar pit that will delay launch by months. Get single-turn perfect.
 
-**No "flexible" configuration.** Don't give people twelve ways to do the same thing. Give them one way that works.
+**No to "helpful" default tests.** Don't scaffold tests that all pass. Scaffold one that fails. A test framework that makes you feel good is lying to you.
 
-**No hosted service.** Your tests run on your machine. Your data stays on your machine. That's not a limitation—that's a feature. Privacy is a moat.
-
----
-
-### The Emotional Hook
-
-Here's why people will *love* this:
-
-Every AI engineer right now is shipping agents and holding their breath. They're crossing their fingers that the prompt changes they made at 6pm don't break everything by morning. They have no tests because writing tests for LLMs feels impossible—how do you assert on vibes?
-
-Proof gives them something they've never had: **the ability to sleep at night.**
-
-That's the emotional hook. Not "better testing"—*peace of mind*. That feeling when all your tests pass, and you *know* your agent won't embarrass you in production.
-
-We're not selling a testing framework. We're selling confidence. We're selling the moment when you push to main and you're not afraid.
-
-That's what people will love. That's what they'll tell their friends about.
+**No to configuration options.** Every `--flag` is an admission of design failure. If we need a flag, we haven't thought hard enough about the default.
 
 ---
 
-*Ship it.*
+### The Emotional Hook: Control in a World of Chaos
+
+AI agents are terrifying. You don't know what they'll say. You can't predict their behavior. You ship them and pray.
+
+Pulse gives developers something they've lost: **control**.
+
+Not control over the AI itself — that's impossible. Control over *knowing*. Knowing what your agent does. Knowing when it changes. Knowing before your users do.
+
+That's the emotional hook: "I finally understand what my agent actually does."
+
+People will love Pulse because it turns anxiety into confidence. It transforms "I hope this works" into "I know this works." That transformation — from chaos to clarity — is worth everything.
+
+---
+
+*Ship it. Call it Pulse. Make developers feel like they have a heartbeat monitor on the most unpredictable technology in a generation.*

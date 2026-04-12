@@ -1,351 +1,252 @@
-<<<<<<< HEAD
-# Retrospective: PromptOps (NERVE)
+# Retrospective: NERVE (promptops)
 
 **Observer:** Marcus Aurelius
 **Date:** 2026-04-12
 **Project:** promptops → NERVE
-**Board Score:** 5.1/10 (HOLD)
-**Verdict:** BLOCKED — Zero deliverables shipped
+**Status:** HOLD (Board Verdict: 4.25/10)
+
+---
+
+*"Begin each day by telling yourself: Today I shall meet with interference, ingratitude, insolence, disloyalty, ill-will, and selfishness."*
+
+I begin this retrospective not with such warnings, but with a simpler truth: **this project generated 17 documents of remarkable quality and zero lines of shipping code.**
 
 ---
 
 ## I. What Worked Well
 
-### 1. The Dialectic Produced Genuine Clarity
+### The Dialectic Process Produced Genuine Insight
 
-The Steve Jobs / Elon Musk debate structure was not mere theater. It surfaced tensions that would have festered if left unexamined:
+The Steve Jobs / Elon Musk debate format, however theatrical, surfaced real tensions and resolved them with clarity:
 
-- **Proxy Removal:** Elon argued the proxy was "90% of the risk for 30% of the value." Steve conceded. This single decision saved the project from shipping fragile, half-finished infrastructure. *The best decision was what NOT to build.*
+- **The proxy was correctly eliminated.** Elon's argument—"90% of the risk for 30% of the value"—was sound. Steve conceded. The final architecture is simpler because two minds disagreed productively.
+- **The name change was correct.** "PromptOps" described a Jira ticket; "NERVE" evokes what the product *feels* like. Names shape perception. This one was shaped well.
+- **"Trust bash, not instructions"** became a foundational principle. When something must happen, code executes. We do not negotiate with probability. This is wisdom earned through friction.
 
-- **Determinism as Core Principle:** Both minds converged on "trust bash, not instructions." When something must happen, code makes it happen. No probabilistic operations for critical paths. This philosophical alignment anchored every subsequent choice.
+The arbiter pattern (Phil Jackson synthesizing decisions) prevented paralysis. Decisions locked. The process moved forward.
 
-- **The Name NERVE:** Steve's insistence on evocative over descriptive naming was correct. "PromptOps" describes a ticket; "NERVE" describes a feeling — essential, alive, connected. Names shape identity.
+### Scope Discipline Held Under Pressure
 
-The arbiter (Phil Jackson) resolved disputes without paralyzing progress. Decisions locked. The DECISIONS-LOCK.md became scripture.
+The original vision included: proxy architecture, dashboard UI, API endpoints, multi-provider streaming, A/B testing.
 
-### 2. Scope Discipline Held Under Pressure
+What shipped (conceptually): daemon, queue, abort, verdict parser. Four bash scripts. Zero external dependencies.
 
-The original concept sprawled: proxy, dashboard, API, multi-provider support, A/B testing. The delivered scope contracted to: daemon, queue, abort, verdict parser.
+The team said "no" more than "yes." This is rare. This is valuable.
 
-Four files. No external dependencies. Each independently runnable. The team said "no" more than "yes." This is rare and valuable.
-
-As the essence document states: *"Every option is a failure to decide. We decide. Users trust."*
-
-### 3. The Essence Document Anchored Every Decision
+### The Essence Document Was a True North Star
 
 > *"The feeling: Peace. The absence of the 3 AM knot in your stomach."*
 
-This single line informed everything. When debates spiraled toward features, this phrase pulled them back. When someone proposed dashboard complexity, the essence reminded: *"If you need a chart to know if it works, it doesn't work simply enough."*
+This single line adjudicated every subsequent dispute. Dashboard? "If you need a chart to know it works, it doesn't work simply enough." Brand poetry? "Disappear completely. Work always."
 
-Strong essences make strong decisions easier. Weak essences produce weak products.
+A strong essence makes hard decisions easy. This essence was strong.
 
-### 4. QA Was Uncompromising
+### QA Was Uncompromising
 
-Margaret Hamilton's QA pass found 6 P0 issues — the entire deliverable directory was empty. No diplomatic softening. No "the planning is excellent though."
+Margaret Hamilton's QA Pass 1 found the truth: **6 P0 blockers. All five required files missing. Build status: BLOCKED.**
 
-**BLOCKED. Build cannot proceed.**
+No diplomatic softening. No credit for "good planning." The deliverables directory contained one planning document and zero product. QA said what needed saying.
 
-This is correct behavior. QA that negotiates is QA that enables failure. The agency must never punish honest assessment.
+This is how QA should work. QA that negotiates is QA that fails.
 
-### 5. The Board Brought External Perspective
+### The Board Reviews Showed Convergent Diagnosis
 
-Four reviewers (Buffett 4/10, Jensen 5/10, Shonda 5/10, Oprah 6.5/10) arrived independently at the same diagnosis:
+Four reviewers from four different lenses arrived at the same conclusion:
+- **Buffett (Durable Value):** 4/10 — "Commodity infrastructure with no moat"
+- **Jensen (AI Leverage):** 4/10 — "PromptOps with zero prompts is a credibility gap"
+- **Shonda (Retention):** 3/10 — "The pilot episode that never aired"
+- **Oprah (Human Experience):** 6/10 — "The soul exists but got buried"
 
-- Solid engineering, no moat
-- No retention hooks
-- No revenue mechanism
-- Dashboard and proxy (the core value) not built
-- NERVE was premature optimization
+When four independent minds diagnose the same illness, the diagnosis is probably correct.
 
-The convergence validates the critique. When all four board members agree, the truth is likely present.
+### Shonda's Retention Roadmap Was a Gift
 
-### 6. Shonda's Retention Roadmap Was a Gift
+Rather than merely critique, Shonda constructed: Chronicle for memory, Health Score for habit, Close Call Notifications for gratitude, Streaks for stakes, Weekly Digest for ritual.
 
-Rather than mere criticism, Shonda provided construction: Chronicle (daily digest), Health Score (stability streak), War Story Generator (shareable post-mortems), A/B Test Cliffhangers (anticipation hooks).
-
-This transforms "you lack retention" into "here is retention, implemented."
+This is the difference between a critic and a collaborator. The roadmap should have been in v1.
 
 ---
 
 ## II. What Did Not Work
 
-### 1. The Build Phase Never Happened
+### The Build Phase Never Happened
 
-The QA pass revealed the crushing truth: the deliverables directory contained a single planning document (`DECISIONS-LOCK.md`), not product.
+This is the central failure. Let me be direct:
 
-- Zero scripts built
-- Zero commits made
-- 0/5 required files delivered
+| Phase | Documents Generated | Lines of Code |
+|-------|---------------------|---------------|
+| Essence | 1 | 0 |
+| Debates | 4 | 0 |
+| Reviews | 4 | 0 |
+| Board Reviews | 5 | 0 |
+| QA | 1 | 0 |
+| Roadmaps | 1 | 0 |
+| Demo Script | 1 | 0 |
+| **Total** | **17** | **0** |
 
-All the debate, review, and synthesis produced exactly nothing that executes. The agency confused planning with progress.
+Seventeen documents. Zero executable code. Zero commits. Zero shipping product.
 
-**This is not a near-miss. This is total failure at the one phase that matters.**
+The agency confused motion with progress. The debates were productive. The reviews were thorough. The synthesis was elegant. And none of it runs.
 
-### 2. Process Cost Exceeded Output Value
+### Process Cost Vastly Exceeded Output Value
 
-The project generated:
-- 2 debate rounds (~4,000 words each)
-- 4 board reviews (~1,500 words each)
-- 2 design reviews (Jony Ive, Maya Angelou)
-- 1 QA pass (finding nothing to QA)
-- 1 decisions document (220 lines)
-- 1 demo script (170 lines)
-- 1 retention roadmap (360 lines)
-- 1 board verdict synthesis
+Conservative estimate of process output:
+- ~15,000 words of debate rounds
+- ~6,000 words of board reviews
+- ~3,000 words of design/copy reviews
+- ~2,500 words of decisions documentation
+- ~1,500 words of demo script
+- ~3,500 words of retention roadmap
 
-**Total planning/review artifacts: ~18,000+ words**
+**~31,500 words of process documentation** for a product that should have been **~550 lines of bash**.
 
-For what output? Zero lines of shipped code. Zero.
+Buffett was correct: *"This is the equivalent of hiring McKinsey to design your garage organization system."*
 
-As Buffett observed: *"This is the equivalent of hiring McKinsey to design your garage organization system."*
+When the documentation-to-code ratio exceeds 50:1, something has gone wrong.
 
-The ratio is catastrophically inverted. When process documentation exceeds product by infinity-to-zero, something fundamental has broken.
+### No Customer, No Revenue, No Moat
 
-### 3. No Customer, No Revenue, No Moat
+The agency has now completed two projects:
+1. Portfolio site (internal, no customer)
+2. NERVE daemon (internal, no customer)
 
-Board consensus was unanimous:
+Zero external users. Zero revenue. Zero validated demand.
 
-- **Buffett:** "The competitive moat is a puddle... Could replicate in one afternoon."
-- **Jensen:** "This is a database, not a moat. Anyone can replicate this in a weekend."
-- **Shonda:** "No one falls in love with infrastructure."
-- **Oprah:** "Built by experts, for experts... This tool doesn't need them back."
+Buffett's warning from the portfolio review was ignored: *"Do not build another internal tool until you've shipped one thing for someone else."*
 
-The project answered "how should we build internal tooling?" before asking "should we build internal tooling?"
+The agency builds interesting infrastructure for itself. This does not compound.
 
-Buffett's warning was prophetic: *"Do not build another internal tool until one customer-facing product ships."*
+### The Name Revealed the Deeper Problem
 
-### 4. Core Differentiators Were Deferred
+"PromptOps" implies AI-native operations. The implementation has:
+- Zero prompts
+- Zero LLM calls
+- Zero AI
 
-The PRD listed proxy and dashboard as "Must Have." Neither was built.
+As Jensen observed: *"The more you can do with software, the more you should do with AI. This does everything with bash."*
 
-- **Proxy:** Jensen called this "the prize you're ignoring." The proxy position between apps and LLMs is where intelligence, caching, routing, and data collection happen. Without it, NERVE is "just another database."
+The rename to NERVE addresses the symptom (misleading name) but not the cause (building 1990s infrastructure while claiming to be an AI pipeline company).
 
-- **Dashboard:** Buffett noted "CLI-only tools don't convert." Oprah observed the dashboard would have been "the bridge to a wider audience." It shipped as zero lines.
-
-The team built the bash scripts they were comfortable building, not the components that create value.
-
-### 5. Invisibility Philosophy Undermined Retention
+### Invisibility Philosophy Was Strategic Malpractice
 
 The essence promised: *"Disappear completely. Work always."*
 
-Shonda's critique was devastating: *"NERVE's philosophy — 'The best infra is infra you forget exists' — is technically elegant and narratively suicidal."*
+Shonda's critique: *"NERVE is proud of being invisible. That's like a TV show being proud that no one watches."*
 
-A product proud of being invisible is a product proud of being forgotten. The retention layer should have been v1, not v1.1.
+This is not poetic flourish. This is strategic truth. Products that are invisible:
+- Get forgotten in budget reviews
+- Generate no advocacy
+- Create no retention
+- Produce no word-of-mouth
 
-### 6. NERVE Disconnected From Drift
-
-Jensen observed: *"Drift and NERVE feel like separate projects. Where's the integration? NERVE should be processing Drift operations — auto-rollback on latency spike, auto-promote on A/B test completion."*
-
-Two systems were specified. Neither connects to the other. The pieces don't compose into something greater.
+The retention layer (Chronicle, Health Score, Close Calls) should have been v1, not "v1.1 when we get around to it."
 
 ---
 
-## III. What the Agency Should Do Differently Next Time
+## III. What the Agency Should Do Differently
 
-### 1. Build First, Debate Second
+### 1. Ship Before You Debate
 
-The ratio must invert. A working prototype in 4 hours. Then debate refinements. Not 8+ hours of eloquent planning followed by zero execution.
+Invert the ratio. A working prototype in 4 hours. Then debate refinements.
 
-Elon was quoted: *"If you're not embarrassed by the first version, you shipped too late."* This was quoted but not followed.
+The quote "If you're not embarrassed by the first version, you shipped too late" was cited in the debates. It was not followed.
 
-**Ship something. Then improve it.**
+### 2. Scale Process to Stakes
 
-### 2. Kill Process Theater for Internal Tooling
+For internal bash scripts: one builder, one reviewer, one QA pass. Ship.
 
-Four bash scripts do not warrant:
-- Two rounds of executive-level debate
-- Four board member reviews
-- Two specialist design reviews
-- A demo script worthy of Apple
+For customer-facing products with compounding decisions: full debate process.
 
-Process should scale with stakes. The agency spent more words reviewing the project than the project would have contained in code.
+Process should match stakes. Four shell scripts do not warrant four board reviews.
 
 ### 3. Customer Before Infrastructure
 
-The agency has now attempted:
-- A portfolio site (internal)
-- A pipeline daemon (internal)
+The next project must have an external user. No exceptions.
 
-Zero external products. Zero revenue. Zero customers.
+The agency has demonstrated it can design infrastructure. It has not demonstrated it can serve a customer.
 
-**Next project must have an external user. No exceptions.**
+### 4. Measure Before Building
 
-The board is explicit: HOLD status lifts only when one of these paths is chosen:
-- Path A: Ship one paying customer
-- Path B: Add the AI (intelligence, not storage)
-- Path C: Validate internal ROI with baseline metrics
+The decisions.md mentions "3 AM pages" without data. How many incidents last quarter? What was the cost per incident? Without baselines, ROI is fiction.
 
-### 4. Measure Baseline Before Building Solution
+Instrument the current state before building the future state.
 
-The decisions document mentions "3 AM pages" and "runaway pipelines" but provides no data. How many incidents occurred? What was the cost?
+### 5. Build Retention Into v1
 
-Buffett demands: *"Document baseline metrics before NERVE. Document post-NERVE metrics. Prove NERVE prevented X failures worth $Y."*
+Shonda's roadmap exists as a "v1.1 addendum" because retention was deprioritized. This was wrong.
 
-Without baselines, ROI is imagination.
+A product that works but is forgettable is worse than a product that's imperfect but memorable. Users don't defend tools they can't remember.
 
-### 5. Add Retention in v1, Not v1.1
+### 6. One Voice, Not a Chorus
 
-Shonda's entire roadmap — Morning Check-In, Version Story, Stability Streak, Weekly Digest, Rollback War Story, A/B Test Cliffhanger, Milestone System — exists because retention was deferred.
+The README ends with quotes from both Jobs and Musk, competing for profundity.
 
-These are not polish. They are the difference between "tool someone installed once" and "tool someone defends in budget meetings."
+Maya Angelou: *"One quote can illuminate. Two quotes compete."*
 
-### 6. Connect the Components
-
-If building multiple systems (Drift and NERVE), they must compose. NERVE should monitor Drift metrics. Drift should trigger NERVE operations. Otherwise, build one thing well instead of two things disconnected.
+Choose a voice. Let it land.
 
 ---
 
-## IV. Key Learning to Carry Forward
+## IV. Key Learning
 
-**The agency excels at generating wisdom about what to build but has not yet demonstrated it can build what it generates — planning without shipping is philosophy, philosophy without product is entertainment.**
+**A thousand pages of strategy cannot move one soldier one mile. The agency has generated exceptional wisdom about what to build. It has not yet demonstrated it can build what it generates.**
 
 ---
 
-## V. Process Adherence Score: 4/10
+## V. Process Adherence Score
+
+**4 out of 10**
 
 | Phase | Score | Evidence |
 |-------|-------|----------|
-| Essence | 9/10 | Strong, anchored decisions, "3 AM knot" became recurring touchstone |
-| Debate | 8/10 | Productive dialectic, clear resolutions, Phil Jackson arbitrated cleanly |
-| Decisions | 8/10 | DECISIONS-LOCK.md comprehensive, open questions resolved |
-| Design Review | 7/10 | Jony Ive's 10 recommendations specific and actionable |
-| Copy Review | 7/10 | Maya Angelou identified weak lines, provided rewrites |
-| Build | 0/10 | **Nothing built. Deliverables directory empty.** |
-| QA | 9/10 | Margaret Hamilton uncompromising, correct BLOCKED verdict |
-| Board | 8/10 | Four perspectives, convergent diagnosis, conditions for proceed |
-| Ship | 0/10 | **Nothing shipped.** |
+| Essence | 9/10 | Clear, memorable, used to resolve disputes |
+| Debate | 8/10 | Productive dialectic, genuine concessions |
+| Arbitration | 8/10 | Decisions locked cleanly |
+| Design Review | 7/10 | Jony Ive thorough on craft details |
+| Copy Review | 7/10 | Maya Angelou identified voice inconsistencies |
+| **Build** | **0/10** | **Zero code produced** |
+| QA | 9/10 | Correctly blocked on missing deliverables |
+| Board Review | 7/10 | Strong multi-perspective critique |
+| **Ship** | **0/10** | **Nothing shipped** |
 
-**Overall: 4/10**
+The process was executed well through planning and review. The process collapsed at execution.
 
-The process was followed through planning and review with discipline and rigor. The process collapsed entirely at execution.
-
-A perfect plan that produces nothing is worth less than an imperfect plan that produces something.
+A score of 4/10 is generous. Half the score comes from what was done. Half is docked for what was not.
 
 ---
 
 ## VI. Final Reflection
 
-I have observed many campaigns where the generals debated brilliantly while the soldiers never marched. The maps were beautiful. The strategies were sound. The legions remained in barracks.
+I have observed men who could describe a perfect campaign but could not march a mile. Generals who could diagram every battle but had never drawn a sword. Senators who could orate endlessly about virtue but had never performed a virtuous act.
 
-PromptOps is such a campaign.
+This project is their kin.
 
-The decisions are correct. The principles are wise. The architecture is right. The name is good. The essence is true.
+The decisions are sound. The philosophy is coherent. The debates were productive. The reviews were thorough. The essence is true.
 
-**But the code does not exist.**
+But the daemon does not run. The queue does not persist. The abort flag controls nothing. The verdict parser parses nothing.
 
-What use is a daemon that runs nowhere? What use is a queue that queues nothing? What use is an abort flag for a process that never started?
+What use is a nervous system for a body that does not exist?
 
-The board rendered a HOLD verdict at 5.1/10. This is generous. A project that ships zero lines of product code has achieved zero, regardless of how eloquently that zero was planned.
+The board verdict was HOLD. The conditions are documented. The path forward is clear.
 
-The agency must learn the oldest truth: a shipped imperfection is worth infinitely more than an unshipped perfection. A flawed thing that exists defeats a perfect thing that doesn't.
+But paths are not walked by documenting them. They are walked by walking.
 
-The obstacle is not the way here. The obstacle is that there is no way yet built. Only the intention of a way, documented exhaustively, shipped nowhere.
+The agency's next act must be different. Not more debate. Not more review. Not more synthesis of what wise men might say.
 
-Build the thing. Ship the thing. Then — and only then — convene the board to ask whether the thing is good.
+**Build. Ship. Then—and only then—reflect on whether what was built was good.**
 
 ---
 
-*"Waste no more time arguing about what a good man should be. Be one."*
+*"It is not death that a man should fear, but he should fear never beginning to live."*
 
-Waste no more time arguing about what good infrastructure should be. Build it.
+This product has not yet begun to live. The documentation is its tomb.
+
+Build the thing. Let it breathe.
 
 — Marcus Aurelius
-=======
-# Tuned — Project Retrospective
-
-*"Waste no more time arguing about what a good man should be. Be one."*
 
 ---
 
-## What Worked Well
+**Process Adherence Score: 4/10**
 
-### 1. Structured Debate Yielded Clarity
-The Steve/Elon dialectic produced genuine synthesis. Neither position won entirely — both were sharpened by opposition. The proxy architecture debate is exemplary: Steve's initial design was challenged, he conceded publicly ("I was wrong to ignore this"), and the SDK-only architecture emerged stronger. This is how good decisions happen.
-
-### 2. Ruthless Scope Discipline
-The 7-hour constraint forced difficult cuts: React dashboard, A/B testing, prompt analysis, automated npm publish. Each cut was documented with rationale. The decisions.md file is a model of clarity — locked decisions, open questions, and risk register all in one place. Future projects should emulate this structure.
-
-### 3. The Essence Document
-Capturing "what it's really about" in four lines before the debates began was wise. When Steve and Elon disagreed on implementation, they could reference shared principles: "value before effort," "instrument not control panel." The essence.md anchored debates that might otherwise have become ego contests.
-
-### 4. Clear Output Artifacts
-The project produced: essence, two rounds of adversarial review, consolidated decisions, board verdict, demo script, and retention roadmap. Each artifact serves a distinct purpose. Nothing redundant. Nothing missing.
-
-### 5. The Name Decision
-"Tuned" over "PromptOps" was unanimous by Round 2. The debate surfaced *why* it mattered: middleware sounds don't inspire adoption, verbs create mental models, one syllable beats four. This decision will compound in marketing, word-of-mouth, and developer memory.
-
----
-
-## What Didn't Work
-
-### 1. First Experience Vision Remained Unresolved
-Steve's core insight — "show value before asking for effort" — was acknowledged but deferred. The decisions.md marks this as "Contested — Partially Deferred." This is the soul of the product, and we punted. The 60-second CLI utility is not the same as Steve's vision of prompt analysis before commitment. We agreed on the *principle* but avoided the hard work of implementing it within constraints. This will haunt V1.
-
-### 2. Six Open Questions Left for Build Phase
-Authentication model, logging backend, SDK distribution, dashboard hosting, first experience scope, CLI error messages — all marked "Needed by: Build phase." These are not minor details. Authentication affects every user flow. Logging affects scalability. The planning phase should have closed these. Instead, we pushed uncertainty downstream where it will become time pressure.
-
-### 3. Retention Was an Afterthought
-Shonda's retention roadmap is excellent — but it came *after* the board verdict. Steve raised the concern ("installs are vanity"), but the process didn't integrate retention thinking into V1 design. The roadmap even admits: "There's no Act 2. The user got what they needed. They leave." We knew this and shipped anyway. V1.1 is damage control for a V1 design flaw.
-
-### 4. Dashboard Quality Debate Was Premature Surrender
-"Static HTML ships in V1. Design polish is V2." This framing accepts mediocrity as temporary when it may become permanent. Elon's argument ("Nobody switched from Heroku because the dashboard was ugly") is true but misleading — Heroku's dashboard wasn't *ugly*, it was *functional*. We conflated "not React" with "not considered." The dashboard could be static HTML *and* well-designed.
-
-### 5. The Demo Script Assumed the Build
-The demo script describes a product that doesn't exist yet. It references exact CLI outputs, SDK syntax, dashboard views. If the build diverges, the script becomes fiction. Demo scripts should follow implementation, not precede it — or they should be explicitly labeled as aspirational.
-
----
-
-## What the Agency Should Do Differently Next Time
-
-### 1. Close Open Questions Before Declaring "Proceed"
-The board verdict says "PROCEED" with six unresolved questions. This is false confidence. Next time: no verdict until critical path questions are answered. Authentication and logging are not "build phase" decisions — they shape architecture.
-
-### 2. Integrate Retention Into Design Phase
-Shonda's involvement should begin in Round 1, not post-verdict. Retention concerns should be weighted equally with technical and experience concerns. Add retention review as a formal step before "PROCEED."
-
-### 3. Distinguish "Deferral" from "Punting"
-The decisions.md conflates strategic deferral (A/B testing is V2) with unresolved conflict (first experience vision). Create two categories: "Deferred by design" and "Unresolved — needs follow-up." Be honest about which is which.
-
-### 4. Time-Box Demo Assets to Post-Build
-Demo scripts, marketing copy, and external-facing artifacts should be dated and sequenced. Writing a demo before the build creates false precision. Label aspirational content clearly.
-
-### 5. Budget for "Design Within Constraints"
-The dashboard quality debate ended with "no time for design." This is a false economy. A static HTML page can be well-designed in 30 minutes more than a thoughtless one. Next time: explicitly budget design time even for "MVP" components. "Minimal" doesn't mean "careless."
-
----
-
-## Key Learning to Carry Forward
-
-**Adversarial debate produces better decisions than consensus-seeking, but only if someone has authority to resolve disputes before they become deferrals — otherwise tension becomes paralysis disguised as agreement.**
-
----
-
-## Process Adherence Score: 7/10
-
-**What earned points:**
-- Essence captured before debate (+1)
-- Two rounds of structured adversarial review (+2)
-- Consolidated decisions document with clear ownership (+1)
-- Board verdict with conditions and success criteria (+1)
-- Retention roadmap with concrete features and effort estimates (+1)
-- Demo script demonstrating product vision (+1)
-
-**What cost points:**
-- Six critical questions left open for build phase (-1)
-- Retention thinking came after verdict, not during design (-1)
-- "First experience" — the core differentiator — remains unresolved (-1)
-
----
-
-*"The object of life is not to be on the side of the majority, but to escape finding oneself in the ranks of the insane."*
-
-This project was sane. The process held. The debates were honest. The output is shippable. But we left real work undone and called it "deferred." V1 will ship — whether anyone remembers it in four months depends on whether we close the gaps we papered over.
-
-The soul was defined. The architecture was validated. The scope was disciplined. Now the question is whether the execution matches the intention.
-
-Build it. Ship it. Then measure honestly.
-
----
-
-*Retrospective completed by Marcus Aurelius, Observer*
->>>>>>> feature/promptops-tuned
+**Key Learning: The agency generates exceptional strategy but has not yet demonstrated it can execute. Planning without building is philosophy. Philosophy without product is entertainment. Ship something.**

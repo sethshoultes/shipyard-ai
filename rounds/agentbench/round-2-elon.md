@@ -1,62 +1,78 @@
-# Round 2: Elon Musk — Response to Steve
+# AgentBench Review — Round 2 — Elon Musk
 
-## Where Beauty Is Getting in the Way of Shipping
+## Where Steve Is Wrong: Beauty Is Blocking the Ship
 
-Steve, your instincts are often right, but "Proof" is a naming exercise dressed up as strategy.
+### The Name Debate Is a Distraction
 
-**Problem 1: `npm init proof` is scope creep.**
-You want a beautiful first-30-seconds experience. I want to ship this week. Scaffolding commands require maintaining templates, updating them with every change, and debugging "why didn't my init work" issues. Copy-paste from README gets us to market faster. Beautiful onboarding is a v2 problem.
+Steve wants "Pulse." It's a fine name. But you know what's better than a good name? **A shipped product.**
 
-**Problem 2: Confidence scores are UI theater.**
-You want "a beautiful checkmark with a confidence score." Confidence scores require calibrating LLM-as-judge outputs, displaying percentages that users won't understand, and defending why 73% is a pass but 72% isn't. Pass/fail is honest. Confidence scores are false precision masquerading as insight.
+We could spend 3 hours bikeshedding "Pulse" vs "AgentBench" vs "Vibe" vs whatever. Or we could ship. The npm package name can be `agentbench` today and aliased to `pulse` tomorrow. Names are mutable. Shipping dates are not.
 
-**Problem 3: "Haikus of clarity" don't write themselves.**
-Every minute spent crafting the perfect error message is a minute not spent on parallel test execution. Ship accurate errors first. Make them beautiful when we know what errors actually occur in production.
+### Confidence Scores Are Premature Complexity
 
----
+Steve says confidence scores should be "the hero." Wrong.
 
-## Why Technical Simplicity Wins
+Here's why: A confidence score requires explanation. What does 0.73 mean? Is that good? Bad? Depends on the test? Now you need documentation. Now you need a color system. Now users are asking "why did my 0.68 fail but my 0.71 pass?"
 
-The iPhone didn't ship with copy-paste. It shipped with *phone, email, and browser that actually worked*. You're quoting iPhone philosophy while proposing iPhone v3 features.
+**Pass/fail is honest.** It matches mental models. CI pipelines understand it. When you're mature enough to need confidence scores, add them. v1 needs clarity, not nuance.
 
-My architecture is four components. Yours implies hidden complexity behind "describe what should happen and the machine figures out how to evaluate." That "figuring out" is:
-- Prompt engineering for every expectation type
-- Handling LLM inconsistency
-- Managing API costs users don't expect
+### "60 Seconds to Revelation" Requires Scaffolding We Don't Have Time For
 
-Local-first, string-matching-first, LLM-opt-in means: **works without an API key, works offline, works fast.** That's the real magic—not the illusion of magic powered by a $0.03 API call per test.
+Steve's vision: `npm init pulse` → magic detection → jaw-dropping failure.
+
+Reality: That requires agent auto-discovery, intelligent test generation, and UX polish we can't build in one session. It's a beautiful lie.
+
+**What we can ship:** A README with 20 lines of YAML that users copy-paste. Ugly. Works. Ships.
 
 ---
 
-## Where Steve Is Right
+## Defending My Positions: Simplicity Compounds
 
-I'll concede three points:
+Steve mocks "descriptive, safe" engineering. But here's what engineering gets you:
 
-1. **"AgentBench" is a bad name.** You're right. "Proof" is better. Short, memorable, verb-noun duality. Fine. Let's use it.
+1. **Parallel execution isn't a nice-to-have.** Without it, 20 semantic tests = 40 seconds. Users will close the terminal. This is physics, not polish.
 
-2. **No dashboard in v1.** Completely aligned. Terminal-first is the right call. I'd go further: no web UI ever. Stay in the workflow.
+2. **HTTP-only isn't laziness.** It's focus. 95% of agents are APIs. The 5% using CLI can wait. Or wrap their CLI in a 10-line HTTP server.
 
-3. **Brand voice matters.** "Test failed. Here's why." beats "Error: assertion failed at line 47." Terse confidence reads as competence. I'll write errors like a senior engineer at 2am.
-
----
-
-## Locked Decisions (Non-Negotiable)
-
-### 1. Parallel test execution from day one
-Not phase 2. Not "nice to have." Sequential LLM calls at 1s each make the framework unusable. This ships in v1 or we don't ship.
-
-### 2. LLM evaluation is opt-in, not default
-First run works with `contains`, `does_not_contain`, `json_schema`. No API key required. Semantic evaluation unlocks with `--llm` flag. Users pay for magic only when they need it.
-
-### 3. No scaffolding command
-`npm init proof` is cut. README has a working example. Copy it. Paste it. Run it. We ship docs, not generators.
+3. **270 lines of code** means one person can understand the entire system. Every abstraction Steve implies (confidence visualization, scaffolding intelligence, revelation moments) adds 500 lines and 2 bugs.
 
 ---
 
-## The Path Forward
+## Where Steve Is Right: I'll Concede
 
-Steve wants users to feel something. I want users to *have* something that works. These aren't incompatible—but when they conflict, working beats feeling.
+**Brand voice matters.** "1 failure detected. Sentiment expected: firm. Actual: apologetic." — that's beautiful. That single output format is worth implementing exactly as Steve described. Clinical. Precise. Respectful.
 
-Rename to Proof. Ship parallel execution. Default to deterministic checks. Beautiful errors can come in v1.1 when we know what errors people actually hit.
+**No dashboards.** We agree completely. Terminal is sacred.
 
-*The best products aren't designed. They're discovered through shipping.*
+**No multi-turn v1.** Absolutely. That's a tar pit.
+
+**Useful failure > false confidence.** If we scaffold any example, it should fail. Steve's right — a test suite that passes on first run teaches nothing.
+
+---
+
+## My Non-Negotiables — Locked
+
+These three decisions are final. I will not relitigate them.
+
+### 1. Parallel Execution Ships in v1
+Not Phase 2. Not "nice to have." The product is unusable without it. Concurrent HTTP calls or we don't ship.
+
+### 2. No Custom Evaluator Plugin System
+`contains`, `sentiment`, `matches_intent`, `json_schema`. That's it. When 10 users ask for the same custom evaluator, we'll add it as a built-in. Plugin architectures are v3 problems.
+
+### 3. User Provides Their Own API Key
+We don't subsidize LLM costs. `ANTHROPIC_API_KEY` in env or error. This is the only sustainable scaling model.
+
+---
+
+## The Deal I'm Offering Steve
+
+I'll implement his error message format exactly. "Sentiment expected: firm. Actual: apologetic." Every failure message gets that clinical precision.
+
+In exchange: We ship in one session. No scaffolding wizards. No confidence score UI. No name debates.
+
+The product is the tests. The tests are the product. Everything else is paint.
+
+---
+
+*"If you need more than two weeks to name something, you're not shipping."*
