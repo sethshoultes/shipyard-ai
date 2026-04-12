@@ -1,27 +1,25 @@
-# Sara Blakely Gut-Check: Tuned
+# Sara Blakely Gut-Check: Anchor
 
-## Would a developer pay for this?
+**Would a real customer pay for this?**
 
-**Not yet.** You're selling version control. They don't care about version control. They care about "my AI broke at 2am and I can't fix it without a full deploy." Lead with the rollback-saves-your-ass story, not the tidy-prompts story. Versioning is a vitamin. Instant rollback is a painkiller.
+Maybe. But you're selling peace of mind to people who don't know they need it yet. The person who just launched their site is HIGH on launch day. They're not thinking "who's watching my PageSpeed?" They're thinking "I DID IT." You're solving a problem they haven't felt yet.
 
-## What's confusing / bounce risk?
+**What's confusing? What would make someone bounce?**
 
-1. **"60 seconds" is a lie.** npm install + init + push + SDK install + code change = 3 minutes minimum. Don't promise what you can't deliver.
-2. **Where does my data go?** Developers are paranoid. No clear answer = no adoption.
-3. **Too much jargon.** KV, D1, Edge — nobody cares. Just tell me it's fast.
+1. Basic vs Pro — I still don't know why I'd pick one. What's the difference *to me*?
+2. PageSpeed scores in Month 1 email — engineering vanity. I don't run the website. I need customers.
+3. The card timing debate is a red flag. If you're fighting about when to ask for money, you haven't nailed the value.
 
-## 30-Second Elevator Pitch
+**30-Second Elevator Pitch:**
 
-> "Every prompt change risks breaking your AI app. Tuned lets you push and rollback prompts instantly — no deploy, no downtime. One command: `tuned push`. Live at the edge in under a second. When something breaks at 2am, fix it in 3 seconds."
+"You just launched your website. Now what? Sites break. Google changes things. Your hours change and you forget to update. Anchor watches your site and nudges you before small problems become big ones. It's like having a web person on retainer for $X/month."
 
-## What would I test first ($0 budget)?
+**What would I test first with $0 budget?**
 
-DM 20 developers on Twitter who've complained about prompt engineering. Ask: "Last time a prompt broke production, how long did the fix take?" If they say "hours" — you've found your customers. If they shrug — they're not ready.
+Send the Launch Day email manually to 10 past clients. See if they reply. If they don't, the email isn't as good as you think. If they DO reply with questions — product-market fit signal.
 
-## Retention hook?
+**What's the retention hook?**
 
-**Weak.** First push feels good. What brings them back? Missing: alerts when prompts cause errors, "your rollback saved you" moments, team features. The hook should be: "Tuned caught a problem before your users did." That's not here yet.
+This is your weak spot. Emails stop after year one. Then what? People don't *feel* monitoring. They feel emails. After anniversary... crickets. You need an ongoing reason to stay.
 
-## Bottom line
-
-Ship it. But know you're shipping a nice-to-have until you add monitoring. The aha moment isn't pushing a prompt — it's rolling back at 2am and being back in bed by 2:01.
+**Bottom line:** Solid idea. Over-engineered execution. You've got 15 tasks for "send 5 good emails and check PageSpeed." Ship the emails first. Prove people read them. THEN build infrastructure.

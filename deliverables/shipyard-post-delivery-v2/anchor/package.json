@@ -1,0 +1,33 @@
+{
+  "name": "anchor",
+  "version": "1.0.0",
+  "description": "Anchor — Post-Delivery System for Shipyard AI clients",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:email-cron": "wrangler deploy --config workers/cron-email-scheduler.ts",
+    "deploy:pagespeed-cron": "wrangler deploy --config workers/cron-pagespeed.ts",
+    "deploy:webhook": "wrangler deploy --config workers/stripe-webhook.ts",
+    "tail": "wrangler tail",
+    "types": "wrangler types"
+  },
+  "keywords": [
+    "cloudflare-workers",
+    "post-delivery",
+    "email-automation",
+    "stripe",
+    "pagespeed"
+  ],
+  "author": "Shipyard AI",
+  "license": "UNLICENSED",
+  "private": true,
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260401.0",
+    "typescript": "^5.4.0",
+    "wrangler": "^3.50.0"
+  },
+  "dependencies": {
+    "stripe": "^14.21.0"
+  }
+}
