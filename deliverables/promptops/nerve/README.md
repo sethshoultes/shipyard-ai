@@ -1,245 +1,300 @@
 # NERVE
 
-**The invisible backbone that makes everything else possible.**
+**Operations Hardening for Autonomous Pipeline Daemon**
 
-NERVE is the autonomous pipeline daemon for operations hardening. It provides deterministic execution, crash recovery, and clean shutdown mechanisms for the Shipyard AI pipeline.
+> The invisible backbone that makes everything else possible—infrastructure you trust so completely you forget it exists.
 
-## Philosophy
+---
 
-- **Determinism over elegance.** When something must happen, it happens.
-- **Invisible architecture.** The best infra is infra you forget exists.
-- **Zero configuration.** Every option is a failure to decide.
-- **Clinical voice.** No emoji. No color codes. Just facts.
+## The Essence
 
-## Components
+**What it is:** Deterministic pipeline execution. No hoping. No asking. Execution.
+
+**The feeling:** Peace. The absence of the 3 AM knot in your stomach.
+
+**The one thing that must be perfect:** Determinism. When something must happen, it happens.
+
+**Creative direction:** Disappear completely. Work always.
+
+---
+
+## Architecture
 
 ```
 nerve/
-├── daemon.sh         # Main daemon loop with PID lockfile
-├── queue.sh          # Queue persistence and recovery
-├── abort.sh          # Abort flag management
+├── daemon.sh         # Main loop with PID lockfile
+├── queue.sh          # Persistence and crash recovery
+├── abort.sh          # Graceful shutdown management
 ├── parse-verdict.sh  # Strict QA verdict parsing
+├── status.sh         # Quick status check
 └── README.md         # This file
 ```
 
-## Quick Start
+**Principle:** Four files. No new dependencies. Defense in depth.
+
+**Philosophy:** Trust bash, not instructions. Deterministic execution is the architectural contract. No probabilistic operations for critical paths.
+
+---
+
+## Usage
+
+### Starting the Daemon
 
 ```bash
-# Start the daemon
-./daemon.sh start
+./daemon.sh
+```
 
-# Check daemon status
-./daemon.sh status
+The daemon:
+- Acquires a PID lockfile at `/tmp/nerve.pid`
+- Initializes the queue at `/tmp/nerve-queue/`
+- Polls for work every 5 seconds
+- Logs to stdout in clinical format
 
-# Add item to queue
-./queue.sh push qa-pass /path/to/qa-report.md
+### Stopping the Daemon
+
+```bash
+./abort.sh request
+```
+
+This creates an abort flag. The daemon detects it, drains the queue gracefully, and shuts down.
+
+To force stop (emergency only):
+```bash
+kill $(cat /tmp/nerve.pid)
+```
+
+### Checking Status
+
+```bash
+./status.sh          # Human-readable
+./status.sh --json   # JSON output
+```
+
+### Queue Management
+
+```bash
+# Initialize queue directories
+./queue.sh init
+
+# Add an item to the queue
+./queue.sh enqueue "item-001" '{"task":"build","project":"sunrise-yoga"}'
 
 # Check queue depth
 ./queue.sh depth
 
-# Graceful shutdown
-./abort.sh set
+# List all items by status
+./queue.sh list
 
-# Force shutdown (emergency only)
-./abort.sh force
+# Recover crashed items (automatic on daemon start)
+./queue.sh recover
 ```
 
-## Daemon (daemon.sh)
-
-The main daemon loop with PID lockfile prevention.
-
-### Commands
-
-| Command | Description |
-|---------|-------------|
-| `start` | Start the daemon (default) |
-| `status` | Check if daemon is running |
-
-### PID Lockfile
-
-The daemon writes its PID to `/tmp/nerve.pid` on startup. If another instance attempts to start, it will detect the existing process and exit. Stale PID files (from crashed processes) are automatically cleaned up.
-
-### Example
+### Verdict Parsing
 
 ```bash
-$ ./daemon.sh start
-[2026-04-11T14:22:33Z] [DAEMON] started (PID: 12345)
-[2026-04-11T14:22:34Z] [QUEUE] initialized with 3 pending items
+# Parse QA report verdict
+./parse-verdict.sh /path/to/qa-report.md
 
-$ ./daemon.sh status
-[2026-04-11T14:22:35Z] [DAEMON] running (PID: 12345)
+# Check exit code
+if ./parse-verdict.sh report.md; then
+    echo "QA PASS"
+else
+    echo "QA FAIL or ERROR"
+fi
 ```
 
-## Queue (queue.sh)
+Exit codes:
+- `0` — PASS verdict found
+- `1` — FAIL verdict found
+- `2` — ERROR (no verdict, file missing, or ambiguous)
 
-Persistent queue with crash recovery.
-
-### Commands
-
-| Command | Description |
-|---------|-------------|
-| `init` | Initialize queue directories |
-| `push <type> <payload>` | Add item to queue |
-| `pop` | Get next item for processing |
-| `complete <id>` | Mark item as completed |
-| `fail <id> [reason]` | Mark item as failed |
-| `list [state]` | List items (pending/processing/completed/failed) |
-| `depth` | Show pending queue depth |
-| `metrics` | Show queue metrics |
-| `purge [days]` | Remove completed items older than N days |
-
-### Crash Recovery
-
-On initialization, any items left in the `processing` state (from a previous crash) are automatically moved back to `pending`. No queue state is ever lost.
-
-### Queue Directories
-
-```
-/tmp/nerve-queue/
-├── pending/      # Items waiting to be processed
-├── processing/   # Items currently being processed
-├── completed/    # Successfully processed items
-└── failed/       # Items that failed processing
-```
-
-### Example
-
-```bash
-$ ./queue.sh init
-[2026-04-11T14:22:33Z] [QUEUE] initialized with 0 pending items
-
-$ ./queue.sh push qa-pass /home/agent/qa-report.md
-[2026-04-11T14:22:34Z] [QUEUE] pushed item a1b2c3d4e5f6 (type: qa-pass)
-a1b2c3d4e5f6
-
-$ ./queue.sh depth
-1
-
-$ ./queue.sh metrics
-[2026-04-11T14:22:35Z] [METRICS] depth=1 processing=0 completed=0 errors=0
-```
-
-## Abort (abort.sh)
-
-Clean shutdown mechanism for runaway pipelines.
-
-### Commands
-
-| Command | Description |
-|---------|-------------|
-| `set` | Set abort flag (graceful shutdown) |
-| `clear` | Clear abort flag |
-| `status` | Check if abort flag is set |
-| `force` | Force kill daemon (SIGTERM, then SIGKILL) |
-| `wait [secs]` | Set abort and wait for shutdown |
-
-### Abort Mechanism
-
-The daemon checks for the abort flag (`/tmp/nerve.abort`) at each poll interval. When detected:
-
-1. Current item processing completes
-2. Abort flag is cleared
-3. Daemon shuts down cleanly
-
-Use `force` only when graceful shutdown fails.
-
-### Example
-
-```bash
-$ ./abort.sh set
-[2026-04-11T14:22:33Z] [ABORT] abort flag set
-[2026-04-11T14:22:33Z] [ABORT] daemon (PID: 12345) will shutdown on next poll
-
-$ ./abort.sh status
-[2026-04-11T14:22:34Z] [ABORT] abort flag is SET
-```
-
-## Verdict Parser (parse-verdict.sh)
-
-Strict QA verdict parsing with unambiguous results.
-
-### Commands
-
-| Command | Description |
-|---------|-------------|
-| `parse <file>` | Extract verdict (PASS/FAIL/BLOCKED/UNKNOWN) |
-| `report <file>` | Full report parsing with JSON output |
-| `p0 <file>` | Count P0 (blocker) issues |
-| `p1 <file>` | Count P1 (must-fix) issues |
-| `p2 <file>` | Count P2 (should-fix) issues |
-| `metrics` | Show cumulative parsing metrics |
-| `validate <v>` | Check if verdict string is valid |
-
-### Verdict Values
-
-| Verdict | Meaning |
-|---------|---------|
-| `PASS` | QA checks passed, ready to ship |
-| `FAIL` | QA checks failed, fixes required |
-| `BLOCKED` | Critical issues prevent any progress |
-| `UNKNOWN` | No verdict found in file |
-| `ERROR` | File not found or parsing error |
-
-### Example
-
-```bash
-$ ./parse-verdict.sh parse qa-pass-1.md
-[2026-04-11T14:22:33Z] [VERDICT] parsed qa-pass-1.md: BLOCKED
-BLOCKED
-
-$ ./parse-verdict.sh p0 qa-pass-1.md
-[2026-04-11T14:22:33Z] [VERDICT] P0 issues in qa-pass-1.md: 6
-6
-
-$ ./parse-verdict.sh report qa-pass-1.md
-{"file":"qa-pass-1.md","verdict":"BLOCKED","issues":{"p0":6,"p1":2,"p2":0},"parsed_at":"2026-04-11T14:22:33Z"}
-```
+---
 
 ## Log Format
 
-All scripts use the same clinical, greppable log format:
+All NERVE components use a consistent, clinical log format:
 
 ```
 [TIMESTAMP] [COMPONENT] message
 ```
 
-- **Timestamp:** ISO 8601 UTC format `[2026-04-11T14:22:33Z]`
-- **Components:** `DAEMON`, `QUEUE`, `ABORT`, `VERDICT`, `METRICS`
-- **Message:** Plain text, no emoji, no ANSI color codes
+**Components:** `DAEMON`, `QUEUE`, `ABORT`, `VERDICT`, `METRICS`
 
-### Grep Examples
-
-```bash
-# All daemon messages
-grep '\[DAEMON\]' nerve.log
-
-# All queue operations
-grep '\[QUEUE\]' nerve.log
-
-# All abort events
-grep '\[ABORT\]' nerve.log
-
-# All metrics
-grep '\[METRICS\]' nerve.log
+**Examples:**
+```
+[2026-04-11T14:22:33Z] [DAEMON] started (PID: 12345)
+[2026-04-11T14:22:34Z] [QUEUE] initialized with 3 pending items
+[2026-04-11T14:22:35Z] [QUEUE] processed item abc123 in 2.3s
+[2026-04-11T14:22:36Z] [METRICS] depth=2 latency=2.3s errors=0
+[2026-04-11T14:22:37Z] [ABORT] shutdown requested
+[2026-04-11T14:22:38Z] [DAEMON] shutdown complete
 ```
 
-## File Locations
+**Grep patterns:**
+```bash
+grep '\[DAEMON\]'    # All daemon messages
+grep '\[QUEUE\]'     # All queue operations
+grep '\[ABORT\]'     # All abort events
+grep '\[METRICS\]'   # All metrics output
+grep '\[VERDICT\]'   # All verdict parsing
+```
 
-| File | Purpose |
-|------|---------|
-| `/tmp/nerve.pid` | Daemon PID lockfile |
-| `/tmp/nerve.abort` | Abort flag |
-| `/tmp/nerve-queue/` | Queue storage directory |
-| `/tmp/nerve-metrics.json` | Cumulative metrics |
+---
 
-## Exit Codes
+## Metrics
 
-| Code | Meaning |
-|------|---------|
-| `0` | Success |
-| `1` | Error (see log output) |
+NERVE tracks three metrics, written to `/tmp/nerve-metrics.json`:
+
+| Metric | Description |
+|--------|-------------|
+| `queue_depth` | Number of pending items |
+| `latency_last` | Processing time of last item (seconds) |
+| `error_count` | Cumulative failed items |
+
+**Example:**
+```json
+{"queue_depth":5,"latency_last":2.3,"error_count":0,"timestamp":"2026-04-11T14:22:36Z"}
+```
+
+Metrics are updated after each queue poll cycle and logged every 60 seconds.
+
+---
+
+## Failure Modes
+
+### Duplicate Daemon Attempt
+
+**Symptom:** `[DAEMON] already running (PID: 12345)`
+
+**Cause:** Another daemon instance holds the lockfile.
+
+**Resolution:** Either stop the existing daemon or kill it if unresponsive.
+
+### Stale Lockfile
+
+**Symptom:** Daemon finds lockfile but no process at that PID.
+
+**Automatic Recovery:** NERVE cleans stale lockfiles automatically:
+```
+[DAEMON] cleaning stale lockfile (was PID: 12345)
+[DAEMON] started (PID: 67890)
+```
+
+### Crashed Queue Items
+
+**Symptom:** Items stuck in `running/` after daemon crash.
+
+**Automatic Recovery:** On startup, NERVE moves `running/` items back to `pending/`:
+```
+[QUEUE] recovered 2 items from crashed state
+```
+
+### Abort Flag Not Cleared
+
+**Symptom:** Daemon immediately shuts down on start.
+
+**Resolution:** Clear the abort flag:
+```bash
+./abort.sh clear
+```
+
+---
+
+## Environment Variables
+
+All configuration uses zero-config defaults. Override only if needed:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NERVE_LOCKFILE` | `/tmp/nerve.pid` | PID lockfile path |
+| `NERVE_ABORT_FLAG` | `/tmp/nerve.abort` | Abort flag path |
+| `NERVE_QUEUE_DIR` | `/tmp/nerve-queue` | Queue directory |
+| `NERVE_METRICS_FILE` | `/tmp/nerve-metrics.json` | Metrics output |
+| `NERVE_LOG_FILE` | (none) | Optional log file path |
+| `NERVE_POLL_INTERVAL` | `5` | Queue poll interval (seconds) |
+| `NERVE_HEARTBEAT_INTERVAL` | `12` | Metrics log frequency (iterations) |
+
+---
+
+## Compatibility
+
+- **Bash:** 4.0+ required (scripts check and fail fast)
+- **Platform:** Linux, macOS (uses portable `#!/usr/bin/env bash`)
+- **Dependencies:** None (bash-only implementation)
+
+---
+
+## Deferred Features (v2+)
+
+These features were explicitly deferred to keep v1 minimal and reliable:
+
+- Metrics/observability endpoint (HTTP)
+- Multi-daemon coordination
+- Distributed locking (Redis/etcd)
+- Queue partitioning
+- Automated recovery beyond abort flags
+- Dashboard/visualization
+- Webhook notifications
+
+---
+
+## Integration
+
+### With pipeline/qa/run-qa.sh
+
+NERVE's `parse-verdict.sh` understands the verdict format from `run-qa.sh`:
+
+```bash
+# After QA runs
+./parse-verdict.sh projects/my-site/review/qa-report_20260411.md
+```
+
+### With pipeline/deploy/deploy.sh
+
+Use queue to manage deployment order:
+
+```bash
+./queue.sh enqueue "deploy-sunrise-yoga" '{"project":"sunrise-yoga","action":"deploy"}'
+```
+
+---
+
+## Troubleshooting
+
+### "Bash 4.0+ required" error
+
+**macOS ships Bash 3.2.** Install a newer version:
+
+```bash
+brew install bash
+# Then use: /usr/local/bin/bash daemon.sh
+```
+
+### Queue directory permissions
+
+NERVE uses `umask 0077` for security. Files are owner-readable only.
+
+### Process not visible in `ps aux | grep nerve`
+
+The process runs as `bash daemon.sh`. Use:
+```bash
+ps aux | grep daemon.sh
+# or
+cat /tmp/nerve.pid
+```
+
+---
+
+## Design Principles
+
+1. **Determinism over elegance.** When something must happen, it happens.
+2. **Invisible architecture.** The best infra is infra you forget exists.
+3. **Zero configuration.** Every option is a failure to decide.
+4. **Clinical voice.** No emoji. No "Oops!"
+5. **Trust bash, not instructions.** Probabilistic operations have no place in critical paths.
 
 ---
 
 *"Real artists ship."* — Steve Jobs
 *"The best part is no part."* — Elon Musk
+*"When the floor is solid, the dance is free."* — Phil Jackson

@@ -1,128 +1,151 @@
 #!/usr/bin/env bash
-# NERVE abort — Abort flag management
-# Stops runaway pipelines cleanly.
+# NERVE abort.sh — Abort flag management for graceful shutdown
+# Part of NERVE: Operations Hardening for Autonomous Pipeline Daemon
+#
+# Usage:
+#   ./abort.sh request  - Request daemon shutdown
+#   ./abort.sh clear    - Clear abort flag
+#   ./abort.sh status   - Show abort status
+#   ./abort.sh check    - Check if abort requested (exit 0=yes, 1=no)
+#
+# As library:
+#   source abort.sh
+#   if abort_check; then echo "abort requested"; fi
+#   abort_request
+#   abort_clear
 
 set -euo pipefail
 
-# Configuration
-readonly ABORT_FLAG="${ABORT_FLAG:-/tmp/nerve.abort}"
-readonly PID_FILE="${PID_FILE:-/tmp/nerve.pid}"
+# Bash version check (require 4.0+)
+if [[ ${BASH_VERSION%%.*} -lt 4 ]]; then
+    echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [ABORT] ERROR: Bash 4.0+ required" >&2
+    exit 2
+fi
 
-# Logging: [TIMESTAMP] [COMPONENT] message
-log() {
-    local component="$1"
-    shift
-    echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] [$component] $*"
+# Restrictive permissions
+umask 0077
+
+# Configuration (zero-config defaults)
+readonly ABORT_FLAG="${NERVE_ABORT_FLAG:-/tmp/nerve.abort}"
+readonly LOCK_DIR="${NERVE_LOCK_DIR:-/tmp/nerve.lock}"
+readonly LOCKFILE="${LOCK_DIR}/pid"
+readonly ESCALATION_WAIT=5
+
+# Logging function
+abort_log() {
+    local message="$1"
+    local timestamp
+    timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    echo "[${timestamp}] [ABORT] ${message}"
 }
 
-# Set abort flag
-abort_set() {
-    touch "$ABORT_FLAG"
-    log "ABORT" "abort flag set"
-
-    # Check if daemon is running
-    if [[ -f "$PID_FILE" ]]; then
-        local pid
-        pid=$(cat "$PID_FILE")
-        if kill -0 "$pid" 2>/dev/null; then
-            log "ABORT" "daemon (PID: $pid) will shutdown on next poll"
-        fi
+# Check if abort flag exists
+# Returns: 0 (true) if abort requested, 1 (false) if not
+abort_check() {
+    if [[ -f "$ABORT_FLAG" ]]; then
+        return 0
+    else
+        return 1
     fi
+}
+
+# Request abort - create the abort flag
+abort_request() {
+    local timestamp
+    timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+    echo "$timestamp" > "$ABORT_FLAG"
+    abort_log "shutdown requested at ${timestamp}"
 }
 
 # Clear abort flag
 abort_clear() {
     if [[ -f "$ABORT_FLAG" ]]; then
         rm -f "$ABORT_FLAG"
-        log "ABORT" "abort flag cleared"
+        abort_log "flag cleared"
     else
-        log "ABORT" "no abort flag present"
+        abort_log "no flag to clear"
     fi
 }
 
-# Check abort flag status
+# Show abort status
 abort_status() {
     if [[ -f "$ABORT_FLAG" ]]; then
-        log "ABORT" "abort flag is SET"
+        local requested_at
+        requested_at="$(cat "$ABORT_FLAG" 2>/dev/null || echo "unknown")"
+        echo "ABORT: ACTIVE"
+        echo "Requested at: ${requested_at}"
         return 0
     else
-        log "ABORT" "abort flag is CLEAR"
+        echo "ABORT: INACTIVE"
         return 1
     fi
 }
 
-# Force kill daemon (emergency use only)
+# Force abort with signal escalation: SIGTERM → 5s → SIGKILL
 abort_force() {
-    if [[ -f "$PID_FILE" ]]; then
-        local pid
-        pid=$(cat "$PID_FILE")
-        if kill -0 "$pid" 2>/dev/null; then
-            log "ABORT" "sending SIGTERM to daemon (PID: $pid)"
-            kill -TERM "$pid"
+    local daemon_pid
 
-            # Wait up to 5 seconds for graceful shutdown
-            local wait=0
-            while kill -0 "$pid" 2>/dev/null && [[ "$wait" -lt 5 ]]; do
-                sleep 1
-                wait=$((wait + 1))
-            done
-
-            if kill -0 "$pid" 2>/dev/null; then
-                log "ABORT" "daemon not responding, sending SIGKILL"
-                kill -KILL "$pid"
-            fi
-
-            rm -f "$PID_FILE"
-            log "ABORT" "daemon terminated"
-        else
-            log "ABORT" "no daemon running (stale PID file removed)"
-            rm -f "$PID_FILE"
-        fi
-    else
-        log "ABORT" "no daemon PID file found"
+    # Get daemon PID from lockfile
+    if [[ ! -d "$LOCK_DIR" ]] || [[ ! -f "$LOCKFILE" ]]; then
+        abort_log "no daemon running (lock not found)"
+        return 1
     fi
 
-    # Clear any abort flag
-    rm -f "$ABORT_FLAG"
-}
+    daemon_pid="$(cat "$LOCKFILE" 2>/dev/null || echo "")"
+    if [[ -z "$daemon_pid" ]]; then
+        abort_log "ERROR: could not read daemon PID"
+        return 1
+    fi
 
-# Wait for daemon to shutdown after setting abort
-abort_wait() {
-    local timeout="${1:-30}"
-    local elapsed=0
-
-    if [[ ! -f "$PID_FILE" ]]; then
-        log "ABORT" "no daemon running"
+    # Check if process exists
+    if ! kill -0 "$daemon_pid" 2>/dev/null; then
+        abort_log "daemon not running (stale lock), cleaning up"
+        rm -rf "$LOCK_DIR"
+        abort_clear
         return 0
     fi
 
-    local pid
-    pid=$(cat "$PID_FILE")
+    abort_log "sending SIGTERM to daemon (PID: ${daemon_pid})"
+    kill -TERM "$daemon_pid" 2>/dev/null || true
 
-    # Set abort flag
-    abort_set
-
-    log "ABORT" "waiting for daemon (PID: $pid) to shutdown (timeout: ${timeout}s)"
-
-    while kill -0 "$pid" 2>/dev/null && [[ "$elapsed" -lt "$timeout" ]]; do
+    # Wait up to ESCALATION_WAIT seconds for graceful shutdown
+    local waited=0
+    while [[ $waited -lt $ESCALATION_WAIT ]]; do
         sleep 1
-        elapsed=$((elapsed + 1))
+        waited=$((waited + 1))
+
+        if ! kill -0 "$daemon_pid" 2>/dev/null; then
+            abort_log "daemon terminated gracefully after ${waited}s"
+            abort_clear
+            return 0
+        fi
     done
 
-    if kill -0 "$pid" 2>/dev/null; then
-        log "ABORT" "daemon did not shutdown within ${timeout}s"
+    # Process still running, escalate to SIGKILL
+    abort_log "daemon did not respond to SIGTERM, sending SIGKILL"
+    kill -KILL "$daemon_pid" 2>/dev/null || true
+
+    # Wait briefly for kernel to clean up
+    sleep 1
+
+    if kill -0 "$daemon_pid" 2>/dev/null; then
+        abort_log "ERROR: daemon still running after SIGKILL (PID: ${daemon_pid})"
         return 1
-    else
-        log "ABORT" "daemon shutdown complete after ${elapsed}s"
-        return 0
     fi
+
+    # Clean up lock directory
+    rm -rf "$LOCK_DIR"
+    abort_clear
+    abort_log "daemon force terminated"
+    return 0
 }
 
-# CLI interface
-main() {
-    case "${1:-help}" in
-        set)
-            abort_set
+# CLI interface when run directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    case "${1:-}" in
+        request)
+            abort_request
             ;;
         clear)
             abort_clear
@@ -130,38 +153,26 @@ main() {
         status)
             abort_status
             ;;
+        check)
+            if abort_check; then
+                exit 0
+            else
+                exit 1
+            fi
+            ;;
         force)
             abort_force
             ;;
-        wait)
-            abort_wait "${2:-30}"
-            ;;
-        help|*)
-            cat << EOF
-NERVE Abort Manager
-
-Usage: $0 <command> [args]
-
-Commands:
-  set           Set abort flag (graceful shutdown request)
-  clear         Clear abort flag
-  status        Check if abort flag is set
-  force         Force kill daemon (SIGTERM, then SIGKILL)
-  wait [secs]   Set abort and wait for shutdown (default: 30s)
-  help          Show this help
-
-Abort Mechanism:
-  The NERVE daemon checks for the abort flag at each poll interval.
-  When detected, it completes the current item and shuts down cleanly.
-  Use 'force' only when graceful shutdown fails.
-
-Files:
-  Abort flag: $ABORT_FLAG
-  PID file:   $PID_FILE
-
-EOF
+        *)
+            echo "Usage: $0 {request|clear|status|check|force}" >&2
+            echo ""
+            echo "Commands:"
+            echo "  request  Set abort flag to request daemon shutdown"
+            echo "  clear    Clear abort flag"
+            echo "  status   Show current abort status"
+            echo "  check    Exit 0 if abort requested, 1 otherwise"
+            echo "  force    Force shutdown (SIGTERM → 5s → SIGKILL)"
+            exit 1
             ;;
     esac
-}
-
-main "$@"
+fi

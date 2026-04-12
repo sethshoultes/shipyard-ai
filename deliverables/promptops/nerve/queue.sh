@@ -1,234 +1,306 @@
 #!/usr/bin/env bash
-# NERVE queue — Queue persistence and recovery
-# Survives crashes, no lost state.
+# NERVE queue.sh — Queue persistence and recovery
+# Part of NERVE: Operations Hardening for Autonomous Pipeline Daemon
+#
+# Usage: Source this file, then call queue_* functions
+#   source queue.sh
+#   queue_init
+#   queue_enqueue "item-id" '{"payload":"data"}'
+#   item_id=$(queue_dequeue)
+#   queue_complete "$item_id"
+#   queue_fail "$item_id" "reason"
+#   count=$(queue_depth)
+#
+# Standalone commands:
+#   ./queue.sh init     - Initialize queue directories
+#   ./queue.sh enqueue <id> <payload> - Add item to queue
+#   ./queue.sh depth    - Show pending count
+#   ./queue.sh list     - List all items by status
+#   ./queue.sh recover  - Recover crashed items
 
 set -euo pipefail
 
-# Configuration
-readonly QUEUE_DIR="${QUEUE_DIR:-/tmp/nerve-queue}"
-readonly QUEUE_PENDING="$QUEUE_DIR/pending"
-readonly QUEUE_PROCESSING="$QUEUE_DIR/processing"
-readonly QUEUE_COMPLETED="$QUEUE_DIR/completed"
-readonly QUEUE_FAILED="$QUEUE_DIR/failed"
+# Bash version check (require 4.0+)
+if [[ ${BASH_VERSION%%.*} -lt 4 ]]; then
+    echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] [QUEUE] ERROR: Bash 4.0+ required" >&2
+    exit 2
+fi
 
-# Logging: [TIMESTAMP] [COMPONENT] message
-log() {
-    local component="$1"
-    shift
-    echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] [$component] $*"
+# Restrictive permissions
+umask 0077
+
+# Configuration (zero-config defaults)
+readonly QUEUE_DIR="${NERVE_QUEUE_DIR:-/tmp/nerve-queue}"
+
+# Logging function
+queue_log() {
+    local message="$1"
+    local timestamp
+    timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    echo "[${timestamp}] [QUEUE] ${message}"
+}
+
+# Helper: list files in a directory
+_list_files() {
+    local dir="$1"
+    if [[ -d "$dir" ]]; then
+        find "$dir" -maxdepth 1 -name "*.json" -type f 2>/dev/null || true
+    fi
 }
 
 # Initialize queue directories
 queue_init() {
-    mkdir -p "$QUEUE_PENDING" "$QUEUE_PROCESSING" "$QUEUE_COMPLETED" "$QUEUE_FAILED"
+    mkdir -p "${QUEUE_DIR}/pending"
+    mkdir -p "${QUEUE_DIR}/running"
+    mkdir -p "${QUEUE_DIR}/completed"
+    mkdir -p "${QUEUE_DIR}/failed"
 
-    # Recover any items left in processing state (crash recovery)
+    # Crash recovery: move any items left in running/ back to pending/
     local recovered=0
-    if [[ -d "$QUEUE_PROCESSING" ]]; then
-        for item in "$QUEUE_PROCESSING"/*; do
-            if [[ -f "$item" ]]; then
-                local item_name
-                item_name=$(basename "$item")
-                mv "$item" "$QUEUE_PENDING/$item_name"
-                recovered=$((recovered + 1))
-            fi
-        done
+    local files
+    files="$(_list_files "${QUEUE_DIR}/running")"
+
+    if [[ -n "$files" ]]; then
+        while IFS= read -r item; do
+            [[ -f "$item" ]] || continue
+            local basename
+            basename="$(basename "$item")"
+            mv "$item" "${QUEUE_DIR}/pending/${basename}"
+            recovered=$((recovered + 1))
+        done <<< "$files"
+    fi
+
+    if [[ $recovered -gt 0 ]]; then
+        queue_log "recovered ${recovered} items from crashed state"
     fi
 
     local pending_count
-    pending_count=$(queue_depth)
-
-    if [[ "$recovered" -gt 0 ]]; then
-        log "QUEUE" "initialized with $pending_count pending items (recovered $recovered)"
-    else
-        log "QUEUE" "initialized with $pending_count pending items"
-    fi
+    pending_count="$(queue_depth)"
+    queue_log "initialized with ${pending_count} pending items"
 }
 
-# Get queue depth (number of pending items)
-queue_depth() {
-    if [[ -d "$QUEUE_PENDING" ]]; then
-        find "$QUEUE_PENDING" -maxdepth 1 -type f 2>/dev/null | wc -l
-    else
-        echo 0
+# Enqueue a new item
+queue_enqueue() {
+    local item_id="$1"
+    local payload="${2:-'{}'}"
+    local timestamp
+    timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+    # Validate item_id (alphanumeric, dashes, underscores only)
+    if [[ ! "$item_id" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+        queue_log "ERROR: invalid item_id: ${item_id}"
+        return 1
     fi
-}
 
-# Add item to queue
-queue_push() {
-    local item_type="$1"
-    local payload="$2"
+    local item_file="${QUEUE_DIR}/pending/${item_id}.json"
 
-    # Generate unique item ID
-    local item_id
-    item_id=$(date +%s%N | sha256sum | head -c 12)
+    # Check for duplicate
+    if [[ -f "$item_file" ]]; then
+        queue_log "ERROR: item ${item_id} already exists"
+        return 1
+    fi
 
-    local item_file="$QUEUE_PENDING/$item_id"
-
-    # Write item atomically (write to temp, then move)
-    local temp_file="$QUEUE_DIR/.tmp-$item_id"
-    cat > "$temp_file" << EOF
-{"id":"$item_id","type":"$item_type","payload":"$payload","queued_at":"$(date -u '+%Y-%m-%dT%H:%M:%SZ')"}
+    # Write item file atomically (write temp, then mv)
+    local temp_file="${QUEUE_DIR}/pending/.${item_id}.json.tmp"
+    cat > "$temp_file" <<EOF
+{"id":"${item_id}","status":"pending","created":"${timestamp}","payload":${payload}}
 EOF
     mv "$temp_file" "$item_file"
 
-    log "QUEUE" "pushed item $item_id (type: $item_type)"
-    echo "$item_id"
+    queue_log "enqueued item ${item_id}"
+    return 0
 }
 
-# Pop item from queue (moves to processing)
-queue_pop() {
-    # Get oldest pending item (FIFO)
-    local oldest_item
-    oldest_item=$(find "$QUEUE_PENDING" -maxdepth 1 -type f -printf '%T+ %p\n' 2>/dev/null | sort | head -1 | cut -d' ' -f2-)
+# Dequeue the oldest pending item
+queue_dequeue() {
+    local oldest_file=""
+    local oldest_time=""
 
-    if [[ -z "$oldest_item" || ! -f "$oldest_item" ]]; then
+    # Find oldest file in pending/
+    local files
+    files="$(_list_files "${QUEUE_DIR}/pending")"
+
+    if [[ -n "$files" ]]; then
+        while IFS= read -r item; do
+            [[ -f "$item" ]] || continue
+
+            # Get file modification time (portable)
+            local mtime
+            if stat --version 2>/dev/null | grep -q GNU; then
+                mtime="$(stat -c %Y "$item" 2>/dev/null || echo "0")"
+            else
+                mtime="$(stat -f %m "$item" 2>/dev/null || echo "0")"
+            fi
+
+            if [[ -z "$oldest_time" ]] || [[ "$mtime" -lt "$oldest_time" ]]; then
+                oldest_time="$mtime"
+                oldest_file="$item"
+            fi
+        done <<< "$files"
+    fi
+
+    if [[ -z "$oldest_file" ]]; then
+        # Queue is empty
         return 0
     fi
 
-    local item_name
-    item_name=$(basename "$oldest_item")
+    # Extract item ID
+    local item_id
+    item_id="$(basename "$oldest_file" .json)"
 
-    # Move to processing atomically
-    mv "$oldest_item" "$QUEUE_PROCESSING/$item_name"
+    # Move to running/
+    mv "$oldest_file" "${QUEUE_DIR}/running/${item_id}.json"
 
-    echo "$item_name"
+    # Update status in file
+    local running_file="${QUEUE_DIR}/running/${item_id}.json"
+    if [[ -f "$running_file" ]]; then
+        local timestamp
+        timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        # Update status field using sed (portable)
+        if sed --version 2>/dev/null | grep -q GNU; then
+            sed -i 's/"status":"pending"/"status":"running","started":"'"${timestamp}"'"/' "$running_file" 2>/dev/null || true
+        else
+            sed -i '' 's/"status":"pending"/"status":"running","started":"'"${timestamp}"'"/' "$running_file" 2>/dev/null || true
+        fi
+    fi
+
+    queue_log "dequeued item ${item_id}"
+    echo "$item_id"
 }
 
 # Mark item as completed
 queue_complete() {
     local item_id="$1"
-    local processing_file="$QUEUE_PROCESSING/$item_id"
+    local running_file="${QUEUE_DIR}/running/${item_id}.json"
+    local completed_file="${QUEUE_DIR}/completed/${item_id}.json"
 
-    if [[ -f "$processing_file" ]]; then
-        mv "$processing_file" "$QUEUE_COMPLETED/$item_id"
-        log "QUEUE" "completed item $item_id"
+    if [[ ! -f "$running_file" ]]; then
+        queue_log "ERROR: item ${item_id} not found in running"
+        return 1
     fi
+
+    mv "$running_file" "$completed_file"
+
+    # Update status
+    local timestamp
+    timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    if sed --version 2>/dev/null | grep -q GNU; then
+        sed -i 's/"status":"running"/"status":"completed","completed":"'"${timestamp}"'"/' "$completed_file" 2>/dev/null || true
+    else
+        sed -i '' 's/"status":"running"/"status":"completed","completed":"'"${timestamp}"'"/' "$completed_file" 2>/dev/null || true
+    fi
+
+    queue_log "completed item ${item_id}"
 }
 
 # Mark item as failed
 queue_fail() {
     local item_id="$1"
     local reason="${2:-unknown}"
-    local processing_file="$QUEUE_PROCESSING/$item_id"
+    local running_file="${QUEUE_DIR}/running/${item_id}.json"
+    local failed_file="${QUEUE_DIR}/failed/${item_id}.json"
 
-    if [[ -f "$processing_file" ]]; then
-        # Append failure reason
-        echo "\"failed_at\":\"$(date -u '+%Y-%m-%dT%H:%M:%SZ')\",\"reason\":\"$reason\"" >> "$processing_file"
-        mv "$processing_file" "$QUEUE_FAILED/$item_id"
-        log "QUEUE" "failed item $item_id: $reason"
+    if [[ ! -f "$running_file" ]]; then
+        queue_log "ERROR: item ${item_id} not found in running"
+        return 1
     fi
+
+    mv "$running_file" "$failed_file"
+
+    # Update status
+    local timestamp
+    timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    # Escape reason for JSON
+    local escaped_reason
+    escaped_reason="${reason//\"/\\\"}"
+    if sed --version 2>/dev/null | grep -q GNU; then
+        sed -i 's/"status":"running"/"status":"failed","failed":"'"${timestamp}"'","reason":"'"${escaped_reason}"'"/' "$failed_file" 2>/dev/null || true
+    else
+        sed -i '' 's/"status":"running"/"status":"failed","failed":"'"${timestamp}"'","reason":"'"${escaped_reason}"'"/' "$failed_file" 2>/dev/null || true
+    fi
+
+    queue_log "failed item ${item_id}: ${reason}"
 }
 
-# List queue contents
+# Get count of pending items
+queue_depth() {
+    local count
+    count="$(_list_files "${QUEUE_DIR}/pending" | wc -l | tr -d ' ')"
+    echo "${count:-0}"
+}
+
+# List all items by status
 queue_list() {
-    local state="${1:-pending}"
-    local dir
+    local files
 
-    case "$state" in
-        pending)    dir="$QUEUE_PENDING" ;;
-        processing) dir="$QUEUE_PROCESSING" ;;
-        completed)  dir="$QUEUE_COMPLETED" ;;
-        failed)     dir="$QUEUE_FAILED" ;;
-        *)
-            echo "Unknown state: $state" >&2
-            return 1
-            ;;
-    esac
+    echo "=== PENDING ==="
+    files="$(_list_files "${QUEUE_DIR}/pending")"
+    if [[ -n "$files" ]]; then
+        while IFS= read -r item; do
+            [[ -f "$item" ]] && basename "$item" .json
+        done <<< "$files"
+    fi
 
-    if [[ -d "$dir" ]]; then
-        find "$dir" -maxdepth 1 -type f -exec basename {} \;
+    echo "=== RUNNING ==="
+    files="$(_list_files "${QUEUE_DIR}/running")"
+    if [[ -n "$files" ]]; then
+        while IFS= read -r item; do
+            [[ -f "$item" ]] && basename "$item" .json
+        done <<< "$files"
+    fi
+
+    echo "=== COMPLETED ==="
+    files="$(_list_files "${QUEUE_DIR}/completed")"
+    if [[ -n "$files" ]]; then
+        while IFS= read -r item; do
+            [[ -f "$item" ]] && basename "$item" .json
+        done <<< "$files"
+    fi
+
+    echo "=== FAILED ==="
+    files="$(_list_files "${QUEUE_DIR}/failed")"
+    if [[ -n "$files" ]]; then
+        while IFS= read -r item; do
+            [[ -f "$item" ]] && basename "$item" .json
+        done <<< "$files"
     fi
 }
 
-# Get queue metrics
-queue_metrics() {
-    local pending processing completed failed
-
-    pending=$(find "$QUEUE_PENDING" -maxdepth 1 -type f 2>/dev/null | wc -l)
-    processing=$(find "$QUEUE_PROCESSING" -maxdepth 1 -type f 2>/dev/null | wc -l)
-    completed=$(find "$QUEUE_COMPLETED" -maxdepth 1 -type f 2>/dev/null | wc -l)
-    failed=$(find "$QUEUE_FAILED" -maxdepth 1 -type f 2>/dev/null | wc -l)
-
-    log "METRICS" "depth=$pending processing=$processing completed=$completed errors=$failed"
-}
-
-# Purge completed items older than N days
-queue_purge() {
-    local days="${1:-7}"
-
-    local purged=0
-    while IFS= read -r file; do
-        rm -f "$file"
-        purged=$((purged + 1))
-    done < <(find "$QUEUE_COMPLETED" -maxdepth 1 -type f -mtime +"$days" 2>/dev/null)
-
-    if [[ "$purged" -gt 0 ]]; then
-        log "QUEUE" "purged $purged completed items older than $days days"
-    fi
-}
-
-# CLI interface (when run directly)
+# CLI interface when run directly
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    case "${1:-help}" in
+    case "${1:-}" in
         init)
             queue_init
             ;;
-        push)
-            if [[ $# -lt 3 ]]; then
-                echo "Usage: $0 push <type> <payload>" >&2
-                exit 1
-            fi
-            queue_push "$2" "$3"
-            ;;
-        pop)
-            queue_pop
-            ;;
-        complete)
+        enqueue)
             if [[ $# -lt 2 ]]; then
-                echo "Usage: $0 complete <item_id>" >&2
+                echo "Usage: $0 enqueue <id> [payload]" >&2
                 exit 1
             fi
-            queue_complete "$2"
-            ;;
-        fail)
-            if [[ $# -lt 2 ]]; then
-                echo "Usage: $0 fail <item_id> [reason]" >&2
-                exit 1
-            fi
-            queue_fail "$2" "${3:-}"
-            ;;
-        list)
-            queue_list "${2:-pending}"
+            queue_init 2>/dev/null || true
+            queue_enqueue "$2" "${3:-'{}'}"
             ;;
         depth)
+            queue_init 2>/dev/null || true
             queue_depth
             ;;
-        metrics)
-            queue_metrics
+        list)
+            queue_init 2>/dev/null || true
+            queue_list
             ;;
-        purge)
-            queue_purge "${2:-7}"
+        recover)
+            queue_init
             ;;
-        help|*)
-            cat << EOF
-NERVE Queue Manager
-
-Usage: $0 <command> [args]
-
-Commands:
-  init              Initialize queue directories (with crash recovery)
-  push <type> <p>   Add item to queue
-  pop               Get next item for processing
-  complete <id>     Mark item as completed
-  fail <id> [msg]   Mark item as failed
-  list [state]      List items (pending|processing|completed|failed)
-  depth             Show pending queue depth
-  metrics           Show queue metrics
-  purge [days]      Remove completed items older than N days (default: 7)
-  help              Show this help
-
-EOF
+        *)
+            echo "Usage: $0 {init|enqueue|depth|list|recover}" >&2
+            echo ""
+            echo "Commands:"
+            echo "  init              Initialize queue directories"
+            echo "  enqueue <id> [p]  Add item with optional payload"
+            echo "  depth             Show count of pending items"
+            echo "  list              List all items by status"
+            echo "  recover           Recover crashed items"
+            exit 1
             ;;
     esac
 fi
