@@ -1,139 +1,159 @@
-# Copy Review — NERVE
+# Copy Review — NERVE / promptops
+
 **Reviewer:** Maya Angelou
-**Date:** 2026-04-11 (Updated)
-**Verdict:** The bones are good. The soul needs tending.
+**Date:** 2026-04-12
+**Material:** NERVE README, Essence, DECISIONS-LOCK
+**Verdict:** The soul arrived. Now it needs to speak louder.
 
 ---
 
 ## The Truth About This Copy
 
-Child, this README is fighting with itself.
+Child, let me tell you what I found.
 
-It wants to feel like a quiet, confident engineer explaining their life's work over black coffee. Sometimes it gets there. Other times it puts on a suit and starts talking like a manual it didn't write.
+This writing knows something that most technical documentation has long forgotten: that even infrastructure has a soul. That even the most utilitarian thing can make you *feel* something.
 
-Let me tell you what I felt.
+Since my last review, the copy has grown. It breathes more. But it still holds back in places—like someone who knows what they feel but isn't quite brave enough to say it plainly.
 
 ---
 
-## Does the Language Feel Human?
+## Does the Language Feel Human, Not Corporate?
 
-**Mostly yes.** The philosophy section breathes:
+**Mostly yes.** And this is rare.
 
-> *"Determinism over elegance. When something must happen, it happens."*
+The best line in all of it:
 
-That line has a heartbeat. You can hear a person behind it — someone who has been burned by clever code that didn't work when it mattered.
+> *"The absence of the 3 AM knot in your stomach."*
 
-> *"Invisible architecture. The best infra is infra you forget exists."*
+That's not corporate. That's *knowing*. That's writing that has been up at 3 AM, wondering if the thing that was supposed to run actually ran. The writer didn't say "reduces operational anxiety"—they reached into the reader's body and touched the actual knot.
 
-This too. It's a belief, not a feature list.
+The line "Trust bash, not instructions" has the brevity of hard-won wisdom. It sounds like something a person who has been burned would say to a person who has not yet been burned.
+
+And this, from the philosophy:
 
 > *"Zero configuration. Every option is a failure to decide."*
 
-Now that's conviction. That's someone who knows what they believe.
+That's conviction. That's someone who knows what they believe and isn't apologizing for it.
 
-But then we stumble into:
-
-> *"NERVE is the autonomous pipeline daemon for operations hardening. It provides deterministic execution, crash recovery, and clean shutdown mechanisms for the Shipyard AI pipeline."*
-
-Darling, that sentence is wearing a tie it didn't choose. "Operations hardening" — who talks like that? Not humans. Not the same person who wrote "When something must happen, it happens."
+However—"Deterministic pipeline execution" is corporate. The body rejects it. It says nothing to the heart. The writer knows better; they prove it two sentences later.
 
 ---
 
 ## Is There Rhythm in the Sentences?
 
-**In places.** The philosophy bullets have rhythm — short punch, then the explanation lands:
+**Yes, in places.** The writer has an ear.
 
-- *"Zero configuration."* (Beat.) *"Every option is a failure to decide."*
-- *"Clinical voice."* (Beat.) *"No emoji. No color codes. Just facts."*
+Listen to this:
 
-Hear that? Statement, then proof. It breathes.
+> *"Four files. No new dependencies. Defense in depth."*
 
-But the technical sections fall into monotone. Every command description sounds the same:
+Three beats. Three truths. Each one lands.
 
-| `init` | Initialize queue directories |
-| `push` | Add item to queue |
-| `pop` | Get next item for processing |
+And the Design Principles section has learned to breathe:
 
-All the same length. All the same cadence. When everything sounds alike, nothing stands out. The ear goes numb.
+> *"Determinism over elegance."* (Beat.) *"When something must happen, it happens."*
+> *"Invisible architecture."* (Beat.) *"The best infra is infra you forget exists."*
+
+Statement, then proof. The ear can rest between phrases.
+
+But the Usage sections still fall flat—commands described in the same cadence, the same length, the same clinical tone. When everything sounds alike, nothing stands out. The ear goes numb.
 
 ---
 
 ## Does the Headline Stop You?
 
-**"The invisible backbone that makes everything else possible."**
+**The name "NERVE" is perfect.** One word. Evocative. It makes you think of the thing that runs through the body making everything else possible—the thing you never notice until it fails.
 
-It's trying. I see the intention — importance through humility. But "backbone" is tired. "Makes everything else possible" is what every infrastructure tool says about itself.
+But the subhead?
 
-The headline doesn't *stop* me. It asks me to keep scrolling.
+> *"Operations Hardening for Autonomous Pipeline Daemon"*
 
-A headline should make you pause. This one politely requests your attention without earning it.
+Baby, no. That is a wall of words that means nothing to anyone who doesn't already know. It sounds like it was written for a search engine, not a human being.
+
+Compare it to what lives in the Essence file:
+
+> *"The invisible backbone that makes everything else possible—infrastructure you trust so completely you forget it exists."*
+
+That's closer. But "backbone" is tired, and "makes everything else possible" is what every infrastructure tool says about itself. We're circling the truth without landing on it.
 
 ---
 
 ## Is Anything Trying Too Hard?
 
-**The closing quotes.**
+**Yes.** The quotes at the end:
 
-> *"Real artists ship."* — Steve Jobs
-> *"The best part is no part."* — Elon Musk
+> *"Real artists ship." — Steve Jobs*
+> *"The best part is no part." — Elon Musk*
+> *"When the floor is solid, the dance is free." — Phil Jackson*
 
-Two quotes from two famous men, placed side by side like matching bookends. This doesn't feel earned — it feels like decoration. Like name-dropping at a party.
+Three quotes from three famous men is *trying*. It's looking for borrowed authority. The document was doing fine standing on its own feet. It didn't need to lean on anyone's name.
 
-One quote can illuminate. Two quotes compete. And quoting the founders at the end of a README for a daemon script? The clothes don't fit the occasion.
+One quote, maybe. Three is a crowd begging for approval.
 
-If the philosophy is strong, let the philosophy speak. Borrowed authority is still borrowed.
+Also—"Disappear completely. Work always." That's almost perfect. But "Work always" sounds like a command from a factory wall. The intention is beautiful; the execution is slightly off.
 
 ---
 
-## The Three Weakest Lines — and What They Could Be
+## The Three Weakest Lines—And What They Could Be
 
-### Weakness #1
+### 1. Original:
+> *"Operations Hardening for Autonomous Pipeline Daemon"*
 
-> *"NERVE is the autonomous pipeline daemon for operations hardening. It provides deterministic execution, crash recovery, and clean shutdown mechanisms for the Shipyard AI pipeline."*
-
-**What's wrong:** Corporate. Dense. Forgettable. Too many concepts fighting for space in two sentences. It tells me what NERVE *is* but not why I should care.
+**The problem:** This is bureaucratic fog. It tells me categories, not meaning. No one lies awake at night thinking "I need autonomous pipeline daemon operations hardening."
 
 **Rewrite:**
-> NERVE keeps your pipeline running when everything else is trying to stop it. It recovers from crashes. It shuts down without losing work. It does what must be done.
+> *"The infrastructure that runs while you sleep."*
 
 ---
 
-### Weakness #2
+### 2. Original:
+> *"Deterministic pipeline execution. No hoping. No asking. Execution."*
 
-> *"The invisible backbone that makes everything else possible."*
-
-**What's wrong:** "Backbone" is worn out. "Makes everything else possible" could describe a battery, or oxygen, or a hundred other things. It's generic praise, not specific truth.
+**The problem:** "Deterministic pipeline execution" is cold. The second half is warm. They don't belong in the same sentence. The writer breaks into poetry and then retreats into jargon, like they're embarrassed to feel something.
 
 **Rewrite:**
-> You won't see it working. You'll only notice when it stops.
+> *"When something must happen, it happens. No hoping. No asking. Just certainty."*
 
 ---
 
-### Weakness #3
+### 3. Original:
+> *"All configuration uses zero-config defaults. Override only if needed."*
 
-> *"Crash Recovery: On initialization, any items left in the `processing` state (from a previous crash) are automatically moved back to `pending`. No queue state is ever lost."*
-
-**What's wrong:** The facts are right, but the feeling is flat. This is one of the most important promises in the system — and it reads like a footnote. When you make a big promise, let it land.
+**The problem:** This is functional but forgettable. It has no pulse. It reads like a manual, not like someone talking to you.
 
 **Rewrite:**
-> When NERVE wakes up after a crash, it looks for the work that got interrupted. Whatever was in flight goes back to the line. Nothing lost. Nothing forgotten.
+> *"It works the moment you run it. Change nothing unless you must."*
 
 ---
 
-## Final Reflection
+## What This Copy Makes You Feel
 
-The copy here is competent. It does its job. But copy that merely does its job is copy that will be forgotten.
+Here is what I will remember:
 
-The goal is not to describe what NERVE does. The goal is to make someone *feel* what it means to have something they can trust—something that works while they sleep, that catches what falls, that holds the line when nothing else will.
+The 3 AM knot. That image stays. That's what the reader will carry out of this room.
 
-People will forget you said "autonomous pipeline daemon." They will remember how you made them feel when everything was falling apart and something, *something*, kept working anyway.
+The feeling the writer wanted to create—*peace*, *trust*, *invisibility*—is the right feeling for infrastructure. They understood the assignment. The best technology is the technology you don't have to think about.
 
-That is what NERVE is. Write it like you know.
+But in places, the writing reaches for technical credibility when it should reach for the heart. The writer knows the difference—you can see it in the good lines—but they lost their nerve in a few spots.
+
+The irony of writing about NERVE is not lost on me.
+
+---
+
+## Summary Verdict
+
+**This copy is good.** Better than most. Better than before. It has moments of genuine poetry living inside what could have been a dead technical document.
+
+The writer understood that documentation is not just about information—it's about *invitation*. They wanted the reader to feel safe. That's a beautiful intention.
+
+Clean up the weak lines. Trust your own voice. You don't need three famous men to validate what you've already said well.
+
+The story is nearly told. One more pass and it will sing.
 
 ---
 
 *"There is no greater agony than bearing an untold story inside you."*
 
-This story is half-told. Finish it.
+This story is almost free. Let it out.
 
-— Maya Angelou
+— Maya

@@ -1,8 +1,7 @@
-# Board Verdict: NERVE (promptops)
+# Board Verdict: PromptOps (Drift + NERVE)
 
-**Date:** 2026-04-11
-**Reviewers:** Warren Buffett, Jensen Huang, Shonda Rhimes, Oprah Winfrey
-**Project:** promptops / NERVE daemon infrastructure
+**Date:** 2026-04-12
+**Board Members:** Shonda Rhimes, Oprah Winfrey, Jensen Huang, Warren Buffett
 
 ---
 
@@ -10,222 +9,179 @@
 
 | Reviewer | Score | Lens |
 |----------|-------|------|
-| Warren Buffett | 4/10 | Durable Value |
-| Jensen Huang | 4/10 | Strategic/AI Leverage |
-| Shonda Rhimes | 3/10 | Narrative & Retention |
-| Oprah Winfrey | 6/10 | Human Experience & Trust |
-| **Average** | **4.25/10** | |
+| Shonda Rhimes | 5/10 | Narrative & Retention |
+| Oprah Winfrey | 6.5/10 | Human Experience & Trust |
+| Jensen Huang | 5/10 | Platform & AI Leverage |
+| Warren Buffett | 4/10 | Durable Value & Economics |
+
+**Average Score: 5.1/10**
 
 ---
 
 ## Points of Agreement
 
-All four board members converge on the following:
+All four board members align on the following:
 
-### 1. The Engineering is Solid
-- **Buffett:** "Well-built commodity infrastructure"
-- **Jensen:** "Competent bash scripting with good engineering hygiene"
-- **Shonda:** "The engineering is fine. The philosophy is coherent."
-- **Oprah:** "Rock-solid engineering that delivers on its promises"
+### 1. Engineering Quality is Solid
+- "Impressive bash engineering" (Huang)
+- "Competent security engineering" (Buffett)
+- "The code embodies the essence: reliable, graceful, peaceful" (Winfrey)
+- "Solid premise and functional infrastructure" (Rhimes)
 
-### 2. This is Infrastructure, Not a Product
-- **Buffett:** "This is plumbing. Essential plumbing, perhaps. But plumbing."
-- **Jensen:** "It's infrastructure for internal tooling, not a product with compounding value."
-- **Shonda:** "NERVE is the pilot episode that never aired."
-- **Oprah:** "Built by experts, for experts, with expert assumptions in every line."
+### 2. The Proxy is the Real Product (And It's Missing)
+- "The proxy is the moat, not the versioning" (Buffett)
+- "The Proxy is the Prize—You're Ignoring It" (Huang)
+- "The proxy sees everything... And what does the product do with this goldmine? Nothing." (Rhimes)
+- PRD listed proxy as "Must Have" — not delivered (all reviewers noted)
 
-### 3. There is No Competitive Moat
-- **Buffett:** "A competent engineer replicates this in 2-4 hours. There is no proprietary algorithm."
-- **Jensen:** "Any competent team can build a file-based queue with PID lockfiles in a weekend."
-- **Both agree:** Commodity infrastructure with no defensible advantage.
+### 3. Dashboard Not Built (Critical Gap)
+- "The promised dashboard" is missing (Winfrey)
+- "CLI-only tools don't convert" (Buffett)
+- "Dashboard | 0 | Not built" (Buffett's audit)
+- Dashboard was "Must Have" in PRD scope
 
-### 4. The Product is Invisible to Its Own Detriment
-- **Shonda:** "NERVE is proud of being invisible. That's like a TV show being proud that no one watches."
-- **Oprah:** "The soul exists but got buried."
-- **Agreement:** Invisibility without strategic visibility is a death wish, not a feature.
+### 4. NERVE is Premature / Wrong Priority
+- "Kill NERVE. It's premature optimization" (Buffett)
+- "NERVE feels like a separate project... The pieces don't compose" (Huang)
+- "NERVE is the B-plot that never gets screen time" (Rhimes)
+- 40% of effort spent on infrastructure for 0 users
 
-### 5. No Revenue Path Exists
-- **Buffett:** "No revenue model exists or is proposed. This is a cost center."
-- **Jensen:** "It's not a venture-scale opportunity" in current form.
+### 5. No Moat / Easily Replicable
+- "Could replicate in a weekend... one afternoon" (Buffett)
+- "This is a database, not a moat. Anyone can replicate this in a weekend." (Huang)
+- "Prompt text is not differentiated data" (Huang)
+- "The competitive moat is a puddle" (Buffett)
 
-### 6. The Name Doesn't Match Reality
-- **Jensen:** "Why is this called 'promptops' when there are no prompts? The irony: This is called 'promptops' but has zero prompts. Zero LLM calls. Zero AI."
-- **Buffett:** "The README quotes Jobs and Musk. That's not a moat. That's decoration."
+### 6. Zero Revenue Mechanism
+- "No billing integration... This is a hobby wearing a business plan" (Buffett)
+- "No mechanism to collect revenue" (Buffett)
+- Stripe would take 30 minutes to integrate — not done
+
+### 7. Accessibility Too Narrow
+- "Built by experts, for experts" (Winfrey)
+- "CLI-only tools don't convert" (Buffett)
+- Non-technical stakeholders (PMs, writers) excluded
+- "This tool doesn't need them back" (Winfrey)
 
 ---
 
 ## Points of Tension
 
-### 1. Process Investment vs. Output Value
+### 1. Kill NERVE vs. Integrate NERVE
+- **Buffett:** "Kill NERVE. Defer until we have users."
+- **Huang:** "Connect NERVE to Drift... NERVE should monitor Drift metrics. Auto-rollback if version N has 2x latency."
+- **Tension:** Buffett sees NERVE as wasted effort; Huang sees unrealized integration potential.
 
-**Buffett (Critical):**
-> "Two AI personas debating bash script naming conventions is not value creation. It's expensive entertainment... equivalent of hiring McKinsey to design your garage organization system."
+### 2. Feature vs. Platform Debate
+- **Buffett:** "This is a feature, not a company. Prompt versioning will be absorbed into LangSmith, OpenAI, Claude..."
+- **Huang:** "Stop building storage. Start building intelligence. Own the prompt layer."
+- **Tension:** Buffett questions whether any version of this wins; Huang sees a path if they pivot to intelligence.
 
-**Oprah (Sympathetic):**
-> "The DECISIONS-LOCK.md shows real rigor—stakeholder debates resolved with clear rationale."
+### 3. Emotional UX vs. Just Ship Payments
+- **Rhimes:** Invest in narrative, celebration, emotional payoff ("Rolled back in 0.3s. Crisis averted.")
+- **Winfrey:** "Error messages with empathy... progressive disclosure"
+- **Buffett:** "Talk to users before more code. Add billing immediately."
+- **Tension:** Polish the experience vs. validate willingness to pay first.
 
-**Tension:** Was the elaborate debate process wasteful or valuable documentation?
-
-### 2. Invisibility Philosophy
-
-**Engineering View (Jensen, Buffett):**
-Zero-configuration is good engineering taste but not defensible.
-
-**Narrative View (Shonda):**
-> "Things you forget don't survive budget cuts. When someone asks 'what tools do you use?', no one mentions the thing they forgot exists."
-
-**Human View (Oprah):**
-> "The things that serve us best are the things we stop thinking about... I respect that ambition."
-
-**Tension:** Is invisible infrastructure a virtue or a failure of product thinking?
-
-### 3. What's Missing Most
-
-| Board Member | Primary Gap |
-|--------------|-------------|
-| **Buffett** | Customers and revenue |
-| **Jensen** | AI leverage and compounding data |
-| **Shonda** | Retention hooks and story arc |
-| **Oprah** | Human documentation and accessibility |
-
-### 4. Path Forward
-
-**Buffett:**
-> "Stop Building Internal Infrastructure. Find a Customer... Do not build another internal tool until you've shipped one thing for someone else."
-
-**Jensen:**
-> "NERVE becomes the 'Datadog for AI pipelines'—observability, orchestration, and optimization... Add an LLM to the verdict parser. Today."
-
-**Shonda:**
-> "Give NERVE a memory. Give it a voice. Give users a reason to care about Episode 2."
-
-**Oprah:**
-> "A human introduction... Before/After story... Progressive disclosure... An emergency guide."
-
-**Tension:** Pivot to external product (Buffett/Jensen) vs. improve internal experience first (Shonda/Oprah)?
+### 4. AI Leverage Priority
+- **Huang:** AI features are "non-negotiable" — semantic diff, prompt optimization, intelligent routing
+- **Buffett:** Find 10 paying customers first. AI features are premature without validation.
+- **Tension:** Build intelligence now vs. prove demand first.
 
 ---
 
-## Overall Verdict: HOLD
+## Overall Verdict
 
-NERVE is **not ready for additional investment** in its current form, but it should **not be abandoned**.
+# HOLD
 
-### Rationale
+**Not PROCEED:** Critical MVP components missing (proxy, dashboard). No revenue mechanism. No demonstrated customer demand.
 
-**Against PROCEED:**
-- Average score of 4.25/10 falls below threshold for active development
-- No revenue model, no moat, no customer
-- Missing AI leverage despite "promptops" name
-- Zero retention mechanisms, no story arc
-- Heavy process costs for commodity output
-
-**Against REJECT:**
-- Engineering is genuinely solid
-- Crash recovery, queue persistence, and abort mechanisms work correctly
-- Foundation could support a real product
-- Philosophy documents show vision coherence
-- Oprah scored it 6/10—there's value here that could be unlocked
-
-**HOLD means:**
-- No new feature development on NERVE core
-- No additional debate rounds or process theater
-- Preserve what exists; it works
-- Redirect energy toward revenue-generating work OR
-- Address conditions below to unlock continued investment
+**Not REJECT:** Engineering quality is real. The team can build. The problem space is valid. Course correction is possible.
 
 ---
 
 ## Conditions for Proceeding
 
-NERVE may receive continued investment **only if** the following conditions are met:
+The board will reconsider PROCEED status when the following are demonstrated:
 
-### Mandatory (All Required)
+### Must Have (Non-Negotiable)
 
-1. **Customer Identification**
-   - Identify at least one external user or internal stakeholder with measurable need
-   - Document: What was breaking before? What is the incident cost?
-   - *Owner: Product*
-   - *Addresses Buffett: "Find a Customer"*
+1. **Ship the Proxy**
+   - The proxy sitting between app and LLM is the core value proposition
+   - Without it, this is "another database" competing with git
 
-2. **ROI Documentation**
-   - Before/after metrics showing NERVE prevented X failures worth $Y
-   - Actual incident data, not theoretical benefits
-   - *Owner: Operations*
-   - *Addresses Buffett: "Measure Before You Optimize"*
+2. **Ship the Dashboard**
+   - Visual interface for non-CLI users
+   - Required for broader market accessibility
+   - Enables conversion beyond power users
 
-3. **AI Integration (MVP)**
-   - Add LLM to verdict parser for semantic understanding of failures
-   - Demonstrate one AI-powered feature that provides 10x value over regex
-   - *Owner: Engineering*
-   - *Addresses Jensen: "promptops with zero prompts is a credibility gap"*
+3. **Add Billing Integration**
+   - Stripe integration (30-minute task per Buffett)
+   - Cannot validate willingness to pay without ability to pay
+   - Even one paying customer changes the equation
 
-### Recommended (At Least 2 of 4)
+4. **Customer Validation**
+   - Talk to 10 companies with prompt management pain
+   - Confirm they'd pay $29/mo before building more features
+   - "Find 10 companies... If you can't find them, that's your answer" (Buffett)
 
-4. **Retention Layer**
-   - Implement Chronicle (execution history with memory)
-   - Add Health Score or streak tracking
-   - Create Close Call notifications
-   - *Addresses Shonda's retention void*
+### Should Have (Strong Recommendations)
 
-5. **Human Documentation**
-   - "Before NERVE" scenario showing the chaos it prevents
-   - Emergency troubleshooting guide
-   - Visual diagram of system flow
-   - Progressive disclosure for different audiences
-   - *Addresses Oprah's accessibility concerns*
+5. **Instrument the Proxy for Data Collection**
+   - Log: prompt_version, model, tokens_in, tokens_out, latency_ms, status
+   - "This data is your future. Start collecting now." (Huang)
+   - Enables all future intelligence features
 
-6. **Platform Architecture**
-   - REST/gRPC API for programmatic access
-   - Plugin architecture for custom verdict parsers
-   - Durable, queryable execution history (not /tmp)
-   - *Addresses Jensen's platform requirements*
+6. **Connect NERVE to Drift (or Kill It)**
+   - Either: NERVE monitors Drift metrics, enables auto-rollback
+   - Or: Defer NERVE entirely until user base exists
+   - Current state of disconnection is worst option
 
-7. **Content Flywheel**
-   - Shareable Close Call reports
-   - Weekly digest mechanism
-   - War Stories annotation feature
-   - *Addresses Shonda's content flywheel gap*
+7. **Daily/Weekly User Touchpoint**
+   - Morning digest, weekly summary, performance alerts
+   - "Give users a reason to look at the dashboard daily" (Rhimes)
+   - Transforms tool into habit
 
----
+### Nice to Have (v1.1 Considerations)
 
-## Next Steps
+8. **Semantic Diff Using AI**
+   - Plain English explanation of prompt changes
+   - "This change makes the model more verbose and less likely to refuse" (Huang)
 
-| Action | Owner | Timeline |
-|--------|-------|----------|
-| Document current incident costs (ROI baseline) | Operations | 1 week |
-| Identify pilot customer/stakeholder | Product | 2 weeks |
-| Prototype LLM verdict parser | Engineering | 2 weeks |
-| Board re-review | All | 30 days |
+9. **Privacy/Trust Documentation**
+   - What we store, how long, who can see it
+   - Required for enterprise trust (Winfrey)
+
+10. **Celebration Moments in CLI**
+    - "Rolled back in 0.3s. Crisis averted." not "Rolled back to v2."
+    - Emotional resonance in critical moments (Rhimes)
 
 ---
 
-## Closing Quotes
+## Next Review Gate
 
-> *"Price is what you pay. Value is what you get."* — Warren Buffett
-> "I see price. I don't yet see value."
+**Timeline:** 14 days
 
-> *"The more you can do with software, the more you should do with AI. This does everything with bash."* — Jensen Huang
+**Required Deliverables:**
+1. Working proxy (intercepting LLM calls)
+2. Basic dashboard (view prompts, versions, rollback button)
+3. Stripe billing integration (even if not live)
+4. Evidence of 5+ customer conversations with documented pain points
 
-> *"Make them laugh, make them cry, make them wait. NERVE does none of these."* — Shonda Rhimes
-
-> *"The whole point of being alive is to evolve into the complete person you were intended to be."* — Oprah Winfrey
-> "The same is true for products. NERVE knows what it wants to be. The code has arrived. Now the story needs to catch up."
-
----
-
-## Signatures
-
-| Board Member | Verdict | Concurrence |
-|--------------|---------|-------------|
-| Warren Buffett | HOLD | Agreed |
-| Jensen Huang | HOLD | Agreed |
-| Shonda Rhimes | HOLD | Agreed |
-| Oprah Winfrey | HOLD | Agreed |
+**Success Criteria for PROCEED:**
+- All four "Must Have" conditions addressed
+- At least one customer willing to pay (LOI or actual payment)
+- Clear answer to: "Why can't a customer just use git?"
 
 ---
 
-**Board Verdict: HOLD**
-**Conditions documented. Re-review in 30 days.**
+## Board Signatures
 
-*Consolidated by: Board Synthesis Process*
-*Great Minds Agency*
+- **Shonda Rhimes** — Narrative & Retention
+- **Oprah Winfrey** — Human Experience & Trust
+- **Jensen Huang** — Platform & AI Leverage
+- **Warren Buffett** — Durable Value & Economics
+
+---
+
+*"The team can build. That's clear. Now build the right thing."*

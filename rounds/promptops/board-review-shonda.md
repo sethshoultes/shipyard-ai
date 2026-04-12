@@ -1,239 +1,291 @@
-# Board Review: NERVE (promptops)
+# Board Review: PromptOps (Drift)
 
 **Reviewer:** Shonda Rhimes
 **Role:** Board Member, Great Minds Agency
 **Lens:** Narrative Arc, Retention, Emotional Engagement
-**Date:** 2026-04-11
+**Date:** 2026-04-12
 
 ---
 
 ## Executive Summary
 
-NERVE is the pilot episode that never aired. The infrastructure is there, the set is built, the actors are hired — but there's no story. No reason for the audience to care. No reason for them to come back next week.
+PromptOps is a promising premise with an underdeveloped pilot. The "Git for prompts" concept is solid — there's drama inherent in the question "did my AI just break?" But the current build treats the audience like technicians instead of protagonists in their own story. The CLI works. The API works. But no one falls in love with infrastructure. They fall in love with *what infrastructure lets them become*.
 
-I've read the scripts. I've watched the dailies. What I see is technically competent television that no one will remember. And in my business, forgettable is fatal.
+I see the bones of a show here. Now we need to write the character arcs.
 
 ---
 
 ## Story Arc: Does the Product Tell a Story from Signup to "Aha Moment"?
 
-**Rating: 2/10**
+**Rating: 5/10**
 
 ### What I See
 
-There is no story. There isn't even a protagonist.
+The journey exists, but it's told wrong. Here's the current narrative:
 
-The user journey is:
+**Act One (Setup):** `npm install -g promptops && promptops init`
+- Cold open. No stakes established. User doesn't know why they're here.
+- The init command creates a project and shows: "API Key: xxx. Save this key!"
+- This is exposition without context. It's like opening Grey's Anatomy with a tax form.
 
-1. **Cold Open:** Read a README that quotes Steve Jobs and Elon Musk (decoration, not story)
-2. **Act One:** Run `./daemon.sh start`. See a timestamp. Feel nothing.
-3. **Act Two:** ... there is no Act Two. The daemon runs. Invisibly. Silently.
-4. **Climax:** Never arrives. Nothing escalates. Nothing resolves.
-5. **Aha Moment:** Never happens. Users don't have an "aha" — they have an "oh, I guess it's running."
+**Act Two (Rising Action):** `promptops push system-prompt --file ./prompt.txt`
+- The user pushes a prompt. Version 1 created.
+- Response: "Pushed system-prompt v1."
+- Six words. No emotion. No understanding of what just happened to their world.
 
-### The Problem
+**Act Three (Climax?):** The rollback.
+- This is where the drama *should* be. The 2 AM moment when production is on fire and someone realizes the new prompt is hallucinating credit card numbers.
+- `promptops rollback system-prompt 2` — "Rolled back to v2. Live now."
+- That's the save! That's the hero moment! And it reads like a log file.
 
-The essence doc says NERVE's feeling is "peace — the absence of the 3 AM knot in your stomach."
+**Act Four (Resolution):** Never arrives. There's no payoff. No "your app is safe now." No acknowledgment that something almost went very wrong.
 
-But here's the thing about peace: **you don't feel the absence of anxiety. You feel the presence of it.**
+### The Missing "Aha Moment"
 
-NERVE promises peace but delivers nothing. Not peace. Not anxiety. Just... silence. And silence isn't a story. Silence is the space between episodes where your audience changes the channel.
+The PRD defines the problem beautifully: *"Prompts scattered across codebases, Notion docs, and developer heads."*
+
+But the product never shows this chaos. It never lets the user feel the pain before providing relief.
+
+**Current aha moment:** "I guess my prompt is versioned now?"
+**Should-be aha moment:** "Oh my god, I just saved production with one command."
 
 ### What Would Fix It
 
-Every great pilot has a **hook** in the first five minutes. NERVE's first five minutes should make the user feel something:
+1. **The Inciting Incident:** On `init`, show what's at stake. "You have 3 prompts in production. Any one of them could hallucinate at any time. Let's fix that."
 
-- "Your pipeline ran 3 jobs in the last hour. One almost failed. NERVE caught it."
-- "Welcome to NERVE. You have 47 items in queue. Estimated clear time: 12 minutes."
-- Show them the problem NERVE solves *before* NERVE solves it.
+2. **Rising Tension:** On `push`, show the diff. Make the change visible. "Here's what changed between v4 and v5. Want to make this live?"
 
-The aha moment should be: *"Oh my god, this thing is watching my back."*
+3. **The Climax Moment:** On `rollback`, celebrate the save. "Rolled back in 0.3s. Your production prompt is restored. Crisis averted."
 
-Right now, the aha moment is: *"I think I typed the command correctly?"*
+4. **Resolution:** Show the after. "system-prompt is now on v2. All requests are using the safe version. You're good."
 
 ---
 
 ## Retention Hooks: What Brings Users Back Tomorrow? Next Week?
 
-**Rating: 1/10**
+**Rating: 4/10**
 
 ### What I See
 
-Nothing. Absolutely nothing.
+The retention model is implicit: "You'll come back when you need to change a prompt."
 
-I've built shows that kept audiences for 15 seasons. The secret isn't quality — it's **unfinished business**. Every episode ends with something unresolved. Every scene plants a seed for later harvest.
+That's not retention. That's hoping the user remembers you exist.
 
-NERVE has:
-- **No continuity.** Each run is isolated. There's no "previously on NERVE."
-- **No memory.** The system forgets everything the moment it stops.
-- **No ritual.** There's no daily touchpoint, no weekly digest, no reason to check in.
-- **No stakes.** If I stop using NERVE, what do I lose? Nothing I remember.
+| Retention Driver | Grey's Anatomy | PromptOps Current State |
+|------------------|----------------|------------------------|
+| **Daily Touchpoint** | Episode airs weekly | None — forgotten between deploys |
+| **Unfinished Business** | Will they survive? | Is v5 working? (User has no idea) |
+| **Earned Progress** | Character development | Version numbers (meaningless without context) |
+| **Fear of Missing Out** | What happened? | Nothing — prompts just sit there |
+| **Status Display** | Fandom identity | No shareable status |
 
 ### The Retention Void
 
-| Driver | Grey's Anatomy | NERVE |
-|--------|---------------|-------|
-| **Unfinished Business** | Will Meredith survive? | Is the queue empty? (Who cares?) |
-| **Ritual Belonging** | Thursday at 9pm is mine | Never think about it |
-| **Identity Investment** | "I'm a Grey's person" | "I use some daemon thing" |
-| **Earned Trust** | 19 seasons of payoff | No proof it works |
+PromptOps has one killer retention opportunity hiding in plain sight: **the proxy sees everything**.
 
-### What Would Fix It
+Every API call flows through the proxy. That's performance data. That's usage patterns. That's potential failure signals. And what does the product do with this goldmine?
 
-I wrote the Retention Roadmap for a reason. The short version:
+*Nothing.* The PRD lists "performance metrics" as "Nice to Have (Post-MVP)."
 
-1. **The Chronicle** — Give NERVE a memory. Let users see what happened yesterday.
-2. **The Health Score** — Give users a number to check. Make it a habit.
-3. **Close Call Notifications** — When NERVE saves you, *tell you*.
-4. **Streak Tracking** — "34 days without a production escape."
-5. **Weekly Digest** — A reason to remember NERVE exists.
+That's like filming every episode of a hit show and never reviewing the footage.
 
-None of these exist. The deliverables are just bash scripts that run and forget.
+### What Would Create Retention
+
+1. **The Morning Check-In:** "Your prompts handled 2,340 requests yesterday. Average latency: 1.2s. No anomalies."
+   - Give users a reason to look at the dashboard daily.
+
+2. **The Alert Hook:** "system-prompt v5 is generating 23% longer responses than v4. Worth investigating?"
+   - Create curiosity. Make them want to know more.
+
+3. **The Version Story:** Show performance over time. "v3 had the lowest error rate. v5 is faster but flakier."
+   - This turns version history into a narrative users want to follow.
+
+4. **The Streak:** "47 days of stable prompts. Keep it going."
+   - Manufactured continuity. It works. Ask Snapchat.
+
+5. **The Weekly Digest:** "This week: 14,000 requests, 3 prompt changes, 0 rollbacks needed."
+   - A reason to remember PromptOps exists.
 
 ---
 
 ## Content Strategy: Is There a Content Flywheel?
 
-**Rating: 2/10**
+**Rating: 3/10**
 
 ### What I See
 
-The "content" is:
-- Four bash scripts
-- A README
-- A DECISIONS-LOCK.md file
+The content strategy is: "Post on Hacker News."
 
-None of this is content in the way I understand content. There's no:
-- Onboarding story
-- Success stories
-- Educational material
-- Community voice
-- User-generated anything
+That's not a flywheel. That's a one-time launch spike followed by silence.
 
-### The Missing Flywheel
+**Current content assets:**
+- CLI (functional but silent)
+- API (invisible)
+- Dashboard (minimal, from PRD scope)
+- README (tutorial-focused)
 
-A content flywheel looks like this:
+**Missing flywheel elements:**
+- No success stories embedded in the product
+- No shareable moments
+- No user-generated content hooks
+- No educational progression
+- No community formation point
+
+### The Flywheel That Should Exist
+
+A prompt versioning tool has *natural* content generation potential:
 
 ```
-User Experience → Story to Tell → Content Created → New Users → More Stories
+User Experience → Prompt Improvement → Measurable Outcome → Shareable Story → Discovery → New User
 ```
 
-NERVE's "flywheel":
-
-```
-User Experience → Nothing Memorable → No Content → No Discovery → Death
-```
+But PromptOps breaks this chain by making outcomes invisible.
 
 ### What Would Create a Flywheel
 
-1. **Close Call Reports** — When NERVE catches a P0, generate a shareable report. Users post these to Slack. That's organic content.
+1. **"This Prompt Worked":** When a prompt version shows improved metrics, generate a shareable report.
+   - "After switching to v5, response quality improved by 18%. Here's the diff that made the difference."
+   - Users share these wins. That's organic content.
 
-2. **War Stories Feature** — Let users annotate their Chronicle: "This was the day we almost shipped a broken deploy. NERVE saved us." That's content that sells itself.
+2. **Prompt Case Studies:** Aggregate anonymized improvement patterns.
+   - "This week, PromptOps users improved their prompt response times by an average of 340ms through version iteration."
+   - That's a blog post. That's a tweet. That's content.
 
-3. **Reliability Certificates** — "NERVE protected your pipeline for 30 days. Here's the proof." Shareable. Postable. Content.
+3. **The Rollback War Story:** When someone saves production with a rollback, offer to generate a post-mortem.
+   - "What Went Wrong: The v4 Incident (and how we recovered in 0.3s)"
+   - Developers love sharing war stories.
 
-4. **The NERVE Blog** — Aggregate anonymized close calls across all users. "This week, NERVE prevented 47 production incidents across our users." That's thought leadership.
-
-Right now? There's no story to tell. And if there's no story, there's no flywheel.
+4. **Template Gallery:** Let users share successful prompt structures.
+   - Now users return to browse. Now they contribute. Now you have a community.
 
 ---
 
 ## Emotional Cliffhangers: What Makes Users Curious About What's Next?
 
-**Rating: 1/10**
+**Rating: 3/10**
 
 ### What I See
 
-Nothing. Zero. The void.
+No cliffhangers. Every interaction is complete and closed.
 
-A cliffhanger is a question the audience *needs* answered. In NERVE:
+- `promptops init` → Done.
+- `promptops push` → Done.
+- `promptops rollback` → Done.
 
-- What happens next? *(Nothing. The daemon just... runs.)*
-- What's at stake? *(Unknown. No visibility into what's being protected.)*
-- What could go wrong? *(No foreshadowing. No tension. No warning.)*
-- What could go right? *(No success stories. No celebration. No payoff.)*
+There's no "but what happens next?" There's no tension carried forward.
 
-### The Emotional Void
+### Where the Cliffhangers Should Be
 
-The essence doc promises "the absence of the 3 AM knot."
+**The Version Comparison Hook:**
+"v5 has been live for 4 hours. Want to see how it's performing against v4?"
+- This creates an open question. Users *have* to check back.
 
-But to feel the absence of anxiety, you need to first experience the anxiety. NERVE never shows you the danger. It never lets you feel afraid. So when it saves you... you don't know you were saved.
+**The A/B Test Tease:**
+"Running A/B test: v4 vs v5. Results in 24 hours."
+- Even if A/B testing isn't in MVP, the *structure* of anticipation matters.
 
-**That's a crime against storytelling.**
+**The Anomaly Detection Hook:**
+"system-prompt is receiving unusual traffic patterns. We're watching it."
+- Fear is a powerful cliffhanger. Make users feel protected AND curious.
 
-Every hero's journey requires the hero to face a dragon. NERVE slays dragons in secret and expects gratitude for work no one witnessed.
+**The Milestone Approach:**
+"You're 3 prompts away from Pro tier features. Your next prompt unlocks analytics."
+- Progression creates anticipation.
 
-### What Would Create Cliffhangers
+### The NERVE Problem (Subsystem Review)
 
-1. **"You're 12 minutes away from queue overflow."** — Show impending doom. Let users feel it.
+The NERVE daemon (bash scripts for queue management) has zero emotional hooks:
 
-2. **"NERVE caught something. View details?"** — The notification creates curiosity. The click resolves it.
+- It runs invisibly
+- It logs clinically
+- It provides no user-facing narrative
 
-3. **"Your streak is at 29 days. Tomorrow is 30."** — Manufactured tension. Will they make it?
+NERVE's philosophy—"The best infra is infra you forget exists"—is technically elegant and narratively suicidal. The README quotes Steve Jobs and Elon Musk, but no quote compensates for a silent protagonist.
 
-4. **"Three close calls this week. Want the full report?"** — Tease the story. Make them want more.
-
-Right now, NERVE ends every episode with credits rolling over silence. No "next week on." No tease. Just... nothing.
-
----
-
-## The Deeper Problem: Invisible Infrastructure Doesn't Retain
-
-The philosophy states: "Invisible architecture. The best infra is infra you forget exists."
-
-I understand the appeal. But here's what 20 years of television taught me:
-
-**Things you forget don't survive budget cuts.**
-
-When someone asks "what tools do you use?", no one mentions the thing they forgot exists. When leadership reviews costs, no one defends the tool no one remembers.
-
-NERVE is proud of being invisible. That's like a TV show being proud that no one watches.
-
-### The Balance
-
-The goal isn't to make NERVE annoying. It's to make NERVE **memorable at the right moments**:
-
-- Invisible when working
-- Visible when it saves you
-- Celebrated when it proves its value
-
-Right now, NERVE is invisible always. That's not a feature. That's a death wish.
+**NERVE is the B-plot that never gets screen time.** Either integrate it into the user story or accept it's purely backend infrastructure that should never touch user consciousness.
 
 ---
 
-## Score: 3/10
+## The Deeper Narrative Problem: Tools vs. Characters
 
-**Justification:** NERVE has no story arc, no retention hooks, no content flywheel, and no emotional cliffhangers — it's the pilot that gets canceled before Episode 2.
+The PRD positions PromptOps as a tool: "Git for prompts."
+
+But tools don't retain. **Characters retain.**
+
+Git succeeded because it enabled a *story*: the collaborative development narrative. Pull requests aren't features—they're drama. Merge conflicts aren't bugs—they're tension. GitHub understood this. They added avatars, contribution graphs, stars.
+
+PromptOps is currently just a tool. It has:
+- Commands (actions)
+- Versions (numbers)
+- Rollbacks (undo)
+
+It needs:
+- Progress (journey)
+- Celebration (payoff)
+- Stakes (risk)
+- Memory (continuity)
 
 ---
 
-## What Would Make This a 7/10
+## Score: 5/10
+
+**Justification:** Solid premise and functional infrastructure, but the user journey lacks emotional stakes, retention hooks, and narrative payoff — it's a pilot with good production values but no reason to tune in next week.
+
+---
+
+## What Would Make This a 8/10
 
 | Current State | Required Change |
 |---------------|-----------------|
-| No story arc | First-run experience that shows the problem before the solution |
-| No retention | Chronicle + Health Score + Weekly Digest |
-| No content flywheel | Shareable Close Call reports |
-| No cliffhangers | Visible near-misses, streaks, countdowns |
-| Proud invisibility | Strategic visibility at high-value moments |
+| Silent CLI responses | Contextual celebration of key moments |
+| No visibility into production | Dashboard with real-time prompt performance |
+| One-time launch strategy | Content flywheel through shareable wins |
+| Closed interactions | Open loops (A/B results pending, metrics updating) |
+| Invisible NERVE subsystem | Either user-facing narrative integration or pure backend |
+| Version numbers without context | Version stories with performance comparisons |
+| No daily touchpoint | Morning digest or dashboard habit formation |
 
 ---
 
-## The Showrunner's Note
+## The Showrunner's Rewrite
 
-In television, we have a saying: "If you're not growing, you're dying."
+If this were my show, here's the pilot I'd write:
 
-NERVE isn't growing. It's not even planted. The seeds are in the packet, labeled with quotes from famous people, sitting in a drawer marked "infrastructure."
+**COLD OPEN:** User's AI app is behaving strangely. Customers are complaining. They check their prompts—when did this change? Who changed it? Which version is live?
 
-The engineering is fine. The philosophy is coherent. But philosophy doesn't retain users. Stories do.
+**ACT ONE:** User discovers PromptOps. `promptops init` doesn't just create a project—it *discovers* existing prompts and shows the user what's at stake.
 
-Give NERVE a memory. Give it a voice. Give users a reason to care about Episode 2.
+**ACT TWO:** User pushes their first versioned prompt. The CLI shows the diff. "This is now live. We're watching it."
 
-Right now, this show gets canceled after the pilot.
+**ACT THREE:** Something goes wrong. PromptOps detects anomalous behavior. The user sees an alert.
+
+**CLIMAX:** `promptops rollback system-prompt 2` — The CLI shows the fix happening in real-time. "Rolled back. Production is stable. Here's what changed."
+
+**RESOLUTION:** Dashboard shows the incident timeline. User sees exactly what happened and when. They feel protected. They feel smart. They feel like they want to tell someone about this.
+
+**TAG:** "Tomorrow's digest will show how v2 is performing. We've got your back."
+
+*That's* a show people come back for.
 
 ---
 
-*"Make them laugh, make them cry, make them wait. NERVE does none of these."*
+## Final Note
+
+PromptOps has real potential. The problem it solves is genuine—prompt management *is* chaos right now. The technical foundation is solid.
+
+But right now, it's infrastructure pretending it doesn't need to be loved.
+
+Every great show—Grey's Anatomy, Scandal, Bridgerton—makes you *feel* something. Relief. Triumph. Anticipation. Belonging.
+
+PromptOps makes you feel... like you typed a command correctly.
+
+That's not enough. Give users a story. Give them stakes. Give them a reason to tell their friends: "You won't believe what almost happened to my production app—and how I saved it in 0.3 seconds."
+
+*That's* a show that gets renewed.
+
+---
+
+*"Every episode should end with the audience desperate to see what happens next. PromptOps ends every interaction with nothing but a version number."*
 
 **Shonda Rhimes**
 Board Member — Narrative & Retention

@@ -1,125 +1,169 @@
-# NERVE Demo Script
+# PromptOps Demo Script
 
 **Runtime:** 2 minutes
 **Format:** NARRATOR + [SCREEN] stage directions
 
 ---
 
-[SCREEN: Black. A cursor blinks in the dark.]
+[SCREEN: Black. Then a timestamp appears: "11:47 PM — Tuesday"]
 
 NARRATOR:
-It's 2 AM. You're watching a pipeline run.
+Sarah just pushed a prompt change to production.
 
-[SCREEN: Terminal alive with scrolling logs. Timestamps flying past.]
-
-NARRATOR:
-Not because you want to be here. Because the last time you didn't watch, the pipeline crashed at 2:47 AM. By the time you woke up, it had been spinning for four hours doing nothing. And nobody knew. And the client demo was at nine.
-
-[SCREEN: Scrolling freezes. A single line: "Connection timeout."]
+[SCREEN: A Slack channel. A message pops in: "Hey, why is the chatbot being weird?"]
 
 NARRATOR:
-So now you watch. You watch it like it's a sleeping baby. You watch it like it's a fuse you lit and you're not sure how long it is.
+The chatbot that talks to forty thousand customers a day. She tweaked the system prompt. Made it friendlier. Two words.
 
-[SCREEN: Hard cut. Clean terminal. Empty prompt.]
-
-NARRATOR:
-This is NERVE.
-
-[SCREEN: `./daemon.sh start`]
+[SCREEN: A diff. Old: "You are a helpful assistant." New: "You are a helpful, cheerful assistant."]
 
 NARRATOR:
-One command. It starts.
+Except now it's adding exclamation points to everything. Including the apology emails. The ones that go out when orders are late.
+
+[SCREEN: Email preview. Subject: "Your Order Update!" Body: "We're so sorry your package is delayed! We hope you have a wonderful day!"]
+
+NARRATOR:
+Sarah doesn't have a backup of the old prompt. It's in a Google Doc somewhere. Maybe. Her git history shows "updated prompt" fourteen times. Which one worked?
+
+[SCREEN: Git log showing identical commit messages stacked: "updated prompt", "updated prompt", "updated prompt"...]
+
+NARRATOR:
+This is the problem. Prompts are code now. They run your business. But we're still managing them like sticky notes.
+
+[SCREEN: Fade to black. Then: Terminal. A cursor blinks.]
+
+NARRATOR:
+Here's Drift.
+
+[SCREEN: `drift init` — typed and entered]
+
+[SCREEN: Output appears:
+```
+Initializing Drift project...
+Project initialized: acme-support
+API Key: dk_a1b2c3d4e5f6...
+⚠️  Save this key! It won't be shown again.
+```]
+
+NARRATOR:
+One command. No signup form. No OAuth dance. No "verify your email." You get a project. You get an API key. You're working.
+
+[SCREEN: `drift push system-prompt --file ./prompt.txt -m "initial version"`]
+
+[SCREEN: `Pushed system-prompt v1.`]
+
+NARRATOR:
+Push your prompt. Just like code.
+
+[SCREEN: Quick montage — commands flying by:
+`drift push system-prompt --file ./prompt.txt -m "removed hedging"`
+`Pushed system-prompt v2.`
+`drift push system-prompt --file ./prompt.txt -m "PM feedback on tone"`
+`Pushed system-prompt v3.`]
+
+NARRATOR:
+Version two. Version three. Your PM has a "quick idea." Version four. Every version lives. Every version has a message. Every version can come back.
+
+[SCREEN: `drift push system-prompt --file ./prompt.txt -m "cheerful tone per marketing"`]
+[SCREEN: `Pushed system-prompt v7.`]
+
+NARRATOR:
+And then Tuesday night happens.
+
+[SCREEN: Slack explodes. Messages stacking:
+"customers are complaining"
+"this is bad"
+"who touched the prompt"
+"@sarah ???"]
+
+NARRATOR:
+Sarah opens her terminal.
+
+[SCREEN: `drift prompts system-prompt`]
+
+[SCREEN: Output shows version history:
+```
+system-prompt
+  v7  "cheerful tone per marketing"   11:47 PM
+  v6  "removed hedging"               3:15 PM
+  v5  "PM feedback on tone"           yesterday
+  v4  "shortened responses"           2 days ago
+```]
+
+NARRATOR:
+Every version. Right there. With the message she wrote when she pushed it.
+
+[SCREEN: Sarah's finger hovers. Then:]
+
+[SCREEN: `drift rollback system-prompt --version 6`]
+
+NARRATOR:
+One command.
+
+[SCREEN: `Rolled back to v6. Live now.`]
+
+NARRATOR:
+Not "deployed in five minutes." Not "waiting for CI." Live. Now.
+
+[SCREEN: Clock in corner: 11:48 PM. One minute later.]
+
+[SCREEN: Slack. New message: "chatbot seems normal again?" followed by "yep we're good 🙏"]
+
+NARRATOR:
+Eleven seconds. That's how long the fix took. The customers who saw the weird emails? A few dozen. Not forty thousand.
+
+[SCREEN: Fade. New terminal. Different vibe — cleaner, more sparse.]
+
+NARRATOR:
+Now here's the part nobody thinks about until 3 AM.
+
+[SCREEN: `./daemon.sh`]
 
 [SCREEN: `[2026-04-11T14:22:33Z] [DAEMON] started (PID: 12345)`]
 
 NARRATOR:
-No configuration file. No YAML. No "let me just set up the"—no. It starts. It runs. It does exactly one thing: it makes sure your pipeline never dies in the dark.
+This is NERVE. The daemon that runs everything else.
 
-[SCREEN: `./queue.sh push qa-pass /reports/qa-report.md`]
-
-NARRATOR:
-Queue a job.
-
-[SCREEN: `[2026-04-11T14:22:34Z] [QUEUE] pushed item a1b2c3d4e5f6 (type: qa-pass)`]
+[SCREEN: Logs scroll. Clean. Clinical. No emoji. No color.
+`[2026-04-11T14:22:34Z] [QUEUE] initialized with 3 pending items`
+`[2026-04-11T14:22:35Z] [QUEUE] processed item abc123 in 2.3s`
+`[2026-04-11T14:22:36Z] [METRICS] depth=2 latency=2.3s errors=0`]
 
 NARRATOR:
-That item is now in a persistent queue. Not in memory. Not in some Redis you forgot to configure. On disk. Where it belongs.
+Every prompt push, every QA check, every deployment—queued, processed, logged. If NERVE crashes, it recovers. Your items don't vanish. They come back.
 
-[SCREEN: `./queue.sh metrics`]
-[SCREEN: `[2026-04-11T14:22:35Z] [METRICS] depth=1 processing=0 completed=0 errors=0`]
+[SCREEN: Daemon crashes — screen goes dark]
 
-NARRATOR:
-Now here's where it gets interesting.
+[SCREEN: Restart. `./daemon.sh`]
 
-[SCREEN: Terminal window slams shut. Black.]
-
-NARRATOR:
-Power outage. Kernel panic. Your laptop dies because you forgot to plug it in. Whatever. The daemon's gone.
-
-[SCREEN: New terminal opens. `./daemon.sh start`]
+[SCREEN: `[DAEMON] cleaning stale lockfile (was PID: 12345)`
+`[QUEUE] recovered 2 items from crashed state`
+`[DAEMON] started (PID: 67890)`]
 
 NARRATOR:
-Start it again.
+Zero lost work. Because determinism isn't a feature. It's the whole point.
 
-[SCREEN: `[2026-04-11T14:23:01Z] [QUEUE] initialized with 1 pending items (recovered 1)`]
-
-NARRATOR:
-*Recovered one.*
-
-[SCREEN: Beat. The line glows slightly.]
+[SCREEN: Back to Sarah. Laptop closed. Lights off.]
 
 NARRATOR:
-That job you queued? Still there. Still waiting. Because NERVE doesn't guess about state. It writes to disk. It reads from disk. If it was processing when you crashed, it moves back to pending. Zero lost work. Zero.
+Sarah sleeps tonight. Not because nothing went wrong. Things always go wrong. But because when they did, the fix was one line. Eleven seconds. And there was a daemon running that didn't need her to watch it.
 
-[SCREEN: `./parse-verdict.sh report /reports/qa-report.md`]
-
-NARRATOR:
-Parse a QA report.
-
-[SCREEN: `{"file":"qa-report.md","verdict":"BLOCKED","issues":{"p0":6,"p1":2,"p2":0}}`]
+[SCREEN: Black. Then, typed slowly: `drift rollback`]
 
 NARRATOR:
-Not "it looks like maybe there might be some issues." BLOCKED. Six P0s. Two P1s. That's the answer. Unambiguous. Grep-able. Debuggable at 2 AM when you've had too much coffee and not enough sleep.
+That's PromptOps. Version control for prompts. Rollback for mistakes. Infrastructure that disappears because it just works.
 
-[SCREEN: `grep '\[QUEUE\]' nerve.log`]
-[SCREEN: Clean filtered output — only queue operations, nothing else.]
+[SCREEN: Logo fades in: "PromptOps"]
+[SCREEN: Below: "Drift + NERVE"]
+[SCREEN: Below that, smaller: "The undo button for your AI's soul."]
 
-NARRATOR:
-Every component logs to the same format. Square brackets. Timestamps. No emoji. No colors. Because when something breaks, you don't need it to look pretty. You need to find it. Fast.
-
-[SCREEN: `./abort.sh set`]
-
-[SCREEN: `[2026-04-11T14:23:30Z] [ABORT] abort flag set`]
-[SCREEN: `[2026-04-11T14:23:30Z] [ABORT] daemon (PID: 12345) will shutdown on next poll`]
+[SCREEN: Beat. Hold.]
 
 NARRATOR:
-And when you need to stop? You tell it to stop. It finishes what it's doing. Shuts down clean. No orphan processes. No zombie jobs. No wondering if it's still running somewhere.
-
-[SCREEN: `[2026-04-11T14:23:31Z] [DAEMON] shutdown complete`]
-
-NARRATOR:
-That's it.
-
-[SCREEN: Hold on the clean terminal. Cursor blinks twice.]
-
-NARRATOR:
-NERVE isn't a dashboard. It isn't a platform. It's the thing that lets you close your laptop at 2 AM and actually go to sleep.
+Go to sleep. We've got this.
 
 [SCREEN: Fade to black.]
 
-[SCREEN: Text fades in: "NERVE"]
-[SCREEN: Below it: "Deterministic. Invisible. Unbreakable."]
-
-NARRATOR:
-Because the best infrastructure is infrastructure you forget exists.
-
-[SCREEN: Beat.]
-
-NARRATOR:
-Until the moment you need it.
-
-[SCREEN: Fade out.]
-
 ---
 
-*END*
+*END — Runtime: ~2:00*
