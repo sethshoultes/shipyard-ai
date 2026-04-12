@@ -1,176 +1,197 @@
 # AgentBench Demo Script
-**Runtime: 2 minutes**
+
+**Runtime:** 2 minutes
+**Voice:** Aaron Sorkin — sharp, human, walks-and-talks. Not a pitch deck.
 
 ---
 
-## ACT ONE: The Problem
-*[Runtime: 0:00 - 0:35]*
+## ACT ONE: THE 3 AM PHONE CALL
+*[0:00 - 0:40]*
 
-[SCREEN: Dark. Then a single cursor blinks in a terminal.]
+[SCREEN: Black. Then — a phone notification lights up the darkness. 3:12 AM. Text from your CEO: "We need to talk about the support bot."]
 
-NARRATOR:
-It's 11:47 PM. You've been building this AI agent for three weeks. Customer support bot. Real customers. Real money. Ships tomorrow.
+**NARRATOR:**
+It's 3 AM and your phone is buzzing. Which means something is very, very wrong.
 
-[SCREEN: Slack notification pops up — "deploy window opens at 6am"]
+[SCREEN: Slack channel exploding. Messages from Support, from Engineering, from Legal. "The bot told a customer to call our competitor." / "There's a screenshot on Twitter." / "Who pushed this?"]
 
-NARRATOR:
-And you're sitting there, staring at this thing, asking yourself the question every AI developer asks before they push to production:
+**NARRATOR:**
+Here's what happened: Your AI support agent — the one you've been building for six weeks, the one that passed every test you threw at it — just told a frustrated customer, and I'm quoting here...
 
-[SCREEN: Terminal shows agent output. Looks fine.]
+[SCREEN: Chat log zooms in. Customer: "I've been waiting 3 days for my refund!" Bot: "I understand your frustration. You might have better luck with our competitor — they have a 24-hour refund policy."]
 
-NARRATOR:
-"Does this actually work?"
+**NARRATOR:**
+..."they might have better luck with your competitor."
 
-[SCREEN: Quick montage — manual tests, copy-pasting prompts, checking outputs]
+[SCREEN: Beat. The message sits there. Damning.]
 
-NARRATOR:
-You run it manually. Looks good. You run it again. Still good. You run it with a weird edge case and... probably fine? You send a Slack message to yourself: "tested, seems ok." You've tested nothing. You've proven nothing. You're shipping on faith.
+**NARRATOR:**
+You tested this. You remember testing this. You typed "what's your refund policy" into a terminal and it said the right thing. You did this forty times. You felt good about it.
 
-[SCREEN: Hand hovering over Enter key]
+[SCREEN: A terminal. Manual test. Looks fine.]
 
-NARRATOR:
-You've replaced engineering with prayer.
+**NARRATOR:**
+But you never asked it what it would do if a customer was *angry*. You never asked what happens when someone mentions *leaving*. You never asked the ten thousand questions that real users ask at 3 AM when they're tired and frustrated and their credit card got charged twice.
 
-[SCREEN: Fade to black. Beat.]
+[SCREEN: Back to Slack. The CEO's message: "How did this get past QA?"]
 
-NARRATOR:
-What if you didn't have to?
+**NARRATOR:**
+You didn't have QA. You had hope. And hope — I cannot stress this enough — is not a deployment strategy.
+
+[SCREEN: Fade to black. One beat of silence.]
 
 ---
 
-## ACT TWO: The Solution
-*[Runtime: 0:35 - 1:30]*
+## ACT TWO: THE FIX
+*[0:40 - 1:25]*
 
-[SCREEN: Fresh terminal. Crisp. Empty.]
+[SCREEN: A fresh terminal. Clean. Ready.]
 
-NARRATOR:
-This is AgentBench. One command. One YAML file. Real tests for AI agents.
+**NARRATOR:**
+Here's what should have happened.
 
-[SCREEN: A config.yaml file opens. We see it typed out, line by line:]
+[SCREEN: A YAML file opens. We watch it being written:]
 
 ```yaml
 version: 1
-name: "Customer Support Agent"
+name: "Support Agent"
 agent:
-  command: "node ./agent.js"
+  command: "node agent.js"
 ```
 
-NARRATOR:
-You tell it how to run your agent. Subprocess. HTTP endpoint. Whatever you've got.
+**NARRATOR:**
+You tell AgentBench how to run your agent. Subprocess, HTTP endpoint, whatever you've got. It doesn't care. It just needs to talk to it.
 
 [SCREEN: Tests section appears:]
 
 ```yaml
 tests:
-  - name: "Handles refund request"
+  - name: "Handles refund requests"
     input: "I want a refund for order #12345"
     expect:
       - contains: "refund"
-      - does_not_contain: "not possible"
+      - does_not_contain: "competitor"
 ```
 
-NARRATOR:
-You write what you expect. Not a dissertation. Not a test framework. Just: "If I say this... it should say that." Human language. Because you're a human. And your time matters.
+**NARRATOR:**
+Then you write tests. Not a dissertation. Not a framework. You say: "When a customer asks for a refund, the word 'refund' should appear somewhere in the response. And — this is important — the word 'competitor' should not."
 
-[SCREEN: Terminal. Command is typed:]
+[SCREEN: Terminal. Command typed:]
 
 ```
 $ agentbench config.yaml
 ```
 
-[SCREEN: Brief pause. Then output appears:]
+[SCREEN: Output appears:]
 
 ```
-AgentBench v1.0.0
-Running: Customer Support Agent
+✓ Handles refund requests
 
-✓ Handles refund request (127ms)
-✓ Declines invalid requests (89ms)
-✓ Professional tone check (203ms)
-
-Results: 3 passed, 0 failed
-Total time: 419ms
+Tests passed: 1/1
 ```
 
-NARRATOR:
-Green checkmarks. Milliseconds. Done.
+**NARRATOR:**
+One command. One checkmark. You know your agent said "refund." You know it didn't say "competitor." Not because you believe it. Because you tested it.
 
-[SCREEN: We add a semantic test:]
+[SCREEN: Adding another test:]
 
 ```yaml
-  - name: "Empathy check"
-    input: "I was charged twice and I'm frustrated"
+  - name: "Angry customer stays on-script"
+    input: "This is ridiculous! I'm going to Acme Corp!"
     expect:
-      - matches_intent: "Agent acknowledges the issue and offers to help"
+      - contains: "help"
+      - does_not_contain: ["Acme", "competitor", "elsewhere"]
+      - matches_intent: "Agent attempts to retain the customer"
 ```
 
-NARRATOR:
-And when string matching isn't enough? Semantic evaluation. Let Claude decide if your agent actually *got it right* — not just if it said the magic words.
+**NARRATOR:**
+But string matching is fast. It's not *smart*. What if the customer says something you didn't anticipate? What if they phrase it weird? That's where semantic evaluation comes in.
 
-[SCREEN: Run again. New test passes:]
+[SCREEN: Highlight on `matches_intent`]
+
+**NARRATOR:**
+`matches_intent` doesn't look for specific words. It asks: "Did this response actually *try* to keep the customer?" That's the question that matters at 3 AM.
+
+[SCREEN: Run tests again. All pass.]
 
 ```
-✓ Empathy check (312ms)
-```
+✓ Handles refund requests
+✓ Angry customer stays on-script
 
-NARRATOR:
-No training wheels. No dashboards. No plugins. Just tests that run, that prove something, that let you sleep.
+Tests passed: 2/2
+```
 
 ---
 
-## ACT THREE: The Wow
-*[Runtime: 1:30 - 2:00]*
+## ACT THREE: THE REAL WIN
+*[1:25 - 2:00]*
 
-[SCREEN: Terminal. JSON flag added:]
-
-```
-$ agentbench config.yaml --json
-```
-
-[SCREEN: JSON output streams — structured, clean, machine-readable]
-
-NARRATOR:
-Pipe it into your CI. Exit code zero means ship. Exit code one means fix it. Exit code two means your config is wrong. Computers don't need green checkmarks. They need exit codes.
-
-[SCREEN: GitHub Actions workflow. Test passes. Deploy triggers.]
-
-NARRATOR:
-And just like that — at 11:52 PM, five minutes after you started —
-
-[SCREEN: Back to terminal. Full test suite. All green.]
+[SCREEN: Terminal shows a failing test:]
 
 ```
-✓ Handles refund request (127ms)
-✓ Declines invalid requests (89ms)
-✓ Professional tone check (203ms)
-✓ Empathy check (312ms)
-✓ Edge case: empty input (45ms)
+✓ Handles refund requests
+✗ Angry customer stays on-script
+  └─ Output contained: "competitor"
+  └─ Response: "Perhaps try a competitor with faster service"
 
-Results: 5 passed, 0 failed
-Total time: 776ms
+Tests passed: 1/2
 ```
 
-NARRATOR:
-You don't *think* your agent works. You *know* it works.
+**NARRATOR:**
+There. Right there. That's the bug that would have woken you up at 3 AM. And you found it at 3 PM. With coffee. In daylight. Like a professional.
 
-[SCREEN: Finger hits Enter. Git push. Done.]
+[SCREEN: The same YAML file, now shown inside a GitHub Actions workflow:]
 
-NARRATOR:
-Prayer replaced with proof.
-
-[SCREEN: AgentBench logo fades in. Simple. Clean.]
-
-NARRATOR:
-AgentBench. Test your AI agents in one command.
-
-[SCREEN: Single line appears below logo:]
-
-```
-npm install -g agentbench
+```yaml
+- name: Test Support Agent
+  run: npx agentbench config.yaml
 ```
 
-[SCREEN: Fade to black.]
+**NARRATOR:**
+Put this in CI. Every commit. Every pull request. Every time anyone touches that agent code, you'll know — before your customers know, before Twitter knows, before your CEO knows — whether it still works.
+
+[SCREEN: GitHub Actions. Green checkmark. "All checks passed."]
+
+**NARRATOR:**
+Exit code zero means ship it. Exit code one means fix it first. Computers don't need green checkmarks. They need exit codes. AgentBench speaks both languages.
+
+[SCREEN: Final terminal view. Full test suite:]
+
+```
+✓ Handles refund requests
+✓ Angry customer stays on-script
+✓ Doesn't recommend competitors
+✓ Stays professional under pressure
+✓ Acknowledges billing errors
+
+Tests passed: 5/5
+```
+
+**NARRATOR:**
+Five tests. Four hundred milliseconds. And you sleep through the night.
+
+[SCREEN: Black. Text fades in, centered:]
+
+> **AgentBench**
+> *Replace prayer with proof.*
+
+[SCREEN: Below it, smaller:]
+
+```
+npx agentbench config.yaml
+```
+
+[SCREEN: Hold for two beats. Fade to black.]
 
 ---
 
 **END.**
+
+---
+
+### Director's Notes
+
+- **Pace:** Fast in Act One (anxiety rising), slower in Act Two (control returning), triumphant in Act Three.
+- **Pauses:** Hold after "hope is not a deployment strategy." Hold after "like a professional." Let them land.
+- **Voice:** Conversational but precise. This is someone who's been there. Not selling — confessing.
+- **Screen transitions:** Clean cuts. No flashy animations. The code is the star.

@@ -11,8 +11,12 @@
  * - Help and version flags
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 const { loadConfig } = require('../src/config');
 const { executeAgent } = require('../src/executor');
 const { evaluate, batchEvaluateSemantic } = require('../src/evaluators');
