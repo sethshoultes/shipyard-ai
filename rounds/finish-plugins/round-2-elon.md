@@ -1,76 +1,64 @@
-# Round 2 — Elon Musk (Chief Product & Growth)
+# Round 2 — Elon Musk
 
-## Challenging Steve's Weakest Positions
+## Where Beauty Is Blocking the Ship
 
-### "Sofia Chen — Member since today" Is Beautiful Theater
+Steve, your Round 1 is poetry. It's also why we have zero customers.
 
-Steve, you want demo data on first install. You want users to "witness success" before they've done anything. Here's the problem: **that success is a lie.**
+**"Belong" and "Moment" are naming exercises for plugins that don't exist.** You spent 500 words on why "MemberShip" lacks soul. Meanwhile, MemberShip has 4,000 lines of untested code rotting in staging. Soul doesn't matter if the body is dead.
 
-The yoga instructor sees Sofia Chen. She feels good. Then she asks: "How do I add a real member?" And she's back to learning. You've added a step, not removed one.
+**"Your first member is waiting"** — beautiful onboarding copy. For what? A `/membership/status` endpoint that leaks auth tokens? We're writing invitations to a party that will poison the guests.
 
-Worse: demo data requires mock generators, conditional rendering, fake avatars, believable timestamps. That's 2-3 weeks of engineering for a moment users experience *once*.
+The yoga instructor with 47 tabs open? She can't use our software at all right now. Zero tabs. Zero software. Because we haven't shipped.
 
-**The empty state that says "Your first member will appear here — share this link" is honest.** It points forward. Demo data points backward at fiction.
-
-### "Belong" and "Moment" Are Search Engine Suicide
-
-"MemberShip EmDash plugin" — findable. "Belong EmDash" — returns self-help articles about community building.
-
-You've optimized for poetry over discoverability. **We don't exist in the market yet.** When zero people can find us, beautiful names are gravestones.
-
-Ship with ugly, searchable names. Rebrand at 1,000 users. You can't rebrand at zero.
-
-### "Every interaction should take half the steps" — Of What Baseline?
-
-This philosophy added three sprints of UX refinement to code that has **never touched production**. Half the steps of infinity is still infinity.
-
-We don't know what steps users actually take. We've never watched one. The first real user at Sunrise Yoga will teach us more about friction than 16 planning documents.
+**Every hour spent on naming is an hour not spent on deploying.**
 
 ---
 
-## Defending Technical Simplicity
+## Why Technical Simplicity Wins
 
-### The 4,000-Line Monolith Ships This Week
+You want disappearance. I want existence.
 
-1. **Refactoring code nobody uses is vanity.** Refactoring code 100 customers depend on is engineering. We have zero customers.
+The iPhone didn't ship with emotional hooks — it shipped with a phone that worked. Then you polished. First the atoms, then the poetry.
 
-2. **Duplication is a feature.** When MemberShip and EventDash share 60% code and we ship only MemberShip first, that "duplication" means zero blast radius. EventDash breaks? No customer cares.
+**My Round 1 cuts stand:**
+- 5,400 lines to 2,200. Not because beauty doesn't matter — because deployed ugly beats unshipped gorgeous.
+- One transaction. One customer. Then we've earned the right to debate names.
 
-3. **KV storage scales to 10K.** We have zero records. D1 migration is optimization for imaginary load.
-
-**Every hour on architecture before production is an hour that generates zero learning.**
+**The 10x learning:** Sunrise Yoga will teach us more in 48 hours than 16 planning documents taught us in months.
 
 ---
 
 ## Where Steve Is Right
 
-1. **Brand voice at touchpoints.** "Successfully submitted" vs "You're in" — Steve wins. This takes 30 minutes to fix, not 3 weeks. It's just better strings.
+I'll concede three things:
 
-2. **Five settings max.** Settings pages are where products die. Ship with right defaults. Users who need customization will email us — that's data.
+1. **"Free/Paid only"** — Correct. Multi-tier is scope creep disguised as flexibility. Two tiers. Done.
+2. **"NO to analytics dashboards"** — Agreed. Members count. Revenue sum. Anything else is distraction.
+3. **Brand voice matters** — "Oops" > "Error 500". But we fix this in the copy pass AFTER deployment, not before.
 
-3. **Two tiers only.** Free and Paid. Delete Bronze/Silver/Gold. This cuts 200+ lines. Taste and deletion instinct align.
-
----
-
-## Locked Decisions (Non-Negotiable)
-
-### 1. Ship MemberShip to Sunrise Yoga THIS WEEK
-No more planning. Deploy what exists. Fix what breaks in production. The audience teaches things the mirror cannot.
-
-### 2. Zero Demo Data
-Empty states with CTAs pointing to real action. First member should be a *real* member. We're not building theater.
-
-### 3. Names Stay: MemberShip and EventDash
-"Belong" and "Moment" are poetry for products with zero users. SEO matters. Rebrand is a success problem — we need existence first.
+Taste isn't wrong. Taste before traction is wrong.
 
 ---
 
-## The Uncomfortable Truth
+## My Non-Negotiables (Locked)
 
-Steve wants users to "feel like geniuses." I want users to *exist*.
+### 1. Deploy MemberShip to Sunrise Yoga This Week
+Not next sprint. Not after naming review. This week. One real customer with real money or we've learned nothing.
 
-The yoga instructor isn't overwhelmed by our UX — she doesn't know we exist. She's using Squarespace with a broken Stripe embed because that's what shipped.
+### 2. EventDash Is v2
+Ship one plugin. Learn. Transfer learnings. "Moment" can wait for momentum.
 
-**Ship ugly. Listen. Improve. Repeat.**
+### 3. Cut First, Polish Later
+2,200 lines ship. 5,400 lines wait. No feature survives without a paying customer requesting it.
 
-Polish is earned by survival. Let's survive first.
+---
+
+## The Challenge Back
+
+Steve, answer this: **Would you rather have "Belong" in six months or "MemberShip" taking payments Tuesday?**
+
+Because right now, we're choosing neither. We're choosing perpetual planning. And that's the only outcome that's truly ugly.
+
+> "The best product is the one that exists."
+
+Ship Tuesday. Rename Wednesday. Argue about souls when we have a heartbeat.

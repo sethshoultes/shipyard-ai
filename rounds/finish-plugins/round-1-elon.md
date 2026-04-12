@@ -1,150 +1,126 @@
 # Round 1 — Elon Musk (Chief Product & Growth)
 
-## The Brutal Truth Redux
+## The Reality Check
 
-Sixteen planning documents. Zero deployed code. The retrospective already said it: **"We rehearsed the play with excellence. We never took the stage."**
+7,607 lines of plugin code. 16 planning documents. Zero production deployments.
 
-The deliverables directory is literally empty. This is the most expensive form of procrastination I've ever seen—twelve thousand lines of code exist *somewhere*, but zero lines are serving customers.
+We have achieved **negative velocity**. Every hour spent perfecting code no one uses is an hour we fall further behind shipping.
 
 ---
 
 ## Architecture: Simplest System That Could Work
 
-**Current architecture:** Two plugins, shared ~60% code duplication, 4,000-line monolith, KV storage, Stripe webhooks, Resend emails.
+**What we built:** Two 4,000-line monoliths with 60% shared code, JWT auth, KV storage, Stripe webhooks, email templates, drip content, group memberships, coupon engines, CSV export, developer webhooks.
 
-**First principles reduction:**
-1. One plugin (MemberShip)
-2. One customer (Sunrise Yoga)
-3. One payment flow (Stripe checkout → webhook → KV write → email)
-4. One permission check (member vs. not-member)
+**What we needed:** `email → KV write → Stripe link → member yes/no`
 
-That's it. Everything else is optimization before validation.
+The simplest membership system is 200 lines. We built 4,000. That's 20x complexity for 0x customers.
 
-**The 4,000-line monolith?** Ship it. Refactoring a monolith nobody uses is vanity. Refactoring a monolith 100 customers depend on is engineering.
+**First-principles reduction:**
+- Delete EventDash from v1 scope
+- Delete coupons, groups, drip content, CSV, webhooks
+- Delete everything except: register → pay → access
+
+**The cut:** 3,500 lines. Ship the remaining 500.
 
 ---
 
 ## Performance: Where Are The Bottlenecks?
 
-**Not where you think.**
+**Fake bottlenecks (things that won't matter):**
+- KV read latency: ~5ms. Fine to 50K members.
+- Stripe webhook processing: Cloudflare Workers handle it.
+- JWT verification: Microseconds.
 
-The tech bottlenecks are mild:
-- KV reads: Fine to 10K records, then migrate to D1
-- Stripe webhooks: Cloudflare handles it
-- Email: Resend rate limits matter at 500+ members
+**Real bottleneck:** Zero feedback from production. We don't know:
+- What error states actually occur
+- Which UX confuses actual users
+- Whether installation even works
 
-**The actual bottleneck:** Zero production contact. We have no data on:
-- What breaks in real Stripe transactions
-- What confuses the yoga instructor in the admin UI
-- Whether anyone can actually install this thing
-
-**10x path:** Deploy today. Collect error logs. Fix what breaks. Repeat. This beats another planning cycle by 100x.
+**10x path:** Deploy today. Replace all assumptions with data.
 
 ---
 
 ## Distribution: How Does This Reach 10,000 Users?
 
-**Short answer:** It doesn't. Not directly.
+**Hard truth:** EmDash's addressable market is unknown. 100 sites? 500? Let's be generous: 1,000.
 
-These are plugins for EmDash. EmDash market size is "Unknown. 100 sites? 500?" If EmDash has 100 sites and 20% activate MemberShip, we have 20 users. Full stop.
+At 20% plugin adoption: **200 users maximum**. Full stop.
 
-**Distribution strategy (cost: $0):**
-1. Bundle MemberShip in every new EmDash template by default
-2. Make it work on first run—no configuration required
-3. Let EmDash's growth carry plugin adoption
+**Path to 10,000:**
+1. EmDash grows to 50,000 sites (not our control)
+2. OR: Extract MemberShip as standalone SaaS (requires rebuild)
+3. OR: License to competing CMS platforms (requires partnerships)
 
-**10,000 users requires EmDash to reach 50,000 sites** (assuming 20% plugin activation). That's upstream of this PRD. We can't plugin our way to scale.
-
-**One leverage point:** If MemberShip makes EmDash sites stickier (retain members = retain site owners), we accelerate EmDash's own growth. But that's a second-order effect we can't measure until we ship.
+**For v1:** Bundle with EmDash templates. Zero marketing spend. Let platform growth carry us. Measure before optimizing.
 
 ---
 
 ## What to CUT (v2 Features Masquerading as v1)
 
-| Cut | Rationale |
-|-----|-----------|
-| **EventDash** | Ship MemberShip first. EventDash inherits learnings. |
-| **Week view** | 30% complexity, 3% usage (Steve's estimate, unverified) |
-| **Multi-day events** | "Part 1 of 3" in title works |
-| **CSV import/export** | Manual onboarding for first 50 customers |
-| **Coupon engine** | Zero customers have asked |
-| **Analytics dashboards** | Members + revenue number. That's it. |
-| **Demo data on install** | 2-3 weeks of work. Empty state + CTA sufficient. |
-| **Group/corporate memberships** | Zero customer requests |
-| **Shared module extraction** | Ship duplicated code. Extract when it matters. |
+| Feature | Lines | Rationale |
+|---------|-------|-----------|
+| EventDash (entire plugin) | 3,600 | Ship one plugin first. Learnings transfer. |
+| Group/corporate memberships | ~300 | Zero customers asked |
+| Coupon engine | ~200 | Zero customers asked |
+| Drip content | ~400 | Zero customers asked |
+| Developer webhooks | ~250 | Zero customers will use |
+| CSV import/export | ~150 | Manual onboarding for first 50 |
+| Multi-tier permissions | ~200 | Two tiers (free/paid) covers 99% |
+| Analytics dashboards | ~300 | Count = members. Sum = revenue. Done. |
 
-**The cut philosophy:** If zero customers have requested it, don't build it. Build infrastructure for the customers you have (zero), not the customers you imagine (ten thousand).
+**Total cut:** ~5,400 lines across both plugins. Ship ~2,200.
 
 ---
 
 ## Technical Feasibility: Can One Agent Session Build This?
 
-**Honest assessment:**
+**Yes — IF scope is honest.**
 
-The decisions doc lists 8 REQUIRED items before ship:
-1. Deploy to Sunrise Yoga
-2. Three real Stripe transactions
-3. Webhook failure recovery verified
-4. Documentation complete (4 docs)
-5. Admin authentication secured
-6. Status endpoint secured
-7. Version number unified
-8. Brand voice applied
+One session can:
+- Strip 114 `throw new Response` antipatterns
+- Deploy to Sunrise Yoga
+- Verify one Stripe transaction end-to-end
+- Write Installation.md
 
-**One session:** Can fix the banned API patterns (114 `throw new Response`), deploy to one site, and verify basic functionality.
+One session cannot:
+- Test three real credit cards (requires human)
+- Write four complete docs
+- Review all copy for brand voice
+- Stress-test webhook failures
 
-**Cannot do in one session:**
-- Three real Stripe transactions (requires live cards, human involvement)
-- Full documentation (4 complete docs = 4-8 hours of writing)
-- Stress testing webhook failure scenarios
-- Brand voice review of all copy
-
-**Realistic scope for one session:** Fix security gaps (admin auth, status endpoint), deploy to Sunrise Yoga, verify one transaction flow works.
-
-**Ship criteria reduction:** Trade "three real transactions" for "one real transaction." Trade "four complete docs" for "one installation README that works."
+**Ship criteria:** One transaction. One README. One customer.
 
 ---
 
 ## Scaling: What Breaks at 100x?
 
-| Component | At 100x (10K members) | Risk |
-|-----------|----------------------|------|
-| KV storage | `entries.query()` timeout | **HIGH** — already documented |
-| Stripe webhooks | 100K/month | Low — Cloudflare handles |
-| Resend emails | Rate limit hits | Medium — queue needed |
-| Admin dashboard | Linear scaling | Low |
-| Auth tokens | JWT refresh overhead | Low |
+| At 100x | Impact | When to Fix |
+|---------|--------|-------------|
+| KV `entries.query()` | Timeouts at 10K+ records | After 5,000 members |
+| Email rate limits | Resend caps at 1K/day | After 500 members |
+| Monolith complexity | Maintenance pain | After validation |
 
-**The real 100x problem:** We don't have 1x. Scaling concerns are theoretical when production usage is zero.
-
-**First make it work. Then make it scale.** Every minute spent on D1 migration before we have 1,000 members is wasted.
+**The honest answer:** We don't have 1x. We have 0x. Scaling concerns before shipping is masturbation disguised as engineering.
 
 ---
 
-## Bottom Line
+## The Decision
 
-**Process score: 10/10.** The debates were rigorous. The artifacts are polished. The decisions are sound.
+**Stop debating. Start deploying.**
 
-**Shipping score: 0/10.** The deliverables directory is empty.
+This week:
+1. Fix `/membership/status` auth (security blocker)
+2. Deploy to Sunrise Yoga
+3. Run one real payment
+4. Ship
 
-**What needs to happen THIS WEEK:**
-1. Fix admin authentication (security blocker)
-2. Fix status endpoint exposure (security blocker)
-3. Deploy to Sunrise Yoga (production contact)
-4. Run one real transaction (validation)
-5. Ship
-
-**What needs to NOT happen:**
-- Another planning round
+**What doesn't happen:**
 - More board reviews
-- Retention roadmaps for users that don't exist
-- Demo data implementations
-- Week view debates without data
+- More retention roadmaps
+- More copy polish
+- More "comprehensive" solutions
 
-**The philosophy:**
+> "Perfect planning with zero execution is zero. Imperfect execution with one customer is infinity."
 
-> "Planning without production is rehearsal without performance. The audience teaches things the mirror cannot."
-
-That's from our own retrospective. We wrote it. Now execute it.
-
-Stop documenting. Start deploying. Today.
+Ship today. Learn tomorrow. Everything else is theater.

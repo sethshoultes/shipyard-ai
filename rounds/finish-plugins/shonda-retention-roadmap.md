@@ -2,6 +2,7 @@
 
 **Product:** EmDash Plugin Suite (MemberShip & EventDash)
 **Author:** Shonda Rhimes (Chief Retention & Narrative)
+**Version:** 1.1 Feature Roadmap
 **Target Users:** Small business owners — yoga instructors, bistro owners, craftspeople, creative entrepreneurs
 
 ---
@@ -20,28 +21,46 @@ When a yoga instructor sees members signing up through her site, she feels capab
 
 ---
 
-## V1.0 Retention Foundations (Ship Now)
+## What Keeps Users Coming Back
 
-These elements must be in V1 — they're the foundation of the retention loop.
+### 1. Visible Progress
+Users return when they can *see* their wins. A number going up. A chart trending right. A milestone achieved. Progress creates dopamine.
+
+### 2. Emotional Payoffs
+Milestones, celebrations, success notifications. "You've welcomed your 10th member!" is not just data — it's validation.
+
+### 3. Low Friction Returns
+Quick actions, mobile access, weekly summaries. Coming back must be easier than not coming back.
+
+### 4. Social Proof Creation
+Shareable moments. Screenshots of dashboards. "Look at my community." Each share creates an evangelist.
+
+### 5. Passive Re-engagement
+They don't have to remember us. We remind them. Weekly digest emails. Milestone notifications. We bring them back.
+
+---
+
+## V1.0 Retention Foundations (Ships Now)
+
+These elements must be in v1 — they're the foundation of the retention loop.
 
 ### 1. The First 30 Seconds
-- Empty state with clear, confident CTA: "Create Your First Member"
+- Empty state with clear, confident CTA: "Your first member is waiting."
 - Stripe connects once. Colors inherit automatically.
 - Admin sees progress immediately — not settings screens, not tutorials
-- **Goal:** Confidence before competence. Show them winning before teaching them how.
+- **Goal:** Confidence before competence.
 
 ### 2. Beautiful Admin Experience
 - Admins spend 80% of plugin time in dashboard
 - Must be as beautiful as customer-facing UI
-- Not spreadsheet-like — signals we respect the person running the business
+- Not spreadsheet-like — signals we respect the person
 - **Goal:** Every time they open the dashboard, they feel professional.
 
 ### 3. Terse, Warm Communication
 - "You're in." not "Successfully submitted!"
 - "Done. Saved. Live." not "Your changes have been confirmed."
 - Three words where competitors use twelve
-- **Kill these words:** Successfully, submitted, confirmed, error occurred, please, unfortunately
-- **Goal:** Speak like you're texting a smart friend, not writing a support article.
+- **Goal:** Speak like you're texting a smart friend.
 
 ### 4. Zero-Config That Works
 - Plugin feels like it was *always there*
@@ -65,7 +84,7 @@ Users come back when they can *see* their progress. V1.1 surfaces wins and creat
 
 ---
 
-### Feature 1: Weekly Digest Email (Admin Summary)
+### Feature 1: Weekly Digest Email
 
 **What:** Every Monday at 9am, site owners receive a beautiful email summarizing their week.
 
@@ -79,22 +98,27 @@ Users come back when they can *see* their progress. V1.1 surfaces wins and creat
 - Reminds them the plugin exists (passive re-engagement)
 - Shows growth: "5 new members this week" feels like progress
 - Creates shareable moments: screenshot → social proof
-- Even zero-growth weeks can be framed positively: "Your 23 members are still with you."
+- Even zero-growth weeks framed positively: "Your 23 members are still with you."
 
-**Effort:** Low — data already exists, just formatting + Resend integration
+**Implementation:**
+- Data already exists in KV storage
+- Template in Resend with dynamic content
+- Opt-out preference in admin settings
 
-**Priority:** **P1**
+**Effort:** Low
+**Priority:** **P1 — Ships in v1.1a**
 
 ---
 
 ### Feature 2: Milestone Celebrations
 
-**What:** Automatic celebration when admins or members hit meaningful milestones.
+**What:** Automatic celebration when admins hit meaningful milestones.
 
 **Admin Milestones:**
 - "You've welcomed your 10th member!"
 - "100 members — your community is thriving."
 - "$1,000 processed through your site this month."
+- "One year since your first member joined."
 
 **Member Milestones (visible to admin):**
 - "Sarah has been a member for 1 year"
@@ -106,13 +130,13 @@ Users come back when they can *see* their progress. V1.1 surfaces wins and creat
 - Creates screenshot-worthy moments → word of mouth
 
 **Implementation:**
-- Track member tenure, cumulative counts, revenue thresholds
-- Surface in admin dashboard + optional email notification
+- Track member tenure, cumulative counts, revenue thresholds in KV
+- Surface in admin dashboard as toast notification
+- Optional email notification
 - Beautiful, shareable card design
 
-**Effort:** Medium — requires milestone tracking logic and UI
-
-**Priority:** **P2**
+**Effort:** Medium
+**Priority:** **P2 — Ships in v1.1b**
 
 ---
 
@@ -131,9 +155,8 @@ Users come back when they can *see* their progress. V1.1 surfaces wins and creat
 - More promotion → more signups → more success → more retention
 - Admin feels empowered, not stuck figuring out URLs
 
-**Effort:** Low — mostly UI + meta tag polish
-
-**Priority:** **P1**
+**Effort:** Low
+**Priority:** **P1 — Ships in v1.1a**
 
 ---
 
@@ -154,13 +177,12 @@ Users come back when they can *see* their progress. V1.1 surfaces wins and creat
 - Makes success tangible and visible
 
 **Implementation:**
-- Lightweight charting component (no heavy libraries)
+- Lightweight charting (no heavy libraries — inline SVG or Canvas)
 - Just the basics, beautifully rendered
-- No advanced analytics — that's V2+
+- No advanced analytics — that's v2+
 
-**Effort:** Medium — requires charting component
-
-**Priority:** **P2**
+**Effort:** Medium
+**Priority:** **P2 — Ships in v1.1b**
 
 ---
 
@@ -170,10 +192,10 @@ Users come back when they can *see* their progress. V1.1 surfaces wins and creat
 
 **Actions:**
 - "Send email to all members"
-- "Create new event"
+- "Create new event" (if EventDash installed)
 - "View recent signups"
 - "Copy signup link"
-- "Download member list"
+- "Download member list" (simple export)
 
 **Why It Retains:**
 - Reduces time-to-action → feels efficient
@@ -181,9 +203,8 @@ Users come back when they can *see* their progress. V1.1 surfaces wins and creat
 - Makes the plugin feel powerful without being complicated
 - Dashboard becomes a command center, not a waiting room
 
-**Effort:** Low — UI reorganization, no new functionality
-
-**Priority:** **P1**
+**Effort:** Low
+**Priority:** **P1 — Ships in v1.1a**
 
 ---
 
@@ -203,9 +224,8 @@ Users come back when they can *see* their progress. V1.1 surfaces wins and creat
 - Sets expectation that communication continues
 - Zero effort after initial setup
 
-**Effort:** Medium — template editor + variable parsing
-
-**Priority:** **P3**
+**Effort:** Medium
+**Priority:** **P3 — Ships in v1.2**
 
 ---
 
@@ -219,82 +239,104 @@ Users come back when they can *see* their progress. V1.1 surfaces wins and creat
 - "I can manage my membership from anywhere"
 - Checking stats becomes a satisfying habit
 
-**Effort:** Medium-High — responsive design across all admin screens
-
-**Priority:** **P3**
+**Effort:** Medium-High
+**Priority:** **P3 — Ships in v1.2**
 
 ---
 
-## V1.1 Prioritization Matrix
+## V1.1 Ship Schedule
 
-| Feature | Retention Impact | Effort | Ship Order |
-|---------|------------------|--------|------------|
-| Weekly Digest Email | High | Low | **V1.1a** |
-| One-Click Social Sharing | Medium | Low | **V1.1a** |
-| Quick Actions Dashboard | Medium | Low | **V1.1a** |
-| Milestone Celebrations | High | Medium | **V1.1b** |
-| Simple Progress Dashboard | High | Medium | **V1.1b** |
-| Welcome Email Automation | Medium | Medium | **V1.2** |
-| Mobile-Responsive Admin | Medium | High | **V1.2** |
+### V1.1a (2 weeks after v1.0 validation)
 
-**V1.1a ships:** Weekly Digest + Social Sharing + Quick Actions (all low-effort, high-impact)
-**V1.1b ships:** Milestones + Progress Dashboard (medium-effort, high-impact)
-**V1.2 ships:** Welcome Automation + Mobile Admin (medium/high effort, medium-impact)
+| Feature | Effort | Impact |
+|---------|--------|--------|
+| Weekly Digest Email | Low | High |
+| One-Click Social Sharing | Low | Medium |
+| Quick Actions Dashboard | Low | Medium |
+
+**Total effort:** ~1 week of development
+**Theme:** Low-effort, high-engagement quick wins
+
+---
+
+### V1.1b (4 weeks after v1.0 validation)
+
+| Feature | Effort | Impact |
+|---------|--------|--------|
+| Milestone Celebrations | Medium | High |
+| Simple Progress Dashboard | Medium | High |
+
+**Total effort:** ~2 weeks of development
+**Theme:** Visible progress and emotional payoffs
+
+---
+
+### V1.2 (After EventDash ships)
+
+| Feature | Effort | Impact |
+|---------|--------|--------|
+| Welcome Email Automation | Medium | Medium |
+| Mobile-Responsive Admin | High | Medium |
+
+**Total effort:** ~3 weeks of development
+**Theme:** Professional polish and accessibility
 
 ---
 
 ## The Retention Flywheel
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                                                              │
-│   1. INSTALL                                                 │
-│      └── Feel capable (first 30 seconds)                     │
-│                                                              │
-│   2. CREATE                                                  │
-│      └── First member/event → immediate win                  │
-│                                                              │
-│   3. SEE PROGRESS                                            │
-│      └── Dashboard analytics, milestones                     │
-│                                                              │
-│   4. SHARE SUCCESS                                           │
-│      └── One-click social sharing                            │
-│                                                              │
-│   5. GET REMINDED                                            │
-│      └── Weekly digest email                                 │
-│                                                              │
-│   6. RETURN                                                  │
-│      └── Open dashboard, see growth                          │
-│                                                              │
-│   7. LOOP                                                    │
-│      └── Tell a friend, they install                         │
-│                                                              │
-└──────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────┐
+│                                                           │
+│   1. INSTALL                                              │
+│      └── Feel capable (first 30 seconds)                  │
+│                                                           │
+│   2. CREATE                                               │
+│      └── First member/event → immediate win               │
+│                                                           │
+│   3. SEE PROGRESS                                         │
+│      └── Dashboard analytics, milestones (v1.1)           │
+│                                                           │
+│   4. SHARE SUCCESS                                        │
+│      └── One-click social sharing (v1.1)                  │
+│                                                           │
+│   5. GET REMINDED                                         │
+│      └── Weekly digest email (v1.1)                       │
+│                                                           │
+│   6. RETURN                                               │
+│      └── Open dashboard, see growth                       │
+│                                                           │
+│   7. EVANGELIZE                                           │
+│      └── Tell a friend, they install                      │
+│                                                           │
+│   8. LOOP                                                 │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Anti-Retention Patterns to Avoid
 
-### ❌ Don't Add Complexity
+### Don't Add Complexity
 - No granular permissions
 - No enterprise features masquerading as "flexibility"
 - No settings pages with 47 options
 - If you need more than 5 settings, you've failed at defaults
 
-### ❌ Don't Break Trust
+### Don't Break Trust
 - Payments must never fail silently
 - Emails must always arrive
 - Webhooks must recover gracefully
 - One broken payment = lost customer forever
 
-### ❌ Don't Lose the Feeling
+### Don't Lose the Feeling
 - Never make admins feel inadequate
 - Never use jargon they don't understand
 - Never surface errors without clear next steps
 - Never show empty states that feel like failure
 
-### ❌ Don't Optimize for Power Users First
+### Don't Optimize for Power Users First
 - Design for the yoga instructor. Power users figure it out.
 - Every interaction should take half the steps users expect
 - Invisible complexity is the philosophy
@@ -308,7 +350,7 @@ Users come back when they can *see* their progress. V1.1 surfaces wins and creat
 | Weekly Active Admins | 60% of installed base | Dashboard visits per week |
 | Weekly Digest Open Rate | >40% | Resend email analytics |
 | Social Shares per Month | >10 per active site | Share button clicks |
-| Time to First Member | <5 minutes from install | Onboarding timestamp tracking |
+| Time to First Member | <5 minutes from install | Onboarding timestamp |
 | Return Visit Rate | >3 visits/week | Dashboard session tracking |
 | Support Tickets per User | <0.5/month | Support system metrics |
 | Net Promoter Score | >50 | Post-milestone survey |
@@ -317,18 +359,18 @@ Users come back when they can *see* their progress. V1.1 surfaces wins and creat
 
 ## The Narrative Arc of Retention
 
-Great retention tells a story. Each user's journey should feel like a narrative with rising action:
+Great retention tells a story. Each user's journey should feel like a narrative:
 
-**Act 1: Discovery** (V1.0)
+**Act 1: Discovery** (v1.0)
 > "This is easier than I expected. It just... works."
 
-**Act 2: Early Wins** (V1.0 → V1.1a)
+**Act 2: Early Wins** (v1.0 → v1.1a)
 > "My first member signed up! And another. This is real."
 
-**Act 3: Visible Growth** (V1.1b)
+**Act 3: Visible Growth** (v1.1b)
 > "Look at this chart. Look at these milestones. My business is growing."
 
-**Act 4: Mastery** (V1.2+)
+**Act 4: Mastery** (v1.2+)
 > "I run my membership from my phone. I have automated welcome emails. I'm a professional."
 
 **Epilogue: Evangelism**
@@ -350,13 +392,33 @@ That feeling — *competence without complexity* — is what keeps them coming b
 
 ---
 
-## Final Note
+## Prerequisite: Ship V1 First
 
 The yoga instructor isn't overwhelmed by our UX. She doesn't even know we exist yet. She's using Squarespace with a broken Stripe embed because that's what shipped.
 
-Before we can retain users, we need users. Ship V1. Then this roadmap activates.
+Before we can retain users, we need users.
 
-But when V1.1 ships, it won't just keep users — it will turn them into evangelists.
+**Ship MemberShip v1. Then this roadmap activates.**
+
+---
+
+## V1.1 Feature Summary
+
+| Priority | Feature | Effort | When |
+|----------|---------|--------|------|
+| P1 | Weekly Digest Email | Low | v1.1a |
+| P1 | One-Click Social Sharing | Low | v1.1a |
+| P1 | Quick Actions Dashboard | Low | v1.1a |
+| P2 | Milestone Celebrations | Medium | v1.1b |
+| P2 | Simple Progress Dashboard | Medium | v1.1b |
+| P3 | Welcome Email Automation | Medium | v1.2 |
+| P3 | Mobile-Responsive Admin | High | v1.2 |
+
+---
+
+## Final Note
+
+When v1.1 ships, it won't just keep users — it will turn them into evangelists.
 
 > *"They won't just use these plugins. They'll tell every business owner they know."*
 
@@ -364,4 +426,6 @@ That's retention. That's growth. That's the goal.
 
 ---
 
-**Next Step:** Ship MemberShip V1. Then execute this roadmap.
+**Next Step:** Ship MemberShip v1. Then execute this roadmap.
+
+**Document Updated:** April 12, 2026
