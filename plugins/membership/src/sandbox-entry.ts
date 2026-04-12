@@ -231,7 +231,7 @@ async function fireWebhook(
 	};
 
 	// Store webhook log
-	await ctx.kv.set(`webhook:log:${log.id}`, JSON.stringify(log));
+	await ctx.kv.set(`webhook:log:${log.id}`, log);
 
 	// Add to webhook's log list
 	const logsJson = await ctx.kv.get<string>(`webhook:${endpoint.id}:logs`);
@@ -239,7 +239,7 @@ async function fireWebhook(
 	logs.push(log.id);
 	// Keep last 100 logs
 	if (logs.length > 100) logs.shift();
-	await ctx.kv.set(`webhook:${endpoint.id}:logs`, JSON.stringify(logs));
+	await ctx.kv.set(`webhook:${endpoint.id}:logs`, logs);
 
 	// Update endpoint's last fired time
 	if (success) {
@@ -248,7 +248,7 @@ async function fireWebhook(
 	} else {
 		endpoint.failedCount++;
 	}
-	await ctx.kv.set(`webhook:${endpoint.id}`, JSON.stringify(endpoint));
+	await ctx.kv.set(`webhook:${endpoint.id}`, endpoint);
 
 	return log;
 }
@@ -353,7 +353,7 @@ async function updateMember(
 	ctx: PluginContext
 ): Promise<void> {
 	const encodedEmail = emailToKvKey(member.email);
-	await ctx.kv.set(`member:${encodedEmail}`, JSON.stringify(member));
+	await ctx.kv.set(`member:${encodedEmail}`, member);
 }
 
 /**
@@ -937,7 +937,7 @@ export default definePlugin({
 			handler: async (_event: unknown, ctx: PluginContext) => {
 				ctx.log.info("Membership plugin installed");
 				// Initialize with default plans
-				await ctx.kv.set("plans", JSON.stringify(DEFAULT_PLANS));
+				await ctx.kv.set("plans", DEFAULT_PLANS);
 				await ctx.kv.set("settings:requirePaymentApproval", "true");
 
 				// Initialize email settings (can be customized via admin)
@@ -1079,7 +1079,7 @@ export default definePlugin({
 						}
 					}
 
-						await ctx.kv.set(`member:${encodedEmail}`, JSON.stringify(member));
+						await ctx.kv.set(`member:${encodedEmail}`, member);
 
 						// Add to members list for admin
 						const listKey = `members:list`;
@@ -1087,7 +1087,7 @@ export default definePlugin({
 						const membersList = parseJSON<string[]>(listJson, []);
 						if (!membersList.includes(encodedEmail)) {
 							membersList.push(encodedEmail);
-							await ctx.kv.set(listKey, JSON.stringify(membersList));
+							await ctx.kv.set(listKey, membersList);
 						}
 
 						ctx.log.info(`Member registered: ${email} for plan ${planId}`);
@@ -1321,8 +1321,9 @@ export default definePlugin({
 					}
 
 					// Get raw body and signature
-					const rawBody = rc.rawBody as string | undefined;
-					const headers = rc.headers as Record<string, string> | undefined;
+					const requestMeta = rc.requestMeta as { rawBody?: string; headers?: Record<string, string> } | undefined;
+					const rawBody = requestMeta?.rawBody;
+					const headers = requestMeta?.headers;
 					const signature = headers?.["stripe-signature"] as string | undefined;
 
 					if (!rawBody || !signature) {
@@ -1738,7 +1739,8 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const headers = rc.headers as Record<string, string> | undefined;
+					const requestMeta = rc.requestMeta as { headers?: Record<string, string> } | undefined;
+					const headers = requestMeta?.headers;
 					const authHeader = headers?.["authorization"] || headers?.["cookie"];
 
 					// Extract token from header or cookie
@@ -1767,10 +1769,7 @@ export default definePlugin({
 
 					const payload = await verifyJWT(token, jwtSecret);
 					if (!payload) {
-						throw new Response(
-							JSON.stringify({ error: "Invalid or expired token" }),
-							{ status: 401, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Your session has expired. Please sign in again.");
 					}
 
 					// Get member from KV
@@ -1826,7 +1825,8 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const headers = rc.headers as Record<string, string> | undefined;
+					const requestMeta = rc.requestMeta as { headers?: Record<string, string> } | undefined;
+					const headers = requestMeta?.headers;
 					const authHeader = headers?.["authorization"] || headers?.["cookie"];
 
 					// Extract token
@@ -1903,7 +1903,8 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const headers = rc.headers as Record<string, string> | undefined;
+					const requestMeta = rc.requestMeta as { headers?: Record<string, string> } | undefined;
+					const headers = requestMeta?.headers;
 					const authHeader = headers?.["authorization"] || headers?.["cookie"];
 					const input = rc.input as Record<string, unknown>;
 
@@ -2044,14 +2045,14 @@ export default definePlugin({
 					if (description) coupon.description = description;
 
 					// Store coupon
-					await ctx.kv.set(`coupon:${code}`, JSON.stringify(coupon));
+					await ctx.kv.set(`coupon:${code}`, coupon);
 
 					// Add to coupons list
 					const listJson = await ctx.kv.get<string>("coupons:list");
 					const coupons = parseJSON<string[]>(listJson, []);
 					if (!coupons.includes(code)) {
 						coupons.push(code);
-						await ctx.kv.set("coupons:list", JSON.stringify(coupons));
+						await ctx.kv.set("coupons:list", coupons);
 					}
 
 					ctx.log.info(`Coupon created: ${code}`);
@@ -2197,14 +2198,6 @@ export default definePlugin({
 
 					// EmDash admin routes are behind admin authentication by default.
 					// The admin handler is not marked public: true, so only authenticated admin users can reach it.
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					// Members page
 					if (interaction.type === "page_load" && interaction.page === "/members") {
 						const listJson = await ctx.kv.get<string>("members:list");
@@ -2632,17 +2625,11 @@ export default definePlugin({
 						const previewText = input.previewText ? String(input.previewText).trim() : undefined;
 
 						if (!contentId) {
-							throw new Response(
-								JSON.stringify({ error: "contentId is required" }),
-								{ status: 400, headers: { "Content-Type": "application/json" } }
-							);
+							throw new Error("Please specify which content to gate");
 						}
 
 						if (planIds.length === 0) {
-							throw new Response(
-								JSON.stringify({ error: "At least one plan ID is required" }),
-								{ status: 400, headers: { "Content-Type": "application/json" } }
-							);
+							throw new Error("Please select at least one membership plan");
 						}
 
 						const ruleId = generateId();
@@ -2658,13 +2645,13 @@ export default definePlugin({
 						};
 
 						// Save rule to KV
-						await ctx.kv.set(`gating-rule:${ruleId}`, JSON.stringify(rule));
+						await ctx.kv.set(`gating-rule:${ruleId}`, rule);
 
 						// Add to rules list
 						const listJson = await ctx.kv.get<string>("gating-rules:list");
 						const ruleIds = parseJSON<string[]>(listJson, []);
 						ruleIds.push(ruleId);
-						await ctx.kv.set("gating-rules:list", JSON.stringify(ruleIds));
+						await ctx.kv.set("gating-rules:list", ruleIds);
 
 						ctx.log.info(`Gating rule created: ${ruleId} for ${contentId}`);
 
@@ -2672,10 +2659,7 @@ export default definePlugin({
 					} catch (error) {
 						if (error instanceof Response) throw error;
 						ctx.log.error(`Create gating rule error: ${String(error)}`);
-						throw new Response(
-							JSON.stringify({ error: "Internal server error" }),
-							{ status: 500, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Something went wrong. Please try again.");
 					}
 				},
 			},
@@ -2704,10 +2688,7 @@ export default definePlugin({
 						return { rules };
 					} catch (error) {
 						ctx.log.error(`List gating rules error: ${String(error)}`);
-						throw new Response(
-							JSON.stringify({ error: "Internal server error" }),
-							{ status: 500, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Something went wrong. Please try again.");
 					}
 				},
 			},
@@ -2808,17 +2789,15 @@ export default definePlugin({
 				handler: async (routeCtx: unknown, ctx: PluginContext) => {
 					try {
 						const rc = routeCtx as Record<string, unknown>;
-						const headers = rc.headers as Record<string, string> | undefined;
+						const requestMeta = rc.requestMeta as { headers?: Record<string, string> } | undefined;
+						const headers = requestMeta?.headers;
 						const cronSecret = headers?.["x-cron-secret"] || "";
 
 						// Verify cron secret if configured
 						const expectedCronSecret = (ctx as any).env?.CRON_SECRET as string | undefined;
 						if (expectedCronSecret && cronSecret !== expectedCronSecret) {
 							ctx.log.warn("Drip process: unauthorized cron request");
-							throw new Response(
-								JSON.stringify({ error: "Unauthorized" }),
-								{ status: 401, headers: { "Content-Type": "application/json" } }
-							);
+							throw new Error("Please sign in to continue");
 						}
 
 						let processed = 0;
@@ -2939,10 +2918,7 @@ export default definePlugin({
 							throw error;
 						}
 						ctx.log.error(`Drip process error: ${String(error)}`);
-						throw new Response(
-							JSON.stringify({ error: "Internal server error", message: String(error) }),
-							{ status: 500, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Something went wrong. Please try again.");
 					}
 				},
 			},
@@ -2958,14 +2934,6 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = rc.input as Record<string, unknown>;
 					const days = Number(input.days ?? 30);
 
@@ -3023,10 +2991,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Revenue report error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Something went wrong. Please try again.");
 				}
 			},
 		},
@@ -3035,14 +3000,6 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = rc.input as Record<string, unknown>;
 					const days = Number(input.days ?? 30);
 
@@ -3089,10 +3046,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Churn report error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Something went wrong. Please try again.");
 				}
 			},
 		},
@@ -3101,14 +3055,6 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = rc.input as Record<string, unknown>;
 					const planId = input.planId ? String(input.planId).trim() : undefined;
 					const status = input.status ? String(input.status).trim() : undefined;
@@ -3166,10 +3112,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Members report error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Something went wrong. Please try again.");
 				}
 			},
 		},
@@ -3186,14 +3129,6 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = rc.input as Record<string, unknown>;
 					const orgName = String(input.orgName ?? "").trim();
 					const orgEmail = String(input.orgEmail ?? "").trim().toLowerCase();
@@ -3203,10 +3138,7 @@ export default definePlugin({
 
 					// Validate
 					if (!orgName || !orgEmail || !planId || maxSeats < 1) {
-						throw new Response(
-							JSON.stringify({ error: "Missing required fields" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Please fill in all required fields");
 					}
 
 					// Create group
@@ -3223,13 +3155,13 @@ export default definePlugin({
 						updatedAt: new Date().toISOString(),
 					};
 
-					await ctx.kv.set(`group:${groupId}`, JSON.stringify(group));
+					await ctx.kv.set(`group:${groupId}`, group);
 
 					// Add to groups list
 					const listJson = await ctx.kv.get<string>("groups:list");
 					const groups = parseJSON<string[]>(listJson, []);
 					groups.push(groupId);
-					await ctx.kv.set("groups:list", JSON.stringify(groups));
+					await ctx.kv.set("groups:list", groups);
 
 					ctx.log.info(`Group created: ${groupId} (${orgName})`);
 
@@ -3241,10 +3173,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Group create error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Something went wrong. Please try again.");
 				}
 			},
 		},
@@ -3253,14 +3182,6 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = rc.input as Record<string, unknown>;
 					const groupId = String(input.groupId ?? "").trim();
 					const email = String(input.email ?? "").trim().toLowerCase();
@@ -3268,26 +3189,17 @@ export default definePlugin({
 					// Get group
 					const groupJson = await ctx.kv.get<string>(`group:${groupId}`);
 					if (!groupJson) {
-						throw new Response(
-							JSON.stringify({ error: "Group not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This group doesn't exist");
 					}
 
 					const group = parseJSON<GroupRecord>(groupJson, null);
 					if (!group) {
-						throw new Response(
-							JSON.stringify({ error: "Group not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This group doesn't exist");
 					}
 
 					// Check seat availability
 					if (group.members.length >= group.maxSeats) {
-						throw new Response(
-							JSON.stringify({ error: "Group has reached maximum seats" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This group is full");
 					}
 
 					// Generate invite code
@@ -3301,13 +3213,13 @@ export default definePlugin({
 						createdBy: adminUser.email as string || "admin",
 					};
 
-					await ctx.kv.set(`group:invite:${code}`, JSON.stringify(invite));
+					await ctx.kv.set(`group:invite:${code}`, invite);
 
 					// Add to group's invites list
 					const invitesJson = await ctx.kv.get<string>(`group:${groupId}:invites`);
 					const invites = parseJSON<string[]>(invitesJson, []);
 					invites.push(code);
-					await ctx.kv.set(`group:${groupId}:invites`, JSON.stringify(invites));
+					await ctx.kv.set(`group:${groupId}:invites`, invites);
 
 					ctx.log.info(`Group invite created: ${groupId} -> ${email}`);
 
@@ -3320,10 +3232,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Group invite error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Something went wrong. Please try again.");
 				}
 			},
 		},
@@ -3332,14 +3241,6 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = rc.input as Record<string, unknown>;
 					const groupId = String(input.groupId ?? "").trim();
 					const email = String(input.email ?? "").trim().toLowerCase();
@@ -3347,32 +3248,23 @@ export default definePlugin({
 					// Get group
 					const groupJson = await ctx.kv.get<string>(`group:${groupId}`);
 					if (!groupJson) {
-						throw new Response(
-							JSON.stringify({ error: "Group not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This group doesn't exist");
 					}
 
 					const group = parseJSON<GroupRecord>(groupJson, null);
 					if (!group) {
-						throw new Response(
-							JSON.stringify({ error: "Group not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This group doesn't exist");
 					}
 
 					// Remove member
 					const idx = group.members.indexOf(email);
 					if (idx === -1) {
-						throw new Response(
-							JSON.stringify({ error: "Member not in group" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This member isn't part of this group");
 					}
 
 					group.members.splice(idx, 1);
 					group.updatedAt = new Date().toISOString();
-					await ctx.kv.set(`group:${groupId}`, JSON.stringify(group));
+					await ctx.kv.set(`group:${groupId}`, group);
 
 					ctx.log.info(`Removed ${email} from group ${groupId}`);
 
@@ -3383,10 +3275,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Group remove error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Something went wrong. Please try again.");
 				}
 			},
 		},
@@ -3395,31 +3284,17 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = rc.input as Record<string, unknown>;
 					const groupId = String(input.groupId ?? "").trim();
 
 					const groupJson = await ctx.kv.get<string>(`group:${groupId}`);
 					if (!groupJson) {
-						throw new Response(
-							JSON.stringify({ error: "Group not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This group doesn't exist");
 					}
 
 					const group = parseJSON<GroupRecord>(groupJson, null);
 					if (!group) {
-						throw new Response(
-							JSON.stringify({ error: "Group not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This group doesn't exist");
 					}
 
 					return {
@@ -3430,10 +3305,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Group get error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Something went wrong. Please try again.");
 				}
 			},
 		},
@@ -3450,58 +3322,40 @@ export default definePlugin({
 					// Get invite
 					const inviteJson = await ctx.kv.get<string>(`group:invite:${code}`);
 					if (!inviteJson) {
-						throw new Response(
-							JSON.stringify({ error: "Invite not found or expired" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This invite link is no longer valid");
 					}
 
 					const invite = parseJSON<GroupInviteCode>(inviteJson, null);
 					if (!invite) {
-						throw new Response(
-							JSON.stringify({ error: "Invite not found or expired" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This invite link is no longer valid");
 					}
 
 					// Check expiry
 					if (new Date(invite.expiresAt) < new Date()) {
-						throw new Response(
-							JSON.stringify({ error: "Invite has expired" }),
-							{ status: 410, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This invite has expired");
 					}
 
 					// Get group
 					const groupJson = await ctx.kv.get<string>(`group:${invite.groupId}`);
 					if (!groupJson) {
-						throw new Response(
-							JSON.stringify({ error: "Group not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This group doesn't exist");
 					}
 
 					const group = parseJSON<GroupRecord>(groupJson, null);
 					if (!group) {
-						throw new Response(
-							JSON.stringify({ error: "Group not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This group doesn't exist");
 					}
 
 					// Check seat availability
 					if (group.members.length >= group.maxSeats) {
-						throw new Response(
-							JSON.stringify({ error: "Group has reached maximum seats" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This group is full");
 					}
 
 					// Add member to group
 					if (!group.members.includes(email)) {
 						group.members.push(email);
 						group.updatedAt = new Date().toISOString();
-						await ctx.kv.set(`group:${invite.groupId}`, JSON.stringify(group));
+						await ctx.kv.set(`group:${invite.groupId}`, group);
 					}
 
 					// Delete invite
@@ -3517,10 +3371,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Group accept error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Something went wrong. Please try again.");
 				}
 			},
 		},
@@ -3535,34 +3386,20 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = rc.input as Record<string, unknown>;
 					const url = String(input.url ?? "").trim();
 					const events = input.events as string[] | undefined;
 
 					// Validate
 					if (!url || !events || events.length === 0) {
-						throw new Response(
-							JSON.stringify({ error: "URL and events required" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Please provide a URL and select events");
 					}
 
 					// Validate URL
 					try {
 						new URL(url);
 					} catch {
-						throw new Response(
-							JSON.stringify({ error: "Invalid URL" }),
-							{ status: 400, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("Please enter a valid URL");
 					}
 
 					// Create webhook
@@ -3578,13 +3415,13 @@ export default definePlugin({
 						failedCount: 0,
 					};
 
-					await ctx.kv.set(`webhook:${webhookId}`, JSON.stringify(webhook));
+					await ctx.kv.set(`webhook:${webhookId}`, webhook);
 
 					// Add to webhooks list
 					const listJson = await ctx.kv.get<string>("webhooks:list");
 					const webhooks = parseJSON<string[]>(listJson, []);
 					webhooks.push(webhookId);
-					await ctx.kv.set("webhooks:list", JSON.stringify(webhooks));
+					await ctx.kv.set("webhooks:list", webhooks);
 
 					ctx.log.info(`Webhook registered: ${webhookId} for ${events.join(", ")}`);
 
@@ -3597,10 +3434,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Webhook register error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Something went wrong. Please try again.");
 				}
 			},
 		},
@@ -3609,23 +3443,12 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = rc.input as Record<string, unknown>;
 					const webhookId = String(input.webhookId ?? "").trim();
 
 					const webhookJson = await ctx.kv.get<string>(`webhook:${webhookId}`);
 					if (!webhookJson) {
-						throw new Response(
-							JSON.stringify({ error: "Webhook not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This webhook doesn't exist");
 					}
 
 					// Delete webhook
@@ -3637,7 +3460,7 @@ export default definePlugin({
 					const idx = webhooks.indexOf(webhookId);
 					if (idx !== -1) {
 						webhooks.splice(idx, 1);
-						await ctx.kv.set("webhooks:list", JSON.stringify(webhooks));
+						await ctx.kv.set("webhooks:list", webhooks);
 					}
 
 					ctx.log.info(`Webhook deleted: ${webhookId}`);
@@ -3649,10 +3472,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Webhook delete error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Something went wrong. Please try again.");
 				}
 			},
 		},
@@ -3661,14 +3481,6 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const listJson = await ctx.kv.get<string>("webhooks:list");
 					const webhookIds = parseJSON<string[]>(listJson, []);
 
@@ -3690,10 +3502,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Webhook list error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Something went wrong. Please try again.");
 				}
 			},
 		},
@@ -3702,31 +3511,17 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-						throw new Response(
-							JSON.stringify({ error: "Admin access required" }),
-							{ status: 403, headers: { "Content-Type": "application/json" } }
-						);
-					}
-
 					const input = rc.input as Record<string, unknown>;
 					const webhookId = String(input.webhookId ?? "").trim();
 
 					const webhookJson = await ctx.kv.get<string>(`webhook:${webhookId}`);
 					if (!webhookJson) {
-						throw new Response(
-							JSON.stringify({ error: "Webhook not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This webhook doesn't exist");
 					}
 
 					const webhook = parseJSON<WebhookEndpoint>(webhookJson, null);
 					if (!webhook) {
-						throw new Response(
-							JSON.stringify({ error: "Webhook not found" }),
-							{ status: 404, headers: { "Content-Type": "application/json" } }
-						);
+						throw new Error("This webhook doesn't exist");
 					}
 
 					// Fire test webhook
@@ -3746,10 +3541,7 @@ export default definePlugin({
 				} catch (error) {
 					if (error instanceof Response) throw error;
 					ctx.log.error(`Webhook test error: ${String(error)}`);
-					throw new Response(
-						JSON.stringify({ error: "Internal server error" }),
-						{ status: 500, headers: { "Content-Type": "application/json" } }
-					);
+					throw new Error("Something went wrong. Please try again.");
 				}
 			},
 		},
