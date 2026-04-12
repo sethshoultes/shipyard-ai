@@ -7,359 +7,312 @@
 
 ---
 
-## The Core Problem
+## The Core Insight
 
-> "Don't just promise you won't disappear. Give them reasons to look for you."
+> "The best stories don't end. They pause, and make you desperate for the next chapter."
 
-The current Anchor system is a **promise of presence**. But presence alone isn't retention. Clients should:
-- **Want** to hear from us
-- Be **curious** about what's next
-- Feel like they're part of a **story still being written**
+Retention isn't about reminding people you exist. It's about making them **curious** what happens next. Every touchpoint should create anticipation for the following one.
 
 ---
 
-## Retention Framework: The Four Horizons
+## What Keeps Users Coming Back (Current State)
 
-| Horizon | Timeframe | Question | Current State | v1.1 Target |
-|---------|-----------|----------|---------------|-------------|
-| Tomorrow | 24-72 hours | "Why check back?" | No reason | First Week Wins |
-| Next Week | 7 days | "Why return?" | Passive email waiting | Client destination |
-| Next Month | 30 days | "Why stay engaged?" | One-way communication | Client-initiated action |
-| Six Months+ | 180+ days | "Why remain loyal?" | 152-day silence gap | Complete story arc |
+### Working Today
+
+| Hook | Timing | Mechanism | Strength |
+|------|--------|-----------|----------|
+| Launch celebration | Day 0 | Shared ownership ("Look what we built together") | Strong |
+| Preview of next chapter | Day 0 → Day 7 | "We'll check in next week..." | Strong |
+| Relationship deepening | Day 7 | Care without selling | Moderate |
+| Preview of refresh | Day 7 → Day 30 | "At one month, we'll help you refresh..." | Strong |
+| Agency & momentum | Day 30 | Actionable questions they're already thinking | Moderate |
+| Anniversary nostalgia | Month 6 | "It's been working for you 24/7..." | Moderate |
+
+### Broken Today
+
+| Gap | Problem | Impact |
+|-----|---------|--------|
+| Day 30 → Month 6 | 152 days of silence | Clients forget, seek alternatives |
+| Email 3 has no preview | Serialization stops | Anticipation dies at Day 30 |
+| Email 4 has no preview | No promise of Year 1 | Relationship feels finite |
+| No Day 365 | Anniversary unused | Emotional milestone wasted |
+| All retention is outbound | Client waits for you | No destination to return to |
+| No flywheel | Content doesn't compound | Every client is standalone |
 
 ---
 
-## v1.1 Features: What Keeps Users Coming Back
+## V1.1 Features: The Serialization Fix
 
-### 1. First Week Wins (Tomorrow Retention)
+### Priority 1: Complete the Preview Chain
 
-**Problem:** No immediate reason to return after launch.
+**Goal:** Every email promises the next chapter.
 
-**Solution:** "First Week Stats" in Day 7 email.
+| Email | Current Preview | Add Preview |
+|-------|-----------------|-------------|
+| Email 1 (Day 0) | ✓ "We'll check in next week..." | — |
+| Email 2 (Day 7) | ✓ "At one month, we'll help you refresh..." | — |
+| Email 3 (Day 30) | ✗ None | "At the six-month mark, we'll help you plan the year ahead." |
+| Email 4 (Month 6) | ✗ None | "Your one-year anniversary is coming. We're already planning how to celebrate." |
 
-**Implementation:**
+**Effort:** 30 minutes
+**Impact:** High — transforms static emails into serialized narrative
+
+---
+
+### Priority 2: Bridge the Five-Month Gap
+
+**Goal:** Maintain presence between Day 30 and Month 6.
+
+**Add: Email 3.5 — Day 90 Check-in**
+
 ```
-Day 7 Email Addition:
+Subject: Quick check-in (no action needed)
 
-"Your first week by the numbers:
-- [X] visitors found your site
-- [X] pages viewed
-- Average time on site: [X] minutes
-- Top traffic source: [source]
+Hey {{NAME}},
 
-Your site is working. People are finding you."
-```
+Three months with {{SITENAME}}.com live. Just wanted to pop in.
 
-**Requirements:**
-- Cloudflare or basic analytics integration
-- Auto-pull stats for each client site
-- Fallback copy if analytics unavailable
+Everything still working? Anything feel different than you expected?
 
-**Impact:** Client now has a number going up. That's Tomorrow Retention 101.
+No action needed on your end—we're just making sure the foundation is solid.
 
----
+Talk soon,
+{{SENDER}}
 
-### 2. Site Card Artifact (Client Destination)
-
-**Problem:** Clients have no place to return to. No "home base."
-
-**Solution:** A simple, branded one-page artifact clients can hold.
-
-**Contents:**
-| Field | Description |
-|-------|-------------|
-| Site URL | Their live website |
-| Launch Date | When we shipped |
-| Maintenance Tier | Basic / Pro / None |
-| Tokens Used (Lifetime) | Running total |
-| Tokens Remaining (Monthly) | Current allowance status |
-| Next Touchpoint | When they'll hear from us |
-| Quick Actions | "Reply to update" / "Upgrade plan" links |
-
-**Format Options:**
-- Static PDF (Phase 1 — manual generation)
-- Hosted page at `shipyard.ai/clients/[id]` (Phase 2)
-- Client dashboard (Phase 3)
-
-**Impact:** A destination. Something to check. Something to hold.
-
----
-
-### 3. Explicit Cliffhangers (Serialized Narrative)
-
-**Problem:** Emails are standalone episodes. They should be a serialized narrative.
-
-**Solution:** Each email previews the next touchpoint.
-
-**Implementation:**
-
-| Email | Current Ending | v1.1 Ending |
-|-------|----------------|-------------|
-| Day 0 | [CTA to buy Anchor] | "We'll check in next week to see how your first visitors liked it." |
-| Day 7 | "Hit reply if you need anything" | "At one month, we'll help you refresh what's already feeling dated." |
-| Day 30 | [CTA to buy Anchor] | "At six months, we'll review the year ahead together." |
-| Month 6 | "Let's build what's next" | "One year coming up — we're planning something special for your anniversary." |
-
-**Impact:** Anticipation. Curiosity. The feeling that the story continues.
-
----
-
-### 4. Day 90 Pulse Check (Mid-Season Episode)
-
-**Problem:** 152-day gap between Day 30 and Month 6 is a mid-season hiatus.
-
-**Solution:** Lightweight Day 90 touchpoint.
-
-**Email Purpose:** "Still here. You?"
-
-**Draft:**
-```
-Subject: Quick check-in — [Site Name]
-
-Hey [Client Name],
-
-Three months in. Just wanted to say: we're still here.
-
-Your site's been live for 90 days now. If anything's been nagging at
-you — a page that needs updating, a feature you've been thinking about,
-a question you haven't asked — now's a good time.
-
-Hit reply. We'll take it from there.
-
-Still watching out for you,
-[Sender]
-
-P.S. At six months, we'll do a full review together. For now, just
-wanted you to know we're not going anywhere.
+P.S. Six-month mark is coming up. We're already thinking about your refresh.
 ```
 
-**CTA Type:** Soft (relationship-building, not revenue)
+**Characteristics:**
+- Light touch, no CTA
+- Reinforces "We don't disappear" without selling
+- Creates anticipation for Month 6
 
-**Impact:** Closes the narrative gap. Reminds them we exist.
+**Effort:** 1 hour (write, review, add to sequence)
+**Impact:** High — cuts silence from 152 days to 62 days max
 
 ---
 
-### 5. Day 365 Anniversary (Season Finale)
+### Priority 3: Restore Day 365 Anniversary Email
 
-**Problem:** The year-one arc ends at Month 6. That's an incomplete story.
+**Goal:** Emotional milestone that deepens relationship.
 
-**Solution:** Restore the anniversary email from original PRD.
+**Add: Email 5 — One Year Anniversary**
 
-**Email Purpose:** Celebration + Renewal + Referral
-
-**Draft:**
 ```
-Subject: Happy 1 Year, [Client Name]!
+Subject: One year with {{SITENAME}}.com
 
-One year ago today, we shipped [Site Name].
+Hey {{NAME}},
 
-That's 365 days of your business being live on the internet. 365 days
-of customers finding you, learning about what you do, and deciding to
-work with you.
+One year ago today, we launched {{SITENAME}}.com together.
 
-We helped build the foundation. You built everything on top of it.
+Since then:
+- Your site has been live for 8,760 hours
+- It's been working while you slept, traveled, and lived your life
+- And we've been here the whole time
 
-To celebrate, here's 20% off any project you book in the next 30 days.
-New feature, new page, fresh design — whatever's next for you.
+We don't have a card or a cake. But we do have this: 20% off your next project with Shipyard. Same team. Same care. Same promise.
 
-Use code ONEYEAR at checkout, or just reply to this email and we'll
-apply it.
-
-And if you know someone who needs what you have — a website that
-actually works, from a team that doesn't disappear — send them our way.
-We'd be honored.
+You've built something that lasts. We're proud to have been part of it.
 
 Here's to year two,
-[Sender]
+{{SENDER}}
 
-P.S. Thank you for trusting us. It still means something.
+P.S. Know someone starting out who needs a site they can trust? We'd love to meet them.
 ```
 
-**CTA Type:** Hard (discount offer with urgency)
+**Characteristics:**
+- Celebration, not transaction
+- Emotional milestone language ("8,760 hours")
+- Soft referral prompt
+- Renewal offer embedded naturally
 
-**Impact:** The finale. Celebration, incentive, and referral ask in one.
+**Effort:** 1 hour
+**Impact:** High — captures emotional anniversary moment, drives referrals
 
 ---
 
-### 6. Testimonial Capture (Content Flywheel Start)
+### Priority 4: Surface Pro Tier Value in Month 6
 
-**Problem:** No mechanism to capture success stories. No social proof.
+**Goal:** Make quarterly refresh proposals a retention hook, not a buried feature.
 
-**Solution:** Add testimonial ask to Day 30 or Month 6 email.
+**Add to Email 4 (Month 6):**
 
-**Implementation:**
-
-Add to Day 30 email (after soft CTA):
 ```
-P.S. One more thing — if you're happy with what we built together,
-would you mind if we shared your story? A quick quote from you could
-help another business owner find the right team. Just reply with a
-sentence or two about your experience, and we'll take it from there.
+If you're on Anchor Pro, your first quarterly refresh proposal is ready.
+Here's what we'd suggest based on six months of watching your site evolve:
+
+[AI-generated refresh recommendations]
+
+Not on Pro yet? Reply "interested" and we'll share what we'd recommend.
 ```
 
-**Process:**
-1. Client replies with quote
-2. We follow up with permission request
-3. Add to testimonials page / marketing materials
-4. Notify client when their story goes live ("You're featured!")
-
-**Impact:** Clients become content. Their success feeds our pipeline.
+**Effort:** 2 hours (template update + process for generating proposals)
+**Impact:** Medium — upsell opportunity + curiosity hook
 
 ---
 
-### 7. Referral Prompt (Word-of-Mouth Engine)
+## V1.1 Feature Summary
 
-**Problem:** Satisfied clients have networks. We never ask.
+| Feature | Type | Effort | Impact | Priority |
+|---------|------|--------|--------|----------|
+| Preview line in Email 3 | Copy update | 30 min | High | P1 |
+| Preview line in Email 4 | Copy update | 30 min | High | P1 |
+| Day 90 check-in email | New template | 1 hr | High | P2 |
+| Day 365 anniversary email | New template | 1 hr | High | P2 |
+| Pro tier callout in Month 6 | Copy update | 2 hr | Medium | P3 |
 
-**Solution:** Add referral prompt to Month 6 and Day 365 emails.
-
-**Implementation:**
-
-Add to Month 6 email:
-```
-Know someone who needs a site that actually works? Reply with their
-name and email, and we'll mention you said hello. (We'll credit your
-account with a free token boost if they sign on.)
-```
-
-**Referral Reward Structure:**
-- Referrer: 25K bonus tokens (one-time)
-- Referred: 10% off first project
-
-**Impact:** Referrals are content. Word-of-mouth is designed, not hoped for.
+**Total V1.1 Effort:** ~5 hours
+**Total V1.1 Impact:** Transforms incomplete serialization into full narrative arc
 
 ---
 
-### 8. Pro Tier Highlight (Curiosity Driver)
+## V1.2 Features: The Flywheel Foundation
 
-**Problem:** Quarterly Refresh Proposals (Pro feature) are buried in product description.
+### What's a Flywheel?
 
-**Solution:** Surface this in Month 6 email as a curiosity hook.
+A flywheel is a system where each action generates more actions. Currently, Anchor is a funnel:
 
-**Implementation:**
-
-Add to Month 6 email (for Basic tier clients):
 ```
-Anchor Pro clients get quarterly refresh proposals — specific
-recommendations for what to update next, based on how your site has
-evolved. Here's what we'd suggest for you this quarter:
-
-• [Recommendation 1]
-• [Recommendation 2]
-• [Recommendation 3]
-
-Want the full breakdown? Upgrade to Pro and we'll send your complete
-Q3 refresh proposal within 48 hours.
+Client enters → 4 emails → converts or doesn't → end
 ```
 
-**For Pro clients:**
+A flywheel looks like:
+
 ```
-As promised, here's your Q3 refresh proposal...
+Client enters → emails → converts → success → referral → new client enters
+                                      ↓
+                              content generated
+                                      ↓
+                              attracts new clients
 ```
 
-**Impact:** Now they're curious. Now they want to know what the recommendations are.
+### Flywheel Components to Build
+
+#### 1. Referral Mechanics
+**Where:** Month 6 and Day 365 emails
+**How:** Soft prompt: "Know someone who needs a site? Tell us and we'll thank you."
+**Incentive:** $100 credit toward next project
+**Effort:** 2 hours
+
+#### 2. Client Success Stories
+**Where:** Internal capture after Month 6
+**How:** Ask high-engagement clients for 2-sentence testimonial
+**Use:** Social proof in Day 0 emails for new clients
+**Effort:** Ongoing process
+
+#### 3. Monthly Inbound Content
+**What:** "Site Owner Tips" — one useful thing per month
+**Examples:**
+- "3 things to update on your site before the holidays"
+- "How to tell if your site needs a refresh"
+- "What your competitors just changed (and what it means)"
+
+**Goal:** Position Shipyard as trusted advisor, not vendor
+**Effort:** 2-4 hours/month
+
+#### 4. Site Card Artifact
+**What:** Static page or PDF showing site status
+**Contents:** URL, launch date, maintenance tier, last update, next touchpoint
+**Goal:** Something the client can hold — makes relationship tangible
+**Effort:** 4-8 hours to build template
 
 ---
 
-## v1.1 Email Sequence (Updated)
+## V1.3 Features: Inbound Retention
 
-| Touchpoint | Day | Type | New in v1.1 |
-|------------|-----|------|-------------|
-| Launch Day | 0 | Hard CTA | + Preview of Day 7 |
-| Day 7 Check-in | 7 | Soft CTA | + First Week Stats, + Preview of Day 30 |
-| Day 30 Refresh | 30 | Hard CTA | + Testimonial ask, + Preview of Month 6 |
-| **Day 90 Pulse** | 90 | **Soft CTA** | **NEW** |
-| Month 6 Review | 182 | Hard CTA | + Referral prompt, + Pro highlight, + Preview of Day 365 |
-| **Day 365 Anniversary** | 365 | **Hard CTA** | **NEW (restored)** |
+### The Problem
 
----
+All V1 retention is **outbound**: Shipyard reaches to client. Client waits passively.
 
-## The Content Flywheel (Future State)
+### The Solution
 
-```
-         ┌──────────────────────────┐
-         │   Client Success         │
-         │   (site performs well)   │
-         └───────────┬──────────────┘
-                     │
-                     ▼
-         ┌──────────────────────────┐
-         │   Testimonial Capture    │
-         │   (Day 30 / Month 6)     │
-         └───────────┬──────────────┘
-                     │
-                     ▼
-         ┌──────────────────────────┐
-         │   Social Proof           │
-         │   (marketing materials)  │
-         └───────────┬──────────────┘
-                     │
-                     ▼
-         ┌──────────────────────────┐
-         │   New Client Acquisition │
-         │   (trust + credibility)  │
-         └───────────┬──────────────┘
-                     │
-                     ▼
-         ┌──────────────────────────┐
-         │   Referral from Happy    │
-         │   Client (Month 6/365)   │
-         └───────────┬──────────────┘
-                     │
-                     └──────► [Back to Client Success]
-```
+Give clients somewhere to **return to**:
 
-**Current state:** Funnel (in → through → out)
-**Target state:** Flywheel (in → through → compound → in)
+| Feature | Description | Retention Mechanism |
+|---------|-------------|---------------------|
+| Site Card page | Simple status page per client | Bookmark, check occasionally |
+| Request portal | "Submit update request here" | Habit formation |
+| Health dashboard | Uptime, speed score, traffic basics | Reason to log in |
+
+### Why This Matters
+
+> "The client waits for you. They have no destination to return to."
+
+When clients have a place that's "theirs," they visit. Visits create habit. Habit creates retention. Retention creates lifetime value.
+
+### Implementation Approach
+
+**Phase 1:** Static Site Card (PDF or simple page)
+**Phase 2:** Basic portal (submit requests, view status)
+**Phase 3:** Full dashboard (analytics, health scores, recommendations)
 
 ---
 
-## Implementation Priority
+## The Serialized Narrative Arc (Complete)
 
-### Phase 1 (Before Launch)
-1. Restore Day 365 email
-2. Add preview lines to all emails (explicit cliffhangers)
+### Before V1.1
 
-### Phase 2 (Within 30 Days)
-3. Add Day 90 Pulse Check email
-4. Add testimonial capture to Day 30
-5. Add referral prompt to Month 6
+| Day | Episode | Preview | Gap |
+|-----|---------|---------|-----|
+| 0 | Launch | ✓ Day 7 | — |
+| 7 | Check-in | ✓ Day 30 | — |
+| 30 | Refresh | ✗ | 152 days |
+| 182 | Review | ✗ | 183 days |
+| 365 | ✗ Missing | — | — |
 
-### Phase 3 (Within 90 Days)
-6. First Week Stats integration (requires analytics)
-7. Site Card artifact (PDF version)
-8. Pro tier highlight in Month 6
+### After V1.1
 
-### Phase 4 (Future)
-9. Client dashboard (hosted Site Card)
-10. Anchor Client Community (Slack/newsletter)
-11. Monthly "Site Owner Tips" content
+| Day | Episode | Preview | Gap |
+|-----|---------|---------|-----|
+| 0 | Launch | ✓ Day 7 | — |
+| 7 | Check-in | ✓ Day 30 | — |
+| 30 | Refresh | ✓ Day 90 | — |
+| 90 | Light touch | ✓ Month 6 | — |
+| 182 | Review | ✓ Day 365 | — |
+| 365 | Anniversary | ✓ Year 2 | — |
+
+**Result:** Complete serialized narrative with no silence longer than 92 days.
 
 ---
 
 ## Success Metrics
 
-| Metric | Current | v1.1 Target | Measurement |
+| Metric | Current | V1.1 Target | V1.2 Target |
 |--------|---------|-------------|-------------|
-| Day 7 reply rate | Unknown | 15%+ | Track in Notion |
-| Day 30 testimonial capture | 0% | 10%+ | Count replies with quotes |
-| Month 6 referral rate | 0% | 5%+ | Count referral replies |
-| Day 365 discount redemption | N/A | 25%+ | Track code usage |
-| Basic → Pro upgrade rate | Unknown | 10%+ | Stripe data |
+| Reply rate (Day 30) | TBD | +20% | +30% |
+| Churn rate (Month 6) | TBD | <10% | <5% |
+| Referral rate | 0% | 5% | 15% |
+| Client content generated | 0 | 2/month | 5/month |
+| Inbound site visits | 0 | N/A | Track |
 
 ---
 
-## The Shonda Test
+## The One Thing
 
-Every touchpoint should pass this test:
+> "You've built presence. Now build anticipation."
 
-> "Does this make them curious about what happens next?"
+**V1.1 Goal:** Make every email promise the next chapter.
+**V1.2 Goal:** Make clients generate content and referrals.
+**V1.3 Goal:** Give clients a destination to return to.
 
-If the answer is no, add a cliffhanger. Add a tease. Add a reason to wonder.
-
-The goal isn't just to be present. The goal is to be **anticipated**.
+Each version compounds on the previous. By V1.3, Anchor isn't just a retention system—it's a relationship platform.
 
 ---
 
-*"Every good story has a second act. Anchor has a first act. Now write the rest."*
+*"Don't just tell them you'll be there. Make them want to see what you'll do next."*
 — Shonda Rhimes
+
+---
+
+## Appendix: Full Email Sequence (V1.1)
+
+1. **Day 0 — Launch Day** (existing + no changes)
+2. **Day 7 — Check-in** (existing + no changes)
+3. **Day 30 — Refresh** (add preview line)
+4. **Day 90 — Light Touch** (NEW)
+5. **Month 6 — Review** (add preview line + Pro callout)
+6. **Day 365 — Anniversary** (NEW)
+
+Total emails: 6 (up from 4)
+Maximum silence: 92 days (down from 152)
+Serialization: Complete
