@@ -11,10 +11,10 @@ CORS_ORIGIN = "https://wardrobe.emdash.dev"
 #   wrangler kv:namespace create "RATE_LIMITS"
 [[kv_namespaces]]
 binding = "EMAILS"
-id = "e1m2a3i4l5s6k7v8n9a0m1e2s3p4a5c6"
-preview_id = "e6m5a4i3l2s1k0v9n8a7m6e5s4p3a2c1"
+id = "29a8b94cad87fb6c789a5dd88d1a9a47"
+preview_id = "a14a7404124553339290654d323045db"
 
 [[kv_namespaces]]
 binding = "RATE_LIMITS"
-id = "r1a2t3e4l5i6m7i8t9s0k1v2n3a4m5e6"
-preview_id = "r6a5t4e3l2i1m0i9t8s7k6v5n4a3m2e1"
+id = "5b065bc4a2d1063e0ed3bea8ae6a21cc"
+preview_id = "b0d7a870e649ed51ec9af992278c30b8"

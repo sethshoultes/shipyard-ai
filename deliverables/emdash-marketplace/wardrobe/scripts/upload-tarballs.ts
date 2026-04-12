@@ -30,7 +30,7 @@ const s3Client = new S3Client({
     accessKeyId: R2_ACCESS_KEY_ID,
     secretAccessKey: R2_SECRET_ACCESS_KEY,
   },
-  endpoint: `https://${CLOUDFLARE_ACCOUNT_ID}.r2.googleapis.com`,
+  endpoint: `https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
 });
 
 async function uploadTarball(filePath: string, bucketName: string): Promise<void> {
