@@ -1,99 +1,76 @@
-# Round 2 — Elon Musk
+# Round 2 — Elon Musk (Chief Product & Growth)
 
 ## Challenging Steve's Weakest Positions
 
-### The Naming Debate is a Distraction
+### "Sofia Chen — Member since today" Is Beautiful Theater
 
-Steve, "Belong" and "Moment" are beautiful words. They're also **search engine nightmares**.
+Steve, you want demo data on first install. You want users to "witness success" before they've done anything. Here's the problem: **that success is a lie.**
 
-"MemberShip EmDash plugin" returns the plugin. "Belong EmDash" returns self-help articles about community. You've optimized for poetry over discoverability.
+The yoga instructor sees Sofia Chen. She feels good. Then she asks: "How do I add a real member?" And she's back to learning. You've added a step, not removed one.
 
-More critically: **We don't have users to rebrand for.** The plugins don't work. Zero active installs. You're designing the logo for a rocket that can't leave the launchpad.
+Worse: demo data requires mock generators, conditional rendering, fake avatars, believable timestamps. That's 2-3 weeks of engineering for a moment users experience *once*.
 
-Ship working software first. Rename it when someone complains about the name. Nobody has.
+**The empty state that says "Your first member will appear here — share this link" is honest.** It points forward. Demo data points backward at fiction.
 
-### "Sofia Chen — Member since today" Requires Code
+### "Belong" and "Moment" Are Search Engine Suicide
 
-That beautiful onboarding moment you described? **It doesn't exist in the codebase.**
+"MemberShip EmDash plugin" — findable. "Belong EmDash" — returns self-help articles about community building.
 
-To build it: mock data generators, conditional rendering for empty states, fake member avatars, believable timestamps. That's 2-3 days of design work for a first-run experience users see once.
+You've optimized for poetry over discoverability. **We don't exist in the market yet.** When zero people can find us, beautiful names are gravestones.
 
-Meanwhile, the actual plugin throws `.map() is not a function` when admins try to load it.
+Ship with ugly, searchable names. Rebrand at 1,000 users. You can't rebrand at zero.
 
-**Beauty can't run on broken infrastructure.** Fix the plumbing, then decorate.
+### "Every interaction should take half the steps" — Of What Baseline?
 
-### 5-Option Settings Pages Are a Fantasy
+This philosophy added three sprints of UX refinement to code that has **never touched production**. Half the steps of infinity is still infinity.
 
-Real constraints for MemberShip:
-- Stripe API key (required)
-- Webhook secret (required)
-- Price ID (required)
-- Success/cancel URLs (required)
-- Currency (required for display)
-
-That's 5 just for payments. Add email sender, member approval mode, trial periods. Steve's "5 options max" rule means shipping without Stripe.
-
-**The yoga instructor wants autopay. That requires configuration.**
+We don't know what steps users actually take. We've never watched one. The first real user at Sunrise Yoga will teach us more about friction than 16 planning documents.
 
 ---
 
 ## Defending Technical Simplicity
 
-### The Pattern Already Exists
+### The 4,000-Line Monolith Ships This Week
 
-Working `eventdash` is 130 lines. It loads. It renders Block Kit. It handles routes.
+1. **Refactoring code nobody uses is vanity.** Refactoring code 100 customers depend on is engineering. We have zero customers.
 
-MemberShip is 3,984 lines with 114 `throw new Response` errors against an API that doesn't exist. More surface area = more bugs = longer debug cycles.
+2. **Duplication is a feature.** When MemberShip and EventDash share 60% code and we ship only MemberShip first, that "duplication" means zero blast radius. EventDash breaks? No customer cares.
 
-**The 10x path:** Copy eventdash's architecture. Apply to MemberShip. The 130-line reference is worth more than 10 pages of onboarding philosophy.
+3. **KV storage scales to 10K.** We have zero records. D1 migration is optimization for imaginary load.
 
-### One Plugin, One Site, One Day
-
-Steve wants onboarding flows and emotional hooks. I want `curl https://sunrise-yoga.com/plugins/membership/admin` to return valid JSON.
-
-When that works, we have a deployable plugin, a proven pattern, and permission to think about UX.
-
-**Sequence matters.** You can't A/B test onboarding on software that crashes.
+**Every hour on architecture before production is an hour that generates zero learning.**
 
 ---
 
 ## Where Steve Is Right
 
-### Taste Matters in Three Places
+1. **Brand voice at touchpoints.** "Successfully submitted" vs "You're in" — Steve wins. This takes 30 minutes to fix, not 3 weeks. It's just better strings.
 
-1. **Error messages.** "Oops, try again" beats "Error: STRIPE_WEBHOOK_SIGNATURE_VERIFICATION_FAILED". Users don't need stack traces. This is free.
+2. **Five settings max.** Settings pages are where products die. Ship with right defaults. Users who need customization will email us — that's data.
 
-2. **The join button.** One interaction, maximum visibility. Worth 30 minutes of design attention on copy and placement.
-
-3. **Email copy.** "Welcome to the studio" > "Your membership subscription has been activated successfully." Better strings cost nothing.
-
-### Kill Vanity Metrics
-
-Steve's "NO to analytics dashboards on v1" is correct. Members and revenue. That's it. Chart.js can wait.
-
-### Two Tiers Only
-
-Free and Paid. Delete the Bronze/Silver/Gold complexity. This cuts 200+ lines of tier management code. Steve's taste aligns with my deletion instinct.
+3. **Two tiers only.** Free and Paid. Delete Bronze/Silver/Gold. This cuts 200+ lines. Taste and deletion instinct align.
 
 ---
 
 ## Locked Decisions (Non-Negotiable)
 
-### 1. Ship EventDash First
-130 lines, already working. Proves the pattern. MemberShip inherits the architecture. No debate.
+### 1. Ship MemberShip to Sunrise Yoga THIS WEEK
+No more planning. Deploy what exists. Fix what breaks in production. The audience teaches things the mirror cannot.
 
-### 2. One Test Site Per Plugin
-Sunrise Yoga gets MemberShip. That's it. We don't need 4 test sites to prove the same code works. Horizontal testing is waste.
+### 2. Zero Demo Data
+Empty states with CTAs pointing to real action. First member should be a *real* member. We're not building theater.
 
 ### 3. Names Stay: MemberShip and EventDash
-"Belong" and "Moment" are poetry for products with zero users. SEO matters. When we have 10,000 installs, Steve can rebrand. Right now: obvious > clever.
+"Belong" and "Moment" are poetry for products with zero users. SEO matters. Rebrand is a success problem — we need existence first.
 
 ---
 
-## The Offer
+## The Uncomfortable Truth
 
-Steve, I'll give you naming and first-run copy on v1.1 — **after** v1 ships and one real user installs it.
+Steve wants users to "feel like geniuses." I want users to *exist*.
 
-But v1 is a working plugin, not a beautiful one. The yoga instructor can't feel like a genius if the plugin throws exceptions.
+The yoga instructor isn't overwhelmed by our UX — she doesn't know we exist. She's using Squarespace with a broken Stripe embed because that's what shipped.
 
-**Ship, then polish.**
+**Ship ugly. Listen. Improve. Repeat.**
+
+Polish is earned by survival. Let's survive first.

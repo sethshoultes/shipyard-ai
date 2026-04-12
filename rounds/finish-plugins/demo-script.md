@@ -1,149 +1,190 @@
-# Membership Plugin Demo Script
+# MemberShip Demo Script
 ## 2-Minute Product Walkthrough
 
-**Runtime:** 2:00
-**Tone:** Walk and talk. Personal. Urgent where it needs to be, quiet where it lands.
+---
+
+**NARRATOR:**
+It's 11:47 PM.
+
+[SCREEN: Dark room. Laptop glow on a woman's face. Elena. Late 30s. Yoga mat rolled in the corner. Empty coffee mug.]
+
+**NARRATOR:**
+Elena runs a yoga studio. Twenty-three students. Good ones. The kind who show up even when it rains.
+
+[SCREEN: Her browser. Tab hell. "WordPress membership plugins comparison." "MemberPress vs Paid Memberships Pro." "Why won't my plugin activate."]
+
+**NARRATOR:**
+She's been at this for four hours.
+
+[SCREEN: MemberPress admin panel. A wall of settings. Dropdowns nested in dropdowns. A red error: "Please enter valid license key."]
+
+**NARRATOR:**
+Four hours trying to do one thing: let her students pay her.
+
+[SCREEN: Close on her eyes. Tired. The kind of tired that isn't about sleep.]
+
+**NARRATOR:**
+She got into this because teaching yoga made people's lives better. But right now? Right now she's Googling "what is a webhook" at midnight because some plugin is asking her to configure one.
+
+[SCREEN: Google results for "what is a webhook." Wikipedia definition that starts with "In web development, a webhook is—"]
+
+**NARRATOR:**
+She doesn't need to know what a webhook is. She needs to get paid.
+
+[SCREEN: Hard cut to black. Beat. Then—]
+
+**NARRATOR:**
+What if that was the only question that mattered?
+
+[SCREEN: Clean white. Emdash dashboard. One sidebar. Three options. Air to breathe.]
+
+**NARRATOR:**
+This is Elena's Emdash site. She built it last week. Today, she's going to add memberships.
+
+[SCREEN: Mouse moves to "Plugins." Single click.]
+
+**NARRATOR:**
+Not "spend three hours trying to add memberships." Actually add them.
+
+[SCREEN: Marketplace. MemberShip at the top. Blue button: "Install." Nothing else competing for attention.]
+
+**NARRATOR:**
+One button.
+
+[SCREEN: Click. Progress bar fills. Three seconds. Done.]
+
+**NARRATOR:**
+Installed.
+
+[SCREEN: "Members" appears in sidebar. She clicks it.]
+
+**NARRATOR:**
+No wizard. No twenty questions about her business. No email asking her to complete her profile.
+
+[SCREEN: Dashboard. Clean. One big button: "Create your first plan." Three metric cards below—MRR, Members, Churn—all showing zero. But elegant zeros. Ready zeros.]
+
+**NARRATOR:**
+Just this: "Create your first plan." Four words. And for the first time tonight, she's not lost.
+
+[SCREEN: Click. Simple form. Three fields. Plan name. Price. Billing cycle—dropdown showing Monthly, Yearly, Free.]
+
+**NARRATOR:**
+She types: "Unlimited Classes."
+
+[SCREEN: Text appears in the field. Clean typography.]
+
+**NARRATOR:**
+Forty dollars a month.
+
+[SCREEN: "40" in the price field. Dropdown shows "Monthly."]
+
+**NARRATOR:**
+Save.
+
+[SCREEN: Click. Toast notification: "Plan created." List view shows her new plan. Ten seconds total.]
+
+**NARRATOR:**
+That's it. That's her membership tier. The thing that took four hours last night? Just happened while I was talking.
+
+[SCREEN: "Connect Stripe" button. Single click. OAuth flow—redirect, authorize, redirect back. Maybe four seconds total.]
+
+**NARRATOR:**
+Stripe connects in two clicks. No API keys. No webhook configuration. No documentation that assumes you already know what documentation is for.
+
+[SCREEN: Dashboard. "Stripe Connected" with green checkmark.]
+
+**NARRATOR:**
+Now here's what matters.
+
+[SCREEN: Cut to: Morning. Different location. Phone screen. Young guy, Marcus, looking at his phone on a bus.]
+
+**NARRATOR:**
+Marcus has been meaning to sign up for Elena's classes for three weeks. Always something. Work, commute, life.
+
+[SCREEN: He's on Elena's site. Homepage. Beautiful. Mountain backdrop. "Become a Member" button.]
+
+**NARRATOR:**
+Today, on the 7 train, somewhere between Flushing and Times Square, he finally does it.
+
+[SCREEN: Click. Registration form. Name. Email. Plan auto-selected. Credit card fields via Stripe. That's the whole form.]
+
+**NARRATOR:**
+Name. Email. Card. He's done before his stop.
+
+[SCREEN: Loading state. Brief. Then: "Welcome to the practice, Marcus." Simple. Warm. Not celebrating itself. Just... welcoming him.]
+
+**NARRATOR:**
+No account verification email. No password he'll forget by tomorrow. No "click here to confirm." He's in.
+
+[SCREEN: Cut back to Elena. Her studio. Morning light now. She's checking her phone before first class.]
+
+**NARRATOR:**
+And three boroughs away—
+
+[SCREEN: Her dashboard. MRR: "$40". Members: "1". One notification.]
+
+**NARRATOR:**
+Elena sees it happen.
+
+[SCREEN: She taps. Member list. Marcus. His name. His plan. "Active." One line.]
+
+**NARRATOR:**
+Her first paying member. Right there. While she was unrolling mats.
+
+[SCREEN: She smiles. Not because the tech impressed her. Because it got out of her way.]
+
+**NARRATOR:**
+Here's what MemberShip doesn't have.
+
+[SCREEN: Quick cuts—competitor UIs. Dense. Gray. Seventeen tabs. Role matrices. Permission levels. Config screens that scroll forever.]
+
+**NARRATOR:**
+No Bronze tier. No Silver tier. No "granular permission matrices." No drip content scheduling. No features built for a corporation pretending to be a yoga studio.
+
+[SCREEN: Back to Elena's clean dashboard.]
+
+**NARRATOR:**
+Two tiers. Members and everyone else. Because that's what Elena actually needs.
+
+[SCREEN: Marcus, later, at home. Logging in. The "Members Only" content that was blurred before is now visible. Class schedule. Video library. Welcome message.]
+
+**NARRATOR:**
+When Marcus comes back, the gated content is unlocked. No configuration. The plugin just knows.
+
+[SCREEN: Elena's dashboard. Days passing. MRR climbing. $40. $120. $280. Members: 1. 3. 7.]
+
+**NARRATOR:**
+And over the next few weeks—
+
+[SCREEN: Dashboard. MRR: "$1,640". Members: "41". Graph trending up.]
+
+**NARRATOR:**
+This happens.
+
+[SCREEN: Elena. Studio. End of class. Students rolling up mats. She's smiling.]
+
+**NARRATOR:**
+Not because she learned what a webhook is. Not because she mastered some admin panel. Because she never had to.
+
+[SCREEN: Close on the dashboard. The numbers. Clean.]
+
+**NARRATOR:**
+Small business owners don't want powerful software. They want to feel powerful themselves.
+
+[SCREEN: Elena closes her laptop. Grabs her mat. Walks toward students gathering for the next class.]
+
+**NARRATOR:**
+MemberShip. One plugin. One click. One less thing between you and the work you actually love.
+
+[SCREEN: Fade to logo. "MemberShip — for Emdash." Below: "Competence without complexity."]
+
+**NARRATOR:**
+Now go teach yoga.
+
+[SCREEN: Black.]
 
 ---
 
-[SCREEN: An inbox. 147 unread. Subject lines scroll by: "Can you add me manually?" ... "My card got declined, now what?" ... "I thought I cancelled?" ... "Where's my premium content?"]
-
-NARRATOR:
-You know what nobody tells you about running a membership site? It's not the content. The content you're good at. It's the *other* 47 jobs you didn't sign up for.
-
-[SCREEN: Cut to a Notion doc titled "Member Tracking." Rows and rows of emails, dates, handwritten notes: "PAID - venmo" ... "gave free access - ask Mark" ... "expired??" with three question marks.]
-
-NARRATOR:
-You've become a bookkeeper. A payment processor. A customer service rep. And somewhere in there, occasionally, when you have time, a creator.
-
-[SCREEN: A sticky note on a monitor: "Tuesday: cancel Jenny's subscription (she emailed)." Another sticky: "Check if Dan's card went through."]
-
-NARRATOR:
-This is what membership looks like when you build it yourself. Sticky notes. Manual email. Fingers crossed.
-
-[SCREEN: A text message from a friend: "Hey, your member login is broken again." Timestamp: 11:47 PM.]
-
-NARRATOR:
-And when something breaks—because something always breaks—it breaks at 11:47 on a Tuesday night.
-
-[SCREEN: Fade to black. One beat. Two. Then—the EmDash admin panel appears. Clean. Quiet. Empty in a good way.]
-
-NARRATOR:
-Okay. Different approach.
-
-[SCREEN: The terminal. Someone types: `npm install @shipyard/membership`. Press enter. Packages install. Done.]
-
-NARRATOR:
-This takes about forty-five seconds.
-
-[SCREEN: The astro.config file. Three lines added. Save.]
-
-NARRATOR:
-And this takes about ten.
-
-[SCREEN: The EmDash admin panel now shows a new sidebar item: "Members."]
-
-NARRATOR:
-Now you have a membership system. Real one. Let me show you what that means.
-
-[SCREEN: Click "Plans." A simple interface. User clicks "Add Plan." Types "Pro" — $12/month. Adds features: "All posts. Discord access. Monthly Q&A."]
-
-NARRATOR:
-You make a plan. Pro, twelve bucks a month, whatever features you want to list. That's your product now. It exists.
-
-[SCREEN: The content editor. A blog post. User selects a section of text—a deep-dive analysis. Right-clicks. "Gate this content." Selects "Pro plan."]
-
-NARRATOR:
-And this—this is the part I love. You've got free content. You've got premium content. The difference used to be: a developer quote and three weeks of your life. Now it's a right-click.
-
-[SCREEN: A lock icon appears on the gated section. Clean. Subtle.]
-
-NARRATOR:
-Pro members see it. Everyone else sees what they're missing.
-
-[SCREEN: Cut to the public site. A reader scrolls. They hit the gated section. It says: "This section is for Pro members. Join now."]
-
-NARRATOR:
-Here's your customer.
-
-[SCREEN: They click "Join." A modal appears. Just an email field. They type their email.]
-
-NARRATOR:
-Just their email. No password to forget. No "verify your inbox" purgatory.
-
-[SCREEN: Stripe Checkout appears. They enter a card. Click "Pay $12."]
-
-NARRATOR:
-Stripe handles the money. Because Stripe is very, very good at handling money.
-
-[SCREEN: Success. The page reloads. The locked content is now visible. A welcome email notification pops up in the corner.]
-
-NARRATOR:
-They're in. Content unlocked. Welcome email sent. Subscription active. All of it—automatic.
-
-[SCREEN: Back to admin. The Members table now shows one entry. Email, plan, status: Active, next billing date, payment method.]
-
-NARRATOR:
-And you? You see everything. Who's paying. What plan. When they renew. You're not checking Stripe and cross-referencing a spreadsheet. It's one table. The truth.
-
-[SCREEN: Quick cuts—]
-- A failed payment notification
-- The member gets an email: "Update your payment method"
-- They click. Add a new card. Status: Active again.
-
-NARRATOR:
-Failed payment? They get an email. They fix it. You don't have to chase anyone down.
-
-[SCREEN: Quick cuts continue—]
-- Admin creates coupon: "LAUNCH" — 20% off, expires in 7 days
-- A member upgrades from Free to Pro with one click in their portal
-- Drip content settings: "Module 2 unlocks 7 days after signup"
-
-NARRATOR:
-Coupons. Upgrades. Drip content that unlocks on a schedule. The stuff that used to be "Phase Two" of your project? It's already there.
-
-[SCREEN: The reporting dashboard. MRR: $1,847. Active members: 156. Churn rate: 3.2%. A chart shows steady growth.]
-
-NARRATOR:
-And this.
-
-[SCREEN: Slow push in on the numbers.]
-
-NARRATOR:
-This is what it looks like when you know. Not "I think we're doing okay." Not "let me check the spreadsheet." You know. Monthly recurring revenue. Churn. The numbers that tell you whether this thing is working.
-
-[SCREEN: The dashboard, full view. Members. Plans. Reports. Everything in one place.]
-
-NARRATOR:
-You spent years getting good at making things people want. You shouldn't have to spend another year learning to get paid for it.
-
-[SCREEN: Back to that inbox from the opening. But now—it's different. Calm. Normal emails. The member management emails are gone. Because the system handles them.]
-
-NARRATOR:
-Those 47 other jobs you didn't sign up for?
-
-[SCREEN: The EmDash logo fades in.]
-
-NARRATOR:
-Let the software do them.
-
-[SCREEN: Text appears: "Membership for EmDash. npm install @shipyard/membership"]
-
-NARRATOR:
-Start today. Be done by lunch.
-
-[SCREEN: Fade to black.]
-
----
-
-**[END]**
-
----
-
-## Production Notes
-
-**Runtime:** 2:00
-**Pacing:** Opens claustrophobic—the inbox, the sticky notes, the chaos. Releases when the solution appears. Builds confidence through the walkthrough. Lands warm and quiet.
-**VO Direction:** This isn't a pitch. It's someone who's been where you are, telling you there's a better way. Conversational. Some lines almost thrown away ("That's your product now. It exists."). The close should feel like permission.
-**Music:** Starts tense/cluttered ambient. Clears at "Different approach." Builds through features. Resolves with space.
-**Key visual rhythm:** Chaos → Clarity → Capability → Calm
+**RUNTIME:** 2:00
+**TONE:** Urgent, human, rhythmic. Walk-and-talk energy. Not a pitch—a story that moves.
+**MUSIC:** Minimal piano. Single notes. Building like a heartbeat. Think "the moment before something good happens."

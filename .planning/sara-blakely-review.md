@@ -1,29 +1,30 @@
-# Sara Blakely Gut-Check: AgentBench Phase 1
+# Sara Blakely Gut-Check: MemberShip v1
 
 ## Would a real customer pay for this?
 
-**Yes — but for the RELIEF, not the tool.** Developers shipping AI agents are terrified. Every deploy is a prayer. You're selling permission to ship. That's worth money. But they won't pay until they've felt the relief. First run has to be frictionless.
+**Yes, but barely.** A yoga instructor wants to get paid for her video library. This does that. But she doesn't care about JWT tokens, webhook kill-tests, or 114 banned patterns. She cares: "Can my students sign up? Do I get the money?" The feature list reads like an engineering resume, not a sales page.
 
 ## What's confusing? What would make someone bounce?
 
-1. **`matches_intent` requires an API key.** Friction at the exact moment they're excited. First run should work WITHOUT Claude.
-2. **Three evaluators = three things to learn.** Lead with ONE: `contains`. That's it. Everything else is "advanced."
-3. **No cost visibility.** Someone will run 100 semantic checks and get a surprise bill. Tell them upfront.
+- **Email-only auth, no password.** Sounds simple until a member asks "how do I log in?" and there's no clear answer.
+- **Price in cents (9900 = $99)** — she'll set it wrong. Guaranteed.
+- **The plan has 12 tasks about fixing code.** Zero tasks about making the signup feel magical.
+- **Setup requires "webhooks" and ".env files"** — she's out. She teaches yoga at 6am. She's not debugging env vars at 11pm.
 
-## The 30-second elevator pitch:
+## 30-Second Elevator Pitch
 
-> "Your AI agent works in your terminal. Does it work in production? One command tells you — green checkmark or red X. No setup. No dashboard. No prayers."
+"MemberShip lets you charge for your best content. Add it to your site, connect Stripe, and your students can subscribe in under a minute. You keep 100% minus Stripe fees. No coding. No monthly SaaS fee. You built it — you own it."
 
-## What would I test first with $0 marketing budget?
+## What would I test first with $0 budget?
 
-**Twitter/X thread.** 30-second video of running `npx agentbench` on a real agent. Show the output. Tag three AI engineers: "Would this save you time?" The tool sells itself or it doesn't.
+DM five yoga instructors on Instagram. Ask: "Would you pay $200 once to add paid memberships to your website?" If three say yes, ship it. If they ask "what's EmDash?" — you have a positioning problem, not a product problem.
 
 ## What's the retention hook?
 
-**The fear never goes away.** Every new feature, every model update — they'll run AgentBench again. The hook is the anxiety loop: build, test, breathe, repeat. Make that loop feel GOOD.
+**Drip content.** That's the only thing that makes her come back. "Your student unlocks Module 3 tomorrow" is a reason to check the dashboard. Everything else is set-and-forget.
 
-## Bottom line:
+But here's what's missing: **no notification when someone joins.** That dopamine hit — "Sarah just became a member!" — is the whole game. She needs to feel like a business owner, not a sys admin.
 
-This solves a real problem. But the magic is in the FIRST RUN. Nail that or nothing else matters. Ship it, watch what breaks, fix fast.
+---
 
-—Sara
+**Bottom line:** The plumbing works. The feeling doesn't. Ship it, but the first update better be that "new member" ping.

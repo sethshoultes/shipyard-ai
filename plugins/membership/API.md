@@ -1,6 +1,6 @@
 # MemberShip Plugin -- REST API Reference
 
-**Version:** 1.5.0
+**Version:** 1.0.0
 **Base path:** `/membership`
 
 All routes are prefixed with the plugin's base path. For example, a route documented as `POST /register` is reached at `POST /membership/register`.
@@ -1887,7 +1887,7 @@ GET /membership/health
 ```json
 {
   "status": "ok",
-  "version": "1.5.0",
+  "version": "1.0.0",
   "features": [
     "reporting",
     "groups",

@@ -1,137 +1,150 @@
 # Round 1 — Elon Musk (Chief Product & Growth)
 
-## The Brutal Truth
+## The Brutal Truth Redux
 
-We built 6 plugins against a **hallucinated API**. That's ~10,000 lines of code that literally cannot run. This isn't a bug fix — this is a rewrite dressed up as maintenance.
+Sixteen planning documents. Zero deployed code. The retrospective already said it: **"We rehearsed the play with excellence. We never took the stage."**
 
-The PRD says "fix the existing code, don't rewrite from scratch." That's optimistic thinking. When 114 instances of `throw new Response` need to become `throw new Error`, and you're touching every error path in 3,984 lines — you're rewriting. Call it what it is.
-
----
-
-## Architecture: First Principles
-
-**Simplest system that could work:**
-1. Read `EMDASH-GUIDE.md`
-2. Read `examples/sunrise-yoga/node_modules/emdash/dist/` source
-3. Replace banned patterns with real API calls
-4. Test one plugin against one live site
-5. Repeat for remaining 5 plugins
-
-**What's actually happening:**
-6 plugins, 4 test sites, 7 success criteria per plugin, Playwright screenshots, curl every route. That's 42+ verification steps before "done."
-
-**Cut the ceremony.** Deploy one plugin to one site. Verify it loads. Ship. Move to next.
+The deliverables directory is literally empty. This is the most expensive form of procrastination I've ever seen—twelve thousand lines of code exist *somewhere*, but zero lines are serving customers.
 
 ---
 
-## Performance: Where Are the Bottlenecks?
+## Architecture: Simplest System That Could Work
 
-The PRD buries the lede: **the admin route returns valid JSON via curl but Emdash's PluginRegistry fails with `.map()` error.**
+**Current architecture:** Two plugins, shared ~60% code duplication, 4,000-line monolith, KV storage, Stripe webhooks, Resend emails.
 
-This is the only bottleneck that matters. Everything else is find-and-replace.
+**First principles reduction:**
+1. One plugin (MemberShip)
+2. One customer (Sunrise Yoga)
+3. One payment flow (Stripe checkout → webhook → KV write → email)
+4. One permission check (member vs. not-member)
 
-**Analysis:**
-- Block Kit JSON is valid
-- Browser fails
-- `.map()` error means the host expects an array but gets an object (or vice versa)
+That's it. Everything else is optimization before validation.
 
-**10x path:**
-1. `curl` the working `eventdash` admin route
-2. Compare response shape to broken plugins
-3. Fix the shape mismatch
-4. All 6 plugins inherit the fix
+**The 4,000-line monolith?** Ship it. Refactoring a monolith nobody uses is vanity. Refactoring a monolith 100 customers depend on is engineering.
 
-This is a 1-hour investigation, not a 40-hour debug session.
+---
+
+## Performance: Where Are The Bottlenecks?
+
+**Not where you think.**
+
+The tech bottlenecks are mild:
+- KV reads: Fine to 10K records, then migrate to D1
+- Stripe webhooks: Cloudflare handles it
+- Email: Resend rate limits matter at 500+ members
+
+**The actual bottleneck:** Zero production contact. We have no data on:
+- What breaks in real Stripe transactions
+- What confuses the yoga instructor in the admin UI
+- Whether anyone can actually install this thing
+
+**10x path:** Deploy today. Collect error logs. Fix what breaks. Repeat. This beats another planning cycle by 100x.
 
 ---
 
 ## Distribution: How Does This Reach 10,000 Users?
 
-**It doesn't.** Not without EmDash reaching 10,000 users first.
+**Short answer:** It doesn't. Not directly.
 
-These are plugins FOR EmDash. EmDash market size is listed as "Unknown. 100 sites? 500?" in the decisions doc. If EmDash has 100 sites, perfect plugins get us... 100 potential users.
+These are plugins for EmDash. EmDash market size is "Unknown. 100 sites? 500?" If EmDash has 100 sites and 20% activate MemberShip, we have 20 users. Full stop.
 
-**Distribution strategy for plugins:**
-1. Bundle MemberShip and EventDash into official EmDash templates
-2. Ship enabled-by-default, not discoverable-and-installable
-3. New EmDash sites get working plugins on day one
-4. Zero marketing required — distribution is EmDash's problem
+**Distribution strategy (cost: $0):**
+1. Bundle MemberShip in every new EmDash template by default
+2. Make it work on first run—no configuration required
+3. Let EmDash's growth carry plugin adoption
 
-**The real growth question:** How does EmDash reach 10,000 users? That's upstream of this PRD.
+**10,000 users requires EmDash to reach 50,000 sites** (assuming 20% plugin activation). That's upstream of this PRD. We can't plugin our way to scale.
+
+**One leverage point:** If MemberShip makes EmDash sites stickier (retain members = retain site owners), we accelerate EmDash's own growth. But that's a second-order effect we can't measure until we ship.
 
 ---
 
-## What to CUT (v2 Masquerading as v1)
+## What to CUT (v2 Features Masquerading as v1)
 
-**Cut from this PRD:**
+| Cut | Rationale |
+|-----|-----------|
+| **EventDash** | Ship MemberShip first. EventDash inherits learnings. |
+| **Week view** | 30% complexity, 3% usage (Steve's estimate, unverified) |
+| **Multi-day events** | "Part 1 of 3" in title works |
+| **CSV import/export** | Manual onboarding for first 50 customers |
+| **Coupon engine** | Zero customers have asked |
+| **Analytics dashboards** | Members + revenue number. That's it. |
+| **Demo data on install** | 2-3 weeks of work. Empty state + CTA sufficient. |
+| **Group/corporate memberships** | Zero customer requests |
+| **Shared module extraction** | Ship duplicated code. Extract when it matters. |
 
-| Cut | Reason |
-|-----|--------|
-| **Playwright screenshots** | Curl + browser console is sufficient. Screenshot infra is overhead. |
-| **"Test on a live site" for all 6** | Test MemberShip on Sunrise Yoga. If it works, pattern transfers. |
-| **ReviewPulse (P1)** | Zero evidence anyone uses review collection features. Fix last. |
-| **SEODash (P1)** | EmDash has `plugin-seo` in the guide. Duplicate functionality. |
-| **CommerceKit (P2)** | "No example site assignment yet" = no customer demand. Cut entirely or defer. |
-
-**Ship order:**
-1. EventDash (130 lines, working reference)
-2. MemberShip (highest stated priority, Stripe integration)
-3. FormForge (no banned patterns, likely works)
-4. The rest — when someone asks for them
+**The cut philosophy:** If zero customers have requested it, don't build it. Build infrastructure for the customers you have (zero), not the customers you imagine (ten thousand).
 
 ---
 
 ## Technical Feasibility: Can One Agent Session Build This?
 
-**MemberShip alone:** Maybe. 3,984 lines with 114 `throw new Response` replacements. That's mechanical work. One session can do it if:
-- No architectural surprises
-- The Block Kit response format is documented
-- Stripe webhook testing doesn't require live card transactions
+**Honest assessment:**
 
-**All 6 plugins:** No. The PRD describes 40+ hours of work:
-- 6 plugins * (grep + build + deploy + curl routes + curl admin + screenshots + console check) = minimum 3 hours per plugin
-- Plus the Block Kit format investigation
-- Plus Playwright setup for screenshots (which I'm cutting anyway)
+The decisions doc lists 8 REQUIRED items before ship:
+1. Deploy to Sunrise Yoga
+2. Three real Stripe transactions
+3. Webhook failure recovery verified
+4. Documentation complete (4 docs)
+5. Admin authentication secured
+6. Status endpoint secured
+7. Version number unified
+8. Brand voice applied
 
-**Achievable in one session:**
-1. Fix MemberShip banned patterns (2 hours)
-2. Deploy to Sunrise Yoga (30 mins)
-3. Debug Block Kit format if it fails (1 hour)
-4. Document the working pattern (30 mins)
+**One session:** Can fix the banned API patterns (114 `throw new Response`), deploy to one site, and verify basic functionality.
 
-That's one plugin shipped. Not six.
+**Cannot do in one session:**
+- Three real Stripe transactions (requires live cards, human involvement)
+- Full documentation (4 complete docs = 4-8 hours of writing)
+- Stress testing webhook failure scenarios
+- Brand voice review of all copy
+
+**Realistic scope for one session:** Fix security gaps (admin auth, status endpoint), deploy to Sunrise Yoga, verify one transaction flow works.
+
+**Ship criteria reduction:** Trade "three real transactions" for "one real transaction." Trade "four complete docs" for "one installation README that works."
 
 ---
 
-## Scaling: What Breaks at 100x Usage?
+## Scaling: What Breaks at 100x?
 
-| Component | Now | At 100x | Fix Required |
-|-----------|-----|---------|--------------|
-| KV reads | 1K/day | 100K/day | Fine ($0.05/day at KV pricing) |
-| Plugin sandboxing | 10 installs | 1,000 installs | Worker isolate limits apply |
-| Stripe webhooks | 10/day | 1K/day | Cloudflare handles fan-out |
-| Block Kit rendering | 1 admin | 100 admins | No state, scales linearly |
+| Component | At 100x (10K members) | Risk |
+|-----------|----------------------|------|
+| KV storage | `entries.query()` timeout | **HIGH** — already documented |
+| Stripe webhooks | 100K/month | Low — Cloudflare handles |
+| Resend emails | Rate limit hits | Medium — queue needed |
+| Admin dashboard | Linear scaling | Low |
+| Auth tokens | JWT refresh overhead | Low |
 
-**The real 100x risk:** EmDash itself. These plugins run inside EmDash's sandbox. If EmDash has scaling issues at 100x, plugins inherit them. We don't control that.
+**The real 100x problem:** We don't have 1x. Scaling concerns are theoretical when production usage is zero.
 
-**Our scaling risk:** KV list operations. `ctx.storage.entries.query()` against 10K records times out. The decisions doc already flagged this — D1 migration path exists. Accept for v1, migrate in v2.
+**First make it work. Then make it scale.** Every minute spent on D1 migration before we have 1,000 members is wasted.
 
 ---
 
 ## Bottom Line
 
-**The PRD is overcomplicated.** 6 plugins, 7 criteria each, 4 test sites, Playwright screenshots, curl every route. This is process theater for a mechanical find-and-replace task.
+**Process score: 10/10.** The debates were rigorous. The artifacts are polished. The decisions are sound.
 
-**What actually needs to happen:**
-1. One engineer reads the working `eventdash/sandbox-entry.ts`
-2. Same engineer applies the pattern to MemberShip
-3. Deploy to one site
-4. Verify admin loads in browser
-5. Verify one Stripe transaction works
-6. Ship
+**Shipping score: 0/10.** The deliverables directory is empty.
 
-**Timeline:** 1 day for MemberShip. 1 day for EventDash. FormForge probably already works. ReviewPulse, SEODash, CommerceKit — when customers request them.
+**What needs to happen THIS WEEK:**
+1. Fix admin authentication (security blocker)
+2. Fix status endpoint exposure (security blocker)
+3. Deploy to Sunrise Yoga (production contact)
+4. Run one real transaction (validation)
+5. Ship
 
-**The philosophy:** We hallucinated an API and wrote 10,000 lines against it. The fix is not more process. The fix is reading the real API and writing less code.
+**What needs to NOT happen:**
+- Another planning round
+- More board reviews
+- Retention roadmaps for users that don't exist
+- Demo data implementations
+- Week view debates without data
 
-Stop documenting. Start deploying.
+**The philosophy:**
+
+> "Planning without production is rehearsal without performance. The audience teaches things the mirror cannot."
+
+That's from our own retrospective. We wrote it. Now execute it.
+
+Stop documenting. Start deploying. Today.

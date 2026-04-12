@@ -1,276 +1,367 @@
-# Retention Roadmap: What Keeps Users Coming Back
+# Shonda's Retention Roadmap — What Keeps Users Coming Back
 
-**Author:** Based on Shonda Rhimes Board Review
-**Version:** 1.1 Planning
-**Date:** 2026-04-12
-
----
-
-## The Core Problem
-
-> "This product answers: 'How do we gate content and collect payment?' It should be answering: 'How do we make members *need* to come back?'"
-
-The MemberShip plugin has infrastructure. It lacks *narrative*. Every successful long-running show has hooks that make audiences count down to the next episode. MemberShip needs the same.
+**Product:** EmDash Plugin Suite (MemberShip & EventDash)
+**Author:** Shonda Rhimes (Chief Retention & Narrative)
+**Target Users:** Small business owners — yoga instructors, bistro owners, craftspeople, creative entrepreneurs
 
 ---
 
-## What Keeps Users Coming Back
+## The Core Truth About Retention
 
-### The Three Retention Principles
+Users don't return for features. They return for **feelings**.
 
-1. **Anticipation > Delivery** — The excitement of what's coming is often more powerful than the thing itself
-2. **Progress Creates Commitment** — People who see how far they've come are reluctant to abandon the journey
-3. **Curiosity Demands Resolution** — Unanswered questions pull people back
+These are creative people trapped in technical prisons. Every SaaS tool they've tried has a learning curve, a tutorial video, a help article maze. They start excited, feel overwhelmed, then quit.
 
----
+The feeling we're selling: *"I did that. I built that. I can do this."*
 
-## v1.0 Retention Gaps
+When a yoga instructor sees members signing up through her site, she feels capable. That feeling is addictive. That feeling makes her tell every business owner she knows.
 
-| Touchpoint | Current State | Retention Problem |
-|------------|---------------|-------------------|
-| Registration | "You're registered!" | No hint of what's next |
-| Dashboard | Static content list | No "new since last visit" |
-| Drip Unlock | "Content now available" | No anticipation building |
-| Between Logins | Silence | No reason to return |
-| Renewal Reminder | "You're about to renew" | Defensive, not exciting |
-| Cancellation | "Subscription cancelled" | No last hook |
+**We're not selling membership software. We're selling confidence that technology can serve them.**
 
 ---
 
-## v1.1 Retention Features
+## V1.0 Retention Foundations (Ship Now)
 
-### 1. The "Aha Moment" Framework
+These elements must be in V1 — they're the foundation of the retention loop.
 
-**Goal:** Define and design the specific moment when members realize value.
+### 1. The First 30 Seconds
+- Empty state with clear, confident CTA: "Create Your First Member"
+- Stripe connects once. Colors inherit automatically.
+- Admin sees progress immediately — not settings screens, not tutorials
+- **Goal:** Confidence before competence. Show them winning before teaching them how.
+
+### 2. Beautiful Admin Experience
+- Admins spend 80% of plugin time in dashboard
+- Must be as beautiful as customer-facing UI
+- Not spreadsheet-like — signals we respect the person running the business
+- **Goal:** Every time they open the dashboard, they feel professional.
+
+### 3. Terse, Warm Communication
+- "You're in." not "Successfully submitted!"
+- "Done. Saved. Live." not "Your changes have been confirmed."
+- Three words where competitors use twelve
+- **Kill these words:** Successfully, submitted, confirmed, error occurred, please, unfortunately
+- **Goal:** Speak like you're texting a smart friend, not writing a support article.
+
+### 4. Zero-Config That Works
+- Plugin feels like it was *always there*
+- Colors match the site automatically
+- No technical decisions forced on non-technical users
+- **Goal:** They didn't read docs. They just... won.
+
+### 5. Reliable Core Flows
+- Payments work. Every time.
+- Emails arrive. Every time.
+- Webhook failures recover gracefully
+- **Goal:** Never break trust. Ever.
+
+---
+
+## V1.1 Features — Deepening the Hook
+
+### Theme: Make Success Visible
+
+Users come back when they can *see* their progress. V1.1 surfaces wins and creates emotional payoffs that keep admins engaged.
+
+---
+
+### Feature 1: Weekly Digest Email (Admin Summary)
+
+**What:** Every Monday at 9am, site owners receive a beautiful email summarizing their week.
+
+**Contents:**
+- New members/registrations this week
+- Revenue processed through Stripe
+- Upcoming events (if EventDash installed)
+- One encouraging line: "Your community grew by 12% this week."
+
+**Why It Retains:**
+- Reminds them the plugin exists (passive re-engagement)
+- Shows growth: "5 new members this week" feels like progress
+- Creates shareable moments: screenshot → social proof
+- Even zero-growth weeks can be framed positively: "Your 23 members are still with you."
+
+**Effort:** Low — data already exists, just formatting + Resend integration
+
+**Priority:** **P1**
+
+---
+
+### Feature 2: Milestone Celebrations
+
+**What:** Automatic celebration when admins or members hit meaningful milestones.
+
+**Admin Milestones:**
+- "You've welcomed your 10th member!"
+- "100 members — your community is thriving."
+- "$1,000 processed through your site this month."
+
+**Member Milestones (visible to admin):**
+- "Sarah has been a member for 1 year"
+- "This month's top event had 47 attendees"
+
+**Why It Retains:**
+- Emotional payoff for the admin
+- Reinforces that the plugin is *working*
+- Creates screenshot-worthy moments → word of mouth
 
 **Implementation:**
-- [ ] Creator-configurable "aha moment" designation in admin
-- [ ] Instrumentation to track when members hit it
-- [ ] Analytics: "X% of members reach aha moment within Y days"
-- [ ] Intervention: Automated nudges for members who haven't reached it
+- Track member tenure, cumulative counts, revenue thresholds
+- Surface in admin dashboard + optional email notification
+- Beautiful, shareable card design
 
-**Example Aha Moments:**
-- First exclusive content consumed
-- First drip unlock
-- First community interaction
-- First tangible result from content
+**Effort:** Medium — requires milestone tracking logic and UI
+
+**Priority:** **P2**
 
 ---
 
-### 2. Episode-Style Drip Content
+### Feature 3: One-Click Social Sharing
 
-**Goal:** Transform mechanical unlocks into anticipated reveals.
-
-**Current:**
-```
-"Module 3 is now available"
-```
-
-**v1.1:**
-```
-"Module 3 is here: 'The Pivot Point'
-In this module, everything you thought you knew about [topic] gets challenged.
-143 other members unlocked this today. Here's what they're saying..."
-```
+**What:** Share event or membership signup pages directly to social media from admin.
 
 **Implementation:**
-- [ ] Drip content preview/teaser field (blurred image, summary text)
-- [ ] "Coming in X days" dashboard widget with countdown
-- [ ] Unlock notification templates with narrative hooks
-- [ ] Social proof: "X members unlocked this" / "X members waiting"
+- Pre-formatted share text with intelligent defaults
+- Open Graph meta tags optimized for each platform
+- "Share to Facebook / Instagram / X" buttons in admin
+- Copy link with preview of how it will appear
+
+**Why It Retains:**
+- Reduces friction to promotion
+- More promotion → more signups → more success → more retention
+- Admin feels empowered, not stuck figuring out URLs
+
+**Effort:** Low — mostly UI + meta tag polish
+
+**Priority:** **P1**
 
 ---
 
-### 3. "Previously On..." Dashboard
+### Feature 4: Simple Progress Dashboard
 
-**Goal:** Reorient returning members and surface progress.
+**What:** Visual representation of members/events over time. Simple. Beautiful. Not overwhelming.
+
+**Contents:**
+- Monthly member count trend (line chart)
+- Revenue trend if Stripe connected
+- This week vs. last week comparison
+- "Your busiest day was Thursday"
+
+**Why It Retains:**
+- Progress visualization creates dopamine
+- "Line going up" keeps people engaged
+- Answers "Is this working?" without needing Google Analytics
+- Makes success tangible and visible
 
 **Implementation:**
-- [ ] "New since your last visit" section
-- [ ] Content consumption history ("You've completed 7 of 12 modules")
-- [ ] Streak tracking ("Member for 47 days")
-- [ ] Personalized "Continue where you left off" prompt
+- Lightweight charting component (no heavy libraries)
+- Just the basics, beautifully rendered
+- No advanced analytics — that's V2+
 
-**Dashboard Sections (v1.1):**
+**Effort:** Medium — requires charting component
+
+**Priority:** **P2**
+
+---
+
+### Feature 5: Quick Actions from Dashboard Home
+
+**What:** Most common actions one click away from dashboard home.
+
+**Actions:**
+- "Send email to all members"
+- "Create new event"
+- "View recent signups"
+- "Copy signup link"
+- "Download member list"
+
+**Why It Retains:**
+- Reduces time-to-action → feels efficient
+- Surfaces capabilities users might not discover
+- Makes the plugin feel powerful without being complicated
+- Dashboard becomes a command center, not a waiting room
+
+**Effort:** Low — UI reorganization, no new functionality
+
+**Priority:** **P1**
+
+---
+
+### Feature 6: Welcome Email Automation
+
+**What:** Customizable welcome email that sends automatically when someone joins.
+
+**Implementation:**
+- Simple template editor (single template, not flows)
+- Variable insertion: {first_name}, {membership_tier}, {site_name}
+- Preview before save
+- Default template ships ready to use
+
+**Why It Retains:**
+- Admin feels professional: "I have automated systems"
+- Members feel welcomed → better downstream retention
+- Sets expectation that communication continues
+- Zero effort after initial setup
+
+**Effort:** Medium — template editor + variable parsing
+
+**Priority:** **P3**
+
+---
+
+### Feature 7: Mobile-Responsive Admin
+
+**What:** Full admin functionality on phone and tablet.
+
+**Why It Retains:**
+- Business owners check their business constantly
+- Mobile access = more frequent engagement
+- "I can manage my membership from anywhere"
+- Checking stats becomes a satisfying habit
+
+**Effort:** Medium-High — responsive design across all admin screens
+
+**Priority:** **P3**
+
+---
+
+## V1.1 Prioritization Matrix
+
+| Feature | Retention Impact | Effort | Ship Order |
+|---------|------------------|--------|------------|
+| Weekly Digest Email | High | Low | **V1.1a** |
+| One-Click Social Sharing | Medium | Low | **V1.1a** |
+| Quick Actions Dashboard | Medium | Low | **V1.1a** |
+| Milestone Celebrations | High | Medium | **V1.1b** |
+| Simple Progress Dashboard | High | Medium | **V1.1b** |
+| Welcome Email Automation | Medium | Medium | **V1.2** |
+| Mobile-Responsive Admin | Medium | High | **V1.2** |
+
+**V1.1a ships:** Weekly Digest + Social Sharing + Quick Actions (all low-effort, high-impact)
+**V1.1b ships:** Milestones + Progress Dashboard (medium-effort, high-impact)
+**V1.2 ships:** Welcome Automation + Mobile Admin (medium/high effort, medium-impact)
+
+---
+
+## The Retention Flywheel
+
 ```
-┌─────────────────────────────────────┐
-│ Welcome back, [Name]!               │
-│ You've been a member for 47 days    │
-├─────────────────────────────────────┤
-│ 🆕 NEW SINCE YOUR LAST VISIT        │
-│ • Module 5 unlocked (2 days ago)    │
-│ • 3 new community posts             │
-├─────────────────────────────────────┤
-│ ⏳ COMING SOON                       │
-│ • Module 6 unlocks in 5 days        │
-│   "The moment everything changes"   │
-├─────────────────────────────────────┤
-│ 📊 YOUR PROGRESS                    │
-│ ████████░░░░ 7/12 modules complete  │
-└─────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                                                              │
+│   1. INSTALL                                                 │
+│      └── Feel capable (first 30 seconds)                     │
+│                                                              │
+│   2. CREATE                                                  │
+│      └── First member/event → immediate win                  │
+│                                                              │
+│   3. SEE PROGRESS                                            │
+│      └── Dashboard analytics, milestones                     │
+│                                                              │
+│   4. SHARE SUCCESS                                           │
+│      └── One-click social sharing                            │
+│                                                              │
+│   5. GET REMINDED                                            │
+│      └── Weekly digest email                                 │
+│                                                              │
+│   6. RETURN                                                  │
+│      └── Open dashboard, see growth                          │
+│                                                              │
+│   7. LOOP                                                    │
+│      └── Tell a friend, they install                         │
+│                                                              │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-### 4. Anticipation Mechanics
+## Anti-Retention Patterns to Avoid
 
-**Goal:** Make members look forward to what's next.
+### ❌ Don't Add Complexity
+- No granular permissions
+- No enterprise features masquerading as "flexibility"
+- No settings pages with 47 options
+- If you need more than 5 settings, you've failed at defaults
 
-**Teaser System:**
-- [ ] Preview cards for locked content (blurred, with tagline)
-- [ ] "Unlocks in X days" countdown timers
-- [ ] Email: Weekly "What's coming" digest
-- [ ] Creator tool: Write teaser copy for upcoming drips
+### ❌ Don't Break Trust
+- Payments must never fail silently
+- Emails must always arrive
+- Webhooks must recover gracefully
+- One broken payment = lost customer forever
 
-**Example Email:**
-```
-Subject: This week on [Creator Name]...
+### ❌ Don't Lose the Feeling
+- Never make admins feel inadequate
+- Never use jargon they don't understand
+- Never surface errors without clear next steps
+- Never show empty states that feel like failure
 
-Module 6 drops in 5 days.
-We're not going to tell you what's in it.
-But we will say this: it changes everything.
-
-[See what's coming →]
-```
-
----
-
-### 5. Milestone Celebrations
-
-**Goal:** Celebrate creator and member achievements.
-
-**Creator Milestones:**
-- [ ] First subscriber notification (with confetti!)
-- [ ] 10th, 50th, 100th subscriber emails
-- [ ] First $100, $1,000, $10,000 revenue celebrations
-- [ ] Monthly "Your community grew by X%" summary
-
-**Member Milestones:**
-- [ ] Welcome sequence (Day 1, Day 3, Day 7)
-- [ ] Consumption milestones ("You've completed half the course!")
-- [ ] Anniversary ("You've been a member for 1 year")
-- [ ] Streak achievements ("30 days in a row!")
+### ❌ Don't Optimize for Power Users First
+- Design for the yoga instructor. Power users figure it out.
+- Every interaction should take half the steps users expect
+- Invisible complexity is the philosophy
 
 ---
 
-### 6. Cliffhanger Touchpoints
+## Success Metrics for V1.1
 
-**Goal:** End every interaction with a question, not a period.
-
-**Redesigned Touchpoints:**
-
-| Touchpoint | Current | v1.1 |
-|------------|---------|------|
-| Registration Confirm | "You're registered!" | "Welcome! Your first exclusive drops in 24 hours. We can't wait to show you..." |
-| Drip Unlock Email | "Content available" | "It's here. But fair warning—after this, nothing is what you expect." |
-| Dashboard Exit | (none) | "Before you go: Module 6 drops in 3 days. It's a big one." |
-| Renewal Reminder | "Renewing in 7 days" | "Next month: [teaser]. Plus something we've never done before." |
-| Cancellation | "Cancelled" | "We'll miss you. Before you go, here's one last thing we made for you..." |
+| Metric | Target | How We Measure |
+|--------|--------|----------------|
+| Weekly Active Admins | 60% of installed base | Dashboard visits per week |
+| Weekly Digest Open Rate | >40% | Resend email analytics |
+| Social Shares per Month | >10 per active site | Share button clicks |
+| Time to First Member | <5 minutes from install | Onboarding timestamp tracking |
+| Return Visit Rate | >3 visits/week | Dashboard session tracking |
+| Support Tickets per User | <0.5/month | Support system metrics |
+| Net Promoter Score | >50 | Post-milestone survey |
 
 ---
 
-### 7. Content Engagement Intelligence
+## The Narrative Arc of Retention
 
-**Goal:** Help creators understand what resonates.
+Great retention tells a story. Each user's journey should feel like a narrative with rising action:
 
-**Analytics (v1.1):**
-- [ ] Content view tracking (which gated content is accessed)
-- [ ] Completion rates (for video/long-form content)
-- [ ] Drip email open rates
-- [ ] Correlation: "Members who complete X have Y% lower churn"
+**Act 1: Discovery** (V1.0)
+> "This is easier than I expected. It just... works."
 
-**Creator Insights:**
-```
-📈 This Month's Insights
+**Act 2: Early Wins** (V1.0 → V1.1a)
+> "My first member signed up! And another. This is real."
 
-• Your most-viewed content: "Module 3: The Basics"
-• Pro members engage most with: [AI/Strategy content]
-• Members who complete Module 1 within 7 days → 2x retention
-• Suggested: Email members who haven't started Module 1 yet
-```
+**Act 3: Visible Growth** (V1.1b)
+> "Look at this chart. Look at these milestones. My business is growing."
 
----
+**Act 4: Mastery** (V1.2+)
+> "I run my membership from my phone. I have automated welcome emails. I'm a professional."
 
-### 8. Win-Back Sequence
-
-**Goal:** Re-engage members before and after they leave.
-
-**Pre-Churn (7 days before renewal):**
-- [ ] "Here's what you'll miss" preview of upcoming content
-- [ ] Highlight unused benefits ("You haven't accessed X yet")
-- [ ] Social proof: "147 members renewed this week"
-
-**Post-Churn (7, 14, 30 days after):**
-- [ ] "We saved your progress" email
-- [ ] "Here's what you missed" summary
-- [ ] Special comeback offer (if enabled by creator)
+**Epilogue: Evangelism**
+> "You have to try this. It made me feel like I actually know what I'm doing."
 
 ---
 
-## Implementation Priority
+## The North Star
 
-### v1.1 Sprint 1: Foundation
-1. Member event logging (all actions tracked)
-2. "New since last visit" dashboard section
-3. Drip content teaser/preview fields
-4. First-subscriber celebration for creators
+> **Users come back because we make them feel successful.**
 
-### v1.1 Sprint 2: Anticipation
-5. Countdown timers for locked content
-6. "Coming soon" dashboard widget
-7. Narrative unlock email templates
-8. Weekly "what's coming" digest
+Not because we have the most features.
+Not because we're the cheapest.
+Not because we're the most powerful.
 
-### v1.1 Sprint 3: Progress & Milestones
-9. Content consumption tracking
-10. Progress bar dashboard component
-11. Member streak tracking
-12. Creator milestone notifications
+Because every time they open our dashboard, they see evidence that their business is working.
 
-### v1.1 Sprint 4: Intelligence
-13. Content engagement analytics
-14. Creator insights dashboard
-15. Churn correlation analysis
-16. Pre-churn intervention triggers
+That feeling — *competence without complexity* — is what keeps them coming back.
 
 ---
 
-## Success Metrics
+## Final Note
 
-| Metric | Current Baseline | v1.1 Target |
-|--------|------------------|-------------|
-| Day 7 retention | Unknown | 70% |
-| Day 30 retention | Unknown | 50% |
-| Drip email open rate | Unknown | 45% |
-| Dashboard return visits/month | Unknown | 4+ |
-| Members reaching "aha moment" | Unknown | 60% in first 7 days |
-| Monthly churn rate | Unknown | <5% |
+The yoga instructor isn't overwhelmed by our UX. She doesn't even know we exist yet. She's using Squarespace with a broken Stripe embed because that's what shipped.
 
----
+Before we can retain users, we need users. Ship V1. Then this roadmap activates.
 
-## The Shonda Test
+But when V1.1 ships, it won't just keep users — it will turn them into evangelists.
 
-Before shipping any v1.1 feature, ask:
+> *"They won't just use these plugins. They'll tell every business owner they know."*
 
-1. **Does this make members curious about what's next?**
-2. **Does this create a reason to come back tomorrow?**
-3. **Does this celebrate progress, not just deliver content?**
-4. **Does this end with a question, not a period?**
-
-If the answer to any of these is "no," redesign it.
+That's retention. That's growth. That's the goal.
 
 ---
 
-## Closing Principle
-
-> "I've greenlit shows and I've cancelled shows. The cancelled ones always had one thing in common: they didn't make audiences care about next week."
-
-MemberShip v1.0 manages members.
-MemberShip v1.1 must *captivate* them.
-
-Every feature in this roadmap serves one goal: **make members need to know what happens next.**
-
----
-
-*Retention Roadmap based on Shonda Rhimes Board Review*
-*Great Minds Agency — 2026-04-12*
+**Next Step:** Ship MemberShip V1. Then execute this roadmap.
