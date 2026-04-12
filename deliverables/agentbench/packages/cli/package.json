@@ -1,0 +1,41 @@
+{
+  "name": "@agentbench/cli",
+  "version": "1.0.0",
+  "description": "Command-line interface for agentbench",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "agentbench": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "agentbench",
+    "cli",
+    "testing",
+    "ai"
+  ],
+  "author": "Shipyard AI",
+  "license": "MIT",
+  "dependencies": {
+    "@agentbench/core": "1.0.0",
+    "zod": "^3.22.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

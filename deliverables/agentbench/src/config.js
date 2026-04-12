@@ -1,5 +1,5 @@
-const yaml = require('js-yaml');
-const fs = require('fs');
+import yaml from 'js-yaml';
+import fs from 'fs';
 
 function loadConfig(filePath) {
   let fileContents;
@@ -110,6 +110,4 @@ function loadConfig(filePath) {
   return config;
 }
 
-module.exports = {
-  loadConfig
-};
+export { loadConfig };

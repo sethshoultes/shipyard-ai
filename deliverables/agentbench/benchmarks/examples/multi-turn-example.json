@@ -1,0 +1,180 @@
+{
+  "name": "customer-support-conversation",
+  "description": "A benchmark that evaluates multi-turn conversational abilities in a customer support context. Tests context retention, problem-solving, and appropriate escalation across conversation turns.",
+  "evaluationType": "multi-turn",
+  "prompts": [
+    {
+      "id": "support-001",
+      "input": [
+        {
+          "role": "system",
+          "content": "You are a helpful customer support agent for TechGadget Inc. Be polite, professional, and help resolve customer issues efficiently."
+        },
+        {
+          "role": "user",
+          "content": "Hi, I ordered a laptop last week and it still hasn't arrived. Order number is TG-2024-78432."
+        },
+        {
+          "role": "assistant",
+          "content": "Hello! I'm sorry to hear about the delay with your laptop order. Let me look up order TG-2024-78432 for you right away. I can see your order was shipped on April 5th via express delivery. According to the tracking, it's currently at the local distribution center and should be delivered today or tomorrow."
+        },
+        {
+          "role": "user",
+          "content": "That's what they said 3 days ago. Can I get a refund instead?"
+        }
+      ],
+      "expectedOutput": {
+        "type": "semantic",
+        "value": "The agent should acknowledge the customer's frustration, offer to investigate the delivery issue further, and explain the refund process while trying to retain the customer.",
+        "threshold": 0.75
+      },
+      "context": {
+        "maxTokens": 300,
+        "temperature": 0.7
+      },
+      "weight": 1
+    },
+    {
+      "id": "support-002",
+      "input": [
+        {
+          "role": "system",
+          "content": "You are a helpful customer support agent for TechGadget Inc. Be polite, professional, and help resolve customer issues efficiently."
+        },
+        {
+          "role": "user",
+          "content": "My new headphones won't connect to my phone via Bluetooth."
+        },
+        {
+          "role": "assistant",
+          "content": "I'd be happy to help you troubleshoot the Bluetooth connection issue with your headphones. Let's start with a few basic steps. First, can you tell me which headphone model you have and what type of phone you're trying to connect to?"
+        },
+        {
+          "role": "user",
+          "content": "It's the TechGadget Pro X headphones and I have an iPhone 15."
+        },
+        {
+          "role": "assistant",
+          "content": "Thank you for that information. The TechGadget Pro X headphones are fully compatible with iPhone 15. Let's try these steps: 1) Make sure the headphones are in pairing mode by holding the power button for 5 seconds until you see a flashing blue light. 2) On your iPhone, go to Settings > Bluetooth and make sure Bluetooth is turned on. 3) Look for 'TechGadget Pro X' in the available devices list. Do you see the flashing blue light on your headphones?"
+        },
+        {
+          "role": "user",
+          "content": "Yes, I see the blue light but the headphones don't show up in my iPhone's Bluetooth list at all."
+        }
+      ],
+      "expectedOutput": {
+        "type": "contains",
+        "value": ["forget", "reset", "restart"]
+      },
+      "context": {
+        "maxTokens": 350,
+        "temperature": 0.5
+      },
+      "weight": 1.5
+    },
+    {
+      "id": "support-003",
+      "input": [
+        {
+          "role": "system",
+          "content": "You are a helpful customer support agent for TechGadget Inc. Be polite, professional, and help resolve customer issues efficiently. You can offer up to 15% discount for customer retention."
+        },
+        {
+          "role": "user",
+          "content": "I want to cancel my TechGadget Premium subscription."
+        },
+        {
+          "role": "assistant",
+          "content": "I understand you'd like to cancel your TechGadget Premium subscription. Before I process that, would you mind sharing what's prompting this decision? I want to make sure I understand your concerns and see if there's anything we can do to improve your experience."
+        },
+        {
+          "role": "user",
+          "content": "It's too expensive. I'm paying $19.99/month but I don't use half the features."
+        }
+      ],
+      "expectedOutput": {
+        "type": "semantic",
+        "value": "The agent should acknowledge the pricing concern, potentially offer a discount or suggest a lower-tier plan, and highlight underused features that might provide value.",
+        "threshold": 0.7
+      },
+      "weight": 2
+    }
+  ],
+  "scoring": {
+    "method": "rubric",
+    "rubric": [
+      {
+        "criterion": "Context Retention",
+        "description": "How well the model remembers and references previous conversation turns",
+        "weight": 2,
+        "levels": [
+          {
+            "score": 0,
+            "description": "Ignores or contradicts previous conversation context"
+          },
+          {
+            "score": 0.5,
+            "description": "Partially acknowledges previous context but misses key details"
+          },
+          {
+            "score": 1,
+            "description": "Fully incorporates all relevant previous context appropriately"
+          }
+        ]
+      },
+      {
+        "criterion": "Problem Resolution",
+        "description": "Effectiveness in addressing and resolving the customer's issue",
+        "weight": 2.5,
+        "levels": [
+          {
+            "score": 0,
+            "description": "Fails to address the customer's core issue"
+          },
+          {
+            "score": 0.33,
+            "description": "Acknowledges issue but provides unhelpful or generic response"
+          },
+          {
+            "score": 0.66,
+            "description": "Provides helpful guidance but incomplete resolution"
+          },
+          {
+            "score": 1,
+            "description": "Offers clear, actionable steps that effectively address the issue"
+          }
+        ]
+      },
+      {
+        "criterion": "Tone and Professionalism",
+        "description": "Appropriate customer service tone and professional communication",
+        "weight": 1.5,
+        "levels": [
+          {
+            "score": 0,
+            "description": "Rude, dismissive, or unprofessional tone"
+          },
+          {
+            "score": 0.5,
+            "description": "Neutral but lacking warmth or empathy"
+          },
+          {
+            "score": 1,
+            "description": "Warm, empathetic, and professionally appropriate"
+          }
+        ]
+      }
+    ],
+    "passingScore": 0.65
+  },
+  "metadata": {
+    "author": "AgentBench Team",
+    "tags": ["multi-turn", "customer-support", "conversation", "retention"],
+    "version": "1.0.0",
+    "createdAt": "2026-04-12T00:00:00Z",
+    "license": "MIT",
+    "difficulty": "hard",
+    "estimatedDuration": 180,
+    "categories": ["conversation", "customer-service"]
+  }
+}

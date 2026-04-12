@@ -1,0 +1,355 @@
+{
+  "name": "api-tool-calling",
+  "description": "A benchmark that evaluates the model's ability to correctly select and invoke tools with appropriate parameters. Tests understanding of tool descriptions, parameter requirements, and multi-step tool orchestration.",
+  "evaluationType": "tool-use",
+  "prompts": [
+    {
+      "id": "tool-001",
+      "input": "What's the weather like in San Francisco today?",
+      "expectedOutput": {
+        "type": "tool-call",
+        "toolName": "get_weather",
+        "toolParameters": {
+          "location": "San Francisco",
+          "unit": "fahrenheit"
+        }
+      },
+      "context": {
+        "systemPrompt": "You are a helpful assistant with access to various tools. Use the appropriate tool to answer user questions.",
+        "tools": [
+          {
+            "name": "get_weather",
+            "description": "Get the current weather for a specific location",
+            "parameters": {
+              "type": "object",
+              "required": ["location"],
+              "properties": {
+                "location": {
+                  "type": "string",
+                  "description": "The city and optionally state/country"
+                },
+                "unit": {
+                  "type": "string",
+                  "enum": ["celsius", "fahrenheit"],
+                  "default": "fahrenheit",
+                  "description": "Temperature unit"
+                }
+              }
+            }
+          },
+          {
+            "name": "search_web",
+            "description": "Search the web for information",
+            "parameters": {
+              "type": "object",
+              "required": ["query"],
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "The search query"
+                }
+              }
+            }
+          }
+        ],
+        "maxTokens": 100,
+        "temperature": 0
+      },
+      "weight": 1
+    },
+    {
+      "id": "tool-002",
+      "input": "Send an email to john@example.com with the subject 'Meeting Tomorrow' and body 'Hi John, Can we meet at 2pm tomorrow to discuss the project? Thanks!'",
+      "expectedOutput": {
+        "type": "tool-call",
+        "toolName": "send_email",
+        "toolParameters": {
+          "to": "john@example.com",
+          "subject": "Meeting Tomorrow",
+          "body": "Hi John, Can we meet at 2pm tomorrow to discuss the project? Thanks!"
+        }
+      },
+      "context": {
+        "systemPrompt": "You are an email assistant. Use the send_email tool to send emails on behalf of the user.",
+        "tools": [
+          {
+            "name": "send_email",
+            "description": "Send an email to a recipient",
+            "parameters": {
+              "type": "object",
+              "required": ["to", "subject", "body"],
+              "properties": {
+                "to": {
+                  "type": "string",
+                  "description": "Email address of the recipient"
+                },
+                "subject": {
+                  "type": "string",
+                  "description": "Subject line of the email"
+                },
+                "body": {
+                  "type": "string",
+                  "description": "Body content of the email"
+                },
+                "cc": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "CC recipients"
+                }
+              }
+            }
+          }
+        ],
+        "maxTokens": 150,
+        "temperature": 0
+      },
+      "weight": 1.5
+    },
+    {
+      "id": "tool-003",
+      "input": "Calculate 15% tip on a $85.50 restaurant bill",
+      "expectedOutput": {
+        "type": "tool-call",
+        "toolName": "calculate",
+        "toolParameters": {
+          "expression": "85.50 * 0.15"
+        }
+      },
+      "context": {
+        "systemPrompt": "You are a helpful assistant with access to a calculator tool. Use it for any mathematical calculations.",
+        "tools": [
+          {
+            "name": "calculate",
+            "description": "Perform a mathematical calculation",
+            "parameters": {
+              "type": "object",
+              "required": ["expression"],
+              "properties": {
+                "expression": {
+                  "type": "string",
+                  "description": "Mathematical expression to evaluate (e.g., '2 + 2', '100 * 0.15')"
+                }
+              }
+            }
+          },
+          {
+            "name": "convert_currency",
+            "description": "Convert between currencies",
+            "parameters": {
+              "type": "object",
+              "required": ["amount", "from", "to"],
+              "properties": {
+                "amount": { "type": "number" },
+                "from": { "type": "string" },
+                "to": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "maxTokens": 100,
+        "temperature": 0
+      },
+      "weight": 1
+    },
+    {
+      "id": "tool-004",
+      "input": "Create a new task called 'Review quarterly report' with high priority, due next Friday",
+      "expectedOutput": {
+        "type": "tool-call",
+        "toolName": "create_task",
+        "toolParameters": {
+          "title": "Review quarterly report",
+          "priority": "high"
+        }
+      },
+      "context": {
+        "systemPrompt": "You are a task management assistant. Help users create and manage their tasks.",
+        "tools": [
+          {
+            "name": "create_task",
+            "description": "Create a new task in the task manager",
+            "parameters": {
+              "type": "object",
+              "required": ["title"],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "description": "Title of the task"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Detailed description of the task"
+                },
+                "priority": {
+                  "type": "string",
+                  "enum": ["low", "medium", "high"],
+                  "description": "Priority level"
+                },
+                "due_date": {
+                  "type": "string",
+                  "description": "Due date in ISO format"
+                }
+              }
+            }
+          },
+          {
+            "name": "list_tasks",
+            "description": "List all tasks",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "filter": {
+                  "type": "string",
+                  "enum": ["all", "pending", "completed"]
+                }
+              }
+            }
+          }
+        ],
+        "maxTokens": 150,
+        "temperature": 0
+      },
+      "weight": 1
+    },
+    {
+      "id": "tool-005",
+      "input": "Search for the latest news about artificial intelligence",
+      "expectedOutput": {
+        "type": "tool-call",
+        "toolName": "search_news",
+        "toolParameters": {
+          "query": "artificial intelligence",
+          "sort_by": "date"
+        }
+      },
+      "context": {
+        "systemPrompt": "You are a news assistant. Use the search tools to find relevant news articles for the user.",
+        "tools": [
+          {
+            "name": "search_news",
+            "description": "Search for news articles",
+            "parameters": {
+              "type": "object",
+              "required": ["query"],
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "description": "Search query for news articles"
+                },
+                "sort_by": {
+                  "type": "string",
+                  "enum": ["relevance", "date"],
+                  "default": "relevance",
+                  "description": "How to sort results"
+                },
+                "category": {
+                  "type": "string",
+                  "enum": ["technology", "business", "science", "health", "sports"],
+                  "description": "News category filter"
+                }
+              }
+            }
+          },
+          {
+            "name": "get_article",
+            "description": "Get full content of a news article",
+            "parameters": {
+              "type": "object",
+              "required": ["article_id"],
+              "properties": {
+                "article_id": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "maxTokens": 100,
+        "temperature": 0
+      },
+      "weight": 1.5
+    }
+  ],
+  "scoring": {
+    "method": "rubric",
+    "rubric": [
+      {
+        "criterion": "Tool Selection",
+        "description": "Whether the correct tool was selected for the task",
+        "weight": 3,
+        "levels": [
+          {
+            "score": 0,
+            "description": "Wrong tool selected or no tool called"
+          },
+          {
+            "score": 1,
+            "description": "Correct tool selected"
+          }
+        ]
+      },
+      {
+        "criterion": "Required Parameters",
+        "description": "All required parameters provided with correct values",
+        "weight": 2.5,
+        "levels": [
+          {
+            "score": 0,
+            "description": "Missing required parameters"
+          },
+          {
+            "score": 0.5,
+            "description": "Required parameters present but incorrect values"
+          },
+          {
+            "score": 1,
+            "description": "All required parameters correct"
+          }
+        ]
+      },
+      {
+        "criterion": "Optional Parameters",
+        "description": "Appropriate use of optional parameters when relevant",
+        "weight": 1.5,
+        "levels": [
+          {
+            "score": 0,
+            "description": "Relevant optional parameters omitted"
+          },
+          {
+            "score": 0.5,
+            "description": "Some relevant optional parameters included"
+          },
+          {
+            "score": 1,
+            "description": "All relevant optional parameters appropriately included"
+          }
+        ]
+      },
+      {
+        "criterion": "Parameter Formatting",
+        "description": "Parameters formatted correctly according to schema",
+        "weight": 1,
+        "levels": [
+          {
+            "score": 0,
+            "description": "Incorrectly formatted parameters"
+          },
+          {
+            "score": 1,
+            "description": "All parameters correctly formatted"
+          }
+        ]
+      }
+    ],
+    "passingScore": 0.75
+  },
+  "metadata": {
+    "author": "AgentBench Team",
+    "tags": ["tool-use", "function-calling", "api", "agents"],
+    "version": "1.0.0",
+    "createdAt": "2026-04-12T00:00:00Z",
+    "license": "MIT",
+    "difficulty": "medium",
+    "estimatedDuration": 120,
+    "categories": ["tool-use", "agents"]
+  }
+}

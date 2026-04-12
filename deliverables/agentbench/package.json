@@ -2,12 +2,18 @@
   "name": "agentbench",
   "version": "1.0.0",
   "description": "Test your AI agents in one command. Replace prayer with proof.",
-  "main": "src/config.js",
-  "bin": {
-    "agentbench": "./bin/agentbench.js"
-  },
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "test": "vitest run"
+    "build": "npm run build --workspaces",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint packages/*/src/**/*.ts",
+    "lint:fix": "eslint packages/*/src/**/*.ts --fix",
+    "typecheck": "tsc --build"
   },
   "keywords": [
     "ai",
@@ -15,14 +21,17 @@
     "testing",
     "benchmark",
     "llm",
-    "claude"
+    "claude",
+    "monorepo"
   ],
   "author": "Shipyard AI",
   "license": "MIT",
-  "dependencies": {
-    "js-yaml": "^4.1.0"
-  },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@types/node": "^20.11.0",
+    "eslint": "^9.0.0",
+    "typescript": "^5.3.0",
+    "typescript-eslint": "^8.0.0",
     "vitest": "^3.0.0"
   },
   "engines": {

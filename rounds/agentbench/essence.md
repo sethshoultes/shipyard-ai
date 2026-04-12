@@ -1,13 +1,13 @@
 # Essence
 
-**What it's really about:**
-Replacing prayer with proof when you ship AI.
+**What is this product REALLY about?**
+Showing developers exactly where their AI agent breaks — and making them want to fix it.
 
-**The feeling:**
-The exhale.
+**What's the feeling it should evoke?**
+Clarity. The fog lifts. You see the truth about your agent instantly.
 
-**The one thing that must be perfect:**
-The first run. One command. Truth.
+**What's the one thing that must be perfect?**
+The moment of failure. When the benchmark reveals a weakness, that moment must teach — not punish.
 
 **Creative direction:**
-Quiet certainty.
+Truth, delivered beautifully.

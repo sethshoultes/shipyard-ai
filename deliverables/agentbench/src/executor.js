@@ -1,4 +1,4 @@
-const { spawn } = require('child_process');
+import { spawn } from 'child_process';
 
 async function executeAgent(agentConfig, input) {
   const startTime = Date.now();
