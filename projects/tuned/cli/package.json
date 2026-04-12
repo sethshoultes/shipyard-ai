@@ -1,0 +1,20 @@
+{
+  "name": "tuned-cli",
+  "version": "1.0.0",
+  "description": "Prompt version control for AI applications",
+  "type": "module",
+  "main": "src/cli.ts",
+  "bin": {
+    "tuned": "./bin/tuned"
+  },
+  "scripts": {
+    "dev": "tsx src/cli.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0"
+  }
+}

@@ -1,30 +1,27 @@
-# Sara Blakely Gut-Check: MemberShip v1
+# Sara Blakely Gut-Check: Tuned
 
-## Would a real customer pay for this?
+## Would a developer pay for this?
 
-**Yes, but barely.** A yoga instructor wants to get paid for her video library. This does that. But she doesn't care about JWT tokens, webhook kill-tests, or 114 banned patterns. She cares: "Can my students sign up? Do I get the money?" The feature list reads like an engineering resume, not a sales page.
+**Not yet.** You're selling version control. They don't care about version control. They care about "my AI broke at 2am and I can't fix it without a full deploy." Lead with the rollback-saves-your-ass story, not the tidy-prompts story. Versioning is a vitamin. Instant rollback is a painkiller.
 
-## What's confusing? What would make someone bounce?
+## What's confusing / bounce risk?
 
-- **Email-only auth, no password.** Sounds simple until a member asks "how do I log in?" and there's no clear answer.
-- **Price in cents (9900 = $99)** — she'll set it wrong. Guaranteed.
-- **The plan has 12 tasks about fixing code.** Zero tasks about making the signup feel magical.
-- **Setup requires "webhooks" and ".env files"** — she's out. She teaches yoga at 6am. She's not debugging env vars at 11pm.
+1. **"60 seconds" is a lie.** npm install + init + push + SDK install + code change = 3 minutes minimum. Don't promise what you can't deliver.
+2. **Where does my data go?** Developers are paranoid. No clear answer = no adoption.
+3. **Too much jargon.** KV, D1, Edge — nobody cares. Just tell me it's fast.
 
 ## 30-Second Elevator Pitch
 
-"MemberShip lets you charge for your best content. Add it to your site, connect Stripe, and your students can subscribe in under a minute. You keep 100% minus Stripe fees. No coding. No monthly SaaS fee. You built it — you own it."
+> "Every prompt change risks breaking your AI app. Tuned lets you push and rollback prompts instantly — no deploy, no downtime. One command: `tuned push`. Live at the edge in under a second. When something breaks at 2am, fix it in 3 seconds."
 
-## What would I test first with $0 budget?
+## What would I test first ($0 budget)?
 
-DM five yoga instructors on Instagram. Ask: "Would you pay $200 once to add paid memberships to your website?" If three say yes, ship it. If they ask "what's EmDash?" — you have a positioning problem, not a product problem.
+DM 20 developers on Twitter who've complained about prompt engineering. Ask: "Last time a prompt broke production, how long did the fix take?" If they say "hours" — you've found your customers. If they shrug — they're not ready.
 
-## What's the retention hook?
+## Retention hook?
 
-**Drip content.** That's the only thing that makes her come back. "Your student unlocks Module 3 tomorrow" is a reason to check the dashboard. Everything else is set-and-forget.
+**Weak.** First push feels good. What brings them back? Missing: alerts when prompts cause errors, "your rollback saved you" moments, team features. The hook should be: "Tuned caught a problem before your users did." That's not here yet.
 
-But here's what's missing: **no notification when someone joins.** That dopamine hit — "Sarah just became a member!" — is the whole game. She needs to feel like a business owner, not a sys admin.
+## Bottom line
 
----
-
-**Bottom line:** The plumbing works. The feeling doesn't. Ship it, but the first update better be that "new member" ping.
+Ship it. But know you're shipping a nice-to-have until you add monitoring. The aha moment isn't pushing a prompt — it's rolling back at 2am and being back in bed by 2:01.

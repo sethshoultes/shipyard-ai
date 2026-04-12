@@ -1,0 +1,41 @@
+name = "tuned-worker"
+type = "service"
+account_id = ""
+workers_dev = true
+main = "src/index.ts"
+compatibility_date = "2026-03-29"
+compatibility_flags = ["nodejs_compat"]
+
+# D1 Database Binding
+[[d1_databases]]
+binding = "DB"
+database_name = "tuned-db"
+database_id = ""
+
+# KV Namespace Binding for cached prompts
+[[kv_namespaces]]
+binding = "PROMPTS_KV"
+id = ""
+preview_id = ""
+
+# Analytics Engine (v1.1)
+# Uncomment when implementing persistent logging with Analytics Engine
+# [[analytics_engine_datasets]]
+# binding = "LOGS"
+# dataset = "tuned_logs"
+#
+# Migration path for v1.1:
+# 1. Update Env interface in src/index.ts to include LOGS binding
+# 2. Implement event batching in src/routes/log.ts
+# 3. Add retry logic with exponential backoff
+# 4. Update handlePostLog to write to Analytics Engine instead of console
+# 5. Test with production-like load (>1000 events/min)
+
+# Env-specific overrides
+[env.development]
+name = "tuned-worker-dev"
+route = "https://tuned-dev.workers.dev/*"
+
+[env.production]
+name = "tuned-worker-prod"
+route = "https://tuned-api.workers.dev/*"
