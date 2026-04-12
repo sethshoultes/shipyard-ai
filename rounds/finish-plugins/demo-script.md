@@ -4,142 +4,187 @@
 ---
 
 **NARRATOR:**
-Here's the thing about running a yoga studio.
+It's 11:47 PM.
 
-[SCREEN: Sarah's laptop. Gmail open. Tab says "14 unread." Coffee ring on desk. Morning light.]
-
-**NARRATOR:**
-You got into this because you love helping people find stillness. Not because you wanted to become an IT department.
-
-[SCREEN: Browser history visible — "how to add membership to website," "WooCommerce vs MemberPress," "why is my plugin not working."]
+[SCREEN: Dark room. Laptop glow on a woman's face. Elena. Late 30s. Yoga mat rolled in the corner. Empty coffee mug.]
 
 **NARRATOR:**
-But here you are, at 6 AM, three tutorials deep into something called "webhook configuration." You don't even know what a webhook *is*. You just know your credit card's getting charged monthly for software that makes you feel stupid.
+Elena runs a yoga studio. Twenty-three students. Good ones. The kind who show up even when it rains.
 
-[SCREEN: MemberPress admin. Dense UI. Seventeen tabs. Red error message: "License key invalid."]
-
-**NARRATOR:**
-And the worst part? Your site still doesn't have memberships.
-
-[SCREEN: Hard cut to black. Beat.]
+[SCREEN: Her browser. Tab hell. "WordPress membership plugins comparison." "MemberPress vs Paid Memberships Pro." "Why won't my plugin activate."]
 
 **NARRATOR:**
-What if it didn't have to be like this?
+She's been at this for four hours.
 
-[SCREEN: Clean Emdash dashboard. Simple. White space. One sidebar.]
-
-**NARRATOR:**
-This is Sarah's Emdash site. She built it in an afternoon. And this—
-
-[SCREEN: Mouse clicks "Plugins" in sidebar. Plugin marketplace appears. "MemberShip" is first, with a simple blue "Install" button.]
+[SCREEN: MemberPress admin panel. A wall of settings. Dropdowns nested in dropdowns. A red error: "Please enter valid license key."]
 
 **NARRATOR:**
-—is MemberShip.
+Four hours trying to do one thing: let her students pay her.
 
-[SCREEN: Click. Progress bar. Done. No configuration wizard. No onboarding modal.]
-
-**NARRATOR:**
-One click. That's it. It's installed.
-
-[SCREEN: New "Members" tab appears in sidebar. User clicks it.]
+[SCREEN: Close on her eyes. Tired. The kind of tired that isn't about sleep.]
 
 **NARRATOR:**
-Now watch what happens.
+She got into this because teaching yoga made people's lives better. But right now? Right now she's Googling "what is a webhook" at midnight because some plugin is asking her to configure one.
 
-[SCREEN: Clean dashboard. Big blue button: "Create your first plan." Three cards below showing MRR, Active Members, Churn — all showing zeros, but not sad. Minimal. Ready.]
-
-**NARRATOR:**
-No demo data pretending to be hers. No overwhelm. Just a clear starting point.
-
-[SCREEN: Click "Create your first plan." Simple form appears: Plan name, Price, Billing cycle dropdown (Monthly/Yearly/Free).]
+[SCREEN: Google results for "what is a webhook." Wikipedia definition that starts with "In web development, a webhook is—"]
 
 **NARRATOR:**
-She types: "Unlimited Classes. Forty dollars a month."
+She doesn't need to know what a webhook is. She needs to get paid.
 
-[SCREEN: Form fills in. Clean typography. No asterisks. No required-field anxiety.]
-
-**NARRATOR:**
-Clicks save.
-
-[SCREEN: Button says "Save Plan." Click. Screen transitions to plan list showing the new plan. Toast notification appears briefly: "Plan created."]
+[SCREEN: Hard cut to black. Beat. Then—]
 
 **NARRATOR:**
-That's her first membership plan. Twenty seconds.
+What if that was the only question that mattered?
 
-[SCREEN: Click "Connect Stripe" button. Stripe OAuth flow — quick redirect, one click authorize, redirect back.]
-
-**NARRATOR:**
-Stripe connects in two clicks. No API keys. No webhooks to configure manually. It just... works.
-
-[SCREEN: Back in dashboard. "Stripe Connected" badge appears. Green checkmark.]
+[SCREEN: Clean white. Emdash dashboard. One sidebar. Three options. Air to breathe.]
 
 **NARRATOR:**
-Now here's the part that matters.
+This is Elena's Emdash site. She built it last week. Today, she's going to add memberships.
 
-[SCREEN: Navigate to site frontend. Homepage of Sunrise Yoga Studio. Beautiful. Calm colors.]
-
-**NARRATOR:**
-Sarah's student, Marcus, finds her site. He clicks "Become a Member."
-
-[SCREEN: Simple registration form. Name, email, select plan. "Unlimited Classes - $40/month" is pre-selected. Credit card fields appear via Stripe Elements. Clean. One page.]
+[SCREEN: Mouse moves to "Plugins." Single click.]
 
 **NARRATOR:**
-Name. Email. Card. That's the whole form. He clicks join.
+Not "spend three hours trying to add memberships." Actually add them.
 
-[SCREEN: Click "Join." Brief loading state. Transitions to: "Welcome to Sunrise Yoga, Marcus." Confetti? No. Just warmth. A simple message: "Check your email for next steps."]
-
-**NARRATOR:**
-And back in Sarah's admin—
-
-[SCREEN: Admin dashboard. MRR card now shows "$40." Active Members shows "1." A notification badge pulses once.]
+[SCREEN: Marketplace. MemberShip at the top. Blue button: "Install." Nothing else competing for attention.]
 
 **NARRATOR:**
-She sees it happen. Real-time. Her first paying member.
+One button.
 
-[SCREEN: Sarah clicks into member list. Marcus appears. His plan. His join date. His status: Active. One line. No spreadsheet.]
-
-**NARRATOR:**
-And Marcus? When he comes back to the site—
-
-[SCREEN: Marcus logs in. Members-only content that was blurred is now visible. A class schedule. A video library. A message: "Welcome back, Marcus."]
+[SCREEN: Click. Progress bar fills. Three seconds. Done.]
 
 **NARRATOR:**
-He sees what he paid for. The gated content, unlocked. No extra configuration. The plugin just *knows* he's a member.
+Installed.
 
-[SCREEN: Pull back slightly. Sarah's face reflected in screen. She's smiling. Not because the technology impressed her. Because it disappeared.]
-
-**NARRATOR:**
-Here's what MemberShip doesn't have. No granular role permissions. No complex content rules. No fifteen-step wizard.
-
-[SCREEN: Quick montage: competitor interfaces — dense, gray, overwhelming. Each one flashes and fades.]
+[SCREEN: "Members" appears in sidebar. She clicks it.]
 
 **NARRATOR:**
-Because here's what we learned building this.
+No wizard. No twenty questions about her business. No email asking her to complete her profile.
 
-[SCREEN: Back to Sarah's clean dashboard.]
-
-**NARRATOR:**
-Small business owners don't want powerful software. They want to feel powerful *themselves*.
-
-[SCREEN: MRR card ticks up. $40. $80. $160. Members: 1. 2. 4. Time-lapse of growth.]
+[SCREEN: Dashboard. Clean. One big button: "Create your first plan." Three metric cards below—MRR, Members, Churn—all showing zero. But elegant zeros. Ready zeros.]
 
 **NARRATOR:**
-Every yoga instructor, every bistro owner, every artist with a Patreon dream — they're not looking for features. They're looking for the feeling of: "I built that. I did that. My site has memberships now."
+Just this: "Create your first plan." Four words. And for the first time tonight, she's not lost.
 
-[SCREEN: Dashboard now shows MRR: $1,240. Active Members: 31. Graph trending up.]
-
-**NARRATOR:**
-Competence without complexity.
-
-[SCREEN: Sarah closes her laptop. Grabs her yoga mat. Walks toward studio door. Morning class is starting.]
+[SCREEN: Click. Simple form. Three fields. Plan name. Price. Billing cycle—dropdown showing Monthly, Yearly, Free.]
 
 **NARRATOR:**
-That's MemberShip. One plugin. One click. One less thing standing between you and the work you actually love.
+She types: "Unlimited Classes."
 
-[SCREEN: Fade to logo. "MemberShip — for Emdash." Tagline below: "Your community. Finally simple."]
+[SCREEN: Text appears in the field. Clean typography.]
+
+**NARRATOR:**
+Forty dollars a month.
+
+[SCREEN: "40" in the price field. Dropdown shows "Monthly."]
+
+**NARRATOR:**
+Save.
+
+[SCREEN: Click. Toast notification: "Plan created." List view shows her new plan. Ten seconds total.]
+
+**NARRATOR:**
+That's it. That's her membership tier. The thing that took four hours last night? Just happened while I was talking.
+
+[SCREEN: "Connect Stripe" button. Single click. OAuth flow—redirect, authorize, redirect back. Maybe four seconds total.]
+
+**NARRATOR:**
+Stripe connects in two clicks. No API keys. No webhook configuration. No documentation that assumes you already know what documentation is for.
+
+[SCREEN: Dashboard. "Stripe Connected" with green checkmark.]
+
+**NARRATOR:**
+Now here's what matters.
+
+[SCREEN: Cut to: Morning. Different location. Phone screen. Young guy, Marcus, looking at his phone on a bus.]
+
+**NARRATOR:**
+Marcus has been meaning to sign up for Elena's classes for three weeks. Always something. Work, commute, life.
+
+[SCREEN: He's on Elena's site. Homepage. Beautiful. Mountain backdrop. "Become a Member" button.]
+
+**NARRATOR:**
+Today, on the 7 train, somewhere between Flushing and Times Square, he finally does it.
+
+[SCREEN: Click. Registration form. Name. Email. Plan auto-selected. Credit card fields via Stripe. That's the whole form.]
+
+**NARRATOR:**
+Name. Email. Card. He's done before his stop.
+
+[SCREEN: Loading state. Brief. Then: "Welcome to the practice, Marcus." Simple. Warm. Not celebrating itself. Just... welcoming him.]
+
+**NARRATOR:**
+No account verification email. No password he'll forget by tomorrow. No "click here to confirm." He's in.
+
+[SCREEN: Cut back to Elena. Her studio. Morning light now. She's checking her phone before first class.]
+
+**NARRATOR:**
+And three boroughs away—
+
+[SCREEN: Her dashboard. MRR: "$40". Members: "1". One notification.]
+
+**NARRATOR:**
+Elena sees it happen.
+
+[SCREEN: She taps. Member list. Marcus. His name. His plan. "Active." One line.]
+
+**NARRATOR:**
+Her first paying member. Right there. While she was unrolling mats.
+
+[SCREEN: She smiles. Not because the tech impressed her. Because it got out of her way.]
+
+**NARRATOR:**
+Here's what MemberShip doesn't have.
+
+[SCREEN: Quick cuts—competitor UIs. Dense. Gray. Seventeen tabs. Role matrices. Permission levels. Config screens that scroll forever.]
+
+**NARRATOR:**
+No Bronze tier. No Silver tier. No "granular permission matrices." No drip content scheduling. No features built for a corporation pretending to be a yoga studio.
+
+[SCREEN: Back to Elena's clean dashboard.]
+
+**NARRATOR:**
+Two tiers. Members and everyone else. Because that's what Elena actually needs.
+
+[SCREEN: Marcus, later, at home. Logging in. The "Members Only" content that was blurred before is now visible. Class schedule. Video library. Welcome message.]
+
+**NARRATOR:**
+When Marcus comes back, the gated content is unlocked. No configuration. The plugin just knows.
+
+[SCREEN: Elena's dashboard. Days passing. MRR climbing. $40. $120. $280. Members: 1. 3. 7.]
+
+**NARRATOR:**
+And over the next few weeks—
+
+[SCREEN: Dashboard. MRR: "$1,640". Members: "41". Graph trending up.]
+
+**NARRATOR:**
+This happens.
+
+[SCREEN: Elena. Studio. End of class. Students rolling up mats. She's smiling.]
+
+**NARRATOR:**
+Not because she learned what a webhook is. Not because she mastered some admin panel. Because she never had to.
+
+[SCREEN: Close on the dashboard. The numbers. Clean.]
+
+**NARRATOR:**
+Small business owners don't want powerful software. They want to feel powerful themselves.
+
+[SCREEN: Elena closes her laptop. Grabs her mat. Walks toward students gathering for the next class.]
+
+**NARRATOR:**
+MemberShip. One plugin. One click. One less thing between you and the work you actually love.
+
+[SCREEN: Fade to logo. "MemberShip — for Emdash." Below: "Competence without complexity."]
+
+**NARRATOR:**
+Now go teach yoga.
+
+[SCREEN: Black.]
 
 ---
 
 **RUNTIME:** 2:00
-**TONE:** Warm, confident, human. Not a pitch — a story.
-**MUSIC SUGGESTION:** Acoustic guitar, single instrument, building quietly. Think "Sunday morning with purpose."
+**TONE:** Urgent, human, rhythmic. Walk-and-talk energy. Not a pitch—a story that moves.
+**MUSIC:** Minimal piano. Single notes. Building like a heartbeat. Think "the moment before something good happens."

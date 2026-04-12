@@ -1130,38 +1130,54 @@ export default definePlugin({
 		},
 
 		/**
-		 * GET /membership/status?email=user@example.com
-		 * Check membership status for an email.
+		 * GET /membership/status
+		 * Check membership status for the authenticated user.
 		 *
-		 * Returns: { email: string, active: boolean, plan?: string, expiresAt?: string }
+		 * Requires: JWT token from cookie
+		 * Returns: { active: boolean, plan: string, expiresAt: string }
 		 */
 		status: {
-			public: true,
+			public: false,
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const input = rc.input as Record<string, unknown>;
-					const email = String(input.email ?? "").trim().toLowerCase();
+					const headers = rc.headers as Record<string, string> | undefined;
+					const authHeader = headers?.["authorization"] || headers?.["cookie"];
 
-					if (!email) {
-						return {
-							active: false,
-							reason: "Email required",
-						};
+					// Extract token from header or cookie
+					let token: string | null = null;
+					if (authHeader) {
+						if (authHeader.startsWith("Bearer ")) {
+							token = extractToken(authHeader);
+						} else if (authHeader.includes("Authorization=")) {
+							// Parse from cookie format
+							const match = authHeader.match(/Authorization=([^;]+)/);
+							if (match) {
+								token = decodeURIComponent(match[1]);
+							}
+						}
 					}
 
-					if (!isValidEmail(email)) {
-						return {
-							active: false,
-							reason: "Invalid email format",
-						};
+					if (!token) {
+						return { error: "Unauthorized" };
 					}
 
-					const encodedEmail = emailToKvKey(email);
+					// Verify JWT
+					const jwtSecret = (ctx as any).env?.JWT_SECRET as string | undefined;
+					if (!jwtSecret) {
+						return { error: "Oops, something went wrong" };
+					}
+
+					const payload = await verifyJWT(token, jwtSecret);
+					if (!payload) {
+						return { error: "Session expired" };
+					}
+
+					// Get member from KV using authenticated email
+					const encodedEmail = emailToKvKey(payload.email);
 					const memberJson = await ctx.kv.get<string>(`member:${encodedEmail}`);
 					if (!memberJson) {
 						return {
-							email,
 							active: false,
 						};
 					}
@@ -1169,7 +1185,6 @@ export default definePlugin({
 					const member = parseJSON<MemberRecord>(memberJson, null);
 					if (!member) {
 						return {
-							email,
 							active: false,
 						};
 					}
@@ -1186,19 +1201,11 @@ export default definePlugin({
 						isActive = false;
 					}
 
+					// Return minimal info without Stripe IDs
 					return {
-						email,
 						active: isActive,
 						plan: member.plan,
-						status: member.status,
 						expiresAt: member.expiresAt,
-						// Include Stripe subscription info
-						stripeCustomerId: member.stripeCustomerId,
-						stripeSubscriptionId: member.stripeSubscriptionId,
-						stripePaymentMethod: member.stripePaymentMethod,
-						planInterval: member.planInterval,
-						currentPeriodEnd: member.currentPeriodEnd,
-						cancelAtPeriodEnd: member.cancelAtPeriodEnd,
 					};
 				} catch (error) {
 					ctx.log.error(`Status check error: ${String(error)}`);
@@ -1241,6 +1248,14 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+					throw new Response(
+						JSON.stringify({ error: "Admin access required" }),
+						{ status: 403, headers: { "Content-Type": "application/json" } }
+					);
+				}
+
 					const input = rc.input as Record<string, unknown>;
 					const email = String(input.email ?? "").trim().toLowerCase();
 
@@ -1297,6 +1312,14 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
+					const adminUser = rc.user as Record<string, unknown> | undefined;
+					if (!adminUser || !adminUser.isAdmin) {
+					throw new Response(
+						JSON.stringify({ error: "Admin access required" }),
+						{ status: 403, headers: { "Content-Type": "application/json" } }
+					);
+				}
+
 					const input = rc.input as Record<string, unknown>;
 					const email = String(input.email ?? "").trim().toLowerCase();
 
