@@ -1,26 +1,30 @@
-# Sara Blakely Gut-Check — Wardrobe
+# Sara Blakely Gut-Check: MemberShip v1
 
 ## Would a real customer pay for this?
-**Yes, but not for "5 themes."** They'd pay to stop feeling embarrassed by their site. That's the product — *dignity on demand*. Your plan buries this under 20 infrastructure tasks.
 
-## What's confusing? What makes someone bounce?
-1. **"Wardrobe" means nothing.** I don't know what Emdash is. The showcase assumes I do. Fatal.
-2. **5 themes sounds thin.** Why trust this vs. 500 on Envato?
-3. **"Coming Soon" feels like vapor.** Promise something specific or don't tease.
-4. **No before/after.** Show the transformation, not just screenshots.
+**Yes, but barely.** A yoga instructor wants to get paid for her video library. This does that. But she doesn't care about JWT tokens, webhook kill-tests, or 114 banned patterns. She cares: "Can my students sign up? Do I get the money?" The feature list reads like an engineering resume, not a sales page.
+
+## What's confusing? What would make someone bounce?
+
+- **Email-only auth, no password.** Sounds simple until a member asks "how do I log in?" and there's no clear answer.
+- **Price in cents (9900 = $99)** — she'll set it wrong. Guaranteed.
+- **The plan has 12 tasks about fixing code.** Zero tasks about making the signup feel magical.
+- **Setup requires "webhooks" and ".env files"** — she's out. She teaches yoga at 6am. She's not debugging env vars at 11pm.
 
 ## 30-Second Elevator Pitch
-*"Your Emdash site looks like a developer made it. One command, and it looks like a designer did. Pick a vibe. Paste. Done. Your words stay — only the wrapper changes."*
 
-## What would I test first with $0 marketing budget?
-Post one before/after GIF on Twitter. "My blog before Wardrobe vs. after — 11 seconds." If it doesn't spread, the product lacks word-of-mouth DNA. Kill it.
+"MemberShip lets you charge for your best content. Add it to your site, connect Stripe, and your students can subscribe in under a minute. You keep 100% minus Stripe fees. No coding. No monthly SaaS fee. You built it — you own it."
+
+## What would I test first with $0 budget?
+
+DM five yoga instructors on Instagram. Ask: "Would you pay $200 once to add paid memberships to your website?" If three say yes, ship it. If they ask "what's EmDash?" — you have a positioning problem, not a product problem.
 
 ## What's the retention hook?
-**Weak.** "Coming Soon" and email capture are engineer-brain solutions. Real retention: make the installed site *so good* they tell one friend. Your plan optimizes the funnel, not the product.
 
-## The Hard Truth
-This plan is 80% infrastructure, 20% customer magic. Flip it. Nobody cares about R2 buckets or sha256 hashes. They care about looking good without hiring a designer.
+**Drip content.** That's the only thing that makes her come back. "Your student unlocks Module 3 tomorrow" is a reason to check the dashboard. Everything else is set-and-forget.
 
-**Ship faster. Learn what they actually want. The plan is too precious.**
+But here's what's missing: **no notification when someone joins.** That dopamine hit — "Sarah just became a member!" — is the whole game. She needs to feel like a business owner, not a sys admin.
 
-— Sara
+---
+
+**Bottom line:** The plumbing works. The feeling doesn't. Ship it, but the first update better be that "new member" ping.

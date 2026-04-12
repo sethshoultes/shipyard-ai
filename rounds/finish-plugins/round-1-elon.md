@@ -1,105 +1,150 @@
 # Round 1 — Elon Musk (Chief Product & Growth)
 
-## The Reality Check
+## The Brutal Truth Redux
 
-Let's be honest about what we're debating. We have two plugins claiming "v1" status:
-- **MemberShip**: ~5,700 lines, Phases 1-4 complete, Phase 5 planned
-- **EventDash/Convene**: ~6,400 lines, Phases 1-4 Wave 2 complete, Wave 3 planned
+Sixteen planning documents. Zero deployed code. The retrospective already said it: **"We rehearsed the play with excellence. We never took the stage."**
 
-That's 12,000+ lines of code that has been "verified" by reading verification reports that *themselves* haven't been validated against running code. The QA report says "SHIP" but admits Task 12 (Documentation) is "PENDING."
+The deliverables directory is literally empty. This is the most expensive form of procrastination I've ever seen—twelve thousand lines of code exist *somewhere*, but zero lines are serving customers.
 
-**Question 1: Has anyone actually run this on a live EmDash site?** The decisions.md says "Tested on a live EmDash site (Sunrise Yoga for EventDash, Bella's for MemberShip)" — but where's the evidence?
+---
 
-## Architecture: What's The Simplest System?
+## Architecture: Simplest System That Could Work
 
-The original Round 1 decision was correct: **Stripe as source of truth, D1 for list operations.** But I see no D1 in the current codebase. Everything is still KV. The decisions were made, but were they implemented?
+**Current architecture:** Two plugins, shared ~60% code duplication, 4,000-line monolith, KV storage, Stripe webhooks, Resend emails.
 
-**First principles:** Two plugins that do nearly identical things:
-- User registration → Stripe payment → webhook confirmation → KV update → email
-- Admin CRUD → list/filter/paginate → dashboard
+**First principles reduction:**
+1. One plugin (MemberShip)
+2. One customer (Sunrise Yoga)
+3. One payment flow (Stripe checkout → webhook → KV write → email)
+4. One permission check (member vs. not-member)
 
-That's the pattern. Everything else is feature bloat.
+That's it. Everything else is optimization before validation.
 
-**The 10x simpler architecture:**
-1. One shared auth module (JWT, currently duplicated)
-2. One shared Stripe module (checkout, webhooks, currently duplicated)
-3. One shared email module (Resend, currently duplicated)
-4. Plugin-specific: only the data model and admin UI
+**The 4,000-line monolith?** Ship it. Refactoring a monolith nobody uses is vanity. Refactoring a monolith 100 customers depend on is engineering.
 
-We're shipping two plugins that are 60% identical code.
+---
 
 ## Performance: Where Are The Bottlenecks?
 
-**KV list iteration is still the problem.** The verification report claims "Member lookup: O(1) via email hash" — but admin list views still iterate. Phase 4 added "reporting" endpoints. How do those work at 10,000 records?
+**Not where you think.**
 
-**The numbers that matter:**
-- Stripe webhook processing: 3-5 seconds latency acceptable? No. 500ms or fail.
-- Admin dashboard load: < 2 seconds claimed. Prove it with 1,000 members.
-- Email sending: Resend has 100/second limits. What happens at a 500-person event?
+The tech bottlenecks are mild:
+- KV reads: Fine to 10K records, then migrate to D1
+- Stripe webhooks: Cloudflare handles it
+- Email: Resend rate limits matter at 500+ members
 
-**10x path:** Background job queue for anything that can be async. Webhook confirms immediately, queues the email. Dashboard fetches paginated data, not full dumps.
+**The actual bottleneck:** Zero production contact. We have no data on:
+- What breaks in real Stripe transactions
+- What confuses the yoga instructor in the admin UI
+- Whether anyone can actually install this thing
 
-## Distribution: Path to 10,000 Users
+**10x path:** Deploy today. Collect error logs. Fix what breaks. Repeat. This beats another planning cycle by 100x.
 
-The PRD is still silent on distribution. This is still a fatal error.
+---
 
-**Reality:** EmDash has how many users today? 100? 500? The plugins are ahead of the market.
+## Distribution: How Does This Reach 10,000 Users?
 
-**What we should be doing:**
-1. Ship one plugin (MemberShip) perfectly. Not two plugins at 80%.
-2. Embed it in every EmDash template by default.
-3. Get 10 paying customers using it in production before launching the second.
+**Short answer:** It doesn't. Not directly.
 
-**The anti-pattern we're doing:** Building feature parity with MemberPress/EventBrite for an audience that doesn't exist yet.
+These are plugins for EmDash. EmDash market size is "Unknown. 100 sites? 500?" If EmDash has 100 sites and 20% activate MemberShip, we have 20 users. Full stop.
 
-## What to CUT
+**Distribution strategy (cost: $0):**
+1. Bundle MemberShip in every new EmDash template by default
+2. Make it work on first run—no configuration required
+3. Let EmDash's growth carry plugin adoption
 
-**Phase 5 MemberShip features (all should be cut from v1):**
-- Astro admin reporting dashboard → The API exists. Site owners can build their own UI. Defer.
-- Multi-step registration forms → 90% of signups are single-form. Defer.
-- Integration testing → Should have been done in Phase 2, not Phase 5. This is technical debt, not a feature.
+**10,000 users requires EmDash to reach 50,000 sites** (assuming 20% plugin activation). That's upstream of this PRD. We can't plugin our way to scale.
 
-**EventDash Wave 3 (all should be cut from v1):**
-- Multi-day events → Single-day events with "Part 1 of 3" in title works fine. Defer.
-- CSV import → Manual onboarding for first 50 customers. Learn their needs. Defer.
-- Cohort analysis → Zero customers have asked for this. Defer.
-- Advanced webhooks with retry → Ship simple webhooks. Add retry when someone complains.
+**One leverage point:** If MemberShip makes EmDash sites stickier (retain members = retain site owners), we accelerate EmDash's own growth. But that's a second-order effect we can't measure until we ship.
 
-**What to keep for v1:**
-- Core payment flows (done)
-- Email confirmation (done)
-- Admin dashboard (done)
-- Basic reporting (done)
+---
 
-## Technical Feasibility
+## What to CUT (v2 Features Masquerading as v1)
 
-**Can one agent session finish this?** The code exists. The question is validation.
+| Cut | Rationale |
+|-----|-----------|
+| **EventDash** | Ship MemberShip first. EventDash inherits learnings. |
+| **Week view** | 30% complexity, 3% usage (Steve's estimate, unverified) |
+| **Multi-day events** | "Part 1 of 3" in title works |
+| **CSV import/export** | Manual onboarding for first 50 customers |
+| **Coupon engine** | Zero customers have asked |
+| **Analytics dashboards** | Members + revenue number. That's it. |
+| **Demo data on install** | 2-3 weeks of work. Empty state + CTA sufficient. |
+| **Group/corporate memberships** | Zero customer requests |
+| **Shared module extraction** | Ship duplicated code. Extract when it matters. |
 
-**What's actually blocking ship:**
-1. Live deployment on a real EmDash site (not just "test on Sunrise Yoga" — actually do it)
-2. 5 real transactions through Stripe (not test mode — production)
-3. Webhook failure handling verified (kill the webhook endpoint mid-transaction)
+**The cut philosophy:** If zero customers have requested it, don't build it. Build infrastructure for the customers you have (zero), not the customers you imagine (ten thousand).
 
-If those three pass, ship. If they don't, we have real work to do.
+---
 
-## What Breaks at 100x
+## Technical Feasibility: Can One Agent Session Build This?
 
-At 100x scale (1,000 → 100,000 operations/day):
-1. **KV costs:** $0.50/million reads × 100K reads/day = $1.50/day per site. Acceptable but not efficient.
-2. **Stripe API limits:** 100 requests/second. Checkout creates are 2-3 calls each. Max ~35 concurrent checkouts/sec.
-3. **Email rate limits:** Resend's free tier is 100/day. Growth plan is 50K/month. Event with 500 attendees eats 1% of monthly quota.
-4. **No queue system:** Everything is synchronous. One slow Stripe call blocks the entire request.
+**Honest assessment:**
 
-**Fix before shipping:** Add a simple queue for emails. Everything else can wait.
+The decisions doc lists 8 REQUIRED items before ship:
+1. Deploy to Sunrise Yoga
+2. Three real Stripe transactions
+3. Webhook failure recovery verified
+4. Documentation complete (4 docs)
+5. Admin authentication secured
+6. Status endpoint secured
+7. Version number unified
+8. Brand voice applied
+
+**One session:** Can fix the banned API patterns (114 `throw new Response`), deploy to one site, and verify basic functionality.
+
+**Cannot do in one session:**
+- Three real Stripe transactions (requires live cards, human involvement)
+- Full documentation (4 complete docs = 4-8 hours of writing)
+- Stress testing webhook failure scenarios
+- Brand voice review of all copy
+
+**Realistic scope for one session:** Fix security gaps (admin auth, status endpoint), deploy to Sunrise Yoga, verify one transaction flow works.
+
+**Ship criteria reduction:** Trade "three real transactions" for "one real transaction." Trade "four complete docs" for "one installation README that works."
+
+---
+
+## Scaling: What Breaks at 100x?
+
+| Component | At 100x (10K members) | Risk |
+|-----------|----------------------|------|
+| KV storage | `entries.query()` timeout | **HIGH** — already documented |
+| Stripe webhooks | 100K/month | Low — Cloudflare handles |
+| Resend emails | Rate limit hits | Medium — queue needed |
+| Admin dashboard | Linear scaling | Low |
+| Auth tokens | JWT refresh overhead | Low |
+
+**The real 100x problem:** We don't have 1x. Scaling concerns are theoretical when production usage is zero.
+
+**First make it work. Then make it scale.** Every minute spent on D1 migration before we have 1,000 members is wasted.
+
+---
 
 ## Bottom Line
 
-**We're building Phase 5 features when we haven't validated Phase 2 in production.**
+**Process score: 10/10.** The debates were rigorous. The artifacts are polished. The decisions are sound.
 
-Ship criteria should be:
-1. One plugin (MemberShip) deployed to one real customer
-2. Three real Stripe transactions completed
-3. Webhook failure recovery tested
-4. Documentation complete (not "PENDING")
+**Shipping score: 0/10.** The deliverables directory is empty.
 
-Everything else is procrastination. Stop planning. Start shipping.
+**What needs to happen THIS WEEK:**
+1. Fix admin authentication (security blocker)
+2. Fix status endpoint exposure (security blocker)
+3. Deploy to Sunrise Yoga (production contact)
+4. Run one real transaction (validation)
+5. Ship
+
+**What needs to NOT happen:**
+- Another planning round
+- More board reviews
+- Retention roadmaps for users that don't exist
+- Demo data implementations
+- Week view debates without data
+
+**The philosophy:**
+
+> "Planning without production is rehearsal without performance. The audience teaches things the mirror cannot."
+
+That's from our own retrospective. We wrote it. Now execute it.
+
+Stop documenting. Start deploying. Today.

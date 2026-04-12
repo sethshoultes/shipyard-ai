@@ -1,85 +1,76 @@
-# Round 2 — Elon Musk
+# Round 2 — Elon Musk (Chief Product & Growth)
 
 ## Challenging Steve's Weakest Positions
 
-### The Naming Fantasy
+### "Sofia Chen — Member since today" Is Beautiful Theater
 
-Steve, "Circle" and "Gather" are *beautiful* words. They're also unsearchable. When a yoga studio owner Googles "wordpress membership plugin," they're not looking for "Circle." They're looking for a membership plugin.
+Steve, you want demo data on first install. You want users to "witness success" before they've done anything. Here's the problem: **that success is a lie.**
 
-SEO isn't optional. Discovery isn't optional. The market for "beautifully named things nobody can find" is zero customers.
+The yoga instructor sees Sofia Chen. She feels good. Then she asks: "How do I add a real member?" And she's back to learning. You've added a step, not removed one.
 
-**MemberShip** tells you what it does in the name. That's not lazy—that's *respectful* of people's time.
+Worse: demo data requires mock generators, conditional rendering, fake avatars, believable timestamps. That's 2-3 weeks of engineering for a moment users experience *once*.
 
-### "Your First Gathering" is Scope Creep
+**The empty state that says "Your first member will appear here — share this link" is honest.** It points forward. Demo data points backward at fiction.
 
-You want to ship a demo event that appears on install? That's not zero-config—that's *more config*. Now we need:
-- Demo data generation logic
-- Demo data cleanup logic
-- Edge cases when users delete half the demo
-- Localization for demo content
+### "Belong" and "Moment" Are Search Engine Suicide
 
-The simplest install state is empty. Empty isn't sad—it's *ready*. An invitation to create.
+"MemberShip EmDash plugin" — findable. "Belong EmDash" — returns self-help articles about community building.
 
-### "NO to Week View" — Based on What?
+You've optimized for poetry over discoverability. **We don't exist in the market yet.** When zero people can find us, beautiful names are gravestones.
 
-You declared "nobody needs week view on a small business site." Where's the data? I've seen yoga studios with 20 classes per week. Month view for that is chaos. Week view is the obvious UX.
+Ship with ugly, searchable names. Rebrand at 1,000 users. You can't rebrand at zero.
 
-**This is the danger of taste without data.** You're cutting features based on what *feels* right to you, not what users actually need.
+### "Every interaction should take half the steps" — Of What Baseline?
+
+This philosophy added three sprints of UX refinement to code that has **never touched production**. Half the steps of infinity is still infinity.
+
+We don't know what steps users actually take. We've never watched one. The first real user at Sunrise Yoga will teach us more about friction than 16 planning documents.
 
 ---
 
 ## Defending Technical Simplicity
 
-### Why Functional Beats Beautiful (In v1)
+### The 4,000-Line Monolith Ships This Week
 
-1. **Discovery:** "membership plugin" has 10,000+ monthly searches. "Circle membership" has 12.
-2. **Debugging:** When Stripe fails, "MemberShip webhook error" is greppable. "Circle webhook error" requires translation.
-3. **Support docs:** "How to set up MemberShip" is self-documenting. "How to set up Circle" requires explanation.
+1. **Refactoring code nobody uses is vanity.** Refactoring code 100 customers depend on is engineering. We have zero customers.
 
-Beauty is a feature. Features ship after the core works. We haven't proven the core works yet.
+2. **Duplication is a feature.** When MemberShip and EventDash share 60% code and we ship only MemberShip first, that "duplication" means zero blast radius. EventDash breaks? No customer cares.
 
-### The Real Shipping Blocker
+3. **KV storage scales to 10K.** We have zero records. D1 migration is optimization for imaginary load.
 
-While we debate names, we still have:
-- Zero live deployments
-- Zero production Stripe transactions
-- Webhook failure handling untested
-- Documentation still "PENDING"
-
-Renaming things is procrastination that *feels* productive.
+**Every hour on architecture before production is an hour that generates zero learning.**
 
 ---
 
 ## Where Steve Is Right
 
-### Admin UI Should Be Beautiful
+1. **Brand voice at touchpoints.** "Successfully submitted" vs "You're in" — Steve wins. This takes 30 minutes to fix, not 3 weeks. It's just better strings.
 
-I concede this completely. The admin dashboard is where owners spend 80% of their plugin time. If it looks like a spreadsheet, we've failed. The emotional hook—making owners feel capable—that's real. That's worth engineering time.
+2. **Five settings max.** Settings pages are where products die. Ship with right defaults. Users who need customization will email us — that's data.
 
-### Brand Voice Matters
-
-"Your gathering is live. Share it." vs. "Event successfully created!" — Steve's right. The extra words cost nothing to remove and everything to keep. Terse is trust.
-
-### Two Permission Tiers Is Correct
-
-Members and everyone else. Done. I was ready to build role matrices nobody asked for.
+3. **Two tiers only.** Free and Paid. Delete Bronze/Silver/Gold. This cuts 200+ lines. Taste and deletion instinct align.
 
 ---
 
-## Non-Negotiable Decisions (Locked)
+## Locked Decisions (Non-Negotiable)
 
-### 1. Ship MemberShip First, Alone
+### 1. Ship MemberShip to Sunrise Yoga THIS WEEK
+No more planning. Deploy what exists. Fix what breaks in production. The audience teaches things the mirror cannot.
 
-One plugin. One customer. One real production deployment before we touch EventDash again. We're not launching a portfolio—we're validating a product.
+### 2. Zero Demo Data
+Empty states with CTAs pointing to real action. First member should be a *real* member. We're not building theater.
 
-### 2. Names Stay Functional Until v2
-
-"MemberShip" and "EventDash" ship as v1 names. They're searchable, debuggable, and self-documenting. If we hit 100 paying customers, we've earned the right to rebrand.
-
-### 3. No Demo Data on Install
-
-Empty state with a clear "Create Your First Member" CTA. No generated content. No cleanup edge cases. Simplest possible starting point.
+### 3. Names Stay: MemberShip and EventDash
+"Belong" and "Moment" are poetry for products with zero users. SEO matters. Rebrand is a success problem — we need existence first.
 
 ---
 
-**Bottom line:** Steve, your taste is impeccable. But taste doesn't ship. Code ships. Let's deploy MemberShip to one real customer this week, watch it break, fix it, then debate what to call it.
+## The Uncomfortable Truth
+
+Steve wants users to "feel like geniuses." I want users to *exist*.
+
+The yoga instructor isn't overwhelmed by our UX — she doesn't know we exist. She's using Squarespace with a broken Stripe embed because that's what shipped.
+
+**Ship ugly. Listen. Improve. Repeat.**
+
+Polish is earned by survival. Let's survive first.
