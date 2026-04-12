@@ -551,15 +551,15 @@ export async function checkEmailRateLimit(
 ): Promise<boolean> {
 	try {
 		const key = `email:sent:${encodeURIComponent(email)}:${eventType}:last_sent_at`;
-		const lastSentJson = await ctx.kv.get<string>(key);
+		const lastSentData = await ctx.kv.get<{ timestamp: string }>(key);
 
-		if (!lastSentJson) {
+		if (!lastSentData) {
 			// Record this send for next time
-			await ctx.kv.set(key, JSON.stringify({ timestamp: new Date().toISOString() }));
+			await ctx.kv.set(key, { timestamp: new Date().toISOString() });
 			return true;
 		}
 
-		const lastSent = new Date(lastSentJson);
+		const lastSent = new Date(lastSentData.timestamp);
 		const now = new Date();
 		const hoursSinceLastEmail = (now.getTime() - lastSent.getTime()) / (1000 * 60 * 60);
 
@@ -571,7 +571,7 @@ export async function checkEmailRateLimit(
 		}
 
 		// Update the last sent time
-		await ctx.kv.set(key, JSON.stringify({ timestamp: now.toISOString() }));
+		await ctx.kv.set(key, { timestamp: now.toISOString() });
 		return true;
 	} catch (error) {
 		ctx.log.error(`Rate limit check failed: ${String(error)}`);

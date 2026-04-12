@@ -231,7 +231,7 @@ async function fireWebhook(
 	};
 
 	// Store webhook log
-	await ctx.kv.set(`webhook:log:${log.id}`, JSON.stringify(log));
+	await ctx.kv.set(`webhook:log:${log.id}`, log);
 
 	// Add to webhook's log list
 	const logsJson = await ctx.kv.get<string>(`webhook:${endpoint.id}:logs`);
@@ -239,7 +239,7 @@ async function fireWebhook(
 	logs.push(log.id);
 	// Keep last 100 logs
 	if (logs.length > 100) logs.shift();
-	await ctx.kv.set(`webhook:${endpoint.id}:logs`, JSON.stringify(logs));
+	await ctx.kv.set(`webhook:${endpoint.id}:logs`, logs);
 
 	// Update endpoint's last fired time
 	if (success) {
@@ -248,7 +248,7 @@ async function fireWebhook(
 	} else {
 		endpoint.failedCount++;
 	}
-	await ctx.kv.set(`webhook:${endpoint.id}`, JSON.stringify(endpoint));
+	await ctx.kv.set(`webhook:${endpoint.id}`, endpoint);
 
 	return log;
 }

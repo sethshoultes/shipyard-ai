@@ -1,26 +1,32 @@
-# Sara Blakely Gut-Check — Wardrobe
+# Sara Blakely Gut-Check — MemberShip Fix
 
 ## Would a real customer pay for this?
-**Yes, but not for "5 themes."** They'd pay to stop feeling embarrassed by their site. That's the product — *dignity on demand*. Your plan buries this under 20 infrastructure tasks.
 
-## What's confusing? What makes someone bounce?
-1. **"Wardrobe" means nothing.** I don't know what Emdash is. The showcase assumes I do. Fatal.
-2. **5 themes sounds thin.** Why trust this vs. 500 on Envato?
-3. **"Coming Soon" feels like vapor.** Promise something specific or don't tease.
-4. **No before/after.** Show the transformation, not just screenshots.
+**No.** This isn't a product plan. It's a cleanup of tech debt. You can't sell "we removed JSON.stringify." The plan says the feeling should be "Belonging" but then lists 15 tasks about error message formatting and TypeScript compilation. Where's the belonging?
+
+## What's confusing? What would make someone bounce?
+
+1. **The "Essence" lies.** It promises magic ("tools that disappear") then delivers plumbing.
+2. **No user journey.** I have no idea what a member actually *does* after signup.
+3. **"Sunrise Yoga" appears once.** Is that the customer? The demo? Who's paying?
+4. **15 tasks, 5 waves, XML everywhere.** This feels like enterprise software, not creator tools.
 
 ## 30-Second Elevator Pitch
-*"Your Emdash site looks like a developer made it. One command, and it looks like a designer did. Pick a vibe. Paste. Done. Your words stay — only the wrapper changes."*
 
-## What would I test first with $0 marketing budget?
-Post one before/after GIF on Twitter. "My blog before Wardrobe vs. after — 11 seconds." If it doesn't spread, the product lacks word-of-mouth DNA. Kill it.
+*"We're fixing bugs so the membership plugin stops crashing when people try to pay."*
+
+That's honest. But it's not a pitch. A real pitch: *"MemberShip lets any creator add paid subscriptions in 5 minutes—no code, no Stripe nightmare. Paste and get paid."* I don't know if that's true because this plan doesn't talk about what the product IS.
+
+## What would I test first with $0 budget?
+
+DM 10 yoga teachers on Instagram. Ask: "Would you pay $29/month if I handled all your membership tech—signups, payments, cancellations—so you just teach?" If 7+ say yes without blinking, you have something. This plan tests TypeScript. TypeScript doesn't pay rent.
 
 ## What's the retention hook?
-**Weak.** "Coming Soon" and email capture are engineer-brain solutions. Real retention: make the installed site *so good* they tell one friend. Your plan optimizes the funnel, not the product.
 
-## The Hard Truth
-This plan is 80% infrastructure, 20% customer magic. Flip it. Nobody cares about R2 buckets or sha256 hashes. They care about looking good without hiring a designer.
+**None visible.** What does MemberShip do on day 30 that makes creators stay? Where's the "you earned $X this week" email? The engagement dashboard? The community features? This plan ends at "signup works." That's table stakes, not retention.
 
-**Ship faster. Learn what they actually want. The plan is too precious.**
+---
+
+**Bottom line:** Solid engineering cleanup. Not a product plan. Before writing more code: *Who is the creator, what do they desperately need, and why will they tell their friends?*
 
 — Sara
