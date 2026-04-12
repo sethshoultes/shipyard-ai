@@ -1,54 +1,58 @@
-# Phase 1 Plan — Anchor Post-Delivery System
+# Phase 1 Plan — Wardrobe Theme Marketplace Deployment
 
 **Generated**: April 12, 2026
-**Project Slug**: shipyard-post-delivery-v2
-**Product Name**: Anchor (Post-Delivery System)
+**Project Slug**: emdash-marketplace
+**Product Name**: Wardrobe
 **Requirements**: .planning/REQUIREMENTS.md
-**Total Tasks**: 15
+**Total Tasks**: 13
 **Waves**: 4
-**Status**: READY FOR BUILD (pending founder decisions)
-**Token Budget**: 300K max
+**Status**: READY FOR DEPLOYMENT
+**Estimated Time**: 2.5-3 hours (sequential), 1.5 hours (parallelized)
 
 ---
 
 ## The Essence
 
-> **What it's really about:** Making clients feel watched over after their site launches.
+> **What it's really about:** One command transforms your site into something beautiful.
 
-> **What it evokes:** "Someone's got my back."
+> **What it evokes:** "That's me."
 
-> **What must be perfect:** The emails. They are the entire product.
+> **What must be perfect:** The reveal. The instant your site becomes dignified.
 
-> **Creative direction:** Trust before transaction.
+> **Creative direction:** Instant dignity.
 
 ---
 
 ## Build Status
 
-**Technical MVP:** 0% (greenfield build)
-**Board Verdict:** LOCKED (decisions.md consolidated)
-**Current State:** Debate complete, awaiting founder decision on REQ-058 (card timing)
+**Technical MVP:** 100% COMPLETE (code is done)
+**Deployment:** 0% (infrastructure blockers)
+**Board Verdict:** PROCEED (Conditional) — 9 P0 blockers must be resolved
 
 ### Locked Decisions
 
 | Decision | Winner | Rationale |
 |----------|--------|-----------|
-| Product Name: **Anchor** | Steve Jobs | "Post-Delivery System takes five syllables to say nothing. Anchor takes two to say everything." |
-| Architecture: **Cron + JSON + Email + Stripe** | Elon Musk | "Infrastructure should follow traction, not precede it." |
-| No Dashboard in v1 | Both | "Build the relationship first. Earn the right to ask for a login." |
-| Token Budget: **300K** | Elon Musk | "The 900K estimate is fantasy. 270K is real." |
-| Email Quality: **A+ or don't ship** | Steve Jobs | "The email IS the entire product. Copy is not decoration." |
-| Two Tiers Only | Elon Musk | Cut complexity. Three tiers is v2. |
-| Weekly PageSpeed | Elon Musk | "Daily is vanity. Weekly is useful." |
-| First-Party Analytics | Elon Musk | "OAuth for Google Analytics is a dead end." |
+| Product Name: **Wardrobe** | Steve Jobs | `npx wardrobe install ember` is tweetable |
+| Theme Count: **5** | Steve Jobs | Five feels like a collection, not a test |
+| Preview: **Screenshots** | Elon Musk | Ships in one session; live preview is V2 |
+| Architecture: **CLI-First** | Elon Musk | The CLI IS the product |
+| Infrastructure: **Static** | Elon Musk | R2 + CDN scales infinitely with zero ops |
+| Install Speed: **Sub-3-Second** | Both | Transformation must feel instant |
 
-### UNRESOLVED (Blocking)
+### P0 Blockers (Must Resolve in This Plan)
 
-| Decision | Elon's Position | Steve's Position |
-|----------|-----------------|------------------|
-| Card Collection Timing | Card at project start (5x attach rate) | No card until trust earned (trust before transaction) |
-
-**This must be resolved before Wave 3 (signup flow) can begin.**
+| # | Blocker | Status |
+|---|---------|--------|
+| 1 | KV namespace IDs are placeholders | NOT DONE |
+| 2 | R2 bucket not created | NOT DONE |
+| 3 | Theme tarballs not uploaded | NOT DONE |
+| 4 | Workers not deployed | NOT DONE |
+| 5 | Showcase not deployed | NOT DONE |
+| 6 | Demo sites not deployed | NOT DONE |
+| 7 | Screenshots are SVG placeholders | NOT DONE |
+| 8 | R2 upload script has bug | NOT DONE |
+| 9 | Uncommitted files | NOT DONE |
 
 ---
 
@@ -56,21 +60,19 @@
 
 | Requirement | Task(s) | Wave |
 |-------------|---------|------|
-| REQ-037: Project Structure | phase-1-task-1 | 1 |
-| REQ-041, REQ-029: Lib files + PageSpeed wrapper | phase-1-task-2 | 1 |
-| REQ-042: Customer JSON schema | phase-1-task-3 | 1 |
-| REQ-022, REQ-039: Email cron worker | phase-1-task-4 | 2 |
-| REQ-030, REQ-031, REQ-032, REQ-039: PageSpeed cron | phase-1-task-5 | 2 |
-| REQ-023, REQ-024, REQ-025, REQ-039: Stripe webhook | phase-1-task-6 | 2 |
-| REQ-017: Launch Day email | phase-1-task-7 | 3 |
-| REQ-018: Week 1 email | phase-1-task-8 | 3 |
-| REQ-019: Month 1 email | phase-1-task-9 | 3 |
-| REQ-020: Q1 Refresh email | phase-1-task-10 | 3 |
-| REQ-021: Anniversary email | phase-1-task-11 | 3 |
-| REQ-033, REQ-034, REQ-035, REQ-038: Landing + Pricing | phase-1-task-12 | 4 |
-| REQ-043: README documentation | phase-1-task-13 | 4 |
-| REQ-026: BetterUptime setup | phase-1-task-14 | 4 |
-| Sara Blakely customer gut-check | phase-1-task-15 | 4 |
+| P0-001, P0-002, P0-003: KV namespaces | phase-1-task-1 | 1 |
+| P0-004: R2 bucket | phase-1-task-2 | 1 |
+| RISK-001: R2 upload script fix | phase-1-task-3 | 1 |
+| P0-005: Upload tarballs | phase-1-task-4 | 2 |
+| P0-006, T1-005: Analytics worker | phase-1-task-5 | 2 |
+| P0-007, T1-004: Email worker | phase-1-task-6 | 2 |
+| T1-001: Demo sites (ember) | phase-1-task-7 | 3 |
+| T1-001: Demo sites (forge, slate) | phase-1-task-8 | 3 |
+| T1-001: Demo sites (drift, bloom) | phase-1-task-9 | 3 |
+| T1-002: Screenshots | phase-1-task-10 | 4 |
+| P0-008: Showcase deploy | phase-1-task-11 | 4 |
+| P0-009: Git commit | phase-1-task-12 | 4 |
+| QA Pass 2 | phase-1-task-13 | 4 |
 
 ---
 
@@ -78,80 +80,75 @@
 
 This plan cites specific sections from source documents:
 
-- **decisions.md**: MVP Feature Set, File Structure, Risk Register
-- **docs/EMDASH-GUIDE.md Section 5**: Cloudflare Workers deployment (wrangler.jsonc, D1/R2)
-- **docs/EMDASH-GUIDE.md Section 8**: Real examples (Bella's Bistro configuration)
-- **Codebase patterns**:
-  - `/workers/contact-form/` (Resend API, CORS, email sending)
-  - `/apps/pulse/lib/stripe.ts` (Stripe integration, idempotency)
-  - `/plugins/eventdash/src/email.ts` (HTML email templates)
+- **decisions.md**: P0 Launch Blockers (lines 334-361), Board Conditions (lines 366-395)
+- **docs/EMDASH-GUIDE.md Section 5**: Cloudflare deployment (wrangler.jsonc, D1, R2)
+- **docs/EMDASH-GUIDE.md Section 7**: Theme structure, seed files
+- **docs/DEPLOYMENT-RUNBOOK.md**: Step-by-step infrastructure guide
+- **qa-pass-1.md**: 9 P0 blockers, verification evidence
 
 ---
 
 ## Wave Execution Order
 
-### Wave 1 (Parallel) — Project Foundation
+### Wave 1 (Parallel) — Infrastructure Foundation
 
-Three independent tasks setting up project structure, libraries, and data schema. **Token budget: 30K**
+Three independent tasks provisioning Cloudflare resources. **Estimated time: 10 minutes**
 
 ```xml
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Create Anchor project directory structure</title>
-  <requirement>REQ-037: Project Structure with site/, workers/, emails/, data/, lib/</requirement>
+  <title>Create KV namespaces for workers</title>
+  <requirement>P0-001, P0-002, P0-003: Create KV namespaces (ANALYTICS, EMAILS, RATE_LIMITS)</requirement>
   <description>
-    Per decisions.md File Structure section:
-    Create the complete Anchor project skeleton with all required directories.
+    Per qa-pass-1.md P0 blockers #1-2:
+    Create three KV namespaces required by analytics and email-capture workers.
+    Update wrangler.toml files with real namespace IDs.
 
-    Target structure from decisions.md:
-    anchor/
-    ├── site/                 # Cloudflare Pages static site
-    ├── workers/              # Cron workers
-    ├── emails/               # HTML email templates
-    ├── data/                 # customers.json
-    ├── lib/                  # Utility libraries
-    └── scripts/              # Deploy scripts
+    Current placeholder IDs (workers/analytics/wrangler.toml lines 8-9):
+    - id = "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6" (PLACEHOLDER)
+    - preview_id = "p6o5n4m3l2k1j0i9h8g7f6e5d4c3b2a1" (PLACEHOLDER)
+
+    Current placeholder IDs (workers/email-capture/wrangler.toml lines 14-20):
+    - EMAILS id = "e1m2a3i4l5s6k7v8n9a0m1e2s3p4a5c6" (PLACEHOLDER)
+    - RATE_LIMITS id = "r1a2t3e4l5i6m7i8t9s0k1v2n3a4m5e6" (PLACEHOLDER)
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="File Structure section defines layout" />
-    <file path="/home/agent/shipyard-ai/workers/contact-form/" reason="Reference Cloudflare Worker structure" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5: wrangler.jsonc patterns" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/analytics/wrangler.toml" reason="Contains placeholder ANALYTICS KV ID" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/email-capture/wrangler.toml" reason="Contains placeholder EMAILS and RATE_LIMITS IDs" />
+    <file path="/home/agent/shipyard-ai/rounds/emdash-marketplace/qa-pass-1.md" reason="Documents P0 blockers 1-2" />
   </context>
 
   <steps>
-    <step order="1">Create /home/agent/shipyard-ai/projects/anchor/ root directory</step>
-    <step order="2">Create site/ directory with assets/ subdirectory</step>
-    <step order="3">Create workers/ directory for cron workers</step>
-    <step order="4">Create emails/ directory for 5 HTML templates</step>
-    <step order="5">Create data/ directory for customers.json</step>
-    <step order="6">Create lib/ directory for utility libraries</step>
-    <step order="7">Create scripts/ directory for deploy scripts</step>
-    <step order="8">Create wrangler.toml with compatibility_date per EMDASH-GUIDE.md Section 5</step>
-    <step order="9">Create package.json with project metadata and wrangler dependency</step>
-    <step order="10">Create .gitignore for node_modules, .env, *.log</step>
+    <step order="1">Run: wrangler kv:namespace create ANALYTICS</step>
+    <step order="2">Copy the returned namespace ID</step>
+    <step order="3">Run: wrangler kv:namespace create ANALYTICS --preview (for preview_id)</step>
+    <step order="4">Update workers/analytics/wrangler.toml lines 8-9 with real IDs</step>
+    <step order="5">Update workers/analytics/wrangler.toml line 20 (env.production) with real ID</step>
+    <step order="6">Run: wrangler kv:namespace create EMAILS</step>
+    <step order="7">Run: wrangler kv:namespace create EMAILS --preview</step>
+    <step order="8">Run: wrangler kv:namespace create RATE_LIMITS</step>
+    <step order="9">Run: wrangler kv:namespace create RATE_LIMITS --preview</step>
+    <step order="10">Update workers/email-capture/wrangler.toml lines 14-20 with real IDs</step>
   </steps>
 
   <verification>
-    <check type="bash">test -d /home/agent/shipyard-ai/projects/anchor/site && echo "site dir exists"</check>
-    <check type="bash">test -d /home/agent/shipyard-ai/projects/anchor/workers && echo "workers dir exists"</check>
-    <check type="bash">test -d /home/agent/shipyard-ai/projects/anchor/emails && echo "emails dir exists"</check>
-    <check type="bash">test -d /home/agent/shipyard-ai/projects/anchor/lib && echo "lib dir exists"</check>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/wrangler.toml && echo "wrangler exists"</check>
+    <check type="bash">grep -v "a1b2c3d4\|e1m2a3i4\|r1a2t3e4" /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/analytics/wrangler.toml</check>
+    <check type="bash">grep -v "PLACEHOLDER\|placeholder" /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/email-capture/wrangler.toml</check>
+    <check type="manual">All 6 KV namespace IDs are valid 32-character hex strings</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>feat(anchor): create project directory structure
+  <commit-message>chore(wardrobe): configure KV namespace IDs
 
-Per decisions.md File Structure:
-- site/ for Cloudflare Pages static site
-- workers/ for cron automation
-- emails/ for 5 HTML templates
-- data/ for JSON customer storage
-- lib/ for utility libraries
-- wrangler.toml configured per EMDASH-GUIDE.md Section 5
+Replace placeholder KV namespace IDs with real IDs from wrangler:
+- ANALYTICS namespace for install telemetry
+- EMAILS namespace for email capture
+- RATE_LIMITS namespace for request throttling
+
+Resolves P0 blockers #1-2 from qa-pass-1.md
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -159,63 +156,48 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-2" wave="1">
-  <title>Create utility libraries (pagespeed, email, stripe)</title>
-  <requirement>REQ-041: Library Files, REQ-029: PageSpeed API Wrapper</requirement>
+  <title>Create R2 bucket for theme distribution</title>
+  <requirement>P0-004: Create R2 bucket for theme tarballs</requirement>
   <description>
-    Per decisions.md lib/ section:
-    Create three utility libraries with clean interfaces.
+    Per qa-pass-1.md P0 blocker #4 and DEPLOYMENT-RUNBOOK.md Task 1:
+    Create the R2 bucket that will host theme tarballs for CLI downloads.
+    Enable public access for CDN distribution.
 
-    - pagespeed.js: Google PageSpeed Insights API wrapper
-    - email.js: Resend API integration (per existing /workers/contact-form/ pattern)
-    - stripe.js: Stripe SDK wrapper (per existing /apps/pulse/lib/stripe.ts pattern)
-
-    Reference: EMDASH-GUIDE.md Section 6 shows ctx.http for external API calls.
+    Target bucket: emdash-themes
+    Expected URL format: https://pub-{id}.r2.dev/{theme}@1.0.0.tar.gz
+    Or custom domain: https://cdn.emdash.dev/themes/{theme}@1.0.0.tar.gz
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/workers/contact-form/src/index.ts" reason="Resend API email pattern" />
-    <file path="/home/agent/shipyard-ai/apps/pulse/lib/stripe.ts" reason="Stripe singleton + idempotency pattern" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6: ctx.http for external APIs" />
-    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="PageSpeed API rate limit mitigation" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 1: R2 bucket creation steps" />
+    <file path="/home/agent/shipyard-ai/rounds/emdash-marketplace/decisions.md" reason="Open Question #1: R2 bucket name confirmation" />
   </context>
 
   <steps>
-    <step order="1">Create lib/pagespeed.ts with PageSpeedConfig interface</step>
-    <step order="2">PageSpeed wrapper: getPerformanceScore(url) returns { desktop, mobile, coreWebVitals }</step>
-    <step order="3">Add rate limit handling: exponential backoff on 429 responses</step>
-    <step order="4">Cache results in memory for 6 days (weekly refresh)</step>
-    <step order="5">Create lib/email.ts following /workers/contact-form/ Resend pattern</step>
-    <step order="6">Email wrapper: sendEmail({ to, subject, html, from? }) with Resend REST API</step>
-    <step order="7">Add domain authentication headers (SPF/DKIM compliance)</step>
-    <step order="8">Create lib/stripe.ts following /apps/pulse/lib/stripe.ts pattern</step>
-    <step order="9">Stripe wrapper: createCheckoutSession(), handleWebhook(), getSubscriptionStatus()</step>
-    <step order="10">Add idempotency key generation per existing pattern</step>
-    <step order="11">Add StripeError handling with user-friendly messages</step>
-    <step order="12">Create lib/types.ts with shared TypeScript interfaces</step>
+    <step order="1">Run: wrangler r2 bucket create emdash-themes</step>
+    <step order="2">Navigate to Cloudflare dashboard > R2 > emdash-themes > Settings</step>
+    <step order="3">Enable public access (Settings > Public access > Enable)</step>
+    <step order="4">Note the public URL: https://pub-{bucketId}.r2.dev</step>
+    <step order="5">Optionally configure custom domain (cdn.emdash.dev) for prettier URLs</step>
+    <step order="6">Test access: curl -I https://pub-{bucketId}.r2.dev (should return 200 or 404)</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/lib/pagespeed.ts && echo "pagespeed lib exists"</check>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/lib/email.ts && echo "email lib exists"</check>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/lib/stripe.ts && echo "stripe lib exists"</check>
-    <check type="bash">grep "exponential\|backoff" /home/agent/shipyard-ai/projects/anchor/lib/pagespeed.ts</check>
-    <check type="bash">grep "idempotency\|Idempotency" /home/agent/shipyard-ai/projects/anchor/lib/stripe.ts</check>
-    <check type="test">All three libraries export documented interfaces</check>
+    <check type="bash">wrangler r2 bucket list | grep emdash-themes</check>
+    <check type="manual">Public access enabled in Cloudflare dashboard</check>
+    <check type="manual">Public URL accessible (even if empty bucket)</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>feat(anchor): create utility libraries
+  <commit-message>chore(wardrobe): document R2 bucket creation
 
-Per decisions.md lib/ section and existing patterns:
-- pagespeed.ts: PageSpeed Insights API with rate limiting
-- email.ts: Resend API (pattern from /workers/contact-form/)
-- stripe.ts: Stripe SDK (pattern from /apps/pulse/lib/stripe.ts)
-- types.ts: Shared TypeScript interfaces
+R2 bucket 'emdash-themes' created with public access enabled.
+CLI will download theme tarballs from this bucket.
 
-Cites: EMDASH-GUIDE.md Section 6 for external API patterns
+Resolves P0 blocker #4 from qa-pass-1.md
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -223,64 +205,42 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-3" wave="1">
-  <title>Define customers.json schema and seed data</title>
-  <requirement>REQ-042: Customer Data File, REQ-006: JSON Storage, REQ-028: Operations Tracking</requirement>
+  <title>Fix R2 upload script endpoint bug</title>
+  <requirement>RISK-001: R2 upload script uses incorrect endpoint (googleapis.com)</requirement>
   <description>
-    Per decisions.md Data Storage section:
-    JSON storage for up to 100 customers. No database.
+    Risk Scanner identified critical bug in scripts/upload-tarballs.ts line 33:
 
-    Required fields per REQ-028 (Operations Tracking):
-    - Last Contact
-    - Next Touch
-    - Status
+    Current (WRONG): endpoint: `https://${CLOUDFLARE_ACCOUNT_ID}.r2.googleapis.com`
+    Correct: endpoint: `https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`
 
-    Additional fields from decisions.md MVP:
-    - Customer info (email, Stripe ID)
-    - Subscription tier (Basic/Pro)
-    - Enrollment date
-    - Emails sent tracking
-    - PageSpeed history
+    The script incorrectly uses googleapis.com instead of Cloudflare's R2 endpoint.
+    This will cause all upload attempts to fail with 403 or connection refused.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Spreadsheet Columns and Data Storage sections" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/scripts/upload-tarballs.ts" reason="Contains bug on line 33" />
   </context>
 
   <steps>
-    <step order="1">Create data/customers.json with empty array: { "customers": [] }</step>
-    <step order="2">Create data/schema.ts with TypeScript Customer interface</step>
-    <step order="3">Customer fields: id, email, name, siteUrl, stripeCustomerId, stripeSubscriptionId</step>
-    <step order="4">Operations fields: lastContact, nextTouch, status (active/paused/cancelled)</step>
-    <step order="5">Subscription fields: tier (basic/pro), enrollmentDate, subscriptionStatus</step>
-    <step order="6">Email tracking: emailsSent object with boolean flags for each of 5 emails</step>
-    <step order="7">PageSpeed fields: pagespeedHistory array with { date, desktop, mobile, vitals }</step>
-    <step order="8">Add sample customer record for testing (marked as test: true)</step>
-    <step order="9">Create lib/customers.ts with CRUD helpers: loadCustomers(), saveCustomers(), addCustomer(), updateCustomer()</step>
-    <step order="10">Add atomic write pattern: write to temp file, then rename (prevents corruption)</step>
+    <step order="1">Open scripts/upload-tarballs.ts</step>
+    <step order="2">Line 33: Change "r2.googleapis.com" to "r2.cloudflarestorage.com"</step>
+    <step order="3">Save file</step>
+    <step order="4">Verify fix: grep "r2.cloudflarestorage.com" scripts/upload-tarballs.ts</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/data/customers.json && echo "customers.json exists"</check>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/data/schema.ts && echo "schema exists"</check>
-    <check type="bash">grep "lastContact" /home/agent/shipyard-ai/projects/anchor/data/schema.ts</check>
-    <check type="bash">grep "nextTouch" /home/agent/shipyard-ai/projects/anchor/data/schema.ts</check>
-    <check type="bash">grep "emailsSent" /home/agent/shipyard-ai/projects/anchor/data/schema.ts</check>
-    <check type="test">Schema includes all required fields from decisions.md</check>
+    <check type="bash">grep "r2.cloudflarestorage.com" /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/scripts/upload-tarballs.ts</check>
+    <check type="bash">grep -v "r2.googleapis.com" /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/scripts/upload-tarballs.ts | grep -q "endpoint"</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundational task -->
   </dependencies>
 
-  <commit-message>feat(anchor): define customers.json schema and helpers
+  <commit-message>fix(wardrobe): correct R2 endpoint URL in upload script
 
-Per decisions.md Data Storage:
-- JSON storage until 100 customers (no database)
-- Three required tracking fields: lastContact, nextTouch, status
-- Email send tracking for 5 scheduled emails
-- PageSpeed history array
-- Atomic write pattern for data safety
-- Sample test customer included
+Change R2 endpoint from googleapis.com to cloudflarestorage.com.
+The previous endpoint was incorrect and would cause upload failures.
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -288,76 +248,69 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 2 (Parallel, after Wave 1) — Cloudflare Workers
+### Wave 2 (Parallel, after Wave 1) — Workers & Uploads
 
-Three workers implementing cron automation and webhook handling. **Token budget: 80K**
+Three tasks deploying workers and uploading tarballs. **Estimated time: 15 minutes**
 
 ```xml
 <task-plan id="phase-1-task-4" wave="2">
-  <title>Implement email scheduler cron worker</title>
-  <requirement>REQ-022: Email Cron System, REQ-039: Worker Files</requirement>
+  <title>Upload theme tarballs to R2</title>
+  <requirement>P0-005: Upload 5 theme tarballs to R2 CDN</requirement>
   <description>
-    Per decisions.md workers/cron-email-scheduler.js:
-    Daily cron that checks which emails are due and sends them.
+    Per qa-pass-1.md P0 blocker #5 and DEPLOYMENT-RUNBOOK.md Task 1:
+    Upload all 5 pre-built theme tarballs to the R2 bucket.
 
-    Email schedule from decisions.md MVP:
-    - Launch Day: Day 0 (enrollment day)
-    - Week 1: Day 7
-    - Month 1: Day 30
-    - Q1 Refresh: Day 90
-    - Anniversary: Day 365
+    Tarballs exist locally at:
+    - dist/themes/ember@1.0.0.tar.gz (6.3 KB)
+    - dist/themes/forge@1.0.0.tar.gz (5.1 KB)
+    - dist/themes/slate@1.0.0.tar.gz (5.2 KB)
+    - dist/themes/drift@1.0.0.tar.gz (5.4 KB)
+    - dist/themes/bloom@1.0.0.tar.gz (5.5 KB)
 
-    Reference: /workers/contact-form/ for Resend API pattern
+    Requires: R2 bucket created (task-2), upload script fixed (task-3)
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/projects/anchor/lib/email.ts" reason="Email sending utility" />
-    <file path="/home/agent/shipyard-ai/projects/anchor/lib/customers.ts" reason="Customer data CRUD" />
-    <file path="/home/agent/shipyard-ai/workers/contact-form/src/index.ts" reason="Resend API pattern" />
-    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Five core emails schedule" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/scripts/upload-tarballs.ts" reason="Upload script (must be fixed first)" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/.env.example" reason="Required environment variables" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 1 upload steps" />
   </context>
 
   <steps>
-    <step order="1">Create workers/cron-email-scheduler.ts</step>
-    <step order="2">Add scheduled handler: export default { scheduled(event, env, ctx) {} }</step>
-    <step order="3">Configure wrangler.toml: [[triggers.crons]] cron = "0 8 * * *" (daily at 8am UTC)</step>
-    <step order="4">Load customers.json at start of cron run</step>
-    <step order="5">For each active customer, calculate days since enrollment</step>
-    <step order="6">Check which email is due based on daysSinceEnrollment: 0=launchDay, 7=week1, 30=month1, 90=q1Refresh, 365=anniversary</step>
-    <step order="7">Skip if email already marked sent in emailsSent object</step>
-    <step order="8">Load email template from emails/ directory</step>
-    <step order="9">Send via lib/email.ts sendEmail() function</step>
-    <step order="10">Update customer.emailsSent flag to true</step>
-    <step order="11">Update customer.lastContact to current date</step>
-    <step order="12">Calculate customer.nextTouch for next scheduled email</step>
-    <step order="13">Save updated customers.json</step>
-    <step order="14">Log success/failure for each send (console.log for MVP)</step>
-    <step order="15">Add error handling: continue on single failure, don't stop entire cron</step>
+    <step order="1">Copy .env.example to .env</step>
+    <step order="2">Set CLOUDFLARE_ACCOUNT_ID (from Cloudflare dashboard)</step>
+    <step order="3">Generate R2 API token: Cloudflare dashboard > R2 > API Tokens > Create API Token</step>
+    <step order="4">Set R2_ACCESS_KEY_ID (from API token)</step>
+    <step order="5">Set R2_SECRET_ACCESS_KEY (from API token)</step>
+    <step order="6">Set R2_BUCKET_NAME=emdash-themes</step>
+    <step order="7">Verify tarballs exist: ls dist/themes/*.tar.gz</step>
+    <step order="8">Run: npm run upload:themes</step>
+    <step order="9">Verify each tarball accessible: curl -I https://pub-{id}.r2.dev/ember@1.0.0.tar.gz</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/workers/cron-email-scheduler.ts && echo "email cron exists"</check>
-    <check type="bash">grep "scheduled" /home/agent/shipyard-ai/projects/anchor/workers/cron-email-scheduler.ts</check>
-    <check type="bash">grep "crons" /home/agent/shipyard-ai/projects/anchor/wrangler.toml</check>
-    <check type="bash">grep "daysSinceEnrollment\|enrollment" /home/agent/shipyard-ai/projects/anchor/workers/cron-email-scheduler.ts</check>
-    <check type="test">Email scheduling logic handles all 5 email types</check>
+    <check type="bash">cd /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe && ls dist/themes/*.tar.gz | wc -l</check>
+    <check type="manual">curl -I for each of 5 tarballs returns HTTP 200</check>
+    <check type="manual">Script output shows "All tarballs uploaded successfully!"</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
-    <depends-on task-id="phase-1-task-2" reason="Email library must exist" />
-    <depends-on task-id="phase-1-task-3" reason="Customer schema must exist" />
+    <depends-on task-id="phase-1-task-2" reason="R2 bucket must exist" />
+    <depends-on task-id="phase-1-task-3" reason="Upload script bug must be fixed" />
   </dependencies>
 
-  <commit-message>feat(anchor): implement email scheduler cron worker
+  <commit-message>chore(wardrobe): upload theme tarballs to R2
 
-Per decisions.md email schedule:
-- Daily cron at 8am UTC
-- Checks days since enrollment: 0, 7, 30, 90, 365
-- Sends appropriate email template
-- Updates lastContact and nextTouch
-- Error handling continues on single failure
-- Uses Resend API via lib/email.ts
+5 theme tarballs uploaded to emdash-themes R2 bucket:
+- ember@1.0.0.tar.gz
+- forge@1.0.0.tar.gz
+- slate@1.0.0.tar.gz
+- drift@1.0.0.tar.gz
+- bloom@1.0.0.tar.gz
+
+CLI installs now functional.
+
+Resolves P0 blocker #5 from qa-pass-1.md
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -365,69 +318,52 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-5" wave="2">
-  <title>Implement PageSpeed cron worker</title>
-  <requirement>REQ-030: Weekly Performance Data, REQ-031: Storage, REQ-032: Rate Limit Handling, REQ-039: Worker Files</requirement>
+  <title>Deploy analytics worker</title>
+  <requirement>P0-006: Deploy analytics worker; T1-005: Anonymous install telemetry</requirement>
   <description>
-    Per decisions.md workers/cron-pagespeed.js:
-    Weekly cron that fetches PageSpeed scores for all customer sites.
+    Per qa-pass-1.md P0 blocker #6 and DEPLOYMENT-RUNBOOK.md Task 4:
+    Deploy the analytics worker that tracks anonymous theme installs.
 
-    Constraints from decisions.md:
-    - Once per week (not daily)
-    - Run at 3am (low traffic)
-    - Cache aggressively
-    - Handle rate limits gracefully
-
-    Reference: EMDASH-GUIDE.md Section 6 for external API patterns
+    Worker: workers/analytics/
+    Endpoints: POST /track, GET /stats, GET /health
+    Requires: KV namespace IDs configured (task-1)
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/projects/anchor/lib/pagespeed.ts" reason="PageSpeed API wrapper" />
-    <file path="/home/agent/shipyard-ai/projects/anchor/lib/customers.ts" reason="Customer data CRUD" />
-    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="PageSpeed frequency and rate limit mitigation" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6: external API calls" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/analytics/src/index.ts" reason="Analytics worker implementation (389 lines)" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/analytics/wrangler.toml" reason="Worker configuration" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 4 deployment steps" />
   </context>
 
   <steps>
-    <step order="1">Create workers/cron-pagespeed.ts</step>
-    <step order="2">Add scheduled handler for weekly execution</step>
-    <step order="3">Configure wrangler.toml: [[triggers.crons]] cron = "0 3 * * 1" (Mondays at 3am UTC)</step>
-    <step order="4">Load customers.json at start</step>
-    <step order="5">For each active customer, get siteUrl</step>
-    <step order="6">Check if last PageSpeed run was >6 days ago (skip if recent)</step>
-    <step order="7">Call lib/pagespeed.ts getPerformanceScore(siteUrl)</step>
-    <step order="8">Handle rate limit: if 429, wait 60 seconds, retry once</step>
-    <step order="9">Store result in customer.pagespeedHistory array: { date, desktop, mobile, vitals }</step>
-    <step order="10">Keep last 52 weeks of history (1 year rolling window)</step>
-    <step order="11">Update customer.lastPagespeedRun timestamp</step>
-    <step order="12">Save updated customers.json</step>
-    <step order="13">Add delay between requests: 500ms to avoid burst rate limits</step>
-    <step order="14">Log completion: "PageSpeed: {n} sites checked, {m} updated"</step>
+    <step order="1">cd workers/analytics</step>
+    <step order="2">Verify wrangler.toml has real KV namespace IDs (from task-1)</step>
+    <step order="3">Generate API key: openssl rand -hex 32</step>
+    <step order="4">Set secret: wrangler secret put API_KEY (paste generated key)</step>
+    <step order="5">Deploy: wrangler deploy</step>
+    <step order="6">Note deployed URL: wardrobe-analytics.{subdomain}.workers.dev</step>
+    <step order="7">Verify health: curl https://wardrobe-analytics.{subdomain}.workers.dev/health</step>
+    <step order="8">Test track endpoint: curl -X POST -H "Content-Type: application/json" -d '{"theme":"ember","os":"darwin","timestamp":1712844000000,"cliVersion":"1.0.0"}' https://wardrobe-analytics.{subdomain}.workers.dev/track</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/workers/cron-pagespeed.ts && echo "pagespeed cron exists"</check>
-    <check type="bash">grep "scheduled" /home/agent/shipyard-ai/projects/anchor/workers/cron-pagespeed.ts</check>
-    <check type="bash">grep "0 3 \* \* 1\|Monday" /home/agent/shipyard-ai/projects/anchor/wrangler.toml</check>
-    <check type="bash">grep "rate\|429\|retry" /home/agent/shipyard-ai/projects/anchor/workers/cron-pagespeed.ts</check>
-    <check type="test">PageSpeed cron handles rate limits per decisions.md</check>
+    <check type="bash">curl https://wardrobe-analytics.{subdomain}.workers.dev/health</check>
+    <check type="manual">/health returns {"status":"ok"}</check>
+    <check type="manual">/track accepts POST and returns {"success":true}</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
-    <depends-on task-id="phase-1-task-2" reason="PageSpeed library must exist" />
-    <depends-on task-id="phase-1-task-3" reason="Customer schema must exist" />
+    <depends-on task-id="phase-1-task-1" reason="KV namespace IDs must be configured" />
   </dependencies>
 
-  <commit-message>feat(anchor): implement PageSpeed cron worker
+  <commit-message>feat(wardrobe): deploy analytics worker
 
-Per decisions.md PageSpeed requirements:
-- Weekly run on Mondays at 3am UTC (not daily)
-- Rate limit handling: 429 → wait 60s, retry
-- 500ms delay between requests
-- 52-week rolling history
-- Skip if last run <6 days ago
+Analytics worker deployed to Cloudflare Workers:
+- POST /track: Record anonymous install events
+- GET /stats: Aggregated statistics (API key protected)
+- GET /health: Health check endpoint
 
-Cites: EMDASH-GUIDE.md Section 6 for external API patterns
+Resolves P0 blocker #6 and T1-005 from qa-pass-1.md
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -435,70 +371,52 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-6" wave="2">
-  <title>Implement Stripe webhook handler</title>
-  <requirement>REQ-023: Stripe Checkout, REQ-024: Webhook Handling, REQ-025: Subscription Management, REQ-039: Worker Files</requirement>
+  <title>Deploy email-capture worker</title>
+  <requirement>P0-007: Deploy email-capture worker; T1-004: Wire email capture endpoint</requirement>
   <description>
-    Per decisions.md workers/stripe-webhook.js:
-    Handle Stripe webhook events for subscription lifecycle.
+    Per qa-pass-1.md P0 blocker #7 and DEPLOYMENT-RUNBOOK.md Task 3:
+    Deploy the email capture worker for showcase email signups.
 
-    Events to handle:
-    - customer.subscription.created → Add to customers.json
-    - customer.subscription.updated → Update status
-    - customer.subscription.deleted → Mark cancelled
-
-    Reference: /apps/pulse/lib/stripe.ts for webhook pattern
+    Worker: workers/email-capture/
+    Endpoints: POST /subscribe
+    Requires: KV namespace IDs configured (task-1)
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/projects/anchor/lib/stripe.ts" reason="Stripe utilities" />
-    <file path="/home/agent/shipyard-ai/projects/anchor/lib/customers.ts" reason="Customer data CRUD" />
-    <file path="/home/agent/shipyard-ai/apps/pulse/lib/stripe.ts" reason="Stripe webhook verification pattern" />
-    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Two-tier subscriptions" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/email-capture/src/index.ts" reason="Email capture implementation (305 lines)" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/workers/email-capture/wrangler.toml" reason="Worker configuration with CORS_ORIGIN" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 3 deployment steps" />
   </context>
 
   <steps>
-    <step order="1">Create workers/stripe-webhook.ts</step>
-    <step order="2">Add fetch handler for POST /webhook endpoint</step>
-    <step order="3">Verify webhook signature using Stripe SDK (STRIPE_WEBHOOK_SECRET env)</step>
-    <step order="4">Return 400 if signature invalid</step>
-    <step order="5">Parse event.type from webhook payload</step>
-    <step order="6">Handle customer.subscription.created: create new customer in JSON</step>
-    <step order="7">Extract: email, name from customer; tier from price_id; siteUrl from metadata</step>
-    <step order="8">Set enrollmentDate = now, status = 'active', nextTouch = 7 days</step>
-    <step order="9">Handle customer.subscription.updated: update subscription status</step>
-    <step order="10">Handle customer.subscription.deleted: set status = 'cancelled'</step>
-    <step order="11">Handle invoice.payment_failed: set status = 'past_due'</step>
-    <step order="12">Save updated customers.json after each event</step>
-    <step order="13">Return 200 immediately for unhandled events (Stripe requires)</step>
-    <step order="14">Add idempotency: check event.id hasn't been processed before</step>
-    <step order="15">Add env vars to wrangler.toml: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET</step>
+    <step order="1">cd workers/email-capture</step>
+    <step order="2">Verify wrangler.toml has real KV namespace IDs (from task-1)</step>
+    <step order="3">Verify CORS_ORIGIN matches target showcase domain (wardrobe.emdash.dev)</step>
+    <step order="4">Deploy: wrangler deploy</step>
+    <step order="5">Note deployed URL: wardrobe-email-capture.{subdomain}.workers.dev</step>
+    <step order="6">Test subscribe endpoint: curl -X POST -H "Content-Type: application/json" -H "Origin: https://wardrobe.emdash.dev" -d '{"email":"test@example.com"}' https://wardrobe-email-capture.{subdomain}.workers.dev/subscribe</step>
+    <step order="7">Verify showcase script.js has correct endpoint URL (update if different)</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/workers/stripe-webhook.ts && echo "webhook exists"</check>
-    <check type="bash">grep "signature\|verify" /home/agent/shipyard-ai/projects/anchor/workers/stripe-webhook.ts</check>
-    <check type="bash">grep "subscription.created\|subscription.deleted" /home/agent/shipyard-ai/projects/anchor/workers/stripe-webhook.ts</check>
-    <check type="bash">grep "STRIPE_WEBHOOK_SECRET" /home/agent/shipyard-ai/projects/anchor/wrangler.toml</check>
-    <check type="test">Webhook handles all subscription lifecycle events</check>
+    <check type="bash">curl -X POST -H "Content-Type: application/json" -d '{"email":"test@example.com"}' https://wardrobe-email-capture.{subdomain}.workers.dev/subscribe</check>
+    <check type="manual">POST /subscribe returns success response</check>
+    <check type="manual">CORS headers present in response</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
-    <depends-on task-id="phase-1-task-2" reason="Stripe library must exist" />
-    <depends-on task-id="phase-1-task-3" reason="Customer schema must exist" />
+    <depends-on task-id="phase-1-task-1" reason="KV namespace IDs must be configured" />
   </dependencies>
 
-  <commit-message>feat(anchor): implement Stripe webhook handler
+  <commit-message>feat(wardrobe): deploy email-capture worker
 
-Per decisions.md Stripe integration:
-- Webhook signature verification
-- Handle subscription.created → add customer
-- Handle subscription.updated → update status
-- Handle subscription.deleted → mark cancelled
-- Handle invoice.payment_failed → mark past_due
-- Idempotency check on event.id
+Email capture worker deployed to Cloudflare Workers:
+- POST /subscribe: Capture email signups with rate limiting
+- Email validation (RFC 5322)
+- Duplicate detection
+- CORS configured for showcase domain
 
-Pattern from: /apps/pulse/lib/stripe.ts
+Resolves P0 blocker #7 and T1-004 from qa-pass-1.md
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -506,71 +424,68 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 3 (Parallel, after Wave 2) — Email Templates
+### Wave 3 (Parallel, after Wave 2) — Demo Sites
 
-Five A+ quality email templates. **Token budget: 100K**
-
-**CRITICAL: Per Steve Jobs (REQ-012): "The email IS the entire product. Copy is not decoration."**
+Three parallel tracks deploying 5 demo sites (longest task). **Estimated time: 60-90 minutes**
 
 ```xml
 <task-plan id="phase-1-task-7" wave="3">
-  <title>Create Launch Day email template</title>
-  <requirement>REQ-017: Launch Day Email, REQ-012: A+ Quality, REQ-013: Voice, REQ-014: Single CTA, REQ-016: First-Line Impact</requirement>
+  <title>Deploy Ember demo site</title>
+  <requirement>T1-001: Deploy live demo sites (1 of 5)</requirement>
   <description>
-    Per decisions.md email requirements:
-    - A+ copy or don't ship
-    - Confident friend voice, not salesy
-    - One CTA, embedded naturally
-    - First line makes recipient feel SEEN
+    Per DEPLOYMENT-RUNBOOK.md Task 5 and Board Condition T1-001:
+    Deploy the Ember theme as a live Emdash demo site.
 
-    Launch Day is the first impression. Per Steve:
-    "Not 'Your site is live' but 'You built something real.'"
+    This is the first demo site and establishes the pattern for others.
 
-    Reference: /plugins/eventdash/src/email.ts for HTML template structure
+    Target: ember.wardrobe.emdash.dev
+    Theme: Ember ("Bold. Editorial. For people with something to say.")
+
+    Reference: docs/EMDASH-GUIDE.md Section 5 for Cloudflare deployment
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/eventdash/src/email.ts" reason="HTML email template pattern" />
-    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Email quality requirements" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/themes/ember/src/" reason="Ember theme source files" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 5: Demo site deployment steps" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5: Cloudflare deployment patterns" />
   </context>
 
   <steps>
-    <step order="1">Create emails/launch-day.html</step>
-    <step order="2">Use responsive HTML email template (600px max-width container)</step>
-    <step order="3">Use inline CSS (email clients strip external CSS)</step>
-    <step order="4">First line: "You built something real."</step>
-    <step order="5">Body: Acknowledge the work, not just the technical completion</step>
-    <step order="6">Include: What Anchor does for them (watching performance, catching issues)</step>
-    <step order="7">Single CTA: "Reply if you have questions" (not a button, natural in text)</step>
-    <step order="8">Tone: Confident expert friend (not "Congratulations!" or corporate)</step>
-    <step order="9">Include {{customerName}} and {{siteName}} variables</step>
-    <step order="10">Add plain text fallback version</step>
-    <step order="11">Test rendering in major email clients (Gmail, Outlook, Apple Mail)</step>
-    <step order="12">No P.S. lines (per Steve: "desperate")</step>
+    <step order="1">Create new Emdash site: npm create emdash@latest -- --template @emdash-cms/template-blog-cloudflare</step>
+    <step order="2">Name: wardrobe-demo-ember</step>
+    <step order="3">cd wardrobe-demo-ember</step>
+    <step order="4">Copy theme: cp -r /path/to/wardrobe/themes/ember/src/* ./src/</step>
+    <step order="5">Create D1 database: wrangler d1 create wardrobe-demo-ember</step>
+    <step order="6">Note database_id from output</step>
+    <step order="7">Create R2 bucket: wrangler r2 bucket create wardrobe-demo-ember-media</step>
+    <step order="8">Update wrangler.jsonc with database_id and bucket name (per EMDASH-GUIDE.md Section 5)</step>
+    <step order="9">Run migrations: wrangler d1 migrations apply wardrobe-demo-ember</step>
+    <step order="10">Seed demo content: npx emdash seed</step>
+    <step order="11">Generate auth secret: npx emdash auth secret</step>
+    <step order="12">Set secret: wrangler secret put EMDASH_AUTH_SECRET</step>
+    <step order="13">Deploy: wrangler deploy</step>
+    <step order="14">Configure custom domain: ember.wardrobe.emdash.dev (Cloudflare dashboard)</step>
+    <step order="15">Verify site loads: curl -I https://ember.wardrobe.emdash.dev</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/emails/launch-day.html && echo "launch-day exists"</check>
-    <check type="bash">grep "You built something real" /home/agent/shipyard-ai/projects/anchor/emails/launch-day.html</check>
-    <check type="bash">grep -v "Congratulations\|P.S." /home/agent/shipyard-ai/projects/anchor/emails/launch-day.html</check>
-    <check type="manual">Email passes Steve Jobs A+ quality review</check>
+    <check type="bash">curl -I https://ember.wardrobe.emdash.dev</check>
+    <check type="manual">Site renders with Ember theme styling</check>
+    <check type="manual">Demo content visible on homepage</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
-    <depends-on task-id="phase-1-task-4" reason="Email cron needs templates" />
+    <depends-on task-id="phase-1-task-4" reason="Theme distribution must be working" />
   </dependencies>
 
-  <commit-message>feat(anchor): create Launch Day email template
+  <commit-message>feat(wardrobe): deploy ember demo site
 
-Per decisions.md email requirements:
-- First line: "You built something real."
-- Confident expert friend voice
-- Single natural CTA: "Reply if you have questions"
-- No P.S. lines, no corporate congratulations
-- Responsive HTML with inline CSS
+Ember demo site deployed to ember.wardrobe.emdash.dev
+- D1 database: wardrobe-demo-ember
+- R2 bucket: wardrobe-demo-ember-media
+- Demo content seeded
 
-Pattern from: /plugins/eventdash/src/email.ts
+Part of T1-001 (1/5 demo sites)
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -578,49 +493,55 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-8" wave="3">
-  <title>Create Week 1 check-in email template</title>
-  <requirement>REQ-018: Week 1 Email, REQ-012: A+ Quality</requirement>
+  <title>Deploy Forge and Slate demo sites</title>
+  <requirement>T1-001: Deploy live demo sites (2-3 of 5)</requirement>
   <description>
-    Week 1 email: First check-in after launch.
+    Per DEPLOYMENT-RUNBOOK.md Task 5 and Board Condition T1-001:
+    Deploy Forge and Slate themes as live Emdash demo sites.
 
-    Purpose: Show we're paying attention. Reference something specific.
-    Tone: Like a text from a friend who remembered to check in.
+    Follow the same pattern as Ember (task-7).
+
+    Targets:
+    - forge.wardrobe.emdash.dev ("Dark and technical. Built for builders.")
+    - slate.wardrobe.emdash.dev ("Trust at first glance.")
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/projects/anchor/emails/launch-day.html" reason="Template structure reference" />
-    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Email quality requirements" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/themes/forge/src/" reason="Forge theme source files" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/themes/slate/src/" reason="Slate theme source files" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 5 pattern" />
   </context>
 
   <steps>
-    <step order="1">Create emails/week-1.html</step>
-    <step order="2">First line: "One week in. How's it going?"</step>
-    <step order="3">Body: Brief check-in, not a long report</step>
-    <step order="4">Optional: Include first PageSpeed score if available</step>
-    <step order="5">Single CTA: "Hit reply if anything's not working"</step>
-    <step order="6">Keep it short (under 100 words)</step>
-    <step order="7">Include {{customerName}} variable</step>
-    <step order="8">Add plain text fallback</step>
+    <step order="1">Deploy Forge: Repeat steps from task-7 for themes/forge/</step>
+    <step order="2">D1 database: wardrobe-demo-forge</step>
+    <step order="3">R2 bucket: wardrobe-demo-forge-media</step>
+    <step order="4">Domain: forge.wardrobe.emdash.dev</step>
+    <step order="5">Verify: curl -I https://forge.wardrobe.emdash.dev</step>
+    <step order="6">Deploy Slate: Repeat steps from task-7 for themes/slate/</step>
+    <step order="7">D1 database: wardrobe-demo-slate</step>
+    <step order="8">R2 bucket: wardrobe-demo-slate-media</step>
+    <step order="9">Domain: slate.wardrobe.emdash.dev</step>
+    <step order="10">Verify: curl -I https://slate.wardrobe.emdash.dev</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/emails/week-1.html && echo "week-1 exists"</check>
-    <check type="bash">grep "week\|Week" /home/agent/shipyard-ai/projects/anchor/emails/week-1.html</check>
-    <check type="manual">Email is brief and feels like a friend checking in</check>
+    <check type="bash">curl -I https://forge.wardrobe.emdash.dev</check>
+    <check type="bash">curl -I https://slate.wardrobe.emdash.dev</check>
+    <check type="manual">Both sites render with correct theme styling</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
-    <depends-on task-id="phase-1-task-4" reason="Email cron needs templates" />
+    <depends-on task-id="phase-1-task-4" reason="Theme distribution must be working" />
   </dependencies>
 
-  <commit-message>feat(anchor): create Week 1 check-in email template
+  <commit-message>feat(wardrobe): deploy forge and slate demo sites
 
-Per decisions.md email requirements:
-- Brief check-in after first week
-- "One week in. How's it going?"
-- Under 100 words
-- Single natural CTA
+Demo sites deployed:
+- forge.wardrobe.emdash.dev (dark, technical)
+- slate.wardrobe.emdash.dev (clean, professional)
+
+Part of T1-001 (3/5 demo sites)
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -628,158 +549,55 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-9" wave="3">
-  <title>Create Month 1 report email template</title>
-  <requirement>REQ-019: Month 1 Email, REQ-012: A+ Quality</requirement>
+  <title>Deploy Drift and Bloom demo sites</title>
+  <requirement>T1-001: Deploy live demo sites (4-5 of 5)</requirement>
   <description>
-    Month 1 email: First performance report.
+    Per DEPLOYMENT-RUNBOOK.md Task 5 and Board Condition T1-001:
+    Deploy Drift and Bloom themes as live Emdash demo sites.
 
-    Purpose: Show the value of monitoring. Include PageSpeed data.
-    Per decisions.md: Use hardcoded tips (10 max), not AI recommendations.
+    Follow the same pattern as Ember (task-7).
+
+    Targets:
+    - drift.wardrobe.emdash.dev ("Let your content breathe.")
+    - bloom.wardrobe.emdash.dev ("Where community feels at home.")
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/projects/anchor/emails/launch-day.html" reason="Template structure" />
-    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="REQ-046: 10 hardcoded tips, no recommendation engine" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/themes/drift/src/" reason="Drift theme source files" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/themes/bloom/src/" reason="Bloom theme source files" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 5 pattern" />
   </context>
 
   <steps>
-    <step order="1">Create emails/month-1.html</step>
-    <step order="2">First line: "Your first month, by the numbers."</step>
-    <step order="3">Include PageSpeed scores: {{desktopScore}}, {{mobileScore}}</step>
-    <step order="4">Include uptime if available: {{uptimePercent}}%</step>
-    <step order="5">Add one generic optimization tip (from list of 10 hardcoded)</step>
-    <step order="6">Tip selection: Based on lowest score area (mobile vs desktop)</step>
-    <step order="7">Single CTA: "Questions about these numbers?"</step>
-    <step order="8">Celebrate wins: "Mobile performance: strong" if score >80</step>
-    <step order="9">Keep it factual, not over-hyped</step>
-    <step order="10">Add plain text fallback</step>
+    <step order="1">Deploy Drift: Repeat steps from task-7 for themes/drift/</step>
+    <step order="2">D1 database: wardrobe-demo-drift</step>
+    <step order="3">R2 bucket: wardrobe-demo-drift-media</step>
+    <step order="4">Domain: drift.wardrobe.emdash.dev</step>
+    <step order="5">Verify: curl -I https://drift.wardrobe.emdash.dev</step>
+    <step order="6">Deploy Bloom: Repeat steps from task-7 for themes/bloom/</step>
+    <step order="7">D1 database: wardrobe-demo-bloom</step>
+    <step order="8">R2 bucket: wardrobe-demo-bloom-media</step>
+    <step order="9">Domain: bloom.wardrobe.emdash.dev</step>
+    <step order="10">Verify: curl -I https://bloom.wardrobe.emdash.dev</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/emails/month-1.html && echo "month-1 exists"</check>
-    <check type="bash">grep "desktopScore\|mobileScore" /home/agent/shipyard-ai/projects/anchor/emails/month-1.html</check>
-    <check type="manual">Email presents data clearly without hype</check>
+    <check type="bash">curl -I https://drift.wardrobe.emdash.dev</check>
+    <check type="bash">curl -I https://bloom.wardrobe.emdash.dev</check>
+    <check type="manual">Both sites render with correct theme styling</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
-    <depends-on task-id="phase-1-task-4" reason="Email cron needs templates" />
+    <depends-on task-id="phase-1-task-4" reason="Theme distribution must be working" />
   </dependencies>
 
-  <commit-message>feat(anchor): create Month 1 report email template
+  <commit-message>feat(wardrobe): deploy drift and bloom demo sites
 
-Per decisions.md Month 1 Report:
-- First performance data email
-- PageSpeed scores (desktop + mobile)
-- One hardcoded optimization tip (REQ-046)
-- Factual tone, not over-hyped
+Demo sites deployed:
+- drift.wardrobe.emdash.dev (minimal, airy)
+- bloom.wardrobe.emdash.dev (warm, organic)
 
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-10" wave="3">
-  <title>Create Q1 Refresh Prompt email template</title>
-  <requirement>REQ-020: Q1 Refresh Email, REQ-012: A+ Quality</requirement>
-  <description>
-    Q1 (90 day) email: Prompt for site refresh.
-
-    Purpose: Gentle nudge to consider updates. Not pushy upsell.
-    Per Steve: "Trust before transaction."
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/projects/anchor/emails/launch-day.html" reason="Template structure" />
-    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Trust before transaction positioning" />
-  </context>
-
-  <steps>
-    <step order="1">Create emails/q1-refresh.html</step>
-    <step order="2">First line: "Three months. Sites evolve."</step>
-    <step order="3">Body: Gentle observation that content often needs refreshing</step>
-    <step order="4">Include performance trend: "Performance: {{trend}}" (improving/stable/declining)</step>
-    <step order="5">Suggest common refresh items: new testimonials, updated hours, seasonal content</step>
-    <step order="6">Single CTA: "Reply if you'd like to discuss updates"</step>
-    <step order="7">NOT an upsell: No "upgrade to Pro" pitch</step>
-    <step order="8">Keep it helpful, not salesy</step>
-    <step order="9">Add plain text fallback</step>
-  </steps>
-
-  <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/emails/q1-refresh.html && echo "q1-refresh exists"</check>
-    <check type="bash">grep -v "upgrade\|Upgrade\|Pro" /home/agent/shipyard-ai/projects/anchor/emails/q1-refresh.html</check>
-    <check type="manual">Email is helpful, not salesy</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
-    <depends-on task-id="phase-1-task-4" reason="Email cron needs templates" />
-  </dependencies>
-
-  <commit-message>feat(anchor): create Q1 Refresh email template
-
-Per decisions.md Q1 Refresh:
-- 90-day nudge for content refresh
-- "Three months. Sites evolve."
-- Helpful suggestions, not upsell
-- Trust before transaction positioning
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-11" wave="3">
-  <title>Create Anniversary email template</title>
-  <requirement>REQ-021: Anniversary Email (emotional peak), REQ-012: A+ Quality</requirement>
-  <description>
-    Anniversary (365 day) email: The emotional peak.
-
-    Per decisions.md: This is marked as "emotional peak" —
-    the most important email of the sequence.
-
-    Purpose: Celebrate the milestone. Acknowledge the journey.
-    Tone: Warm, reflective, genuinely proud of their success.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/projects/anchor/emails/launch-day.html" reason="Template structure" />
-    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Anniversary = emotional peak" />
-  </context>
-
-  <steps>
-    <step order="1">Create emails/anniversary.html</step>
-    <step order="2">First line: "One year. Still standing. Still growing."</step>
-    <step order="3">Body: Reflect on the journey, not just the metrics</step>
-    <step order="4">Include year-over-year data if meaningful: {{totalUptime}}, {{avgPagespeed}}</step>
-    <step order="5">Acknowledge the human behind the site</step>
-    <step order="6">Single CTA: "Here's to year two."</step>
-    <step order="7">Warm and genuine, not corporate</step>
-    <step order="8">Shorter is better — emotional impact, not info dump</step>
-    <step order="9">Add plain text fallback</step>
-    <step order="10">This email should make them feel proud</step>
-  </steps>
-
-  <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/emails/anniversary.html && echo "anniversary exists"</check>
-    <check type="bash">grep "year\|Year" /home/agent/shipyard-ai/projects/anchor/emails/anniversary.html</check>
-    <check type="manual">Email achieves emotional resonance (Steve Jobs approval required)</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
-    <depends-on task-id="phase-1-task-4" reason="Email cron needs templates" />
-  </dependencies>
-
-  <commit-message>feat(anchor): create Anniversary email template
-
-Per decisions.md: Anniversary is "emotional peak"
-- One year celebration
-- "One year. Still standing. Still growing."
-- Warm, reflective tone
-- Shorter is better — emotional impact
-- Must pass Steve Jobs A+ quality review
+Completes T1-001 (5/5 demo sites)
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -787,68 +605,182 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ---
 
-### Wave 4 (Parallel, after Wave 3) — Landing Page, Docs, Review
+### Wave 4 (Sequential, after Wave 3) — Screenshots, Showcase, QA
 
-Final tasks: static site, documentation, and customer gut-check. **Token budget: 50K**
+Four tasks completing deployment and validation. **Estimated time: 30 minutes**
 
 ```xml
-<task-plan id="phase-1-task-12" wave="4">
-  <title>Create landing page and pricing page</title>
-  <requirement>REQ-033: Landing Page, REQ-034: Pricing Page, REQ-035: Assets, REQ-038: Static Site Files</requirement>
+<task-plan id="phase-1-task-10" wave="4">
+  <title>Generate real PNG screenshots from demo sites</title>
+  <requirement>T1-002: Replace SVG placeholders with real PNGs</requirement>
   <description>
-    Per decisions.md site/ structure:
-    - index.html: Landing page explaining Anchor
-    - pricing.html: Two-tier breakdown (Basic Anchor / Pro Anchor)
+    Per qa-pass-1.md P0 blocker #3 and DEPLOYMENT-RUNBOOK.md Task 6:
+    Generate real screenshots from the 5 live demo sites.
 
-    Per Steve: "Trust before transaction."
+    Current: SVG placeholders at showcase/screenshots/*.svg
+    Target: PNG screenshots at showcase/screenshots/*.png (< 200KB each)
 
-    NOTE: Pricing amounts are UNRESOLVED. Use placeholder {{BASIC_PRICE}} and {{PRO_PRICE}}.
+    Uses Playwright for automated screenshot capture.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/website/src/app/" reason="Reference styling patterns" />
-    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Two tiers, trust-first positioning" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/scripts/generate-screenshots.ts" reason="Playwright screenshot script" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/screenshots/" reason="Output directory" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 6 screenshot steps" />
   </context>
 
   <steps>
-    <step order="1">Create site/index.html with semantic HTML</step>
-    <step order="2">Hero: "Someone's got your back." (per decisions.md positioning)</step>
-    <step order="3">Explain what Anchor does: performance monitoring, proactive emails, peace of mind</step>
-    <step order="4">Include "Request Update" button (REQ-027)</step>
-    <step order="5">Link to pricing.html</step>
-    <step order="6">Create site/pricing.html</step>
-    <step order="7">Two tiers only: Basic Anchor, Pro Anchor</step>
-    <step order="8">Use placeholder prices: {{BASIC_PRICE}}/mo, {{PRO_PRICE}}/mo</step>
-    <step order="9">Include Stripe checkout buttons (integration pending)</step>
-    <step order="10">Create site/assets/styles.css with Tailwind-style utility classes</step>
-    <step order="11">Mobile-responsive design (flexbox/grid)</step>
-    <step order="12">Create site/assets/logo.svg placeholder</step>
-    <step order="13">Add Cloudflare Analytics snippet (first-party, per REQ-009)</step>
-    <step order="14">No OAuth, no Google Analytics (per decisions.md)</step>
+    <step order="1">Install Playwright: npx playwright install chromium</step>
+    <step order="2">Update scripts/generate-screenshots.ts with live demo URLs if needed</step>
+    <step order="3">Verify all 5 demo sites are accessible</step>
+    <step order="4">Run: npm run screenshots</step>
+    <step order="5">Verify output: ls -la showcase/screenshots/*.png</step>
+    <step order="6">Check file sizes: du -h showcase/screenshots/*.png (should be < 200KB each)</step>
+    <step order="7">Spot-check visual quality of each screenshot</step>
+    <step order="8">Remove old SVG files: rm showcase/screenshots/*.svg</step>
+    <step order="9">Update showcase/index.html if referencing .svg extensions</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/site/index.html && echo "index exists"</check>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/site/pricing.html && echo "pricing exists"</check>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/site/assets/styles.css && echo "styles exist"</check>
-    <check type="bash">grep "Request Update" /home/agent/shipyard-ai/projects/anchor/site/index.html</check>
-    <check type="bash">grep -v "google-analytics\|gtag" /home/agent/shipyard-ai/projects/anchor/site/index.html</check>
-    <check type="manual">Landing page communicates trust-first positioning</check>
+    <check type="bash">ls /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/screenshots/*.png | wc -l</check>
+    <check type="bash">du -h /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/screenshots/*.png</check>
+    <check type="manual">All 5 screenshots capture theme personality</check>
+    <check type="manual">No SVG files remain</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
+    <depends-on task-id="phase-1-task-7" reason="Ember demo site must be live" />
+    <depends-on task-id="phase-1-task-8" reason="Forge and Slate demo sites must be live" />
+    <depends-on task-id="phase-1-task-9" reason="Drift and Bloom demo sites must be live" />
   </dependencies>
 
-  <commit-message>feat(anchor): create landing and pricing pages
+  <commit-message>feat(wardrobe): generate real PNG screenshots
 
-Per decisions.md site structure:
-- index.html: "Someone's got your back" positioning
-- pricing.html: Two tiers (Basic/Pro, prices TBD)
-- Request Update button for support
-- Cloudflare Analytics (first-party)
-- No Google Analytics, no OAuth
-- Mobile-responsive CSS
+Replace SVG placeholders with real screenshots from live demo sites:
+- ember.png (bold, editorial)
+- forge.png (dark, technical)
+- slate.png (clean, professional)
+- drift.png (minimal, airy)
+- bloom.png (warm, organic)
+
+All screenshots < 200KB per Board requirement.
+
+Resolves T1-002 from qa-pass-1.md
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-11" wave="4">
+  <title>Deploy showcase website to Cloudflare Pages</title>
+  <requirement>P0-008: Deploy showcase website to Cloudflare Pages</requirement>
+  <description>
+    Per qa-pass-1.md P0 blocker #7 and DEPLOYMENT-RUNBOOK.md Task 7:
+    Deploy the marketing showcase website with real screenshots.
+
+    Target: wardrobe.emdash.dev
+    Content: Theme cards, copy buttons, email capture form
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/" reason="Showcase website files" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/showcase/script.js" reason="May need endpoint URL update" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 7 deployment steps" />
+  </context>
+
+  <steps>
+    <step order="1">cd showcase</step>
+    <step order="2">Verify screenshots use .png extensions in index.html</step>
+    <step order="3">Verify email endpoint URL in script.js matches deployed worker</step>
+    <step order="4">Create Pages project: wrangler pages project create wardrobe-showcase</step>
+    <step order="5">Deploy: wrangler pages deploy . --project-name wardrobe-showcase</step>
+    <step order="6">Note deployment URL: wardrobe-showcase.pages.dev</step>
+    <step order="7">Configure custom domain: wardrobe.emdash.dev (Cloudflare dashboard)</step>
+    <step order="8">Verify HTTPS: curl -I https://wardrobe.emdash.dev</step>
+    <step order="9">Test email form: submit test email, verify worker receives</step>
+    <step order="10">Test copy buttons: verify clipboard functionality</step>
+  </steps>
+
+  <verification>
+    <check type="bash">curl -I https://wardrobe.emdash.dev</check>
+    <check type="manual">All 5 theme cards visible</check>
+    <check type="manual">Copy buttons functional</check>
+    <check type="manual">Email form submits successfully</check>
+    <check type="manual">Mobile responsive at 375px width</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-10" reason="Real screenshots must be generated" />
+    <depends-on task-id="phase-1-task-6" reason="Email capture worker must be deployed" />
+  </dependencies>
+
+  <commit-message>feat(wardrobe): deploy showcase to Cloudflare Pages
+
+Showcase website deployed to wardrobe.emdash.dev:
+- 5 theme cards with real screenshots
+- Email capture form (wired to worker)
+- Copy buttons for install commands
+- WCAG 2.1 AA accessible
+- Mobile responsive
+
+Resolves P0 blocker #7 from qa-pass-1.md
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-12" wave="4">
+  <title>Commit all changes to git</title>
+  <requirement>P0-009: Commit uncommitted files</requirement>
+  <description>
+    Per qa-pass-1.md P0 blocker #9:
+    Commit all modified and untracked files in the wardrobe project.
+
+    Uncommitted per QA:
+    - cli/commands/install.ts (Modified - contains T1-003 fix)
+    - dist/cli/commands/install.js (Modified - built output)
+    - docs/ (Untracked - DEPLOYMENT-RUNBOOK.md)
+
+    Plus all changes from this deployment plan.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/" reason="Project root" />
+    <file path="/home/agent/shipyard-ai/rounds/emdash-marketplace/qa-pass-1.md" reason="Documents uncommitted files" />
+  </context>
+
+  <steps>
+    <step order="1">cd /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe</step>
+    <step order="2">git status (review all changes)</step>
+    <step order="3">git add .</step>
+    <step order="4">Create commit with all deployment changes</step>
+    <step order="5">git status (verify clean working tree)</step>
+  </steps>
+
+  <verification>
+    <check type="bash">cd /home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe && git status --porcelain</check>
+    <check type="manual">git status shows clean working tree</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-3" reason="Upload script fix must be committed" />
+    <depends-on task-id="phase-1-task-1" reason="KV namespace updates must be committed" />
+    <depends-on task-id="phase-1-task-10" reason="Screenshots must be committed" />
+  </dependencies>
+
+  <commit-message>chore(wardrobe): complete Phase 1 deployment
+
+Phase 1 deployment complete:
+- KV namespace IDs configured
+- R2 upload script fixed
+- Workers deployed (analytics, email-capture)
+- 5 demo sites deployed
+- Real PNG screenshots generated
+- Showcase deployed to Cloudflare Pages
+
+Resolves all 9 P0 blockers from qa-pass-1.md
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -856,160 +788,57 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ```xml
 <task-plan id="phase-1-task-13" wave="4">
-  <title>Create README documentation</title>
-  <requirement>REQ-043: Internal Documentation</requirement>
+  <title>Run QA Pass 2 verification</title>
+  <requirement>QA validation before launch</requirement>
   <description>
-    Per decisions.md: README.md is internal-only documentation.
+    Per DEPLOYMENT-RUNBOOK.md Task 9:
+    Execute comprehensive QA verification of all deployed components.
 
-    Include: Setup, deployment, operational procedures.
-    Do NOT include: Customer-facing documentation.
+    All 9 P0 blockers must be resolved.
+    All 5 Tier 1 conditions must pass.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/projects/anchor/" reason="Document this project" />
-    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Architecture and operational decisions" />
+    <file path="/home/agent/shipyard-ai/rounds/emdash-marketplace/qa-pass-1.md" reason="QA checklist to re-verify" />
+    <file path="/home/agent/shipyard-ai/deliverables/emdash-marketplace/wardrobe/docs/DEPLOYMENT-RUNBOOK.md" reason="Task 9 verification steps" />
   </context>
 
   <steps>
-    <step order="1">Create README.md at project root</step>
-    <step order="2">Title: "Anchor — Post-Delivery System (Internal)"</step>
-    <step order="3">Section: Overview (what Anchor does)</step>
-    <step order="4">Section: Architecture (Cloudflare Workers + JSON + Stripe + Resend)</step>
-    <step order="5">Section: Setup (wrangler login, environment variables)</step>
-    <step order="6">Section: Deployment (wrangler deploy commands)</step>
-    <step order="7">Section: Cron schedules (email daily at 8am, PageSpeed weekly at 3am)</step>
-    <step order="8">Section: Adding a customer manually (for testing)</step>
-    <step order="9">Section: Troubleshooting common issues</step>
-    <step order="10">Mark as INTERNAL ONLY in header</step>
+    <step order="1">Verify P0-001/002/003: All KV namespace IDs are real (not placeholders)</step>
+    <step order="2">Verify P0-004: R2 bucket exists and has public access</step>
+    <step order="3">Verify P0-005: All 5 tarballs return HTTP 200</step>
+    <step order="4">Verify P0-006: Analytics worker /health returns 200</step>
+    <step order="5">Verify P0-007: Email-capture worker accepts POST /subscribe</step>
+    <step order="6">Verify P0-008: Showcase loads at wardrobe.emdash.dev</step>
+    <step order="7">Verify P0-009: git status shows clean working tree</step>
+    <step order="8">Verify T1-001: All 5 demo sites load</step>
+    <step order="9">Verify T1-002: All screenshots are PNG (not SVG)</step>
+    <step order="10">Verify T1-003: CLI shows post-install reveal</step>
+    <step order="11">Verify T1-004: Email form submits successfully</step>
+    <step order="12">Verify T1-005: Analytics receives test event</step>
+    <step order="13">Benchmark install speed: npx wardrobe install ember (< 3 seconds)</step>
+    <step order="14">Document QA Pass 2 results</step>
   </steps>
 
   <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/README.md && echo "README exists"</check>
-    <check type="bash">grep "INTERNAL\|Internal" /home/agent/shipyard-ai/projects/anchor/README.md</check>
-    <check type="bash">grep "wrangler" /home/agent/shipyard-ai/projects/anchor/README.md</check>
-    <check type="manual">Documentation covers setup and deployment</check>
+    <check type="manual">All 9 P0 blockers: PASS</check>
+    <check type="manual">All 5 T1 conditions: PASS</check>
+    <check type="manual">Install speed < 3 seconds</check>
+    <check type="manual">Overall verdict: PASS</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Project must exist to document" />
-    <depends-on task-id="phase-1-task-4" reason="Cron workers must exist" />
-    <depends-on task-id="phase-1-task-6" reason="Stripe webhook must exist" />
+    <depends-on task-id="phase-1-task-11" reason="Showcase must be deployed" />
+    <depends-on task-id="phase-1-task-12" reason="All changes must be committed" />
   </dependencies>
 
-  <commit-message>docs(anchor): add internal README
+  <commit-message>docs(wardrobe): QA Pass 2 verification complete
 
-Per decisions.md:
-- Internal-only documentation
-- Setup and deployment instructions
-- Cron schedules documented
-- Troubleshooting section
-- Marked INTERNAL ONLY
+All P0 blockers resolved. All Tier 1 conditions met.
+Wardrobe Theme Marketplace ready for launch.
 
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-14" wave="4">
-  <title>Document BetterUptime setup</title>
-  <requirement>REQ-026: Uptime Monitoring via BetterUptime</requirement>
-  <description>
-    Per decisions.md MVP: "Uptime monitoring via free BetterUptime"
-
-    This is a manual setup task — document the process.
-    NOTE: BetterUptime configuration details are UNRESOLVED.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="BetterUptime requirement" />
-  </context>
-
-  <steps>
-    <step order="1">Create docs/betteruptime-setup.md</step>
-    <step order="2">Document: Create BetterUptime account (free tier)</step>
-    <step order="3">Document: Add monitor for Anchor landing page</step>
-    <step order="4">Document: Configure alert email (support@anchor)</step>
-    <step order="5">Document: How to add customer sites to monitoring (manual process)</step>
-    <step order="6">Note: Alert thresholds TBD (mark as open question)</step>
-    <step order="7">Note: Per-customer monitoring costs TBD at scale</step>
-    <step order="8">Add link to BetterUptime dashboard in README.md</step>
-  </steps>
-
-  <verification>
-    <check type="bash">test -f /home/agent/shipyard-ai/projects/anchor/docs/betteruptime-setup.md && echo "betteruptime docs exist"</check>
-    <check type="bash">grep "BetterUptime" /home/agent/shipyard-ai/projects/anchor/docs/betteruptime-setup.md</check>
-    <check type="manual">Documentation provides clear setup steps</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
-  </dependencies>
-
-  <commit-message>docs(anchor): add BetterUptime setup guide
-
-Per decisions.md REQ-026:
-- Free BetterUptime for uptime monitoring
-- Manual setup documentation
-- Alert thresholds TBD (open question)
-- Per-customer monitoring process
-
-Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-15" wave="4">
-  <title>Sara Blakely customer gut-check</title>
-  <requirement>SKILL.md Step 7: Customer value validation</requirement>
-  <description>
-    Per SKILL.md Step 7:
-    Spawn Sara Blakely agent for customer perspective.
-    Anchor customers are small business owners who just launched a website.
-
-    Questions to answer:
-    - Would a real customer pay for this?
-    - What would make them say "shut up and take my money"?
-    - What feels like engineering vanity vs. customer value?
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/.planning/phase-1-plan.md" reason="This plan" />
-    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-delivery-v2/decisions.md" reason="Product essence" />
-    <file path="/home/agent/shipyard-ai/projects/anchor/emails/" reason="Email templates" />
-  </context>
-
-  <steps>
-    <step order="1">Spawn haiku sub-agent as Sara Blakely</step>
-    <step order="2">Prompt: Read phase plan and email templates</step>
-    <step order="3">Answer: Would a small business owner pay for this?</step>
-    <step order="4">Answer: Does "someone's got my back" resonate?</step>
-    <step order="5">Answer: Are the emails helpful or annoying?</step>
-    <step order="6">Answer: Is Basic vs Pro distinction clear and compelling?</step>
-    <step order="7">Answer: What would make them recommend to a friend?</step>
-    <step order="8">Answer: What's missing that would kill the deal?</step>
-    <step order="9">Write findings to .planning/sara-blakely-review.md</step>
-    <step order="10">Review and address major gaps if any</step>
-  </steps>
-
-  <verification>
-    <check type="bash">cat /home/agent/shipyard-ai/.planning/sara-blakely-review.md</check>
-    <check type="manual">Customer perspective review complete</check>
-    <check type="manual">Major gaps addressed if any</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-7" reason="Emails must exist for review" />
-    <depends-on task-id="phase-1-task-12" reason="Landing page must exist for review" />
-  </dependencies>
-
-  <commit-message>docs(anchor): add Sara Blakely customer gut-check
-
-Per SKILL.md Step 7:
-- Customer perspective validation
-- Small business owner lens
-- Email value assessment
-- Pricing tier clarity
-- Recommendation likelihood
+QA Director: Margaret Hamilton
+Verdict: PASS
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -1019,40 +848,39 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 
 ## Wave Summary
 
-| Wave | Tasks | Description | Parallelism | Token Budget |
-|------|-------|-------------|-------------|--------------|
-| 1 | 3 | Foundation: structure, libs, schema | 3 parallel | 30K |
-| 2 | 3 | Workers: email cron, PageSpeed cron, Stripe webhook | 3 parallel (after Wave 1) | 80K |
-| 3 | 5 | Email Templates: 5 A+ quality emails | 5 parallel (after Wave 2) | 100K |
-| 4 | 4 | Landing page, docs, BetterUptime, review | 4 parallel (after Wave 3) | 50K |
+| Wave | Tasks | Description | Parallelism | Est. Time |
+|------|-------|-------------|-------------|-----------|
+| 1 | 3 | Infrastructure: KV namespaces, R2 bucket, script fix | 3 parallel | 10 min |
+| 2 | 3 | Workers: Upload tarballs, analytics worker, email worker | 3 parallel (after Wave 1) | 15 min |
+| 3 | 3 | Demo Sites: Ember, Forge+Slate, Drift+Bloom | 3 parallel (after Wave 2) | 60-90 min |
+| 4 | 4 | Finalize: Screenshots, showcase, git, QA | Sequential (after Wave 3) | 30 min |
 
-**Total Tasks:** 15
-**Maximum Parallelism:** Wave 3 (5 concurrent tasks)
-**Total Token Budget:** 260K (within 300K limit, with 40K buffer)
+**Total Tasks:** 13
+**Maximum Parallelism:** Wave 3 (3 concurrent demo site deployments)
+**Total Time (Sequential):** ~2.5-3 hours
+**Total Time (Parallelized):** ~1.5-2 hours
 
 ---
 
 ## Dependencies Diagram
 
 ```
-Wave 1:  [task-1: Structure] ─────────────────────────────────────────────>
-         [task-2: Libraries] ─────────────────────────────────────────────>
-         [task-3: Schema] ────────────────────────────────────────────────>
+Wave 1:  [task-1: KV Namespaces] ─────────────────────────────────────────>
+         [task-2: R2 Bucket] ─────────────────────────────────────────────>
+         [task-3: Script Fix] ────────────────────────────────────────────>
 
-Wave 2:  [task-4: Email Cron] ────> (depends on 1,2,3) ───────────────────>
-         [task-5: PageSpeed Cron] ─> (depends on 1,2,3) ──────────────────>
-         [task-6: Stripe Webhook] ─> (depends on 1,2,3) ──────────────────>
+Wave 2:  [task-4: Upload Tarballs] ────> (depends on 2,3) ────────────────>
+         [task-5: Analytics Worker] ───> (depends on 1) ──────────────────>
+         [task-6: Email Worker] ───────> (depends on 1) ──────────────────>
 
-Wave 3:  [task-7: Launch Day] ────> (depends on 1,4) ─────────────────────>
-         [task-8: Week 1] ────────> (depends on 1,4) ─────────────────────>
-         [task-9: Month 1] ───────> (depends on 1,4) ─────────────────────>
-         [task-10: Q1 Refresh] ───> (depends on 1,4) ─────────────────────>
-         [task-11: Anniversary] ──> (depends on 1,4) ─────────────────────>
+Wave 3:  [task-7: Ember Demo] ─────────> (depends on 4) ──────────────────>
+         [task-8: Forge+Slate Demos] ──> (depends on 4) ──────────────────>
+         [task-9: Drift+Bloom Demos] ──> (depends on 4) ──────────────────>
 
-Wave 4:  [task-12: Landing Page] ─> (depends on 1) ───────────────────────>
-         [task-13: README] ───────> (depends on 1,4,6) ───────────────────>
-         [task-14: BetterUptime] ─> (depends on 1) ───────────────────────>
-         [task-15: Sara Review] ──> (depends on 7,12) ────────────────────>
+Wave 4:  [task-10: Screenshots] ───────> (depends on 7,8,9) ──────────────>
+         [task-11: Showcase Deploy] ───> (depends on 10,6) ───────────────>
+         [task-12: Git Commit] ────────> (depends on 1,3,10) ─────────────>
+         [task-13: QA Pass 2] ─────────> (depends on 11,12) ──────────────>
 ```
 
 ---
@@ -1063,73 +891,51 @@ Wave 4:  [task-12: Landing Page] ─> (depends on 1) ─────────
 
 | Risk | Mitigation | Task |
 |------|------------|------|
-| Scope creep | 300K token budget, 15 tasks max | All |
-| Email quality | A+ requirement, Steve Jobs approval | tasks 7-11 |
-| PageSpeed rate limits | 3am runs, weekly frequency, 500ms delays | task-5 |
-| JSON corruption | Atomic write pattern | task-3 |
-| Stripe failures | Webhook signature verification, idempotency | task-6 |
+| R2 upload script bug | Fix endpoint URL before upload | task-3 |
+| Placeholder KV IDs | Replace with real IDs | task-1 |
+| Demo sites are longest task | Parallelize 3 deployment tracks | tasks 7-9 |
+| Screenshot dependencies | Wait for all demo sites | task-10 |
+| CORS_ORIGIN mismatch | Verify domain consistency | task-6 |
 
-### BLOCKERS (Must Resolve Before Build)
-
-| Risk | Status | Resolution Required |
-|------|--------|---------------------|
-| Card collection timing | DEADLOCKED | Founder decision |
-| Stripe pricing amounts | UNRESOLVED | Product decision |
-| Email copy approval | PENDING | Steve Jobs review |
-| Support email address | UNRESOLVED | Ops decision |
-| Email service provider | UNRESOLVED | Tech lead decision (Resend recommended) |
-
-### Accepted for v1 (Not Blocking)
+### Remaining Risks (Monitor)
 
 | Risk | Impact | Notes |
 |------|--------|-------|
-| No dashboard | Low | Intentional cut, v2 scope |
-| JSON at scale | Low | Monitor at 100 customers |
-| Manual BetterUptime | Low | Document process |
-
----
-
-## Open Questions Resolved
-
-| Question | Resolution | Rationale |
-|----------|------------|-----------|
-| Email service | Resend API | Existing pattern in /workers/contact-form/ |
-| Project location | /projects/anchor/ | Follows existing project structure |
-| Cron schedules | 8am (email), 3am Mon (PageSpeed) | Per decisions.md |
-| HTML vs React | Static HTML | Per decisions.md: no dashboard |
+| DNS propagation delay | Medium | May need to wait for custom domains |
+| Playwright browser download | Low | Requires internet access |
+| R2 public URL format | Medium | May need CLI update if URL differs |
 
 ---
 
 ## Verification Checklist
 
-- [x] All 58 requirements have task coverage
+- [x] All 9 P0 blockers have task coverage
+- [x] All 5 Tier 1 conditions have task coverage
 - [x] Each task has clear verification criteria
 - [x] Dependencies form valid DAG (no cycles)
 - [x] Each task can be committed independently
 - [x] Risk mitigations addressed
-- [x] 300K token budget achievable (260K estimated)
-- [x] Sara Blakely customer gut-check scheduled (task-15)
-- [x] docs/EMDASH-GUIDE.md cited (Section 5, 6, 8)
-- [x] Codebase patterns cited (/workers/contact-form/, /apps/pulse/lib/stripe.ts)
-- [x] Blocking decisions identified and escalated
+- [x] docs/EMDASH-GUIDE.md cited (Section 5, 7)
+- [x] DEPLOYMENT-RUNBOOK.md referenced throughout
+- [x] Critical path identified (demo sites)
 
 ---
 
 ## Ship Test
 
-> Does the client feel watched over after their site launches?
+> Does `npx wardrobe install ember` transform the site in under 3 seconds?
 
-> Does "someone's got my back" come through in every email?
+> Does the showcase make you want to try a theme?
 
-> Are the emails helpful or annoying?
+> Do the screenshots capture the personality of each theme?
 
-> Would you pay for this if you just launched a website?
+> Would you share wardrobe.emdash.dev with a friend?
 
 > **If yes, ship it.**
 
 ---
 
 *Generated by Great Minds Agency — Phase Planning Skill*
-*Source: rounds/shipyard-post-delivery-v2/decisions.md, docs/EMDASH-GUIDE.md*
-*Project Slug: shipyard-post-delivery-v2*
-*Product Name: Anchor*
+*Source: rounds/emdash-marketplace/decisions.md, docs/EMDASH-GUIDE.md, qa-pass-1.md*
+*Project Slug: emdash-marketplace*
+*Product Name: Wardrobe*

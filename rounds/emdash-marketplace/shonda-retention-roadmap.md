@@ -1,28 +1,35 @@
-# Wardrobe Retention Roadmap v1.1
+# Shonda Retention Roadmap: Wardrobe v1.1
 
 **Author:** Based on Shonda Rhimes' Board Review
-**Date:** April 11, 2026
-**Focus:** What Keeps Users Coming Back
+**Date:** April 12, 2026
+**Objective:** Transform Wardrobe from a one-transaction product into an ongoing relationship
 
 ---
 
 ## The Core Problem
 
-Wardrobe is currently a **one-transaction product**:
+> "Wardrobe is built as a one-transaction product... This is a movie. Satisfying. Complete. Finite."
+> — Shonda Rhimes
 
+**Current state:**
 ```
-User has boring site → Discovers Wardrobe → Installs theme → Has nice site → [END]
+User has boring site → Discovers Wardrobe → Installs theme → Has nice site → [THE END]
 ```
 
-This is a movie. We need a series.
-
-> "Characters don't change once; they keep changing, and we keep watching because we want to see who they become next."
+**Target state:**
+```
+Installs theme → Welcome sequence → Discovers features → Shares to gallery →
+Gets update notifications → Tries new themes → [LOOP]
+```
 
 ---
 
-## Retention Philosophy
+## What Keeps Users Coming Back
+
+### The Four Retention Drivers
 
 Users return when they have:
+
 1. **Unfinished business** — Something they started but haven't completed
 2. **Anticipated events** — Something coming they don't want to miss
 3. **Community belonging** — A place where they're recognized
@@ -45,7 +52,9 @@ Users return when they have:
 ## What's Working Now
 
 ### The Transformation Moment
+
 The narrative structure is cinematically clean:
+
 1. **Inciting Incident:** "Every Emdash site looks the same."
 2. **Rising Action:** User discovers Wardrobe, browses five themes with distinct personalities
 3. **Climax:** `npx wardrobe install ember` — 3 seconds — transformation complete
@@ -54,21 +63,29 @@ The narrative structure is cinematically clean:
 That final line is brilliant screenwriting. It reframes failure as iteration, not rejection.
 
 ### Theme Personalities
-Each theme is an identity choice, not a feature list:
-- *"Bold. Editorial. For people with something to say."* (Ember)
-- *"Dark and technical. Built for builders."* (Forge)
-- *"Warm and inviting. Where community feels at home."* (Bloom)
-- *"Clean and professional. Trust at first glance."* (Slate)
-- *"Minimal and airy. Let your content breathe."* (Drift)
 
-You're casting yourself.
+Each theme is an identity choice, not a feature list:
+
+| Theme | Identity Statement |
+|-------|-------------------|
+| **Ember** | "Bold. Editorial. For people with something to say." |
+| **Forge** | "Dark and technical. Built for builders." |
+| **Slate** | "Clean and professional. Trust at first glance." |
+| **Drift** | "Minimal and airy. Let your content breathe." |
+| **Bloom** | "Warm and inviting. Where community feels at home." |
+
+> "Users aren't choosing fonts; they're choosing identities. They're answering the question: *Who do I want to be when people visit my site?*"
 
 ### Coming Soon Cliffhangers
-Four themes with evocative names, personality teasers, and release windows:
-- **Aurora:** "For brands that refuse to blend in" — Summer 2026
-- **Chronicle:** "Stories deserve dignity" — Fall 2026
-- **Neon:** "The future is now" — Summer 2026
-- **Haven:** "Home on the internet" — Fall 2026
+
+Four themes with evocative names and release windows create season anticipation:
+
+| Theme | Tagline | Release |
+|-------|---------|---------|
+| **Aurora** | "For brands that refuse to blend in" | Summer 2026 |
+| **Chronicle** | "Stories deserve dignity" | Fall 2026 |
+| **Neon** | "The future is now" | Summer 2026 |
+| **Haven** | "Home on the internet" | Fall 2026 |
 
 "Stories deserve dignity" makes you want to see it NOW.
 
@@ -77,38 +94,30 @@ Four themes with evocative names, personality teasers, and release windows:
 ## What's Broken
 
 ### 1. The Silent Payoff
+
+> "The climax happens off-screen. In Grey's Anatomy, we never cut before showing someone's face when they see the flatline become a heartbeat."
+
 The install completes with a terminal message. But the *actual* magic—seeing YOUR content transformed—requires the user to manually start their dev server and discover it alone.
 
-> "We're cutting away before the reveal. In Grey's Anatomy, we never cut before showing someone's face when they see the flatline become a heartbeat."
-
 ### 2. No Flywheel
-Content flows one direction: Emdash creates themes → users consume themes. No user contribution. No remix culture. No community voice.
 
-**Current:**
+Content flows one direction:
 ```
 Emdash creates themes → Users consume themes → [END]
 ```
 
-**Target:**
-```
-User installs theme →
-User customizes →
-User shares their site →
-Others see the gallery →
-They discover Wardrobe →
-They install →
-They share →
-[LOOP]
-```
+No user contribution. No remix culture. No community voice.
 
-### 3. No Progress or History
-Every visit is treated as a first visit. Returning audiences want acknowledgment of their history.
+### 3. No Post-Install Relationship
 
-### 4. No Post-Install Relationship
 After installation, Wardrobe has done its job. There's no:
 - "How's Ember treating you?" follow-up
 - Day-2 customization tips email
 - Progress indicator ("You've tried 1 of 5 themes")
+
+### 4. No Progress or History
+
+Every visit is treated as a first visit. Returning audiences want acknowledgment of their history.
 
 ---
 
@@ -122,16 +131,20 @@ After installation, Wardrobe has done its job. There's no:
 ```bash
 npx wardrobe install ember
 
-✓ Theme installed.
+✓ Theme installed successfully.
 
-Your site is now wearing ember.
+Your site is now wearing Ember.
 
-┌─────────────────────────────────────────┐
-│  View your transformation:              │
-│  → http://localhost:4321                │
-│                                         │
-│  Open now? [Y/n]                        │
-└─────────────────────────────────────────┘
+┌─────────────────────────────────────────────────┐
+│  View your transformation:                      │
+│  → http://localhost:4321                        │
+│                                                 │
+│  Next steps:                                    │
+│  → Customize colors: docs.emdash.dev/themes    │
+│  → Share your site: wardrobe.emdash.dev/gallery│
+│                                                 │
+│  Open in browser? [Y/n]                         │
+└─────────────────────────────────────────────────┘
 ```
 
 **Implementation:**
@@ -143,17 +156,25 @@ Your site is now wearing ember.
 
 ---
 
-### Feature 2: Day-2 Engagement Email
+### Feature 2: Welcome Email Sequence
 
 **Problem:** After installation, Wardrobe has no relationship with the user.
 
 **Solution:** Automated email sequence triggered by theme installation.
 
-**Email 1: Installation +24 hours**
+| Day | Subject | Content |
+|-----|---------|---------|
+| Day 0 | "You're wearing Ember" | Confirmation + quick customization tip |
+| Day 3 | "Three ways to make it yours" | Color variables, typography, layout tweaks |
+| Day 7 | "Join the gallery" | Submit site for showcase, see others |
+| Day 14 | "Have you met Forge?" | Cross-sell another theme personality |
+| Day 30 | "Chronicle is coming" | Tease upcoming theme, create anticipation |
+
+**Example: Day 3 Email**
 ```
 Subject: How's Ember treating you?
 
-You installed Ember yesterday. Here's what most Ember users do next:
+You installed Ember 3 days ago. Here's what most Ember users do next:
 
 1. Customize the accent color
    → Edit src/styles/theme.css, line 12
@@ -171,20 +192,6 @@ Trying on something else? That's what wardrobes are for:
 → wardrobe list
 
 — The Wardrobe Team
-```
-
-**Email 2: Installation +7 days**
-```
-Subject: 127 sites are wearing Ember this week
-
-You're part of the Ember community now. Here's what's happening:
-
-• New this week: 3 Ember sites joined the gallery
-• Most popular customization: Dark mode variant
-• Coming soon: Ember 1.1 with pull-quote components
-
-See the gallery → [link]
-Submit your site → [link]
 ```
 
 **Implementation:**
@@ -207,21 +214,20 @@ Submit your site → [link]
 ```bash
 npx wardrobe list
 
-Installed Themes:
-┌─────────┬───────────┬────────────┬─────────────────┐
-│ Theme   │ Installed │ Latest     │ Status          │
-├─────────┼───────────┼────────────┼─────────────────┤
-│ ember   │ 1.0.0     │ 1.1.0      │ Update available│
-└─────────┴───────────┴────────────┴─────────────────┘
+INSTALLED THEMES
+────────────────
+Ember      v1.0.0  →  v1.1.0 available
+                      ↳ New: Pull-quote component, dark mode toggle
+                      ↳ Run: wardrobe update ember
 
-Run `wardrobe update ember` to get the latest.
+Drift      v1.0.0     (up to date)
 ```
 
 **Update Command:**
 ```bash
 npx wardrobe update ember
 
-Updating ember: 1.0.0 → 1.1.0
+Updating Ember: 1.0.0 → 1.1.0
 
 What's new in Ember 1.1:
 • Pull-quote component for editorial emphasis
@@ -249,14 +255,19 @@ Proceed? [Y/n]
 
 **Gallery Structure:**
 ```
-/gallery
-  /ember
-    - Site 1: "The Morning Brief" (news blog)
-    - Site 2: "Studio Volta" (design agency)
-    - Site 3: "Chef's Table Portland" (restaurant)
-  /forge
-    - Site 1: "DevTools Weekly" (developer newsletter)
-    ...
+SITES WEARING EMBER
+─────────────────────
+
+[Screenshot] The Morning Brief — News Blog
+"Ember let my writing take center stage."
+
+[Screenshot] Studio Volta — Design Agency
+"Finally, a theme that respects long-form."
+
+[Screenshot] Mountain Bakery — Local Business
+"Our customers say the site feels like us."
+
++ Submit your site to the gallery
 ```
 
 **Submission Flow:**
@@ -273,11 +284,11 @@ Screenshot captured ✓
 Submitted for review. We'll email you within 48 hours.
 ```
 
-**Gallery Page Features:**
-- Filterable by theme
-- Screenshot + live link
-- "Sites wearing this" counter
-- Featured/Staff Pick badges
+**Flywheel effect:**
+```
+User installs → User customizes → User submits to gallery →
+Others see submission → Others install → Others submit → [LOOP]
+```
 
 **Implementation:**
 - Static gallery page (Astro)
@@ -299,62 +310,42 @@ Submitted for review. We'll email you within 48 hours.
 **Solution:** Monthly "Design Diary" content showing theme creation process.
 
 **Content Calendar:**
-```
-April 2026: "Chronicle: How We're Designing for Long-Form"
-- Typography exploration
-- Reading rhythm research
-- Early wireframes
 
-May 2026: "Aurora: Finding the Line Between Bold and Obnoxious"
-- Color theory for attention
-- A/B test results from user research
-- Component sketches
-
-June 2026: "Chronicle Progress Update"
-- Beta screenshots
-- User feedback integration
-- Launch date confirmation
-```
+| Month | Topic |
+|-------|-------|
+| April 2026 | "Chronicle: How We're Designing for Long-Form" — Typography exploration, reading rhythm research |
+| May 2026 | "Aurora: Finding the Line Between Bold and Obnoxious" — Color theory, A/B test results |
+| June 2026 | "Chronicle Progress Update" — Beta screenshots, user feedback integration |
+| July 2026 | "Aurora Launch Preview" — Final design, launch date confirmation |
 
 **Distribution:**
 - Email to subscribers
 - Blog post on showcase site
 - Social media excerpts
 
-**Implementation:**
-- Markdown content in `/content/diary/`
-- Rendered on showcase site
-- Email via Workers
-
 **Retention impact:** Creates appointment content. Users check in monthly to see progress on themes they're anticipating.
 
 ---
 
-### Feature 6: Progress & Achievement System
+### Feature 6: Community Milestones
 
-**Problem:** No sense of journey. Installation is the end, not the beginning.
+**Problem:** No sense of being part of something larger.
 
-**Solution:** Light gamification that recognizes user milestones.
+**Solution:** Milestone celebrations and cohort identity.
 
-**Achievements:**
 ```
-┌─────────────────────────────────────────────────────┐
-│ Your Wardrobe Journey                               │
-├─────────────────────────────────────────────────────┤
-│ ✓ First Fit       - Installed your first theme     │
-│ ✓ Adventurous     - Tried 3 different themes       │
-│ ○ Curator         - Submitted to the gallery       │
-│ ○ Early Adopter   - Installed a theme on launch day│
-│ ○ Feedback Friend - Submitted a feature request    │
-└─────────────────────────────────────────────────────┘
+────────────────────────────────────────
+🎉 You're one of 500 sites wearing Ember.
+   See the community → wardrobe.emdash.dev/ember
+────────────────────────────────────────
 ```
 
-**Implementation:**
-- Local tracking in `.wardrobe/journey.json`
-- Optional sync to account (future)
-- Display on `wardrobe status`
+**Milestone emails:**
+- "100 sites now wear Ember. You were #47."
+- "Ember sites have been viewed 1 million times. You're part of that."
+- "The Ember community voted: Pull-quotes are coming in 1.1."
 
-**Retention impact:** Creates unfinished business. Users return to complete their journey.
+**Retention impact:** People return to communities, not products.
 
 ---
 
@@ -364,7 +355,6 @@ June 2026: "Chronicle Progress Update"
 
 **Solution:** Group themes into seasonal collections.
 
-**Example:**
 ```
 FALL 2026 COLLECTION
 "Cozy themes for autumn"
@@ -381,22 +371,16 @@ Available September 15, 2026
 - Gives users a reason to check back seasonally
 - Batch releases feel like events, not trickles
 
-**Implementation:**
-- Group Coming Soon themes by season
-- Coordinated release dates
-- Launch email to subscribers
-- Update showcase with seasonal messaging
-
 ---
 
-## The Retention Loop (Complete)
+## The Complete Retention Loop
 
 ```
 User installs theme
     ↓
 CLI shows transformation (Feature 1)
     ↓
-Day-2 email with customization tips (Feature 2)
+Day-3 email with customization tips (Feature 2)
     ↓
 User customizes, shares site
     ↓
@@ -421,74 +405,99 @@ User installs new theme
 
 ## Implementation Priority
 
-### Sprint 1 (Immediate)
-| Feature | Effort | Impact |
-|---------|--------|--------|
-| Post-Install Reveal | Low | High |
-| Wire Email Capture | Low | Critical |
+### Sprint 1: The Transformation Moment (Week 1-2)
 
-### Sprint 2 (Next 2 Weeks)
 | Feature | Effort | Impact |
 |---------|--------|--------|
-| Theme Versioning | Medium | High |
-| Day-2 Email Sequence | Medium | High |
+| Post-install browser open prompt | S | High |
+| Post-install "next steps" messaging | S | High |
+| Deploy email capture worker | S | Critical |
 
-### Sprint 3 (Month 2)
-| Feature | Effort | Impact |
-|---------|--------|--------|
-| Gallery MVP (static) | Medium | Medium |
-| Gallery Submission Flow | Medium | Medium |
-| Behind-the-Scenes Content | Low | Medium |
+### Sprint 2: The Relationship Begins (Week 3-4)
 
-### Future
 | Feature | Effort | Impact |
 |---------|--------|--------|
-| Progress System | Medium | Low-Medium |
-| Seasonal Collections | Low | Medium |
-| Account System | High | High (enables all) |
+| Welcome email sequence (5 emails) | M | High |
+| Gallery page (static, 10 curated sites) | M | High |
+| Gallery submission form | M | Medium |
+
+### Sprint 3: The Return Visit (Week 5-6)
+
+| Feature | Effort | Impact |
+|---------|--------|--------|
+| `wardrobe list` shows update availability | M | Medium |
+| `wardrobe update [theme]` command | M | Medium |
+| Theme update email notifications | S | Medium |
+
+### Sprint 4: The Community (Week 7-8)
+
+| Feature | Effort | Impact |
+|---------|--------|--------|
+| Design Diary blog/email series | M | Medium |
+| Milestone celebration emails | S | Low-Medium |
+| Seasonal collection messaging | S | Medium |
 
 ---
 
 ## Success Metrics
 
 ### Leading Indicators (Week 1-4)
-| Metric | Target |
-|--------|--------|
-| Email signups | 100+ in first month |
-| Gallery submissions | 10+ sites |
-| Second-theme installs (same user) | 20% of users |
+
+| Metric | Current | Target |
+|--------|---------|--------|
+| Email capture rate | 0% | 15% of showcase visitors |
+| Gallery submissions | 0 | 25 sites |
+| Second-theme installs | Unknown | 10% of users |
 
 ### Lagging Indicators (Month 2+)
-| Metric | Target |
-|--------|--------|
-| Return visitor rate (showcase) | 30%+ |
-| Theme update adoption rate | 50%+ within 7 days |
-| User-to-evangelist conversion | 10% share or submit |
+
+| Metric | Current | Target |
+|--------|---------|--------|
+| Day-7 email open rate | N/A | 40% |
+| Return visits (30-day) | Unknown | 20% of installers |
+| Theme update adoption | N/A | 50% within 7 days |
 
 ### Q3 2026 Targets
+
 | Metric | Target |
 |--------|--------|
-| Email capture rate | 15% of installs |
-| Day-2 email open rate | 45% |
+| Email subscribers | 500+ |
+| Gallery sites | 50+ |
 | 30-day retention | 25% |
 | Theme diversity | 20% tried 2+ themes |
-| Gallery submissions | 50 sites |
+
+---
+
+## The Narrative Arc
+
+Shonda's insight: "The best transformations aren't endings. They're beginnings."
+
+| Episode | What Happens |
+|---------|--------------|
+| **Episode 1** | User discovers Wardrobe, installs theme, sees transformation |
+| **Episode 2** | Welcome email with customization tips, user makes it their own |
+| **Episode 3** | Gallery invitation, user sees others, considers submitting |
+| **Episode 4** | Theme update available, user returns to upgrade |
+| **Episode 5** | New theme announced, user explores expanding their identity |
+| **Episode 6** | User submits to gallery, becomes part of the community |
+| **Season 2** | User tries a second theme, the cycle continues |
 
 ---
 
 ## Closing Principle
 
-> "In television, we say: make them laugh, make them cry, make them wait.
-> Wardrobe has the wait. Now it needs the reasons to stay."
+> "In television, we say: make them laugh, make them cry, make them wait. Wardrobe has the wait. Now it needs the reasons to stay."
+> — Shonda Rhimes
 
 The goal isn't to trap users. It's to give them reasons to return because they *want* to—because there's always something new to see, something to contribute, something to anticipate.
 
 A wardrobe isn't something you visit once. It's something you return to every morning, wondering who you want to be today.
 
-Because the best transformations aren't endings. They're beginnings.
+**Because the best transformations aren't endings. They're beginnings.**
 
 ---
 
 *Retention Roadmap v1.1*
 *Wardrobe Theme Marketplace*
 *Great Minds Agency*
+*April 12, 2026*

@@ -1,8 +1,8 @@
 # Board Verdict: Emdash Theme Marketplace (Wardrobe)
 
-**Consolidated Review**
-**Date:** April 11, 2026
+**Date:** April 12, 2026
 **Reviewers:** Warren Buffett, Jensen Huang, Oprah Winfrey, Shonda Rhimes
+**Project:** Wardrobe — Theme Marketplace for Emdash CMS
 
 ---
 
@@ -26,45 +26,43 @@ Four board members reviewed Wardrobe, the theme marketplace CLI for Emdash CMS. 
 All four board members converged on these assessments:
 
 ### 1. Execution Quality is High
-- CLI experience is clean and fast (~3 seconds to transform)
-- Theme quality is distinct and well-crafted (Ember, Forge, Slate, Drift, Bloom)
-- Infrastructure choices (R2, Workers, Cloudflare stack) are sound
-- Capital efficiency is excellent (MVP delivered for ~$1,000 equivalent)
-- Backup system (`src.backup/`) demonstrates responsible safety thinking
+- **Buffett:** "The team delivered the full PRD with minimal resources... Clean code."
+- **Jensen:** "CLI experience is clean... Three seconds to transform. That's the dopamine hit."
+- **Oprah:** "One-line install commands. No configuration files, no wrestling with settings."
+- **Shonda:** "Three seconds. Done. Your content untouched, your presentation transformed."
+
+Infrastructure choices (R2, Workers, Cloudflare stack) are sound. Capital efficiency is excellent (MVP delivered for ~$1,000 equivalent). Backup system (`src.backup/`) demonstrates responsible safety thinking.
 
 ### 2. Emotional Language is Exceptional
-- "Try it on. If it doesn't fit, try another." — universally praised
 - Theme identity statements ("For people with something to say") resonate deeply
+- "Try it on. If it doesn't fit, try another." — universally praised
 - The "wardrobe/wearing" metaphor humanizes technical software
 - "Instant dignity for your Emdash site" is emotionally powerful
-- This is a differentiator worth preserving and expanding
+
+**Oprah:** "These aren't feature lists. They're *identity statements*."
+**Shonda:** "They wrote them like character breakdowns for a casting director."
 
 ### 3. No Competitive Moat Exists
-- 5 themes can be replicated in approximately one week
-- CLI is ~200 lines of TypeScript — trivially replicable
-- No network effects, no data advantages, no lock-in
-- No third-party creator ecosystem
-- The Emdash integration is the only defensible element
+- **Buffett:** "A competent developer could rebuild this in a weekend."
+- **Jensen:** "Current moat: None. Five hand-crafted themes is a content library, not a moat."
+- **Shonda:** "Marketplace framing without marketplace mechanics."
 
-### 4. Missing Visual Payoff ("The Aha Moment")
-- SVG placeholders instead of real screenshots
-- Live demo links exist in registry but aren't prominently featured
-- CLI doesn't auto-open the transformed site after install
-- Users must manually discover their transformation
-- "We're cutting away before the reveal" (Shonda)
+5 themes can be replicated in approximately one week. CLI is ~200 lines of TypeScript — trivially replicable. No network effects, no data advantages, no lock-in. The Emdash integration is the only defensible element.
 
-### 5. Feature, Not Platform (Yet)
-- "Marketplace" framing without marketplace mechanics
-- No third-party theme submission process documented
-- No creator tools, no revenue sharing infrastructure
-- Currently a download mechanism, not an ecosystem
-- 5 themes = content library, not a moat
+### 4. This Is a Feature, Not a Business (Yet)
+- **Buffett:** "This is currently a feature, not a business."
+- **Jensen:** "You've built a theme swapper, not a marketplace."
+- **Shonda:** "The product completes in one scene. It's a movie, not a series."
+- **Oprah:** (Implied) Needs live demos and social proof to become a real offering.
+
+### 5. Missing Post-Install Engagement Loop
+- **Shonda:** "After installation, Wardrobe disappears... no post-install engagement loop."
+- **Jensen:** "Nothing compounds."
+- **Buffett:** "No mechanism to *know* who your users are. No accounts. No telemetry. No relationship."
+- **Oprah:** Needs testimonials and "Meet the Makers" human connection.
 
 ### 6. Coming Soon Themes are Well-Executed
-- Aurora, Chronicle, Neon, Haven create genuine anticipation
-- Identity statements ("Stories deserve dignity") are compelling
-- Email capture exists (worker code built)
-- Release windows (Summer/Fall 2026) set expectations
+Aurora, Chronicle, Neon, Haven create genuine anticipation. Identity statements ("Stories deserve dignity") are compelling. Email capture worker code exists (built, needs deployment). Release windows (Summer/Fall 2026) set expectations.
 
 ---
 
@@ -88,7 +86,7 @@ Board members diverged on these dimensions:
 
 **Huang's AI Vision:**
 - AI theme generation from natural language
-- Preview with user's actual D1 content
+- Preview with user's actual D1 content ("the money shot")
 - Intelligent defaults based on content analysis
 - Theme repair/compatibility automation
 
@@ -125,7 +123,7 @@ Board members diverged on these dimensions:
 
 ## Overall Verdict
 
-# PROCEED (Conditional)
+# PROCEED — With Conditions
 
 **Rationale:**
 
@@ -151,31 +149,29 @@ However, the 5/10 scores from business-focused reviewers (Buffett, Huang) indica
 
 ## Conditions for Proceeding
 
-The following must be addressed before the next board review:
-
 ### Tier 1: Required for Launch (This Sprint)
 
-| # | Condition | Rationale | Owner Priority |
-|---|-----------|-----------|----------------|
-| 1 | **Deploy live demo sites** — Each theme must have a working preview URL prominently featured | "Let visitors experience their content in each theme" (Oprah) | Oprah, Shonda |
+| # | Condition | Rationale | Owner |
+|---|-----------|-----------|-------|
+| 1 | **Deploy live demo sites** — Each theme must have a working preview URL prominently featured | "Let visitors experience their content in each theme" (Oprah) | Oprah |
 | 2 | **Add real screenshots** — Replace SVG placeholders with actual site images | "SVG placeholders don't let people see themselves in the themes" (Oprah) | Oprah |
 | 3 | **Post-install reveal** — CLI offers to open transformed site or prints clear localhost URL | "The climax happens off-screen" (Shonda) | Shonda |
-| 4 | **Wire email capture** — The worker code exists; deploy it and confirm data practices | "Someone who subscribes today should get notified about Chronicle" (Shonda) | Shonda, Oprah |
+| 4 | **Wire email capture** — The worker code exists; deploy it and confirm data practices | "Someone who subscribes today should get notified about Chronicle" (Shonda) | Shonda |
 | 5 | **Anonymous install telemetry** — Track which themes are installed | "Which themes do people install? We have no idea" (Buffett) | Buffett |
 
 ### Tier 2: Required Before Monetization (Next Sprint)
 
-| # | Condition | Rationale | Owner Priority |
-|---|-----------|-----------|----------------|
+| # | Condition | Rationale | Owner |
+|---|-----------|-----------|-------|
 | 6 | **Build pricing rails** — Even if themes remain free, infrastructure for paid themes must exist | "Add pricing before launch" (Buffett) | Buffett |
-| 7 | **Theme creator guidelines** — Public documentation for third-party submissions | "Platform value comes from creators, not just our 5 themes" (Buffett) | Jensen, Buffett |
+| 7 | **Theme creator guidelines** — Public documentation for third-party submissions | "Platform value comes from creators, not just our 5 themes" (Buffett) | Buffett, Jensen |
 | 8 | **Post-install engagement email** — "You're wearing Ember. Here's how to customize it." | "Give them Day 2" (Shonda) | Shonda |
 | 9 | **User content preview** — Let users see THEIR content in a theme before installing | "This is the money shot" (Jensen) | Jensen |
 
 ### Tier 3: Required for Platform Status (This Quarter)
 
-| # | Condition | Rationale | Owner Priority |
-|---|-----------|-----------|----------------|
+| # | Condition | Rationale | Owner |
+|---|-----------|-----------|-------|
 | 10 | **Theme versioning and updates** — `wardrobe list` shows installed vs. latest versions | Creates return visits for updates | Shonda |
 | 11 | **Site gallery** — Showcase of real sites using each theme | Social proof + contribution incentive + flywheel starter | Shonda, Oprah |
 | 12 | **Creator submission pipeline** — Automated validation, review process | "If you want a marketplace, you need sellers" (Buffett) | Jensen, Buffett |
@@ -186,7 +182,7 @@ The following must be addressed before the next board review:
 
 ## Strategic Guidance
 
-### What to Build First (Recommended Priority)
+### Recommended Priority Order
 
 1. **Retention mechanics** (Shonda's view) — A product people love and return to beats a platform no one uses twice
 2. **Revenue infrastructure** (Buffett's view) — Build the rails for monetization before you need them
@@ -206,8 +202,9 @@ The following must be addressed before the next board review:
 ## Next Review Gate
 
 **Date:** End of Q2 2026
+
 **Success Criteria:**
-- Tier 1 conditions complete (all 5)
+- All 5 Tier 1 conditions complete
 - At least 3 of 4 Tier 2 conditions in progress
 - Documented roadmap for Tier 3
 
@@ -234,3 +231,4 @@ The foundation is exceptional. Now build the house.
 - Shonda Rhimes, Board Member
 
 *Great Minds Agency Board of Directors*
+*April 12, 2026*

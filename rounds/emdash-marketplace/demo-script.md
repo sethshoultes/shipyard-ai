@@ -2,160 +2,169 @@
 
 **Runtime:** 2 minutes
 **Format:** NARRATOR lines + [SCREEN: description]
+**Style:** Sorkin — rapid, rhythmic, human
 
 ---
 
-## COLD OPEN (0:00 – 0:30)
+## COLD OPEN (0:00 – 0:25)
 
-[SCREEN: A laptop screen glowing in a dark room. Clock reads 11:47 PM. Someone's been here a while.]
-
-NARRATOR:
-You know that feeling when you finally nail the thing?
-
-[SCREEN: Slow pull back. We see a blog post open in an editor. Draft 14. The cursor blinks after a finished sentence.]
+[SCREEN: Dark. A cursor blinks. Then—keystrokes. Fast. Confident. Someone who knows exactly what they want to say.]
 
 NARRATOR:
-The late nights. The rewrites. That one paragraph you deleted three times before you realized—no, actually, it was right the first time.
+Here's a thing nobody tells you.
 
-[SCREEN: Cut to the live website. Same words. But the site looks... anonymous. Default template. Gray. Forgettable.]
-
-NARRATOR:
-And then you publish it. And you look at your site. And it looks like—
-
-[SCREEN: Quick cuts—four Emdash sites. Same template. Same fonts. Same nothing.]
+[SCREEN: Pull back to reveal a finished blog post. Clean prose. Tight paragraphs. This person can write.]
 
 NARRATOR:
-—everyone else's.
+You can spend three weeks on a piece. You can cut a thousand words. You can find the sentence that makes the whole thing click—the one that wakes you up at 2 AM and you text it to yourself so you don't lose it—
 
-[SCREEN: Close on the writer's face. The disappointment is quiet, but it's there.]
+[SCREEN: They hit Publish. Satisfaction.]
 
 NARRATOR:
-You did the hard part. You found your voice. But your site doesn't know that yet.
+—and then you publish it.
+
+[SCREEN: Cut to the live site. Same words. But the site itself looks like... nothing. A template. Beige on beige.]
+
+NARRATOR:
+And your site makes it look like everyone else wrote it.
+
+[SCREEN: Quick cuts. Four different Emdash sites. Same template. Same gray. Same forgettable.]
+
+NARRATOR:
+Your voice is singular. Your site is plural. That's the gap.
+
+[SCREEN: Beat. The cursor blinks alone.]
+
+NARRATOR:
+That's the gap we're here to close.
 
 ---
 
-## THE TURN (0:30 – 0:50)
+## THE TURN (0:25 – 0:45)
 
-[SCREEN: Black screen. A single cursor blinks.]
-
-NARRATOR:
-So here's what we built.
-
-[SCREEN: Terminal window appears. Clean. Ready.]
+[SCREEN: Terminal window. Clean. Waiting.]
 
 NARRATOR:
-It's called Wardrobe. And it does exactly one thing.
+Wardrobe. One command. That's the whole pitch.
 
-[SCREEN: Hands type slowly, deliberately: `npx wardrobe install ember`]
+[SCREEN: Hands type: `npx wardrobe list`]
 
-NARRATOR:
-You type one command.
-
-[SCREEN: Finger hovers over Enter.]
+[SCREEN: Five themes appear—Ember, Forge, Slate, Drift, Bloom. Each with a one-line personality.]
 
 NARRATOR:
-And in three seconds—
+Five themes. Pick the one that sounds like you.
 
-[SCREEN: Press Enter. Progress bar fills. "Installing Ember..." becomes "Done."]
+[SCREEN: They pause on "Ember: Bold. Editorial. For people with something to say."]
 
 NARRATOR:
-—your site becomes *yours*.
+Let's say you've got something to say.
+
+[SCREEN: They type: `npx wardrobe install ember`]
+
+NARRATOR:
+You type that. You hit enter.
+
+[SCREEN: Progress bar flies. "Installing..." becomes "Done." 2.3 seconds on screen.]
+
+NARRATOR:
+And in less time than it takes to regret the email you just sent—
 
 ---
 
-## THE TRANSFORMATION (0:50 – 1:25)
+## THE TRANSFORMATION (0:45 – 1:20)
 
-[SCREEN: The same blog from before. Cursor moves to refresh.]
+[SCREEN: Browser. They hit refresh.]
 
-NARRATOR:
-Same words. Same database. Nothing changes except—
-
-[SCREEN: Click. Page loads. And it's completely different.]
-
-[SCREEN: Dark navy background. Burnt orange accents. Serif headings that own the page. Magazine layout. Pull quotes. The content hasn't changed. But now it has *presence*.]
+[SCREEN: The same blog. Same words. But now—dark navy, burnt orange accents, serif headings that command attention. Magazine-style layout. It looks like The Atlantic had a baby with your personal journal.]
 
 NARRATOR:
-—the way it feels when someone lands on it.
+Same words. Same database. Nothing moves except the skin.
 
-[SCREEN: Slow scroll. The blog posts look like features in The Atlantic. The about page looks like someone who matters wrote it.]
-
-NARRATOR:
-That's Ember. "Bold. Editorial. For people with something to say."
-
-[SCREEN: Cut to terminal. New command: `npx wardrobe install forge`]
+[SCREEN: Slow scroll. The writing hasn't changed. But it *reads* different now. It looks like it was meant to be read.]
 
 NARRATOR:
-But maybe that's not you. Maybe you're technical.
+That's Ember. But watch—
 
-[SCREEN: Progress bar. Refresh. Same content—now dark mode. Neon green accents. Monospace everywhere. A developer's home.]
+[SCREEN: Terminal. `npx wardrobe install forge`]
 
-NARRATOR:
-Forge. Built for builders.
-
-[SCREEN: Terminal. `npx wardrobe install drift`]
-
-[SCREEN: Refresh. Light. Airy. Sage green accents. Whitespace that lets you breathe.]
+[SCREEN: Refresh. Dark mode. Monospace fonts. Neon green accents. Terminal vibes. The content looks like it was written by someone who could also ship it.]
 
 NARRATOR:
-Drift. When you want your words to land softly.
+That's Forge. For builders.
 
-[SCREEN: Rapid montage—Slate (professional, blue-gray, trustworthy), Bloom (warm, terracotta, rounded corners, inviting). Same content. Five different personalities.]
+[SCREEN: `npx wardrobe install drift`]
+
+[SCREEN: Refresh. Light. Airy. Generous whitespace. Sage green. The same post now feels like a Sunday morning.]
 
 NARRATOR:
-Five themes. Two seconds each. Try them all. That's literally the point.
+Drift. When you want room to breathe.
+
+[SCREEN: Rapid montage—Slate (professional, blue, trustworthy), Bloom (warm, terracotta, soft corners). Same content wearing five different personalities.]
+
+NARRATOR:
+Five themes. Try them all. That's not a sales pitch—that's literally the product. You try it, you don't like it, you try another one. Takes three seconds.
 
 ---
 
-## THE WOW (1:25 – 2:00)
+## THE HOW (1:20 – 1:40)
 
-[SCREEN: Split view—file system on one side, database on the other.]
-
-NARRATOR:
-Here's what's actually happening under the hood.
-
-[SCREEN: Animation: the src/ folder slides out. A new src/ folder slides in. Everything else stays perfectly still.]
+[SCREEN: Split view—file tree on left, database on right.]
 
 NARRATOR:
-Wardrobe swaps your presentation layer. That's it. Your layouts, your components, your styles—new.
+Here's what's happening underneath. Pay attention, this goes fast.
 
-[SCREEN: The database side pulses with a "UNCHANGED" label. Posts, pages, settings—frozen in place.]
-
-NARRATOR:
-Your content? Doesn't move. Your posts. Your pages. Your hours of work. Exactly where you left it.
-
-[SCREEN: Terminal shows: "Backup saved to src.backup/"]
+[SCREEN: Animation. The src/ folder slides out. A fresh src/ folder slides in. Everything else—posts, pages, images, settings—stays perfectly still.]
 
 NARRATOR:
-And if you don't love it? Your old theme is right there. One folder over.
+Wardrobe swaps your presentation layer. Layouts, components, styles—new. Your content? Doesn't know anything happened.
 
-[SCREEN: The writer from the opening. Different angle now. Looking at their transformed site. Something shifts in their expression—not excitement, something quieter. Recognition.]
-
-NARRATOR:
-Look—we timed the average install. It's 2.4 seconds.
-
-[SCREEN: The transformed site, full screen. Beautiful. Intentional.]
+[SCREEN: Database side glows with "UNTOUCHED" label. Posts table. Pages table. All quiet.]
 
 NARRATOR:
-2.4 seconds to go from "I built a site" to "I built *this* site."
+Your three weeks of writing? Still there.
 
-[SCREEN: Fade to black. White text fades in:]
+[SCREEN: Terminal shows: "Previous theme backed up to src.backup/"]
+
+NARRATOR:
+Your old theme? One folder over. Don't like the new one? Move it back. Thirty seconds.
+
+---
+
+## THE WOW (1:40 – 2:00)
+
+[SCREEN: Back to the writer from the opening. Different angle. They're looking at their site now. Not reading it—seeing it. The expression isn't excitement. It's recognition.]
+
+NARRATOR:
+Here's what I want you to notice.
+
+[SCREEN: Close on the transformed site. Beautiful. Intentional. Theirs.]
+
+NARRATOR:
+Same words. Same person. But now when someone lands on that page—
+
+[SCREEN: The site loads fresh. Fast. Polished.]
+
+NARRATOR:
+—they're not wondering if this person knows what they're doing. They're just reading.
+
+[SCREEN: Fade to black. Beat. White text appears:]
 
 **Wardrobe**
 *One command. Instant transformation.*
 
-[SCREEN: Below, the command appears like it's being typed:]
+[SCREEN: Below, typed in real-time:]
 
 ```
 npx wardrobe list
 ```
 
 NARRATOR:
-Your words did the hard part.
+You already did the hard part.
 
-[SCREEN: Logo holds.]
+[SCREEN: The command sits there. Waiting.]
 
 NARRATOR:
-Let your site catch up.
+Your site just needs to know it.
 
 [END]
 
@@ -163,12 +172,12 @@ Let your site catch up.
 
 ## PRODUCTION NOTES
 
-**Tone:** Not a pitch. A conversation with someone who gets it. The frustration in the opening should feel *earned*—this is something the viewer has actually felt.
+**The Sorkin thing:** Sorkin dialogue moves. It's not slow and moody—it's someone who's already figured it out explaining it to you while walking somewhere. The rhythm is: setup, pivot, punchline. Repeat. No lingering. If a beat isn't earning its time, cut it.
 
-**Pacing:** The first 30 seconds should be slow enough to hurt. Let the gap between "I wrote something good" and "my site doesn't show it" really land. Then the product section moves fast—matching Wardrobe's speed.
+**The problem must hurt first:** The opening 25 seconds are about a specific frustration: I did good work and my site buried it. Don't make it abstract. Make it the person watching say "yeah, that happened to me last Tuesday."
 
-**The wow moment:** It's not the tech. It's the face at 1:45. That quiet moment of recognition—*oh, this actually looks like mine now.*
+**Speed matches product:** Wardrobe installs in 3 seconds. The demo should *feel* fast once we hit the product. The transformation sequence is quick cuts—we're not explaining themes, we're showing what "pick one and go" looks like.
 
-**Music:** Start sparse. Piano or ambient. Build through the transformation. Not triumphant—confident. Like someone who just realized they can stop worrying about the wrong things.
+**The wow isn't tech:** The wow is the face. The recognition. The moment someone sees their work presented the way it deserves and stops thinking about the container. That's the beat at 1:45. Don't undercut it with features.
 
-**What we're NOT doing:** Feature lists. Bullet points. "And it also does X!" Every beat is one thing: the gap between your voice and your site, and how fast you can close it.
+**Tone:** We're not selling. We're solving something that was annoying them anyway. The whole video should feel like: "You know that thing? We fixed it. Here's how. It takes three seconds. You're welcome."

@@ -1,66 +1,57 @@
-# Steve Jobs — Round 2
-## Emdash Theme Marketplace: Response to Elon
+# Steve Jobs — Round 2 Response
 
 ---
 
-### Where Elon Is Optimizing for the Wrong Metric
-
-**"Ship in a day, not a week" — speed to ship is not speed to adoption.**
-
-Elon wants to cut demo sites, use screenshots instead of live previews, and launch with 2 themes. He's optimizing for *time to deploy*, not *time to desire*.
-
-A marketplace nobody wants isn't faster to success. It's faster to obscurity.
+## Challenging Elon's Weakest Positions
 
 **"Screenshots are 95% as useful at 1% the cost."**
 
-Wrong. Screenshots show. Live previews *convince*. The gap between "looks nice" and "that's my site" is the gap between browsing and buying. Screenshots are brochures. Live demos are test drives. Nobody buys a car from a brochure.
+Wrong metric, Elon. You're optimizing for *deployment cost*, not *conversion*. A screenshot shows what a theme looks like. A full-screen experience shows what it *feels* like. People don't choose clothes from catalog swatches — they try them on.
 
-**"One demo site with a dropdown" — this is a grocery store mentality.**
+The 5% you're dismissing is the entire purchase decision. It's the difference between "that looks nice" and "that's *me*." One converts. One doesn't.
 
-Switching themes via dropdown destroys the emotional isolation each theme needs. Ember shouldn't coexist with Drift on the same page. They're opinions, not options. The museum has separate rooms for Monet and Picasso.
+**"One demo site with theme switcher dropdown."**
 
----
+A dropdown is a decision tree. Decision trees are cognitive load. Cognitive load is abandonment. You're treating the experience like a configuration panel instead of a gallery walk. Nobody falls in love through a select menu.
 
-### Why Design Quality Matters HERE
+**"Ship 3 themes, not 5."**
 
-Elon asks: "How many active users?" Good question. But the answer isn't found in distribution hacks — it's found in the product itself.
-
-Emdash users are makers. Writers, photographers, small business owners with taste. They chose Emdash over WordPress because they care about craft. They will judge the marketplace in 3 seconds. If it looks like npm's package list, they'll assume the themes are equally generic.
-
-**The marketplace IS the portfolio.** It proves we can design. Screenshots on a static page prove nothing except that we can run `npx create-cloudflare`.
+You're right about one thing: three polished themes beat five rushed ones. But your rationale is wrong. You're cutting for *scope reduction*. I'd cut for *curation*. Three themes that span the emotional spectrum — warm, clean, bold — beats five that overlap. The number matters less than the range.
 
 ---
 
-### Where Elon Is Right
+## Defending My Positions
 
-**npm over R2 tarballs.** Correct. The ecosystem exists. Don't reinvent it. npm gives us versioning, caching, and familiarity for free.
+**"Why does full-screen preview matter for a $0 CLI install?"**
 
-**Cut live preview with user content for v1.** Agreed. Auth and D1 access is scope creep. Demo content that sings is sufficient — the user's imagination fills the gap.
+Because the theme marketplace isn't selling software. It's selling *identity*. When someone chooses Ember over Drift, they're not comparing file sizes — they're answering the question: "How do I want to be seen?"
 
-**2 themes to start, 5 later.** I'll meet him halfway: **3 themes.** Two is a comparison. Three is a collection. Ship Forge, Drift, and Ember — max contrast, clear personalities.
+That decision happens in the limbic system, not the prefrontal cortex. Full-screen immersion triggers the right part of the brain. Thumbnails don't. This isn't aesthetics for its own sake — it's conversion psychology.
 
-**Community themes are v2 infrastructure.** Absolutely. Curation requires standards. Standards require saying no. We're not ready to say no at scale yet.
+**"'Garb' is precious naming."**
 
----
-
-### My Non-Negotiables (Locked)
-
-1. **Name: Skins.** "Theme Marketplace" is a category. Skins is identity. `npx skins install ember` — that's the CLI poetry we ship.
-
-2. **Full-bleed immersive previews, not a card grid.** Each theme gets its own room. One scroll, five experiences. No dropdown switcher. No thumbnail grid. If we can't make people *feel* each theme, we've already lost.
-
-3. **No ratings, no reviews, no accounts.** Curation is our brand. We chose these themes. Users trust our taste or they don't. Democracy is for v3, when we've earned the right to scale.
+Maybe. But "Theme Store" is what everyone else has. Memorable brands are specific, not descriptive. You named your car company after an eccentric inventor. I'm naming a concept after what it actually is: clothing for content.
 
 ---
 
-### The Real Question
+## Conceding to Elon
 
-Elon frames this as "weekend project inflated to a week."
+**npm over R2 tarballs.** You're right. npm solves distribution, versioning, and caching. We shouldn't rebuild infrastructure that exists. Use it.
 
-I frame it as: **the moment Emdash proves it has taste.**
+**One demo domain with seamless switching.** Fine — but not a dropdown. Scroll-driven transitions. Same outcome, better experience.
 
-Every platform eventually has a marketplace. Most are forgettable. Ours shouldn't be. Not because we spent more time — because we spent the time on what matters.
+**"The themes are 80% of the work."** Absolutely correct. The marketplace is the stage; the themes are the performance. Engineering time should reflect this ratio.
 
-Ship 3 themes. Ship them beautifully. Ship them this week.
+---
 
-*Speed is a virtue. Taste is a weapon.*
+## Locked: My 3 Non-Negotiables
+
+1. **Full-viewport theme experiences.** No thumbnails. No grids. Each theme consumes the entire screen during preview. This is the soul of the product.
+
+2. **"Wear This" as the CTA.** Not "Install," not "Download," not "Get Started." The language shapes the relationship. You don't install identity — you put it on.
+
+3. **Zero accounts, zero friction.** One command. No signup. No email capture. The product earns attention by being effortless, not by trapping it.
+
+---
+
+*Elon wants a weekend project. I want something people remember. We can have both — if we're ruthless about what matters.*

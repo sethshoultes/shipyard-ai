@@ -1,23 +1,36 @@
-# Sara Blakely Gut-Check: AgentBench Phase 1
+# Sara Blakely Review — Wardrobe Phase 1 Plan
 
-**Would a real customer pay for this?**
-No. Not yet. It's free (npm), which is right for v1. But would they *choose* it? Maybe. The "replace prayer with proof" hook is strong. Developers live in fear of AI agents breaking in production. That fear is real money. But they won't pay until they've felt the relief. First run has to nail it.
+## Would a real customer pay for this?
 
-**What's confusing? What would make someone bounce?**
-- "AgentBench" means nothing. It's jargon. Nobody wakes up wanting a "bench."
-- `matches_intent` requires an API key. That's friction. First-time user hits a wall unless they read everything.
-- HTTP endpoint example assumes they already have an agent running. Most don't.
-- "Evaluators" is engineer-speak. Call them "checks" or "expectations."
+**Maybe.** But not because of anything in this plan. This is an infrastructure deployment checklist, not a product. I see KV namespaces and R2 buckets. Where's the customer? Where's the pain?
 
-**30-Second Elevator Pitch:**
-"You built an AI agent. It works on your laptop. You have no idea if it'll work tomorrow. AgentBench is one command that tells you: green means ship, red means fix. No dashboards, no logins, no setup. Write a YAML file with your test cases, run `npx agentbench`, get an answer."
+The buried truth: "One command transforms your site into something beautiful" — THAT's the product. Everything else is plumbing.
 
-**What would I test first with $0 marketing budget?**
-Post the YAML example in AI agent Discord servers (LangChain, AutoGPT, Claude). Say nothing else. "Here's how I test my agents." If people screenshot it and share — you're onto something. If they ask "how do I install?" — you win. Silence means the value prop isn't landing.
+## What's confusing / What makes someone bounce?
 
-**What's the retention hook?**
-Weak. Once tests pass, why come back? Need: (1) test file versioning showing regressions over time, (2) "last run" comparison, or (3) CI integration that makes it painful to remove. Right now it's one-and-done. Great for adoption, bad for habit.
+1. **"Wardrobe Theme Marketplace"** — Is this a marketplace? I don't see pricing, browsing, or purchasing anywhere. Don't call it a marketplace if it's not one.
+2. **5 themes** — Why would I try this instead of just picking a theme from the million others out there? What makes these special?
+3. **The reveal** — You keep saying the reveal must be perfect. I don't see any plan to MAKE it perfect. Where's the before/after? The dopamine hit?
 
-**Bottom line:** The insight is right — developers pray their agents work. The execution focuses too much on elegance (500 lines! batched LLM calls!) and not enough on the moment of relief. Ship it, but watch what happens AFTER the first run. That's where you'll learn what this actually needs to be.
+## 30-Second Elevator Pitch
+
+*Your website looks like everyone else's. Run one command, pick a theme, and in 3 seconds your site looks like YOU hired a designer. No config files. No breaking changes. Just instant dignity.*
+
+## What would I test first with $0 marketing budget?
+
+Screenshot before/after and post it in one Emdash Discord or Slack. DM 5 real users. Ask: "Which theme fits you?" Watch if they actually run the command. If they don't, you learned something way more valuable than your KV namespace IDs.
+
+## What's the retention hook?
+
+**I don't see one.** They install a theme once and leave. Where's the:
+- Theme updates that make them come back?
+- Community showcase ("sites using Ember")?
+- Seasonal drops ("Fall collection just shipped")?
+
+You're building a one-night-stand, not a relationship.
+
+---
+
+**Bottom line:** The plan is technically solid. But it's all foundation, no house. Ship it, then immediately figure out why someone would come back.
 
 —Sara

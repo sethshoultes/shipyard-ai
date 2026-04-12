@@ -3,13 +3,13 @@
 **Reviewer:** Shonda Rhimes
 **Role:** Board Member, Great Minds Agency
 **Lens:** Narrative and Retention
-**Date:** April 11, 2026
+**Date:** April 12, 2026 (Updated)
 
 ---
 
 ## The Verdict
 
-**Score: 6/10** — This is a pilot with a compelling cold open and solid character introductions, but it ends on a period instead of an ellipsis. The audience watches the transformation, applauds, and walks out. We haven't given them a reason to come back Thursday night.
+**Score: 6/10** — This is a pilot with a compelling cold open, strong character introductions, and a satisfying transformation moment. But the story ends at the act break. The audience transforms their site, the credits roll, and they walk out. We haven't built the season that keeps them coming back Thursday nights.
 
 ---
 
@@ -17,64 +17,66 @@
 
 ### The Cold Open
 
-The problem statement lands:
+The problem statement lands with force:
 
 > "Emdash launched April 1, 2026 with no theme marketplace. Every Emdash site looks the same."
 
-This is the "previously on" that makes audiences lean in. Sameness is death. Everyone wants to be seen.
+This is the "previously on" that makes audiences lean in. Sameness is death in storytelling. Every protagonist needs to differentiate from the ordinary world. Wardrobe offers exactly that.
 
 ### The Character Introductions
 
-Five themes, five identities. And they wrote them like character descriptions, not feature lists:
+Five themes. Five identities. They wrote them like character breakdowns for a casting director, not feature lists:
 
-| Theme | Identity Statement |
-|-------|-------------------|
-| **Ember** | "Bold. Editorial. For people with something to say." |
-| **Forge** | "Dark and technical. Built for builders." |
-| **Slate** | "Clean and professional. Trust at first glance." |
-| **Drift** | "Minimal and airy. Let your content breathe." |
-| **Bloom** | "Warm and inviting. Where community feels at home." |
+| Theme | The Character |
+|-------|---------------|
+| **Ember** | "Bold. Editorial. For people with something to say." — The confident voice who won't apologize for taking up space |
+| **Forge** | "Dark and technical. Built for builders." — The engineer who thinks in terminal commands |
+| **Slate** | "Clean and professional. Trust at first glance." — The consultant who bills by the hour |
+| **Drift** | "Minimal and airy. Let your content breathe." — The wellness brand that whispers instead of shouts |
+| **Bloom** | "Warm and inviting. Where community feels at home." — The neighborhood bakery that knows everyone's name |
 
-This is smart writing. You're not picking a color scheme—you're picking who you want to be. Ember isn't navy and orange; Ember is "for people with something to say." That's casting, not decoration.
+This is smart writing. Users aren't choosing fonts; they're choosing identities. They're answering the question: *Who do I want to be when people visit my site?*
+
+The registry even teases future characters:
+- **Aurora**: "For brands that refuse to blend in"
+- **Chronicle**: "Stories deserve dignity"
+- **Neon**: "The future is now"
+- **Haven**: "Home on the internet"
+
+These read like season two casting announcements. Evocative. Curiosity-provoking.
 
 ### The Transformation Moment
 
 ```bash
 npx wardrobe install ember
-
-✓ Theme installed.
-
-Your site is now wearing ember.
-
-Try it on. If it doesn't fit, try another.
-
-Installed in 2.34s
 ```
 
-The language is doing heavy lifting:
-- "wearing" (not "using")
-- "Try it on" (not "installation complete")
-- "If it doesn't fit, try another" (permission to experiment)
+Three seconds. Done. Your content untouched, your presentation transformed.
 
-This is the screenwriter making dialogue feel human. It's excellent.
+The messaging does heavy lifting:
+- "wearing" (not "using")
+- "Try it on" (permission to experiment)
+- "Your content stays untouched" (reassurance)
+
+This is a screenwriter making technical dialogue feel human.
 
 ### The Narrative Gap
 
-Here's where I lose the audience: **the aha moment is invisible.**
+Here's where I lose the audience: **the climax happens off-screen.**
 
-The user runs a command. The terminal says success. Then... nothing. The user has to:
+After installation, the user must:
 1. Remember how to start their dev server
-2. Navigate to localhost
+2. Navigate to localhost:4321
 3. Recall what their site looked like before
-4. Notice the change
+4. Manually notice the change
 
-We're cutting away before the reveal. In Grey's Anatomy, we never cut before showing someone's face when they see the flatline become a heartbeat. We SHOW the moment of recognition.
+We cut away before showing the transformation. In Grey's Anatomy, we never cut before showing someone's face when they see the flatline become a heartbeat. The payoff IS the reveal.
 
-**Recommendation:** The CLI should offer to open the transformed site automatically. Or print a clear "View your site → http://localhost:4321" with instructions. The transformation needs a visual payoff.
+**What's needed:** The CLI should offer to open the transformed site automatically. Show a clear "View your transformation → http://localhost:4321" moment.
 
 ### Story Arc Score: 7/10
 
-Strong setup, evocative characters, excellent transformation language—but the climax happens off-screen.
+Strong setup, evocative characters, excellent transformation language—but the climactic reveal happens off-camera.
 
 ---
 
@@ -84,137 +86,141 @@ Strong setup, evocative characters, excellent transformation language—but the 
 
 **Rating: Weak**
 
-After installation, Wardrobe has done its job. There's no:
-- "How's Ember treating you?" follow-up
-- Day-2 customization tips email
+After installation, Wardrobe disappears. There's no:
+- "How's Ember treating you?" touchpoint
+- Day-2 customization tips
 - Progress indicator ("You've tried 1 of 5 themes")
+- Post-install email sequence
 
 The product completes in one scene. It's a movie, not a series.
 
 ### Next Week?
 
-The only structural hooks I see:
+The structural hooks I identified:
 
-1. **Coming Soon Themes** — Aurora, Chronicle, Neon, and Haven are teased with Summer/Fall 2026 releases. This creates anticipation.
+1. **Coming Soon Themes** — Four themes teased for Summer/Fall 2026. This creates season anticipation.
 
-2. **Email Capture** — "Get notified when new themes drop." There's a form, and the worker code exists with proper validation and KV storage.
+2. **Email Capture Worker** — Code exists in `workers/email-capture/` with proper validation and KV storage. Infrastructure is built; deployment needed.
 
-3. **Theme Swapping** — If a user dislikes their choice, they might return. But this requires dissatisfaction, not delight.
+3. **Theme Swapping** — If dissatisfied, users return. But this is a failure mode, not a success loop.
 
-### What's Missing
+### What's Glaringly Missing
 
-**No ongoing relationship.** Consider what would create habit:
+**No ongoing relationship after installation.** What would create habit:
 
-- **Theme updates**: "Ember 1.1 adds pull-quote components. Run `wardrobe update`." Now there's a reason to check back.
+- **Theme updates**: "Ember 1.1 adds pull-quote components. Run `wardrobe update`." Reason to check back.
 
-- **Site gallery**: "See how other sites wear Ember." Social proof + inspiration + contribution opportunity.
+- **User gallery**: "See 47 sites wearing Ember." Social proof + inspiration + contribution opportunity. Currently absent.
 
-- **Usage stats**: Even simple telemetry ("432 sites wearing Ember this week") creates a sense of community.
+- **Community milestones**: "You're one of 500 Ember sites." Creates belonging.
 
-- **Seasonal collections**: "Fall 2026: Introducing cozy themes for autumn." Make it feel like fashion seasons.
+- **Seasonal campaigns**: "Fall 2026: Introducing cozy themes." Fashion-like cadence.
 
-The email capture for Coming Soon is the right instinct, but it's a passive hook. You wait. You hope. There's no active relationship.
+The premium tier (per PRICING-ARCHITECTURE.md) has retention built in—subscriptions require renewals, license validation creates touchpoints. But V1 is free-only, so those mechanics don't exist yet.
 
 ### Retention Score: 5/10
 
-Coming Soon themes and email capture exist, but there's no post-install engagement loop.
+Coming Soon themes and email infrastructure exist, but no post-install engagement loop is implemented.
 
 ---
 
 ## Content Strategy: The Flywheel
 
-### Current State: One-Way Content
+### Current State: One-Way Broadcast
 
 ```
-Emdash creates themes → Users consume themes → [END]
+Wardrobe creates themes → Users install → [END]
 ```
 
-This is a broadcast, not a conversation. Content flows downhill and stops.
+Content flows downhill and stops. No user-generated momentum.
 
 ### What a Flywheel Would Look Like
 
 ```
 User installs theme →
 User customizes →
-User shares their site →
-Others see the gallery →
-They discover Wardrobe →
-They install →
-They share →
+User builds something →
+User shares site →
+Others discover via gallery →
+Others install →
+Others share →
 [LOOP]
 ```
 
-### The Seeds Are There
+Wardrobe has steps 1-3. Steps 4-7 don't exist.
+
+### The Missing Community Engine
 
 The README mentions:
 
-> "Want to create a theme for Wardrobe? We're building a small, curated collection — quality over quantity. If you've got a theme that brings something genuinely new to the table, we'd love to see it."
+> "Want to create a theme for Wardrobe? Reach out through the Emdash community channels."
 
-This is the *promise* of a creator ecosystem. But there's no:
-- Public submission process
-- Theme creator guidelines
-- Revenue share or credit model
-- Community showcase
+But there are no visible community channels. No submission process. No creator guidelines. No "Built with Wardrobe" showcase. No contribution pathway.
 
-Without community contributions, this is a store, not a marketplace. The "marketplace" framing creates expectations that aren't met.
+The "marketplace" framing creates expectations of a two-sided ecosystem. Currently, it's a one-sided store.
 
-### The Bright Spot
+### The Showcase Website
 
-The theme READMEs are excellent content:
+The `showcase/` folder contains a polished marketing site with:
+- Theme cards with descriptions
+- Copy-to-clipboard install commands
+- Responsive design
+- Accessibility compliance
 
-> "Installing Ember should feel like putting on something that fits. Your content stays exactly the same—the same words, the same structure—but suddenly it's wearing clothes that make it feel more powerful. That moment, when you see your site with Ember? That's what we built for."
-
-This is emotional, voice-y content. But it's buried in files most users won't read.
+But it's static. No featured sites using themes. No social proof. No user stories. The themes feel hypothetical because we don't see real people wearing them.
 
 ### Content Strategy Score: 5/10
 
-Strong foundational content, no user-generated flywheel, marketplace framing without marketplace mechanics.
+Solid foundational content. No user-generated flywheel. Marketplace framing without marketplace mechanics.
 
 ---
 
-## Emotional Cliffhangers: What Makes Users Curious?
+## Emotional Cliffhangers: What Creates Curiosity?
 
 ### What Works
 
 **The Coming Soon section is proper serialization:**
 
-- **Aurora**: "For brands that refuse to blend in." (Summer 2026)
-- **Chronicle**: "Stories deserve dignity." (Fall 2026)
-- **Neon**: "The future is now." (Summer 2026)
-- **Haven**: "Home on the internet." (Fall 2026)
+From `registry/themes.json`:
+- **Aurora**: "For brands that refuse to blend in" (Summer 2026)
+- **Chronicle**: "Stories deserve dignity" (Fall 2026)
+- **Neon**: "The future is now" (Summer 2026)
+- **Haven**: "Home on the internet" (Fall 2026)
 
-Each name and tagline poses a question: *What will this look like? Is this more me than what I have now?*
+Each tagline poses a question: *What will this look like? Is this more me than what I have now?*
 
 This is the season finale tease. "Next time on Wardrobe..." It works.
 
 ### What's Missing
 
-**No episode-to-episode serialization.** The Coming Soon themes are a *season* cliffhanger, but there's nothing keeping users engaged week to week.
+**No episode-to-episode hooks.** The Coming Soon themes are a *season* cliffhanger. There's nothing keeping users engaged week to week.
 
 What would create ongoing curiosity:
 
-1. **Behind-the-scenes previews**: Monthly emails showing Chronicle's color palette development, Haven's typography choices. Make the creation process a story.
+1. **Behind-the-scenes previews**: Monthly emails showing Chronicle's color palette development. Make the creation process a story.
 
-2. **Theme evolution**: "Ember 1.1 preview: We're adding asymmetric grids based on user feedback." Now users want to see how *their* feedback shaped the product.
+2. **Theme evolution narratives**: "Ember 1.1 preview: We added asymmetric grids based on community feedback." Users see their input shaping the product.
 
-3. **Community spotlights**: "This week's Drift site: [screenshot]. Here's how they customized it." Serialized content that changes.
+3. **Community spotlights**: "This week's Drift site" with a screenshot and customization story. Serialized content.
 
-4. **Release countdowns**: "Chronicle drops in 23 days. Here's what we're finalizing." Create appointment viewing.
+4. **Release countdowns**: "Chronicle drops in 23 days. Here's what we're finalizing." Appointment viewing.
 
-### The Big Miss: Stakes
+### The Missing Stakes
 
-Every great story has stakes. What does the user *lose* if they don't return? Currently: nothing.
+Every great story has stakes. What does the user *lose* if they don't return?
 
-Consider framing:
-- "Chronicle launches next month. Early adopters get [X]." — Scarcity hook
-- "Join 400+ sites wearing Ember." — Social proof that grows
-- "Limited to 50 site submissions for our Fall gallery." — Exclusive access
+Currently: nothing.
 
-Stakes don't have to be manipulative. They can be aspirational. "Be part of the first wave."
+The premium tier (Q3 2026) introduces some stakes:
+- Trial expirations (14-day premium trials)
+- License renewals
+- Early access for subscribers
+
+But V1 is entirely stakes-free.
 
 ### Emotional Cliffhangers Score: 6/10
 
-Coming Soon themes are well-executed cliffhangers. No ongoing episode hooks.
+Coming Soon themes are well-executed seasonal hooks. No ongoing episodic engagement.
 
 ---
 
@@ -222,25 +228,34 @@ Coming Soon themes are well-executed cliffhangers. No ongoing episode hooks.
 
 Wardrobe is built as a **one-transaction product**:
 
+```
 1. User has boring site
 2. User discovers Wardrobe
 3. User installs theme
 4. User has nice site
-5. [END]
+5. [THE END]
+```
 
-This is a movie. Satisfying, complete, finite.
+This is a movie. Satisfying. Complete. Finite.
 
 Great retention products are **ongoing relationships**:
 
+```
 1. User installs theme
-2. User gets "How's it going?" touchpoint
-3. User discovers customization options
-4. User shares their site
-5. User gets notified of updates
+2. User gets welcome email with customization tips
+3. User discovers additional features
+4. User shares their site to gallery
+5. User gets notified of theme updates
 6. User tries new theme when available
-7. [LOOP]
+7. [LOOP TO STEP 3]
+```
 
-Wardrobe has the movie. It needs the series.
+The infrastructure for a relationship exists in pieces:
+- Email capture worker (built, awaiting deployment)
+- Analytics worker (built, tracks installs)
+- Theme versioning in registry (v1.0.0 implies updates coming)
+
+But the loop isn't connected. The pieces exist but don't form a cycle.
 
 ---
 
@@ -249,7 +264,7 @@ Wardrobe has the movie. It needs the series.
 | Category | Score | Assessment |
 |----------|-------|------------|
 | **Story Arc** | 7/10 | Strong setup, evocative characters, invisible climax |
-| **Retention Hooks** | 5/10 | Coming Soon and email exist, no post-install loop |
+| **Retention Hooks** | 5/10 | Infrastructure exists, loop not connected |
 | **Content Strategy** | 5/10 | Good foundation, no flywheel mechanics |
 | **Emotional Cliffhangers** | 6/10 | Season tease works, no episode hooks |
 
@@ -263,25 +278,29 @@ Wardrobe has the movie. It needs the series.
 
 ## The Path to 8+
 
-### Immediate (This Sprint)
+### Immediate (Before Launch)
 
-1. **Post-install reveal**: CLI offers to open the transformed site. Show the aha moment.
+1. **Post-install reveal**: CLI offers to open the transformed site. Show the transformation moment on screen.
 
-2. **Wire the email capture**: The worker code is built. Deploy it. Someone who subscribes today should get notified about Chronicle.
+2. **Deploy email capture**: The worker exists. Ship it. Everyone who subscribes today should hear about Chronicle when it launches.
 
-### Near-Term (Next Sprint)
+3. **Post-install messaging**: After install, show "Next steps: customize colors at [URL]" or "Share your site: [gallery submission link]"
 
-3. **Post-install email**: "You're wearing Ember. Here are 3 ways to make it yours." Include customization tips, CSS variable reference, gallery submission CTA.
+### Near-Term (First Month Post-Launch)
 
-4. **Site gallery**: Even a static page of 10 sites using each theme creates social proof and contribution incentive.
+4. **Site gallery page**: Even 10 curated sites per theme creates social proof and contribution incentive.
+
+5. **Welcome email sequence**: Day 1: "You're wearing Ember." Day 3: "Three customizations to make it yours." Day 7: "Join the gallery."
+
+6. **Coming Soon notifications**: Email subscribers when Aurora/Chronicle/Neon/Haven have updates.
 
 ### Medium-Term (This Quarter)
 
-5. **Theme versioning**: `wardrobe list` shows "EMBER (installed: 1.0, latest: 1.1)". Create return visits for updates.
+7. **Theme versioning visible**: `wardrobe list` shows "EMBER (installed: 1.0, latest: 1.1)" — creates return visits.
 
-6. **Behind-the-scenes content**: Monthly "Design Diary" emails showing upcoming theme development.
+8. **Behind-the-scenes content**: Monthly "Design Diary" showing upcoming theme development.
 
-7. **Creator submission path**: Public guidelines, review process, creator credits. Turn the catalog into a marketplace.
+9. **Creator submission path**: Public guidelines, review process, creator credits. Turn the catalog into a true marketplace.
 
 ---
 
@@ -289,19 +308,21 @@ Wardrobe has the movie. It needs the series.
 
 I've spent two decades telling stories about transformation. Meredith Grey becoming a surgeon. Olivia Pope owning her power. Annalise Keating facing impossible choices.
 
-Wardrobe understands transformation. "Your site is now wearing Ember" is the kind of line I'd give to a character. The identity framing—"for people with something to say"—is casting, not shopping.
+Wardrobe understands transformation. The theme identities read like character descriptions. "For people with something to say" is casting, not shopping. The installation moment is properly dramatic—three seconds, total metamorphosis.
 
-But transformation needs aftermath. It needs the next morning. The week later. The year anniversary. Characters don't change once; they keep changing, and we keep watching because we want to see who they become next.
+But transformation needs aftermath. It needs the next morning. The week later. The anniversary episode. Characters don't change once; they keep changing, and we keep watching because we want to see who they become.
 
-Right now, Wardrobe shows the makeover. Then the credits roll. The audience leaves satisfied but without a reason to return.
+Right now, Wardrobe shows the makeover. The credits roll. The audience leaves satisfied but with no appointment to return.
 
-Give them Episode 2. Give them the community gallery, the update notifications, the behind-the-scenes creation process. Give them something to tune in for.
+The infrastructure for ongoing engagement exists—email workers, analytics tracking, theme versioning. The pieces are on the board. They just haven't been connected into a narrative arc.
+
+Give them Episode 2. Give them the community gallery, the update notifications, the behind-the-scenes creation process. Give them something to tune in for next Thursday.
 
 Because the best transformations aren't endings. They're beginnings.
 
 ---
 
-*"In television, we say: make them laugh, make them cry, make them wait. Wardrobe has the wait. Now it needs the reasons to stay."*
+*"In television, we say: make them laugh, make them cry, make them wait. Wardrobe has the wait. Now build the reasons to stay."*
 
 — Shonda Rhimes
 Board Member, Great Minds Agency

@@ -5,76 +5,78 @@
 
 ### Product Naming
 
-**Skins.**
+**Garb.**
 
-One syllable. Everyone knows it. Gamers skin their characters. Musicians skin their apps. It's tribal vocabulary for customization. "I grabbed a new skin" — that's how people actually talk.
+One syllable. Ancient. Visceral. Clothing for your digital self. "What garb are you wearing?" — it implies identity, not decoration.
 
-"Theme Marketplace" is a category. Skins is an *identity*.
+"Themes" is what PowerPoint has. "Skins" is what gamers say. **Garb** is what artists choose.
 
-`npx skins install ember` — four words. Say it out loud. It feels inevitable.
+`npx garb wear ember` — it's not installing software. You're *dressing* your creation.
 
 ---
 
 ### Design Philosophy
 
-This is a **gallery**, not a grocery store.
+This isn't a marketplace. **It's a fitting room.**
 
-Every theme marketplace commits the same sin: they look like Amazon. Grids. Filters. Star ratings. Pagination. They're optimized for *having* a thousand mediocre options, not for *choosing* one exceptional one.
+The sin of every theme gallery: thumbnails. Tiny rectangles that reduce your future to postage stamps. You can't feel a theme at 300 pixels wide. You can't fall in love with a swatch.
 
-We have five themes. That's the whole product. So the marketplace must feel like a museum with five rooms — each one immersive, each one curated. You don't browse. You experience.
+Each theme must be experienced at full scale or not at all. When you look at Ember, your entire screen should *burn*. When you see Drift, you should feel the whitespace breathing.
 
-The marketplace itself is the proof. If it doesn't take your breath away, why would anyone trust the themes inside it?
+Five themes. Five experiences. Not a catalog — a *collection*.
 
 ---
 
 ### The First 30 Seconds
 
-You arrive. No header. No navigation. No "Welcome to Skins" hero banner wasting your time.
+You land. The screen is already wearing Ember.
 
-Five full-bleed theme previews. Scroll and each one consumes your screen. Ember *burns*. Drift *floats*. You're not reading descriptions — you're feeling temperatures.
+No welcome banner. No "browse our themes" nonsense. You're *inside* a theme from the first pixel. Scroll down — the entire viewport transforms. Now you're in Drift. Keep going. Forge. Bloom. Slate.
 
-Click any theme. Instant. Not "loading preview" — *instant*. You're inside it, your content or demo content that sings, and you see what your site could become.
+Each scroll is a wardrobe change. Your finger becomes a decision.
 
-The command appears. Copy. Paste. Done.
+You stop on one. You feel something. A button appears: **Wear This.**
 
-Thirty seconds. Transformation. **That's the product.**
+That's it. Thirty seconds from curiosity to commitment. The command copies itself. You paste, and your site transforms.
 
 ---
 
 ### Brand Voice
 
-Confident silence.
+**Declarative. Unhurried. Absolute.**
 
-We don't explain. We don't pitch. We don't say "powerful" or "flexible" or "seamless." Those are words for products that need convincing.
+- "Five garments. Choose one."
+- "Your words deserve better clothes."
+- "Wear this."
 
-- "Five ways to be seen."
-- "Your content. New clothes."
-- "One command."
+No adjectives. No "beautiful" or "stunning" or "modern." Those words are confessions — they're what you say when the work doesn't speak for itself.
 
-Short sentences. No exclamation points. We speak like someone who knows you'll choose us — not because we begged, but because we're right.
+We show. We don't describe. The themes *are* the marketing.
 
 ---
 
 ### What to Say NO To
 
-- **No community submissions.** Not yet. Curation requires standards. Standards require saying no.
-- **No ratings.** Ratings are democracy. This is aristocracy. We chose these five.
-- **No customization panels.** A theme is an opinion. You accept the opinion or you don't.
-- **No search. No filters.** Five themes. One scroll. Search is for confusion.
-- **No accounts.** Anonymous. Instant. Friction-free.
+- **No user uploads.** Not ever. A marketplace is a taste. Ours is perfect.
+- **No preview customization.** You don't try on a tuxedo with your hiking boots.
+- **No comparison view.** Comparison is paralysis. Choose or move on.
+- **No "popular" badges.** Popularity is what killed MTV.
+- **No accounts, no emails, no friction.** One command. Gone.
+
+Simplicity isn't having fewer features. It's having the *nerve* to ship only what matters.
 
 ---
 
 ### The Emotional Hook
 
-Every Emdash site looks identical right now. You poured your heart into content, and it wears a generic uniform.
+Your content is naked right now. You wrote it, you meant it, and it's dressed in whatever Emdash shipped by default. It looks like everyone else's.
 
-Skins is the moment your site becomes *yours*. One command, and your bakery stops looking like a SaaS startup. Your yoga studio stops looking like a law firm.
+Garb is the moment your site stops being "an Emdash site" and becomes *your* site. The bakery finally looks like bread and warmth, not tech startup minimalism. The law firm stops looking like a yoga studio.
 
-That recognition — *that's what I meant, that's who I am* — is why people will love this.
+People don't want themes. They want **recognition**. They want to look at their creation and feel: *Yes. That's me.*
 
-Not features. Not speed. **Identity.**
+That feeling — that moment of identity — is worth more than any feature list.
 
 ---
 
-*Ship the transformation. Everything else is noise.*
+*Ship the mirror. Let people see themselves.*
