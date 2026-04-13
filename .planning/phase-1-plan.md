@@ -1,23 +1,39 @@
-# Phase 1 Plan — MemberShip Fix
+# Phase 1 Plan — Trace (AgentLog) MVP
 
-**Generated:** 2026-04-12
-**Project Slug:** membership-fix
+**Generated:** 2026-04-13
+**Project Slug:** agentlog
 **Requirements:** .planning/REQUIREMENTS.md
-**Total Tasks:** 15
-**Waves:** 5
+**Total Tasks:** 12
+**Waves:** 4
 
 ---
 
 ## The Essence
 
 > **What is this product REALLY about?**
-> Giving creators the gift of invisibility — tools that work so well they disappear.
+> Turning the invisible thinking of AI agents into a story you can see.
 
 > **What's the feeling it should evoke?**
-> Belonging. Not managing. Not configuring. Belonging.
+> The relief of finally understanding — "oh, *that's* why."
 
 > **What's the one thing that must be perfect?**
-> The first 30 seconds.
+> The timeline. One view. Instant. Beautiful. Nothing else.
+
+> **Creative direction:**
+> See your AI think.
+
+---
+
+## Blocking Dependencies
+
+**BUILD CANNOT START** until these are resolved:
+
+| Blocker | Owner | Status | Deadline |
+|---------|-------|--------|----------|
+| Timeline axis orientation (horizontal vs vertical) | Steve | PENDING | Before Wave 3 |
+| Color palette (3 colors) | Steve | PENDING | Before Wave 3 |
+
+**Note:** Waves 1-2 (SDK + CLI) can proceed without these decisions. Wave 3 (Dashboard) requires them.
 
 ---
 
@@ -25,631 +41,581 @@
 
 | Requirement | Task(s) | Wave |
 |-------------|---------|------|
-| REQ-001: Replace throw new Response | phase-1-task-1, phase-1-task-2 | 1 |
-| REQ-002: Remove JSON.stringify from kv.set | phase-1-task-3 | 1 |
-| REQ-003: Remove JSON.parse from kv.get | phase-1-task-4 | 1 |
-| REQ-004: Delete rc.user checks | phase-1-task-5 | 1 |
-| REQ-005: Audit auth.ts | phase-1-task-6 | 1 |
-| REQ-006: Audit email.ts | phase-1-task-7 | 1 |
-| REQ-007: KV pagination schema | phase-1-task-8 | 2 |
-| REQ-008: Admin pagination routes | phase-1-task-9 | 2 |
-| REQ-009: Chunk size constant | phase-1-task-8 | 2 |
-| REQ-010: Human-first error messages | phase-1-task-1, phase-1-task-2 | 1 |
-| REQ-013: tsc --noEmit passes | phase-1-task-10 | 3 |
-| REQ-014: Typed KV operations | phase-1-task-3, phase-1-task-4 | 1 |
-| REQ-017: Register in Sunrise Yoga | phase-1-task-11 | 4 |
-| REQ-018-022: Smoke tests | phase-1-task-12, phase-1-task-13, phase-1-task-14, phase-1-task-15 | 5 |
+| REQ-SDK-001: Initialization | phase-1-task-1 | 1 |
+| REQ-SDK-002: Span Wrapping | phase-1-task-2 | 1 |
+| REQ-SDK-003: Tool Logging | phase-1-task-2 | 1 |
+| REQ-SDK-004: Thought Logging | phase-1-task-2 | 1 |
+| REQ-SDK-005: NDJSON Storage | phase-1-task-3 | 1 |
+| REQ-SDK-006: Session ID | phase-1-task-3 | 1 |
+| REQ-SDK-008: Zero Dependencies | phase-1-task-1, phase-1-task-2, phase-1-task-3 | 1 |
+| REQ-SDK-009: Type Exports | phase-1-task-4 | 1 |
+| REQ-PROJ-001: Monorepo Layout | phase-1-task-1 | 1 |
+| REQ-PROJ-002: SDK Package | phase-1-task-1, phase-1-task-2, phase-1-task-3, phase-1-task-4 | 1 |
+| REQ-CLI-001: Serve Command | phase-1-task-5 | 2 |
+| REQ-CLI-002: Default Port | phase-1-task-5 | 2 |
+| REQ-CLI-003: Zero Config | phase-1-task-5 | 2 |
+| REQ-CLI-004: Session Discovery | phase-1-task-5 | 2 |
+| REQ-CLI-005: File Watching | phase-1-task-6 | 2 |
+| REQ-PROJ-003: CLI Package | phase-1-task-5, phase-1-task-6 | 2 |
+| REQ-DASH-001: Single Timeline | phase-1-task-7 | 3 |
+| REQ-DASH-002: Virtual Scrolling | phase-1-task-8 | 3 |
+| REQ-DASH-003: Expand/Collapse | phase-1-task-8 | 3 |
+| REQ-DASH-004: Error Highlighting | phase-1-task-8 | 3 |
+| REQ-DASH-005: Instant Load | phase-1-task-7 | 3 |
+| REQ-DASH-007: Session List | phase-1-task-7 | 3 |
+| REQ-DASH-010: Color Palette | phase-1-task-9 | 3 |
+| REQ-PROJ-004: Dashboard Package | phase-1-task-7, phase-1-task-8, phase-1-task-9 | 3 |
+| REQ-PROJ-007: README Spec | phase-1-task-10 | 4 |
+| REQ-PROJ-006: Build Orchestration | phase-1-task-11 | 4 |
+| REQ-NFR-001: Performance | phase-1-task-12 | 4 |
 
 ---
 
 ## Wave Execution Order
 
-### Wave 1 (Parallel) — Pattern Corrections
+### Wave 1 (Parallel) — SDK Foundation
 
-All 7 tasks in Wave 1 can run in parallel because they target different code regions or different files.
+All 4 tasks in Wave 1 can run in parallel as they target different files within the SDK package.
 
 ```xml
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Fix throw new Response (routes 1-6)</title>
-  <requirement>REQ-001, REQ-010: Replace throw new Response with throw new Error using human-first error messages</requirement>
+  <title>SDK initialization and project scaffold</title>
+  <requirement>REQ-SDK-001, REQ-SDK-008, REQ-PROJ-001, REQ-PROJ-002</requirement>
   <description>
-    Replace throw new Response patterns in the first half of route handlers (register, status, plans, approve, revoke, webhook).
-    Convert JSON.stringify({ error: "..." }) to plain string messages.
-    Rewrite error text with warm, human-first tone per Decision 5.
+    Create the Turborepo monorepo structure with packages/sdk scaffold.
+    Implement trace.init(projectName) that creates .trace/sessions/ directory.
+    Zero external dependencies for SDK core.
   </description>
 
   <context>
-    <file path="plugins/membership/src/sandbox-entry.ts" reason="Contains all 114 throw new Response instances" />
-    <file path="docs/EMDASH-GUIDE.md" reason="Section 6 shows correct error return patterns" />
-    <file path="rounds/membership-fix/decisions.md" reason="Decision 5 specifies error voice" />
+    <file path="package.json" reason="Root monorepo config with workspaces" />
+    <file path="turbo.json" reason="Turborepo build orchestration" />
+    <file path="packages/sdk/package.json" reason="SDK package configuration" />
+    <file path="packages/sdk/tsconfig.json" reason="TypeScript strict mode" />
+    <file path="packages/sdk/src/index.ts" reason="Main entry point and exports" />
+    <file path="packages/sdk/src/trace.ts" reason="Core Trace class with init method" />
+    <file path=".planning/REQUIREMENTS.md" reason="REQ-SDK-001 signature specs" />
   </context>
 
   <steps>
-    <step order="1">Open sandbox-entry.ts and locate routes: register (lines 967-1130), status (1138-1211), plans (1219-1231), approve (1240-1287), revoke (1296-1342), webhook (1351-1455)</step>
-    <step order="2">For each throw new Response, replace with: throw new Error("Human-readable message") OR return { error: "message", status: N }</step>
-    <step order="3">Remove JSON.stringify wrapper from error payloads</step>
-    <step order="4">Rewrite error messages: "Email is required" → "We need your email to continue"; "Invalid email format" → "That email doesn't look right"</step>
-    <step order="5">Verify each replacement preserves the intended HTTP status code semantics (4xx for client errors, 5xx for server errors)</step>
+    <step order="1">Create root package.json with workspaces: ["packages/*"] and type: module</step>
+    <step order="2">Create turbo.json with pipeline for build, dev, test tasks</step>
+    <step order="3">Create packages/sdk/package.json with name: "trace", main: "dist/index.js", types: "dist/index.d.ts"</step>
+    <step order="4">Create packages/sdk/tsconfig.json with strict: true, target: ESNext, module: NodeNext</step>
+    <step order="5">Create packages/sdk/src/trace.ts with Trace class containing init(projectName: string) method</step>
+    <step order="6">In init(): validate projectName is non-empty, create .trace/sessions/ using fs.mkdirSync with recursive: true</step>
+    <step order="7">Use path.join() for all paths (REQ-PROJ-009 Windows compatibility)</step>
+    <step order="8">Return TraceInstance object with placeholder span, tool, thought methods</step>
+    <step order="9">Create .gitignore at root with: node_modules/, dist/, .trace/</step>
   </steps>
 
   <verification>
-    <check type="grep">grep -c "throw new Response" plugins/membership/src/sandbox-entry.ts | verify count decreased</check>
-    <check type="manual">Spot-check 5 error messages for human-first tone</check>
+    <check type="build">cd packages/sdk && npx tsc --noEmit</check>
+    <check type="test">node -e "const t = require('./packages/sdk/dist').init('test'); console.log(t)"</check>
+    <check type="manual">Verify .trace/sessions/ directory created after init() call</check>
   </verification>
 
   <dependencies>
     <!-- Wave 1: no dependencies -->
   </dependencies>
 
-  <commit-message>fix(membership): replace throw new Response in routes 1-6 with human-friendly errors</commit-message>
+  <commit-message>feat(sdk): scaffold monorepo and implement trace.init()</commit-message>
 </task-plan>
 ```
 
 ```xml
 <task-plan id="phase-1-task-2" wave="1">
-  <title>Fix throw new Response (routes 7-11+)</title>
-  <requirement>REQ-001, REQ-010: Replace throw new Response with throw new Error using human-first error messages</requirement>
+  <title>Implement span, tool, thought methods</title>
+  <requirement>REQ-SDK-002, REQ-SDK-003, REQ-SDK-004</requirement>
   <description>
-    Replace throw new Response patterns in remaining route handlers (checkoutCreate, checkoutSuccess, dashboard, dashboardCancel, dashboardUpgrade, couponCreate, and all admin routes).
-    Focus on Stripe integration errors and admin panel errors.
+    Implement the three core tracing methods: span() for wrapping async operations,
+    tool() for logging tool invocations, and thought() for agent reasoning.
+    All methods generate events with timestamps and unique IDs.
   </description>
 
   <context>
-    <file path="plugins/membership/src/sandbox-entry.ts" reason="Contains remaining ~60 throw new Response instances" />
-    <file path="docs/EMDASH-GUIDE.md" reason="Section 6 shows correct error return patterns" />
+    <file path="packages/sdk/src/trace.ts" reason="Extend Trace class with methods" />
+    <file path="packages/sdk/src/span.ts" reason="Span implementation with start/end/error" />
+    <file path=".planning/REQUIREMENTS.md" reason="Method signatures from REQ-SDK-002/003/004" />
   </context>
 
   <steps>
-    <step order="1">Locate remaining routes: checkoutCreate (1463-1662), checkoutSuccess (1664-1826), dashboard (1835-1932), dashboardCancel (1941-2026), dashboardUpgrade (2036-2154), couponCreate (2163+), admin routes (2200-3984)</step>
-    <step order="2">For each throw new Response, replace with: throw new Error("message") OR return { error: "message", status: N }</step>
-    <step order="3">Special handling for Stripe errors: preserve diagnostic info in message but use friendly framing ("We couldn't process your payment" not "Stripe API error")</step>
-    <step order="4">Admin route errors can be slightly more technical but still human-readable ("Couldn't find that member" not "Error: Member lookup failed")</step>
-    <step order="5">Handle the error re-throw pattern: if (error instanceof Response) throw error; — DELETE these blocks entirely (they're checking for the banned pattern)</step>
+    <step order="1">Create packages/sdk/src/span.ts with Span class</step>
+    <step order="2">Span constructor takes: id (uuid), name (string), parentId (optional)</step>
+    <step order="3">Span methods: start() records startTime, end() records endTime and calculates duration, setError(error) captures error message and stack</step>
+    <step order="4">In trace.ts, implement span&lt;T&gt;(name, fn): create Span, call fn, record result/error, return result</step>
+    <step order="5">Support nested spans: track currentSpan context, child spans reference parentId</step>
+    <step order="6">Implement tool(name, input, output): creates event with type: "tool", timestamp, input/output as JSON</step>
+    <step order="7">Implement thought(content): creates event with type: "thought", timestamp, content as string</step>
+    <step order="8">Generate UUIDs using crypto.randomUUID() (Node.js built-in, no deps)</step>
+    <step order="9">All events queued to internal buffer for writing (writer handles persistence)</step>
   </steps>
 
   <verification>
-    <check type="grep">grep -c "throw new Response" plugins/membership/src/sandbox-entry.ts → should be 0</check>
-    <check type="grep">grep "instanceof Response" plugins/membership/src/sandbox-entry.ts → should be 0</check>
-    <check type="manual">Review Stripe error messages for customer-friendliness</check>
+    <check type="build">cd packages/sdk && npx tsc --noEmit</check>
+    <check type="test">Write test: trace.span('test', async () => 42) should return 42</check>
+    <check type="test">Write test: trace.span that throws should capture error</check>
+    <check type="manual">Verify nested spans have correct parentId references</check>
   </verification>
 
   <dependencies>
-    <!-- Wave 1: no dependencies, runs parallel with task-1 -->
+    <!-- Wave 1: no dependencies, can run parallel with task-1 -->
   </dependencies>
 
-  <commit-message>fix(membership): replace remaining throw new Response with human-friendly errors</commit-message>
+  <commit-message>feat(sdk): implement span(), tool(), thought() tracing methods</commit-message>
 </task-plan>
 ```
 
 ```xml
 <task-plan id="phase-1-task-3" wave="1">
-  <title>Remove JSON.stringify from kv.set calls</title>
-  <requirement>REQ-002, REQ-014: Remove JSON.stringify from kv.set; verify typed operations</requirement>
+  <title>NDJSON writer implementation</title>
+  <requirement>REQ-SDK-005, REQ-SDK-006, REQ-SDK-008</requirement>
   <description>
-    Remove all JSON.stringify() wrapping values passed to ctx.kv.set().
-    Emdash KV auto-serializes objects (per docs/EMDASH-GUIDE.md Section 6).
-    Pass typed values directly.
+    Implement NDJSON file writer that persists trace events to .trace/sessions/{sessionId}.ndjson.
+    One JSON object per line, no array wrapping. Human-readable and grep-able.
+    Zero external dependencies - uses only Node.js fs module.
   </description>
 
   <context>
-    <file path="plugins/membership/src/sandbox-entry.ts" reason="Contains ~50 JSON.stringify in kv.set calls" />
-    <file path="docs/EMDASH-GUIDE.md" reason="Section 6 confirms KV auto-serializes" />
+    <file path="packages/sdk/src/writer.ts" reason="NDJSON writer implementation" />
+    <file path=".planning/REQUIREMENTS.md" reason="NDJSON schema from REQ-SDK-005" />
   </context>
 
   <steps>
-    <step order="1">Search for pattern: ctx.kv.set\(.*,\s*JSON\.stringify\(</step>
-    <step order="2">For each match, remove JSON.stringify wrapper: ctx.kv.set(key, JSON.stringify(obj)) → ctx.kv.set(key, obj)</step>
-    <step order="3">Update member storage: ctx.kv.set(`member:${email}`, JSON.stringify(member)) → ctx.kv.set(`member:${email}`, member)</step>
-    <step order="4">Update webhook storage: ctx.kv.set(`webhook:log:${id}`, JSON.stringify(log)) → ctx.kv.set(`webhook:log:${id}`, log)</step>
-    <step order="5">Update lists: ctx.kv.set("members:list", JSON.stringify(list)) → ctx.kv.set("members:list", list)</step>
-    <step order="6">Update settings: ctx.kv.set("plans", JSON.stringify(plans)) → ctx.kv.set("plans", plans)</step>
-    <step order="7">Do NOT change JSON.stringify used for webhook payloads to external endpoints (fireWebhook function) — that's network serialization, not KV</step>
+    <step order="1">Create packages/sdk/src/writer.ts (~50 lines)</step>
+    <step order="2">NDJSONWriter class with constructor(sessionId: string, baseDir: string)</step>
+    <step order="3">Generate sessionId: use ISO8601 timestamp (YYYY-MM-DDTHH-mm-ss-sss) for human readability</step>
+    <step order="4">File path: path.join(baseDir, '.trace', 'sessions', `${sessionId}.ndjson`)</step>
+    <step order="5">write(event: TraceEvent): appends JSON.stringify(event) + '\n' to file</step>
+    <step order="6">Use fs.appendFileSync for simplicity (sync writes prevent interleaving)</step>
+    <step order="7">Event schema per line: { id, type, name, timestamp, duration, input, output, content, error, parentId }</step>
+    <step order="8">flush() method: no-op for sync writes, exists for future async support</step>
+    <step order="9">Ensure timestamp is ISO8601 string format</step>
+    <step order="10">Add close() method for cleanup (currently no-op, future streaming support)</step>
   </steps>
 
   <verification>
-    <check type="grep">grep "ctx.kv.set.*JSON.stringify" plugins/membership/src/sandbox-entry.ts → should be 0</check>
-    <check type="manual">Verify fireWebhook still uses JSON.stringify for HTTP payload (line ~187)</check>
+    <check type="build">cd packages/sdk && npx tsc --noEmit</check>
+    <check type="test">Write 3 events, verify .ndjson file has 3 lines</check>
+    <check type="test">Each line should be valid JSON when parsed independently</check>
+    <check type="manual">grep "tool" test.ndjson should find tool events</check>
   </verification>
 
   <dependencies>
     <!-- Wave 1: no dependencies -->
   </dependencies>
 
-  <commit-message>fix(membership): remove JSON.stringify from KV storage calls</commit-message>
+  <commit-message>feat(sdk): implement NDJSON writer for trace persistence</commit-message>
 </task-plan>
 ```
 
 ```xml
 <task-plan id="phase-1-task-4" wave="1">
-  <title>Remove JSON.parse from kv.get results</title>
-  <requirement>REQ-003, REQ-014: Remove JSON.parse from kv.get; use typed returns</requirement>
+  <title>TypeScript types and index exports</title>
+  <requirement>REQ-SDK-009, REQ-PROJ-002</requirement>
   <description>
-    Remove all JSON.parse() wrapping results from ctx.kv.get().
-    Use typed generic parameters: ctx.kv.get&lt;MemberRecord&gt;(key).
-    Delete the parseJSON utility function after all usages removed.
+    Define and export all public TypeScript types from packages/sdk/src/index.ts.
+    Ensure type safety for all SDK methods and event structures.
   </description>
 
   <context>
-    <file path="plugins/membership/src/sandbox-entry.ts" reason="Contains parseJSON utility and ~50 parse calls" />
-    <file path="docs/EMDASH-GUIDE.md" reason="Section 6 confirms typed KV returns" />
+    <file path="packages/sdk/src/index.ts" reason="Main entry point with type exports" />
+    <file path="packages/sdk/src/types.ts" reason="Type definitions" />
+    <file path=".planning/REQUIREMENTS.md" reason="Event schema from REQ-SDK-005" />
   </context>
 
   <steps>
-    <step order="1">Locate parseJSON utility function (lines 259-266) — this will be deleted at end</step>
-    <step order="2">Find all parseJSON&lt;T&gt;(await ctx.kv.get(...)) patterns</step>
-    <step order="3">Replace with: const result = await ctx.kv.get&lt;T&gt;(key); Add null check if needed</step>
-    <step order="4">Example: parseJSON&lt;MemberRecord&gt;(memberJson, null) → const member = await ctx.kv.get&lt;MemberRecord&gt;(key); if (!member) ...</step>
-    <step order="5">Update getMemberByStripeCustomerId: remove parseJSON, use typed get</step>
-    <step order="6">Update all route handlers: status, register, dashboard, etc.</step>
-    <step order="7">After all usages removed, delete parseJSON function definition</step>
-    <step order="8">Note: Keep JSON.parse for Stripe webhook raw body (line 1389) — that's HTTP parsing, not KV</step>
+    <step order="1">Create packages/sdk/src/types.ts with all type definitions</step>
+    <step order="2">Define TraceInstance interface: { span, tool, thought } methods</step>
+    <step order="3">Define TraceEvent union type: SpanEvent | ToolEvent | ThoughtEvent</step>
+    <step order="4">Define SpanEvent: { id, type: 'span', name, timestamp, duration?, error?, parentId? }</step>
+    <step order="5">Define ToolEvent: { id, type: 'tool', name, timestamp, input, output }</step>
+    <step order="6">Define ThoughtEvent: { id, type: 'thought', timestamp, content }</step>
+    <step order="7">Define InitOptions interface (currently just projectName, extensible)</step>
+    <step order="8">In index.ts: export { init } from './trace'; export type { TraceInstance, TraceEvent, ... } from './types'</step>
+    <step order="9">Ensure package.json has "types": "dist/index.d.ts"</step>
   </steps>
 
   <verification>
-    <check type="grep">grep "parseJSON" plugins/membership/src/sandbox-entry.ts → should be 0</check>
-    <check type="grep">grep "JSON.parse.*kv.get" plugins/membership/src/sandbox-entry.ts → should be 0</check>
-    <check type="manual">Verify Stripe webhook body parsing preserved</check>
+    <check type="build">cd packages/sdk && npx tsc</check>
+    <check type="test">Import types in test file, verify no TS errors</check>
+    <check type="manual">dist/index.d.ts contains all exported types</check>
   </verification>
 
   <dependencies>
     <!-- Wave 1: no dependencies -->
   </dependencies>
 
-  <commit-message>fix(membership): remove JSON.parse from KV get operations, use typed returns</commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-5" wave="1">
-  <title>Delete rc.user auth checks</title>
-  <requirement>REQ-004: Delete all 14 rc.user defensive checks</requirement>
-  <description>
-    Remove all rc.user auth guard blocks from admin routes.
-    Emdash handles authentication before handler runs — these checks are redundant.
-    Delete entire if-blocks, not just the condition.
-  </description>
-
-  <context>
-    <file path="plugins/membership/src/sandbox-entry.ts" reason="Contains 14 rc.user check instances" />
-    <file path="rounds/membership-fix/decisions.md" reason="Decision 6: unanimous agreement to delete" />
-  </context>
-
-  <steps>
-    <step order="1">Search for pattern: rc\.user</step>
-    <step order="2">For each match, identify the full guard block structure:
-      const adminUser = rc.user as Record&lt;string, unknown&gt; | undefined;
-      if (!adminUser || !adminUser.isAdmin) { ... throw/return ... }</step>
-    <step order="3">Delete the entire block (variable declaration + if statement + error handling)</step>
-    <step order="4">Verify no other code depends on the deleted adminUser variable</step>
-    <step order="5">Known locations: lines ~2167, 2267, 2399, 3160, 3237, 3303, 3388, 3455, 3534, 3597, 3737, 3811, 3863, 3904</step>
-    <step order="6">After deletion, check for orphaned closing braces or indentation issues</step>
-  </steps>
-
-  <verification>
-    <check type="grep">grep "rc.user" plugins/membership/src/sandbox-entry.ts → should be 0</check>
-    <check type="grep">grep "adminUser" plugins/membership/src/sandbox-entry.ts → should be 0</check>
-    <check type="grep">grep "isAdmin" plugins/membership/src/sandbox-entry.ts → should be 0</check>
-  </verification>
-
-  <dependencies>
-    <!-- Wave 1: no dependencies -->
-  </dependencies>
-
-  <commit-message>fix(membership): remove redundant rc.user auth checks (platform handles auth)</commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-6" wave="1">
-  <title>Audit auth.ts for banned patterns</title>
-  <requirement>REQ-005: Check auth.ts for banned patterns</requirement>
-  <description>
-    Review auth.ts for any throw new Response, JSON.stringify in KV, JSON.parse from KV, or rc.user patterns.
-    Fix if found. Do NOT restructure the file.
-  </description>
-
-  <context>
-    <file path="plugins/membership/src/auth.ts" reason="Must audit for banned patterns" />
-  </context>
-
-  <steps>
-    <step order="1">Read auth.ts completely</step>
-    <step order="2">Search for: throw new Response — likely 0 (auth returns null on failure)</step>
-    <step order="3">Search for: ctx.kv — likely 0 (auth is stateless JWT)</step>
-    <step order="4">Search for: rc.user — likely 0 (auth provides user, doesn't check it)</step>
-    <step order="5">If any found, apply same fixes as sandbox-entry.ts</step>
-    <step order="6">Document findings: "auth.ts: [X patterns found, Y fixed]" or "auth.ts: clean"</step>
-  </steps>
-
-  <verification>
-    <check type="grep">grep -c "throw new Response" plugins/membership/src/auth.ts → 0</check>
-    <check type="grep">grep -c "rc.user" plugins/membership/src/auth.ts → 0</check>
-    <check type="manual">Confirm file reviewed; document any changes</check>
-  </verification>
-
-  <dependencies>
-    <!-- Wave 1: no dependencies -->
-  </dependencies>
-
-  <commit-message>chore(membership): audit auth.ts for banned patterns (no changes needed)</commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-7" wave="1">
-  <title>Audit email.ts for banned patterns</title>
-  <requirement>REQ-006: Check email.ts for banned patterns</requirement>
-  <description>
-    Review email.ts for any throw new Response, JSON.stringify in KV, JSON.parse from KV, or rc.user patterns.
-    Fix if found. Do NOT restructure the file.
-  </description>
-
-  <context>
-    <file path="plugins/membership/src/email.ts" reason="Must audit for banned patterns" />
-  </context>
-
-  <steps>
-    <step order="1">Read email.ts completely</step>
-    <step order="2">Search for: throw new Response — likely 0</step>
-    <step order="3">Search for: ctx.kv — may find rate limiting storage</step>
-    <step order="4">If ctx.kv uses JSON.stringify/parse, apply fixes</step>
-    <step order="5">Search for: rc.user — likely 0</step>
-    <step order="6">Document findings</step>
-  </steps>
-
-  <verification>
-    <check type="grep">grep -c "throw new Response" plugins/membership/src/email.ts → 0</check>
-    <check type="grep">grep "ctx.kv.*JSON" plugins/membership/src/email.ts → 0</check>
-    <check type="manual">Confirm file reviewed; document any changes</check>
-  </verification>
-
-  <dependencies>
-    <!-- Wave 1: no dependencies -->
-  </dependencies>
-
-  <commit-message>chore(membership): audit email.ts for banned patterns</commit-message>
+  <commit-message>feat(sdk): add TypeScript type definitions and exports</commit-message>
 </task-plan>
 ```
 
 ---
 
-### Wave 2 (After Wave 1) — KV Pagination
+### Wave 2 (After Wave 1) — CLI Implementation
 
 ```xml
-<task-plan id="phase-1-task-8" wave="2">
-  <title>Implement members:list pagination schema</title>
-  <requirement>REQ-007, REQ-009: Chunked pagination with configurable size</requirement>
+<task-plan id="phase-1-task-5" wave="2">
+  <title>CLI serve command</title>
+  <requirement>REQ-CLI-001, REQ-CLI-002, REQ-CLI-003, REQ-CLI-004, REQ-PROJ-003</requirement>
   <description>
-    Split members:list into 100-member chunks.
-    Keys: members:list:0, members:list:1, etc.
-    Add members:count key for total.
-    Define MEMBERS_CHUNK_SIZE constant.
+    Create packages/cli with `npx trace serve` command.
+    Scans .trace/sessions/ for NDJSON files, starts HTTP server on port 4040,
+    serves the dashboard static files.
   </description>
 
   <context>
-    <file path="plugins/membership/src/sandbox-entry.ts" reason="KV schema changes" />
-    <file path="rounds/membership-fix/decisions.md" reason="Decision 4 requires pagination in v1" />
+    <file path="packages/cli/package.json" reason="CLI package config with bin entry" />
+    <file path="packages/cli/src/index.ts" reason="CLI entry point" />
+    <file path=".planning/REQUIREMENTS.md" reason="CLI requirements REQ-CLI-001 through REQ-CLI-004" />
   </context>
 
   <steps>
-    <step order="1">Add constant at file top: const MEMBERS_CHUNK_SIZE = 100;</step>
-    <step order="2">Create helper: async function addMemberToList(email: string, ctx: PluginContext)</step>
-    <step order="3">In addMemberToList: get current count, calculate chunk index, append to correct chunk, increment count</step>
-    <step order="4">Create helper: async function getAllMemberEmails(ctx: PluginContext): Promise&lt;string[]&gt;</step>
-    <step order="5">In getAllMemberEmails: get count, calculate chunks needed, fetch all chunks, flatten</step>
-    <step order="6">Create helper: async function getMembersPaginated(page: number, ctx: PluginContext)</step>
-    <step order="7">Update register route: use addMemberToList instead of direct list manipulation</step>
-    <step order="8">Preserve backward compatibility: if members:list exists without :N suffix, migrate on first access</step>
+    <step order="1">Create packages/cli/package.json with name: "trace", bin: { "trace": "./dist/index.js" }</step>
+    <step order="2">Add shebang to src/index.ts: #!/usr/bin/env node</step>
+    <step order="3">Parse argv for "serve" subcommand (only command for v1)</step>
+    <step order="4">Validate .trace/sessions/ exists in cwd, error if not found</step>
+    <step order="5">Scan directory for *.ndjson files, build session index</step>
+    <step order="6">Create HTTP server using Node.js http module (zero deps)</step>
+    <step order="7">Serve static dashboard files from packages/dashboard/dist</step>
+    <step order="8">API endpoint: GET /api/sessions returns list of session files</step>
+    <step order="9">API endpoint: GET /api/sessions/:id returns parsed NDJSON as JSON array</step>
+    <step order="10">Start server on port 4040, log URL to console</step>
+    <step order="11">Attempt to open browser using child_process.exec('open' or 'xdg-open')</step>
   </steps>
 
   <verification>
-    <check type="grep">grep "MEMBERS_CHUNK_SIZE" plugins/membership/src/sandbox-entry.ts → 1 definition</check>
-    <check type="grep">grep "members:list:" plugins/membership/src/sandbox-entry.ts → pagination keys used</check>
-    <check type="manual">Verify chunk math: 150 members → chunks 0 and 1</check>
+    <check type="build">cd packages/cli && npx tsc --noEmit</check>
+    <check type="test">Create test .ndjson file, run serve, curl localhost:4040/api/sessions</check>
+    <check type="manual">Browser opens to dashboard (or URL printed if open fails)</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="KV storage must be fixed before pagination" />
-    <depends-on task-id="phase-1-task-4" reason="KV retrieval must be fixed before pagination" />
+    <depends-on task-id="phase-1-task-3" reason="CLI reads NDJSON files written by SDK" />
+    <depends-on task-id="phase-1-task-4" reason="CLI uses SDK type definitions for parsing" />
   </dependencies>
 
-  <commit-message>feat(membership): implement paginated members:list schema (100-member chunks)</commit-message>
+  <commit-message>feat(cli): implement trace serve command with HTTP server</commit-message>
 </task-plan>
 ```
 
 ```xml
-<task-plan id="phase-1-task-9" wave="2">
-  <title>Update admin routes for pagination</title>
-  <requirement>REQ-008: Admin routes use paginated chunks</requirement>
+<task-plan id="phase-1-task-6" wave="2">
+  <title>File watching and hot reload</title>
+  <requirement>REQ-CLI-005</requirement>
   <description>
-    Update admin routes that enumerate members to use pagination helpers.
-    Fetch paginated chunks for large lists.
-    Add pagination controls to Block Kit UI.
+    Add file watching to CLI so dashboard auto-updates when new sessions appear
+    or existing sessions are modified. Uses Node.js fs.watch (zero deps).
   </description>
 
   <context>
-    <file path="plugins/membership/src/sandbox-entry.ts" reason="Admin routes need pagination" />
-    <file path="docs/EMDASH-GUIDE.md" reason="Block Kit table/pagination patterns" />
+    <file path="packages/cli/src/index.ts" reason="Add file watching logic" />
+    <file path="packages/cli/src/watcher.ts" reason="File watcher implementation" />
   </context>
 
   <steps>
-    <step order="1">Locate admin page_load handler that displays member list</step>
-    <step order="2">Replace: ctx.kv.get("members:list") with getMembersPaginated(page, ctx)</step>
-    <step order="3">Add page parameter from Block Kit interaction: const page = input.page ?? 0</step>
-    <step order="4">Update stats block: use members:count for total, not list.length</step>
-    <step order="5">Add pagination actions to Block Kit response:
-      { type: "button", text: "Previous", action_id: "members_prev", disabled: page === 0 }
-      { type: "button", text: "Next", action_id: "members_next", disabled: noMorePages }</step>
-    <step order="6">Handle members_prev/members_next action_ids to change page</step>
+    <step order="1">Create packages/cli/src/watcher.ts with SessionWatcher class</step>
+    <step order="2">Use fs.watch(sessionsDir, { recursive: false }) to monitor .trace/sessions/</step>
+    <step order="3">On file change/add: emit event with session ID</step>
+    <step order="4">Debounce events (100ms) to prevent rapid-fire updates</step>
+    <step order="5">Add Server-Sent Events (SSE) endpoint: GET /api/events</step>
+    <step order="6">SSE pushes session update notifications to connected clients</step>
+    <step order="7">Dashboard will connect to SSE and refresh data on events</step>
+    <step order="8">Handle watcher cleanup on server shutdown (SIGINT/SIGTERM)</step>
   </steps>
 
   <verification>
-    <check type="manual">Admin page loads with 10 members (no pagination needed)</check>
-    <check type="manual">Admin page loads with 150 members (pagination controls visible)</check>
-    <check type="manual">Previous/Next buttons work correctly</check>
+    <check type="build">cd packages/cli && npx tsc --noEmit</check>
+    <check type="test">Start server, create new .ndjson file, verify SSE event sent</check>
+    <check type="manual">Dashboard refreshes without manual page reload</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-8" reason="Pagination helpers must exist" />
+    <depends-on task-id="phase-1-task-5" reason="Watcher extends existing CLI server" />
   </dependencies>
 
-  <commit-message>feat(membership): add pagination to admin member list view</commit-message>
-</task-plan>
-```
-
----
-
-### Wave 3 (After Wave 2) — TypeScript Compilation
-
-```xml
-<task-plan id="phase-1-task-10" wave="3">
-  <title>Verify TypeScript compilation</title>
-  <requirement>REQ-013, REQ-014, REQ-015: tsc --noEmit passes clean</requirement>
-  <description>
-    Run TypeScript compiler on entire plugin.
-    Fix any type errors from pattern changes.
-    Verify all KV operations have correct generic types.
-  </description>
-
-  <context>
-    <file path="plugins/membership/src/sandbox-entry.ts" reason="Main file to compile" />
-    <file path="plugins/membership/src/auth.ts" reason="Must also compile" />
-    <file path="plugins/membership/src/email.ts" reason="Must also compile" />
-    <file path="plugins/membership/tsconfig.json" reason="Compiler config" />
-  </context>
-
-  <steps>
-    <step order="1">Run: cd plugins/membership && npx tsc --noEmit</step>
-    <step order="2">If errors, categorize: type mismatch, missing property, unreachable code, implicit any</step>
-    <step order="3">Fix type mismatches from JSON.parse removal: add explicit type annotations</step>
-    <step order="4">Fix null handling: add null checks where ctx.kv.get may return undefined</step>
-    <step order="5">Fix dead code from rc.user deletion: remove any orphaned else branches</step>
-    <step order="6">Re-run tsc --noEmit until exit code 0</step>
-  </steps>
-
-  <verification>
-    <check type="build">cd plugins/membership && npx tsc --noEmit → exit code 0</check>
-    <check type="grep">grep "// @ts-ignore" plugins/membership/src/*.ts → should be 0 (no suppressions)</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Error handling must be fixed" />
-    <depends-on task-id="phase-1-task-2" reason="Error handling must be fixed" />
-    <depends-on task-id="phase-1-task-3" reason="KV storage must be fixed" />
-    <depends-on task-id="phase-1-task-4" reason="KV retrieval must be fixed" />
-    <depends-on task-id="phase-1-task-5" reason="Auth checks must be removed" />
-    <depends-on task-id="phase-1-task-8" reason="Pagination must be implemented" />
-    <depends-on task-id="phase-1-task-9" reason="Admin routes must be updated" />
-  </dependencies>
-
-  <commit-message>fix(membership): resolve all TypeScript errors after pattern fixes</commit-message>
+  <commit-message>feat(cli): add file watching and SSE for hot reload</commit-message>
 </task-plan>
 ```
 
 ---
 
-### Wave 4 (After Wave 3) — Integration
+### Wave 3 (After Wave 2) — Dashboard Implementation
+
+**BLOCKER:** Tasks 7-9 require Steve's timeline orientation and color palette decisions.
+
+```xml
+<task-plan id="phase-1-task-7" wave="3">
+  <title>Dashboard scaffold and session list</title>
+  <requirement>REQ-DASH-001, REQ-DASH-005, REQ-DASH-007, REQ-PROJ-004</requirement>
+  <description>
+    Create packages/dashboard with Vite + React + TypeScript.
+    Implement session list view and single timeline shell.
+    Dashboard loads instantly with empty state.
+  </description>
+
+  <context>
+    <file path="packages/dashboard/package.json" reason="Dashboard package config" />
+    <file path="packages/dashboard/vite.config.ts" reason="Vite configuration" />
+    <file path="packages/dashboard/src/App.tsx" reason="Main React component" />
+    <file path="packages/dashboard/index.html" reason="HTML entry point" />
+    <file path=".planning/REQUIREMENTS.md" reason="Dashboard requirements" />
+  </context>
+
+  <steps>
+    <step order="1">Create packages/dashboard/package.json with dependencies: react, react-dom, react-window</step>
+    <step order="2">Add devDependencies: vite, @vitejs/plugin-react, typescript, @types/react</step>
+    <step order="3">Create vite.config.ts with react() plugin</step>
+    <step order="4">Create index.html with root div and script src="./src/main.tsx"</step>
+    <step order="5">Create src/main.tsx with ReactDOM.createRoot render</step>
+    <step order="6">Create src/App.tsx with session list component</step>
+    <step order="7">Fetch sessions from /api/sessions on mount</step>
+    <step order="8">Display session list: session ID + timestamp, sorted newest first</step>
+    <step order="9">Click session to view timeline (loads session data)</step>
+    <step order="10">Show empty state ("No sessions yet. Run your agent to see traces.")</step>
+    <step order="11">Add SSE connection to /api/events for hot reload</step>
+  </steps>
+
+  <verification>
+    <check type="build">cd packages/dashboard && npm run build</check>
+    <check type="test">npm run dev, verify app loads in browser</check>
+    <check type="manual">Session list displays correctly, empty state works</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-5" reason="Dashboard needs CLI server to fetch data" />
+    <depends-on task-id="phase-1-task-6" reason="Dashboard uses SSE for hot reload" />
+  </dependencies>
+
+  <commit-message>feat(dashboard): scaffold React app with session list view</commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-8" wave="3">
+  <title>Timeline with virtual scrolling and expand/collapse</title>
+  <requirement>REQ-DASH-002, REQ-DASH-003, REQ-DASH-004</requirement>
+  <description>
+    Implement Timeline.tsx using react-window for virtual scrolling.
+    Each span is expandable to show children and metadata.
+    Error states glow red with error message on expand.
+    CRITICAL: Check Steve's wireframe for axis orientation before implementing.
+  </description>
+
+  <context>
+    <file path="packages/dashboard/src/Timeline.tsx" reason="Main timeline component" />
+    <file path="packages/dashboard/src/Span.tsx" reason="Individual span component" />
+    <file path=".planning/REQUIREMENTS.md" reason="REQ-DASH-002, REQ-DASH-003, REQ-DASH-004" />
+  </context>
+
+  <steps>
+    <step order="1">**BLOCKER CHECK**: Confirm timeline orientation from Steve (horizontal vs vertical)</step>
+    <step order="2">Create src/Timeline.tsx with react-window VariableSizeList</step>
+    <step order="3">If vertical: use VariableSizeList with vertical scroll</step>
+    <step order="4">If horizontal: use FixedSizeList with horizontal scroll + vertical branches</step>
+    <step order="5">Create src/Span.tsx for individual span rendering</step>
+    <step order="6">Span collapsed state: shows name + duration badge</step>
+    <step order="7">Span expanded state: shows input, output, nested children</step>
+    <step order="8">Track expanded/collapsed state in React state (Set of expanded IDs)</step>
+    <step order="9">Error highlighting: red glow CSS, error message in expanded view</step>
+    <step order="10">Lazy-load children only when parent expanded (performance)</step>
+    <step order="11">itemSize function returns different heights for collapsed vs expanded</step>
+    <step order="12">Use resetAfterIndex when expansion state changes</step>
+  </steps>
+
+  <verification>
+    <check type="build">cd packages/dashboard && npm run build</check>
+    <check type="test">Load session with 100+ spans, verify smooth scrolling</check>
+    <check type="test">Expand/collapse span, verify children render correctly</check>
+    <check type="manual">Error spans have red glow, error message visible</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-7" reason="Timeline integrates into App.tsx shell" />
+  </dependencies>
+
+  <commit-message>feat(dashboard): implement virtual scrolling timeline with expand/collapse</commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-9" wave="3">
+  <title>Apply color palette and styling</title>
+  <requirement>REQ-DASH-010, REQ-DASH-006</requirement>
+  <description>
+    Apply Steve's chosen color palette (3 colors: background, foreground, accent).
+    Implement smooth CSS transitions for expand/collapse animations.
+    Design philosophy: "confident and minimal".
+  </description>
+
+  <context>
+    <file path="packages/dashboard/src/styles.css" reason="Main stylesheet" />
+    <file path="packages/dashboard/src/App.tsx" reason="Apply CSS classes" />
+    <file path=".planning/REQUIREMENTS.md" reason="REQ-DASH-010 color palette" />
+  </context>
+
+  <steps>
+    <step order="1">**BLOCKER CHECK**: Get 3 colors from Steve (background, foreground, accent)</step>
+    <step order="2">Create src/styles.css with CSS custom properties: --bg, --fg, --accent</step>
+    <step order="3">Apply colors to body, text, links, buttons</step>
+    <step order="4">Error state: use red variant of accent color for glow</step>
+    <step order="5">Add smooth transitions: expand/collapse uses height transition 150ms ease</step>
+    <step order="6">Virtual scroll: ensure no jank on rapid scrolling (60 FPS target)</step>
+    <step order="7">Typography: use system font stack for fast load</step>
+    <step order="8">Spacing: consistent 8px grid system</step>
+    <step order="9">Mobile responsive: works on screens >= 320px</step>
+    <step order="10">Import styles.css in main.tsx</step>
+  </steps>
+
+  <verification>
+    <check type="build">cd packages/dashboard && npm run build</check>
+    <check type="manual">Colors match Steve's palette specification</check>
+    <check type="manual">Expand/collapse animation is smooth (no jank)</check>
+    <check type="manual">Error spans have red glow effect</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-8" reason="Styling applies to timeline components" />
+  </dependencies>
+
+  <commit-message>feat(dashboard): apply color palette and smooth animations</commit-message>
+</task-plan>
+```
+
+---
+
+### Wave 4 (After Wave 3) — Integration and Polish
+
+```xml
+<task-plan id="phase-1-task-10" wave="4">
+  <title>README with GIF and quick start</title>
+  <requirement>REQ-PROJ-007</requirement>
+  <description>
+    Create README.md optimized for GitHub stars and Twitter virality.
+    ~20 lines + 1 animated GIF demo. Hook: "See what your AI agent is thinking."
+  </description>
+
+  <context>
+    <file path="README.md" reason="Repository README" />
+    <file path=".planning/REQUIREMENTS.md" reason="REQ-PROJ-007 README spec" />
+    <file path="rounds/agentlog/decisions.md" reason="Distribution strategy from Elon" />
+  </context>
+
+  <steps>
+    <step order="1">Record demo GIF: agent running with Trace, show timeline visualization</step>
+    <step order="2">Use screen recording tool, crop to timeline area, export as GIF</step>
+    <step order="3">Host GIF (GitHub assets or external like giphy)</step>
+    <step order="4">Write README structure:
+      - One-liner: "See what your AI agent is thinking."
+      - Problem (one sentence: "Debugging AI agents is hard.")
+      - GIF (animated demo)
+      - Installation: npm install trace
+      - Quick Start: 5-line code example with span, tool, thought
+      - View: npx trace serve
+    </step>
+    <step order="5">Keep total README ~20 lines of text</step>
+    <step order="6">Tone: confident, minimal, no fluff</step>
+    <step order="7">Add badges: npm version, license, build status (if CI set up)</step>
+  </steps>
+
+  <verification>
+    <check type="manual">README renders correctly on GitHub</check>
+    <check type="manual">GIF loads and animates</check>
+    <check type="manual">Quick start code example is copy-pasteable</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-9" reason="Need working dashboard for GIF recording" />
+  </dependencies>
+
+  <commit-message>docs: add README with demo GIF and quick start guide</commit-message>
+</task-plan>
+```
 
 ```xml
 <task-plan id="phase-1-task-11" wave="4">
-  <title>Register plugin in Sunrise Yoga</title>
-  <requirement>REQ-017: Add MemberShip plugin to Sunrise Yoga astro.config.mjs</requirement>
+  <title>Turborepo build orchestration</title>
+  <requirement>REQ-PROJ-006</requirement>
   <description>
-    Add the MemberShip plugin to Sunrise Yoga's Astro configuration.
-    Verify the site builds with the plugin registered.
+    Configure Turborepo for cross-package builds.
+    Ensure npm run build at root builds SDK -> CLI -> Dashboard in correct order.
+    Add dev script for watch mode development.
   </description>
 
   <context>
-    <file path="plugins/membership/src/index.ts" reason="Plugin descriptor export" />
-    <file path="docs/EMDASH-GUIDE.md" reason="Section 6 shows plugin registration pattern" />
+    <file path="turbo.json" reason="Turborepo configuration" />
+    <file path="package.json" reason="Root scripts" />
   </context>
 
   <steps>
-    <step order="1">Locate Sunrise Yoga project directory (likely projects/sunrise-yoga or sites/sunrise-yoga)</step>
-    <step order="2">Open astro.config.mjs</step>
-    <step order="3">Import plugin descriptor: import membershipPlugin from "@shipyard/membership" or relative path</step>
-    <step order="4">Add to emdash plugins array:
-      emdash({
-        plugins: [membershipPlugin()],
-        ...
-      })</step>
-    <step order="5">Run: npm run build to verify plugin loads</step>
-    <step order="6">Check build output for plugin initialization errors</step>
+    <step order="1">Update turbo.json with pipeline configuration</step>
+    <step order="2">Define build task: depends on ^build (build dependencies first)</step>
+    <step order="3">Define dev task: persistent: true, cache: false</step>
+    <step order="4">Define test task: depends on build</step>
+    <step order="5">Add to root package.json scripts: build, dev, test</step>
+    <step order="6">Configure outputs in turbo.json: ["dist/**"]</step>
+    <step order="7">Test: npm run build from root builds all packages</step>
+    <step order="8">Test: npm run dev from root starts all packages in watch mode</step>
+    <step order="9">Ensure CLI builds after dashboard (it serves dashboard dist files)</step>
   </steps>
 
   <verification>
-    <check type="build">cd [sunrise-yoga] && npm run build → success</check>
-    <check type="grep">grep "membershipPlugin" [sunrise-yoga]/astro.config.mjs → 1 match</check>
-    <check type="manual">No "plugin failed to initialize" errors in build log</check>
+    <check type="build">npm run build at root succeeds</check>
+    <check type="test">Verify packages/*/dist/ directories exist</check>
+    <check type="test">npm run dev starts all watchers</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-10" reason="Plugin must compile before registration" />
+    <depends-on task-id="phase-1-task-5" reason="CLI package must exist" />
+    <depends-on task-id="phase-1-task-9" reason="Dashboard package must exist" />
   </dependencies>
 
-  <commit-message>feat(sunrise-yoga): register MemberShip plugin</commit-message>
-</task-plan>
-```
-
----
-
-### Wave 5 (After Wave 4) — Smoke Tests
-
-```xml
-<task-plan id="phase-1-task-12" wave="5">
-  <title>Verify admin page loads</title>
-  <requirement>REQ-018, REQ-022: Admin page returns valid Block Kit</requirement>
-  <description>
-    Start Sunrise Yoga dev server.
-    Navigate to admin plugin page.
-    Verify HTTP 200 with valid blocks array.
-    Check stats show member and plan counts.
-  </description>
-
-  <context>
-    <file path="plugins/membership/src/sandbox-entry.ts" reason="Admin route handler" />
-  </context>
-
-  <steps>
-    <step order="1">Start dev server: cd [sunrise-yoga] && npm run dev</step>
-    <step order="2">Navigate to: http://localhost:4321/_emdash/admin/plugins/membership</step>
-    <step order="3">Verify page loads without error (HTTP 200)</step>
-    <step order="4">Open browser dev tools → Network tab → find plugin API call</step>
-    <step order="5">Verify response has "blocks" array</step>
-    <step order="6">Verify stats block shows member count and plan count</step>
-  </steps>
-
-  <verification>
-    <check type="manual">Admin page loads without console errors</check>
-    <check type="manual">Stats block visible with counts</check>
-    <check type="manual">No "undefined" or "null" displayed in UI</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-11" reason="Plugin must be registered" />
-  </dependencies>
-
-  <commit-message>test(membership): verify admin page loads correctly</commit-message>
+  <commit-message>build: configure Turborepo for monorepo orchestration</commit-message>
 </task-plan>
 ```
 
 ```xml
-<task-plan id="phase-1-task-13" wave="5">
-  <title>Verify member registration returns typed response</title>
-  <requirement>REQ-019, REQ-021: Registration returns object, KV stores object</requirement>
+<task-plan id="phase-1-task-12" wave="4">
+  <title>Performance verification (500+ spans)</title>
+  <requirement>REQ-NFR-001</requirement>
   <description>
-    POST to register endpoint.
-    Verify response is JavaScript object, not double-encoded string.
-    Verify KV stores object directly.
+    Generate test session with 500+ spans.
+    Verify dashboard loads in &lt;1 second, scrolls at 60 FPS.
+    This is the success criterion for virtual scrolling requirement.
   </description>
 
   <context>
-    <file path="plugins/membership/src/sandbox-entry.ts" reason="Register route handler" />
+    <file path="scripts/generate-test-session.ts" reason="Test data generator" />
+    <file path="packages/dashboard/src/Timeline.tsx" reason="May need optimization" />
+    <file path=".planning/REQUIREMENTS.md" reason="REQ-NFR-001 performance targets" />
   </context>
 
   <steps>
-    <step order="1">Use curl or Postman to POST to register endpoint:
-      curl -X POST http://localhost:4321/_emdash/api/plugins/membership/register \
-        -H "Content-Type: application/json" \
-        -d '{"email":"test@example.com","plan":"basic"}'</step>
-    <step order="2">Verify response Content-Type is application/json</step>
-    <step order="3">Verify response body is { success: true, ... } not "{\"success\":true,...}"</step>
-    <step order="4">Check KV directly (via admin debug or test): ctx.kv.get("member:test%40example.com")</step>
-    <step order="5">Verify KV returns object with email, plan, status properties (not a string)</step>
+    <step order="1">Create scripts/generate-test-session.ts</step>
+    <step order="2">Generate NDJSON file with 500+ span events (mixed types)</step>
+    <step order="3">Include nested spans (3-4 levels deep)</step>
+    <step order="4">Include some error events for testing error highlighting</step>
+    <step order="5">Run npx trace serve with generated session</step>
+    <step order="6">Measure initial page load time (target: &lt;1 second)</step>
+    <step order="7">Open Chrome DevTools Performance panel</step>
+    <step order="8">Scroll through timeline, verify 60 FPS (no dropped frames)</step>
+    <step order="9">If performance issues: check itemSize calculations, reduce re-renders</step>
+    <step order="10">Document performance results in PR description</step>
   </steps>
 
   <verification>
-    <check type="manual">curl response is valid JSON object</check>
-    <check type="manual">typeof response.success === "boolean" (not string)</check>
-    <check type="manual">KV get returns object directly</check>
+    <check type="test">Page loads in &lt;1 second with 500 spans</check>
+    <check type="test">Chrome DevTools shows consistent 60 FPS while scrolling</check>
+    <check type="test">Expand/collapse large spans does not cause jank</check>
+    <check type="manual">Test with 1000 spans to verify scalability</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-11" reason="Plugin must be registered" />
+    <depends-on task-id="phase-1-task-8" reason="Timeline must be implemented" />
+    <depends-on task-id="phase-1-task-11" reason="Build pipeline must work" />
   </dependencies>
 
-  <commit-message>test(membership): verify registration returns typed response</commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-14" wave="5">
-  <title>Verify member status returns typed object</title>
-  <requirement>REQ-020: Status endpoint returns MemberRecord object</requirement>
-  <description>
-    GET status endpoint with test email.
-    Verify response is MemberRecord object.
-    Check all expected properties present.
-  </description>
-
-  <context>
-    <file path="plugins/membership/src/sandbox-entry.ts" reason="Status route handler" />
-  </context>
-
-  <steps>
-    <step order="1">First register a test member (if not already done in task-13)</step>
-    <step order="2">GET status endpoint:
-      curl http://localhost:4321/_emdash/api/plugins/membership/status?email=test@example.com</step>
-    <step order="3">Verify response is JSON object with: email, plan, status, createdAt</step>
-    <step order="4">Verify email matches request</step>
-    <step order="5">Verify status is one of: pending, active, revoked, cancelled, past_due</step>
-  </steps>
-
-  <verification>
-    <check type="manual">Response is valid MemberRecord object</check>
-    <check type="manual">All required properties present</check>
-    <check type="manual">No double-encoding (response.email is string, not escaped JSON)</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-13" reason="Must have registered member" />
-  </dependencies>
-
-  <commit-message>test(membership): verify status endpoint returns typed MemberRecord</commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-15" wave="5">
-  <title>Verify signup → payment → access flow</title>
-  <requirement>REQ-016: End-to-end flow works without crash</requirement>
-  <description>
-    Complete full signup flow with Stripe test mode.
-    Verify member record created.
-    Verify access granted.
-    This is the primary success criterion from decisions.md.
-  </description>
-
-  <context>
-    <file path="plugins/membership/src/sandbox-entry.ts" reason="All routes involved" />
-    <file path="rounds/membership-fix/decisions.md" reason="Success Criteria #2" />
-  </context>
-
-  <steps>
-    <step order="1">Ensure Stripe test mode keys configured in environment</step>
-    <step order="2">Register new member with paid plan</step>
-    <step order="3">Follow payment link to Stripe Checkout (test mode)</step>
-    <step order="4">Complete payment with test card: 4242 4242 4242 4242</step>
-    <step order="5">Verify redirect to success page</step>
-    <step order="6">Check member status: should be "active"</step>
-    <step order="7">Verify Stripe fields populated: stripeCustomerId, stripeSubscriptionId</step>
-    <step order="8">Test gated content access (if applicable)</step>
-  </steps>
-
-  <verification>
-    <check type="manual">Complete flow without any crashes or errors</check>
-    <check type="manual">Member status = "active" after payment</check>
-    <check type="manual">Stripe webhook received and processed</check>
-    <check type="manual">No 500 errors in server logs</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-12" reason="Admin must load first" />
-    <depends-on task-id="phase-1-task-13" reason="Registration must work" />
-    <depends-on task-id="phase-1-task-14" reason="Status must work" />
-  </dependencies>
-
-  <commit-message>test(membership): verify complete signup → payment → access flow</commit-message>
+  <commit-message>test: add performance verification for 500+ span sessions</commit-message>
 </task-plan>
 ```
 
@@ -659,29 +625,54 @@ All 7 tasks in Wave 1 can run in parallel because they target different code reg
 
 From Risk Scanner analysis:
 
-1. **RISK-001: 114 throw new Response instances** — High likelihood of breaking on mechanical replacement. Tasks 1-2 require careful manual review, especially for error re-throw patterns (`if (error instanceof Response) throw error;`).
+1. **BLOCKER: Timeline orientation undefined** — Steve must provide Figma wireframe before Wave 3 can begin. Waves 1-2 are unblocked.
 
-2. **RISK-002: High-churn 4,000-line file** — Agent context window may bloat. Batch fixes by pattern type (tasks split into 1-2 for errors, 3-4 for JSON, 5 for auth). Verify TypeScript after each batch.
+2. **BLOCKER: Color palette undefined** — Steve must select 3 colors before Wave 3 task 9 can complete.
 
-3. **RISK-003: Webhook payload serialization** — JSON.stringify in `fireWebhook` is CORRECT (network serialization, not KV). Task 3 explicitly excludes this.
+3. **RISK: react-window learning curve** — Low likelihood, well-documented library. Mitigation: allocate 1-2 hours for familiarization, have fallback of non-virtualized timeline if needed.
 
-4. **RISK-004: Email rate limiting JSON** — email.ts may have incorrect JSON handling. Task 7 will audit and fix if needed.
+4. **RISK: NDJSON file bloat** — Low likelihood for v1 (typical sessions ~100-500 events). Mitigation: document `--max-sessions` as future enhancement.
 
-5. **RISK-005: Pagination migration** — Existing members:list must be migrated. Task 8 includes backward compatibility step.
+5. **RISK: Windows file path compatibility** — Low likelihood. Mitigation: use path.join() everywhere, test on Windows before npm publish.
+
+6. **RISK: Scope creep (search, token tracking)** — Medium likelihood. Mitigation: decisions.md is the contract. If it's not listed, it's v2.
+
+7. **RISK: Trademark conflict on "Trace"** — Medium likelihood. Mitigation: use "Trace" internally, legal review before public launch, fallback names ready (Glint, Span).
 
 ---
 
 ## Summary
 
-| Wave | Tasks | Total |
-|------|-------|-------|
-| Wave 1 (Parallel) | 7 tasks (pattern corrections + audits) | 7 |
-| Wave 2 (After 1) | 2 tasks (pagination) | 2 |
-| Wave 3 (After 2) | 1 task (TypeScript) | 1 |
-| Wave 4 (After 3) | 1 task (integration) | 1 |
-| Wave 5 (After 4) | 4 tasks (smoke tests) | 4 |
-| **Total** | | **15** |
+| Wave | Tasks | Description |
+|------|-------|-------------|
+| Wave 1 (Parallel) | 4 tasks | SDK: init, span/tool/thought, NDJSON writer, types |
+| Wave 2 (Sequential) | 2 tasks | CLI: serve command, file watching |
+| Wave 3 (Sequential) | 3 tasks | Dashboard: scaffold, timeline, styling |
+| Wave 4 (Parallel) | 3 tasks | Polish: README, build config, performance test |
+| **Total** | **12 tasks** | |
 
-**Critical Path:** Wave 1 → Wave 2 → Wave 3 → Wave 4 → Wave 5
+**Critical Path:** Wave 1 -> Wave 2 -> Wave 3 -> Wave 4
 
-**Parallelization:** Wave 1 tasks can all run in parallel. Wave 5 tasks can mostly run in parallel.
+**Parallelization:**
+- Wave 1: All 4 tasks can run in parallel
+- Wave 4: Tasks 10-12 can mostly run in parallel
+
+**Blockers:**
+- Wave 3 blocked on Steve's timeline orientation + color palette decisions
+- Waves 1-2 can proceed immediately
+
+---
+
+## Philosophy Lock
+
+From `rounds/agentlog/decisions.md`:
+
+> **Ship Elon's architecture** (NDJSON, cut decision(), virtual scrolling)
+> **With Steve's soul** (single perfect timeline, instant load, "confident and minimal" voice)
+
+This is not compromise. This is integration.
+
+---
+
+*Generated by Great Minds Agency — Phase Planning (GSD-Style)*
+*2026-04-13*
