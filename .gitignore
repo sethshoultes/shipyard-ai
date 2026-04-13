@@ -6,3 +6,7 @@ node_modules/
 *.log
 .DS_Store
 .vercel
+
+# Runtime token ledger (changes every agent call)
+memory-store/memory.db
+memory-store/*.db
