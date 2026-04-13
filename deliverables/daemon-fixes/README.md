@@ -59,7 +59,7 @@ const merged = [...p0Issues, ...p1Issues].filter((issue) => {
 
 - **Commit:** 01c0daa
 - **Repository:** great-minds-plugin
-- **Message:** fix: call gitAutoCommit in heartbeat; fix gh label syntax for intake
+- **Message:** fix: daemon stability - auto-commit wiring and label query syntax
 
 ## Deployment Checklist
 
@@ -73,4 +73,5 @@ const merged = [...p0Issues, ...p1Issues].filter((issue) => {
 
 - PRD: `/home/agent/shipyard-ai/prds/daemon-fixes.md`
 - Decisions: `/home/agent/shipyard-ai/rounds/daemon-fixes/decisions.md`
-- QA Report: `/home/agent/shipyard-ai/rounds/daemon-fixes/qa-pass-1.md`
+- QA Report (Pass 1): `/home/agent/shipyard-ai/rounds/daemon-fixes/qa-pass-1.md`
+- QA Report (Pass 2): `/home/agent/shipyard-ai/rounds/daemon-fixes/qa-pass-2.md`
