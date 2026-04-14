@@ -150,12 +150,22 @@ async function getPageByHash(ctx: PluginContext, hash: string): Promise<PageSeoD
 }
 
 async function getAllPages(ctx: PluginContext): Promise<PageSeoData[]> {
-	const hashes = await getPageList(ctx);
-	const pages: PageSeoData[] = [];
-	for (const hash of hashes) {
-		const page = await getPageByHash(ctx, hash);
-		if (page) pages.push(page);
+	// Denormalized storage: single KV read instead of N reads (fixes N+1 bug)
+	let pages = await ctx.kv.get<PageSeoData[]>("seo:pages:all");
+
+	// Defensive: rebuild from individual keys if list is missing/corrupted
+	if (!pages || !Array.isArray(pages)) {
+		ctx.log.warn("SEODash: Rebuilding denormalized page list from individual keys");
+		const hashes = await getPageList(ctx);
+		pages = [];
+		for (const hash of hashes) {
+			const page = await getPageByHash(ctx, hash);
+			if (page) pages.push(page);
+		}
+		// Persist the rebuilt list
+		await ctx.kv.set("seo:pages:all", pages);
 	}
+
 	return pages;
 }
 
@@ -274,7 +284,8 @@ export default definePlugin({
 		"plugin:install": {
 			handler: async (_event: unknown, ctx: PluginContext) => {
 				ctx.log.info("SEODash installed — initializing KV schema");
-				await ctx.kv.set("seo:pages:list", []);
+				await ctx.kv.set("seo:pages:list", []);  // Legacy list (for defensive rebuild)
+				await ctx.kv.set("seo:pages:all", []);   // Denormalized list (fixes N+1 bug)
 				await ctx.kv.set("seo:sitemap-settings", {
 					defaultChangefreq: "monthly",
 					defaultPriority: 0.8,
@@ -330,15 +341,25 @@ export default definePlugin({
 					page.seoScore = computeSeoScore(issues);
 					page.issues = issues;
 
-					// Store page data
+					// Store page data (individual key for backward compat)
 					await ctx.kv.set(`seo:${pathHash}`, page);
 
-					// Update page list
+					// Update page hash list (legacy, for defensive rebuild)
 					const list = await getPageList(ctx);
 					if (!list.includes(pathHash)) {
 						list.push(pathHash);
 						await setPageList(ctx, list);
 					}
+
+					// Update denormalized list for fast getAllPages() - fixes N+1 bug
+					const allPages = await ctx.kv.get<PageSeoData[]>("seo:pages:all") ?? [];
+					const existingIndex = allPages.findIndex(p => p.id === page.id);
+					if (existingIndex >= 0) {
+						allPages[existingIndex] = page;
+					} else {
+						allPages.push(page);
+					}
+					await ctx.kv.set("seo:pages:all", allPages);
 
 					ctx.log.info(`SEODash: saved page ${path} (score: ${page.seoScore})`);
 
@@ -427,10 +448,15 @@ export default definePlugin({
 
 					await ctx.kv.delete(`seo:${pathHash}`);
 
-					// Remove from list
+					// Remove from hash list (legacy)
 					const list = await getPageList(ctx);
 					const newList = list.filter((h) => h !== pathHash);
 					await setPageList(ctx, newList);
+
+					// Update denormalized list - fixes N+1 bug
+					const allPages = await ctx.kv.get<PageSeoData[]>("seo:pages:all") ?? [];
+					const filtered = allPages.filter(p => p.id !== existing.id);
+					await ctx.kv.set("seo:pages:all", filtered);
 
 					ctx.log.info(`SEODash: deleted page ${path}`);
 
