@@ -10,3 +10,4 @@ node_modules/
 # Runtime token ledger (changes every agent call)
 memory-store/memory.db
 memory-store/*.db
+.wrangler/
