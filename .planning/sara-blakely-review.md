@@ -1,25 +1,25 @@
-# Sara Blakely Gut-Check: Forge v1 MVP
+# Sara Blakely Gut-Check — Phase 1 Plan
 
-**Would a real customer pay for this?**
+## Would a real customer pay for this?
 
-Maybe. The "Ask something" magic is the right instinct — that's your Spanx moment. But this plan is 90% technical debt cleanup (D1 migration, plugin spec compliance, renaming) and 10% customer magic. 14 tasks to reorganize furniture before the store opens. Customers don't care that you renamed FormForge to Forge or switched from KV to D1. They care: does my form work? Do I get my leads?
+No. This is plumbing. Customers pay for "nothing falls through cracks" — they don't pay for the 4-line patch that makes it true. Issues #34 and #35 were being ignored. That's a bug, not a feature. Fix it, don't celebrate it.
 
-**What's confusing? What would make someone bounce?**
+## What's confusing? What would make someone bounce?
 
-1. No clear "try it in 30 seconds" demo path. Where's the dopamine hit?
-2. "Pattern matching" sounds like autocomplete from 2015. If "What's your email?" needs keyword detection, it's not magic — it's a parlor trick.
-3. You cut webhooks. Forms without integrations are dead ends. I fill it out, you get a CSV, then... manual data entry forever? That's why people hate forms.
+Five tasks and three waves for a 4-line change. The overhead screams "we're scared to ship." Task 3 (configurable labels) contradicts Decision 7 (minimal diff). Pick a lane. Skip the config — you don't have users asking for it yet.
 
-**30-Second Elevator Pitch:**
+## 30-Second Elevator Pitch
 
-"Type a question. Get the field. No dropdowns, no configuration menus. Ask what you want to know, we'll figure out the rest. Forms that write themselves."
+"Our intake system catches priority work from GitHub and auto-queues it. But p2 issues were invisible — teams thought the system was broken. This fix makes p2 work. Four lines. The system finally does what everyone assumed it already did."
 
-**What would you test first with $0 budget?**
+## What would you test first with $0 budget?
 
-Walk into 10 local businesses. Coffee shops, salons, yoga studios. "Can I build your contact form for free? I just want to watch." Watch their face when they type "What's your email?" If they don't say "wait — how'd it know?" the product isn't ready. Don't ship until you see that reaction 7/10 times.
+Watch the logs. Wait one poll cycle. Do issues #34 and #35 become PRDs? Yes = done. No = you broke something. Then ask the person who filed #34 if they noticed. Their face tells you everything marketing research can't.
 
-**What's the retention hook?**
+## What's the retention hook?
 
-Weak. Forms are set-and-forget. Once it's embedded, why return? CSV export is table stakes. The *notification* is the hook. Make "new submission from your website" feel like a gift, not a chore — a morning ritual like checking your DMs.
+Invisibility. The system stops surprising people with dropped issues, so they stop thinking about it. That's retention for infrastructure: removing it would hurt, so they keep it. Danger: invisible tools get zero credit. Make sure someone knows *why* p2 suddenly works.
 
-**Bottom line:** Honest engineering work solving YOUR problems (tech debt), not the CUSTOMER'S problems (I need leads, forms are confusing). Ship the magic moment first. Everything else is noise.
+---
+
+**Bottom line:** Ship it today. It's a bug fix wearing a feature's clothes. The 5-task structure is overkill. Trust the engineer. Push the commit. Stop planning, start doing.
