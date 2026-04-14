@@ -114,11 +114,6 @@ export function auditPage(data: PageSeoData): SeoIssue[] {
 		issues.push({ type: "warning", code: "desc-repeats-title", message: "Description repeats the page title" });
 	}
 
-	// Keywords count
-	if (data.keywords && data.keywords.length > 10) {
-		issues.push({ type: "warning", code: "too-many-keywords", message: `Too many keywords (${data.keywords.length}, recommend 10 or fewer)` });
-	}
-
 	return issues;
 }
 
@@ -342,7 +337,6 @@ export default definePlugin({
 						twitterDescription: input.twitterDescription !== undefined ? String(input.twitterDescription) : existing?.twitterDescription,
 						twitterImage: input.twitterImage !== undefined ? String(input.twitterImage) : existing?.twitterImage,
 						structuredData: input.structuredData !== undefined ? String(input.structuredData) : existing?.structuredData,
-						keywords: Array.isArray(input.keywords) ? input.keywords.map(String) : existing?.keywords,
 						updatedAt: new Date().toISOString(),
 					};
 
@@ -505,7 +499,6 @@ export default definePlugin({
 							twitterDescription: page.twitterDescription,
 							twitterImage: page.twitterImage,
 							structuredData: page.structuredData,
-							keywords: page.keywords,
 						},
 					};
 				} catch (error) {

@@ -31,7 +31,6 @@ export interface PageSeoData {
 	twitterDescription?: string;
 	twitterImage?: string;
 	structuredData?: string;
-	keywords?: string[];
 	updatedAt: string;
 	seoScore?: number;
 	issues?: SeoIssue[];

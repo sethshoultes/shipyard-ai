@@ -29,7 +29,6 @@ interface PageSeoPublic {
 	twitterDescription?: string;
 	twitterImage?: string;
 	structuredData?: string;
-	keywords?: string[];
 }
 
 interface Props {
@@ -81,9 +80,6 @@ const robotsContent = robotsParts.length > 0 ? robotsParts.join(", ") : null;
 			<link rel="canonical" href={seoData.canonicalUrl} />
 		)}
 
-		{seoData.keywords && seoData.keywords.length > 0 && (
-			<meta name="keywords" content={seoData.keywords.join(", ")} />
-		)}
 
 		{/* Open Graph tags */}
 		<meta property="og:title" content={ogTitle} />

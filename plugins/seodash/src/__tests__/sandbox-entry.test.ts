@@ -235,16 +235,6 @@ describe("SEO Audit", () => {
 		expect(repeatIssue.type).toBe("warning");
 	});
 
-	it("should warn when too many keywords", () => {
-		const page = createTestPageSeo({
-			keywords: ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"],
-		});
-		const issues = auditPage(page);
-
-		const kwIssue = issues.find((i: { code: string }) => i.code === "too-many-keywords");
-		expect(kwIssue).toBeTruthy();
-		expect(kwIssue.type).toBe("warning");
-	});
 });
 
 // ---------------------------------------------------------------------------

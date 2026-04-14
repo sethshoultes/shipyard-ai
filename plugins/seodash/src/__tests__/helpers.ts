@@ -101,7 +101,6 @@ export function createTestPageSeo(overrides?: Partial<PageSeoData>): PageSeoData
 		twitterDescription: has("twitterDescription") ? overrides!.twitterDescription : undefined,
 		twitterImage: has("twitterImage") ? overrides!.twitterImage : undefined,
 		structuredData: has("structuredData") ? overrides!.structuredData : '{"@context":"https://schema.org","@type":"AboutPage"}',
-		keywords: has("keywords") ? overrides!.keywords : ["about", "company", "team"],
 		updatedAt: overrides?.updatedAt ?? "2026-04-01T12:00:00.000Z",
 		seoScore: overrides?.seoScore,
 		issues: overrides?.issues,
