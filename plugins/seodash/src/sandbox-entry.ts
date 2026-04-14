@@ -18,7 +18,6 @@ export type { PageSeoData, SeoIssue };
 export interface SitemapSettings {
 	defaultChangefreq: string;
 	defaultPriority: number;
-	patterns: Array<{ pathPrefix: string; changefreq: string; priority: number }>;
 }
 
 export interface RobotsSettings {
@@ -181,18 +180,8 @@ function generateSitemapXml(
 	const nonIndexPages = pages.filter((p) => !p.noIndex);
 
 	const urls = nonIndexPages.map((p) => {
-		let changefreq = settings.defaultChangefreq;
-		let priority = settings.defaultPriority;
-
-		// Check for pattern-specific overrides
-		for (const pattern of settings.patterns) {
-			if (p.path.startsWith(pattern.pathPrefix)) {
-				changefreq = pattern.changefreq;
-				priority = pattern.priority;
-				break;
-			}
-		}
-
+		const changefreq = settings.defaultChangefreq;
+		const priority = settings.defaultPriority;
 		const lastmod = p.updatedAt ? p.updatedAt.slice(0, 10) : new Date().toISOString().slice(0, 10);
 		const loc = `${siteUrl.replace(/\/+$/, "")}${p.path}`;
 
@@ -289,7 +278,6 @@ export default definePlugin({
 				await ctx.kv.set("seo:sitemap-settings", {
 					defaultChangefreq: "monthly",
 					defaultPriority: 0.8,
-					patterns: [],
 				});
 				await ctx.kv.set("seo:robots-settings", {
 					rules: [],
@@ -561,7 +549,6 @@ export default definePlugin({
 					const settings = await ctx.kv.get<SitemapSettings>("seo:sitemap-settings") ?? {
 						defaultChangefreq: "monthly",
 						defaultPriority: 0.8,
-						patterns: [],
 					};
 
 					const xml = generateSitemapXml(pages, siteUrl, settings);
@@ -588,7 +575,6 @@ export default definePlugin({
 					const current = await ctx.kv.get<SitemapSettings>("seo:sitemap-settings") ?? {
 						defaultChangefreq: "monthly",
 						defaultPriority: 0.8,
-						patterns: [],
 					};
 
 					if (typeof input.defaultChangefreq === "string") {
@@ -596,9 +582,6 @@ export default definePlugin({
 					}
 					if (typeof input.defaultPriority === "number") {
 						current.defaultPriority = input.defaultPriority;
-					}
-					if (Array.isArray(input.patterns)) {
-						current.patterns = input.patterns as SitemapSettings["patterns"];
 					}
 
 					await ctx.kv.set("seo:sitemap-settings", current);
