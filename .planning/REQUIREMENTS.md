@@ -1,447 +1,219 @@
-# Requirements: RANK (LocalGenius Benchmark Engine)
+# Requirements: Intake Auto-Close (Closer)
 
-**Generated**: 2026-04-14
-**Project Slug**: localgenius-benchmark-engine
-**Product Name**: RANK
-**Source PRD**: `/home/agent/shipyard-ai/prds/localgenius-benchmark-engine.md`
-**Source Decisions**: `/home/agent/shipyard-ai/rounds/localgenius-benchmark-engine/decisions.md`
+> **Project Slug:** intake-autoclose
+> **Source:** PRD + Locked Decisions from Debate Phase
+> **Generated:** 2025-01-13
 
 ---
 
 ## Executive Summary
 
-RANK is a competitive benchmarking system for LocalGenius that shows small business owners how they rank against peers in their category and location. The product delivers one number that answers: "Am I winning?"
+When the daemon's GitHub intake converts an issue to a PRD and the pipeline ships it, the original GitHub issue should auto-close. Currently issues remain open until manually closed. This feature adds a single function (`closeSourceIssue()`) to `pipeline.ts` that closes the source issue after successful ship.
 
-**Architecture**: PostgreSQL + Materialized View (no separate data warehouse)
-**V1 Scope**: Dashboard Widget + Weekly Email + GBP Integration
-**Timeline**: 4 weeks
-**Total Artifacts**: 14 files
+**Architecture:** Single function in existing file (~20 lines total)
+**Files Modified:** 1 (`pipeline.ts`)
+**New Dependencies:** 0 (uses existing `gh` CLI)
 
 ---
 
 ## The Essence (from decisions.md)
 
-> **What is this product REALLY about?**
-> One number that answers the question every entrepreneur asks alone at night: Am I winning?
+> *"Invisible. Inevitable. Complete."*
 
-> **What's the feeling it should evoke?**
-> Truth that stings — then fire to climb.
-
-> **What's the one thing that must be perfect?**
-> The first glance. Before she thinks, she knows.
-
-> **Creative direction:**
-> Mirror. Not dashboard.
+The quiet satisfaction of a door clicking shut. When you ship, the issue closes. No configuration. No retry logic. No ceremony.
 
 ---
 
-## BLOCKING DECISION
+## Atomic Requirements
 
-### Public vs. Private Rankings (REQUIRES FOUNDER DECISION)
+### Function Definition
 
-| Position | Steve Jobs | Elon Musk |
-|----------|------------|-----------|
-| **Stance** | Private only. Non-negotiable. | Public opt-in badges for Top 20% |
-| **Core Argument** | Competition motivates; humiliation doesn't. Public rankings = Yelp, and businesses hate Yelp. | Private-only = zero viral coefficient, zero backlinks, zero press hooks. |
+| ID | Requirement | Source | Acceptance Criteria |
+|----|-------------|--------|---------------------|
+| REQ-1 | Function `closeSourceIssue()` must be defined in `pipeline.ts` | Decisions #1 | Function exists in `/home/agent/great-minds-plugin/daemon/src/pipeline.ts` |
+| REQ-2 | Function signature: `closeSourceIssue(prdContent: string, projectName: string): void` | Decisions (File Structure) | Function accepts PRD markdown content and project name, returns void |
+| REQ-3 | Function is ~15 lines, total change ~20 lines | Decisions (File Structure) | Line count within bounds |
 
-**Phil Jackson's Recommended Compromise:**
-1. Rankings: Private by default, always. No public leaderboard.
-2. Badges: Opt-in only for businesses above threshold (Top 20%). No forced exposure.
-3. Reports: Aggregated category benchmarks only. No individual business names without consent.
+### Content Parsing
 
-**Build Implications (if approved):**
-- Add `badge_opt_in` boolean to user settings (default: false)
-- Add `/embed/badge.svg` endpoint for website embed
-- Public reports show category averages, not individual rankings
+| ID | Requirement | Source | Acceptance Criteria |
+|----|-------------|--------|---------------------|
+| REQ-4 | Parse PRD content with regex `/Auto-generated from GitHub issue (.+)#(\d+)/` | PRD + Decisions #2 | Regex correctly extracts repo (group 1) and issue number (group 2) |
+| REQ-5 | Content parsing is authoritative — do NOT parse filename | Decisions #2 | Function reads PRD content, not filename pattern |
+| REQ-6 | If markdown lacks issue marker, fail silently (debug log, not error) | Decisions (Open Questions) | No match = silent skip with optional debug log |
 
-**STATUS: BLOCKING — Requires founder decision before schema design.**
+### Shell Command
 
----
+| ID | Requirement | Source | Acceptance Criteria |
+|----|-------------|--------|---------------------|
+| REQ-7 | Execute: `gh issue close {number} --repo "{repo}" --comment "..."` | PRD | Command format matches exactly |
+| REQ-8 | Use `execSync` (synchronous, fire-and-forget) | Decisions #6 | No async/await, no promises for gh command |
+| REQ-9 | Timeout: 15 seconds (15_000 ms) | PRD + Decisions #6 | `execSync` options include `timeout: 15_000` |
 
-## Database Requirements
+### Comment Format
 
-### REQ-DB-001: business_metrics Table
-**Source**: PRD lines 248-253; Decisions line 43
-**Description**: Append-only metrics table with daily timestamped entries.
-**Schema**:
-```sql
-business_id: uuid
-date: date
-category: text (restaurants | home_services | retail)
-location_city: text
-location_metro: text
-location_state: text
-review_count: integer
-avg_rating: decimal(2,1)
-review_velocity: decimal(4,1) -- reviews per month
-response_rate: decimal(5,2) -- percentage 0-100
-avg_response_time_hours: integer
-created_at: timestamp
-```
-**Status**: V1 MUST HAVE
+| ID | Requirement | Source | Acceptance Criteria |
+|----|-------------|--------|---------------------|
+| REQ-10 | Comment text: `Shipped via Great Minds pipeline. Project: {project}` | PRD + Decisions #3 | Exact text with project name interpolated |
+| REQ-11 | Professional tone: no emojis, no exclamation points, no marketing language | Decisions #4 | Comment is single plain sentence |
 
-### REQ-DB-002: weekly_rankings Materialized View
-**Source**: Decisions line 43
-**Description**: ~30 lines SQL materialized view for ranking computation.
-**Schema**:
-```sql
-business_id: uuid
-week_of: date
-category: text
-location_level: text (city | metro | state)
-location_value: text
-rank: integer
-total_in_cohort: integer
-percentile: decimal(5,2)
-composite_score: decimal(6,4)
-previous_rank: integer
-rank_change: integer
-component_scores: jsonb -- breakdown for "why" explanation
-```
-**Refresh**: Weekly (Sunday 6pm, before Monday email)
-**Status**: V1 MUST HAVE
+### Error Handling
 
-### REQ-DB-003: Minimum Cohort Size Constraint
-**Source**: PRD line 72; Decisions line 103
-**Rule**: No rankings shown for cohorts with N < 10 businesses.
-**Fallback**: Show "Insufficient data for ranking" instead of garbage ranks.
-**Status**: V1 MUST HAVE
+| ID | Requirement | Source | Acceptance Criteria |
+|----|-------------|--------|---------------------|
+| REQ-12 | On failure: log error and continue (non-fatal) | PRD + Decisions #6 | Try-catch wraps execSync, logs error, does not throw |
+| REQ-13 | Log format: `[Closer] Failed to close {repo}#{number}: {error}` | Decisions (Open Questions) | Log message follows existing patterns |
+| REQ-14 | Pipeline must not crash if close fails | PRD (Success Criteria) | Pipeline completes even on close failure |
 
-### REQ-DB-004: Data Freshness Rules
-**Source**: PRD line 74
-**Rules**:
-- Metrics updated daily via GBP sync
-- Aggregates (rankings) recalculated weekly
-- Dashboard shows daily-fresh rank; email sends weekly snapshot
-**Status**: V1 MUST HAVE
+### Call Site
 
-### REQ-DB-005: Data Retention Policy
-**Source**: PRD line 280
-**Rules**:
-- Raw metrics: Retained 2 years
-- Aggregates: Retained indefinitely
-**Status**: V1 MUST HAVE
+| ID | Requirement | Source | Acceptance Criteria |
+|----|-------------|--------|---------------------|
+| REQ-15 | Call `closeSourceIssue()` after PRD archived to `completed/` | PRD + Decisions | Call site is after line 566 in `runPipeline()` |
+| REQ-16 | Single call site only | Decisions (MVP) | Only one invocation in entire codebase |
+| REQ-17 | Only call after successful ship (failed pipelines do NOT close) | PRD (Success Criteria) | Close is inside try block, after ship success |
+
+### Negative Scope (What Does NOT Ship)
+
+| ID | Requirement | Source | Acceptance Criteria |
+|----|-------------|--------|---------------------|
+| REQ-18 | No new files (`closer.ts`, `issue-manager/`, etc.) | Decisions (MVP) | Only `pipeline.ts` modified |
+| REQ-19 | No retry logic or exponential backoff | Decisions #7 | No retry loops in code |
+| REQ-20 | No configuration options (toggles, opt-out, settings) | Decisions #5 | No config parameters added |
+| REQ-21 | No async workers or queues | Decisions (MVP) | No queue libraries or async patterns |
+| REQ-22 | No webhooks | Decisions (MVP) | No webhook handlers |
+| REQ-23 | No status labels or transition states | Decisions (MVP) | Only `gh issue close`, no label changes |
+| REQ-24 | No elaborate comment templates | Decisions (MVP) | Hardcoded single-line string |
+| REQ-25 | Zero new dependencies | Decisions (File Structure) | package.json unchanged |
+
+### Success Criteria
+
+| ID | Requirement | Source | Acceptance Criteria |
+|----|-------------|--------|---------------------|
+| REQ-26 | GitHub-sourced PRD ships -> original issue closed with comment | PRD | Manual test passes |
+| REQ-27 | Non-GitHub PRDs (manually created) are unaffected | PRD | PRDs without marker skipped silently |
+| REQ-28 | Failed pipelines do NOT close issues | PRD | Close only runs after successful ship |
+| REQ-29 | TypeScript compiles without errors | PRD | `npx tsc --noEmit` succeeds |
+| REQ-30 | Changes committed to great-minds-plugin | PRD | Git log shows commit |
+| REQ-31 | Service restarted after deploy | PRD | `systemctl restart shipyard-daemon.service` |
 
 ---
 
-## API Requirements
+## Traceability Matrix
 
-### REQ-API-001: Google OAuth Flow
-**Source**: Decisions line 195
-**Build Artifact**: `api/auth/google-oauth.ts`
-**Scope**: `https://www.googleapis.com/auth/business.manage`
-**Implementation**: Reuse existing LocalGenius OAuth pattern at `/home/agent/localgenius/src/services/google-business.ts`
-**Status**: V1 MUST HAVE
-
-### REQ-API-002: OAuth Failure UX
-**Source**: Decisions line 270
-**Requirements**:
-- Clear error message on denial
-- "Reconnect" button
-- Preserve last-known rank with timestamp
-**Status**: V1 MUST HAVE
-
-### REQ-API-003: GBP Daily Data Sync
-**Source**: Decisions line 195
-**Build Artifact**: `api/data/gbp-sync.ts`
-**Data Pulled**: review_count, avg_rating, response_time
-**Caching**: 24-hour minimum cache
-**Rate Limiting**: Exponential backoff, staggered 6-hour window
-**Status**: V1 MUST HAVE
-
-### REQ-API-004: GBP API Cost Controls
-**Source**: Decisions line 267, 291
-**Requirements**:
-- 24-hour cache minimum
-- Exponential backoff on failures
-- Stagger sync across 6-hour window
-- Priority queue: active businesses daily, inactive weekly
-**Estimate**: 5K customers x daily pulls = $500+/month
-**Status**: V1 MUST HAVE
-
-### REQ-API-005: Ranking Calculation Endpoint
-**Source**: Decisions line 228
-**Build Artifact**: `api/rank/calculate.ts`
-**Triggered By**: Weekly cron + materialized view refresh
-**Status**: V1 MUST HAVE
+| Requirement | Task(s) | Wave |
+|-------------|---------|------|
+| REQ-1, REQ-2, REQ-3 | Task 1 (Add function) | 1 |
+| REQ-4, REQ-5, REQ-6 | Task 1 (Regex parsing) | 1 |
+| REQ-7, REQ-8, REQ-9 | Task 1 (execSync call) | 1 |
+| REQ-10, REQ-11 | Task 1 (Comment format) | 1 |
+| REQ-12, REQ-13, REQ-14 | Task 1 (Error handling) | 1 |
+| REQ-15, REQ-16, REQ-17 | Task 2 (Call site) | 1 |
+| REQ-18-25 | Verification (negative scope) | 2 |
+| REQ-26-28 | Task 3 (Manual test) | 2 |
+| REQ-29 | Task 4 (TypeScript compile) | 2 |
+| REQ-30, REQ-31 | Task 5 (Commit & deploy) | 3 |
 
 ---
 
-## UI Requirements
+## Technical Context
 
-### REQ-UI-001: RankWidget Component
-**Source**: Decisions lines 31, 193, 240
-**Build Artifact**: `ui/components/RankWidget.tsx`
-**Display Elements**:
-- Rank number (prominent): "#8"
-- Cohort size: "of 47"
-- Direction arrow: up/down/neutral
-- Cohort context: "Austin Mexican Restaurants"
-- Percentile: "Top 17%"
-- One actionable insight: "2 reviews away from #7"
-**Voice**: Confident Coach (NOT cheerful assistant)
-**Status**: V1 MUST HAVE
+### Archive Location (from Codebase Scout)
 
-### REQ-UI-002: TrendLine Component
-**Source**: Decisions lines 198, 241
-**Build Artifact**: `ui/components/TrendLine.tsx`
-**Display**: 4-week rank history sparkline (SVG, no chart library)
-**Status**: V1 MUST HAVE
+**File:** `/home/agent/great-minds-plugin/daemon/src/pipeline.ts`
+**Lines:** 559-566 (within `runPipeline()` function)
 
-### REQ-UI-003: Dashboard Page
-**Source**: Decisions lines 198, 243
-**Build Artifact**: `ui/pages/dashboard.tsx`
-**Layout**:
-- First view: Big number (#8 of 47), direction, one action
-- Second view: Why (component scores breakdown)
-- Third view: How (specific improvement actions)
-**Status**: V1 MUST HAVE
-
-### REQ-UI-004: Insufficient Data State
-**Source**: Decisions line 269
-**Trigger**: Cohort size < 10 at all geography levels
-**Display**: "Insufficient data for ranking" card
-**Status**: V1 MUST HAVE
-
-### REQ-UI-005: Mirror, Not Dashboard Philosophy
-**Source**: Decisions lines 23, 30-31
-**Principle**: First-second emotional clarity
-**Rules**:
-- No charts or tables on first view
-- Big number = emotional punch
-- UX flow: Rank -> Why -> How
-**Status**: V1 MUST HAVE
-
----
-
-## Email Requirements
-
-### REQ-EMAIL-001: Weekly Rank Email Template
-**Source**: PRD lines 123-142; Decisions line 194
-**Build Artifact**: `email/templates/weekly-rank.html` (React component via Resend)
-**Frequency**: Mondays 8am (recipient local time)
-**Status**: V1 MUST HAVE
-
-### REQ-EMAIL-002: Email Subject Line
-**Source**: PRD line 125
-**Format**: "Your ranking this week: #8 (+2)"
-**Status**: V1 MUST HAVE
-
-### REQ-EMAIL-003: Email Content Structure
-**Source**: PRD lines 130-140; Decisions line 91
-**Sections**:
-1. Rank position + cohort: "Austin Mexican Restaurants: #8 of 47 (Top 17%)"
-2. "What helped" (2-3 positive actions)
-3. "To reach [next rank]" (2-3 specific gaps)
-**Voice**: Coach ("Respond faster. Top performers: 2 hours. You: 8.")
-**NOT**: "Your response rate is below the benchmark average of 62%..."
-**Status**: V1 MUST HAVE
-
-### REQ-EMAIL-004: Email Deliverability Requirements
-**Source**: Decisions line 286
-**Requirements**:
-- Use SendGrid or Postmark (not in-house)
-- Domain warmup pre-launch (2 weeks)
-- Weekly spam rate monitoring
-- One-click unsubscribe in footer
-- CAN-SPAM compliant headers
-**Status**: V1 MUST HAVE
-
----
-
-## Business Logic Requirements
-
-### REQ-BL-001: Composite Score Algorithm
-**Source**: PRD lines 101-106; Decisions line 115
-**Weights**:
-| Metric | Weight | Source |
-|--------|--------|--------|
-| Review count | 25% | GBP API (commodity) |
-| Average rating | 25% | GBP API (commodity) |
-| Review velocity | 20% | Calculated |
-| Response rate | 15% | LocalGenius (proprietary) |
-| Response time | 15% | LocalGenius (proprietary) |
-
-**Key Decision (Decisions line 115)**: Weight proprietary signals (response time, posting frequency) higher than commodity signals. Document weights explicitly in `rank_businesses.sql`.
-**Status**: V1 MUST HAVE
-
-### REQ-BL-002: Dynamic Cohort Sizing
-**Source**: Decisions lines 96, 103
-**Build Artifact**: `config/cohorts.ts`
-**Hierarchy**: city (preferred) -> metro -> state
-**Rule**: Expand geography until N >= 10
-**Fallback**: If state-level < 10, show "Insufficient data"
-**Status**: V1 MUST HAVE
-
-### REQ-BL-003: V1 Category Scope
-**Source**: Decisions lines 47, 55
-**Build Artifact**: `config/categories.ts`
-**Allowed Values**: `['restaurants', 'home_services', 'retail']`
-**Rule**: No additional categories in V1. Expansion is V2.
-**Status**: V1 MUST HAVE
-
-### REQ-BL-004: Category Classification
-**Source**: Decisions line 268
-**Rule**: Trust Google's primary category in V1
-**User Override**: Not in V1. Add approval queue in V1.1.
-**Status**: V1 MUST HAVE
-
-### REQ-BL-005: Bottom-Rank Handling
-**Source**: Decisions line 273
-**Rule**: Never display "You're last" for #47 of 47
-**Alternative**: "Room to climb. Here's your next move."
-**Focus**: Progress over position
-**Status**: V1 MUST HAVE
-
-### REQ-BL-006: Algorithm Transparency
-**Source**: Decisions line 272
-**Requirement**: Show basic "why" explanation
-**Format**: "You're #8 because: response time #3, review velocity #5"
-**Location**: Secondary view in dashboard
-**Status**: V1 MUST HAVE
-
----
-
-## Configuration Requirements
-
-### REQ-CONFIG-001: categories.ts
-**Source**: Decisions line 249
-**Content**:
 ```typescript
-export const RANK_CATEGORIES = ['restaurants', 'home_services', 'retail'] as const;
-export type RankCategory = typeof RANK_CATEGORIES[number];
+// Archive completed PRD so daemon doesn't rebuild it
+const prdPath = resolve(PRDS_DIR, prdFile);
+const archiveDir = resolve(PRDS_DIR, "completed");
+await mkdir(archiveDir, { recursive: true });
+const archivePath = resolve(archiveDir, prdFile);
+const { rename } = await import("fs/promises");
+await rename(prdPath, archivePath).catch(() => {});
+log(`ARCHIVE: Moved ${prdFile} to prds/completed/`);
 ```
-**Status**: V1 MUST HAVE
 
-### REQ-CONFIG-002: cohorts.ts
-**Source**: Decisions line 248
-**Content**:
+**Call site for closeSourceIssue():** After line 566, before line 568.
+
+### PRD Content Format (from health.ts)
+
+The `convertIssueToPRD()` function in health.ts writes PRDs with this format on line 2:
+
+```
+> Auto-generated from GitHub issue {repo}#{number}
+```
+
+**Regex to extract:** `/Auto-generated from GitHub issue (.+)#(\d+)/`
+- Capture group [1] = repo (e.g., `sethshoultes/shipyard-ai`)
+- Capture group [2] = issue number (e.g., `32`)
+
+### Imports Needed
+
+Current imports in pipeline.ts (lines 1-26):
+- `execSync` from "child_process" — **ALREADY IMPORTED** (line 7)
+- `PRDS_DIR` from "./config.js" — **ALREADY IMPORTED** (line 10)
+- `log` from "./logger.js" — **ALREADY IMPORTED** (line 25)
+
+**Need to add:**
+- `readFileSync` from "fs" — modify line 8 to include
+
+### Existing Patterns
+
+**execSync usage (health.ts lines 169-172):**
 ```typescript
-export const MIN_COHORT_SIZE = 10;
-export const GEOGRAPHY_HIERARCHY = ['city', 'metro', 'state'] as const;
-export type GeographyLevel = typeof GEOGRAPHY_HIERARCHY[number];
+const output = execSync(
+  `gh issue list --repo "${repo}" --state open --label "${label}" ...`,
+  { encoding: "utf-8", timeout: 15_000 }
+);
 ```
-**Status**: V1 MUST HAVE
 
-### REQ-CONFIG-003: Ranking Algorithm Weights
-**Source**: Decisions line 115
-**Location**: `db/functions/rank_businesses.sql` with inline documentation
-**Status**: V1 MUST HAVE
-
-### REQ-CONFIG-004: Timing Configuration
-**Source**: Decisions line 271
-**Rules**:
-- Dashboard rank: Daily recalc
-- Weekly email: Monday 8am (fresh calc from Sunday 6pm)
-- GBP sync: Daily with 24hr cache
-**Status**: V1 MUST HAVE
-
----
-
-## Explicitly CUT from V1
-
-| Feature | Source | Rationale | Revisit Trigger |
-|---------|--------|-----------|-----------------|
-| Conversational interface/chatbot | Decisions line 204 | "Cool demo, zero validated user demand" | Post-PMF validation |
-| Monthly performance reports | Decisions line 205 | Redundant with weekly email | Weekly open rate > 40% |
-| Seasonal adjustments | Decisions line 206 | Premature optimization | 6 months of data collected |
-| Multi-location businesses | Decisions line 207 | Complexity; separate ranking needed | >50 customer requests |
-| Website analytics | Decisions line 67 | Consent nightmare, tracking fragmentation | Reliable source identified |
-| Social metrics (FB/IG) | Decisions line 67 | Platform APIs hostile | API stability confirmed |
-| Additional categories (6+) | Decisions line 55 | Cohort density insufficient | 500+ businesses per category |
-| Gamification badges | Decisions line 211 | "Business owners want respect, not stickers" | Never |
-| Public badges/embeds | Decisions line 212 | Deadlocked - pending founder decision | Founder approval |
-| Competitor alerts | Decisions line 213 | Creates anxiety, not motivation | Post-launch user feedback |
-| Full-screen mobile | Decisions line 214 | Widget-first validation | Engagement validated |
-| Customizable dashboards | Decisions line 149 | Choice paralysis kills engagement | Never |
-
----
-
-## File Structure (14 Artifacts)
-
-```
-rank/
-├── api/
-│   ├── auth/
-│   │   └── google-oauth.ts          [REQ-API-001, REQ-API-002]
-│   ├── data/
-│   │   └── gbp-sync.ts              [REQ-API-003, REQ-API-004]
-│   └── rank/
-│       └── calculate.ts             [REQ-API-005]
-├── db/
-│   ├── migrations/
-│   │   ├── 001_business_metrics.sql [REQ-DB-001]
-│   │   └── 002_weekly_rankings.sql  [REQ-DB-002]
-│   └── functions/
-│       └── rank_businesses.sql      [REQ-BL-001, REQ-CONFIG-003]
-├── jobs/
-│   ├── daily-sync.ts                [REQ-API-003]
-│   └── weekly-email.ts              [REQ-EMAIL-001]
-├── ui/
-│   ├── components/
-│   │   ├── RankWidget.tsx           [REQ-UI-001]
-│   │   └── TrendLine.tsx            [REQ-UI-002]
-│   └── pages/
-│       └── dashboard.tsx            [REQ-UI-003, REQ-UI-004]
-├── email/
-│   └── templates/
-│       └── weekly-rank.html         [REQ-EMAIL-001, REQ-EMAIL-002, REQ-EMAIL-003]
-└── config/
-    ├── cohorts.ts                   [REQ-CONFIG-002]
-    └── categories.ts                [REQ-CONFIG-001]
+**Error handling pattern:**
+```typescript
+try {
+  execSync(command, options);
+  log(`Success message`);
+} catch (err) {
+  log(`Error message: ${err}`);
+  // Non-fatal — continue execution
+}
 ```
 
 ---
 
-## Integration with LocalGenius Platform
-
-**Codebase Scout confirmed**: RANK integrates with existing LocalGenius platform at `/home/agent/localgenius/`.
-
-**Existing Patterns to Follow**:
-| Resource | Location | RANK Usage |
-|----------|----------|------------|
-| Database schema | `src/db/schema.ts` | Extend with rank.* schema |
-| Auth middleware | `src/api/middleware/auth.ts` | Reuse for protected endpoints |
-| Email service | `src/services/email.ts` | Use Resend + React templates |
-| GBP integration | `src/services/google-business.ts` | Follow OAuth pattern |
-| Digest service | `src/services/digest.ts` | Adapt for weekly rank email |
-| Cron pattern | `src/app/api/cron/google-sync/route.ts` | Follow for daily-sync |
-| Logger utility | `src/lib/logger.ts` | Use structured logging |
-| Encryption | `src/lib/encryption.ts` | Encrypt OAuth tokens |
-
-**Key Discovery**: `benchmark_aggregates` table already exists in LocalGenius schema with similar structure to RANK requirements.
-
----
-
-## Risk Mitigations (from Risk Scanner)
+## Risk Register
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|------------|--------|------------|
-| GBP API rate limits | HIGH | MEDIUM | 24hr cache, exponential backoff, staggered sync |
-| OAuth drop-off | HIGH | MEDIUM | Pre-permission value prop, clear error UX |
-| Email deliverability | MEDIUM | HIGH | SendGrid, domain warmup, spam monitoring |
-| Cohort sparsity (N<10) | HIGH | HIGH | Dynamic geography expansion, "Insufficient data" fallback |
-| Low-ranked user churn | MEDIUM | HIGH | Coach voice, progress focus, never show "last" |
-| Category misclassification | HIGH | MEDIUM | Trust Google V1, user override V1.1 |
-| Ranking feels arbitrary | MEDIUM | MEDIUM | Show "why" explanation, algorithm transparency |
-| Data freshness mismatch | MEDIUM | MEDIUM | Daily dashboard, fresh Sunday calc for Monday email |
+| gh CLI not authenticated | Low | Medium | Fail gracefully with clear error message |
+| GitHub rate limiting | Low | Low | Authenticated gh CLI gets 5,000 req/hour |
+| Regex fails on malformed markdown | Low | Low | Fail silently, log, continue |
+| 15-second timeout too short | Very Low | Low | GitHub API is fast; timeout indicates larger issues |
+| Feature creep post-ship | Medium | High | Document the "NO" list prominently — this doc is the defense |
+| Closing already-closed issue | Low | Low | gh CLI handles gracefully |
 
 ---
 
-## Success Criteria (from PRD)
+## Implementation Checklist
 
-- [ ] 100+ businesses have rankings
-- [ ] At least 3 categories with 10+ business cohorts (restaurants, home_services, retail)
-- [ ] Weekly email sent to all customers with rankings
-- [ ] Dashboard shows ranking widget
-- [ ] Open rate on weekly email > 15%
+From decisions.md:
+
+- [ ] Read `pipeline.ts` and `health.ts` (existing patterns)
+- [ ] Add `closeSourceIssue()` function (~15 lines)
+- [ ] Add call site in archive success path (~5 lines)
+- [ ] Test with real issue (manual verification)
+- [ ] Compile, commit, restart service
+
+**Estimated time:** 2-4 hours
 
 ---
 
-## Version
+## Final Alignment
 
-- **Specification Version**: 1.0
-- **Last Updated**: 2026-04-14
-- **PRD Source**: `prds/localgenius-benchmark-engine.md`
-- **Decisions Source**: `rounds/localgenius-benchmark-engine/decisions.md`
-- **Integration Target**: `/home/agent/localgenius/`
+**Elon:** "Ship the PRD as written, with Steve's comment format. Everything else is decoration."
+
+**Steve:** "Ship it right. Then move on."
+
+---
+
+*This document is the specification for the build phase. No new debates. Build what's locked.*
