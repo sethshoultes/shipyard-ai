@@ -2,74 +2,57 @@
 
 ## Product Naming
 
-**PULSE.**
+**Call it RANK.**
 
-Not "LocalGenius Benchmark Engine." That's a feature description, not a name. Nobody falls in love with a feature description.
+Not "LocalGenius Benchmark Engine." Not "Competitive Insights Module." Just RANK.
 
-PULSE. One word. It captures everything: the heartbeat of your business, the rhythm of competition, the vital signs that tell you if you're thriving or flatlining. When Maria sees "Your PULSE is strong this week," she *feels* something. When she sees "Your Benchmark Engine metrics have improved," she feels nothing.
-
-The best products have names that become verbs. Google. Tweet. Uber. You don't "run a benchmark analysis" — you "check your PULSE."
-
----
+One word. One syllable. Every small business owner in America understands it instantly. "What's your RANK?" becomes the question they obsess over. It's a verb, a noun, a status symbol. Nike didn't call it "Nike Athletic Footwear Performance System." They called it Air. We're calling this RANK.
 
 ## Design Philosophy
 
-This product should feel like a coach, not a spreadsheet.
+This product is a **mirror, not a dashboard.**
 
-The PRD is drowning in data: composite scores, weighted averages, percentile distributions. That's engineering thinking. Users don't want data — they want *clarity*. They want to know one thing: **Am I winning?**
+Every business owner looks in the mirror and wonders: Am I winning? The current design shows charts and metrics and percentiles. That's a spreadsheet with makeup on. RANK should show you one thing the moment you open it: your number. #8. Big. Bold. Impossible to ignore.
 
-The dashboard mockup shows "#8 of 47." That's good. But it should be simpler. Imagine opening the app and seeing one giant number. YOUR rank. That's it. Everything else fades away. The emotional impact of seeing "8" in 200-point type is infinitely more powerful than seeing it buried in a widget.
+The magic isn't in displaying data—it's in creating *meaning*. A 4.2 star rating means nothing until you know you're beating 83% of your competitors. That's the moment data becomes emotion. That's the moment this product becomes addictive.
 
-What makes this insanely great? **Turning anxiety into motivation.** Every small business owner lies awake wondering, "Am I doing okay?" We answer that question in half a second.
+## User Experience (First 30 Seconds)
 
----
+You open the app. Full screen. Your rank. **#8 of 47.**
 
-## User Experience: The First 30 Seconds
+A subtle animation—you're climbing. You were #10 last week.
 
-You open PULSE. Full screen: your rank. Big. Bold. Beautiful.
+Below: "2 reviews away from #7."
 
-Below it, three words: *"You're climbing."* or *"Time to push."*
+That's it. That's the entire first screen. No navigation spam. No onboarding tutorial. No feature announcements. You know exactly where you stand and exactly what to do next.
 
-That's it. No dashboards. No metrics. No cognitive load. Just the answer to the only question that matters.
-
-*Then* — if they want — they swipe to see the story behind the number. But the first 30 seconds is pure emotional fuel.
-
----
+The second screen shows *why*. The third shows *how*. But that first moment? Pure clarity. Pure emotional hit.
 
 ## Brand Voice
 
-**Confident. Direct. Encouraging.**
+**Confident coach, not cheerful assistant.**
 
-Not "Your response rate is below the benchmark average of 62% for your category cohort." That's a robot talking.
+"You moved up 2 spots" — yes.
+"Great job! You're doing amazing! Keep it up!" — absolutely not.
 
-Instead: "You're leaving reviews unanswered. Your competitors aren't. Fix this."
-
-The voice sounds like a trusted friend who owns a successful business — someone who tells you the truth because they believe in you, not someone reading data off a clipboard.
-
----
+RANK speaks like a trainer who respects you enough to tell you the truth. Direct. Warm but not saccharine. Data-driven but human. "Casa Ole has 2 more reviews than you" isn't mean—it's *useful*. We're not here to make people feel good. We're here to make people *better*.
 
 ## What to Say NO To
 
-**NO to public leaderboards.** The PRD asks if rankings should be public. Absolutely not. Public rankings create shame. Shame creates churn. We want healthy competition, not humiliation.
-
-**NO to complex tier gatekeeping.** Free users see rank. Pro users see details. That's too cute. Everyone sees the full picture. Monetize through *action*, not *information hoarding*. Pro users get AI-generated game plans to climb. Free users see where they stand.
-
-**NO to seasonal adjustments in V1.** Perfect is the enemy of shipped. Launch with simple rankings. Add sophistication later.
-
-**NO to unreliable metrics.** If we can't get solid engagement data, don't show it. Showing "Unknown" destroys trust. Only show what we can measure with confidence.
-
----
+- **NO public leaderboards.** Competition is motivating. Humiliation is not. The moment rankings go public, we become Yelp, and businesses will hate us.
+- **NO social engagement metrics.** If we can't get them reliably, we don't show them. Half-baked data destroys trust.
+- **NO customizable dashboards.** Choice is the enemy of clarity. We decide what matters.
+- **NO gamification badges.** Trophies and confetti are for children's apps. Business owners want respect, not stickers.
+- **NO premium benchmark reports.** Charging extra to understand your own performance is hostile. Benchmarks are the product. Monetize the *actions*, not the *insights*.
 
 ## The Emotional Hook
 
-**People don't buy software. They buy a better version of themselves.**
+**RANK turns isolation into competition.**
 
-Maria doesn't want a benchmark engine. She wants to walk into her restaurant knowing she's *winning*. She wants to see #5 next to her name and feel proud. She wants to screenshot her rank and text it to her husband.
+Every small business owner works alone. They have no peers, no feedback, no scoreboard. They wonder constantly: Am I doing enough? Is this working? Should I be doing more?
 
-The emotional hook is simple: **You're not alone in the dark anymore.**
+RANK answers that question every single day. It transforms anxiety into energy. It gives the lonely entrepreneur what they've never had: a league to play in.
 
-Every small business owner feels isolated. They see competitors thriving and wonder, "What do they know that I don't?" PULSE answers that. It transforms isolation into community, uncertainty into a scoreboard.
+People won't just use RANK. They'll check it obsessively. They'll brag about climbing. They'll lose sleep over slipping. Because for the first time, they'll *know* if they're winning.
 
-This isn't a data product. It's a *confidence* product.
-
-Ship it.
+That's not a feature. That's a reason to exist.

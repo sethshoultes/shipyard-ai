@@ -1,25 +1,27 @@
-# Sara Blakely Gut-Check — Phase 1 Plan
+# Sara Blakely Gut-Check: RANK
 
 ## Would a real customer pay for this?
 
-No. This is plumbing. Customers pay for "nothing falls through cracks" — they don't pay for the 4-line patch that makes it true. Issues #34 and #35 were being ignored. That's a bug, not a feature. Fix it, don't celebrate it.
+**Maybe.** The "Am I winning?" question is real—I asked it every night selling fax machines. But here's the problem: you're answering a question they didn't ask yet. Most local business owners aren't lying awake thinking about rankings. They're thinking about payroll, that bad Yelp review, why the AC broke again.
 
-## What's confusing? What would make someone bounce?
+The hook only works if you first make them *care* about the number. Right now you're building the dashboard before proving the pain.
 
-Five tasks and three waves for a 4-line change. The overhead screams "we're scared to ship." Task 3 (configurable labels) contradicts Decision 7 (minimal diff). Pick a lane. Skip the config — you don't have users asking for it yet.
+## What's confusing? What makes someone bounce?
+
+- **"Cohort"**—Nobody outside a B-school says this. Say "other Austin taco trucks" or "50 plumbers near you."
+- **"Composite score algorithm"**—Customers don't care how the sausage is made. They care if it's right.
+- **"Insufficient data" state**—This is death. If her first experience is "we don't have enough data," she's gone forever. You get ONE first impression.
 
 ## 30-Second Elevator Pitch
 
-"Our intake system catches priority work from GitHub and auto-queues it. But p2 issues were invisible — teams thought the system was broken. This fix makes p2 work. Four lines. The system finally does what everyone assumed it already did."
+"Every week, we tell you exactly where you rank against other [restaurants/plumbers/shops] in your area—and the ONE thing you can do to move up. No dashboards to learn. No reports to read. Just your number, and your next move."
 
-## What would you test first with $0 budget?
+## What would I test first with $0 budget?
 
-Watch the logs. Wait one poll cycle. Do issues #34 and #35 become PRDs? Yes = done. No = you broke something. Then ask the person who filed #34 if they noticed. Their face tells you everything marketing research can't.
+Send 50 hand-written emails to existing LocalGenius users: "You're #8 out of 47 Mexican restaurants in Austin. Want to know why?" Track who replies. If they don't reply, this feature is a vitamin, not a painkiller.
 
 ## What's the retention hook?
 
-Invisibility. The system stops surprising people with dropped issues, so they stop thinking about it. That's retention for infrastructure: removing it would hurt, so they keep it. Danger: invisible tools get zero credit. Make sure someone knows *why* p2 suddenly works.
+The weekly email IS the product—not the dashboard. "Your number changed" is the only reason to come back. But you buried that in Wave 3 Task 10. Flip it: the email should be Week 1, dashboard Week 4.
 
----
-
-**Bottom line:** Ship it today. It's a bug fix wearing a feature's clothes. The 5-task structure is overkill. Trust the engineer. Push the commit. Stop planning, start doing.
+**Bottom line:** Good bones, wrong sequence. Prove the email gets opened before you build the mansion.
