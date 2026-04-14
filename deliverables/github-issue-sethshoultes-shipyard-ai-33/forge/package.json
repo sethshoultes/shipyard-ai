@@ -1,0 +1,20 @@
+{
+	"name": "@shipyard/forge",
+	"version": "1.0.0",
+	"description": "Forge - A beautiful form builder plugin for EmDash CMS",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./sandbox": "./src/sandbox-entry.ts"
+	},
+	"files": ["src", "README.md"],
+	"keywords": ["emdash", "plugin", "forms", "form-builder"],
+	"author": "Shipyard AI",
+	"license": "MIT",
+	"peerDependencies": {
+		"emdash": "^0.1.0"
+	},
+	"devDependencies": {
+		"typescript": "^5.0.0"
+	}
+}
