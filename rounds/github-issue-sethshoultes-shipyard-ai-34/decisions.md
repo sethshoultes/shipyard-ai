@@ -1,4 +1,4 @@
-# SEODash: Locked Decisions Blueprint
+# Beacon: Locked Decisions Blueprint
 
 **Build Phase Authority Document**
 *Compiled by Phil Jackson from Great Minds Agency debates*
@@ -7,258 +7,244 @@
 
 ## Executive Summary
 
-**Product:** SEODash — WordPress SEO plugin for Emdash CMS
-**Core Promise:** Make SEO visible without becoming a distraction. Show what's wrong, show how to fix it.
-**Target Feeling:** Quiet confidence. Not guessing. Fix → save → done.
-**Timeline:** 2 days to ship v1
-**Test Gate:** Must work on Peak Dental (real Emdash instance) before claiming "done"
+**Product:** Beacon (formerly SEODash) — SEO plugin for Emdash CMS
+**Core Promise:** Make users feel confident about SEO without making them learn SEO
+**Target Feeling:** Quiet relief. Not guessing anymore.
+**Ship Gate:** Non-technical user fixes their first SEO issue in under 60 seconds and thinks "Oh. That's it?"
 
 ---
 
 ## Decision Log: Who Proposed, Who Won, Why
 
-### Decision #1: Visual Social Previews (Facebook, Twitter, Google Cards)
-- **Proposed by:** Steve Jobs (Round 1, reinforced Round 2)
-- **Challenged by:** Elon Musk (Round 2 — "pixel-perfect replicas are maintenance burden")
-- **Winner:** **Steve** (with constraints)
-- **Rationale:** This is the core UX differentiator. Users don't want JSON — they want to SEE what others will see. "What You See Is What You Get" is the product's soul.
-- **Implementation constraint:** Build simple HTML/CSS replicas, not iframe embeds. Accept minor rendering differences. Update when platforms break us, not on every tweak.
+### Decision #1: Product Name — "Beacon" vs "SEODash"
+- **Proposed by:** Steve Jobs (Round 1)
+- **Challenged by:** N/A (Elon conceded Round 2)
+- **Winner:** **Steve** (unanimous)
+- **Rationale:** SEODash is forgettable tech jargon. Beacon is visceral, one word, clear metaphor. "SEO is about being found. A beacon guides people through darkness." Names shape perception, perception shapes adoption. Zero extra code cost, infinite marketing value.
+- **Implementation:** All references become "Beacon"
 
-### Decision #2: Red-to-Green Audit Feedback
-- **Proposed by:** Steve Jobs (Round 1 — "the emotional hook")
-- **Challenged by:** Elon Musk (Round 2 — "dopamine dispenser, not real SEO")
-- **Winner:** **Steve**
-- **Rationale:** Both agreed it works psychologically. Elon's concern about misleading users is valid but solvable — green means "technically correct," not "will rank #1." Add disclaimer in UI.
-- **Implementation:** Traffic light system (red/yellow/green) per page and per issue. Visual progress bar on dashboard.
+### Decision #2: Simplicity — 300-400 Lines, Not 969
+- **Proposed by:** Elon Musk (Round 1 — "Delete 60% of code")
+- **Challenged by:** Steve Jobs (Round 2 — "Elon's 300 is too stripped")
+- **Winner:** **Compromise at ~400 lines**
+- **Rationale:** Elon identified massive complexity creep. Steve defended scoring system as core value. Synthesis: Keep intelligence (scoring), cut theater (audit history, pattern overrides, keywords). Target 400 lines.
+- **What gets cut:** SEO scoring engine storage, robots.txt customization UI, sitemap pattern overrides, meta keywords field, bulk operations, Twitter card variants
 
-### Decision #3: Fix getAllPages() N+1 Query Bug
-- **Proposed by:** Elon Musk (Round 1 — identified bottleneck)
-- **Challenged by:** Steve Jobs (Round 2 — "premature optimization")
-- **Winner:** **Elon**
-- **Rationale:** Steve conceded in Round 2 ("I completely missed this"). At 500+ pages, UI becomes unusable. Fix is simple (denormalize to single KV array), impact is massive.
-- **Implementation:** Store full page list as JSON array in `seo:pages:list`. One read instead of N reads. O(1) vs O(n).
+### Decision #3: Storage Architecture — D1 vs KV
+- **Proposed by:** Elon Musk (Round 1 — "Use D1 table, not KV")
+- **Challenged by:** Steve Jobs (Round 2 — "Premature optimization theater")
+- **Winner:** **Steve** (narrow victory, with monitoring clause)
+- **Rationale:** Elon's scaling concern is valid (KV breaks at 5,000 pages), but Steve's correct that v1 won't hit scale. Compromise: Ship on denormalized KV for v1. If scale issues appear in first 30 days, migrate to D1 for v1.1.
+- **Implementation:** Use `seo:pages:all` denormalized array for v1. Monitor performance. Have D1 migration plan ready.
 
-### Decision #4: Pagination on Admin List View
-- **Proposed by:** Elon Musk (Round 1)
-- **Accepted by:** Steve Jobs (Round 2 — "Pagination is non-negotiable")
+### Decision #4: Scoring System — Keep or Cut?
+- **Proposed cut by:** Elon Musk (Round 1 — "200+ lines of theater")
+- **Defended by:** Steve Jobs (Round 2 — "It's not vanity, it's the core value prop")
+- **Winner:** **Steve** (with simplification constraint)
+- **Rationale:** Elon: "Score doesn't affect Google indexing." Steve: "Users don't buy metadata storage, they buy confidence." Synthesis: Keep red/yellow/green scoring (simple traffic light), cut numerical "92/100" and audit history storage. Score is computed on-demand, not persisted.
+- **Implementation:** Pure function: `auditPage(data) → { color: 'red' | 'yellow' | 'green', issues: string[] }`. No KV writes for scores.
+
+### Decision #5: N+1 Query Bug Fix
+- **Proposed by:** Elon Musk (Round 1 — "getAllPages() is broken")
+- **Accepted by:** Steve Jobs (Round 2 — "I completely missed this")
 - **Winner:** **Elon** (unanimous)
-- **Rationale:** Without pagination, 500+ pages crashes browsers. Not theoretical — structural requirement.
-- **Implementation:** Cursor pagination, max 50 pages per view. Hard limit 1,000 until search/filter added.
+- **Rationale:** Current code does N sequential KV reads. At 500 pages, UI becomes unusable. Fix is trivial: denormalize to single array. Steve: "This is the kind of performance fix that actually matters."
+- **Implementation:** Store full page list as `seo:pages:all → PageSeoData[]`. Single read. Update array on save/delete.
 
-### Decision #5: Cut Meta Keywords Field
-- **Proposed by:** Elon Musk (Round 1 — "ignored by Google since 2009")
+### Decision #6: Pagination on Admin List
+- **Proposed by:** Elon Musk (Round 1)
+- **Accepted by:** Steve Jobs (Round 2 — "Non-negotiable")
+- **Winner:** **Elon** (unanimous)
+- **Rationale:** Without pagination, 500+ pages crashes browsers. Not theoretical—structural requirement.
+- **Implementation:** Cursor pagination, max 50 pages per view.
+
+### Decision #7: Cut Meta Keywords Field
+- **Proposed by:** Elon Musk (Round 1 — "Google ignores since 2009")
 - **Accepted by:** Steve Jobs (Round 2 — "Every unused field is a question mark")
 - **Winner:** **Elon** (unanimous)
 - **Rationale:** SEO theater. Adds cognitive load with zero value. "Completeness" doesn't mean shipping dead features.
-- **Implementation:** Remove field from schema, UI, audit logic entirely.
+- **Implementation:** Remove entirely from schema, UI, audit logic.
 
-### Decision #6: Cut Sitemap Pattern Overrides
-- **Proposed by:** Elon Musk (Round 1 — "0.1% use case, 40 lines of code")
-- **Challenged by:** Steve Jobs (Round 2 — wanted data, not assumptions)
+### Decision #8: Cut Sitemap Pattern Overrides
+- **Proposed by:** Elon Musk (Round 1 — "0.1% use case")
+- **Challenged by:** Steve Jobs (Round 2 — "Show me data, not assumptions")
 - **Winner:** **Elon** (with monitoring clause)
 - **Rationale:** Steve's compromise: "Ship without it. If even ONE user asks in first month, add it back."
-- **Implementation:** Default `changefreq: monthly` for all URLs. No UI for per-path overrides. Track feature requests.
+- **Implementation:** Default `changefreq: monthly`, `priority: 0.5` for all URLs. No UI. Track feature requests.
 
-### Decision #7: Robots.txt Settings UI
-- **Proposed cut by:** Elon Musk (Round 1 — "default is perfect, power users can edit manually")
+### Decision #9: Robots.txt Settings UI
+- **Proposed cut by:** Elon Musk (Round 1 — "Default is perfect")
 - **Challenged by:** Steve Jobs (Round 2 — "UI prevents catastrophic mistakes")
 - **Winner:** **Elon** (narrow victory)
-- **Rationale:** Steve's concern is valid (users break robots.txt), but solution is better defaults + docs, not UI. V1 ships with sensible static default. V2 adds UI if users request it.
-- **Implementation:** Generate default robots.txt automatically. No admin UI in v1.
+- **Rationale:** Steve's concern is valid (users break robots.txt), but solution is better defaults + docs, not UI complexity. V1 ships static default. V2 adds UI if users request.
+- **Implementation:** Generate sensible default automatically. No admin UI in v1.
 
-### Decision #8: Structured Data Handling
-- **Proposed cut by:** Elon Musk (Round 1 — "users paste broken JSON-LD, site breaks")
-- **Counter-proposal by:** Steve Jobs (Round 2 — "Don't cut it, constrain it")
-- **Winner:** **Steve** (with Elon's constraints)
-- **Rationale:** Rich snippets drive clicks, but freeform editor is dangerous. Compromise: ship with 3 templates (Article, LocalBusiness, Product) with form fields that generate valid JSON-LD. No freeform textarea.
-- **Implementation:** V1 ships with Article template only. LocalBusiness + Product in v1.1 if users request.
+### Decision #10: Auto-Generate Titles from H1s ("Fix This" Button)
+- **Proposed by:** Steve Jobs (Round 1 — "One click to fix")
+- **Challenged by:** Elon Musk (Round 2 — "This is a 2-week ML problem")
+- **Winner:** **Elon** (deferred to v2)
+- **Rationale:** Elon: "Emdash pages are React components, not static HTML. H1 might not exist. Right title isn't always H1. 'Fix this' is GPT-4 + API cost + latency." Steve conceded: "Let users write titles. Give 60-char guideline. Ship. If 10,000 users struggle, add auto-suggestions."
+- **Implementation:** V1 shows length guidelines only. V2 adds AI-powered suggestions if data proves need.
 
-### Decision #9: Social Preview Endpoint
-- **Proposed cut by:** Elon Musk (Round 1 — "redundant with getPagePublic")
-- **Defended by:** Steve Jobs (Round 2 — "users don't want JSON, they want to SEE")
-- **Winner:** **Steve**
-- **Rationale:** Endpoint renders visual artifacts (HTML cards), not raw data. This is "empathy, not redundancy." Core to WYSIWYG promise.
-- **Implementation:** Keep `/seodash/socialPreview` endpoint. Returns rendered HTML for Facebook/Twitter/Google cards.
+### Decision #11: Sitemap Caching with TTL
+- **Proposed by:** Elon Musk (Round 2)
+- **Accepted by:** Steve Jobs (Round 2 — "Brilliant. I was wrong to miss this.")
+- **Winner:** **Elon** (unanimous)
+- **Rationale:** Regenerating sitemap XML on every request is wasteful. Cache in KV, invalidate on content change via hook. Sub-10ms response time.
+- **Implementation:** Cache at `seo:sitemap:xml`, delete on page save/delete. No TTL—immediate invalidation.
 
-### Decision #10: "NPR at 6am" Brand Voice
-- **Proposed by:** Steve Jobs (Round 1 — "calm, confident, always teaching")
+### Decision #12: "NPR at 6am" Brand Voice
+- **Proposed by:** Steve Jobs (Round 1 — "Calm, confident, always teaching")
 - **Challenged by:** Elon Musk (Round 2 — "3x longer to write, test, internationalize")
 - **Winner:** **Steve** (with efficiency constraint)
-- **Rationale:** Tone matters in error messages — small business owners feel stupid, most SEO tools confirm it. But Elon's right that verbosity kills. Compromise: helpful tone, concise words.
+- **Rationale:** Tone matters—small business owners feel stupid, most SEO tools confirm it. But verbosity kills. Compromise: helpful tone, concise words.
 - **Implementation:** "Description too short (87/160 chars)" not "FAIL". Add context links: "Why does this matter?" → docs.
 
-### Decision #11: Test on Real Emdash Instance Before Ship
-- **Proposed by:** Elon Musk (Round 1, reinforced Round 2)
-- **Accepted by:** Steve Jobs (Round 2 — "all theorizing is worthless if runtime breaks assumptions")
-- **Winner:** **Elon** (unanimous)
-- **Rationale:** Plugin runtime is new. Sandbox model might break assumptions. Peak Dental is proving ground.
-- **Implementation:** Final test checklist must include Peak Dental with real KV bindings.
+### Decision #13: First 30 Seconds UX — Zero Config
+- **Proposed by:** Steve Jobs (Round 1)
+- **Accepted by:** Elon Musk (Round 2 — "Invisible until needed is correct")
+- **Winner:** **Steve** (unanimous)
+- **Rationale:** No setup wizard. No "Welcome! Let's configure..." Install → see what's wrong → fix it → feel smart.
+- **Implementation:** Dashboard shows issues immediately. No config required. Sensible defaults for everything.
 
 ---
 
 ## MVP Feature Set: What Ships in V1
 
 ### INCLUDED (Locked)
-1. **Per-Page SEO Fields:**
-   - Title (with length audit: 50-60 chars optimal)
-   - Meta description (with length audit: 150-160 chars optimal)
-   - OG image (with validation: exists, accessible, correct dimensions)
-   - OG title (defaults to page title)
-   - OG description (defaults to meta description)
-   - Twitter card type (summary vs summary_large_image)
-   - Noindex flag (default: false)
-   - Nofollow flag (default: false)
 
-2. **Audit Engine:**
-   - Title length check (too short <30, too long >60, optimal 50-60)
-   - Description length check (too short <120, too long >160, optimal 150-160)
-   - Missing OG image detection
-   - Missing title/description detection
-   - Red/yellow/green scoring per page
-   - Aggregate dashboard score (worst pages first)
+**Per-Page SEO Fields:**
+- Title (with length guidance: 50-60 chars optimal)
+- Meta description (with length guidance: 150-160 chars optimal)
+- OG image URL
+- OG title (defaults to page title)
+- OG description (defaults to meta description)
+- Canonical URL
+- Noindex flag (default: false)
+- Nofollow flag (default: false)
 
-3. **Dashboard:**
-   - One-screen overview (no tabs, no setup wizard)
-   - Worst pages ranked by issue severity
-   - Quick-fix links (click → edit page)
-   - Overall site health score (visual progress bar)
-   - Zero configuration required (immediate value in <30 seconds)
+**Red-to-Green Feedback System:**
+- Title check (missing, too short <30, too long >60, optimal 50-60)
+- Description check (missing, too short <120, too long >160, optimal 150-160)
+- OG image check (missing, unreachable)
+- Per-page color: red (critical issues), yellow (warnings), green (good)
+- Computed on-demand (not persisted)
 
-4. **Visual Previews:**
-   - Facebook card preview (HTML/CSS replica)
-   - Twitter card preview (HTML/CSS replica)
-   - Google search snippet preview (HTML/CSS replica)
-   - Live updates as user types
-   - Side-by-side view on page edit screen
+**Dashboard:**
+- Single-screen overview (no tabs)
+- Worst pages ranked first
+- Quick-fix links (click → edit page)
+- Overall site health indicator
+- Zero configuration required
 
-5. **XML Sitemap:**
-   - Auto-generated from all published pages
-   - Flat list (no pattern overrides)
-   - Default changefreq: monthly
-   - Default priority: 0.5
-   - Served at `/sitemap.xml`
-   - Cached in KV with 5-minute TTL (invalidate on page save/delete)
+**Sitemap.xml:**
+- Auto-generated from all published pages
+- Excludes noindex pages
+- Default: `changefreq: monthly`, `priority: 0.5`
+- Served at `/sitemap.xml`
+- Cached in KV, invalidated on page save/delete
 
-6. **Robots.txt:**
-   - Auto-generated with sensible defaults
-   - Allow all bots, reference sitemap
-   - No admin UI in v1 (static default only)
+**Robots.txt:**
+- Static default: `User-agent: *\nAllow: /\nSitemap: {url}/sitemap.xml`
+- No admin UI (manual editing only)
 
-7. **Structured Data:**
-   - Article template ONLY in v1
-   - Form fields: headline, datePublished, author, image
-   - Generates valid JSON-LD (no freeform editor)
-   - LocalBusiness + Product templates deferred to v1.1
+**JSON-LD Structured Data:**
+- DEFERRED to v1.1 (cut from v1 scope)
+- Rationale: Reduces scope, still ships core value
+
+**Public Routes:**
+- Metadata injection for `<head>` tags
+- Sitemap XML endpoint
+- Robots.txt endpoint
 
 ### EXCLUDED (Cut for V1)
-1. ~~Meta keywords field~~ — Dead since 2009
-2. ~~Sitemap pattern overrides~~ — 0.1% use case, ships without (track requests)
-3. ~~Robots.txt settings UI~~ — Default is perfect, v2 if users ask
-4. ~~Bulk SEO operations~~ — Focus matters, v2 feature
-5. ~~AI meta generation~~ — V2 differentiator (requires LLM integration)
-6. ~~Google Search Console integration~~ — V2 analytics play
-7. ~~Freeform structured data editor~~ — Dangerous, replaced with templates
-8. ~~SEO score out of 100~~ — Vanity metric, replaced with red/yellow/green
+
+- ❌ Meta keywords field (dead since 2009)
+- ❌ Sitemap pattern overrides UI (0.1% use case)
+- ❌ Robots.txt customization UI (default is perfect)
+- ❌ SEO score out of 100 (vanity metric—use traffic light instead)
+- ❌ Audit history storage (wasted KV writes)
+- ❌ Bulk edit operations (focus matters more)
+- ❌ Auto-generate titles from H1 (v2 ML feature)
+- ❌ Twitter Card type selector (OG tags work fine)
+- ❌ Google Search Console integration (v2 analytics)
+- ❌ Social preview HTML endpoint (cut for simplicity)
+- ❌ Structured data templates (deferred to v1.1)
 
 ---
 
 ## File Structure: What Gets Built
 
-### Plugin Architecture (Emdash KV-backed, no database)
-
 ```
-/plugins/seodash/
+/plugins/beacon/
 │
-├── index.ts                 # Main plugin entry, route registration
-├── types.ts                 # TypeScript interfaces (PageSEO, AuditResult, etc.)
-├── storage.ts               # KV operations (save, get, delete, denormalized list)
-├── audit.ts                 # Pure audit functions (title, description, OG checks)
-├── sitemap.ts               # XML generation + KV caching
-├── robots.ts                # Static robots.txt generator
-├── structured-data.ts       # JSON-LD templates (Article only in v1)
+├── index.ts                 # Plugin entry, route registration
+├── types.ts                 # TypeScript interfaces (PageSEO, AuditResult)
+├── storage.ts               # KV operations (denormalized list pattern)
+├── audit.ts                 # Pure audit functions (red/yellow/green logic)
+├── sitemap.ts               # XML generation + caching
+├── robots.ts                # Static default generator
 │
 ├── routes/
-│   ├── admin.ts             # Dashboard, list view (paginated), edit UI
-│   ├── public.ts            # Sitemap endpoint, robots.txt endpoint
-│   └── api.ts               # Save/delete handlers, social preview renderer
+│   ├── admin.ts             # Dashboard, list (paginated), edit UI
+│   ├── public.ts            # Sitemap, robots.txt endpoints
+│   └── api.ts               # Save/delete handlers
 │
 ├── components/
-│   ├── Dashboard.tsx        # Main admin screen (worst pages, progress bar)
-│   ├── PageEditor.tsx       # Edit form with live previews
-│   ├── SocialPreview.tsx    # Facebook/Twitter/Google card renderers
+│   ├── Dashboard.tsx        # Main admin screen
+│   ├── PageEditor.tsx       # Edit form with live feedback
 │   ├── AuditFeedback.tsx    # Red/yellow/green issue display
-│   └── Pagination.tsx       # List view pagination (max 50 per page)
+│   └── Pagination.tsx       # List pagination (max 50)
 │
 └── utils/
-    ├── scoring.ts           # Red/yellow/green logic
-    ├── validation.ts        # URL/image/length validators
-    └── preview-html.ts      # Social card HTML/CSS templates
+    ├── scoring.ts           # Traffic light logic
+    └── validation.ts        # URL/length validators
 ```
 
-### Key Technical Decisions
+### Storage Pattern (KV-Based)
 
-**Storage Pattern:**
-- Primary keys: `seo:page:{hash}` (per-page data)
-- Denormalized list: `seo:pages:list` (full array, one read)
-- Cache key: `seo:sitemap:xml` (5-min TTL)
-- Hash function: SHA-256 of page path (collision-free)
+**Primary keys:**
+- `beacon:page:{hash}` → per-page SEO data
+- `beacon:pages:all` → denormalized array of all pages (single read)
+- `beacon:sitemap:xml` → cached sitemap XML
 
-**Performance Optimizations:**
+**Hash function:** SHA-256 of page path (collision-free)
+
+**Performance optimizations:**
 - `getAllPages()`: Single KV read (denormalized array)
-- Sitemap: Cached XML, invalidated on writes
-- Pagination: Cursor-based, max 50 items
-- Audit: Pure functions (no I/O), computed on save
-
-**Routes:**
-- Admin: `/admin/seodash/dashboard`, `/admin/seodash/pages`, `/admin/seodash/edit/:hash`
-- Public: `/sitemap.xml`, `/robots.txt`
-- API: `POST /api/seodash/save`, `DELETE /api/seodash/delete/:hash`, `GET /api/seodash/preview/:hash`
+- Sitemap: Cached, invalidated on writes
+- Pagination: Max 50 items per view
+- Audit: Pure function, no I/O
 
 ---
 
 ## Open Questions: What Still Needs Resolution
 
 ### 1. Emdash Runtime Compatibility
-**Question:** Does the plugin sandbox model support KV bindings as assumed?
-**Blocker Status:** HIGH (breaks everything if wrong)
-**Resolution Path:** Test on Peak Dental with real KV before proceeding
-**Owner:** Build agent must validate environment first
+**Question:** Does plugin sandbox support KV bindings as assumed?
+**Blocker:** CRITICAL (nothing works if wrong)
+**Resolution:** Test on Peak Dental FIRST before building
+**Owner:** Build agent pre-flight check
 
-### 2. Social Card Rendering Accuracy
-**Question:** How close do HTML/CSS replicas need to match real platform rendering?
-**Blocker Status:** MEDIUM (UX quality, not functionality)
-**Resolution Path:** Build "good enough" replicas, iterate based on user feedback
-**Owner:** Build agent uses current platform docs (2026 specs)
+### 2. Cache Invalidation Timing
+**Question:** Immediate invalidation vs TTL for sitemap?
+**Decision:** Immediate (delete cache on save/delete)
+**Blocker:** LOW (can adjust if performance issues)
 
-### 3. Structured Data Scope for V1
-**Question:** Article template only, or also LocalBusiness/Product?
-**Decision:** Article only, monitor requests for first 30 days
-**Blocker Status:** LOW (can add templates easily)
-**Owner:** Build agent ships Article, tracks feature requests
+### 3. Error Handling for Missing KV Keys
+**Question:** What if `beacon:pages:all` doesn't exist?
+**Resolution:** Initialize empty array, rebuild from page keys if corrupted
+**Blocker:** LOW (edge case, handle gracefully)
 
-### 4. Dashboard "Worst Pages" Ranking Logic
-**Question:** Sort by issue count, severity, or traffic potential?
-**Current Decision:** Issue severity (missing OG > long title > short description)
-**Blocker Status:** LOW (can adjust weighting)
-**Owner:** Build agent implements severity enum, makes weights configurable
+### 4. Dashboard Ranking Logic
+**Question:** Sort worst pages by issue count or severity?
+**Decision:** Severity (missing OG > long title > short description)
+**Blocker:** LOW (weights configurable)
 
-### 5. Cache Invalidation for Sitemap
-**Question:** 5-minute TTL vs immediate invalidation on page save?
-**Current Decision:** Immediate invalidation (delete `seo:sitemap:xml` on write)
-**Blocker Status:** LOW (performance vs freshness tradeoff)
-**Owner:** Build agent implements invalidation, monitors performance
-
-### 6. Error Handling for Missing KV Keys
-**Question:** What happens if `seo:pages:list` doesn't exist on first run?
-**Resolution:** Initialize empty array, rebuild from individual page keys if corrupted
-**Blocker Status:** LOW (edge case, but must handle gracefully)
-**Owner:** Build agent adds defensive checks
-
-### 7. Pagination State Persistence
-**Question:** Should list view remember page position across sessions?
-**Current Decision:** No (default to page 1 on load, simpler v1)
-**Blocker Status:** LOW (nice-to-have, not critical)
-**Owner:** Defer to v1.1 if users request
+### 5. Pagination State Persistence
+**Question:** Remember page position across sessions?
+**Decision:** No (default to page 1, simpler v1)
+**Blocker:** LOW (defer to v1.1)
 
 ---
 
@@ -266,228 +252,203 @@
 
 ### CRITICAL RISKS (Ship Blockers)
 
-#### Risk #1: Emdash Plugin Runtime Mismatch
-- **Probability:** MEDIUM (new platform, assumptions untested)
+**Risk #1: Emdash Plugin Runtime Mismatch**
+- **Probability:** MEDIUM (new platform, untested assumptions)
 - **Impact:** CRITICAL (nothing works)
-- **Mitigation:** Test on Peak Dental BEFORE building. Validate KV bindings work as expected. If runtime differs from assumptions, stop and re-architect.
-- **Owner:** Build agent (pre-flight check required)
+- **Mitigation:** Test on Peak Dental BEFORE coding. Validate KV bindings. If runtime differs, stop and re-architect.
+- **Owner:** Build agent pre-flight check
 
-#### Risk #2: getAllPages() Still Breaks at Scale
-- **Probability:** LOW (denormalization should fix it)
+**Risk #2: getAllPages() Still Breaks at Scale**
+- **Probability:** LOW (denormalization should fix)
 - **Impact:** HIGH (UX degrades >500 pages)
-- **Mitigation:** Denormalize to `seo:pages:list`. Add pagination. Test with 1,000-page mock dataset.
-- **Owner:** Build agent (must validate with load test)
+- **Mitigation:** Denormalize to single array. Add pagination. Test with 1,000-page mock.
+- **Owner:** Build agent load test
 
-#### Risk #3: Sitemap Exceeds Worker Response Limit
-- **Probability:** LOW (<10,000 pages fits in 10MB limit)
+**Risk #3: Sitemap Exceeds Worker Response Limit**
+- **Probability:** LOW (<10k pages fits in 10MB)
 - **Impact:** MEDIUM (sitemap fails silently)
-- **Mitigation:** Monitor sitemap size. Add compression if >5MB. Stream XML in v2 if needed.
-- **Owner:** Build agent (add size check on generation)
+- **Mitigation:** Monitor size. Add compression if >5MB.
+- **Owner:** Build agent size check
 
 ### HIGH RISKS (Quality Degradation)
 
-#### Risk #4: Social Preview Cards Render Incorrectly
-- **Probability:** MEDIUM (platforms change specs frequently)
-- **Impact:** MEDIUM (users see wrong preview, lose trust)
-- **Mitigation:** Use current 2026 platform specs. Accept minor differences. Add "Preview may differ slightly" disclaimer. Update on user reports.
-- **Owner:** Build agent (document spec versions used)
+**Risk #4: Audit Feedback Misleads Users**
+- **Probability:** MEDIUM (users conflate green with #1 ranking)
+- **Impact:** MEDIUM (unrealistic expectations)
+- **Mitigation:** Disclaimer: "Green = technically optimized. Rankings depend on content, backlinks, competition."
+- **Owner:** Build agent disclaimer text
 
-#### Risk #5: Structured Data Templates Generate Invalid JSON-LD
-- **Probability:** LOW (templates are static, validated)
-- **Impact:** HIGH (breaks rich snippets, user sites penalized)
-- **Mitigation:** Validate all template output with Google's Structured Data Testing Tool. Add schema version comments. Escape all user inputs.
-- **Owner:** Build agent (must validate before ship)
-
-#### Risk #6: Cache Invalidation Fails, Sitemap Serves Stale Data
+**Risk #5: Cache Invalidation Fails**
 - **Probability:** LOW (simple delete on write)
-- **Impact:** MEDIUM (new pages missing from sitemap for up to 5 min)
-- **Mitigation:** Immediate invalidation on page save/delete. Add manual "regenerate sitemap" button in admin if paranoid.
-- **Owner:** Build agent (test save → sitemap flow)
+- **Impact:** MEDIUM (stale sitemap for 5 min)
+- **Mitigation:** Immediate invalidation on save/delete. Test save → sitemap flow.
+- **Owner:** Build agent test coverage
 
 ### MEDIUM RISKS (User Friction)
 
-#### Risk #7: Users Expect Features We Cut (Keywords, Patterns, Robots UI)
+**Risk #6: Users Expect Cut Features**
 - **Probability:** MEDIUM (SEO users have legacy expectations)
-- **Impact:** LOW (can add in v1.1 if demand proven)
-- **Mitigation:** Track all feature requests for 30 days. Add most-requested features in v1.1. Document why features were cut in FAQ.
-- **Owner:** Post-launch monitoring (track GitHub issues)
+- **Impact:** LOW (can add in v1.1)
+- **Mitigation:** Track feature requests for 30 days. Add most-requested in v1.1.
+- **Owner:** Post-launch monitoring
 
-#### Risk #8: Pagination UX Confuses Users (No Search/Filter)
-- **Probability:** MEDIUM (users expect search in lists >50 items)
-- **Impact:** LOW (workaround: use browser find)
-- **Mitigation:** Add search/filter in v1.1. For v1, keep list sorted by worst-first so important pages are on page 1.
-- **Owner:** Build agent (ensure sort order is helpful)
-
-#### Risk #9: Audit Feedback Misleads Users ("Green Means #1 Ranking")
-- **Probability:** MEDIUM (users conflate technical correctness with SEO success)
-- **Impact:** MEDIUM (unrealistic expectations, support burden)
-- **Mitigation:** Add disclaimer in dashboard: "Green = technically optimized. Rankings depend on content quality, backlinks, competition." Link to SEO basics doc.
-- **Owner:** Build agent (add disclaimer text)
+**Risk #7: Pagination UX Confuses Users**
+- **Probability:** MEDIUM (expect search in lists >50)
+- **Impact:** LOW (workaround: browser find)
+- **Mitigation:** Sort by worst-first so important pages on page 1. Add search in v1.1.
+- **Owner:** Build agent sort logic
 
 ### LOW RISKS (Edge Cases)
 
-#### Risk #10: Path Hashing Collision (Unlikely but Catastrophic)
-- **Probability:** VERY LOW (SHA-256 is collision-resistant)
-- **Impact:** CRITICAL (wrong page data returned)
-- **Mitigation:** Use full SHA-256 hash (not truncated). Log all hash operations. Add collision detection in storage layer.
-- **Owner:** Build agent (use crypto.subtle.digest, no shortcuts)
+**Risk #8: Path Hashing Collision**
+- **Probability:** VERY LOW (SHA-256 resistant)
+- **Impact:** CRITICAL (wrong data returned)
+- **Mitigation:** Use full SHA-256. Log all hashes. Add collision detection.
+- **Owner:** Build agent (no shortcuts)
 
-#### Risk #11: OG Image Validation Blocks Valid Images
-- **Probability:** LOW (validation is permissive)
-- **Impact:** LOW (user sees false negative, annoying)
-- **Mitigation:** Check URL format + reachability only. Don't enforce dimensions/format strictly. Allow override.
-- **Owner:** Build agent (validate but don't block)
-
-#### Risk #12: Robots.txt Default Accidentally Blocks Google
+**Risk #9: Robots.txt Default Blocks Google**
 - **Probability:** VERY LOW (default is "allow all")
-- **Impact:** CRITICAL (site disappears from search)
-- **Mitigation:** Default template: `User-agent: *\nAllow: /\nSitemap: {url}/sitemap.xml`. Test against Google's robots.txt validator. Add warning if user tries to edit manually.
-- **Owner:** Build agent (use battle-tested default)
+- **Impact:** CRITICAL (site vanishes)
+- **Mitigation:** Battle-tested default. Test against Google's validator.
+- **Owner:** Build agent validation
 
 ---
 
 ## Success Criteria: How We Know It's Done
 
-### Technical Validation (Required Before Ship)
-- [ ] Runs on Peak Dental without errors
-- [ ] KV bindings work as expected (read/write/delete)
-- [ ] `getAllPages()` loads 500-page dataset in <500ms
-- [ ] Sitemap generates valid XML (W3C validator passes)
-- [ ] Structured data passes Google's testing tool
-- [ ] Social preview cards render on all major browsers
-- [ ] Pagination works (navigate 50+ pages without crash)
+### Technical Validation
+- ✅ Runs on Peak Dental without errors
+- ✅ KV bindings work (read/write/delete)
+- ✅ `getAllPages()` loads 500 pages in <500ms
+- ✅ Sitemap generates valid XML
+- ✅ Pagination works (50+ pages without crash)
+- ✅ Cache invalidation works (save → sitemap updates)
 
-### User Experience Validation (Required Before Ship)
-- [ ] Install → see dashboard in <30 seconds (zero config)
-- [ ] Edit page → see live preview updates
-- [ ] Fix issue → see red turn green
-- [ ] Save page → sitemap updates (within 5 min)
-- [ ] Delete page → removed from list and sitemap
-- [ ] No console errors, no broken images, no 404s
+### User Experience Validation
+- ✅ Install → see dashboard in <30 seconds (zero config)
+- ✅ Edit page → see live feedback
+- ✅ Fix issue → see red turn green
+- ✅ Save → sitemap updates immediately
+- ✅ No console errors, no 404s
 
-### Quality Gates (Required Before Ship)
-- [ ] All audit functions have unit tests
-- [ ] Storage layer has integration tests (mock KV)
-- [ ] Error messages follow "NPR at 6am" tone
-- [ ] No meta keywords field in UI or schema
-- [ ] No sitemap pattern overrides in UI
-- [ ] Robots.txt UI does not exist (static default only)
-- [ ] Structured data limited to Article template
+### Ship Gate (The One That Matters)
+**Non-technical user fixes their first SEO issue in under 60 seconds and thinks "Oh. That's it?"**
 
 ---
 
 ## Post-Ship Monitoring Plan
 
-### Week 1: Stability & Critical Bugs
-- Monitor error logs for runtime crashes
-- Track sitemap generation failures
-- Validate KV performance (no timeouts)
-- Fix critical bugs within 24 hours
+### Week 1: Stability
+- Monitor error logs
+- Track sitemap failures
+- Validate KV performance
+- Fix critical bugs <24 hours
 
-### Days 1-30: Feature Request Tracking
+### Days 1-30: Feature Requests
 - Log all "I wish it had..." comments
-- Count requests for cut features (keywords, patterns, robots UI)
-- Identify most-requested v1.1 features
-- Decision threshold: 3+ users request = add to v1.1
+- Count requests for cut features
+- Decision threshold: 3+ users = add to v1.1
 
 ### Day 30: V1.1 Planning
-- Review feature request data
-- Prioritize by demand + effort
-- Top candidates for v1.1:
-  - LocalBusiness structured data template (if requested)
-  - Search/filter on page list (if >500 pages common)
-  - Manual sitemap regeneration button (if cache issues reported)
-  - Robots.txt UI (if users break default)
+Top candidates:
+- LocalBusiness/Product structured data (if requested)
+- Search/filter on page list (if >500 pages common)
+- Robots.txt UI (if users break default)
+- D1 migration (if KV performance issues)
 
 ---
 
 ## Build Agent Instructions
 
-### Pre-Flight Checklist (MUST Complete Before Coding)
-1. Verify Peak Dental is accessible with KV bindings
-2. Confirm Emdash plugin API matches assumptions (route registration, context object)
-3. Check if TypeScript/React toolchain is configured
-4. Validate that `ctx.kv.get()`, `ctx.kv.put()`, `ctx.kv.delete()` work as expected
+### Pre-Flight Checklist (MUST Complete First)
+1. ✅ Verify Peak Dental accessible with KV
+2. ✅ Confirm Emdash plugin API matches assumptions
+3. ✅ Validate `ctx.kv.get()`, `ctx.kv.put()`, `ctx.kv.delete()` work
+4. ✅ Check TypeScript/React toolchain configured
 
-### Build Order (Sequential, Do Not Skip Steps)
-1. **Storage layer** — KV operations, denormalized list, hash function
-2. **Audit engine** — Pure functions for title/description/OG checks
-3. **Dashboard** — One-screen view, worst pages, progress bar
-4. **Page editor** — Form fields, live previews, save handler
-5. **Sitemap** — XML generation, KV caching, invalidation
-6. **Robots.txt** — Static default generator
-7. **Structured data** — Article template only
-8. **Pagination** — List view, max 50 items
-9. **Social previews** — Facebook/Twitter/Google HTML/CSS replicas
-10. **Testing** — Unit tests (audit), integration tests (storage), Peak Dental validation
+### Build Order (Sequential)
+1. **Storage layer** — KV ops, denormalized list, hash
+2. **Audit engine** — Pure functions for red/yellow/green
+3. **Dashboard** — One-screen, worst-first
+4. **Page editor** — Form fields, live feedback
+5. **Sitemap** — XML generation, caching, invalidation
+6. **Robots.txt** — Static default
+7. **Pagination** — List view, max 50
+8. **Testing** — Unit + integration + Peak Dental validation
 
-### Non-Negotiable Requirements
-- Fix `getAllPages()` before proceeding (denormalize to single array)
-- Add pagination before claiming list view is done
-- Test on Peak Dental before claiming "done"
-- NO meta keywords field anywhere
-- NO sitemap pattern overrides UI
-- NO robots.txt settings UI
-- NO freeform structured data editor
-- Article template ONLY for structured data
+### Non-Negotiables
+- ❌ NO meta keywords field
+- ❌ NO sitemap pattern overrides UI
+- ❌ NO robots.txt settings UI
+- ❌ NO numerical scores (use red/yellow/green only)
+- ❌ NO audit history storage
+- ✅ FIX getAllPages() before proceeding
+- ✅ ADD pagination before claiming done
+- ✅ TEST on Peak Dental before shipping
 
 ### Quality Standards
-- Error messages: helpful tone, concise words (not verbose)
-- Social previews: "good enough" replicas (not pixel-perfect)
-- Audit feedback: red/yellow/green with context (not just pass/fail)
-- Dashboard: zero config, immediate value (<30 seconds to usefulness)
+- Error messages: helpful tone, concise words
+- Audit feedback: traffic light + context
+- Dashboard: zero config, immediate value
+- Code: ~400 lines total
 
 ---
 
 ## Debate Synthesis: Steve vs Elon
 
 ### Where Steve Won (Design & UX)
-- Visual social previews (core differentiator)
-- Red-to-green feedback (psychological hook)
-- "NPR at 6am" brand voice (with efficiency constraint)
-- Structured data templates (not cut, constrained to Article)
-- Social preview endpoint (visual empathy, not JSON)
+- ✅ Product name: Beacon
+- ✅ Red-to-green feedback system (core value)
+- ✅ "NPR at 6am" brand voice (with efficiency)
+- ✅ First 30 seconds must feel like magic
+- ✅ KV storage for v1 (defer D1 to scale)
 
 ### Where Elon Won (Performance & Scope)
-- Fix `getAllPages()` N+1 bug (unanimous)
-- Add pagination (unanimous)
-- Cut meta keywords (unanimous)
-- Cut sitemap patterns (with monitoring clause)
-- Cut robots.txt UI (narrow victory)
+- ✅ Fix getAllPages() N+1 bug
+- ✅ Add pagination
+- ✅ Cut meta keywords
+- ✅ Cut sitemap patterns
+- ✅ Cut robots.txt UI
+- ✅ Sitemap caching with invalidation
+- ✅ Defer auto-title generation to v2
 
-### Where Both Agreed (Locked Consensus)
-- Test on Peak Dental before ship
-- One dashboard, zero setup
-- Worst pages ranked first
-- No keyword density scores
-- Sitemap/robots.txt auto-generation
-- Ship simple, iterate with data
+### Where Both Agreed (Locked)
+- ✅ Test on Peak Dental before ship
+- ✅ One dashboard, zero setup
+- ✅ Worst pages ranked first
+- ✅ Ship simple, iterate with data
+- ✅ 400 lines max
+- ✅ Delete complexity creep
 
 ### Core Tension Resolved
-**Steve:** "Design creates trust, trust drives adoption."
+**Steve:** "Design creates trust. Trust drives adoption."
 **Elon:** "Taste tells you WHAT to build. Data tells you WHEN."
-
-**Synthesis:** Build the 10% of features that deliver 90% of value WITH Steve's design quality. Ship in 2 days. Let usage data tell us what to add next.
-
----
-
-## Final Word: The Blueprint
-
-**What we're building:** A tool that makes people feel confident, not just correct.
-
-**How we're building it:** Steve's UX taste + Elon's performance discipline + data-driven iteration.
-
-**When we ship:** 2 days from start.
-
-**How we know it works:** Peak Dental runs it without errors.
-
-**What happens next:** Monitor for 30 days. Add most-requested features in v1.1. Cut features nobody asks for.
-
-**The promise:** SEO that's invisible when perfect, obvious when broken. Fix → save → done.
+**Synthesis:** Build the 10% that delivers 90% WITH design quality. Ship in 2 days. Let data guide v1.1.
 
 ---
 
-**This document is the contract between debate and execution. Build agent: make it real.**
+## The Essence (What This Is Really About)
+
+**What we're building:**
+A guide that whispers the answer. Not another dashboard. Not another form.
+
+**How it feels:**
+Quiet relief. Confident, not confused. "Oh. That's it?"
+
+**What must be perfect:**
+First 30 seconds. Install → see what's wrong → fix it → feel smart.
+
+**Creative direction:**
+Invisible until needed. Obvious when broken.
+
+**Ship when:**
+Non-technical user fixes their first SEO issue in under 60 seconds without reading docs.
+
+---
+
+**This document is the contract between debate and execution.**
+
+**Build agent: Make it real.**
 
 — Phil Jackson, Zen Master
 Great Minds Agency

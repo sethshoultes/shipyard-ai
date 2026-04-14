@@ -1,29 +1,30 @@
-# SEODash: The Essence
+# Essence
 
-**What is this product REALLY about?**
-Make SEO visible without becoming distraction. Show exactly what's wrong and exactly how to fix it.
+**What is this REALLY about?**
+Making people feel confident about SEO without making them learn SEO.
 
-**The Feeling**
-Quiet confidence. Not guessing. Not Googling the same question again. Fix → save → done.
+**What's the feeling?**
+Quiet relief. Not guessing anymore.
 
-**The One Thing That Must Be Perfect**
-Seeing the actual preview. Facebook, Twitter, Google. No translation. What You See Is What You Get.
+**What must be perfect?**
+First 30 seconds. Install → see what's wrong → fix it → feel smart.
 
-**Creative Direction**
-Invisible. Simple. One dashboard. Trust.
+**Creative direction:**
+Invisible until needed. Obvious when broken.
 
 ---
 
-**Ship This**
-Dashboard showing worst pages. Visual preview. Red-to-green feedback. Zero setup. Two days.
+**Core tension resolved:**
+Steve's empathy + Elon's ruthlessness = trust without bloat.
 
-**Cut**
-- Keywords field (dead since 2009)
-- Sitemap pattern overrides (0.1% case)
-- Robots.txt UI (sensible default exists)
+**The one thing:**
+Red → green feedback loop. Everything else supports this.
 
-**Test**
-Real Emdash instance before claiming done.
+**What we're NOT building:**
+Another dashboard. Another form. Another thing to configure.
 
-**Then**
-Prove demand. Build the 90%. Not the other way around.
+**What we ARE building:**
+A guide that whispers the answer.
+
+**Ship when:**
+Non-technical user fixes their first SEO issue in under 60 seconds and thinks "Oh. That's it?"

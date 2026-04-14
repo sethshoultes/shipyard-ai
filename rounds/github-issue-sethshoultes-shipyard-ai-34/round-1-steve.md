@@ -1,46 +1,79 @@
-# Steve Jobs — Chief Design & Brand Officer
-## SEODash Plugin Review
-
-### Product Naming
-The name is **SEODash**. One word. Clean. But let me be clear: it's not great, it's just acceptable. "Dash" suggests speed, but this isn't about speed—it's about *clarity*. SEO is a swamp of confusion, and this tool should be the flashlight. If we had time to rename, I'd call it **Beacon** or **Lighthouse**—something that guides you home. But SEODash works. It's direct. Keep it.
-
-### Design Philosophy — Invisible Excellence
-This plugin must be **invisible when perfect, obvious when broken**. Like the best UI, it shouldn't exist until you need it. The user shouldn't think "I need to do SEO"—they should think "I want to write a great page" and SEO just *happens*.
-
-The audit engine is the soul of this product. It's not a checklist—it's a **conversation**. "Your title is 23 characters. Google will cut it off. You're losing clicks." That's what great design does: it explains *why*, not just *what*.
-
-### User Experience — First 30 Seconds
-You install the plugin. You see **one dashboard**. Not 17 tabs. Not a settings maze. One screen that shows:
-- Your worst pages (red)
-- Your good pages (green)
-- What to fix first (ranked by impact)
-
-Click a page. See the preview—Facebook card, Twitter card, Google snippet—*exactly* as users will see it. No guessing. No "check the meta tags." You see what they see. That's the promise.
-
-### Brand Voice — A Quiet Expert
-This product doesn't yell. It doesn't say "OPTIMIZE NOW!" like every garbage SEO tool. It speaks like a patient expert: "This description is 87 characters. Add 33 more to avoid truncation." Factual. Helpful. Never condescending.
-
-The tone is **NPR at 6am**—calm, confident, always teaching. You trust it because it doesn't waste your time.
-
-### What to Say NO To
-NO to:
-- **Keyword density scores** — it's 2026, not 2006. Google is smarter than that.
-- **SEO scores out of 100** — meaningless vanity metrics. Show *issues*, not *points*.
-- **AI-written meta descriptions** — this tool *helps* you write better, it doesn't write *for* you.
-- **Bulk editing** — if you're changing 50 pages at once, you're doing SEO wrong. Focus matters.
-- **Integration with 37 analytics tools** — this does *one thing*: makes your pages findable. Period.
-
-### The Emotional Hook — Why People Love This
-Because **it respects their time**.
-
-Every CMS adds SEO as an afterthought—20 empty fields per page, no guidance, no feedback. This tool tells you *exactly* what's wrong and *exactly* how to fix it. You're not Googling "ideal meta description length" for the 900th time. You're not wondering if you did it right.
-
-You save the page. The red dot turns green. You *feel* the progress.
-
-That's the hook: **certainty in a sea of guesswork**. You know your pages are ready for the world. That quiet confidence—*that's* insanely great.
+# Steve Jobs — Design & Brand Vision
+## SEODash Plugin for Emdash CMS
 
 ---
 
-**One more thing:** The sitemap and robots.txt generation? Hidden genius. Most people screw this up or pay $50/month for a service. We do it automatically, correctly, invisibly. That's what Apple does—solve the problem you didn't know you had.
+## Product Naming
 
-Ship this. Make it work flawlessly. Then make it disappear into the background where all great tools belong.
+**SEODash is wrong.** It's forgettable tech jargon. Nobody falls in love with "dash" suffixes.
+
+Call it **Beacon**.
+
+Why? Because SEO is about being *found*. A beacon guides people through darkness. It's a single word. It's visceral. When someone asks "How do I get traffic?" you say "Turn on Beacon." Done.
+
+---
+
+## Design Philosophy
+
+Most SEO tools are like car dashboards designed by engineers who hate drivers — 47 knobs, 12 warnings, zero clarity.
+
+**Beacon must be the opposite: invisible intelligence.**
+
+The user should never see a "meta description field" or "canonical URL input." They write their page. Beacon *already knows* what's wrong. It shows a simple score: green (ship it), yellow (fixable), red (don't you dare publish this).
+
+One number. One color. One click to see what matters.
+
+If the user has to think about `<meta property="og:image">`, we've already failed.
+
+---
+
+## User Experience: The First 30 Seconds
+
+You install Beacon. You see nothing.
+
+Then you edit a page. In the corner: a small green "92" with a checkmark. You hover — "Your SEO is strong. Ship it."
+
+You delete the title. The number turns red: "38." A popover appears: "No title = invisible to Google." One button: "Fix this." It writes a title based on your H1.
+
+**That's it.** No tutorials. No onboarding. No "Would you like to configure your sitemap frequency?" Hell no. We choose the right defaults. If they want to nerd out later, fine — but the first 30 seconds must feel like *magic*, not homework.
+
+---
+
+## Brand Voice
+
+Beacon speaks like a confident designer, not a panicked marketer.
+
+**Bad:** "Warning: Meta description length exceeds optimal range (160-320 characters)."
+**Beacon:** "Your description is too long. Google will cut it off. Say less."
+
+**Bad:** "Consider implementing structured data markup for enhanced SERP visibility."
+**Beacon:** "Add rich snippets so Google shows your reviews in search. Here's the code."
+
+Sharp. Direct. No jargon unless it earns its place.
+
+---
+
+## What to Say NO To
+
+1. **Keyword density trackers.** It's 2026. Google doesn't count keywords like a dumb robot anymore. Cut it.
+2. **Bulk editing.** If you have 500 pages with bad SEO, your problem isn't tooling — it's content strategy. Fix one page well, then systematize.
+3. **A/B testing SEO titles.** You're not Amazon. Pick a good title and move on.
+4. **"Advanced settings" tabs.** Every setting you add is an admission of design failure. Choose defaults so good users never need to configure.
+
+Simplicity means the **courage to choose**. We're not building a Swiss Army knife. We're building a scalpel.
+
+---
+
+## The Emotional Hook
+
+People will love Beacon because **it makes them feel smart without making them work hard.**
+
+Bad SEO feels like you're failing a test you never studied for. Beacon is the friend who whispers the answers — not to cheat, but because they actually know the material and want you to succeed.
+
+When a user sees their score jump from 62 to 94 after fixing two simple things, they'll feel *powerful*. Not because they learned SEO — because Beacon learned them.
+
+That's the hook: **effortless excellence.**
+
+---
+
+**Bottom line:** SEODash is dead. Long live Beacon. Ship it when it's so simple your mom could get a 95 SEO score without reading a single doc.

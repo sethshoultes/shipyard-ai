@@ -1,296 +1,445 @@
-# SEODash Plugin Fix — Requirements Traceability
+# Beacon Plugin — Requirements Specification
 
+**Project:** Beacon (SEO Plugin for Emdash CMS)
+**Slug:** github-issue-sethshoultes-shipyard-ai-34
+**Status:** Planning Phase — Research Complete
 **Generated:** 2026-04-14
-**Project:** github-issue-sethshoultes-shipyard-ai-34
-**Source PRD:** `/home/agent/shipyard-ai/prds/github-issue-sethshoultes-shipyard-ai-34.md`
-**Source Decisions:** `/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-34/decisions.md`
-**Source Documentation:** `/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md`
-**Existing Code:** `/home/agent/shipyard-ai/plugins/seodash/src/` (969 lines in sandbox-entry.ts)
+**Research Sources:**
+- Codebase Scout (agent ac6595b)
+- Requirements Analyst (agent ab197dc)
+- Risk Scanner (agent a22ef73)
 
 ---
 
 ## Executive Summary
 
-The SEODash plugin is an existing Emdash CMS plugin providing comprehensive SEO management (title/description optimization, sitemaps, robots.txt, social previews, structured data). The plugin code exists but needs critical fixes before it can ship:
+**Product:** Beacon — SEO plugin for Emdash CMS (name changed from SEODash per Decision #1)
+**Core Promise:** Make users feel confident about SEO without making them learn SEO
+**Target Feeling:** Quiet relief. Not guessing anymore.
+**Ship Gate:** Non-technical user fixes their first SEO issue in under 60 seconds and thinks "Oh. That's it?"
 
-**Problems:**
-1. **Architectural Mismatches** — Code doesn't fully align with Emdash plugin API expectations
-2. **Feature Scope Violations** — Includes 4 features explicitly cut in product decisions (keywords, sitemap patterns, robots UI, freeform structured data)
-3. **Missing V1 Requirements** — Pagination, visual social previews, proper dashboard UI, Article template system
-4. **Untested Runtime** — Never deployed to Peak Dental (real Emdash instance)
+**Current State:**
+- Codebase exists: 796 lines (sandbox-entry.ts) + 487 lines (admin-ui.ts) + 40+ test cases
+- Status: Clean foundation, NO banned patterns found (throw new Response, rc.user)
+- Issues: N+1 query pattern still active, no pagination, simple hash (not SHA-256)
+- Target: ~400 lines total after cleanup
 
-**Status:** Code foundation is solid (audit engine, storage patterns, tests exist) but needs 8-15 hours of remediation before ship.
-
-**Target:** Working v1 deployment to Peak Dental in 2 days after fixes completed.
-
----
-
-## Requirements Traceability Matrix
-
-### Legend
-- ✅ **DONE** — Implemented correctly in current code
-- ⚠️ **PARTIAL** — Partially implemented or needs validation
-- ❌ **MISSING** — Not implemented
-- ❌ **VIOLATES** — Violates locked decision (must remove)
-- ⚠️ **BLOCKER** — Blocks all other work until resolved
+**Scope Reduction:**
+- Cut: 11 features (meta keywords, pattern overrides, numerical scores, audit history, etc.)
+- Defer: Structured data to v1.1 per decisions.md
 
 ---
 
-## Wave 0: Pre-Flight Validation (CRITICAL BLOCKERS)
+## Critical Findings from Research
 
-| ID | Requirement | Source | Status | Priority |
-|----|-------------|--------|--------|----------|
-| REQ-001 | Validate Emdash plugin API on Peak Dental with minimal test plugin | Risk #1 | ⚠️ BLOCKER | P0 |
-| REQ-002 | Confirm `ctx.kv` works in sandboxed execution vs `ctx.storage` | Risk #2 | ⚠️ BLOCKER | P0 |
-| REQ-003 | Verify custom content-type responses work for public routes (XML, plain text) | Risk Scanner | ⚠️ BLOCKER | P0 |
-| REQ-004 | Determine if Block Kit is required for admin UI or if HTML strings work | EMDASH-GUIDE L1023 | ⚠️ BLOCKER | P0 |
-| REQ-005 | Document actual Emdash plugin API patterns from test results | Risk #1 | ⚠️ BLOCKER | P0 |
+### Codebase Scout Report (agent ac6595b)
 
-**Acceptance:** Cannot proceed to Wave 1 until all P0 blockers resolved and documented.
+**GOOD NEWS:**
+- ✅ NO banned patterns found (`throw new Response()` = 0 occurrences, `rc.user` = 0)
+- ✅ Solid test coverage (40+ tests in place)
+- ✅ Clean TypeScript with full type coverage
+- ✅ Audit engine already implemented correctly
+- ✅ Sitemap and robots.txt generation working
+- ✅ Error handling uses proper `throw new Error()` pattern
 
----
+**ISSUES IDENTIFIED:**
+- ❌ N+1 query pattern STILL EXISTS (lines 158-166 in sandbox-entry.ts)
+- ❌ No pagination implemented (will crash at 100+ pages)
+- ❌ Simple hash function (not SHA-256 as specified)
+- ❌ No sitemap caching implemented
+- ❌ Numerical scores stored to KV (violates Decision #4)
 
-## Wave 1: Feature Cleanup (Remove Scope Violations)
+### Risk Scanner Report (agent a22ef73)
 
-| ID | Requirement | Source | Current Status | Acceptance Criteria |
-|----|-------------|--------|----------------|---------------------|
-| REQ-006 | Remove `keywords` field from PageSeoData interface | Decision #5 L48-53 | ❌ VIOLATES | No keywords in types, audit logic, or UI |
-| REQ-007 | Remove keyword audit checks from auditPage() function | Decision #5 L48-53 | ❌ VIOLATES | Lines 118-120 deleted |
-| REQ-008 | Remove keywords processing from savePage handler | Decision #5 L48-53 | ❌ VIOLATES | Line 345 deleted |
-| REQ-009 | Remove sitemap pattern overrides from SitemapSettings | Decision #6 L55-60 | ❌ VIOLATES | Only defaultChangefreq and defaultPriority remain |
-| REQ-010 | Remove pattern logic from generateSitemapXml() | Decision #6 L55-60 | ❌ VIOLATES | Lines 193-199 deleted |
-| REQ-011 | Remove sitemapSettings handler (pattern configuration) | Decision #6 L55-60 | ❌ VIOLATES | Handler removed or simplified to defaults only |
-| REQ-012 | Remove robotsSettings handler (make robots.txt immutable) | Decision #7 L62-67 | ❌ VIOLATES | Handler at lines 655-682 deleted |
-| REQ-013 | Remove RobotsSettings rules configuration support | Decision #7 L62-67 | ❌ VIOLATES | Only static default template |
+**CRITICAL RISKS:**
+1. **RISK-001:** KV denormalization not implemented — N+1 pattern still present
+2. **RISK-002:** Emdash plugin runtime KV binding assumptions untested
+3. **RISK-004:** Hash collision risk with simple 32-bit hash (not SHA-256)
 
-**Acceptance:** All cut features removed, zero references remain, tests still pass.
-
----
-
-## Wave 2: Storage Architecture Fixes
-
-| ID | Requirement | Source | Current Status | Acceptance Criteria |
-|----|-------------|--------|----------------|---------------------|
-| REQ-014 | Fix getAllPages() N+1 bug by storing full page objects in list | Decision #3 Risk #3 | ⚠️ PARTIAL | `seo:pages:all` stores PageSeoData[], not hashes |
-| REQ-015 | Denormalize page storage: one KV read returns all pages | Decision #3 L206-209 | ⚠️ PARTIAL | getAllPages() = single `ctx.kv.get("seo:pages:all")` |
-| REQ-016 | Update savePage to maintain denormalized list on write | Storage fix | ❌ MISSING | Save updates both `seo:{hash}` AND full list |
-| REQ-017 | Update deletePage to maintain denormalized list on delete | Storage fix | ❌ MISSING | Delete removes from both individual key and full list |
-| REQ-018 | Add defensive handling for missing/corrupted `seo:pages:all` | Open Q #6 | ⚠️ PARTIAL | Initialize empty array, rebuild from individual keys if needed |
-| REQ-019 | Implement sitemap cache invalidation on page save/delete | Decisions L140 Open Q #5 | ⚠️ UNCLEAR | Delete `seo:sitemap:xml` on write operations |
-| REQ-020 | SHA-256 hash function with no truncation | Risk #10 | ✅ DONE | hashPath() uses full hash output |
-
-**Acceptance:** Load test with 1,000 pages completes in <500ms, no N+1 queries.
+**HIGH RISKS:**
+5. **RISK-005:** getAllPages() blocks until all N reads complete (25-50 seconds for 500 pages)
+6. **RISK-006:** No pagination on admin page list
+7. **RISK-008:** Cache invalidation logic missing
 
 ---
 
-## Wave 3: Pagination & Sorting
+## MUST HAVE (MVP Features)
 
-| ID | Requirement | Source | Current Status | Acceptance Criteria |
-|----|-------------|--------|----------------|---------------------|
-| REQ-021 | Implement cursor-based pagination (max 50 items per view) | Decision #4 L41-46 | ❌ MISSING | listPages accepts limit/offset params |
-| REQ-022 | Hard limit 1,000 total pages | Decision #4 L46 | ❌ MISSING | Returns error if page count exceeds 1,000 |
-| REQ-023 | Sort pages by SEO score (worst first), not alphabetically | Decisions §122 Open Q #4 | ❌ WRONG | Line 416 sorts by `seoScore` ascending |
-| REQ-024 | Severity ranking: missing OG > long title > short description | Open Q #4 | ⚠️ IMPLICIT | Issue types have explicit severity weights |
-| REQ-025 | Dashboard shows "Page X of Y" indicator | Gap identified | ❌ MISSING | Pagination UI includes current page/total |
+### Per-Page SEO Metadata Fields (8 fields)
 
-**Acceptance:** Admin list shows worst 50 pages first, pagination works, no browser crashes at 500+ pages.
+**REQ-001: Title field with length guidance**
+- Store and display page title (50-60 chars optimal range)
+- Acceptance: UI shows "50-60 chars optimal" guideline; value persists to KV
+- Status: ✅ IMPLEMENTED (lines 63-72 in sandbox-entry.ts)
+- Source: MVP Feature Set, Decision #10
 
----
+**REQ-002: Meta description field with length guidance**
+- Store and display meta description (150-160 chars optimal range)
+- Acceptance: UI shows "150-160 chars optimal" guideline; value persists to KV
+- Status: ✅ IMPLEMENTED (lines 75-84 in sandbox-entry.ts)
+- Source: MVP Feature Set
 
-## Wave 4: Dashboard UI Completion
+**REQ-003: OG image URL field**
+- Store and validate OG image URL
+- Acceptance: Form accepts URL; audit fails if missing or unreachable
+- Status: ✅ IMPLEMENTED (lines 87-89 in sandbox-entry.ts)
+- Source: MVP Feature Set
 
-| ID | Requirement | Source | Current Status | Acceptance Criteria |
-|----|-------------|--------|----------------|---------------------|
-| REQ-026 | One-screen dashboard overview (no tabs, no wizards) | Decisions §120-124 | ⚠️ PARTIAL | Single dashboard page at `/admin/seodash/dashboard` |
-| REQ-027 | Worst pages ranked list with issue severity display | Decisions §121 | ⚠️ PARTIAL | Shows score + top issue per page |
-| REQ-028 | Quick-fix links to edit pages (click → edit) | Decisions §122 | ❌ MISSING | Each page row has "Edit" button |
-| REQ-029 | Overall site health score with visual progress bar | Decisions §123 | ⚠️ PARTIAL | Progress bar shows average score visually |
-| REQ-030 | Zero configuration required (<30 sec to value) | Decisions §124 | ✅ DONE | No setup wizard, immediate data |
-| REQ-031 | Disclaimer: "Green = technically optimized, not rankings" | Risk #9 L324-326 | ❌ MISSING | Dashboard includes disclaimer text |
+**REQ-004: OG title field with default**
+- Store OG title; defaults to page title if empty
+- Acceptance: Field shows default value from title; can override
+- Status: ✅ IMPLEMENTED
+- Source: MVP Feature Set
 
-**Acceptance:** Dashboard loads in <30 seconds, shows all key metrics on one screen, clear action paths.
+**REQ-005: OG description field with default**
+- Store OG description; defaults to meta description if empty
+- Acceptance: Field shows default value from meta description; can override
+- Status: ✅ IMPLEMENTED
+- Source: MVP Feature Set
 
----
+**REQ-006: Canonical URL field**
+- Store and validate canonical URL
+- Acceptance: Form accepts URL; can be empty (self-referential assumed)
+- Status: ✅ IMPLEMENTED (lines 92-94 in sandbox-entry.ts)
+- Source: MVP Feature Set
 
-## Wave 5: Visual Social Previews
+**REQ-007: Noindex flag (boolean)**
+- Store noindex flag (default: false)
+- Acceptance: Toggle on/off; excludes page from sitemap when true
+- Status: ✅ IMPLEMENTED
+- Source: MVP Feature Set
 
-| ID | Requirement | Source | Current Status | Acceptance Criteria |
-|----|-------------|--------|----------------|---------------------|
-| REQ-032 | Facebook card HTML/CSS visual replica (not just meta tags) | Decision #1 L20-25 | ⚠️ META ONLY | Rendered visual card showing how FB will display |
-| REQ-033 | Twitter card HTML/CSS visual replica | Decision #1 L20-25 | ⚠️ META ONLY | Rendered visual card for Twitter |
-| REQ-034 | Google search snippet HTML/CSS replica | Decision #1 L20-25 | ⚠️ META ONLY | Blue title, green URL, gray description |
-| REQ-035 | Live preview updates as user types in editor | Decisions §132 | ❌ MISSING | Real-time update on title/description change |
-| REQ-036 | Side-by-side preview view on page edit screen | Decisions §132 | ❌ MISSING | Edit form left, previews right |
-| REQ-037 | Disclaimer: "Preview may differ slightly from actual platform" | Risk #4 L291-293 | ❌ MISSING | Note below previews |
-| REQ-038 | Use 2026 platform specs for rendering accuracy | Risk #4 L293 | ⚠️ PARTIAL | Document spec versions used |
+**REQ-008: Nofollow flag (boolean)**
+- Store nofollow flag (default: false)
+- Acceptance: Toggle on/off; default false
+- Status: ✅ IMPLEMENTED
+- Source: MVP Feature Set
 
-**Acceptance:** Users see visual cards that match Facebook/Twitter/Google appearance, updates happen live.
+### Red-to-Green Feedback System
 
----
+**REQ-009: Title audit check (computed on-demand)**
+- Audit page title and return red/yellow/green status
+- Acceptance: Red if missing OR <30 OR >60; yellow if boundary; green if 50-60
+- Status: ✅ IMPLEMENTED (lines 63-72 in sandbox-entry.ts)
+- Source: MVP Feature Set, Decision #4
 
-## Wave 6: Testing & Validation
+**REQ-010: Description audit check (computed on-demand)**
+- Audit meta description and return red/yellow/green status
+- Acceptance: Red if missing OR <120 OR >160; yellow if boundary; green if 150-160
+- Status: ✅ IMPLEMENTED (lines 75-84 in sandbox-entry.ts)
+- Source: MVP Feature Set
 
-| ID | Requirement | Source | Current Status | Acceptance Criteria |
-|----|-------------|--------|----------------|---------------------|
-| REQ-039 | Deploy minimal test plugin to Peak Dental (from Wave 0) | Success §352 | ❌ MISSING | Plugin loads, routes work, KV accessible |
-| REQ-040 | Deploy full SEODash plugin to Peak Dental | Success §352 | ❌ MISSING | All routes work without errors |
-| REQ-041 | Load test with 1,000-page mock dataset | Risk #2 Success §354 | ❌ MISSING | getAllPages() <500ms, list view renders |
-| REQ-042 | Validate sitemap XML with W3C validator | Success §355 | ⚠️ UNTESTED | XML passes W3C validation |
-| REQ-043 | Validate structured data with Google's testing tool | Success §356 Risk #5 | ⚠️ UNTESTED | JSON-LD passes Google validation |
-| REQ-044 | Test social previews on all major browsers | Success §357 | ❌ MISSING | Chrome, Firefox, Safari, Edge render correctly |
-| REQ-045 | Verify no console errors, broken images, or 404s | Success §367 | ⚠️ UNTESTED | Clean console on all admin pages |
-| REQ-046 | Test UX flow: install → dashboard in <30 seconds | Success §362 | ❌ MISSING | Timed test with fresh install |
-| REQ-047 | Test UX flow: edit page → live preview updates | Success §363 | ❌ MISSING | Type in field, preview changes immediately |
-| REQ-048 | Test UX flow: fix issue → red turns green | Success §364 | ❌ MISSING | Save with fixed issue, score improves |
-| REQ-049 | Test UX flow: save page → sitemap updates | Success §365 | ⚠️ UNCLEAR | Sitemap XML includes new page |
-| REQ-050 | Test UX flow: delete page → removed from list and sitemap | Success §366 | ⚠️ UNCLEAR | Page gone from both admin and sitemap |
+**REQ-011: OG image audit check (computed on-demand)**
+- Audit OG image and return red/yellow/green status
+- Acceptance: Red if missing; green if present
+- Status: ✅ IMPLEMENTED (lines 87-89 in sandbox-entry.ts)
+- Source: MVP Feature Set
 
-**Acceptance:** All tests pass, Peak Dental deployment confirmed working, zero critical errors.
+**REQ-012: Per-page color indicator (red/yellow/green only)**
+- Compute single color per page based on audit results
+- Acceptance: Red if ANY critical issue; yellow if warnings; green if optimal
+- Status: ⚠️ PARTIAL — numerical score also computed and stored (violates Decision #4)
+- Source: MVP Feature Set, Decision #4
 
----
+**REQ-013: Dashboard overall site health indicator**
+- Show aggregate site health based on page colors
+- Acceptance: Display count of pages by color or overall status
+- Status: ✅ IMPLEMENTED (seo score widget in admin-ui.ts)
+- Source: MVP Feature Set
 
-## Wave 7: Structured Data Templates
+### Dashboard (Admin Interface)
 
-| ID | Requirement | Source | Current Status | Acceptance Criteria |
-|----|-------------|--------|----------------|---------------------|
-| REQ-051 | Article JSON-LD template ONLY (no LocalBusiness/Product) | Decision #8 L69-74 | ❌ FREEFORM | Only Article template available |
-| REQ-052 | Form fields: headline, datePublished, author, image | Decisions §148-150 | ❌ MISSING | Admin UI has 4 form fields |
-| REQ-053 | Generate valid JSON-LD from form inputs (no freeform textarea) | Decision #8 L71-73 | ❌ VIOLATES | Template generator function |
-| REQ-054 | Escape all user inputs to prevent injection | Risk #5 | ⚠️ PARTIAL | JSON.stringify() with proper escaping |
-| REQ-055 | Add schema version comments in JSON-LD output | Risk #5 L299 | ❌ MISSING | Output includes @type and @context |
-| REQ-056 | Validate template output against Google's tool before ship | Risk #5 Success §356 | ⚠️ UNTESTED | Manual validation with Google tool |
+**REQ-014: Single-screen dashboard overview**
+- Display all critical SEO issues on one screen without tabs
+- Acceptance: No tabs; single scrolling page
+- Status: ✅ IMPLEMENTED
+- Source: MVP Feature Set, Decision #13
 
-**Acceptance:** Article template generates valid Schema.org JSON-LD, passes Google validation, no freeform editor.
+**REQ-015: Worst pages ranked first**
+- Sort page list by severity (worst → best)
+- Acceptance: Severity order enforced; red before yellow before green
+- Status: ⚠️ PARTIAL — currently sorts alphabetically (line 416)
+- Source: MVP Feature Set, Open Questions #4
 
----
+**REQ-016: Quick-fix links in dashboard**
+- Each listed page has clickable link to edit form
+- Acceptance: Click page row → navigate to edit form
+- Status: ⚠️ NEEDS VALIDATION
+- Source: MVP Feature Set
 
-## Non-Functional Requirements
+**REQ-017: Zero configuration required for dashboard**
+- Dashboard functional immediately after plugin install
+- Acceptance: No setup wizard; install → dashboard shows data
+- Status: ✅ IMPLEMENTED
+- Source: MVP Feature Set, Decision #13
 
-### SEO Audit Engine (Already Implemented ✅)
+### Sitemap Generation & Caching
 
-| ID | Requirement | Source | Current Status |
-|----|-------------|--------|----------------|
-| REQ-057 | Title length validation (red <30, yellow >60, green 50-60) | Decisions §102 | ✅ DONE |
-| REQ-058 | Description length validation (red <120, yellow >160, green 150-160) | Decisions §102 | ✅ DONE |
-| REQ-059 | OG image validation (exists, accessible, permissive) | Decisions §102 | ✅ DONE |
-| REQ-060 | Missing field detection (title, description, OG image) | Decisions §102 | ✅ DONE |
-| REQ-061 | Red/yellow/green scoring system (NOT 0-100 vanity metrics) | Decision #2 | ✅ DONE |
-| REQ-062 | "NPR at 6am" error message tone (helpful, concise, educational) | Decisions §371 | ✅ DONE |
+**REQ-018: Auto-generate sitemap.xml from published pages**
+- Generate valid XML sitemap from all published pages
+- Acceptance: Sitemap served at `/sitemap.xml`; valid XML; passes validator
+- Status: ✅ IMPLEMENTED (lines 181-216 in sandbox-entry.ts)
+- Source: MVP Feature Set
 
-### XML Sitemap (Mostly Implemented ✅)
+**REQ-019: Exclude noindex pages from sitemap**
+- Sitemap includes only pages where noindex flag is false
+- Acceptance: Pages with noindex=true NOT in sitemap XML
+- Status: ✅ IMPLEMENTED (line 184 filters noindex)
+- Source: MVP Feature Set
 
-| ID | Requirement | Source | Current Status |
-|----|-------------|--------|----------------|
-| REQ-063 | Auto-generate sitemap from all published pages (exclude noindex) | Decisions §135 | ✅ DONE |
-| REQ-064 | Flat list structure (NO pattern overrides after cleanup) | Decision #6 | ❌ VIOLATES → Wave 1 |
-| REQ-065 | Static defaults: changefreq=monthly, priority=0.5 | Decisions §137-138 | ✅ DONE |
-| REQ-066 | Served at `/sitemap.xml` public route | Decisions §139 | ✅ DONE |
-| REQ-067 | Monitor size (alert if >5MB, compress if needed) | Risk #3 L282-285 | ❌ MISSING |
+**REQ-020: Default sitemap values**
+- All URLs use default `changefreq: monthly` and `priority: 0.5`
+- Acceptance: XML shows these values; no overrides in v1
+- Status: ⚠️ PARTIAL — pattern override logic still exists (lines 193-199)
+- Source: MVP Feature Set, Decision #8
 
-### Robots.txt (Implemented but needs UI removal ⚠️)
+**REQ-021: Cache sitemap in KV**
+- Store generated sitemap XML in KV to avoid regeneration
+- Acceptance: First request caches at `beacon:sitemap:xml`; subsequent <10ms
+- Status: ❌ MISSING — no caching implemented
+- Source: MVP Feature Set, Decision #11
 
-| ID | Requirement | Source | Current Status |
-|----|-------------|--------|----------------|
-| REQ-068 | Auto-generated with battle-tested default | Decisions §142 | ✅ DONE |
-| REQ-069 | Allow all bots, reference sitemap | Decisions §143 | ✅ DONE |
-| REQ-070 | NO admin UI (static immutable default only) | Decision #7 | ❌ VIOLATES → Wave 1 |
-| REQ-071 | Validate default against Google's robots.txt validator | Risk #12 L342-345 | ⚠️ UNTESTED |
+**REQ-022: Invalidate sitemap cache on page save**
+- Delete cached sitemap when page SEO data saved
+- Acceptance: Save → delete cache → next request regenerates
+- Status: ❌ MISSING — no cache invalidation
+- Source: Decision #11
 
-### Quality Gates (Enforcement Rules)
+**REQ-023: Invalidate sitemap cache on page delete**
+- Delete cached sitemap when page deleted
+- Acceptance: Delete → delete cache → next request regenerates
+- Status: ❌ MISSING — no cache invalidation
+- Source: Decision #11
 
-| ID | Requirement | Source | Acceptance Criteria |
-|----|-------------|--------|---------------------|
-| REQ-072 | NO meta keywords field anywhere in code | Success §372 | All keywords references removed (Wave 1) |
-| REQ-073 | NO sitemap pattern overrides UI or logic | Success §373 | All pattern logic removed (Wave 1) |
-| REQ-074 | NO robots.txt settings UI | Success §374 | robotsSettings handler removed (Wave 1) |
-| REQ-075 | NO freeform structured data editor | Success §375 | Only Article template form (Wave 7) |
-| REQ-076 | Article template ONLY (no LocalBusiness/Product in v1) | Success §376 | Only one template exists (Wave 7) |
+### Robots.txt Generation
 
----
+**REQ-024: Static default robots.txt**
+- Serve static robots.txt at `/robots.txt`
+- Acceptance: Returns static default; no admin UI
+- Status: ⚠️ PARTIAL — robots.txt works but robotsSettings handler exists (should be removed)
+- Source: MVP Feature Set, Decision #9
 
-## Requirements Summary by Status
+### Metadata Injection
 
-| Status | Count | % of Total |
-|--------|-------|-----------|
-| ✅ DONE | 18 | 24% |
-| ⚠️ PARTIAL | 18 | 24% |
-| ❌ MISSING | 30 | 39% |
-| ❌ VIOLATES | 8 | 11% |
-| ⚠️ BLOCKER | 5 | 7% |
-| **TOTAL** | **76** | **100%** |
+**REQ-025: Inject SEO metadata into page head**
+- Insert meta tags, OG tags, canonical into page `<head>`
+- Acceptance: Page HTML includes proper meta tags
+- Status: ✅ IMPLEMENTED (SeoHead.astro component)
+- Source: MVP Feature Set
 
----
+### Admin UI Components
 
-## Critical Path to Ship
+**REQ-026: Page editor form with live feedback**
+- Form for editing all 8 SEO fields with real-time audit feedback
+- Acceptance: Form shows all fields; color updates as user types
+- Status: ⚠️ NEEDS VALIDATION (admin-ui.ts exists, live feedback unclear)
+- Source: File Structure, Components, Decision #13
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│ Wave 0: Pre-Flight (BLOCKING — cannot skip)                 │
-│ - Validate Emdash API on Peak Dental                        │
-│ - Confirm ctx.kv vs ctx.storage pattern                     │
-│ - Verify admin UI approach (Block Kit vs HTML)              │
-│ └─────────────────────────────────────┬────────────────────┘
-│                                        ▼
-│ Wave 1: Feature Cleanup (Remove scope violations)
-│ - Delete keywords, sitemap patterns, robots UI
-│ └─────────────────────────────────────┬────────────────────┘
-│                                        ▼
-│ Wave 2: Storage Architecture
-│ - Fix getAllPages() denormalization
-│ - Cache invalidation
-│ └─────────────────────────────────────┬────────────────────┘
-│                                        ▼
-│ ┌──────────────────────────┐   ┌──────────────────────────┐
-│ │ Wave 3: Pagination       │   │ Wave 5: Visual Previews  │
-│ │ - Cursor pagination      │   │ - FB/Twitter/Google cards│
-│ │ - Worst-first sorting    │   │ - Live update mechanism  │
-│ └──────────┬───────────────┘   └────────┬─────────────────┘
-│            │                              │
-│            └──────────────┬───────────────┘
-│                           ▼
-│ ┌─────────────────────────────────────────────────────────┐
-│ │ Wave 4: Dashboard UI + Wave 7: Structured Data          │
-│ │ - One-screen dashboard - Quick links - Disclaimer       │
-│ │ - Article template form - JSON-LD generation            │
-│ └──────────────────────────┬──────────────────────────────┘
-│                             ▼
-│ ┌─────────────────────────────────────────────────────────┐
-│ │ Wave 6: Testing & Validation                            │
-│ │ - Peak Dental deploy - Load tests - Browser tests       │
-│ │ - W3C XML validation - Google JSON-LD validation        │
-│ │ - UX flow testing - Zero errors verification            │
-│ └─────────────────────────────────────────────────────────┘
-│                             ▼
-│                   ✅ SHIP TO PRODUCTION
-└─────────────────────────────────────────────────────────────┘
-```
+**REQ-027: Pagination on admin list (max 50 items)**
+- Split page list into pages of 50 items max
+- Acceptance: List shows max 50 items; pagination controls; works with 500+ pages
+- Status: ❌ MISSING — no pagination (CRITICAL RISK #6)
+- Source: MVP Feature Set, Decision #6
 
-**Estimated Timeline:** 8-15 hours of focused development work after blockers resolved.
-
----
-
-## References
-
-### Source Documents
-- **PRD:** `/home/agent/shipyard-ai/prds/github-issue-sethshoultes-shipyard-ai-34.md`
-- **Decisions Blueprint:** `/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-34/decisions.md` (490 lines, Phil Jackson)
-- **Emdash Guide:** `/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md` (1,754 lines, comprehensive plugin system docs)
-
-### Existing Codebase
-- **Main Entry:** `/home/agent/shipyard-ai/plugins/seodash/src/index.ts` (37 lines, plugin descriptor)
-- **Runtime Logic:** `/home/agent/shipyard-ai/plugins/seodash/src/sandbox-entry.ts` (796 lines, definePlugin with 16 routes)
-- **Admin UI:** `/home/agent/shipyard-ai/plugins/seodash/src/admin-ui.ts` (487 lines, HTML rendering)
-- **Astro Components:** `/home/agent/shipyard-ai/plugins/seodash/src/astro/SeoHead.astro`, `SocialPreview.astro`
-- **Tests:** `/home/agent/shipyard-ai/plugins/seodash/src/__tests__/sandbox-entry.test.ts` (797 lines, 45+ test cases)
-
-### Risk Analysis
-- **Codebase Scout Report:** Agent a4f3b0f — Complete file tree and capabilities analysis
-- **Requirements Analyst Report:** Agent a467392 — 62 atomic requirements extracted
-- **Risk Scanner Report:** Agent a221484 — 12 risks identified (3 critical, 3 high, 3 medium, 3 low)
+**REQ-028: Audit feedback display with context**
+- Show issues with helpful tone
+- Acceptance: "Description too short (87/160 chars)" not "FAIL"
+- Status: ✅ IMPLEMENTED (audit messages have helpful tone)
+- Source: MVP Feature Set, Decision #12
 
 ---
 
-**Document Authority:** Phil Jackson, Zen Master — Great Minds Agency
-**Build Blueprint:** SEODash Locked Decisions (2 days to V1 ship)
-**Validation Gate:** Peak Dental deployment required before claiming "done"
-**Final Arbiter:** "Ship simple, iterate with data" (Steve + Elon consensus)
+## MUST NOT HAVE (Explicitly Cut from v1)
+
+**NOFEATURE-001: Meta keywords field**
+- Why: Google ignores since 2009; adds cognitive load
+- Status: ⚠️ VIOLATION — keywords field still in code (lines 118-120, 345)
+- Source: Decision #7
+
+**NOFEATURE-002: Sitemap pattern overrides UI**
+- Why: 0.1% use case; default settings sufficient
+- Status: ⚠️ VIOLATION — pattern logic still exists (lines 193-199)
+- Source: Decision #8
+
+**NOFEATURE-003: Robots.txt customization UI**
+- Why: Default is perfect
+- Status: ⚠️ VIOLATION — robotsSettings handler exists (lines 655-682)
+- Source: Decision #9
+
+**NOFEATURE-004: Numerical SEO score (e.g., "92/100")**
+- Why: Vanity metric; traffic light clearer
+- Status: ⚠️ VIOLATION — score persisted to KV (lines 351-352)
+- Source: Decision #4
+
+**NOFEATURE-005: Audit history storage**
+- Why: Wasted KV writes
+- Status: ✅ NOT PRESENT
+- Source: Decision #2
+
+**NOFEATURE-006: Bulk edit operations**
+- Why: Focus matters more than batch
+- Status: ✅ NOT PRESENT
+- Source: Decision #2
+
+**NOFEATURE-007: Auto-generate titles from H1**
+- Why: Requires ML/GPT-4; deferred to v2
+- Status: ✅ NOT PRESENT
+- Source: Decision #10
+
+**NOFEATURE-008: Twitter Card type selector**
+- Why: OG tags work fine
+- Status: ✅ NOT PRESENT
+- Source: Decision #2, MVP EXCLUDED
+
+**NOFEATURE-009: Google Search Console integration**
+- Why: v2 analytics feature
+- Status: ✅ NOT PRESENT
+- Source: MVP EXCLUDED
+
+**NOFEATURE-010: Social preview HTML endpoint**
+- Why: Cut for simplicity
+- Status: ✅ NOT PRESENT
+- Source: MVP EXCLUDED
+
+**NOFEATURE-011: Structured data templates (JSON-LD)**
+- Why: Deferred to v1.1
+- Status: ⚠️ PARTIAL — freeform structuredData field exists (should remove per decisions.md)
+- Source: MVP EXCLUDED
+
+---
+
+## Technical Requirements
+
+**TECH-001: KV storage denormalization pattern** (CRITICAL)
+- Store all page data at `beacon:pages:all` (single read)
+- Acceptance: <500ms for 500 pages
+- Status: ❌ MISSING — N+1 pattern still active (CRITICAL RISK #1)
+- Source: Decision #5, Decision #3
+
+**TECH-002: Primary KV schema for per-page data**
+- Pattern: `beacon:page:{sha256_hash}`
+- Acceptance: Each page has unique, collision-free key
+- Status: ⚠️ PARTIAL — uses `seo:` prefix and simple hash (not SHA-256)
+- Source: File Structure, Storage Pattern
+
+**TECH-003: SHA-256 hashing for path collision resistance** (CRITICAL)
+- Use full SHA-256 (not shortened)
+- Acceptance: No collisions; cryptographic hash
+- Status: ❌ MISSING — simple 32-bit hash used (CRITICAL RISK #4)
+- Source: Risk Register, Risk #8
+
+**TECH-004: Sitemap cache KV key**
+- Pattern: `beacon:sitemap:xml` → XML string
+- Acceptance: First request caches; subsequent <10ms
+- Status: ❌ MISSING — no caching
+- Source: File Structure, Decision #11
+
+**TECH-005: Cache invalidation (immediate, no TTL)**
+- Sitemap cache invalidated immediately on save/delete
+- Acceptance: Save → delete cache → next request sees change
+- Status: ❌ MISSING — no cache invalidation logic
+- Source: Decision #11
+
+**TECH-006: Audit engine pure function requirement**
+- Audit functions with NO side effects (no KV writes)
+- Signature: `auditPage(pageData) → { color, issues }`
+- Status: ⚠️ PARTIAL — audit is pure but score is persisted (should not be)
+- Source: Decision #4
+
+**TECH-007: No numerical score persistence**
+- Scores computed on-demand only; not stored
+- Status: ❌ VIOLATION — seoScore stored at line 351-352
+- Source: Decision #4
+
+**TECH-008: Emdash KV binding availability** (CRITICAL BLOCKER)
+- Plugin runtime must provide `ctx.kv` bindings
+- Acceptance: Pre-flight test on Peak Dental validates KV works
+- Status: ❌ UNTESTED — CRITICAL BLOCKER #1
+- Source: Risk Register, Risk #1
+
+**TECH-009: Pagination cursor-based**
+- Max 50 items per page; cursor to next batch
+- Status: ❌ MISSING — CRITICAL RISK #6
+- Source: Decision #6
+
+**TECH-010: KV rebuild logic for corrupted state**
+- If `beacon:pages:all` corrupted, rebuild from individual keys
+- Status: ❌ MISSING
+- Source: Open Questions #3
+
+---
+
+## Performance Requirements
+
+**PERF-001: getAllPages() <500ms for 500 pages** (CRITICAL)
+- Single KV read (denormalized array)
+- Status: ❌ FAILING — N+1 pattern = 25-50 seconds (CRITICAL RISK #5)
+- Source: Risk Register, Success Criteria
+
+**PERF-002: Sitemap serving <10ms (cached)**
+- Cached sitemap served quickly
+- Status: ❌ MISSING — no caching implemented
+- Source: Decision #11
+
+**PERF-003: Audit function <50ms**
+- Pure function; no I/O
+- Status: ✅ LIKELY OK (pure function)
+- Source: MVP Feature Set
+
+**PERF-004: Pagination prevents browser crash**
+- UI remains responsive with 500+ pages
+- Status: ❌ MISSING — no pagination
+- Source: Decision #6
+
+---
+
+## Critical Blockers Summary
+
+| Blocker ID | Issue | Status | Impact |
+|------------|-------|--------|--------|
+| BLOCKER-001 | Emdash KV binding validation | UNTESTED | CRITICAL — Nothing works if wrong |
+| BLOCKER-002 | N+1 query pattern fix | NOT FIXED | CRITICAL — 25-50s load time at 500 pages |
+| BLOCKER-003 | Hash collision fix (SHA-256) | NOT FIXED | CRITICAL — Data corruption risk |
+| BLOCKER-004 | Pagination implementation | MISSING | HIGH — Browser crashes at 100+ pages |
+| BLOCKER-005 | Scope violations cleanup | NOT DONE | HIGH — Violates product decisions |
+
+---
+
+## Requirements Status Summary
+
+| Status | Count | % |
+|--------|-------|---|
+| ✅ IMPLEMENTED | 18 | 26% |
+| ⚠️ PARTIAL | 15 | 21% |
+| ❌ MISSING | 28 | 40% |
+| ❌ VIOLATION | 6 | 9% |
+| ❌ UNTESTED | 3 | 4% |
+| **TOTAL** | **70** | **100%** |
+
+---
+
+## Success Criteria
+
+### Technical Validation
+- ✅ Runs on Peak Dental without errors — UNTESTED
+- ✅ KV bindings work (read/write/delete) — UNTESTED
+- ✅ `getAllPages()` loads 500 pages in <500ms — FAILING (N+1)
+- ✅ Sitemap generates valid XML — IMPLEMENTED
+- ✅ Pagination works (50+ pages without crash) — MISSING
+- ✅ Cache invalidation works (save → sitemap updates) — MISSING
+
+### User Experience Validation
+- ✅ Install → see dashboard in <30 seconds — IMPLEMENTED
+- ✅ Edit page → see live feedback — NEEDS VALIDATION
+- ✅ Fix issue → see red turn green — NEEDS VALIDATION
+- ✅ Save → sitemap updates immediately — MISSING (cache)
+- ✅ No console errors, no 404s — NEEDS VALIDATION
+
+### Ship Gate
+**Non-technical user fixes their first SEO issue in under 60 seconds and thinks "Oh. That's it?"**
+
+---
+
+**Document Status:** FINAL — Research Complete
+**Next Step:** Generate XML task plans in phase-1-plan.md
+**Critical Path:** Fix N+1 → Add pagination → Remove violations → Test on Peak Dental
