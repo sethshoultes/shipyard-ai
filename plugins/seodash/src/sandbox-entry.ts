@@ -411,14 +411,40 @@ export default definePlugin({
 		// List all pages with SEO data.
 		// -----------------------------------------------------------------
 		listPages: {
-			handler: async (_routeCtx: unknown, ctx: PluginContext) => {
+			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
-					const pages = await getAllPages(ctx);
+					const rc = routeCtx as Record<string, unknown>;
+					const input = (rc.input ?? {}) as Record<string, unknown>;
 
-					// Sort by path alphabetically
-					pages.sort((a, b) => a.path.localeCompare(b.path));
+					// Pagination parameters (Decision #4: max 50 per view)
+					const limit = Math.min(Number(input.limit || 50), 50);
+					const offset = Number(input.offset || 0);
 
-					return { pages, total: pages.length };
+					const allPages = await getAllPages(ctx);
+
+					// Hard limit: reject if more than 1,000 pages (Decision #4)
+					if (allPages.length > 1000) {
+						throw new Error("Page limit exceeded (1,000 max). Add search/filter to narrow results.");
+					}
+
+					// Sort by SEO score (worst first) - see Task 7
+					allPages.sort((a, b) => (a.seoScore ?? 0) - (b.seoScore ?? 0));
+
+					// Paginate
+					const paginatedPages = allPages.slice(offset, offset + limit);
+					const totalPages = allPages.length;
+					const currentPage = Math.floor(offset / limit) + 1;
+					const totalPagesCount = Math.ceil(totalPages / limit);
+
+					return {
+						pages: paginatedPages,
+						total: totalPages,
+						limit,
+						offset,
+						currentPage,
+						totalPagesCount,
+						hasMore: offset + limit < totalPages,
+					};
 				} catch (error) {
 					if (error instanceof Error) throw error;
 					ctx.log.error(`listPages error: ${String(error)}`);
