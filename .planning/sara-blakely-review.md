@@ -1,27 +1,25 @@
-# Sara Blakely Gut-Check — ReviewPulse v1
+# Sara Blakely Gut-Check: Forge v1 MVP
 
-## Would a customer pay for this?
+**Would a real customer pay for this?**
 
-**Probably not yet.** You're selling a display widget. That's table stakes, not a product. The real pain is the 2-star review sitting unanswered for 8 hours while the owner loses sleep. You're showing them the wound. You're not giving them a bandaid.
+Maybe. The "Ask something" magic is the right instinct — that's your Spanx moment. But this plan is 90% technical debt cleanup (D1 migration, plugin spec compliance, renaming) and 10% customer magic. 14 tasks to reorganize furniture before the store opens. Customers don't care that you renamed FormForge to Forge or switched from KV to D1. They care: does my form work? Do I get my leads?
 
-## What's confusing? What makes someone bounce?
+**What's confusing? What would make someone bounce?**
 
-1. **OAuth setup before value** — If I need API keys before I feel anything, I'm gone.
-2. **No immediate notification** — So I sync my reviews... then what? Check back tomorrow? That's not peace of mind. That's a chore.
-3. **"Widget endpoint"** — Means nothing to a bakery owner. Speak human.
+1. No clear "try it in 30 seconds" demo path. Where's the dopamine hit?
+2. "Pattern matching" sounds like autocomplete from 2015. If "What's your email?" needs keyword detection, it's not magic — it's a parlor trick.
+3. You cut webhooks. Forms without integrations are dead ends. I fill it out, you get a CSV, then... manual data entry forever? That's why people hate forms.
 
-## 30-Second Elevator Pitch
+**30-Second Elevator Pitch:**
 
-"You know that knot in your stomach when you check Google reviews? ReviewPulse puts all your reviews in one place, shows the good ones on your website, and pings you the second a bad one lands — so you can respond before it spreads. Connect once, sleep better."
+"Type a question. Get the field. No dropdowns, no configuration menus. Ask what you want to know, we'll figure out the rest. Forms that write themselves."
 
-## What would I test first with $0 budget?
+**What would you test first with $0 budget?**
 
-**DM 15 restaurant owners on Instagram.** Mock up their dashboard with their real reviews imported. Watch their face. If they lean in and say "wait, how'd you get this?" — you've got something. If they shrug — you're solving the wrong problem.
+Walk into 10 local businesses. Coffee shops, salons, yoga studios. "Can I build your contact form for free? I just want to watch." Watch their face when they type "What's your email?" If they don't say "wait — how'd it know?" the product isn't ready. Don't ship until you see that reaction 7/10 times.
 
-## What's the retention hook?
+**What's the retention hook?**
 
-**Missing.** Sync + display is set-and-forget. Set-and-forget = forget-to-pay. You need a weekly email: "3 new reviews this week. Average up 0.2 stars." That's the dopamine. That's habit. Without it, this is a utility, not a product.
+Weak. Forms are set-and-forget. Once it's embedded, why return? CSV export is table stakes. The *notification* is the hook. Make "new submission from your website" feel like a gift, not a chore — a morning ritual like checking your DMs.
 
----
-
-**Bottom line:** 687 lines of technical debt cleanup is not a product strategy. Ship faster. Cut Wave 3 polish entirely. Resolve the notification question — that's the feature, not the widget. Bella doesn't need prettier buttons. She needs to sleep.
+**Bottom line:** Honest engineering work solving YOUR problems (tech debt), not the CUSTOMER'S problems (I need leads, forms are confusing). Ship the magic moment first. Everything else is noise.
