@@ -1,67 +1,57 @@
-# Sara Blakely's Raw Gut-Check on Intake Auto-Close
+# Sara Blakely on SEODash Phase 1
 
-## Would a real customer pay for this?
+## Would a Real Customer Pay? YES
 
-**Maybe. But probably not.**
+"I have 500 pages, no idea which ones suck for SEO, and Google's Search Console is a nightmare." That's the customer. This solves it: Dashboard shows worst-first. Fix highest-impact issues. Done.
 
-An issue staying open after it ships is mildly annoying. Is it worth money? You're saving someone 30 seconds per cycle. If someone ships 10 issues a month, that's 5 minutes a year. That's not a feature—that's a nice-to-have built for internal satisfaction, not customer pain.
-
-The honest question you haven't answered: Did a customer ask for this, or did you invent it because you found it mildly irritating?
+Real pain = real money.
 
 ---
 
-## What's confusing? What would make someone bounce?
+## What's Confusing? Three Things Kill This Plan
 
-The integration assumption. You need:
-- `gh` CLI installed
-- User authenticated
-- Markdown format exactly right
-- GitHub repo configured
+1. **Wave 0 (pre-flight) blocks everything.** 8 steps to test API behavior. Ship first, learn second. Test the real assumptions *during* integration, not before. You're building a harness for a harness.
 
-A customer doesn't see that. They see "auto-close issues" and expect magic. When it requires three hidden preconditions, they bounce.
+2. **"18 tasks over 7 waves" = we don't know what we're building.** Pagination, visual previews, structured data, load testing, robots.txt UX removal. That's scope creep masquerading as a plan. Cut 60%. Focus on: Dashboard → See Issues → Fix One.
 
-Also: the comment. "Shipped via Great Minds pipeline. Project: {name}" — nobody cares. They shipped it, it's done. Stop talking.
+3. **"Peak Dental validation" is vague.** Does "runs without errors" mean plugin installs? Pages audit correctly? Sitemap validates? Define the acceptance test *first*, then build backwards.
 
 ---
 
-## 30-second elevator pitch
+## 30-Second Pitch
 
-**"Your GitHub issue closes automatically when we ship it. No manual cleanup."**
+"One dashboard shows all your pages ranked by SEO score. Worst first. Click one, fix it, sitemap updates instantly. No config."
 
-That's honest. Not exciting, but honest.
-
----
-
-## What would you test first with $0 budget?
-
-**Don't test the feature. Test the need.**
-
-Ask 5 developers: "How many times a month do you manually close a GitHub issue after it ships?"
-
-If the answer is "rarely," you're building for a phantom problem. If it's "every day and it drives me crazy," then you have something. Right now you're guessing.
+(Current pitch is 3 paragraphs of architecture. Lead with customer win.)
 
 ---
 
-## What's the retention hook?
+## Test First ($0 Budget)
 
-**There isn't one.**
+1. **Install → Dashboard visible in 30 seconds.** No pagination, no previews, just the list.
+2. **Edit page → Score recalculates → Visual feedback (red→green).** Proof that the loop works.
+3. **Delete page → Disappears immediately.** Storage layer is real.
 
-A feature isn't a retention hook. A retention hook is: "I can't live without this." Auto-close is hygiene. It's not a habit-former. It's not a lock-in.
-
-Real retention is: "Great Minds shipped my feature 40% faster than last quarter." That's a number. That's obsession. Closing issues automatically isn't obsession—it's cleanup.
-
----
-
-## The Real Gut-Check
-
-**The code is tight.** 15 lines, error-handling correct, scope locked. Ship-worthy.
-
-**The plan is bloated.** A 484-line plan for a 22-line feature is process theater. You're building infrastructure for scale when you haven't proven you need it. Cut the plan to one page and ship in a day.
-
-**The thinking is backward.** You optimized for not shipping, not for shipping. You wanted a *perfect plan* instead of a *quick win*. In startup mode, quick wins beat perfect plans.
-
-**My call:** The feature is small and clean. Ship it. But next time, don't over-plan. You won't have customers paying for 30-second time savings. You'll have customers obsessed with what you build because you shipped it so fast they thought it was magic.
+Skip everything else until these three work.
 
 ---
 
-**Ship it. Stop planning. Start selling.**
+## Retention Hook
+
+**Missing.** What brings them back after they fix their pages?
+
+Real retention: "New pages detected: 3. New issues: 2." Monitor mode. Weekly digest of regressions. Not in the plan.
+
+Right now: Install → Fix → Leave forever.
+
+---
+
+## Final Call
+
+**The plan shows good DNA but wrong diet.** Cut Waves 5, 7, and the pre-flight validation gate. Build Waves 1-4 in parallel. Test on Peak Dental with basic acceptance criteria.
+
+**Timeline:** 4-5 days, not 8-15 hours. Get it shipped. Get real feedback. Build retention in Phase 2.
+
+**Grade:** B+ architecture, C- prioritization. Same mistake Spanx almost made: overthinking instead of shipping.
+
+Ship the dashboard. Let the data tell you what's next.
