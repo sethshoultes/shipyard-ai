@@ -43,6 +43,13 @@ export {
   type CohortConfig,
 } from "./cohorts";
 
+// ─── Metro Areas ──────────────────────────────────────────────────────────────
+export {
+  deriveMetroFromCity,
+  getCitiesInMetro,
+  getAllMetros,
+} from "./metros";
+
 // ─── Algorithm Weights ────────────────────────────────────────────────────────
 /**
  * Algorithm weights per decisions.md line 115.

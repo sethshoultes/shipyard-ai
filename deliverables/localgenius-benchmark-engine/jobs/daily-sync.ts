@@ -29,6 +29,7 @@ import {
   preserveLastKnownRank,
 } from "../api/auth/google-oauth";
 import { isValidCategory, type RankCategory } from "../config/categories";
+import { deriveMetroFromCity } from "../config/metros";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -202,7 +203,7 @@ async function getBusinessesNeedingSync(): Promise<BusinessToSync[]> {
         category: businessInfo.vertical as RankCategory,
         city: businessInfo.city,
         state: businessInfo.state,
-        metro: null, // TODO: Derive from city
+        metro: deriveMetroFromCity(businessInfo.city, businessInfo.state),
         isActive,
         lastSyncedAt: conn.lastSyncedAt,
       });
