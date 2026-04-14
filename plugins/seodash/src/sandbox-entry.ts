@@ -279,10 +279,7 @@ export default definePlugin({
 					defaultChangefreq: "monthly",
 					defaultPriority: 0.8,
 				});
-				await ctx.kv.set("seo:robots-settings", {
-					rules: [],
-					sitemapUrl: "",
-				});
+				// Note: robots.txt uses static default (no KV storage needed per Decision #7)
 			},
 		},
 	},
@@ -603,15 +600,12 @@ export default definePlugin({
 			public: true,
 			handler: async (_routeCtx: unknown, ctx: PluginContext) => {
 				try {
-					const settings = await ctx.kv.get<RobotsSettings>("seo:robots-settings") ?? {
-						rules: [],
-						sitemapUrl: "",
+					// Use static battle-tested default (no UI configuration in v1)
+					const sitemapUrl = ctx.site?.url ? `${ctx.site.url.replace(/\/+$/, "")}/sitemap.xml` : "";
+					const settings: RobotsSettings = {
+						rules: [],  // Empty rules = use default: Allow all, Disallow /admin/
+						sitemapUrl,
 					};
-
-					// Auto-set sitemap URL if available
-					if (!settings.sitemapUrl && ctx.site?.url) {
-						settings.sitemapUrl = `${ctx.site.url.replace(/\/+$/, "")}/sitemap.xml`;
-					}
 
 					const content = generateRobotsTxt(settings);
 
@@ -620,39 +614,6 @@ export default definePlugin({
 					if (error instanceof Error) throw error;
 					ctx.log.error(`robotsTxt error: ${String(error)}`);
 					throw new Error("Failed to generate robots.txt");
-				}
-			},
-		},
-
-		// -----------------------------------------------------------------
-		// PUT /seodash/robotsSettings
-		// Admin: configure robots.txt rules.
-		// -----------------------------------------------------------------
-		robotsSettings: {
-			handler: async (routeCtx: unknown, ctx: PluginContext) => {
-				try {
-					const rc = routeCtx as Record<string, unknown>;
-					const input = (rc.input ?? {}) as Record<string, unknown>;
-
-					const current = await ctx.kv.get<RobotsSettings>("seo:robots-settings") ?? {
-						rules: [],
-						sitemapUrl: "",
-					};
-
-					if (Array.isArray(input.rules)) {
-						current.rules = input.rules as RobotsSettings["rules"];
-					}
-					if (typeof input.sitemapUrl === "string") {
-						current.sitemapUrl = input.sitemapUrl;
-					}
-
-					await ctx.kv.set("seo:robots-settings", current);
-
-					return { settings: current };
-				} catch (error) {
-					if (error instanceof Error) throw error;
-					ctx.log.error(`robotsSettings error: ${String(error)}`);
-					throw new Error("Failed to update robots settings");
 				}
 			},
 		},
