@@ -1,200 +1,176 @@
-# REQUIREMENTS — Daemon Stagger Review
+# ReviewPulse v1 MVP — Requirements Specification
 
-**Project Slug:** daemon-stagger-review
-**Generated:** 2024-04-13
-**Sources:** PRD (`prds/daemon-stagger-review.md`), Decisions (`rounds/daemon-stagger-review/decisions.md`)
-
----
-
-## Core Requirements
-
-### REQ-1: Split runBoardReview() into Sequential Batches of 2 Agents
-
-| Field | Value |
-|-------|-------|
-| **Source** | PRD (Section: Change 1) |
-| **Description** | Modify `runBoardReview()` in `/home/agent/great-minds-plugin/daemon/src/pipeline.ts` to execute board review agents in two sequential Promise.all blocks instead of one. Batch 1: Jensen + Oprah. Batch 2: Warren + Shonda. |
-| **Current Code** | Lines 404-409: Single Promise.all with 4 agents |
-| **Target Code** | Two sequential Promise.all blocks, each with 2 agents |
-| **Verification** | TypeScript compiles; logs show 2-wave agent arrival pattern (2 START, 2 DONE, 2 START, 2 DONE) |
-
-### REQ-2: Split runCreativeReview() into Sequential Batches (2+1 Pattern)
-
-| Field | Value |
-|-------|-------|
-| **Source** | PRD (Section: Change 2) |
-| **Description** | Modify `runCreativeReview()` to execute creative review agents in two sequential phases. Batch 1: Jony Ive + Maya Angelou (visual + copy). Batch 2: Aaron Sorkin solo (demo script). |
-| **Current Code** | Lines 388-392: Single Promise.all with 3 agents |
-| **Target Code** | One Promise.all with 2 agents, then one sequential `await runAgent()` |
-| **Verification** | TypeScript compiles; logs show sequential agent execution |
-
-### REQ-3: Preserve Exact Function Signatures
-
-| Field | Value |
-|-------|-------|
-| **Source** | PRD (Sections: Change 1 & 2) |
-| **Description** | All function call signatures must match PRD specification exactly: agent identifiers, timeout values (20 for board agents, 15 for visual/copy, 20 for demo), output file paths. |
-| **Verification** | Code diff shows exact match to PRD template; no argument reordering |
-
-### REQ-4: Achieve 50% Peak Memory Reduction
-
-| Field | Value |
-|-------|-------|
-| **Source** | Decisions (Decision 1) |
-| **Description** | Peak memory must reduce from ~2.3GB to ~1.15GB through the batching constraint. This is the engineering goal underpinning the strategy. |
-| **Verification** | `ps -o rss` during pipeline shows peak ≤ 1.8GB; zero OOM restarts in 72-hour window |
-
-### REQ-5: Semantic Commit Message Format
-
-| Field | Value |
-|-------|-------|
-| **Source** | Decisions (Decision 4) |
-| **Description** | Commit message must follow exact format: `fix(pipeline): batch agents in pairs to reduce peak memory 50%` |
-| **Verification** | `git log --oneline` shows exact commit message |
-
-### REQ-6: Commit to great-minds-plugin Repository
-
-| Field | Value |
-|-------|-------|
-| **Source** | PRD (Section: CRITICAL) |
-| **Description** | Changes must be committed and pushed to `/home/agent/great-minds-plugin/daemon/src/pipeline.ts`, NOT shipyard-ai. Post-push: `systemctl restart shipyard-daemon.service` |
-| **Verification** | `git log` in great-minds-plugin shows new commit; systemctl confirms restart |
-
-### REQ-7: No Scope Creep
-
-| Field | Value |
-|-------|-------|
-| **Source** | Decisions (Decision 5) |
-| **Description** | Single targeted fix only. No new features, abstractions, or files. One PR, one purpose. |
-| **Verification** | PR contains only pipeline.ts changes; no new files added |
+**Project Slug:** `github-issue-sethshoultes-shipyard-ai-32`
+**Generated:** 2026-04-13
+**Source:** PRD + Locked Decisions (decisions.md)
 
 ---
 
-## Explicit Scope Exclusions
+## Executive Summary
 
-The following are **explicitly OUT of scope** per Decisions Document (Decision 5):
+ReviewPulse is an Emdash CMS plugin for review management. This specification covers the v1 MVP which includes Google/Yelp sync, display widgets, and admin dashboard — but explicitly excludes response templates, email campaigns, AI suggestions, and sentiment analysis.
 
-| Category | Excluded Item |
-|----------|---------------|
-| Architecture | Pipeline restructuring |
-| Agent Config | Agent renaming |
-| Prompts | Agent prompt changes |
-| Observability | Metrics collection |
-| Observability | Dashboards |
-| Observability | Alerts |
-| Configuration | Dynamic batch sizing |
-| Configuration | Configuration flags |
-| Code Structure | New abstractions (BatchManager, AgentScheduler) |
-| Code Structure | New manager classes |
-| Code Structure | New files |
+**North Star:** *Letting small business owners sleep at night by turning customer voices into peace of mind.*
 
 ---
 
-## Implementation Patterns
+## Requirements Traceability Matrix
 
-### Pattern 1: Board Review (4 agents → 2+2 batches)
+### MVP Features (IN)
 
-**BEFORE (Lines 404-409):**
-```typescript
-await Promise.all([
-  runAgent("jensen-huang-review", jensenHuangBoardReview(project, delDir, prdPath, resolve(roundsDir, "board-review-jensen.md")), 20),
-  runAgent("oprah-winfrey-review", oprahWinfreyBoardReview(project, delDir, prdPath, resolve(roundsDir, "board-review-oprah.md")), 20),
-  runAgent("warren-buffett-review", warrenBuffettBoardReview(project, delDir, prdPath, resolve(roundsDir, "board-review-buffett.md")), 20),
-  runAgent("shonda-rhimes-review", shondaRhimesBoardReview(project, delDir, prdPath, resolve(roundsDir, "board-review-shonda.md")), 20),
-]);
+| ID | Category | Description | Acceptance Criteria | Priority |
+|----|----------|-------------|---------------------|----------|
+| REQ-SYNC-001 | SYNC | Google OAuth connection | User authenticates via Google OAuth; token stored securely; reviews sync within 30s | P0 |
+| REQ-SYNC-002 | SYNC | Google Places API integration | Reviews pulled from Google Business Profile; all fields populated (rating, text, author, date) | P0 |
+| REQ-SYNC-003 | SYNC | Yelp API integration | Reviews pulled from Yelp Business; same field coverage as Google | P0 |
+| REQ-SYNC-004 | SYNC | KV storage pattern | Reviews persist using `reviews:list` + `review:{id}` pattern; handles <1000 reviews | P0 |
+| REQ-SYNC-005 | SYNC | 30-second first-run | Reviews visible within 30 seconds of OAuth completion; no config screens | P0 |
+| REQ-UI-001 | WIDGET | Review display widget | Reviews render with rating, author, text, date; uses Emdash design system; mobile-responsive | P0 |
+| REQ-UI-002 | WIDGET | Schema markup (JSON-LD) | Valid JSON-LD for review rich snippets; Google Search Console validates | P0 |
+| REQ-UI-003 | WIDGET | Widget data endpoint | Public `/widgetData` endpoint returns featured + recent reviews with stats | P0 |
+| REQ-ADMIN-001 | ADMIN | Dashboard overview | Lists all reviews with rating, author, text, date, source; loads <2s | P0 |
+| REQ-ADMIN-002 | ADMIN | Filter by rating | Filter reviews by star rating (1-5); count per rating shown | P1 |
+| REQ-ADMIN-003 | ADMIN | Filter by source | Filter by Google/Yelp/Manual source | P1 |
+| REQ-ADMIN-004 | ADMIN | Featured toggle | Mark reviews as featured; featured status persists; featured display first on widget | P0 |
+| REQ-ADMIN-005 | ADMIN | Flagged toggle | Mark reviews for follow-up; flagged status persists; highlighted in admin | P0 |
+| REQ-ADMIN-006 | ADMIN | Design system alignment | All UI uses Emdash design system components; no custom CSS | P0 |
+| REQ-UI-004 | WIDGET | 30-day trends | Simple trend line showing review volume over 30 days; tiny, unobtrusive | P1 |
+| REQ-UI-005 | COPY | Human-first UI copy | Warm, human language throughout: "You've got 3 new reviews" not technical jargon | P1 |
+
+### Required Fixes (FIX)
+
+| ID | Category | Description | Acceptance Criteria | Priority |
+|----|----------|-------------|---------------------|----------|
+| REQ-FIX-001 | FIX | Eliminate `throw new Response()` | Replace all instances with proper Emdash error handling; all routes return valid responses | P0 |
+| REQ-FIX-002 | FIX | Correct `rc.user` access | Replace all 17 `rc.user` references with correct Emdash context API | P0 |
+| REQ-FIX-003 | FIX | Correct `rc.pathParams` access | Replace with correct Emdash route parameter access pattern | P0 |
+| REQ-FIX-004 | FIX | Emdash design system | Refactor all UI to use Emdash components; zero custom CSS | P0 |
+| REQ-FIX-005 | FIX | Mock data testing | All routes testable with mock data; tests pass without live API credentials | P0 |
+
+### Features to Cut (CUT) — Explicitly Out of Scope
+
+| ID | Category | Description | Acceptance Criteria | Priority |
+|----|----------|-------------|---------------------|----------|
+| REQ-CUT-001 | CUT | Response templates | No template system; no template UI; all responses are manual | P0 |
+| REQ-CUT-002 | CUT | Email campaigns | No email campaign routes; no marketing automation | P0 |
+| REQ-CUT-003 | CUT | Manual review creation | No "create review" button; all reviews from sync only | P0 |
+| REQ-CUT-004 | CUT | AI response suggestions | No AI drafts; no suggestion engine; defer to v2 | P0 |
+| REQ-CUT-005 | CUT | Sentiment analysis | No sentiment graphs; no confidence scores; ratings from source only | P0 |
+| REQ-CUT-006 | CUT | Notification emails | Deferred pending resolution; no email notifications in v1 | P0 |
+
+---
+
+## Technical Constraints
+
+### From EMDASH-GUIDE.md Section 6 (Plugin System)
+
+1. **Plugin Context APIs** (verified from docs):
+   - `ctx.kv.get<T>(key)` — Read from KV store
+   - `ctx.kv.set(key, value, options?)` — Write to KV store
+   - `ctx.kv.delete(key)` — Delete from KV store
+   - `ctx.log.{info|warn|error}(msg)` — Structured logging
+   - `ctx.env.{VARIABLE}` — Environment variable access
+   - `ctx.storage` — Plugin document collections (preferred for scalability)
+
+2. **Route Handler Pattern** (from EMDASH-GUIDE.md):
+   ```typescript
+   routeName: {
+     public?: boolean,
+     handler: async (ctx) => {
+       // Return object, not throw Response
+       return { data: ... };
+     }
+   }
+   ```
+
+3. **Block Kit Admin UI** (from EMDASH-GUIDE.md Section 6):
+   - Sandboxed plugins describe admin UI as JSON
+   - Block types: header, section, divider, fields, table, actions, stats, form
+   - Plugin-supplied JavaScript does NOT run in browser
+
+4. **Capabilities Required**:
+   - `read:content` — Optional (if accessing site content)
+   - `network:fetch` — Required for Google/Yelp API calls
+   - `email:send` — Deferred (notifications cut from v1)
+
+### From decisions.md
+
+1. **Product name**: ReviewPulse (not Chorus) for v1
+2. **Design system**: Use Emdash's existing design system exclusively
+3. **KV pattern**: O(n) acceptable for v1; optimize if >1000 reviews become common
+4. **Testing**: Mock data testing; human QA for live API verification
+5. **No notification config UI**: Decision pending but cut from v1 MVP
+
+---
+
+## File Structure Target (~800 lines core)
+
+Based on decisions.md file structure:
+
 ```
-
-**AFTER:**
-```typescript
-// Batch 1: Jensen + Oprah
-await Promise.all([
-  runAgent("jensen-huang-review", jensenHuangBoardReview(project, delDir, prdPath, resolve(roundsDir, "board-review-jensen.md")), 20),
-  runAgent("oprah-winfrey-review", oprahWinfreyBoardReview(project, delDir, prdPath, resolve(roundsDir, "board-review-oprah.md")), 20),
-]);
-
-// Batch 2: Warren + Shonda
-await Promise.all([
-  runAgent("warren-buffett-review", warrenBuffettBoardReview(project, delDir, prdPath, resolve(roundsDir, "board-review-buffett.md")), 20),
-  runAgent("shonda-rhimes-review", shondaRhimesBoardReview(project, delDir, prdPath, resolve(roundsDir, "board-review-shonda.md")), 20),
-]);
-```
-
-### Pattern 2: Creative Review (3 agents → 2+1 batches)
-
-**BEFORE (Lines 388-392):**
-```typescript
-await Promise.all([
-  runAgent("jony-ive-review", jonyIveVisualReview(delDir, resolve(roundsDir, "review-jony-ive.md")), 15),
-  runAgent("maya-angelou-review", mayaAngelouCopyReview(delDir, resolve(roundsDir, "review-maya-angelou.md")), 15),
-  runAgent("aaron-sorkin-demo", aaronSorkinDemoScript(project, delDir, resolve(roundsDir, "demo-script.md")), 20),
-]);
-```
-
-**AFTER:**
-```typescript
-// Batch 1: Jony + Maya (visual + copy)
-await Promise.all([
-  runAgent("jony-ive-review", jonyIveVisualReview(delDir, resolve(roundsDir, "review-jony-ive.md")), 15),
-  runAgent("maya-angelou-review", mayaAngelouCopyReview(delDir, resolve(roundsDir, "review-maya-angelou.md")), 15),
-]);
-
-// Batch 2: Aaron solo (demo script is independent)
-await runAgent("aaron-sorkin-demo", aaronSorkinDemoScript(project, delDir, resolve(roundsDir, "demo-script.md")), 20);
+reviewpulse/
+├── index.ts                 # Plugin descriptor export (40 lines)
+├── routes/
+│   ├── admin.ts            # Admin dashboard routes
+│   ├── api.ts              # CRUD API endpoints
+│   ├── oauth.ts            # Google OAuth flow
+│   └── widget.ts           # Frontend widget endpoint
+├── sync/
+│   ├── google.ts           # Google Places API sync
+│   └── yelp.ts             # Yelp API sync
+├── storage/
+│   └── kv.ts               # KV operations (reviews:list pattern)
+├── components/
+│   ├── widget.tsx          # Review display widget (Astro)
+│   └── admin-panel.tsx     # Admin dashboard UI
+├── types.ts                # Shared type definitions
+└── utils.ts                # Helpers (date formatting, etc.)
 ```
 
 ---
 
-## Success Criteria
+## Risk Mitigations Required
 
-### From PRD
+From risk scan analysis:
 
-- [ ] `pipeline.ts` shows two batched blocks in `runBoardReview()` and `runCreativeReview()`
-- [ ] TypeScript compiles without errors
-- [ ] Pipeline logs show board review agents arriving in two waves (2 START, 2 DONE, 2 START, 2 DONE)
-- [ ] Peak RSS of daemon process during board-review stays ≤ 1.8GB
-- [ ] Pipeline completes end-to-end
-- [ ] Changes committed to `great-minds-plugin` and pushed
-- [ ] `systemctl restart shipyard-daemon.service` executed after push
-
-### From Decisions
-
-- [ ] Zero OOM restarts in 72-hour observation window post-deploy
-- [ ] Peak memory ≤ 1.5GB under normal pipeline load
-- [ ] All existing tests pass (no functional regression)
-- [ ] Single PR with no follow-up fixes required
+| Risk ID | Description | Mitigation |
+|---------|-------------|------------|
+| RP-001 | Environment variable validation | Add explicit checks at plugin:install hook |
+| RP-002 | External API error handling | Implement retry logic, timeouts, circuit breaker |
+| RP-003 | KV storage scalability | Document limits; defer migration to ctx.storage |
+| RP-006 | Admin UI XSS | Audit all HTML generation; add CSP headers |
+| RP-008 | Public route rate limiting | Add IP-based rate limits on public endpoints |
 
 ---
 
-## Risk Summary
+## Acceptance Criteria Summary
 
-| Risk | Severity | Mitigation |
-|------|----------|------------|
-| Wall-clock time doubles (~60s → ~120s per phase) | MEDIUM | Accepted tradeoff per decisions.md |
-| Memory estimate wrong | MEDIUM | 72-hour observation window; rollback ready |
-| Scope creep | MEDIUM | Explicit NOs documented; enforce in review |
-| Sequential overhead | LOW | Negligible; pure await statement |
+### Must Pass Before Ship
+
+1. [ ] All `throw new Response()` patterns removed
+2. [ ] All `rc.user` and `rc.pathParams` references corrected
+3. [ ] Google OAuth flow works with mock data
+4. [ ] Yelp sync works with mock data
+5. [ ] Widget displays reviews with Emdash design system
+6. [ ] Admin dashboard loads in <2 seconds
+7. [ ] Featured/flagged toggles persist correctly
+8. [ ] 30-day trend line renders
+9. [ ] All tests pass with mock data
+10. [ ] No response templates, email campaigns, AI suggestions, or sentiment analysis code
+
+### Human QA Required
+
+1. [ ] Live Google Places API sync
+2. [ ] Live Yelp API sync
+3. [ ] Bella's Bistro integration test
+4. [ ] Mobile responsiveness verification
+5. [ ] First-run ≤30 seconds verification
 
 ---
 
-## Deferred to v2 Architecture
+## Version
 
-The following are explicitly deferred and do NOT block this ship:
-
-1. Is 7 agents per pipeline architecturally sound?
-2. Queue-based execution design for 100x scale
-3. Agent pooling strategy (warm Claude SDK instances)
-4. Horizontal scaling topology (multiple workers)
-5. Post-stabilization observability
-
----
-
-## File Scope
-
-**ONLY ONE FILE MODIFIED:**
-```
-/home/agent/great-minds-plugin/daemon/src/pipeline.ts
-```
-
-- No new files created
-- No files deleted
-- No files renamed
+- **Specification Version**: 1.0
+- **Last Updated**: 2026-04-13
+- **PRD Source**: `prds/github-issue-sethshoultes-shipyard-ai-32.md`
+- **Decisions Source**: `rounds/github-issue-sethshoultes-shipyard-ai-32/decisions.md`

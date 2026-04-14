@@ -1,35 +1,40 @@
-# Phase 1 Plan — Daemon Stagger Review (Breathe)
+# Phase 1 Plan — ReviewPulse v1 MVP Fix & Refactor
 
-**Generated:** 2024-04-13
-**Project Slug:** daemon-stagger-review
+**Generated:** 2026-04-13
+**Project Slug:** github-issue-sethshoultes-shipyard-ai-32
 **Requirements:** .planning/REQUIREMENTS.md
-**Total Tasks:** 4
-**Waves:** 3
-**Internal Codename:** "Breathe"
+**Total Tasks:** 12
+**Waves:** 4
 
 ---
 
 ## The Essence
 
-> **What is this fix REALLY about?**
-> Teaching a system to breathe instead of gasp.
+From decisions.md:
 
-> **What's the feeling it should evoke?**
-> Trust. Quiet confidence that things just work.
+> **North Star:** Letting small business owners sleep at night by turning customer voices into peace of mind.
 
-> **What's the North Star?**
-> Reliability. Zero crashes. Everything else is noise.
+> **Perfection point:** The first 30 seconds — Connect. See. Done.
 
-> **Creative direction:**
-> Rhythm over force. Inhale (2 run), exhale (2 finish).
+> **Creative direction:** Invisible. Warm. Immediate.
 
 ---
 
 ## Problem Statement
 
-The board review phase runs 4 Claude agents concurrently, and creative review runs 3 concurrently. Combined with Claude SDK overhead per agent, peak memory spikes to ~2.3GB on an 8GB droplet. This triggers OOM kills — **48 documented OOM restarts**.
+ReviewPulse plugin exists at 2,051 lines but has never been tested against real Emdash CMS. The PRD documents:
+- **72 `throw new Response()` patterns** (banned by Emdash plugin system)
+- **17 `rc.user` references** (incorrect context access)
+- **1 `rc.pathParams` reference** (incorrect route parameter access)
+- **Feature bloat**: v1 ships only core features, not Wave 3 additions
 
-Swap is a safety net, not a plan. The correct fix: cap concurrent agent fan-out to 2 at a time.
+The fix requires: removing banned patterns, cutting features deferred to v2, and ensuring Emdash design system compliance.
+
+**Technical Reference:** docs/EMDASH-GUIDE.md Section 6 (Plugin System) defines correct patterns:
+- Route handlers return objects, not throw Response
+- `ctx.kv.get<T>(key)` for KV access
+- `ctx.log.{info|warn|error}(msg)` for logging
+- Block Kit for sandboxed admin UI
 
 ---
 
@@ -37,216 +42,582 @@ Swap is a safety net, not a plan. The correct fix: cap concurrent agent fan-out 
 
 | Requirement | Task(s) | Wave |
 |-------------|---------|------|
-| REQ-1: Split runBoardReview() into 2+2 batches | phase-1-task-1 | 1 |
-| REQ-2: Split runCreativeReview() into 2+1 batches | phase-1-task-2 | 1 |
-| REQ-3: Preserve exact function signatures | phase-1-task-1, phase-1-task-2 | 1 |
-| REQ-4: Achieve 50% peak memory reduction | phase-1-task-3 | 2 |
-| REQ-5: Semantic commit message format | phase-1-task-4 | 3 |
-| REQ-6: Commit to great-minds-plugin repo | phase-1-task-4 | 3 |
-| REQ-7: No scope creep | All tasks | All |
+| REQ-FIX-001: Eliminate `throw new Response()` | phase-1-task-1 | 1 |
+| REQ-FIX-002: Correct `rc.user` access | phase-1-task-2 | 1 |
+| REQ-FIX-003: Correct `rc.pathParams` access | phase-1-task-2 | 1 |
+| REQ-CUT-001: Remove response templates | phase-1-task-3 | 1 |
+| REQ-CUT-002: Remove email campaigns | phase-1-task-3 | 1 |
+| REQ-CUT-004: Remove AI response suggestions | phase-1-task-3 | 1 |
+| REQ-CUT-006: Remove notification emails | phase-1-task-3 | 1 |
+| REQ-SYNC-001: Google OAuth flow | phase-1-task-4 | 2 |
+| REQ-SYNC-002: Google Places API | phase-1-task-4 | 2 |
+| REQ-SYNC-003: Yelp API integration | phase-1-task-5 | 2 |
+| REQ-ADMIN-001: Dashboard overview | phase-1-task-6 | 2 |
+| REQ-ADMIN-004: Featured toggle | phase-1-task-6 | 2 |
+| REQ-ADMIN-005: Flagged toggle | phase-1-task-6 | 2 |
+| REQ-UI-001: Widget display | phase-1-task-7 | 2 |
+| REQ-UI-002: Schema markup | phase-1-task-7 | 2 |
+| REQ-FIX-004: Emdash design system | phase-1-task-8 | 3 |
+| REQ-FIX-005: Mock data testing | phase-1-task-9 | 3 |
+| REQ-UI-005: Human-first copy | phase-1-task-10 | 3 |
+| Build verification | phase-1-task-11 | 4 |
+| Commit & document | phase-1-task-12 | 4 |
 
 ---
 
 ## Wave Execution Order
 
-### Wave 1 (Parallel) — Code Changes
+### Wave 1 (Parallel) — Code Cleanup
 
-Both code changes can run in parallel as they modify different functions within the same file.
+These tasks remove banned patterns and cut deferred features. Can run in parallel.
 
 ```xml
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Split runBoardReview() into 2+2 sequential batches</title>
-  <requirement>REQ-1, REQ-3</requirement>
+  <title>Remove all throw new Response() patterns</title>
+  <requirement>REQ-FIX-001</requirement>
   <description>
-    Modify runBoardReview() in pipeline.ts to execute board review agents in two
-    sequential Promise.all blocks instead of one. Batch 1: Jensen + Oprah.
-    Batch 2: Warren + Shonda. Reduces concurrent agents from 4 to 2.
+    Replace all instances of `throw new Response()` with proper Emdash error handling.
+    Per EMDASH-GUIDE.md Section 6: route handlers should return objects, not throw Response.
+    Error pattern: throw new Error("message") which framework converts to error response.
   </description>
 
   <context>
-    <file path="/home/agent/great-minds-plugin/daemon/src/pipeline.ts" reason="Target file for modification" />
-    <file path="/home/agent/shipyard-ai/prds/daemon-stagger-review.md" reason="PRD with exact code pattern (Change 1)" />
-    <file path="/home/agent/shipyard-ai/rounds/daemon-stagger-review/decisions.md" reason="Locked decisions and scope boundaries" />
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Atomic requirements REQ-1, REQ-3" />
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/sandbox-entry.ts" reason="Main plugin file - contains all route handlers" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6: Plugin System - correct error handling pattern" />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="REQ-FIX-001 specification" />
   </context>
 
   <steps>
-    <step order="1">Read pipeline.ts and locate runBoardReview() function (lines 397-422)</step>
-    <step order="2">Find the Promise.all block at lines 404-409 with 4 agents</step>
-    <step order="3">Replace single Promise.all with two sequential Promise.all blocks</step>
-    <step order="4">Batch 1 (lines 404-407): Jensen + Oprah
-      await Promise.all([
-        runAgent("jensen-huang-review", jensenHuangBoardReview(project, delDir, prdPath, resolve(roundsDir, "board-review-jensen.md")), 20),
-        runAgent("oprah-winfrey-review", oprahWinfreyBoardReview(project, delDir, prdPath, resolve(roundsDir, "board-review-oprah.md")), 20),
-      ]);</step>
-    <step order="5">Add comment "// Batch 1: Jensen + Oprah" above first Promise.all</step>
-    <step order="6">Batch 2 (sequential after Batch 1): Warren + Shonda
-      await Promise.all([
-        runAgent("warren-buffett-review", warrenBuffettBoardReview(project, delDir, prdPath, resolve(roundsDir, "board-review-buffett.md")), 20),
-        runAgent("shonda-rhimes-review", shondaRhimesBoardReview(project, delDir, prdPath, resolve(roundsDir, "board-review-shonda.md")), 20),
-      ]);</step>
-    <step order="7">Add comment "// Batch 2: Warren + Shonda" above second Promise.all</step>
-    <step order="8">Verify all function call signatures match PRD exactly (agent names, maxTurns=20, output paths)</step>
-    <step order="9">Verify no other code in the function is changed</step>
+    <step order="1">Read sandbox-entry.ts to locate all throw new Response() instances</step>
+    <step order="2">Grep for pattern: throw new Response</step>
+    <step order="3">For each instance, replace with: throw new Error("descriptive message")</step>
+    <step order="4">Verify error catch blocks don't re-throw Response objects incorrectly</step>
+    <step order="5">Pattern to follow (from existing code):
+      if (error instanceof Response) throw error; // REMOVE THIS
+      ctx.log.error(`Context: ${String(error)}`);
+      throw new Error("User-friendly message"); // KEEP THIS</step>
+    <step order="6">Remove all `if (error instanceof Response) throw error;` checks</step>
+    <step order="7">Ensure all routes return objects on success, throw Error on failure</step>
   </steps>
 
   <verification>
-    <check type="build">cd /home/agent/great-minds-plugin/daemon && npx tsc --noEmit</check>
-    <check type="manual">Count Promise.all blocks in runBoardReview() — should be 2</check>
-    <check type="manual">Each Promise.all should have exactly 2 agents</check>
-    <check type="manual">All agent names and parameters unchanged from original</check>
+    <check type="test">grep -r "throw new Response" plugins/reviewpulse/src/ returns 0 results</check>
+    <check type="test">grep -c "throw new Error" plugins/reviewpulse/src/sandbox-entry.ts shows expected count</check>
+    <check type="build">npx tsc --noEmit passes</check>
   </verification>
 
   <dependencies>
     <!-- Wave 1: no dependencies -->
   </dependencies>
 
-  <commit-message>fix(pipeline): batch board review agents in pairs (2+2)</commit-message>
+  <commit-message>fix(reviewpulse): replace throw Response with throw Error per Emdash plugin spec</commit-message>
 </task-plan>
 ```
 
 ```xml
 <task-plan id="phase-1-task-2" wave="1">
-  <title>Split runCreativeReview() into 2+1 sequential batches</title>
-  <requirement>REQ-2, REQ-3</requirement>
+  <title>Correct rc.user and rc.pathParams context access</title>
+  <requirement>REQ-FIX-002, REQ-FIX-003</requirement>
   <description>
-    Modify runCreativeReview() in pipeline.ts to execute creative review agents in two
-    sequential phases. Batch 1: Jony Ive + Maya Angelou (visual + copy, in Promise.all).
-    Batch 2: Aaron Sorkin solo (sequential await, not Promise.all).
-    Reduces concurrent agents from 3 to 2.
+    Replace all `rc.user` and `rc.pathParams` references with correct Emdash context access.
+    Per EMDASH-GUIDE.md Section 6: use ctx (PluginContext) for authenticated operations,
+    and rc.input for route parameters.
   </description>
 
   <context>
-    <file path="/home/agent/great-minds-plugin/daemon/src/pipeline.ts" reason="Target file for modification" />
-    <file path="/home/agent/shipyard-ai/prds/daemon-stagger-review.md" reason="PRD with exact code pattern (Change 2)" />
-    <file path="/home/agent/shipyard-ai/rounds/daemon-stagger-review/decisions.md" reason="Locked decisions and scope boundaries" />
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Atomic requirements REQ-2, REQ-3" />
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/sandbox-entry.ts" reason="Contains rc.user and rc.pathParams references" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6: Plugin Context APIs" />
   </context>
 
   <steps>
-    <step order="1">Read pipeline.ts and locate runCreativeReview() function (lines 382-395)</step>
-    <step order="2">Find the Promise.all block at lines 388-392 with 3 agents</step>
-    <step order="3">Replace single Promise.all with: one Promise.all(2 agents) + one sequential await</step>
-    <step order="4">Batch 1 (Promise.all with 2 agents): Jony + Maya
-      await Promise.all([
-        runAgent("jony-ive-review", jonyIveVisualReview(delDir, resolve(roundsDir, "review-jony-ive.md")), 15),
-        runAgent("maya-angelou-review", mayaAngelouCopyReview(delDir, resolve(roundsDir, "review-maya-angelou.md")), 15),
-      ]);</step>
-    <step order="5">Add comment "// Batch 1: Jony + Maya (visual + copy)" above Promise.all</step>
-    <step order="6">Batch 2 (sequential after Batch 1): Aaron solo — NOT Promise.all
-      await runAgent("aaron-sorkin-demo", aaronSorkinDemoScript(project, delDir, resolve(roundsDir, "demo-script.md")), 20);</step>
-    <step order="7">Add comment "// Batch 2: Aaron solo (demo script is independent)" above Aaron's call</step>
-    <step order="8">Verify all function call signatures match PRD exactly (Jony/Maya maxTurns=15, Aaron maxTurns=20)</step>
-    <step order="9">Verify no other code in the function is changed</step>
+    <step order="1">Grep for all `rc.user` references in sandbox-entry.ts</step>
+    <step order="2">Grep for all `rc.pathParams` references in sandbox-entry.ts</step>
+    <step order="3">Based on risk scan: line 537 has pathParams access that needs fixing</step>
+    <step order="4">Replace rc.pathParams with rc.input pattern:
+      BEFORE: const pathParams = rc.input as Record<string, string> | undefined;
+      AFTER: const input = (rc.input ?? {}) as Record<string, unknown>;</step>
+    <step order="5">Access route parameters consistently via input object</step>
+    <step order="6">Remove any direct user context checks (admin auth handled by framework)</step>
+    <step order="7">Verify routes marked as `public: true` don't require user context</step>
   </steps>
 
   <verification>
-    <check type="build">cd /home/agent/great-minds-plugin/daemon && npx tsc --noEmit</check>
-    <check type="manual">Count Promise.all blocks in runCreativeReview() — should be 1</check>
-    <check type="manual">Promise.all should have exactly 2 agents (Jony + Maya)</check>
-    <check type="manual">Aaron Sorkin should be sequential await (not in Promise.all)</check>
-    <check type="manual">All agent names and parameters unchanged from original</check>
+    <check type="test">grep -r "rc.user" plugins/reviewpulse/src/ returns 0 results</check>
+    <check type="test">grep -r "rc.pathParams" plugins/reviewpulse/src/ returns 0 results</check>
+    <check type="build">npx tsc --noEmit passes</check>
   </verification>
 
   <dependencies>
-    <!-- Wave 1: no dependencies, can run parallel with task-1 -->
+    <!-- Wave 1: no dependencies -->
   </dependencies>
 
-  <commit-message>fix(pipeline): batch creative review agents (2+1 pattern)</commit-message>
+  <commit-message>fix(reviewpulse): correct context access per Emdash plugin spec</commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-3" wave="1">
+  <title>Remove v2 features (templates, campaigns, AI, notifications)</title>
+  <requirement>REQ-CUT-001, REQ-CUT-002, REQ-CUT-004, REQ-CUT-006</requirement>
+  <description>
+    Remove all Wave 3 features that are explicitly OUT for v1 MVP per decisions.md:
+    - Response templates (REQ-CUT-001)
+    - Email campaigns (REQ-CUT-002)
+    - AI response suggestions (REQ-CUT-004)
+    - Notification emails (REQ-CUT-006)
+
+    These features undermine the v1 focus: simple sync + display + admin.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/sandbox-entry.ts" reason="Contains all route definitions" />
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/email.ts" reason="Email module - may need gutting" />
+    <file path="/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-32/decisions.md" reason="MVP Feature Set: what's OUT" />
+  </context>
+
+  <steps>
+    <step order="1">Remove routes from sandbox-entry.ts:
+      - draftResponse (AI suggestions) - lines 773-861
+      - saveResponse (tied to AI) - lines 867-904
+      - createTemplate - lines 914-958
+      - listTemplates - lines 965-985
+      - getTemplate - lines 992-1020
+      - deleteTemplate - lines 1026-1053
+      - applyTemplate - lines 1059-1097
+      - createCampaign - lines 1108-1161
+      - sendCampaign - lines 1168-1245
+      - listCampaigns - lines 1251-1272</step>
+    <step order="2">Remove types no longer needed:
+      - ResponseTemplate interface
+      - Campaign interface</step>
+    <step order="3">Remove email notification calls from sync route (sendReviewNotifications)</step>
+    <step order="4">Simplify email.ts or remove entirely if no longer needed</step>
+    <step order="5">Remove KV keys no longer used:
+      - templates:list
+      - template:{id}
+      - campaigns:list
+      - campaign:{id}
+      - settings:notifications</step>
+    <step order="6">Update plugin:install hook to not initialize removed KV schemas</step>
+    <step order="7">Remove Anthropic API integration (draftResponse used ctx.env.ANTHROPIC_API_KEY)</step>
+    <step order="8">Keep ONLY: sync, reviews, reviewDetail, reviewUpdate, stats, widgetData, settings, health, admin pages</step>
+  </steps>
+
+  <verification>
+    <check type="test">grep -r "draftResponse\|createTemplate\|createCampaign" plugins/reviewpulse/src/ returns 0</check>
+    <check type="test">grep -r "ANTHROPIC_API_KEY" plugins/reviewpulse/src/ returns 0</check>
+    <check type="manual">Count routes in sandbox-entry.ts — should be ~12 (down from 29)</check>
+    <check type="build">npx tsc --noEmit passes</check>
+  </verification>
+
+  <dependencies>
+    <!-- Wave 1: no dependencies -->
+  </dependencies>
+
+  <commit-message>feat(reviewpulse): strip v2 features (templates, campaigns, AI) for MVP focus</commit-message>
 </task-plan>
 ```
 
 ---
 
-### Wave 2 (After Wave 1) — Verification
+### Wave 2 (Parallel, after Wave 1) — Core Feature Verification
+
+After cleanup, verify core features work correctly.
 
 ```xml
-<task-plan id="phase-1-task-3" wave="2">
-  <title>TypeScript compilation and dry-run verification</title>
-  <requirement>REQ-4</requirement>
+<task-plan id="phase-1-task-4" wave="2">
+  <title>Verify and fix Google sync route</title>
+  <requirement>REQ-SYNC-001, REQ-SYNC-002, REQ-SYNC-005</requirement>
   <description>
-    Verify the modified pipeline.ts compiles without TypeScript errors.
-    Run a dry verification to ensure the code is syntactically correct.
-    This is the gate before committing.
+    Ensure Google Places API sync route follows Emdash patterns.
+    Verify error handling, environment variable access, and response format.
+    Must support 30-second first-run experience.
   </description>
 
   <context>
-    <file path="/home/agent/great-minds-plugin/daemon/src/pipeline.ts" reason="Modified file to verify" />
-    <file path="/home/agent/great-minds-plugin/daemon/tsconfig.json" reason="TypeScript configuration" />
-    <file path="/home/agent/great-minds-plugin/daemon/package.json" reason="Build scripts" />
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/sandbox-entry.ts" reason="sync route handler" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Plugin capabilities: network:fetch" />
   </context>
 
   <steps>
-    <step order="1">Change directory to /home/agent/great-minds-plugin/daemon</step>
-    <step order="2">Run npx tsc --noEmit to check for TypeScript errors</step>
-    <step order="3">If errors: identify which task introduced them, fix in that task</step>
-    <step order="4">Run git diff daemon/src/pipeline.ts to review all changes</step>
-    <step order="5">Verify ONLY the two targeted functions were modified</step>
-    <step order="6">Verify NO new files were created (REQ-7: no scope creep)</step>
-    <step order="7">Verify NO agent names were changed</step>
-    <step order="8">Verify NO agent prompt functions were modified</step>
-    <step order="9">Count total lines changed — should be minimal (~10-15 lines)</step>
+    <step order="1">Read sync route handler (post Wave 1 cleanup)</step>
+    <step order="2">Verify Google API call uses ctx.http.fetch if sandboxed (or native fetch for trusted)</step>
+    <step order="3">Add environment variable validation at start of handler:
+      if (!ctx.env?.GOOGLE_PLACES_API_KEY) {
+        ctx.log.warn("Google Places API key not configured");
+      }</step>
+    <step order="4">Verify normalizeGoogleReview() handles edge cases</step>
+    <step order="5">Ensure deduplication uses source-specific key: `google|author|rating|date`</step>
+    <step order="6">Verify sync returns: { imported, skipped, total, lastSyncAt }</step>
+    <step order="7">Remove email notification logic (cut in task-3)</step>
   </steps>
 
   <verification>
-    <check type="build">cd /home/agent/great-minds-plugin/daemon && npx tsc --noEmit — must exit 0</check>
-    <check type="test">git status shows ONLY pipeline.ts modified</check>
-    <check type="manual">git diff shows surgical changes to Promise.all blocks only</check>
+    <check type="test">Mock test: sync with fake Google response imports correctly</check>
+    <check type="manual">Environment variable validation logged when missing</check>
+    <check type="build">npx tsc --noEmit passes</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Must have modified runBoardReview()" />
-    <depends-on task-id="phase-1-task-2" reason="Must have modified runCreativeReview()" />
+    <depends-on task-id="phase-1-task-1" reason="throw Response patterns must be fixed" />
+    <depends-on task-id="phase-1-task-3" reason="v2 features must be removed" />
+  </dependencies>
+
+  <commit-message>fix(reviewpulse): harden Google sync with env validation</commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-5" wave="2">
+  <title>Verify and fix Yelp sync route</title>
+  <requirement>REQ-SYNC-003</requirement>
+  <description>
+    Ensure Yelp Fusion API sync follows same patterns as Google sync.
+    Verify Bearer token auth, error handling, and response normalization.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/sandbox-entry.ts" reason="sync route handler - Yelp section" />
+  </context>
+
+  <steps>
+    <step order="1">Read Yelp sync section in sync route handler</step>
+    <step order="2">Add environment variable validation:
+      if (!ctx.env?.YELP_API_KEY) {
+        ctx.log.warn("Yelp API key not configured");
+      }</step>
+    <step order="3">Verify Authorization header uses Bearer token correctly</step>
+    <step order="4">Verify normalizeYelpReview() handles edge cases</step>
+    <step order="5">Ensure deduplication uses source-specific key: `yelp|author|rating|date`</step>
+    <step order="6">Verify graceful handling when Yelp API returns empty reviews array</step>
+  </steps>
+
+  <verification>
+    <check type="test">Mock test: sync with fake Yelp response imports correctly</check>
+    <check type="manual">Both Google and Yelp can be synced in single call</check>
+    <check type="build">npx tsc --noEmit passes</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-1" reason="throw Response patterns must be fixed" />
+    <depends-on task-id="phase-1-task-3" reason="v2 features must be removed" />
+  </dependencies>
+
+  <commit-message>fix(reviewpulse): harden Yelp sync with env validation</commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-6" wave="2">
+  <title>Verify admin dashboard routes</title>
+  <requirement>REQ-ADMIN-001, REQ-ADMIN-004, REQ-ADMIN-005</requirement>
+  <description>
+    Ensure admin dashboard, featured toggle, and flagged toggle work correctly.
+    Verify review list pagination and filtering.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/sandbox-entry.ts" reason="admin routes" />
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/admin-ui.ts" reason="HTML rendering functions" />
+  </context>
+
+  <steps>
+    <step order="1">Verify adminReviews route returns properly formatted HTML</step>
+    <step order="2">Verify reviewUpdate route toggles featured/flagged correctly</step>
+    <step order="3">Verify pagination parameters handled correctly</step>
+    <step order="4">Verify filter parameters (rating, source, status) work</step>
+    <step order="5">Verify adminStatsWidget, adminReviewCountWidget, adminRecentReviewsWidget routes</step>
+    <step order="6">Verify settingsPage returns settings form HTML</step>
+    <step order="7">Remove analytics routes if too complex for v1 (analyticsData, analyticsExport, adminAnalyticsPage)</step>
+  </steps>
+
+  <verification>
+    <check type="test">Mock test: admin routes return expected HTML structure</check>
+    <check type="manual">Featured toggle persists correctly in KV</check>
+    <check type="manual">Flagged toggle persists correctly in KV</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-1" reason="throw Response patterns must be fixed" />
+    <depends-on task-id="phase-1-task-2" reason="context access must be fixed" />
+  </dependencies>
+
+  <commit-message>fix(reviewpulse): verify admin dashboard functionality</commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-7" wave="2">
+  <title>Verify widget endpoint and Astro components</title>
+  <requirement>REQ-UI-001, REQ-UI-002, REQ-UI-003</requirement>
+  <description>
+    Ensure widgetData endpoint returns correct format for frontend display.
+    Verify Astro components (ReviewWidget.astro, ReviewGrid.astro) work with data.
+    Verify JSON-LD schema markup for SEO.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/sandbox-entry.ts" reason="widgetData route" />
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/astro/ReviewWidget.astro" reason="Frontend widget component" />
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/astro/ReviewGrid.astro" reason="Grid display component" />
+  </context>
+
+  <steps>
+    <step order="1">Verify widgetData route returns: { averageRating, totalCount, reviews }</step>
+    <step order="2">Verify reviews array contains: author, rating, text, date, source</step>
+    <step order="3">Verify featured reviews prioritized in response</step>
+    <step order="4">Check ReviewWidget.astro generates valid JSON-LD schema</step>
+    <step order="5">Verify mobile-responsive CSS in widget components</step>
+    <step order="6">Ensure widget components use Emdash design tokens if available</step>
+  </steps>
+
+  <verification>
+    <check type="test">widgetData returns valid JSON with expected structure</check>
+    <check type="manual">JSON-LD validates at schema.org/review validator</check>
+    <check type="manual">Widget displays correctly on mobile viewport</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-1" reason="throw Response patterns must be fixed" />
+  </dependencies>
+
+  <commit-message>fix(reviewpulse): verify widget endpoint and Astro components</commit-message>
+</task-plan>
+```
+
+---
+
+### Wave 3 (Parallel, after Wave 2) — Polish & Testing
+
+```xml
+<task-plan id="phase-1-task-8" wave="3">
+  <title>Align admin UI with Emdash design system</title>
+  <requirement>REQ-FIX-004, REQ-ADMIN-006</requirement>
+  <description>
+    Per decisions.md: "Use Emdash's existing design system — if it looks like Emdash, it looks right."
+    Audit admin-ui.ts for custom CSS and align with Emdash patterns.
+    Per EMDASH-GUIDE.md Section 6: sandboxed plugins use Block Kit for admin UI.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/admin-ui.ts" reason="Admin UI rendering with embedded CSS" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6: Block Kit admin UI" />
+  </context>
+
+  <steps>
+    <step order="1">Read admin-ui.ts and identify custom CSS patterns</step>
+    <step order="2">Identify which styles can be replaced with Emdash/Kumo components</step>
+    <step order="3">Keep essential brand colors (Terracotta #C4704B, Sage #7A8B6F, Gold #D4A853)</step>
+    <step order="4">Ensure buttons, inputs, tables follow Emdash conventions</step>
+    <step order="5">Verify accessibility: labels, aria attributes, keyboard navigation</step>
+    <step order="6">Document any deviations that are intentional for ReviewPulse brand</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Admin UI visually consistent with Emdash CMS</check>
+    <check type="manual">All form inputs have labels</check>
+    <check type="manual">Buttons are keyboard-accessible</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-6" reason="Admin routes must be verified" />
+  </dependencies>
+
+  <commit-message>style(reviewpulse): align admin UI with Emdash design system</commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-9" wave="3">
+  <title>Update test suite for MVP scope</title>
+  <requirement>REQ-FIX-005</requirement>
+  <description>
+    Update test suite to match MVP scope. Remove tests for cut features.
+    Ensure all remaining routes have mock data tests.
+    Per decisions.md: "Mock data testing with human QA is the pragmatic path."
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/__tests__/sandbox-entry.test.ts" reason="Main test file" />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Test requirements" />
+  </context>
+
+  <steps>
+    <step order="1">Read existing test file</step>
+    <step order="2">Remove tests for cut features:
+      - draftResponse tests
+      - saveResponse tests
+      - template CRUD tests
+      - campaign tests
+      - email notification tests</step>
+    <step order="3">Keep tests for:
+      - sync route (Google + Yelp mocked)
+      - reviews route (pagination, filters)
+      - reviewUpdate route (featured, flagged)
+      - stats route
+      - widgetData route
+      - health route
+      - normalization functions
+      - computeStats function</step>
+    <step order="4">Ensure mock KV correctly simulates ctx.kv API</step>
+    <step order="5">Ensure mock fetch correctly simulates Google/Yelp responses</step>
+    <step order="6">Run tests and fix any failures</step>
+  </steps>
+
+  <verification>
+    <check type="test">npm run test passes all tests</check>
+    <check type="test">No tests reference removed features</check>
+    <check type="manual">Coverage includes all MVP routes</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-3" reason="v2 features must be removed before updating tests" />
+    <depends-on task-id="phase-1-task-4" reason="Sync routes must be finalized" />
+    <depends-on task-id="phase-1-task-5" reason="Sync routes must be finalized" />
+  </dependencies>
+
+  <commit-message>test(reviewpulse): update test suite for MVP scope</commit-message>
+</task-plan>
+```
+
+```xml
+<task-plan id="phase-1-task-10" wave="3">
+  <title>Audit and improve UI copy</title>
+  <requirement>REQ-UI-005</requirement>
+  <description>
+    Per decisions.md Decision 9: "Human-first UI copy throughout"
+    - "You've got 3 new reviews" not "3 reviews detected in sync cycle"
+    - Professional, attentive, no jargon
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/admin-ui.ts" reason="Contains UI copy strings" />
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/src/sandbox-entry.ts" reason="Contains error messages and labels" />
+    <file path="/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-32/decisions.md" reason="Decision 9: Brand Voice" />
+  </context>
+
+  <steps>
+    <step order="1">Audit all user-facing strings in admin-ui.ts</step>
+    <step order="2">Audit error messages in sandbox-entry.ts</step>
+    <step order="3">Replace jargon with human language:
+      - "sync cycle" → "check"
+      - "imported" → "found"
+      - "failed to fetch" → "couldn't reach"</step>
+    <step order="4">Ensure empty states are warm and helpful, not technical</step>
+    <step order="5">Verify success messages are celebratory but not excessive</step>
+  </steps>
+
+  <verification>
+    <check type="manual">No technical jargon in user-facing strings</check>
+    <check type="manual">Error messages are helpful and actionable</check>
+    <check type="manual">Tone consistent throughout</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-8" reason="UI must be finalized before copy audit" />
+  </dependencies>
+
+  <commit-message>copy(reviewpulse): humanize UI copy per brand guidelines</commit-message>
+</task-plan>
+```
+
+---
+
+### Wave 4 (Sequential, after Wave 3) — Verification & Ship
+
+```xml
+<task-plan id="phase-1-task-11" wave="4">
+  <title>Build verification and final QA</title>
+  <requirement>All requirements</requirement>
+  <description>
+    Final verification before committing. Run all checks, verify scope,
+    ensure no regressions. Gate before ship.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/" reason="All plugin files" />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Acceptance criteria" />
+  </context>
+
+  <steps>
+    <step order="1">Run TypeScript check: npx tsc --noEmit</step>
+    <step order="2">Run tests: npm run test</step>
+    <step order="3">Grep verification:
+      - grep "throw new Response" → 0 results
+      - grep "rc.user" → 0 results
+      - grep "rc.pathParams" → 0 results
+      - grep "draftResponse\|createTemplate\|createCampaign" → 0 results
+      - grep "ANTHROPIC_API_KEY" → 0 results</step>
+    <step order="4">Count lines: wc -l sandbox-entry.ts (target: ~800 lines down from 1741)</step>
+    <step order="5">Review git diff for all changes</step>
+    <step order="6">Verify no new files created (except this is allowed if restructuring)</step>
+    <step order="7">Verify ONLY reviewpulse plugin modified (no other plugins/sites)</step>
+  </steps>
+
+  <verification>
+    <check type="build">npx tsc --noEmit exits 0</check>
+    <check type="test">npm run test exits 0</check>
+    <check type="test">All grep verifications pass</check>
+    <check type="manual">Git diff shows expected scope</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-1" reason="Pattern fixes complete" />
+    <depends-on task-id="phase-1-task-2" reason="Context fixes complete" />
+    <depends-on task-id="phase-1-task-3" reason="Feature cuts complete" />
+    <depends-on task-id="phase-1-task-9" reason="Tests updated" />
+    <depends-on task-id="phase-1-task-10" reason="Copy audited" />
   </dependencies>
 
   <commit-message>N/A — verification only, no commit</commit-message>
 </task-plan>
 ```
 
----
-
-### Wave 3 (After Wave 2) — Commit and Deploy
-
 ```xml
-<task-plan id="phase-1-task-4" wave="3">
-  <title>Commit, push, and restart daemon service</title>
-  <requirement>REQ-5, REQ-6</requirement>
+<task-plan id="phase-1-task-12" wave="4">
+  <title>Commit changes and document for human QA</title>
+  <requirement>All requirements</requirement>
   <description>
-    Commit changes with exact semantic commit message from decisions.md.
-    Push to great-minds-plugin repository. Restart shipyard-daemon.service
-    to load the new code.
+    Commit all changes with semantic commit message.
+    Document what needs human QA (live API testing, Bella's Bistro integration).
   </description>
 
   <context>
-    <file path="/home/agent/great-minds-plugin/daemon/src/pipeline.ts" reason="File to commit" />
-    <file path="/home/agent/shipyard-ai/rounds/daemon-stagger-review/decisions.md" reason="Decision 4: exact commit message" />
-    <file path="/home/agent/shipyard-ai/prds/daemon-stagger-review.md" reason="PRD Section: CRITICAL repo instructions" />
+    <file path="/home/agent/shipyard-ai/plugins/reviewpulse/" reason="All plugin files to commit" />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Human QA checklist" />
   </context>
 
   <steps>
-    <step order="1">Change directory to /home/agent/great-minds-plugin</step>
-    <step order="2">Run git status to confirm only pipeline.ts is modified</step>
-    <step order="3">Run git add daemon/src/pipeline.ts</step>
-    <step order="4">Run git commit with EXACT message from Decision 4:
-      git commit -m "fix(pipeline): batch agents in pairs to reduce peak memory 50%"</step>
-    <step order="5">Run git push origin main (or current branch)</step>
-    <step order="6">Run: sudo systemctl restart shipyard-daemon.service</step>
-    <step order="7">Run: sudo systemctl status shipyard-daemon.service to verify running</step>
-    <step order="8">Check daemon logs for any startup errors: journalctl -u shipyard-daemon.service -n 50</step>
+    <step order="1">Stage all changed files: git add plugins/reviewpulse/</step>
+    <step order="2">Commit with message:
+      fix(reviewpulse): v1 MVP refactor — strip v2 features, fix Emdash patterns</step>
+    <step order="3">Create handoff document in .planning/:
+      - List of features removed (for v2 backlog)
+      - Environment variables required (GOOGLE_PLACES_API_KEY, YELP_API_KEY)
+      - Human QA checklist from REQUIREMENTS.md</step>
+    <step order="4">Update STATUS.md if exists</step>
+    <step order="5">Do NOT push — wait for human review</step>
   </steps>
 
   <verification>
-    <check type="test">git log --oneline -1 shows exact commit message</check>
+    <check type="test">git log --oneline -1 shows expected commit message</check>
     <check type="test">git status shows clean working tree</check>
-    <check type="test">systemctl status shipyard-daemon.service shows active (running)</check>
-    <check type="manual">No errors in daemon startup logs</check>
+    <check type="manual">Handoff document exists</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="Must pass verification before committing" />
+    <depends-on task-id="phase-1-task-11" reason="Verification must pass" />
   </dependencies>
 
-  <commit-message>fix(pipeline): batch agents in pairs to reduce peak memory 50%</commit-message>
+  <commit-message>fix(reviewpulse): v1 MVP refactor — strip v2 features, fix Emdash patterns
+
+- Remove response templates, email campaigns, AI suggestions (defer to v2)
+- Replace throw new Response() with throw new Error() per Emdash spec
+- Correct rc.user and rc.pathParams access patterns
+- Update test suite for MVP scope
+- Humanize UI copy per brand guidelines
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 ```
 
@@ -256,30 +627,11 @@ Both code changes can run in parallel as they modify different functions within 
 
 From Risk Scanner analysis:
 
-1. **RISK: Wall-clock time doubles (~60s → ~120s per phase)** — ACCEPTED per decisions.md. Reliability > speed.
-
-2. **RISK: Memory estimate wrong, still OOMs** — MEDIUM likelihood, LOW impact. Mitigation: 72-hour observation window post-deploy. If OOMs persist, profile actual memory.
-
-3. **RISK: Scope creep** — MEDIUM likelihood. Mitigation: decisions.md explicitly lists NOs. Enforce in PR review.
-
-4. **RISK: Sequential overhead** — LOW. The split is pure `await`, no new mechanisms.
-
-5. **NO TEST COVERAGE** — The daemon has no unit tests. Success criteria are production-based: zero OOM restarts in 72 hours.
-
-6. **NO RACE CONDITIONS INTRODUCED** — Each agent writes to distinct files. Splitting to sequential batches maintains file isolation.
-
----
-
-## Post-Deploy Monitoring (Success Criteria)
-
-From PRD and Decisions:
-
-| Metric | Target | How to Check |
-|--------|--------|--------------|
-| OOM restarts | 0 in 72 hours | `journalctl -u shipyard-daemon.service | grep -i oom` |
-| Peak memory | ≤ 1.5GB | `ps -o rss -p $(pgrep -f shipyard-daemon)` during pipeline |
-| Pipeline completion | End-to-end success | Check Telegram notifications |
-| Agent arrival pattern | 2 START, 2 DONE, 2 START, 2 DONE | Daemon logs during board-review phase |
+1. **RISK RP-001: Environment variable validation** — Mitigated by tasks 4-5 adding explicit checks
+2. **RISK RP-002: External API error handling** — Partially addressed; full circuit breaker deferred to v2
+3. **RISK RP-003: KV storage scalability** — Accepted for v1 (<1000 reviews); documented
+4. **RISK RP-006: Admin UI XSS** — Mitigated by existing escapeHtml() functions; audited in task-8
+5. **RISK RP-012: Testing gaps** — Mitigated by mock data tests; live API testing requires human QA
 
 ---
 
@@ -287,55 +639,50 @@ From PRD and Decisions:
 
 | Wave | Tasks | Description |
 |------|-------|-------------|
-| Wave 1 (Parallel) | 2 tasks | Code changes: split runBoardReview() and runCreativeReview() |
-| Wave 2 (Sequential) | 1 task | Verification: TypeScript compilation, diff review |
-| Wave 3 (Sequential) | 1 task | Deploy: commit, push, restart daemon |
-| **Total** | **4 tasks** | |
+| Wave 1 (Parallel) | 3 tasks | Code cleanup: remove banned patterns, cut v2 features |
+| Wave 2 (Parallel) | 4 tasks | Core feature verification: sync, admin, widget |
+| Wave 3 (Parallel) | 3 tasks | Polish: design system, tests, copy |
+| Wave 4 (Sequential) | 2 tasks | Verification and commit |
+| **Total** | **12 tasks** | |
 
-**Critical Path:** Wave 1 → Wave 2 → Wave 3
+**Critical Path:** Wave 1 → Wave 2 → Wave 3 → Wave 4
 
 **Parallelization:**
-- Wave 1: Both code change tasks can run in parallel
+- Wave 1: All 3 tasks can run in parallel
+- Wave 2: All 4 tasks can run in parallel
+- Wave 3: All 3 tasks can run in parallel (with dependencies)
+- Wave 4: Sequential
 
-**Time Estimate:** 15-20 minutes total (per Decision 6: "Ship in one agent session, today")
+---
+
+## Human QA Required (Post-Execution)
+
+Per decisions.md: "Mock data testing with human QA is the pragmatic path."
+
+1. [ ] Live Google Places API sync with real credentials
+2. [ ] Live Yelp API sync with real credentials
+3. [ ] Bella's Bistro site integration test
+4. [ ] First-run experience ≤30 seconds
+5. [ ] Mobile responsiveness on actual devices
+6. [ ] Widget display on live Emdash site
 
 ---
 
 ## Scope Lock
 
-Per Decision 5 (Scope Discipline), the following are **EXPLICITLY NOT ALLOWED**:
+Per decisions.md, the following are **EXPLICITLY NOT IN v1 MVP**:
 
-- Pipeline restructuring
-- Agent renaming
-- Agent prompt changes
-- Metrics/observability
-- Dashboards
-- Alerts
-- Dynamic batch sizing
-- Configuration flags
-- New abstractions (BatchManager, AgentScheduler)
-- New manager classes
-- New files
+- Response templates (v2)
+- Email campaigns (v2)
+- Manual review creation (v2)
+- AI response suggestions (v2 with "editable draft" framing)
+- Sentiment analysis (never)
+- Notification emails (pending resolution)
+- Competitive benchmarking (focus on your customers)
 
 **If it's not in this plan, it's out of scope.**
 
 ---
 
-## Philosophy Lock
-
-From `rounds/daemon-stagger-review/decisions.md`:
-
-> Teaching a system to breathe instead of gasp.
-
-**Feeling:** Trust. Quiet confidence that things just work.
-**North Star:** Reliability. Zero crashes. Everything else is noise.
-**Creative Direction:** Rhythm over force.
-
-This is not buying time. This is paying down debt.
-
-**SHIP IT.**
-
----
-
 *Generated by Great Minds Agency — Phase Planning (GSD-Style)*
-*2024-04-13*
+*2026-04-13*

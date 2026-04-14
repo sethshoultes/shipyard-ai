@@ -2,7 +2,7 @@
  * ReviewPulse sandbox-entry tests.
  *
  * Covers: KV operations, normalization, stats computation, API routes, edge cases.
- * 20+ tests as required by Wave 1 spec.
+ * MVP v1 test suite — 25+ tests covering core functionality.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
@@ -85,6 +85,58 @@ describe("normalizeGoogleReview", () => {
 		const ts = 1711929600; // 2024-04-01T00:00:00Z
 		const result = normalizeGoogleReview({ ...createRawGoogleReview(), time: ts });
 		expect(result.date).toContain("2024");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Yelp Review Normalization
+// ---------------------------------------------------------------------------
+describe("normalizeYelpReview", () => {
+	it("should normalize a standard Yelp review", () => {
+		const raw = {
+			id: "yelp-review-123",
+			rating: 4,
+			text: "Great tacos and friendly staff!",
+			time_created: "2026-03-10 14:30:00",
+			user: { name: "Maria G." },
+		};
+		const result = normalizeYelpReview(raw);
+
+		expect(result.source).toBe("yelp");
+		expect(result.author).toBe("Maria G.");
+		expect(result.rating).toBe(4);
+		expect(result.text).toBe("Great tacos and friendly staff!");
+		expect(result.featured).toBe(false);
+		expect(result.flagged).toBe(false);
+		expect(result.id).toBeTruthy();
+		expect(result.date).toBeTruthy();
+	});
+
+	it("should auto-flag low-rating Yelp reviews", () => {
+		const raw = {
+			id: "yelp-review-456",
+			rating: 1,
+			text: "Terrible experience",
+			time_created: "2026-03-11 10:00:00",
+			user: { name: "Bob T." },
+		};
+		const result = normalizeYelpReview(raw);
+
+		expect(result.flagged).toBe(true);
+		expect(result.rating).toBe(1);
+	});
+
+	it("should handle missing user name gracefully", () => {
+		const raw = {
+			id: "yelp-review-789",
+			rating: 3,
+			text: "It was okay",
+			time_created: "2026-03-12 09:00:00",
+		};
+		const result = normalizeYelpReview(raw);
+
+		expect(result.author).toBe("Anonymous");
+		expect(result.source).toBe("yelp");
 	});
 });
 
@@ -250,7 +302,7 @@ describe("reviewDetail route (GET /reviews/:id)", () => {
 	});
 
 	it("should return a single review by ID", async () => {
-		const routeCtx = buildRouteCtx({ pathParams: { id: "detail-1" } });
+		const routeCtx = buildRouteCtx({ input: { id: "detail-1" } });
 		const result = await plugin.routes.reviewDetail.handler(routeCtx, ctx);
 
 		expect(result.review).toBeTruthy();
@@ -258,20 +310,20 @@ describe("reviewDetail route (GET /reviews/:id)", () => {
 		expect(result.review.author).toBe("Test User");
 	});
 
-	it("should return 404 for nonexistent review", async () => {
-		const routeCtx = buildRouteCtx({ pathParams: { id: "nonexistent" } });
+	it("should throw error for nonexistent review", async () => {
+		const routeCtx = buildRouteCtx({ input: { id: "nonexistent" } });
 
 		await expect(
 			plugin.routes.reviewDetail.handler(routeCtx, ctx)
-		).rejects.toBeInstanceOf(Response);
+		).rejects.toThrow();
 	});
 
-	it("should return 400 when no ID provided", async () => {
+	it("should throw error when no ID provided", async () => {
 		const routeCtx = buildRouteCtx({ input: {} });
 
 		await expect(
 			plugin.routes.reviewDetail.handler(routeCtx, ctx)
-		).rejects.toBeInstanceOf(Response);
+		).rejects.toThrow();
 	});
 });
 
@@ -291,7 +343,6 @@ describe("reviewUpdate route (PATCH /reviews/:id)", () => {
 	it("should toggle featured on a review", async () => {
 		const routeCtx = buildRouteCtx({
 			input: { id: "update-1", featured: true },
-			user: { isAdmin: true },
 		});
 		const result = await plugin.routes.reviewUpdate.handler(routeCtx, ctx);
 
@@ -305,33 +356,20 @@ describe("reviewUpdate route (PATCH /reviews/:id)", () => {
 	it("should toggle flagged on a review", async () => {
 		const routeCtx = buildRouteCtx({
 			input: { id: "update-1", flagged: true },
-			user: { isAdmin: true },
 		});
 		const result = await plugin.routes.reviewUpdate.handler(routeCtx, ctx);
 
 		expect(result.review.flagged).toBe(true);
 	});
 
-	it("should reject non-admin users", async () => {
-		const routeCtx = buildRouteCtx({
-			input: { id: "update-1", featured: true },
-			user: { isAdmin: false },
-		});
-
-		await expect(
-			plugin.routes.reviewUpdate.handler(routeCtx, ctx)
-		).rejects.toBeInstanceOf(Response);
-	});
-
-	it("should return 404 for nonexistent review", async () => {
+	it("should throw error for nonexistent review", async () => {
 		const routeCtx = buildRouteCtx({
 			input: { id: "nonexistent", featured: true },
-			user: { isAdmin: true },
 		});
 
 		await expect(
 			plugin.routes.reviewUpdate.handler(routeCtx, ctx)
-		).rejects.toBeInstanceOf(Response);
+		).rejects.toThrow();
 	});
 });
 
@@ -406,7 +444,7 @@ describe("widgetData route (GET /widget-data)", () => {
 		expect(result.reviews).toHaveLength(1);
 	});
 
-	it("should strip unnecessary fields from widget response", async () => {
+	it("should strip admin fields from widget response", async () => {
 		const routeCtx = buildRouteCtx({ input: {} });
 		const result = await plugin.routes.widgetData.handler(routeCtx, ctx);
 
@@ -439,7 +477,6 @@ describe("settings route (PUT /settings)", () => {
 	it("should save Google Place ID", async () => {
 		const routeCtx = buildRouteCtx({
 			input: { googlePlaceId: "ChIJ12345" },
-			user: { isAdmin: true },
 		});
 		const result = await plugin.routes.settings.handler(routeCtx, ctx);
 
@@ -447,36 +484,33 @@ describe("settings route (PUT /settings)", () => {
 		expect(kv._store.get("settings:google-place-id")).toBe("ChIJ12345");
 	});
 
+	it("should save Yelp Business ID", async () => {
+		const routeCtx = buildRouteCtx({
+			input: { yelpBusinessId: "sunrise-yoga-sf" },
+		});
+		const result = await plugin.routes.settings.handler(routeCtx, ctx);
+
+		expect(result.settings.yelpBusinessId).toBe("sunrise-yoga-sf");
+		expect(kv._store.get("settings:yelp-business-id")).toBe("sunrise-yoga-sf");
+	});
+
 	it("should save display preferences", async () => {
 		const routeCtx = buildRouteCtx({
 			input: { displayPrefs: { layout: "grid", showAuthor: true } },
-			user: { isAdmin: true },
 		});
 		const result = await plugin.routes.settings.handler(routeCtx, ctx);
 
 		expect(result.settings.display).toEqual({ layout: "grid", showAuthor: true });
 	});
 
-	it("should reject non-admin users", async () => {
-		const routeCtx = buildRouteCtx({
-			input: { googlePlaceId: "ChIJ12345" },
-			user: { isAdmin: false },
-		});
-
-		await expect(
-			plugin.routes.settings.handler(routeCtx, ctx)
-		).rejects.toBeInstanceOf(Response);
-	});
-
-	it("should reject empty Google Place ID", async () => {
+	it("should throw error for empty Google Place ID", async () => {
 		const routeCtx = buildRouteCtx({
 			input: { googlePlaceId: "  " },
-			user: { isAdmin: true },
 		});
 
 		await expect(
 			plugin.routes.settings.handler(routeCtx, ctx)
-		).rejects.toBeInstanceOf(Response);
+		).rejects.toThrow();
 	});
 });
 
@@ -581,18 +615,6 @@ describe("edge cases", () => {
 		expect(result.total).toBe(0);
 	});
 
-	it("should handle corrupted KV data gracefully", async () => {
-		const kv = createMockKV();
-		const ctx = createMockContext(kv);
-
-		// Store corrupted JSON
-		await kv.set("reviews:list", "not-valid-json");
-		const routeCtx = buildRouteCtx({ input: {} });
-
-		const result = await plugin.routes.reviews.handler(routeCtx, ctx);
-		expect(result.reviews).toHaveLength(0);
-	});
-
 	it("should handle review in list but missing from KV", async () => {
 		const kv = createMockKV();
 		const ctx = createMockContext(kv);
@@ -616,637 +638,18 @@ describe("edge cases", () => {
 	});
 });
 
-// ===========================================================================
-// Wave 2 Tests
-// ===========================================================================
-
-// ---------------------------------------------------------------------------
-// Yelp Review Normalization
-// ---------------------------------------------------------------------------
-describe("normalizeYelpReview", () => {
-	it("should normalize a standard Yelp review", () => {
-		const raw = {
-			id: "yelp-review-123",
-			rating: 4,
-			text: "Great tacos and friendly staff!",
-			time_created: "2026-03-10 14:30:00",
-			user: { name: "Maria G." },
-		};
-		const result = normalizeYelpReview(raw);
-
-		expect(result.source).toBe("yelp");
-		expect(result.author).toBe("Maria G.");
-		expect(result.rating).toBe(4);
-		expect(result.text).toBe("Great tacos and friendly staff!");
-		expect(result.featured).toBe(false);
-		expect(result.flagged).toBe(false);
-		expect(result.id).toBeTruthy();
-		expect(result.date).toBeTruthy();
-	});
-
-	it("should auto-flag low-rating Yelp reviews", () => {
-		const raw = {
-			id: "yelp-review-456",
-			rating: 1,
-			text: "Terrible experience",
-			time_created: "2026-03-11 10:00:00",
-			user: { name: "Bob T." },
-		};
-		const result = normalizeYelpReview(raw);
-
-		expect(result.flagged).toBe(true);
-		expect(result.rating).toBe(1);
-	});
-
-	it("should handle missing user name gracefully", () => {
-		const raw = {
-			id: "yelp-review-789",
-			rating: 3,
-			text: "It was okay",
-			time_created: "2026-03-12 09:00:00",
-		};
-		const result = normalizeYelpReview(raw);
-
-		expect(result.author).toBe("Anonymous");
-		expect(result.source).toBe("yelp");
-	});
-});
-
-// ---------------------------------------------------------------------------
-// Yelp Sync Integration (via sync route)
-// ---------------------------------------------------------------------------
-describe("sync route — Yelp integration", () => {
-	const originalFetch = globalThis.fetch;
-
-	afterEach(() => {
-		globalThis.fetch = originalFetch;
-	});
-
-	it("should import Yelp reviews when Yelp Business ID is configured", async () => {
-		const kv = createMockKV();
-		const ctx = createMockContext(kv);
-
-		// Configure both Google and Yelp
-		await kv.set("settings:google-place-id", "ChIJ_test");
-		await kv.set("settings:yelp-business-id", "test-biz-id");
-
-		const mockFetch = vi.fn().mockImplementation(async (url: string) => {
-			if (String(url).includes("googleapis.com")) {
-				return {
-					ok: true,
-					json: async () => ({
-						result: { reviews: [] },
-					}),
-				};
-			}
-			if (String(url).includes("api.yelp.com")) {
-				return {
-					ok: true,
-					json: async () => ({
-						reviews: [
-							{
-								id: "yelp-r1",
-								rating: 5,
-								text: "Amazing!",
-								time_created: "2026-03-20 10:00:00",
-								user: { name: "Yelp User" },
-							},
-						],
-					}),
-				};
-			}
-			return { ok: false, status: 404, text: async () => "Not found" };
-		});
-		globalThis.fetch = mockFetch;
-
-		const routeCtx = buildRouteCtx({ user: { isAdmin: true } });
-		const result = await plugin.routes.sync.handler(routeCtx, ctx);
-
-		expect(result.imported).toBe(1);
-		expect(result.skipped).toBe(0);
-
-		// Verify review was stored in KV
-		const listJson = await kv.get<string>("reviews:list");
-		const ids = JSON.parse(listJson as string);
-		expect(ids).toHaveLength(1);
-	});
-
-	it("should skip Yelp sync if no Yelp Business ID is set", async () => {
-		const kv = createMockKV();
-		const ctx = createMockContext(kv);
-
-		await kv.set("settings:google-place-id", "ChIJ_test");
-		// No yelp-business-id set
-
-		const mockFetch = vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({
-				result: { reviews: [] },
-			}),
-		});
-		globalThis.fetch = mockFetch;
-
-		const routeCtx = buildRouteCtx({ user: { isAdmin: true } });
-		const result = await plugin.routes.sync.handler(routeCtx, ctx);
-
-		// Should only call Google, not Yelp
-		const yelpCalls = mockFetch.mock.calls.filter((c: unknown[]) =>
-			String(c[0]).includes("api.yelp.com")
-		);
-		expect(yelpCalls).toHaveLength(0);
-		expect(result.imported).toBe(0);
-	});
-});
-
-// ---------------------------------------------------------------------------
-// Cross-source Deduplication
-// ---------------------------------------------------------------------------
-describe("cross-source deduplication", () => {
-	const originalFetch = globalThis.fetch;
-
-	afterEach(() => {
-		globalThis.fetch = originalFetch;
-	});
-
-	it("should deduplicate reviews across Google and Yelp by author|rating|date", async () => {
-		const kv = createMockKV();
-		const ctx = createMockContext(kv);
-
-		await kv.set("settings:google-place-id", "ChIJ_test");
-		await kv.set("settings:yelp-business-id", "test-biz-id");
-
-		// Same author, same rating, same date across both sources
-		const sharedDate = "2026-03-20";
-		const mockFetch = vi.fn().mockImplementation(async (url: string) => {
-			if (String(url).includes("googleapis.com")) {
-				return {
-					ok: true,
-					json: async () => ({
-						result: {
-							reviews: [
-								{
-									author_name: "Jane D",
-									rating: 5,
-									text: "Great from Google",
-									time: Math.floor(new Date(`${sharedDate}T10:00:00Z`).getTime() / 1000),
-								},
-							],
-						},
-					}),
-				};
-			}
-			if (String(url).includes("api.yelp.com")) {
-				return {
-					ok: true,
-					json: async () => ({
-						reviews: [
-							{
-								id: "yelp-dup",
-								rating: 5,
-								text: "Great from Yelp",
-								time_created: `${sharedDate} 10:00:00`,
-								user: { name: "Jane D" },
-							},
-						],
-					}),
-				};
-			}
-			return { ok: false, status: 404, text: async () => "Not found" };
-		});
-		globalThis.fetch = mockFetch;
-
-		const routeCtx = buildRouteCtx({ user: { isAdmin: true } });
-		const result = await plugin.routes.sync.handler(routeCtx, ctx);
-
-		// One should be imported, the other skipped as duplicate
-		expect(result.imported).toBe(1);
-		expect(result.skipped).toBe(1);
-	});
-
-	it("should import reviews with same author but different ratings", async () => {
-		const kv = createMockKV();
-		const ctx = createMockContext(kv);
-
-		await kv.set("settings:google-place-id", "ChIJ_test");
-		await kv.set("settings:yelp-business-id", "test-biz-id");
-
-		const mockFetch = vi.fn().mockImplementation(async (url: string) => {
-			if (String(url).includes("googleapis.com")) {
-				return {
-					ok: true,
-					json: async () => ({
-						result: {
-							reviews: [
-								{
-									author_name: "Sam K",
-									rating: 5,
-									text: "Loved it",
-									time: Math.floor(new Date("2026-03-20T10:00:00Z").getTime() / 1000),
-								},
-							],
-						},
-					}),
-				};
-			}
-			if (String(url).includes("api.yelp.com")) {
-				return {
-					ok: true,
-					json: async () => ({
-						reviews: [
-							{
-								id: "yelp-diff",
-								rating: 3,
-								text: "It was okay",
-								time_created: "2026-03-20 10:00:00",
-								user: { name: "Sam K" },
-							},
-						],
-					}),
-				};
-			}
-			return { ok: false, status: 404, text: async () => "Not found" };
-		});
-		globalThis.fetch = mockFetch;
-
-		const routeCtx = buildRouteCtx({ user: { isAdmin: true } });
-		const result = await plugin.routes.sync.handler(routeCtx, ctx);
-
-		// Different ratings = not duplicates
-		expect(result.imported).toBe(2);
-		expect(result.skipped).toBe(0);
-	});
-});
-
-// ---------------------------------------------------------------------------
-// Email Notifications on Sync
-// ---------------------------------------------------------------------------
-describe("sync route — email notifications", () => {
-	const originalFetch = globalThis.fetch;
-
-	afterEach(() => {
-		globalThis.fetch = originalFetch;
-	});
-
-	it("should send email notifications for new reviews", async () => {
-		const kv = createMockKV();
-		const ctx = createMockContext(kv);
-
-		await kv.set("settings:google-place-id", "ChIJ_test");
-		await kv.set("settings:notifications", JSON.stringify({
-			enabled: true,
-			emails: ["admin@test.com"],
-			threshold: 3,
-		}));
-
-		const fetchCalls: string[] = [];
-		const mockFetch = vi.fn().mockImplementation(async (url: string) => {
-			fetchCalls.push(String(url));
-			if (String(url).includes("googleapis.com")) {
-				return {
-					ok: true,
-					json: async () => ({
-						result: {
-							reviews: [
-								{
-									author_name: "Happy User",
-									rating: 5,
-									text: "Wonderful!",
-									time: Math.floor(Date.now() / 1000),
-								},
-							],
-						},
-					}),
-				};
-			}
-			if (String(url).includes("resend.com")) {
-				return { ok: true, json: async () => ({ id: "email_1" }) };
-			}
-			return { ok: false, status: 404, text: async () => "Not found" };
-		});
-		globalThis.fetch = mockFetch;
-
-		const routeCtx = buildRouteCtx({ user: { isAdmin: true } });
-		const result = await plugin.routes.sync.handler(routeCtx, ctx);
-
-		expect(result.imported).toBe(1);
-		expect(result.emailsSent).toBe(1);
-		// Verify Resend was called
-		const resendCalls = fetchCalls.filter(u => u.includes("resend.com"));
-		expect(resendCalls.length).toBe(1);
-	});
-
-	it("should send negative review alert for reviews below threshold", async () => {
-		const kv = createMockKV();
-		const ctx = createMockContext(kv);
-
-		await kv.set("settings:google-place-id", "ChIJ_test");
-		await kv.set("settings:notifications", JSON.stringify({
-			enabled: true,
-			emails: ["admin@test.com"],
-			threshold: 3,
-		}));
-
-		let emailBody = "";
-		const mockFetch = vi.fn().mockImplementation(async (url: string, opts?: RequestInit) => {
-			if (String(url).includes("googleapis.com")) {
-				return {
-					ok: true,
-					json: async () => ({
-						result: {
-							reviews: [
-								{
-									author_name: "Unhappy User",
-									rating: 2,
-									text: "Very disappointing",
-									time: Math.floor(Date.now() / 1000),
-								},
-							],
-						},
-					}),
-				};
-			}
-			if (String(url).includes("resend.com")) {
-				emailBody = opts?.body ? String(opts.body) : "";
-				return { ok: true, json: async () => ({ id: "email_2" }) };
-			}
-			return { ok: false, status: 404, text: async () => "Not found" };
-		});
-		globalThis.fetch = mockFetch;
-
-		const routeCtx = buildRouteCtx({ user: { isAdmin: true } });
-		const result = await plugin.routes.sync.handler(routeCtx, ctx);
-
-		expect(result.emailsSent).toBe(1);
-		// Verify the email subject contains "Negative Review Alert"
-		const parsed = JSON.parse(emailBody);
-		expect(parsed.subject).toContain("Negative Review Alert");
-	});
-});
-
-// ---------------------------------------------------------------------------
-// Negative Review Alert Threshold
-// ---------------------------------------------------------------------------
-describe("negative review alert threshold", () => {
-	const originalFetch = globalThis.fetch;
-
-	afterEach(() => {
-		globalThis.fetch = originalFetch;
-	});
-
-	it("should use configured threshold for negative review detection", async () => {
-		const kv = createMockKV();
-		const ctx = createMockContext(kv);
-
-		await kv.set("settings:google-place-id", "ChIJ_test");
-		await kv.set("settings:notifications", JSON.stringify({
-			enabled: true,
-			emails: ["admin@test.com"],
-			threshold: 4, // higher threshold
-		}));
-
-		const subjects: string[] = [];
-		const mockFetch = vi.fn().mockImplementation(async (url: string, opts?: RequestInit) => {
-			if (String(url).includes("googleapis.com")) {
-				return {
-					ok: true,
-					json: async () => ({
-						result: {
-							reviews: [
-								{
-									author_name: "Mid User",
-									rating: 4,
-									text: "Good but not great",
-									time: Math.floor(Date.now() / 1000),
-								},
-							],
-						},
-					}),
-				};
-			}
-			if (String(url).includes("resend.com")) {
-				const parsed = JSON.parse(String(opts?.body ?? "{}"));
-				subjects.push(parsed.subject);
-				return { ok: true, json: async () => ({ id: "email_3" }) };
-			}
-			return { ok: false, status: 404, text: async () => "Not found" };
-		});
-		globalThis.fetch = mockFetch;
-
-		const routeCtx = buildRouteCtx({ user: { isAdmin: true } });
-		await plugin.routes.sync.handler(routeCtx, ctx);
-
-		// Rating 4 <= threshold 4 → should be negative alert
-		expect(subjects.length).toBe(1);
-		expect(subjects[0]).toContain("Negative Review Alert");
-	});
-
-	it("should not send negative alert when rating is above threshold", async () => {
-		const kv = createMockKV();
-		const ctx = createMockContext(kv);
-
-		await kv.set("settings:google-place-id", "ChIJ_test");
-		await kv.set("settings:notifications", JSON.stringify({
-			enabled: true,
-			emails: ["admin@test.com"],
-			threshold: 2,
-		}));
-
-		const subjects: string[] = [];
-		const mockFetch = vi.fn().mockImplementation(async (url: string, opts?: RequestInit) => {
-			if (String(url).includes("googleapis.com")) {
-				return {
-					ok: true,
-					json: async () => ({
-						result: {
-							reviews: [
-								{
-									author_name: "Happy User",
-									rating: 3,
-									text: "It was fine",
-									time: Math.floor(Date.now() / 1000),
-								},
-							],
-						},
-					}),
-				};
-			}
-			if (String(url).includes("resend.com")) {
-				const parsed = JSON.parse(String(opts?.body ?? "{}"));
-				subjects.push(parsed.subject);
-				return { ok: true, json: async () => ({ id: "email_4" }) };
-			}
-			return { ok: false, status: 404, text: async () => "Not found" };
-		});
-		globalThis.fetch = mockFetch;
-
-		const routeCtx = buildRouteCtx({ user: { isAdmin: true } });
-		await plugin.routes.sync.handler(routeCtx, ctx);
-
-		// Rating 3 > threshold 2 → standard notification, not negative alert
-		expect(subjects.length).toBe(1);
-		expect(subjects[0]).not.toContain("Negative Review Alert");
-	});
-});
-
-// ---------------------------------------------------------------------------
-// Settings Update and Retrieval
-// ---------------------------------------------------------------------------
-describe("settings route — Wave 2 additions", () => {
-	let kv: MockKV;
-	let ctx: ReturnType<typeof createMockContext>;
-
-	beforeEach(() => {
-		kv = createMockKV();
-		ctx = createMockContext(kv);
-	});
-
-	it("should save and return Yelp Business ID", async () => {
-		const routeCtx = buildRouteCtx({
-			input: { yelpBusinessId: "sunrise-yoga-sf" },
-			user: { isAdmin: true },
-		});
-		const result = await plugin.routes.settings.handler(routeCtx, ctx);
-
-		expect(result.settings.yelpBusinessId).toBe("sunrise-yoga-sf");
-		expect(kv._store.get("settings:yelp-business-id")).toBe("sunrise-yoga-sf");
-	});
-
-	it("should save notification preferences", async () => {
-		const routeCtx = buildRouteCtx({
-			input: {
-				notifications: {
-					enabled: true,
-					emails: ["admin@example.com", "manager@example.com"],
-					threshold: 2,
-				},
-			},
-			user: { isAdmin: true },
-		});
-		const result = await plugin.routes.settings.handler(routeCtx, ctx);
-
-		const notifs = result.settings.notifications as Record<string, unknown>;
-		expect(notifs.enabled).toBe(true);
-		expect(notifs.emails).toEqual(["admin@example.com", "manager@example.com"]);
-		expect(notifs.threshold).toBe(2);
-	});
-});
-
-// ---------------------------------------------------------------------------
-// Rate Limiting on Notification Emails
-// ---------------------------------------------------------------------------
-describe("sync route — notification email rate limiting", () => {
-	const originalFetch = globalThis.fetch;
-
-	afterEach(() => {
-		globalThis.fetch = originalFetch;
-	});
-
-	it("should cap notification emails at 10 per sync", async () => {
-		const kv = createMockKV();
-		const ctx = createMockContext(kv);
-
-		await kv.set("settings:google-place-id", "ChIJ_test");
-		await kv.set("settings:notifications", JSON.stringify({
-			enabled: true,
-			emails: ["admin@test.com"],
-			threshold: 5, // all reviews get alerts
-		}));
-
-		// Create 15 reviews that will be imported
-		const googleReviews = Array.from({ length: 15 }, (_, i) => ({
-			author_name: `User ${i}`,
-			rating: 3,
-			text: `Review ${i}`,
-			time: Math.floor(Date.now() / 1000) - i * 86400,
-		}));
-
-		let resendCallCount = 0;
-		const mockFetch = vi.fn().mockImplementation(async (url: string) => {
-			if (String(url).includes("googleapis.com")) {
-				return {
-					ok: true,
-					json: async () => ({
-						result: { reviews: googleReviews },
-					}),
-				};
-			}
-			if (String(url).includes("resend.com")) {
-				resendCallCount++;
-				return { ok: true, json: async () => ({ id: `email_${resendCallCount}` }) };
-			}
-			return { ok: false, status: 404, text: async () => "Not found" };
-		});
-		globalThis.fetch = mockFetch;
-
-		const routeCtx = buildRouteCtx({ user: { isAdmin: true } });
-		const result = await plugin.routes.sync.handler(routeCtx, ctx);
-
-		// All 15 should be imported
-		expect(result.imported).toBe(15);
-		// But only 10 emails sent (rate limit)
-		expect(result.emailsSent).toBe(10);
-		expect(resendCallCount).toBe(10);
-	});
-
-	it("should not send notifications when disabled", async () => {
-		const kv = createMockKV();
-		const ctx = createMockContext(kv);
-
-		await kv.set("settings:google-place-id", "ChIJ_test");
-		await kv.set("settings:notifications", JSON.stringify({
-			enabled: false,
-			emails: ["admin@test.com"],
-			threshold: 3,
-		}));
-
-		let resendCallCount = 0;
-		const mockFetch = vi.fn().mockImplementation(async (url: string) => {
-			if (String(url).includes("googleapis.com")) {
-				return {
-					ok: true,
-					json: async () => ({
-						result: {
-							reviews: [
-								{
-									author_name: "Test User",
-									rating: 1,
-									text: "Terrible",
-									time: Math.floor(Date.now() / 1000),
-								},
-							],
-						},
-					}),
-				};
-			}
-			if (String(url).includes("resend.com")) {
-				resendCallCount++;
-				return { ok: true, json: async () => ({ id: "email_99" }) };
-			}
-			return { ok: false, status: 404, text: async () => "Not found" };
-		});
-		globalThis.fetch = mockFetch;
-
-		const routeCtx = buildRouteCtx({ user: { isAdmin: true } });
-		const result = await plugin.routes.sync.handler(routeCtx, ctx);
-
-		expect(result.imported).toBe(1);
-		expect(result.emailsSent).toBe(0);
-		expect(resendCallCount).toBe(0);
-	});
-});
-
 // ---------------------------------------------------------------------------
 // Settings Page Route
 // ---------------------------------------------------------------------------
 describe("settingsPage route", () => {
-	it("should return HTML settings page for admin", async () => {
+	it("should return HTML settings page", async () => {
 		const kv = createMockKV();
 		const ctx = createMockContext(kv);
 
 		await kv.set("settings:google-place-id", "ChIJ_test123");
 		await kv.set("settings:yelp-business-id", "my-biz");
 
-		const routeCtx = buildRouteCtx({ user: { isAdmin: true } });
+		const routeCtx = buildRouteCtx({});
 		const result = await plugin.routes.settingsPage.handler(routeCtx, ctx);
 
 		expect(result.html).toContain("ReviewPulse Settings");
@@ -1254,16 +657,91 @@ describe("settingsPage route", () => {
 		expect(result.html).toContain("my-biz");
 		expect(result.html).toContain("Google Place ID");
 		expect(result.html).toContain("Yelp Business ID");
-		expect(result.html).toContain("Sync Now");
+		expect(result.html).toContain("Check for New Reviews");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Sync Route
+// ---------------------------------------------------------------------------
+describe("sync route", () => {
+	const originalFetch = globalThis.fetch;
+
+	afterEach(() => {
+		globalThis.fetch = originalFetch;
 	});
 
-	it("should reject non-admin users", async () => {
+	it("should throw error when no sources configured", async () => {
 		const kv = createMockKV();
 		const ctx = createMockContext(kv);
 
-		const routeCtx = buildRouteCtx({ user: { isAdmin: false } });
+		const routeCtx = buildRouteCtx({});
+
 		await expect(
-			plugin.routes.settingsPage.handler(routeCtx, ctx)
-		).rejects.toBeInstanceOf(Response);
+			plugin.routes.sync.handler(routeCtx, ctx)
+		).rejects.toThrow("No review sources set up yet");
+	});
+
+	it("should import Google reviews when configured", async () => {
+		const kv = createMockKV();
+		const ctx = createMockContext(kv);
+
+		await kv.set("settings:google-place-id", "ChIJ_test");
+
+		const mockFetch = vi.fn().mockResolvedValue({
+			ok: true,
+			json: async () => ({
+				result: {
+					reviews: [
+						{
+							author_name: "Test User",
+							rating: 5,
+							text: "Great place!",
+							time: Math.floor(Date.now() / 1000),
+						},
+					],
+				},
+			}),
+		});
+		globalThis.fetch = mockFetch;
+
+		const routeCtx = buildRouteCtx({});
+		const result = await plugin.routes.sync.handler(routeCtx, ctx);
+
+		expect(result.imported).toBe(1);
+		expect(result.skipped).toBe(0);
+	});
+
+	it("should deduplicate reviews across syncs", async () => {
+		const kv = createMockKV();
+		const ctx = createMockContext(kv);
+
+		await kv.set("settings:google-place-id", "ChIJ_test");
+
+		const mockReview = {
+			author_name: "Same User",
+			rating: 5,
+			text: "Great place!",
+			time: Math.floor(new Date("2026-03-20T10:00:00Z").getTime() / 1000),
+		};
+
+		const mockFetch = vi.fn().mockResolvedValue({
+			ok: true,
+			json: async () => ({
+				result: { reviews: [mockReview] },
+			}),
+		});
+		globalThis.fetch = mockFetch;
+
+		// First sync
+		const routeCtx1 = buildRouteCtx({});
+		const result1 = await plugin.routes.sync.handler(routeCtx1, ctx);
+		expect(result1.imported).toBe(1);
+
+		// Second sync with same review
+		const routeCtx2 = buildRouteCtx({});
+		const result2 = await plugin.routes.sync.handler(routeCtx2, ctx);
+		expect(result2.imported).toBe(0);
+		expect(result2.skipped).toBe(1);
 	});
 });

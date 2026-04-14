@@ -25,6 +25,7 @@ export interface ReviewRecord {
 	flagged: boolean;
 	replyText?: string;
 	repliedAt?: string;
+	sourceId?: string; // External ID from Google/Yelp
 }
 
 export interface ReviewFilters {

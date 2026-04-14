@@ -1,62 +1,9 @@
-import type { PluginContext } from "emdash";
-
 /**
  * Email module for ReviewPulse
- * Sends notification emails for new and negative reviews via Resend API
+ *
+ * Basic email template utilities. Email sending is a v2 feature,
+ * but templates are defined here for future use.
  */
-
-export interface EmailOptions {
-	to: string;
-	subject: string;
-	html: string;
-}
-
-/**
- * Send email using Resend API.
- * Graceful failure — returns false if Resend not configured or call fails.
- */
-export async function sendEmail(
-	ctx: PluginContext,
-	options: EmailOptions
-): Promise<boolean> {
-	try {
-		// @ts-ignore - ctx.env is available at runtime
-		const resendKey = ctx.env?.RESEND_API_KEY || process.env.RESEND_API_KEY;
-		// @ts-ignore - ctx.env is available at runtime
-		const fromEmail = ctx.env?.REVIEW_FROM_EMAIL || process.env.REVIEW_FROM_EMAIL;
-
-		if (!resendKey || !fromEmail) {
-			ctx.log.warn("Resend API key or from email not configured — skipping email");
-			return false;
-		}
-
-		const response = await fetch("https://api.resend.com/emails", {
-			method: "POST",
-			headers: {
-				Authorization: `Bearer ${resendKey}`,
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				from: fromEmail,
-				to: options.to,
-				subject: options.subject,
-				html: options.html,
-			}),
-		});
-
-		if (!response.ok) {
-			const error = await response.text();
-			ctx.log.error(`Resend API error: ${response.status} ${error}`);
-			return false;
-		}
-
-		ctx.log.info(`Email sent to ${options.to}: ${options.subject}`);
-		return true;
-	} catch (error) {
-		ctx.log.error(`Failed to send email: ${String(error)}`);
-		return false;
-	}
-}
 
 /**
  * Escape HTML entities to prevent XSS in email templates.
@@ -75,7 +22,7 @@ function escapeHtml(str: string): string {
  */
 function renderStarsHTML(rating: number): string {
 	const filled = "&#9733;"; // ★
-	const empty = "&#9734;";  // ☆
+	const empty = "&#9734;"; // ☆
 	let stars = "";
 	for (let i = 1; i <= 5; i++) {
 		stars += i <= rating ? filled : empty;
@@ -93,6 +40,7 @@ export interface ReviewForEmail {
 
 /**
  * Generate HTML email template for a new review notification.
+ * This is available for future v2 notification features.
  */
 export function generateNewReviewNotificationHTML(review: ReviewForEmail): string {
 	const dateStr = new Date(review.date).toLocaleDateString("en-US", {
@@ -138,7 +86,7 @@ export function generateNewReviewNotificationHTML(review: ReviewForEmail): strin
 
 /**
  * Generate HTML email template for a negative review alert (rating <= threshold).
- * Includes one-click admin link and review text.
+ * Available for future v2 notification features.
  */
 export function generateNegativeReviewAlertHTML(
 	review: ReviewForEmail,
@@ -195,58 +143,6 @@ export function generateNegativeReviewAlertHTML(
 			Respond promptly to negative reviews to protect your reputation.
 		</p>
 	</div>
-</body>
-</html>`;
-}
-
-/**
- * Generate HTML email for a review request campaign.
- * Includes links to Google and/or Yelp review pages.
- */
-export function generateReviewRequestHTML(
-	businessName: string,
-	message: string,
-	googleUrl?: string,
-	yelpUrl?: string,
-): string {
-	const safeBusinessName = escapeHtml(businessName);
-	const safeMessage = escapeHtml(message).replace(/\n/g, "<br>");
-
-	const links: string[] = [];
-	if (googleUrl) {
-		links.push(
-			`<a href="${escapeHtml(googleUrl)}" style="display:inline-block;padding:12px 24px;background-color:#4285F4;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;font-size:16px;margin:0 8px 8px 0;">Review on Google</a>`,
-		);
-	}
-	if (yelpUrl) {
-		links.push(
-			`<a href="${escapeHtml(yelpUrl)}" style="display:inline-block;padding:12px 24px;background-color:#D32323;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;font-size:16px;margin:0 8px 8px 0;">Review on Yelp</a>`,
-		);
-	}
-
-	return `<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background-color:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f5f5;padding:32px 16px;">
-<tr><td align="center">
-<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:8px;overflow:hidden;max-width:600px;">
-	<tr><td style="background-color:#C4704B;padding:24px 32px;text-align:center;">
-		<h1 style="color:#ffffff;margin:0;font-size:24px;font-weight:600;">${safeBusinessName}</h1>
-	</td></tr>
-	<tr><td style="padding:32px;">
-		<p style="font-size:16px;line-height:1.6;color:#333;margin:0 0 24px 0;">${safeMessage}</p>
-		<div style="text-align:center;margin:24px 0;">
-			${links.join("\n\t\t\t")}
-		</div>
-		<p style="font-size:14px;color:#999;margin:24px 0 0 0;text-align:center;">Thank you for your feedback!</p>
-	</td></tr>
-	<tr><td style="background-color:#faf8f5;padding:16px 32px;text-align:center;font-size:12px;color:#999;">
-		Sent by ${safeBusinessName} via ReviewPulse
-	</td></tr>
-</table>
-</td></tr>
-</table>
 </body>
 </html>`;
 }
