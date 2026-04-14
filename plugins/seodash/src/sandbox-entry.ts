@@ -361,6 +361,9 @@ export default definePlugin({
 					}
 					await ctx.kv.set("seo:pages:all", allPages);
 
+					// Invalidate sitemap cache (page added/updated affects sitemap)
+					await ctx.kv.delete("seo:sitemap:xml").catch(() => {});
+
 					ctx.log.info(`SEODash: saved page ${path} (score: ${page.seoScore})`);
 
 					return { page };
@@ -457,6 +460,9 @@ export default definePlugin({
 					const allPages = await ctx.kv.get<PageSeoData[]>("seo:pages:all") ?? [];
 					const filtered = allPages.filter(p => p.id !== existing.id);
 					await ctx.kv.set("seo:pages:all", filtered);
+
+					// Invalidate sitemap cache (page removed affects sitemap)
+					await ctx.kv.delete("seo:sitemap:xml").catch(() => {});
 
 					ctx.log.info(`SEODash: deleted page ${path}`);
 
@@ -566,6 +572,13 @@ export default definePlugin({
 			public: true,
 			handler: async (_routeCtx: unknown, ctx: PluginContext) => {
 				try {
+					// Check cache first
+					const cached = await ctx.kv.get<string>("seo:sitemap:xml");
+					if (cached) {
+						return { xml: cached, contentType: "application/xml" };
+					}
+
+					// Generate fresh sitemap
 					const pages = await getAllPages(ctx);
 					const siteUrl = ctx.site?.url ?? "https://example.com";
 
@@ -575,6 +588,12 @@ export default definePlugin({
 					};
 
 					const xml = generateSitemapXml(pages, siteUrl, settings);
+
+					// Cache the generated XML (invalidated on page save/delete)
+					await ctx.kv.set("seo:sitemap:xml", xml).catch(() => {
+						// Non-critical if cache write fails
+						ctx.log.warn("Failed to cache sitemap XML");
+					});
 
 					return { xml, contentType: "application/xml" };
 				} catch (error) {
