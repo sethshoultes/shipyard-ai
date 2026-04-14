@@ -1,99 +1,90 @@
-# Steve Jobs — Chief Design & Brand Officer
-## CommerceKit: E-Commerce Plugin for Emdash CMS
-
----
+# Steve Jobs — Design & Brand Vision for CommerceKit
 
 ## Product Naming
 
-**CommerceKit is WRONG.**
+**CommerceKit is perfect.** One word. No nonsense. It's not "eCommerce" or "ShopPlugin" or some cutesy startup garbage. It's a **kit** — powerful, modular, complete. Like our transition from iPhoto to Photos, from iWork to Pages. Simple. Confident. This is the tool you need to sell things beautifully.
 
-Call it **Shopfront**.
+## Design Philosophy: What Makes This Insanely Great?
 
-One word. Evokes the physical — a storefront window where you display your wares. It's what every merchant understands at a cellular level. CommerceKit sounds like a developer library. Shopfront sounds like *your business*.
+This is **the anti-WooCommerce**.
 
----
+WooCommerce is a 747 cockpit. Seventeen tabs. Thirty plugins. Six payment gateways you'll never use. It's complexity masquerading as flexibility. It's the Windows of e-commerce.
 
-## Design Philosophy
+CommerceKit is the **iPhone of commerce plugins**. You install it. You add a product. You get paid. That's it.
 
-This is NOT "lightweight WooCommerce."
+The genius is in what we **removed**:
+- No 18-step product setup wizards
+- No "advanced SEO meta tag configurator"
+- No bloated admin panels that require a PhD to navigate
+- No shipping calculator that needs 47 fields to tell you it costs $5
 
-That's defining yourself by what you're NOT. Pathetic.
-
-Shopfront is **commerce that feels native**. It's what happens when you stop bolting shopping carts onto content systems and start treating products like first-class content. Products ARE content. Orders ARE content. Your inventory IS your story.
-
-WooCommerce is a tractor bolted onto a bicycle. Shopfront is a bicycle — elegant, simple, and gets you where you need to go without the oil changes.
-
-**Insanely great means:** A blogger can sell their book in under 5 minutes. A photographer can sell prints before lunch. A maker can launch a store in the time it takes to watch a TED talk.
-
----
+We kept **five things that matter**:
+1. Products (with variants that actually make sense)
+2. Shopping cart (that expires like milk, not plutonium)
+3. Stripe checkout (because PayPal is for 1999)
+4. Order management (status, tracking, done)
+5. Email receipts (that look like Apple designed them)
 
 ## User Experience: The First 30 Seconds
 
-You install Shopfront. You see ONE button: **"Add Your First Product"**.
+A store owner logs into Emdash. Clicks "Add Product."
 
-Not a settings maze. Not a wizard. Not a welcome tour.
+**Name. Price. Photo. Publish.**
 
-You click it. A form appears: Product name. Price. Photo. Description. One button: **"Publish"**.
+Four fields. That's the entire flow to go from zero to selling. Like the first time you sent an email from an iPhone — you didn't need a manual, you just *knew*.
 
-That's it. Your product is live. You just became a merchant.
+The product appears on their site. Gorgeous. The buy button *wants* to be clicked. The checkout is Stripe — 10 seconds, Apple Pay, done. The customer gets an email receipt that doesn't look like a 1997 fax machine threw up.
 
-The URL? `yoursite.com/shop/product-name` — clean, obvious, shareable.
-
-Now you see: **"Share this"** | **"Add another"** | **"Set up payments"**
-
-Three choices. Not seventeen. The user feels *powerful*, not paralyzed.
-
----
+The store owner refreshes their admin panel. Their first sale appears. Revenue widget updates. They smile. **That's the moment we're designing for.**
 
 ## Brand Voice
 
-Shopfront speaks like a seasoned shop owner giving advice to their kid.
+CommerceKit speaks like a confident friend who runs a successful shop, not a "solutions provider in the e-commerce ecosystem."
 
-**Not:** "Configure your payment gateway integration"
-**Instead:** "Let's get you paid. Connect Stripe?"
+- **Not:** "Leverage our robust product taxonomy architecture"
+- **YES:** "Sell your stuff. We'll handle the boring parts."
 
-**Not:** "Inventory management dashboard"
-**Instead:** "What's in stock?"
+- **Not:** "Multi-variant SKU management with dimensional attributes"
+- **YES:** "Sell t-shirts in small, medium, and large"
 
-**Not:** "Order fulfillment workflow"
-**Instead:** "Mark as shipped"
+- **Not:** "Checkout funnel optimization suite"
+- **YES:** "Fast checkout. People actually finish buying."
 
-No jargon. No enterprise-speak. No "solutions" or "ecosystems." Just clear, confident, friendly direction.
-
----
+We're Hemingway, not Faulkner. Short sentences. Clear thoughts. No fluff.
 
 ## What to Say NO To
 
-**NO** to bulk import tools at launch. If you have 10,000 SKUs, you're not our customer yet.
+**We say NO to:**
 
-**NO** to multiple payment gateways. Stripe only. One choice, perfectly executed.
+1. **Subscription billing** — that's a different product, not a "feature request"
+2. **Digital downloads** — keep it physical, keep it simple
+3. **Multi-currency** — pick one, stick with it
+4. **Discount code builders** — if you need a BOGO calculator, you're Groupon
+5. **Inventory forecasting AI** — this is commerce, not mission control
+6. **Social media integrations** — we sell products, not Instagram likes
+7. **Customer accounts & wishlists** — people want to buy, not join your ecosystem
+8. **Shipping carrier API integrations** — just put in a tracking number
+9. **Review/ratings system** — that's a content problem, not a commerce problem
+10. **Affiliate marketing tools** — hard no
 
-**NO** to discount codes, coupons, and promotional campaigns in V1. Sell the thing at the price it costs.
+Every feature is a **tax on simplicity**. The WooCommerce team forgot this. We won't.
 
-**NO** to membership tiers, subscriptions, or digital downloads. Physical and simple products only.
+## The Emotional Hook: Why Will People LOVE This?
 
-**NO** to abandoned cart emails, marketing automation, or CRM integration. That's feature creep wearing a sales hat.
+Because **it gets out of their way**.
 
-**NO** to themes and templates. Shopfront inherits your site's design. It's a *plugin*, not a takeover.
+Stripe gave developers payment processing that didn't make them want to set their laptop on fire. Square gave coffee shops a register that wasn't stuck in 1987.
 
-**Every NO makes the YES more powerful.**
+CommerceKit gives creators, makers, and small businesses commerce that **respects their time**.
 
----
+They'll love it because:
+- **Setup takes 5 minutes, not 5 days**
+- **It doesn't break when WordPress updates** (because it's not WordPress)
+- **The admin panel doesn't require a tutorial** — it's just... obvious
+- **Every email, every page, every interaction feels intentional** — like someone gave a damn
 
-## The Emotional Hook
+The love comes from **relief**. Relief that commerce doesn't have to be complicated. Relief that they can focus on their products, their customers, their craft — not on debugging PHP errors at 2am.
 
-People will LOVE Shopfront because **it doesn't make them feel stupid**.
+This is commerce for people who have **better things to do** than configure e-commerce plugins.
 
-Every other commerce platform treats you like you're either Amazon or an idiot. Shopfront treats you like a smart person who just wants to sell something.
-
-The emotional hook is **instant capability**. The moment you add that first product and see it live on your site — clean, fast, professional — you feel like a *real business*.
-
-Not someday. Not after you hire a developer. Not after you watch 40 tutorial videos.
-
-**Right now.**
-
-That feeling — "Holy shit, I just built a store" — is the hook. It's the same feeling you got the first time you published a blog post and realized *anyone in the world* could read it.
-
-Shopfront makes you feel like a merchant the same way WordPress made you feel like a publisher.
-
-**That's why people will love this.**
+**That's the product. That's CommerceKit.**
