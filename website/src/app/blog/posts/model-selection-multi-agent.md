@@ -1,7 +1,7 @@
 ---
 title: "Why One LLM Isn't Enough: Model Selection for Multi-Agent Pipelines"
 description: "Haiku hallucinates APIs. Sonnet costs 15x more. The solution isn't choosing one model—it's choosing the right model for each phase."
-date: 2026-04-15
+date: "2026-04-15"
 tags: [ai, multi-agent, cost-optimization]
 ---
 
