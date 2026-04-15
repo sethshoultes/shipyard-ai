@@ -1,285 +1,308 @@
-# Shonda's Retention Roadmap: What Keeps Users Coming Back
-**Project:** blog-infrastructure
-**Author:** Shonda Rhimes (User Retention & Engagement Strategist)
+# Shonda's Retention Roadmap
+**What Keeps Users Coming Back: v1.1 Features**
+**Author:** Shonda Rhimes, Board Member
 **Date:** April 15, 2026
 
 ---
 
-## The Retention Problem
+## The Core Problem
 
-**You built infrastructure. But infrastructure doesn't create habit loops.**
+**Blogs don't fail because of bad content. They fail because nobody remembers to come back.**
 
-A blog is not a product people "return to" by default. It's a content destination. Users come once, read a post, leave—and forget you exist.
-
-**Retention = Repeat visits.** Here's what drives that:
-
-1. **Serialized content** (they come back for the next episode)
-2. **Personalized recommendations** (they discover more to read)
-3. **Community engagement** (they return for the conversation)
-4. **Anticipation** (they know new content drops regularly)
-5. **Utility** (they bookmark it as a resource)
-
-Right now, your blog has **none of these.**
+Current state: Blog is a **library**, not a **series**.
+Desired state: Blog is a **destination** readers return to weekly.
 
 ---
 
-## What's Missing: The First-Visit Experience
+## Retention Design Principles
 
-### **Current Experience:**
-1. User lands on `/blog`
-2. Sees list of 6 posts (static, no context)
-3. Clicks one, reads it
-4. Page ends. No next step. No reason to return.
+### 1. **Hook → Habit → Payoff**
+- **Hook:** First visit creates emotional resonance (curiosity, surprise, usefulness)
+- **Habit:** Mechanical triggers bring reader back (email, new post badge, unfinished series)
+- **Payoff:** Return visit delivers value greater than expected (exclusive insight, community, progress)
 
-### **What Shonda Would Do:**
+### 2. **Story Arc Over Time**
+Individual posts can be self-contained, but the *collection* tells a larger story:
+- "How we built an AI that ships code" (origin story)
+- "48 OOM kills and the daemon survived" (rising action)
+- "The day the daemon broke production" (climax) ← *not yet written*
+- "What we learned after 1,000 PRDs" (resolution) ← *future milestone*
 
-#### **1. Hook Them Before They Leave**
-Every post page should end with:
+### 3. **Episodic Momentum**
+TV shows end with "Next time on..." — why don't blogs?
 
-- **"What to read next"** — 3 related posts (AI-generated based on content similarity)
-- **"Subscribe for new posts"** — email capture with one-line value prop:
-  - ❌ "Subscribe to our newsletter"
-  - ✅ "Get new AI insights every Tuesday—no spam, just deep dives"
-
-- **"Join the conversation"** — link to comments, Discord, or GitHub discussions
-  - People return for community, not just content
-
-#### **2. Create Anticipation**
-**Current state:** Posts drop randomly. No user expectation.
-
-**Retention play:**
-- **Publish on a schedule** — e.g., "New post every Tuesday"
-- **Serialized content** — "This is Part 2 of our series on AI agents. Part 3 drops next week."
-- **Tease upcoming posts** — footer widget: "Coming next week: *How We Built a Self-Healing CI/CD Pipeline*"
-
-**Why it works:** Users return on Tuesdays because they *expect* new content.
-
-#### **3. Personalization Layer**
-**Current state:** Everyone sees the same blog index.
-
-**Retention play:**
-- **Track read history** (cookie/localStorage):
-  - "You've read 3 posts on AI agents. Here are 2 more you'd like."
-- **Category filters** — let users bookmark "AI Strategy" or "Engineering Deep Dives"
-- **"Continue reading" section** — if they didn't finish a long post, remind them
-
-**Why it works:** Personalization makes users feel seen. They return because the experience adapts to them.
+Every post should:
+- Reference past posts (continuity)
+- Tease future posts (anticipation)
+- Leave one question unanswered (open loop)
 
 ---
 
-## v1.1 Feature Roadmap: Build the Habit Loop
+## v1.1 Feature Roadmap
 
-### **Tier 1: Quick Wins (1-2 Weeks)**
+### **Tier 1: Mechanical Retention (Ship First)**
+*Zero narrative skill required. Just functional hooks.*
 
-#### **1. Related Posts Section**
-- **What:** At the end of every post, show 3 related articles
-- **How:**
-  - Simple version: match by tags/category
-  - Better version: AI-generated content similarity (embed post content, find nearest neighbors)
-- **Why:** Increases pages-per-session from 1.0 → 2.5+
+#### Feature 1.1: **Working Email Subscription**
+**Current state:** Placeholder form, no backend.
+**Fix:**
+- Integrate Loops or ConvertKit
+- Double opt-in flow (confirm email, set preferences)
+- Weekly digest: "3 new posts this week" + top excerpt
+- Welcome email: "Start here" with 3 greatest hits
 
-#### **2. Email Capture Widget**
-- **What:** Footer CTA on every post: "Get new posts via email"
-- **How:**
-  - Integrate Mailchimp/ConvertKit/Buttondown
-  - Single input field: email + subscribe button
-  - Confirmation: "Check your inbox to confirm"
-- **Why:** Email list = owned audience. You can bring them back on your terms.
-
-#### **3. Publishing Calendar**
-- **What:** Commit to a schedule (e.g., "New post every Tuesday")
-- **How:**
-  - Footer text: "New posts every Tuesday. [Subscribe](#) to never miss one."
-  - RSS feed auto-updates
-  - Daemon generates posts on schedule
-- **Why:** Expectation = habit. Users return on Tuesdays because they know something new is there.
+**Success metric:** 10% of unique visitors subscribe within 30 days.
 
 ---
 
-### **Tier 2: Engagement Hooks (3-4 Weeks)**
+#### Feature 1.2: **"New Since Your Last Visit" Badge**
+**How it works:**
+- Cookie or localStorage tracks last visit timestamp
+- Blog index shows red dot or "NEW" label on unread posts
+- Clears when user clicks post
 
-#### **4. "Top Posts This Month" Widget**
-- **What:** Sidebar or footer showing most-read posts (last 30 days)
-- **How:**
-  - Integrate analytics (Plausible API or Fathom)
-  - Auto-rank by page views
-  - Update weekly
-- **Why:** Social proof. New visitors click popular posts. Returning visitors see what they missed.
+**Why it works:** Taps into completion psychology. "I need to catch up."
 
-#### **5. "New Here? Start Here" Landing Page**
-- **What:** `/blog/start-here` — curated intro to best content
-- **How:**
-  - Manually curate 5 "greatest hits"
-  - Link from blog index: "New here? [Start here](#)"
-- **Why:** Reduces bounce rate. New visitors don't know where to start—guide them.
+**Implementation:**
+```tsx
+const lastVisit = localStorage.getItem('lastVisit') || 0
+const newPosts = posts.filter(p => p.date > lastVisit)
+// Show badge on newPosts
+```
 
-#### **6. Comment Integration**
-- **What:** Enable discussions on every post
-- **How:**
-  - Use GitHub Discussions (via `giscus`) — leverages existing GitHub auth
-  - Or Disqus/Commento if you want standalone
-- **Why:** People return to check replies. Conversation = retention.
+**Success metric:** 25% increase in repeat visitor engagement.
 
 ---
 
-### **Tier 3: Advanced Retention (2-3 Months)**
+#### Feature 1.3: **Related Posts Footer**
+**Current state:** Post ends, reader leaves.
+**Fix:**
+- Add `related: [slug1, slug2]` to frontmatter (manual curation)
+- Display at bottom: "If you liked this, read:"
+  - [The Night Shift](#)
+  - [Model Selection in Multi-Agent Systems](#)
 
-#### **7. Content Series & Navigation**
-- **What:** Group related posts into series (e.g., "AI Agents 101" — Part 1, 2, 3)
-- **How:**
-  - Add `series` field to frontmatter
-  - Auto-generate series navigation at top of post: "← Previous | Next →"
-- **Why:** Binge behavior. Users read one post, immediately click "Next."
+**Advanced version (Phase 3):** AI-generated via semantic embeddings (Jensen's suggestion).
 
-#### **8. Personalized Recommendations**
-- **What:** "Based on what you've read, you might like..."
-- **How:**
-  - Track read history (localStorage or cookie)
-  - Use AI embeddings to find similar posts
-  - Show personalized widget on homepage
-- **Why:** Makes blog feel like a product, not a static archive.
-
-#### **9. Weekly Digest Email**
-- **What:** Auto-generated email every Friday: "This week on Shipyard AI"
-- **How:**
-  - Daemon generates summary of new posts
-  - Email includes:
-    - Post titles + excerpts
-    - "Most popular this week" (analytics-driven)
-    - "Coming next week" teaser
-- **Why:** Brings lapsed users back. Even if they don't visit, they're reminded you exist.
-
-#### **10. "Reader's Leaderboard" (Optional — Gamification)**
-- **What:** Public leaderboard of top commenters or most engaged readers
-- **How:**
-  - Track comments, shares, time on site
-  - Monthly leaderboard page: `/blog/top-readers`
-- **Why:** Status game. Power users compete for recognition, return frequently.
+**Success metric:** 30% of readers click through to related post.
 
 ---
 
-## The Retention Metrics That Matter
+#### Feature 1.4: **RSS Feed with Summaries**
+**Why:** Power users still use RSS. Don't abandon them.
 
-If you're not measuring, you're guessing. Track these:
+**Implementation:**
+- Generate `/blog/rss.xml` at build time
+- Include full post content or excerpt (user preference)
+- Support Feedly, Inoreader, NetNewsWire
 
-### **1. Repeat Visitor Rate**
-- **What:** % of users who return within 30 days
-- **Current state:** Unknown (no analytics)
-- **Target:** 25%+ (industry benchmark for content sites)
-
-### **2. Pages Per Session**
-- **What:** How many posts users read per visit
-- **Current state:** Likely 1.0 (no related posts or recommendations)
-- **Target:** 2.5+
-
-### **3. Email List Growth**
-- **What:** New subscribers per week
-- **Current state:** 0 (no email capture)
-- **Target:** 50+ subscribers in first 90 days
-
-### **4. Time on Site**
-- **What:** Avg minutes per session
-- **Current state:** Unknown
-- **Target:** 5+ minutes (indicates deep reading, not skimming)
-
-### **5. Return Frequency**
-- **What:** How often users come back (weekly, monthly, one-time)
-- **Current state:** Unknown
-- **Target:** 30% weekly, 50% monthly, <20% one-time
+**Success metric:** 50+ RSS subscribers in first month.
 
 ---
 
-## The Retention Flywheel
+### **Tier 2: Narrative Retention (Ship After Tier 1)**
+*Requires editorial judgment. Higher impact, more effort.*
 
-Here's how this compounds:
+#### Feature 2.1: **Series Tagging**
+**Concept:** Multi-part content with explicit progression.
 
-1. **User discovers blog** (organic search, social, referral)
-2. **Reads one post** (landing page)
-3. **Sees 3 related posts** (stays longer, reads 2.5 posts/session)
-4. **Subscribes via email** (you can bring them back)
-5. **Receives weekly digest** (reminder to return)
-6. **Returns next Tuesday** (new post drops, as promised)
-7. **Comments on post** (now emotionally invested)
-8. **Checks back for replies** (repeat visit)
-9. **Shares post on social** (brings new users → restart loop)
+**Example series:**
+- **"Building the Daemon" (4 parts)**
+  - Part 1: The Night Shift (published)
+  - Part 2: When the Daemon Hallucinates ← *draft this*
+  - Part 3: 48 OOM Kills and a Funeral ← *inspiration from existing post*
+  - Part 4: Shipping 1,000 PRDs
 
-**This is the difference between:**
-- **Static blog:** 1 visit, 1 page, never return
-- **Retention engine:** 1 visit → 3 pages → email capture → weekly returns → evangelist
+**UI:**
+- Tag at top: "Part 2 of 4 in *Building the Daemon* series"
+- Series nav: `← Part 1 | Part 3 →`
+- Series page: `/blog/series/building-the-daemon` (all posts listed)
 
----
+**Why it works:** Creates binge-reading behavior. Readers finish Part 1, immediately click Part 2.
 
-## What Shonda Would Ship First
-
-If I had 2 weeks and limited resources, I'd focus on **the 20% that drives 80% of retention:**
-
-### **Week 1: Capture & Remind**
-1. **Email capture widget** on every post (Buttondown is free for <1000 subscribers)
-2. **Publishing schedule** — commit to "New post every Tuesday," announce it everywhere
-3. **RSS feed** — enable auto-notifications for feed readers
-
-### **Week 2: Extend Session**
-4. **Related posts section** at end of every post (even simple tag matching works)
-5. **"Start here" page** for new visitors
-6. **Footer CTA** on every page: "Subscribe | Start Here | Archive"
-
-**Why these 6 things?**
-- They're fast to build
-- They directly increase pages/session and repeat visits
-- They create owned channels (email, RSS) so you're not dependent on SEO
+**Success metric:** Series posts have 2x time-on-page vs. standalone posts.
 
 ---
 
-## What NOT to Build (Yet)
+#### Feature 2.2: **Cliffhanger Endings**
+**Bad ending (current):**
+> "The daemon shipped 20 PRDs that night. Production was stable."
 
-### ❌ **Complex Recommendation Engine**
-Wait until you have 50+ posts and real traffic data. Don't over-engineer personalization for 6 posts.
+**Good ending:**
+> "The daemon shipped 20 PRDs that night. Production was stable. But three weeks later, a hallucinated API spec would bring everything down. More on that soon."
 
-### ❌ **Native Comments System**
-Use existing solutions (giscus, Disqus). Don't build from scratch.
+**Formula:**
+1. Resolve immediate tension (daemon survived)
+2. Introduce new tension (future failure)
+3. Promise resolution (coming soon)
 
-### ❌ **Gamification**
-Leaderboards are cool but only work with existing community. Build that first.
+**Implementation:** Editorial guideline, not code. Review all post endings before publish.
 
-### ❌ **Mobile App**
-Blog is not an app use case. Mobile web is fine.
-
----
-
-## The Retention North Star
-
-**You want users to think:**
-
-> "It's Tuesday—I wonder what Shipyard AI published this week."
-
-That's the habit loop. That's retention.
-
-**How you get there:**
-1. Consistent publishing schedule (expectation)
-2. Email list (owned channel to remind them)
-3. Related posts (extend each visit)
-4. Community (conversation brings them back)
-5. Quality content (the actual reason they stay)
-
-Right now, you have #5. Build the other four.
+**Success metric:** Email click-through rate increases 15% when teaser is included.
 
 ---
 
-## Final Thought: Retention is a Product Decision, Not a Marketing Tactic
+#### Feature 2.3: **Author Profiles & Bylines**
+**Current state:** Posts feel institutional, no human voice.
+**Fix:**
+- Add `author: "Name"` to frontmatter
+- Author bio at bottom of post:
+  - Photo, 2-sentence bio, Twitter/LinkedIn
+  - "More posts by [Author]" link
 
-You can't "growth hack" your way to retention. It's baked into the product.
+**Why:** Readers follow people, not brands. Personal connection = retention.
 
-**Bad retention:**
-- User reads post → page ends → they leave → forget you exist
+**Example:**
+> **Written by Alex Chen**
+> Staff engineer at Shipyard, survived 48 OOM kills. Tweets about AI agents and production nightmares.
+> [More posts by Alex](#) | [@alexchen](https://twitter.com)
 
-**Good retention:**
-- User reads post → sees 3 related posts → subscribes via email → gets weekly digest → returns next Tuesday → comments → checks for replies → becomes evangelist
-
-**Your job:** Design the experience so the path of least resistance is "come back."
+**Success metric:** Posts with bylines get 20% more social shares.
 
 ---
 
-**Signed,**
-Shonda Rhimes
-Board Member, Great Minds Agency
-*"If you're not building for retention, you're building a graveyard."*
+#### Feature 2.4: **"Start Here" Onboarding**
+**Problem:** New reader lands on random post via Google. Where do they go next?
+
+**Solution:** Dedicated page: `/blog/start-here`
+
+**Contents:**
+- "New to Shipyard? Read these 3 posts first:"
+  1. What is the EmDash Daemon? (explainer)
+  2. The Night Shift (flagship narrative)
+  3. Why AI Agents Ship Better Code (philosophy)
+- Link in site nav: "Blog → Start Here"
+- Footer CTA on all posts: "New reader? [Start here](#)"
+
+**Success metric:** 40% of first-time visitors who land on `/blog/start-here` read 2+ posts.
+
+---
+
+### **Tier 3: Community Retention (Ship After Product-Market Fit)**
+*Highest leverage, hardest to build. Only pursue if Tier 1 + 2 prove traction.*
+
+#### Feature 3.1: **Lightweight Comments (Giscus)**
+**Why not Disqus/Facebook:** Privacy concerns, slow load times, spam.
+**Why Giscus:** GitHub Discussions backend, Markdown support, owned by you.
+
+**Use case:**
+- Engineers ask follow-up questions ("How did you configure the OOM threshold?")
+- Readers share their own war stories
+- Authors respond, build relationship
+
+**Guardrail:** Moderation required. Assign someone to respond within 24 hours.
+
+**Success metric:** 5% of posts generate 3+ comments.
+
+---
+
+#### Feature 3.2: **Reader-Requested Topics**
+**Concept:** Turn audience into editorial board.
+
+**Implementation:**
+- Footer widget: "What should we write about next?"
+- Upvote system (simple form → Airtable/Notion)
+- Monthly: Publish most-requested topic
+
+**Why it works:** Readers invested in content creation = loyal readers.
+
+**Example:**
+> 📝 **Requested by readers:**
+> "How do you test AI-generated code?" (47 votes)
+> "Daemon vs. human: speed comparison" (32 votes)
+
+**Success metric:** 1 reader-requested post per month, 50% higher engagement than average.
+
+---
+
+#### Feature 3.3: **Exclusive Content for Subscribers**
+**Concept:** Tiered access model.
+
+**Public posts:** Case studies, technical deep dives (SEO-friendly)
+**Subscriber-only:** Behind-the-scenes, early access, office hours Q&A
+
+**Example:**
+- Public: "How the Daemon Shipped 20 PRDs in One Night"
+- Subscriber: "The 5 PRDs the Daemon Failed + Why" (lessons learned, more raw)
+
+**Why:** Gives reason to subscribe beyond "get notified."
+
+**Success metric:** 20% of email subscribers engage with exclusive content.
+
+---
+
+## Retention Metrics Dashboard
+
+**Track weekly:**
+
+| Metric | Current | Target (30 days) | Target (90 days) |
+|--------|---------|------------------|------------------|
+| Email subscribers | 0 | 100 | 500 |
+| Repeat visitor % | Unknown | 15% | 30% |
+| Avg posts per session | 1.0 | 1.5 | 2.0 |
+| Email open rate | N/A | 30% | 40% |
+| Click-through rate (email) | N/A | 10% | 15% |
+| Social shares per post | Unknown | 20 | 50 |
+| Comments per post | 0 | 2 | 5 |
+
+**Leading indicator:** If email open rate > 30%, retention is working.
+**Lagging indicator:** If repeat visitor % < 15% after 60 days, revisit strategy.
+
+---
+
+## Content Calendar: Next 8 Weeks
+
+**Week 1-2:** Fix broken build, ship Tier 1 features
+**Week 3:** Publish "Behind the Scenes: When the Daemon Hallucinates" (Part 2 of series)
+**Week 4:** Publish "Model Selection: The 3-Step Framework" (evergreen, SEO-focused)
+**Week 5:** Publish "48 OOM Kills: A Survival Guide" (narrative, series Part 3)
+**Week 6:** Reader-requested topic (poll audience Week 4)
+**Week 7:** Case study: "Client X: From 2-Week Builds to 2-Day Deploys"
+**Week 8:** Retrospective: "What We Learned from 100 Blog Subscribers"
+
+**Cadence:** 1 post/week minimum. Consistency > volume.
+
+---
+
+## The Narrative Northstar
+
+**Question to ask before publishing every post:**
+
+> "If a reader finishes this, what makes them want to come back next week?"
+
+**Answers that work:**
+- ✅ "I need to know what happens in Part 3"
+- ✅ "I want to see how they solve the next problem"
+- ✅ "The author promised a follow-up on X topic"
+- ✅ "I'm part of a community learning this together"
+
+**Answers that don't work:**
+- ❌ "That was interesting" (one-time satisfaction, no return trigger)
+- ❌ "I learned something" (educational but not compelling)
+
+---
+
+## Final Thought
+
+**Retention isn't a feature. It's a philosophy.**
+
+Every design choice either:
+- Creates a reason to return (series, cliffhangers, email)
+- Or removes friction to return (RSS, new post badges, related links)
+
+The best content in the world doesn't matter if nobody remembers it exists.
+
+Make the blog **unforgettable**, then make it **unavoidable**.
+
+---
+
+**Next Steps:**
+1. Fix broken build (Phase 1 from board verdict)
+2. Ship Tier 1 features (2 weeks max)
+3. Measure baseline metrics (Week 3)
+4. Iterate based on data (Weeks 4-8)
+
+Retention is earned, not assumed. Build the hooks, then watch them work.
+
+— Shonda Rhimes
+Board Member, Shipyard AI

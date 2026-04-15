@@ -7,8 +7,9 @@ export function generateStaticParams() {
   return getAllPostSlugs().map(slug => ({ slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const post = getPostBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
   return {
     title: `${post.title} — Shipyard AI`,
     description: post.description,
@@ -30,8 +31,9 @@ function formatDate(date: string): string {
   });
 }
 
-export default function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = getPostBySlug(params.slug);
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
 
   return (
     <>

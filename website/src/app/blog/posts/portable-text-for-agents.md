@@ -1,7 +1,7 @@
 ---
 title: "Portable Text Changes Everything for AI Agents"
 description: "WordPress stores HTML blobs. EmDash stores structured JSON. This is why AI agents can build sites 10x faster."
-date: 2026-04-04
+date: "2026-04-04"
 tags: ["portable-text", "structured-content", "ai", "emdash"]
 ---
 
