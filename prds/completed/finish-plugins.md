@@ -52,7 +52,7 @@ Multiple Emdash plugins were built before `docs/EMDASH-GUIDE.md` existed. They w
 - Read how Emdash's admin renders plugin pages in the source
 
 ## Deploy Credentials
-- Cloudflare Token: cfat_dO0mssaJcaRknzI4CMzm8Zg62JHkjRoIVhQxP6Pm7cfee40d
+- Cloudflare Token: 
 - Cloudflare Account: a02352ad1742197c106c1774fcbada2d
 
 ## Testing Requirements

@@ -45,7 +45,7 @@ gh issue create --repo sethshoultes/shipyard-ai \
 
 ## Key Credentials (stored in env/config)
 
-- Cloudflare API Token: cfat_vBugwk4wAyjtxx9JOInovVWkU1BiljJ3N3mt85Mt8b6f7733
+- Cloudflare API Token: 
 - Resend API Key: re_Q3FK5pEv_FkBrWknQuNqkPqwdoyNmzANK
 - GitHub: gh CLI authenticated as sethshoultes
 - Vercel: vercel CLI authenticated as seth-6671

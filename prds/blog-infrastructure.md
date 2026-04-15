@@ -182,7 +182,7 @@ Total: 6 markdown files in `blog/posts/`.
 
 ```bash
 cd website && npm run build
-CLOUDFLARE_API_TOKEN=cfat_yVizuscq4XqHStwiGFwcl5ACexOUM83ZU93YIJiP67b278df CLOUDFLARE_ACCOUNT_ID=a02352ad1742197c106c1774fcbada2d npx wrangler pages deploy out --project-name=shipyard-ai
+CLOUDFLARE_API_TOKEN= CLOUDFLARE_ACCOUNT_ID=a02352ad1742197c106c1774fcbada2d npx wrangler pages deploy out --project-name=shipyard-ai
 ```
 
 ### 7. Verify
