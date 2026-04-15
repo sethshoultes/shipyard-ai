@@ -466,7 +466,7 @@ Per PRD §6-7, this is the final success criteria - the blog must be live and ac
   <steps>
     <step order="1">Ensure build succeeded from previous task (out/ directory exists)</step>
     <step order="2">Navigate to website directory: cd /home/agent/shipyard-ai/website</step>
-    <step order="3">Deploy using wrangler: CLOUDFLARE_API_TOKEN= CLOUDFLARE_ACCOUNT_ID=a02352ad1742197c106c1774fcbada2d npx wrangler pages deploy out --project-name=shipyard-ai</step>
+    <step order="3">Deploy using wrangler: CLOUDFLARE_API_TOKEN=$CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID=$CLOUDFLARE_ACCOUNT_ID npx wrangler pages deploy out --project-name=shipyard-ai</step>
     <step order="4">Wait for deployment to complete</step>
     <step order="5">Verify blog index: curl -s https://www.shipyard.company/blog | grep -i "night shift"</step>
     <step order="6">Verify individual post: curl -s https://www.shipyard.company/blog/the-night-shift | grep -i "title"</step>

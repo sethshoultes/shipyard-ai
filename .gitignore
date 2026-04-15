@@ -11,3 +11,4 @@ node_modules/
 memory-store/memory.db
 memory-store/*.db
 .wrangler/
+.wrangler/
