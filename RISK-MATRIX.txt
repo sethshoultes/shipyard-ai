@@ -1,0 +1,272 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                  BLOG INFRASTRUCTURE RISK MATRIX                                ║
+║                  Probability (vertical) × Impact (horizontal)                   ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+                     LOW IMPACT      MEDIUM IMPACT    HIGH IMPACT
+                        ▼                ▼                ▼
+      ┌──────────────────────────────────────────────────────────┐
+HIGH  │                                   RISK-007          RISK-001 ★
+      │                                   RISK-008          RISK-002 ★
+      │  RISK-013      RISK-004          RISK-009          RISK-003 ★
+      │  RISK-018      RISK-005          RISK-010
+PROB  │  RISK-021      RISK-006          RISK-011
+      │               RISK-012          RISK-014
+      │               RISK-020
+      │
+MEDIUM│                                   RISK-015          RISK-019
+      │  RISK-016      RISK-017
+      │               RISK-019
+      │
+LOW   │
+      └──────────────────────────────────────────────────────────┘
+
+★ = CRITICAL BLOCKER (must resolve before implementation)
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                           RISK SEVERITY SUMMARY                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+CRITICAL (3):
+  ★ RISK-001: Decision vs. PRD Mismatch (react-markdown vs. remark-html)
+  ★ RISK-002: fs Module in Static Export
+  ★ RISK-003: Missing generateStaticParams
+
+HIGH (8):
+  • RISK-004: Frontmatter Schema Mismatch
+  • RISK-005: Missing published Field Logic
+  • RISK-006: RSS Feed Not in PRD
+  • RISK-007: Bundle Size Not Monitored
+  • RISK-008: Markdown Special Characters
+  • RISK-009: Design Consistency Undefined
+  • RISK-010: Cloudflare Deploy Validation
+  • RISK-011: Post Migration Gaps
+  • RISK-012: Incomplete TypeScript Types
+
+MEDIUM (9):
+  • RISK-013: Syntax Highlighting Plugin
+  • RISK-014: fs.readdirSync Performance
+  • RISK-015: Next.js API Stability (deferred)
+  • RISK-016: Pagination Not Planned (intentional)
+  • RISK-017: RSS Validation
+  • RISK-018: gray-matter Version
+  • RISK-019: react-markdown Compatibility
+  • RISK-020: Code Block Accessibility
+  • RISK-021: SEO Meta Tags
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                          IMPLEMENTATION STATUS                                 ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+BLOCKER STATUS:           🔴 DO NOT START
+  ✘ RISK-001: Unresolved (tech stack conflict)
+  ✘ RISK-002: Requires careful review
+  ✘ RISK-003: Requires explicit implementation
+
+PRE-IMPL TODO:            🟠 IN PROGRESS
+  ⧗ Content normalization (markdown schema)
+  ⧗ Frontmatter audit (all files)
+  ⧗ Documentation updates (PRD/Decisions)
+
+IMPLEMENTATION:           🟡 READY (pending blocker resolution)
+  ○ Build checklist prepared
+  ○ Validation scripts documented
+  ○ Deployment verification defined
+
+POST-DEPLOYMENT:          🟢 PLANNED
+  ○ Smoke test suite documented
+  ○ Monitoring procedures defined
+  ○ Sign-off criteria established
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                        CRITICAL PATH TIMELINE                                  ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+PHASE 1: DECISION & BLOCKING ISSUE RESOLUTION (1 day)
+  ┌─ Resolve CRITICAL blockers (RISK-001, 002, 003)
+  ├─ Update PRD with tech stack decision
+  ├─ Add `published` field to schema
+  └─ Add RSS generation spec
+
+PHASE 2: CONTENT PREPARATION (1-2 days)
+  ┌─ Normalize existing markdown files
+  ├─ Audit frontmatter consistency
+  ├─ Establish bundle size baseline
+  └─ Resolve post migration gaps (RISK-011)
+
+PHASE 3: IMPLEMENTATION (2-3 hours)
+  ┌─ Create lib/blog.ts
+  ├─ Create [slug]/page.tsx with generateStaticParams
+  ├─ Update /blog/page.tsx to use dynamic posts
+  └─ Implement RSS generation
+
+PHASE 4: TESTING & VALIDATION (1-2 hours)
+  ┌─ Local build verification
+  ├─ Static output validation
+  ├─ SEO tag verification
+  ├─ Accessibility audit
+  └─ RSS validation
+
+PHASE 5: DEPLOYMENT (30 minutes)
+  ┌─ Cloudflare Pages deploy
+  ├─ Smoke tests (200 status codes)
+  └─ Health check verification
+
+PHASE 6: MONITORING (24-48 hours)
+  ┌─ Watch error logs
+  ├─ Verify page load times
+  └─ Content accessibility check
+
+TOTAL ESTIMATED TIME: 5-8 days (accounting for decision resolution & content prep)
+ACTUAL BUILD TIME:    4 hours (once all prep is complete)
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                      RISK MITIGATION QUICK REFERENCE                          ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+For each risk, the quick mitigation steps are:
+
+RISK-001 (Tech Stack):
+  → Call Steve/Elon: "Do we use react-markdown or remark-html?"
+  → Update PRD/Decisions to match decision
+  → Provide code example for chosen approach
+
+RISK-002 (fs Module):
+  → Mark all fs imports with "build-time only" JSDoc
+  → Use notFound() for missing slugs
+  → Test with: npm run build && npm start
+
+RISK-003 (generateStaticParams):
+  → Make non-optional code review item
+  → Test: ls -R out/blog/ | grep -c index.html (should = post count)
+  → Pre-deploy: curl http://localhost:8788/blog/the-night-shift (should 200)
+
+RISK-004 (Frontmatter):
+  → Run: for f in blog/*.md; do head -10 $f; done
+  → Standardize all files to: title, date (quoted string), description, published, tags
+  → Verify: npm run build shows no TypeError
+
+RISK-005 (published Field):
+  → Add to PRD: "published: boolean (default false)"
+  → Add code: .filter(post => post.published)
+  → Test: Create draft post, verify not in index, verify direct URL works
+
+RISK-006 (RSS):
+  → Add to PRD: blog/rss.xml/route.ts implementation
+  → Generate RSS 2.0 format with full content
+  → Test: curl https://site/blog/rss.xml | xmllint --noout -
+
+RISK-007 (Bundle Size):
+  → Baseline: npm run build && du -sh out/
+  → After adding deps: compare sizes
+  → Set alert if > 100KB increase
+
+RISK-008 (Special Chars):
+  → Test each post rendering: npm run build && npm run dev
+  → Visual check: Do code blocks render correctly?
+  → Check browser console for JavaScript errors
+
+RISK-009 (Design):
+  → Copy prose styling from existing page.tsx to [slug]/page.tsx
+  → Visual comparison: Do post pages look identical to blog index?
+  → Get Steve Jobs approval before deploy
+
+RISK-010 (Cloudflare Deploy):
+  → Create validation script: curl -I https://site/blog/[slug]
+  → Expect: HTTP 200 for all posts
+  → Check: Cloudflare Pages deployment logs for errors
+
+RISK-011 (Post Migration):
+  → Audit: 3 hardcoded posts missing .md files
+  → Decision: Create .md or remove from view?
+  → Source of truth: Remove hardcoded array, use only .md files
+
+RISK-012 (TypeScript):
+  → Update BlogPost interface to include: published, author?, excerpt?, content
+  → Test: npm run build shows no type errors
+  → Verify: TypeScript strict mode passes
+
+RISK-013 (Syntax Highlighting):
+  → Install: npm install rehype-highlight@^6
+  → Test: npm run build && grep -r "highlight" out/blog/ | head -5
+  → Visual: Check code blocks have colored keywords
+
+RISK-014 (Performance):
+  → Monitor: time npm run build at 6, 50, 100 posts
+  → Alert: If build time > 2 minutes, implement ISR
+
+RISK-015 (Next.js Stability):
+  → Check release notes for 16.2.2
+  → Monitor GitHub for static export issues
+  → No action needed if releases are stable
+
+RISK-016 (Pagination):
+  → Intentional scope cut (V2 feature)
+  → No action needed unless blog grows > 50 posts
+
+RISK-017 (RSS):
+  → Validate at: https://validator.w3.org/feed/
+  → Test with reader: Feedly, Apple News, NewsBlur
+  → Ensure full post content is in feed
+
+RISK-018 (gray-matter):
+  → Install: npm install gray-matter@^4
+  → Test parsing: npm run build succeeds
+  → No action needed if no type errors
+
+RISK-019 (react-markdown):
+  → If using react-markdown: add 'use client' to [slug]/page.tsx
+  → Test: npm run build shows no hydration errors
+  → Check browser console for mismatch warnings
+
+RISK-020 (Accessibility):
+  → Run Lighthouse on /blog/[slug]
+  → Accessibility score target: ≥ 90
+  → Test with screen reader on code blocks
+
+RISK-021 (SEO):
+  → Implement: generateMetadata() in [slug]/page.tsx
+  → Test: curl https://site/blog/[slug] | grep '<meta'
+  → Verify: og:title, og:description, og:type present
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                     FULL DOCUMENTATION REFERENCES                             ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+For detailed information on each risk, refer to:
+
+1. RISK-REGISTER-blog-infrastructure.md (884 lines)
+   → Complete risk descriptions, probability/impact analysis, mitigation strategies
+
+2. RISK-CHECKLIST-blog-infrastructure.md (313 lines)
+   → Actionable checklist for implementation, testing, deployment
+
+3. RISK-EXECUTIVE-SUMMARY.md (189 lines)
+   → High-level overview, critical blockers, next steps
+
+4. RISK-MATRIX.txt (this file)
+   → Quick reference visualization
+
+All files located in: /home/agent/shipyard-ai/
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                              KEY METRICS                                       ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+Total Risks Identified:        21
+CRITICAL (blocking):            3
+HIGH (should fix):              8
+MEDIUM (monitor):               9
+LOW (awareness):                4
+
+Estimated Implementation Time:  4 hours (if blockers resolved)
+Estimated Total Project Time:   5-8 days (with decision/prep phase)
+Deployment Success Probability: 85% (with mitigation)
+Rollback Difficulty:            LOW (static site, easy to revert)
+
+Critical Path Items:            3 (all blocking)
+High Priority Items:            8 (should resolve before build)
+Pre-Implementation Tasks:        12 (documentation + content prep)
+Post-Deployment Checks:         20+ (smoke tests + validation)
+
+╚════════════════════════════════════════════════════════════════════════════════╝

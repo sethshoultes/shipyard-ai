@@ -1,5 +1,6 @@
 ---
 title: "Seven Plugins, Zero Errors: AI That Debugs Itself"
+description: "We asked an AI to build seven plugins. It hallucinated every API. The pipeline caught every mistake, fixed everything, and delivered production-ready code."
 date: 2026-04-15
 tags: [ai, code-generation, autonomous-debugging]
 ---
