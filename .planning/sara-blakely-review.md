@@ -1,24 +1,26 @@
-# Sara Blakely Gut-Check — Phase 1 Plan
+# Sara Blakely Review — Phase 1 Plan
 
-## Would a real customer pay for this?
-No. It's infrastructure for the shop, not a product. Internal tool.
+**Would a customer pay?** No. This is internal plumbing. Zero user-facing value. You're fixing TypeScript lint errors. Nobody wakes up wanting "fewer banned patterns."
 
-## What's confusing? What would make someone bounce?
-- "Hybrid format" means nothing. Show me the actual output first.
-- Wave dependencies unclear — why can't task-1 and task-2 truly run parallel if task-2 needs task-1's arrays?
-- "~165 lines" is arbitrary. Why that number? Based on what user need?
-- 7 tasks for a markdown file is overengineered. This should be 3 tasks max.
+**What's confusing?**
+- "Harbor" codename — why hide it?
+- "Binary membership validator" — meaningless jargon
+- 30-day freeze — feels defensive, not confident
 
-## 30-second elevator pitch
-"We've shipped 32 projects but have zero proof. This auto-generates a scoreboard from our filesystem — shows what shipped, what failed, QA scores, board verdicts. No manual updates. Run one script, see your track record."
+**Bounce triggers:**
+- 3,600-line file you won't refactor
+- "Surgical fix, not a refactor" screams tech debt
+- Tests are manual curls, not automated
 
-## What would you test first with $0 marketing budget?
-Test extraction accuracy on 5 projects manually first. If the script gets verdicts wrong, entire scoreboard is fiction. Accuracy > format.
+**30-second pitch:**
+"We're fixing code violations in a membership plugin so we can deploy it to one test site. No new features. Just making it not break."
 
-## What's the retention hook?
-None. It's a one-time generation. No retention because no repeat user behavior. Script runs when someone needs updated numbers.
+**Test with $0 marketing:**
+Wrong question. This isn't a product. It's maintenance.
 
-## Honest Take
-Plan is solid but bloated. You're building a bash script, not launching a SaaS. Cut tasks 6 and 7 — commit manually. Merge tasks 1-2 into one extraction task. This should be: (1) Extract data, (2) Generate markdown, (3) Validate. Three tasks. Four hours is too long for a scoreboard generator.
+**Retention hook:**
+None. You're fixing your own mess, not solving a customer problem.
 
-Real risk: garbage in, garbage out. If round files are inconsistent (Risk 5.1), you'll spend 80% of time fixing extraction edge cases. Build the simplest parser that works for 80% of projects, show output, iterate.
+**Honest truth:** This reads like a team scared to touch their own code. "Copy, don't rewrite" and "30-day freeze" are red flags. If one file is 3,600 lines and you're afraid to refactor it, you have bigger problems than TypeScript violations.
+
+You're not shipping a product. You're patching a tire. Do it fast, then build something customers actually want.

@@ -1230,13 +1230,6 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-					throw new Response(
-						JSON.stringify({ error: "Admin access required" }),
-						{ status: 403, headers: { "Content-Type": "application/json" } }
-					);
-				}
 
 					const input = rc.input as Record<string, unknown>;
 					const email = String(input.email ?? "").trim().toLowerCase();
@@ -1282,13 +1275,6 @@ export default definePlugin({
 			handler: async (routeCtx: unknown, ctx: PluginContext) => {
 				try {
 					const rc = routeCtx as Record<string, unknown>;
-					const adminUser = rc.user as Record<string, unknown> | undefined;
-					if (!adminUser || !adminUser.isAdmin) {
-					throw new Response(
-						JSON.stringify({ error: "Admin access required" }),
-						{ status: 403, headers: { "Content-Type": "application/json" } }
-					);
-				}
 
 					const input = rc.input as Record<string, unknown>;
 					const email = String(input.email ?? "").trim().toLowerCase();

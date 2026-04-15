@@ -1,609 +1,680 @@
-# Phase 1 Plan — Scoreboard Update (Automated Extraction)
+# Phase 1 Plan — MEMBERSHIP-V2 (HARBOR)
 
 **Generated**: 2026-04-15
-**Requirements**: /home/agent/shipyard-ai/prds/scoreboard-update.md + /home/agent/shipyard-ai/rounds/scoreboard-update/decisions.md
-**Total Tasks**: 7
-**Waves**: 3
+**Requirements**: `/home/agent/shipyard-ai/prds/membership-v2.md`, `/home/agent/shipyard-ai/rounds/membership-v2/decisions.md`
+**Total Tasks**: 12
+**Waves**: 4
 
 ---
 
-## Requirements Traceability
+## EXECUTIVE SUMMARY
 
-| Requirement | Task(s) | Wave | Priority |
-|-------------|---------|------|----------|
-| REQ-1: Extract completed projects list | phase-1-task-1 | 1 | MUST |
-| REQ-2–7: Extract QA, board, dates, duration, deliverables | phase-1-task-1, phase-1-task-2 | 1 | MUST |
-| REQ-8: Calculate aggregate metrics | phase-1-task-2 | 1 | MUST |
-| REQ-9: Handle missing data with "—" | phase-1-task-1, phase-1-task-2 | 1 | MUST |
-| REQ-10: Sort projects reverse chronological | phase-1-task-2 | 1 | MUST |
-| REQ-11: Generate core metrics section | phase-1-task-3 | 2 | MUST |
-| REQ-12: Generate summary table | phase-1-task-3 | 2 | MUST |
-| REQ-13: Generate expanded details for top 5 | phase-1-task-4 | 2 | MUST |
-| REQ-14: Assemble complete SCOREBOARD.md | phase-1-task-5 | 3 | MUST |
-| REQ-15: Implement raw brand voice | phase-1-task-3, phase-1-task-4 | 2 | MUST |
-| REQ-16: Update STATUS.md | phase-1-task-6 | 3 | SHOULD |
-| REQ-17: Build extraction script | phase-1-task-1, phase-1-task-2 | 1 | MUST |
-| REQ-18: Test extraction accuracy | phase-1-task-5 | 3 | MUST |
-| REQ-19: Commit and push | phase-1-task-7 | 3 | SHOULD |
+**What we're building:** Fix 4 banned pattern violations in the membership plugin and deploy to Sunrise Yoga for smoke testing.
+
+**Why it matters:** The Harbor plugin (internal codename for MemberShip v2) is a production-grade binary membership validator for Emdash CMS. Currently blocked by 4 TypeScript violations using banned patterns (`rc.user` checks and `throw new Response` in admin routes).
+
+**Core principle:** Copy working code, don't rewrite. This is a surgical fix, not a refactor.
+
+**Critical constraints:**
+- Do NOT rewrite, refactor, or optimize the working code
+- 30-day code freeze after deployment (no changes, no optimizations)
+- Manual smoke tests required (automation deferred 30 days)
+- Zero new features beyond binary membership checks
+
+**Success criteria:**
+- ✅ 0 banned pattern violations (verified by grep)
+- ✅ All 6 smoke tests pass (100% success rate required)
+- ✅ Plugin registered in Sunrise Yoga
+- ✅ Test documentation complete
+- ✅ Code committed and deployed
 
 ---
 
-## Wave Execution Order
+## REQUIREMENTS TRACEABILITY
 
-### Wave 1 (Parallel) — Data Extraction & Script Foundation
+| Requirement | Task(s) | Wave | Source |
+|-------------|---------|------|--------|
+| R1.1 - Verify source files exist | phase-1-task-1 | 1 | PRD Phase 1 |
+| R1.2 - Remove `approve` route violations | phase-1-task-2 | 2 | PRD Phase 1 |
+| R1.3 - Remove `revoke` route violations | phase-1-task-2 | 2 | PRD Phase 1 |
+| R1.4 - Verify violations eliminated | phase-1-task-3 | 3 | PRD Phase 1 |
+| R2.1 - Read Sunrise Yoga config | phase-1-task-4 | 1 | PRD Phase 2 |
+| R2.2 - Locate plugin descriptor | phase-1-task-4 | 1 | PRD Phase 2 |
+| R2.3 - Add plugin import | phase-1-task-5 | 2 | PRD Phase 2 |
+| R2.4 - Register in emdash config | phase-1-task-5 | 2 | PRD Phase 2 |
+| R2.5 - Verify KV binding | phase-1-task-6 | 3 | PRD Phase 2 |
+| R3.1-3.6 - Execute smoke tests | phase-1-task-7, phase-1-task-8, phase-1-task-9 | 3 | PRD Phase 3 |
+| R4.1 - Document test results | phase-1-task-10 | 4 | PRD Phase 4 |
+| R4.2 - Commit changes | phase-1-task-11 | 4 | PRD Phase 4 |
+| R4.3 - Deploy | phase-1-task-12 | 4 | PRD Phase 4 |
 
-**Focus**: Build the extraction engine and collect raw data from filesystem
+---
+
+## WAVE EXECUTION ORDER
+
+### Wave 1 (Parallel) — Research & Verification
+
+Tasks can run in parallel as they only read files and gather information.
+
+---
 
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Build Data Extraction Script Core</title>
-  <requirement>REQ-1, REQ-2, REQ-3, REQ-4, REQ-5, REQ-7, REQ-9, REQ-17: Extract all project data from prds/completed/ and rounds/ directories with graceful "—" fallback for missing data</requirement>
+  <title>Verify source and target files exist</title>
+  <requirement>R1.1 - Verify clean deliverable file and target source file exist with expected line counts</requirement>
   <description>
-    Create the automated extraction script that reads the filesystem and extracts all required data points for each project:
-    - Project names from prds/completed/
-    - QA verdicts (PASS/BLOCK/REJECT) from round files
-    - Board scores (0-10) from board-verdict.md files
-    - Ship dates from round file timestamps
-    - Pipeline duration (approximate from round file timestamps)
-    - Deliverables directory existence checks
-
-    Implements graceful fallback: any missing data returns "—" (never guesses, never blocks).
-
-    This task creates the foundation extraction script at /home/agent/shipyard-ai/scripts/update-scoreboard.sh with all core data extraction logic.
+    Confirm that the clean reference implementation exists at deliverables/membership-fix/sandbox-entry.ts
+    (3,441 lines, 0 violations) and the target file exists at plugins/membership/src/sandbox-entry.ts
+    (3,600 lines, 4 violations). This verification ensures we have the correct files before making changes.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/prds/completed/" reason="Source directory for all shipped project PRDs — enumerate all .md files to get project list" />
-    <file path="/home/agent/shipyard-ai/rounds/" reason="Contains project-specific round directories with QA verdicts, board scores, and timestamps" />
-    <file path="/home/agent/shipyard-ai/deliverables/" reason="Contains project deliverable artifacts — verify existence for each project" />
-    <file path="/home/agent/shipyard-ai/rounds/scoreboard-update/decisions.md" reason="Locked decisions defining extraction rules: use '—' for missing data (Decision 1.9), no daemon log parsing (Decision 1.6), raw verdicts only (Decision 1.4)" />
-    <file path="/home/agent/shipyard-ai/scripts/lighthouse.sh" reason="Reference example for script structure, helper functions, associative arrays, and error handling patterns" />
-    <file path="/home/agent/shipyard-ai/.planning/requirements-analysis.md" reason="Detailed requirements REQ-1 through REQ-9 with acceptance criteria and implementation notes" />
+    <file path="/home/agent/shipyard-ai/deliverables/membership-fix/sandbox-entry.ts" reason="Clean reference file with 0 violations" />
+    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Target file with 4 violations to fix" />
+    <file path="/home/agent/shipyard-ai/prds/membership-v2.md" reason="PRD with file location details" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Emdash plugin system documentation" />
   </context>
 
   <steps>
-    <step order="1">Read /home/agent/shipyard-ai/scripts/lighthouse.sh to understand existing script patterns (helper functions, associative arrays, error handling with 2>/dev/null || true)</step>
-    <step order="2">Create /home/agent/shipyard-ai/scripts/update-scoreboard.sh with executable permissions (chmod +x)</step>
-    <step order="3">Implement function extract_completed_projects() that lists all .md files in prds/completed/ and returns project names (strip .md extension)</step>
-    <step order="4">Implement function extract_qa_verdict(project) that searches rounds/{project}/ for QA verdict files (qa-pass-*.md, final-verdict.md) and greps for PASS/BLOCK/REJECT keywords. Return "—" if not found.</step>
-    <step order="5">Implement function extract_board_score(project) that searches rounds/{project}/board-verdict.md for aggregate/average score patterns (e.g., "Average: 5.5/10", "Aggregate Score: 3.75/10"). Extract numerical value 0-10, return "—" if not found.</step>
-    <step order="6">Implement function extract_ship_date(project) that uses stat command to get modification date of newest file in rounds/{project}/, format as YYYY-MM-DD, return "—" if directory doesn't exist</step>
-    <step order="7">Implement function extract_pipeline_duration(project) that calculates time delta between oldest and newest files in rounds/{project}/ (use stat mtime). Return human-readable format (e.g., "3.2 hours", "2 days") or "—" if insufficient data. DO NOT parse daemon logs (per Decision 1.6).</step>
-    <step order="8">Implement function check_deliverables(project) that tests if /home/agent/shipyard-ai/deliverables/{project}/ directory exists. Return markdown link "[Link](/deliverables/{project}/)" or "—".</step>
-    <step order="9">Add error handling to all functions: use 2>/dev/null for file operations, default to "—" on any error, never exit on missing data</step>
-    <step order="10">Create main extraction loop that iterates through all completed projects and populates associative arrays with extracted data: PROJECT_QA["$project"], PROJECT_BOARD["$project"], PROJECT_DATE["$project"], PROJECT_DURATION["$project"], PROJECT_DELIVERABLES["$project"]</step>
-    <step order="11">Add logging/debugging output (to stderr) showing extraction progress and any missing data warnings</step>
-    <step order="12">Test extraction on 3 sample projects (e.g., shipyard-client-portal, blog-infrastructure, adminpulse) and verify output matches manual inspection of their round files</step>
+    <step order="1">Use Bash to count lines in deliverable file: `wc -l /home/agent/shipyard-ai/deliverables/membership-fix/sandbox-entry.ts`</step>
+    <step order="2">Verify deliverable has ~3,441 lines</step>
+    <step order="3">Use Bash to count lines in target file: `wc -l /home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts`</step>
+    <step order="4">Verify target has ~3,600 lines (159 lines difference is expected)</step>
+    <step order="5">Use Grep to count violations in deliverable: `grep -c "rc\.user" deliverables/membership-fix/sandbox-entry.ts || echo 0`</step>
+    <step order="6">Confirm deliverable has 0 violations</step>
+    <step order="7">Use Grep to count violations in target: `grep -c "rc\.user" plugins/membership/src/sandbox-entry.ts`</step>
+    <step order="8">Confirm target has 2 violations (approve and revoke routes)</step>
   </steps>
 
   <verification>
-    <check type="manual">Run ./scripts/update-scoreboard.sh and verify it outputs debug logs showing successful extraction for all 32 projects</check>
-    <check type="manual">Spot-check 3 projects: manually inspect their rounds/ files and verify extracted QA verdict, board score, and ship date match reality</check>
-    <check type="manual">Verify projects with missing data (e.g., no board-verdict.md) correctly output "—" instead of errors or empty values</check>
-    <check type="manual">Confirm script completes in under 5 minutes for 32 projects</check>
+    <check type="manual">Deliverable file exists with ~3,441 lines</check>
+    <check type="manual">Target file exists with ~3,600 lines</check>
+    <check type="manual">Deliverable has 0 rc.user violations</check>
+    <check type="manual">Target has 2 rc.user violations (4 total violations including throw new Response)</check>
   </verification>
 
   <dependencies>
-    <!-- Independent task (wave 1) -->
+    <!-- No dependencies - this is a Wave 1 verification task -->
   </dependencies>
 
-  <commit-message>feat(scripts): add data extraction engine for scoreboard
-
-Build automated extraction script with functions to extract:
-- Project names from prds/completed/
-- QA verdicts (PASS/BLOCK/REJECT) from round files
-- Board scores (0-10) from board-verdict.md
-- Ship dates and pipeline duration from timestamps
-- Deliverables directory existence
-
-Implements graceful "—" fallback for all missing data per Decision 1.9.
-No daemon log parsing (Decision 1.6).
-
-Addresses: REQ-1 through REQ-7, REQ-9, REQ-17
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-
-<task-plan id="phase-1-task-2" wave="1">
-  <title>Implement Aggregate Metrics & Sorting Logic</title>
-  <requirement>REQ-8, REQ-6, REQ-10: Calculate total shipped/failed counts, success rate, average duration, identify top 5 recent projects, and sort all projects reverse chronological</requirement>
-  <description>
-    Extend the extraction script with calculation functions that process the raw extracted data:
-    - Count total shipped projects (files in prds/completed/)
-    - Count total failed projects (files in prds/failed/ if exists)
-    - Calculate success rate percentage
-    - Calculate average pipeline duration (excluding "—" values)
-    - Sort all projects by ship date (reverse chronological)
-    - Identify top 5 most recent projects for expanded details
-
-    These functions consume the associative arrays populated by phase-1-task-1 and produce aggregate statistics and sorted project lists for markdown generation.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/scripts/update-scoreboard.sh" reason="Add calculation functions to existing extraction script created in phase-1-task-1" />
-    <file path="/home/agent/shipyard-ai/prds/completed/" reason="Count files for total shipped metric" />
-    <file path="/home/agent/shipyard-ai/prds/failed/" reason="Count files for total failed metric (if directory exists)" />
-    <file path="/home/agent/shipyard-ai/rounds/scoreboard-update/decisions.md" reason="Decision 1.2 specifies top 5 recent projects get expanded details; Decision 2 specifies reverse chronological sorting" />
-    <file path="/home/agent/shipyard-ai/.planning/requirements-analysis.md" reason="REQ-8, REQ-6, REQ-10 with detailed acceptance criteria for calculations" />
-  </context>
-
-  <steps>
-    <step order="1">Implement function calculate_total_shipped() that counts .md files in prds/completed/ directory</step>
-    <step order="2">Implement function calculate_total_failed() that counts .md files in prds/failed/ directory if it exists, returns 0 if directory doesn't exist</step>
-    <step order="3">Implement function calculate_success_rate() that computes: shipped / (shipped + failed) * 100, returns percentage with 1 decimal place (e.g., "94.1%"), handles division by zero</step>
-    <step order="4">Implement function calculate_average_duration() that averages all PROJECT_DURATION values that are not "—", converts to common unit (hours), returns "—" if insufficient data (less than 3 projects with duration)</step>
-    <step order="5">Implement function sort_projects_by_date() that sorts all projects by PROJECT_DATE in reverse chronological order (newest first), handles "—" dates by sorting them to end</step>
-    <step order="6">Implement function identify_top_5_recent() that takes sorted project list and returns first 5 project names (or fewer if less than 5 total projects)</step>
-    <step order="7">Create global variables to store calculated metrics: TOTAL_SHIPPED, TOTAL_FAILED, SUCCESS_RATE, AVG_DURATION, SORTED_PROJECTS (array), TOP_5_PROJECTS (array)</step>
-    <step order="8">Add function calls in main script flow: after extraction loop completes, call all calculation functions and populate global variables</step>
-    <step order="9">Add debug output showing calculated aggregate metrics and top 5 project names</step>
-    <step order="10">Test calculations: verify totals match manual count of prds/completed/ and prds/failed/, verify success rate calculation, verify top 5 projects are actually the most recent by date</step>
-  </steps>
-
-  <verification>
-    <check type="manual">Run script and verify TOTAL_SHIPPED matches manual count of files in prds/completed/ (should be 32)</check>
-    <check type="manual">Verify SUCCESS_RATE calculation: manually count failed projects, compute expected percentage, compare to script output</check>
-    <check type="manual">Verify TOP_5_PROJECTS list contains the 5 most recently shipped projects by checking their ship dates</check>
-    <check type="manual">Verify projects with "—" dates are excluded from top 5 or sorted to end of SORTED_PROJECTS list</check>
-  </verification>
-
-  <dependencies>
-    <!-- Independent task (wave 1) - can run in parallel with phase-1-task-1, though logically builds on it -->
-  </dependencies>
-
-  <commit-message>feat(scripts): add aggregate metrics and sorting logic
-
-Implement calculation functions for scoreboard statistics:
-- Total shipped/failed project counts
-- Success rate percentage
-- Average pipeline duration
-- Top 5 most recent projects identification
-- Reverse chronological sorting
-
-All calculations handle missing data ("—") gracefully.
-
-Addresses: REQ-6, REQ-8, REQ-10
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+  <commit-message>N/A - verification task only, no code changes</commit-message>
 </task-plan>
 
 ---
 
-### Wave 2 (Parallel, after Wave 1) — Markdown Generation
-
-**Focus**: Generate markdown sections using extracted and calculated data
-
-<task-plan id="phase-1-task-3" wave="2">
-  <title>Generate Core Metrics & Summary Table Sections</title>
-  <requirement>REQ-11, REQ-12, REQ-15: Generate SCOREBOARD.md header with aggregate metrics and summary table (all projects, 5 columns) using raw brand voice</requirement>
+<task-plan id="phase-1-task-4" wave="1">
+  <title>Research Sunrise Yoga configuration and plugin registration</title>
+  <requirement>R2.1, R2.2 - Understand how to register the membership plugin in Sunrise Yoga's Astro config</requirement>
   <description>
-    Build markdown generation functions for the first two sections of SCOREBOARD.md:
-
-    1. Header section with agency branding and core metrics (Total Shipped, Total Failed, Success Rate, Average Duration)
-    2. Summary table with all projects (one row per project, 5 columns: Project Name linked, Ship Date, QA Verdict, Board Score, Deliverables linked)
-
-    Implements raw brand voice per Decision 1.4: use exact verdicts "PASS on first try", "BLOCK (X cycles)", "REJECT" — no marketing speak. All missing data displayed as "—".
-
-    Target: ~40 lines for this section (32 project rows + headers + metrics).
+    Read Sunrise Yoga's astro.config.mjs to understand the current emdash configuration and plugin
+    registration pattern. Locate the membership plugin descriptor (plugins/membership/src/index.ts)
+    to determine the correct import path and function name. Verify the plugin follows Emdash's
+    descriptor pattern as documented in EMDASH-GUIDE.md section 6.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/scripts/update-scoreboard.sh" reason="Add markdown generation functions to script created in wave 1" />
-    <file path="/home/agent/shipyard-ai/prds/scoreboard-update.md" reason="PRD lines 26-48 provide template for SCOREBOARD.md structure and table format" />
-    <file path="/home/agent/shipyard-ai/rounds/scoreboard-update/decisions.md" reason="Decision 1.4 defines raw brand voice requirements; Decision 1.1 defines product name 'Scoreboard'; Decision 2 defines 5-column summary table structure" />
-    <file path="/home/agent/shipyard-ai/SCOREBOARD.md" reason="Existing scoreboard file (may have old content) — will be overwritten with new generated content" />
-    <file path="/home/agent/shipyard-ai/.planning/requirements-analysis.md" reason="REQ-11, REQ-12, REQ-15 with acceptance criteria for markdown format and brand voice" />
+    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs" reason="Target configuration file where plugin needs to be registered" />
+    <file path="/home/agent/shipyard-ai/plugins/membership/src/index.ts" reason="Plugin descriptor with registration metadata" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6 - Plugin System registration documentation" />
+    <file path="/home/agent/shipyard-ai/plugins/membership/package.json" reason="Package exports and module metadata" />
   </context>
 
   <steps>
-    <step order="1">Implement function generate_header() that outputs markdown with title "# Shipyard AI — Scoreboard" (per Decision 1.1) and agency metadata</step>
-    <step order="2">Implement function generate_core_metrics() that outputs bulleted list or table showing: Total Shipped (from TOTAL_SHIPPED), Total Failed (from TOTAL_FAILED), Success Rate (from SUCCESS_RATE), Average Pipeline Duration (from AVG_DURATION or "—")</step>
-    <step order="3">Implement function generate_summary_table_header() that outputs markdown table header with 5 columns: "| Project | Shipped | QA | Board | Deliverables |" plus separator row</step>
-    <step order="4">Implement function generate_summary_table_row(project) that creates one table row with: project name as markdown link to prds/completed/{project}.md, ship date (PROJECT_DATE), QA verdict (PROJECT_QA with raw language), board score (PROJECT_BOARD), deliverables link (PROJECT_DELIVERABLES)</step>
-    <step order="5">Ensure QA verdict formatting follows Decision 1.4 brand voice: output exactly "PASS on first try", "BLOCK (X cycles)", "REJECT", or "—" — validate no marketing phrases like "Successfully validated"</step>
-    <step order="6">Implement function generate_summary_table() that iterates through SORTED_PROJECTS array (reverse chronological order) and calls generate_summary_table_row() for each project</step>
-    <step order="7">Create function generate_metrics_and_summary_section() that combines header + core metrics + summary table into single markdown block</step>
-    <step order="8">Add output redirection to write this section to temporary file or accumulate in variable for final SCOREBOARD.md assembly</step>
-    <step order="9">Test output: verify markdown table syntax is valid (correct number of pipes, proper alignment), verify all 32 projects appear as rows, verify sorting is newest-first</step>
-    <step order="10">Validate brand voice: grep output for forbidden marketing terms ("successfully validated", "iterative refinement", "strategic alignment") — script should error if found</step>
+    <step order="1">Read /home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs to understand current emdash() integration</step>
+    <step order="2">Note the database binding (d1({ binding: "DB" })) and storage binding (r2({ binding: "MEDIA" }))</step>
+    <step order="3">Check if a plugins array exists in the emdash configuration</step>
+    <step order="4">Read /home/agent/shipyard-ai/plugins/membership/src/index.ts to find the plugin descriptor function</step>
+    <step order="5">Verify the descriptor exports a function (likely `membershipPlugin()`)</step>
+    <step order="6">Check package.json exports to understand import path (@shipyard/membership vs relative path)</step>
+    <step order="7">Review EMDASH-GUIDE.md section 6 "Registering Plugins in astro.config.mjs" for the correct pattern</step>
+    <step order="8">Document the exact import statement and registration line needed</step>
   </steps>
 
   <verification>
-    <check type="manual">Run script and inspect generated markdown — verify table renders correctly in GitHub markdown preview</check>
-    <check type="manual">Count rows in summary table: should be 32 (one per completed project)</check>
-    <check type="manual">Verify QA column uses only: "PASS on first try", "BLOCK (X cycles)", "REJECT", or "—" (no other variants)</check>
-    <check type="manual">Verify board scores are in range 0-10 or "—", no other values</check>
-    <check type="manual">Verify all project links point to /prds/completed/{project}.md format</check>
-    <check type="manual">Verify deliverables links point to /deliverables/{project}/ format or show "—"</check>
-    <check type="manual">Verify sorting: first row is most recent project by ship date</check>
+    <check type="manual">Confirmed Sunrise Yoga's current emdash configuration structure</check>
+    <check type="manual">Located membership plugin descriptor function name</check>
+    <check type="manual">Determined correct import path for the plugin</check>
+    <check type="manual">Documented registration pattern matching Emdash conventions</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Requires PROJECT_* associative arrays populated with extracted data" />
-    <depends-on task-id="phase-1-task-2" reason="Requires SORTED_PROJECTS array and calculated aggregate metrics (TOTAL_SHIPPED, SUCCESS_RATE, etc.)" />
+    <!-- No dependencies - this is a Wave 1 research task -->
   </dependencies>
 
-  <commit-message>feat(scripts): generate core metrics and summary table sections
-
-Add markdown generation functions for:
-- Header with agency branding and "Scoreboard" title (Decision 1.1)
-- Core metrics: total shipped, failed, success rate, avg duration
-- Summary table: all 32 projects with 5 columns (name, date, QA, board, deliverables)
-
-Implements raw brand voice (Decision 1.4): PASS/BLOCK/REJECT only, no marketing speak.
-Reverse chronological sorting per Decision 2.
-
-Addresses: REQ-11, REQ-12, REQ-15
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-
-<task-plan id="phase-1-task-4" wave="2">
-  <title>Generate Expanded Details Section (Top 5 Projects)</title>
-  <requirement>REQ-13, REQ-15: Generate expanded context section for top 5 most recent projects with QA notes, board feedback, and deliverables list using raw brand voice</requirement>
-  <description>
-    Build markdown generation for the expanded details section that provides deep context on the 5 most recent projects. For each of the top 5 projects, generate:
-    - Project name as H2 heading
-    - Context: What was built (extract from essence.md or PRD)
-    - QA Notes: Key blockers, iteration count, final verdict (extract from qa-pass-*.md files)
-    - Board Feedback: Score rationale, strategic notes (extract from board-verdict.md)
-    - Deliverables: Bulleted list with link to deliverables/ directory (no file enumeration per Decision 2)
-
-    Maintains raw brand voice throughout. Target: ~25 lines per project × 5 projects = ~125 lines total for this section.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/scripts/update-scoreboard.sh" reason="Add expanded details generation functions to script" />
-    <file path="/home/agent/shipyard-ai/rounds/" reason="Source for essence.md, qa-pass-*.md, board-verdict.md files to extract expanded context" />
-    <file path="/home/agent/shipyard-ai/rounds/scoreboard-update/decisions.md" reason="Decision 1.2 specifies top 5 projects get expanded details (~25 lines each); Decision 2 specifies no file enumeration in deliverables" />
-    <file path="/home/agent/shipyard-ai/.planning/requirements-analysis.md" reason="REQ-13 with detailed acceptance criteria for expanded details structure and content" />
-  </context>
-
-  <steps>
-    <step order="1">Implement function extract_project_context(project) that reads rounds/{project}/essence.md and extracts 1-2 sentence summary of what was built, fallback to reading PRD if essence.md doesn't exist, return "—" if neither available</step>
-    <step order="2">Implement function extract_qa_notes(project) that reads rounds/{project}/qa-pass-*.md files and extracts: (a) key blockers mentioned, (b) number of BLOCK cycles if any, (c) final verdict with reasoning. Return 2-4 bullet points or "—" if no QA files found.</step>
-    <step order="3">Implement function extract_board_feedback(project) that reads rounds/{project}/board-verdict.md and extracts: (a) overall verdict (HOLD/PROCEED/REJECT), (b) aggregate score, (c) 1-2 key concerns or highlights from board members. Return 2-3 bullet points or "—" if no board verdict found.</step>
-    <step order="4">Implement function extract_deliverables_summary(project) that outputs single bullet: "- [View deliverables](/deliverables/{project}/)" if directory exists, or "- No deliverables directory" if not. DO NOT enumerate files (per Decision 2, WONT-3).</step>
-    <step order="5">Implement function generate_expanded_detail(project) that combines: H2 heading with project name, "Context:" section with extract_project_context() output, "QA Notes:" section with extract_qa_notes() output, "Board Feedback:" section with extract_board_feedback() output, "Deliverables:" section with extract_deliverables_summary() output</step>
-    <step order="6">Ensure all extracted text maintains raw brand voice: preserve original PASS/BLOCK/REJECT language from QA files, preserve HOLD/PROCEED/REJECT from board files, no marketing sanitization</step>
-    <step order="7">Implement function generate_expanded_details_section() that iterates through TOP_5_PROJECTS array and calls generate_expanded_detail() for each, with H1 heading "## Expanded Details (Recent Projects)" at top</step>
-    <step order="8">Add line count estimation: each project detail should target ~25 lines; log warning if any project exceeds 30 lines (indicates too verbose extraction)</step>
-    <step order="9">Test on actual top 5 projects: verify essence.md, QA files, board-verdict.md are parsed correctly and output makes sense</step>
-    <step order="10">Validate no file enumeration: grep output for patterns like "deliverables/{project}/file.md" (should not exist, only directory links allowed)</step>
-  </steps>
-
-  <verification>
-    <check type="manual">Run script and verify expanded details section contains exactly 5 project subsections (or fewer if less than 5 total projects)</check>
-    <check type="manual">Verify each project subsection has all 4 components: Context, QA Notes, Board Feedback, Deliverables</check>
-    <check type="manual">Verify total line count for expanded details section is approximately 125 lines (5 projects × ~25 lines)</check>
-    <check type="manual">Verify no individual project subsection exceeds 30 lines</check>
-    <check type="manual">Verify deliverables section only links to directory, does not enumerate individual files</check>
-    <check type="manual">Spot-check 2 projects: manually read their round files and verify extracted context/QA/board feedback is accurate</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Requires TOP_5_PROJECTS array with identified top 5 recent projects" />
-  </dependencies>
-
-  <commit-message>feat(scripts): generate expanded details for top 5 projects
-
-Add markdown generation for expanded context section with:
-- Project context from essence.md
-- QA notes and blockers from qa-pass-*.md files
-- Board feedback and scores from board-verdict.md
-- Deliverables directory link (no file enumeration)
-
-Covers top 5 most recent projects per Decision 1.2.
-Maintains raw brand voice throughout (Decision 1.4).
-Target: ~25 lines per project, ~125 lines total.
-
-Addresses: REQ-13, REQ-15
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+  <commit-message>N/A - research task only, no code changes</commit-message>
 </task-plan>
 
 ---
 
-### Wave 3 (After Wave 2) — Assembly, Validation & Finalization
+### Wave 2 (Parallel, after Wave 1) — Code Modifications
 
-**Focus**: Combine all sections, validate output, update related files, commit
+These tasks modify code but can run in parallel as they affect different files.
 
-<task-plan id="phase-1-task-5" wave="3">
-  <title>Assemble Complete SCOREBOARD.md & Validate</title>
-  <requirement>REQ-14, REQ-18: Combine all markdown sections into final SCOREBOARD.md file, validate formatting and data accuracy, ensure total length ≤200 lines (target ~165)</requirement>
+---
+
+<task-plan id="phase-1-task-2" wave="2">
+  <title>Remove banned patterns from approve and revoke routes</title>
+  <requirement>R1.2, R1.3 - Eliminate 4 violations by removing rc.user guard blocks from admin routes</requirement>
   <description>
-    Create the main orchestration function that assembles the complete SCOREBOARD.md file by combining:
-    1. Header + Core Metrics section (from phase-1-task-3)
-    2. Summary Table section (from phase-1-task-3)
-    3. Expanded Details section (from phase-1-task-4)
-    4. Closing metadata/notes if needed
-
-    Write the assembled content to /home/agent/shipyard-ai/SCOREBOARD.md (overwrite existing file).
-
-    Validate the output:
-    - Total line count ≤200 lines (target ~165 per Decision 1.8)
-    - Markdown syntax valid (renders correctly on GitHub)
-    - All data accurate (spot-check 5 random projects)
-    - No projects missing from summary table
-    - Brand voice compliance (no marketing speak)
-
-    This task represents the final output generation and quality validation before commit.
+    Remove the redundant admin authentication checks from the approve and revoke routes in
+    plugins/membership/src/sandbox-entry.ts. Each route contains a 4-line block checking rc.user
+    and throwing new Response errors. These checks are unnecessary because Emdash authenticates
+    requests before they reach plugin route handlers (per EMDASH-GUIDE.md section 6). Removing
+    these blocks eliminates all 4 banned pattern violations.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/scripts/update-scoreboard.sh" reason="Add main assembly and validation functions to complete the script" />
-    <file path="/home/agent/shipyard-ai/SCOREBOARD.md" reason="Target output file — will be overwritten with newly generated content" />
-    <file path="/home/agent/shipyard-ai/rounds/scoreboard-update/decisions.md" reason="Decision 1.8 specifies target length ~165 lines (max 200); Decision 1.9 requires validation of no guessed data" />
-    <file path="/home/agent/shipyard-ai/.planning/requirements-analysis.md" reason="REQ-14, REQ-18 with acceptance criteria for final assembly and validation" />
+    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Target file containing the 4 violations to remove" />
+    <file path="/home/agent/shipyard-ai/deliverables/membership-fix/sandbox-entry.ts" reason="Clean reference showing violations already removed" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Documents that route handlers receive authenticated context" />
+    <file path="/home/agent/shipyard-ai/prds/membership-v2.md" reason="PRD Phase 1 with exact violation patterns to remove" />
   </context>
 
   <steps>
-    <step order="1">Implement function assemble_scoreboard() that combines output from: generate_metrics_and_summary_section() + generate_expanded_details_section() into single markdown string</step>
-    <step order="2">Add optional footer section with metadata: generation timestamp, script version, link to update instructions</step>
-    <step order="3">Write assembled markdown to /home/agent/shipyard-ai/SCOREBOARD.md using cat or echo redirection (overwrite mode)</step>
-    <step order="4">Implement function validate_line_count() that counts total lines in SCOREBOARD.md, warns if exceeds 200, errors if exceeds 250</step>
-    <step order="5">Implement function validate_markdown_syntax() that checks for: balanced table pipes, no broken links (all /prds/completed/{project}.md files exist), no empty required sections</step>
-    <step order="6">Implement function validate_brand_voice() that greps SCOREBOARD.md for forbidden marketing terms: "successfully validated", "iterative refinement", "strategic alignment", "TBD", "N/A", "Unknown" — error if any found (should be "PASS"/"BLOCK"/"REJECT"/"—" only)</step>
-    <step order="7">Implement function spot_check_accuracy() that randomly selects 5 projects and compares SCOREBOARD.md data against source files (rounds/{project}/). Check: QA verdict matches, board score matches, ship date reasonable.</step>
-    <step order="8">Create main() function that orchestrates full script execution: extract_all_data() → calculate_metrics() → generate_markdown() → assemble_scoreboard() → validate_all() → output success message</step>
-    <step order="9">Add comprehensive error handling: if any validation fails, print detailed error report and exit 1 (non-zero). If all validations pass, print success summary with stats (projects processed, line count, missing data count)</step>
-    <step order="10">Run full script end-to-end: ./scripts/update-scoreboard.sh should complete successfully and generate valid SCOREBOARD.md</step>
-    <step order="11">Manually inspect generated SCOREBOARD.md: verify it renders correctly in markdown viewer, verify data looks accurate, verify ~165 line target met</step>
-    <step order="12">Test idempotency: run script twice, diff the two outputs — should be identical (no random variation)</step>
+    <step order="1">Read plugins/membership/src/sandbox-entry.ts to locate the approve route (around line 1233)</step>
+    <step order="2">Identify the 4-line admin check block: `const adminUser = rc.user as Record... if (!adminUser || !adminUser.isAdmin) { throw new Response(...) }`</step>
+    <step order="3">Use Edit tool to remove the entire 4-line block from the approve route</step>
+    <step order="4">Locate the revoke route (around line 1285)</step>
+    <step order="5">Identify the identical 4-line admin check block</step>
+    <step order="6">Use Edit tool to remove the entire 4-line block from the revoke route</step>
+    <step order="7">Save the file</step>
+    <step order="8">Verify no syntax errors were introduced by reading the modified sections</step>
   </steps>
 
   <verification>
-    <check type="build">./scripts/update-scoreboard.sh (should exit 0 on success)</check>
-    <check type="manual">Verify SCOREBOARD.md file exists at /home/agent/shipyard-ai/SCOREBOARD.md</check>
-    <check type="manual">Count lines in SCOREBOARD.md: wc -l SCOREBOARD.md (should be ≤200, ideally ~165)</check>
-    <check type="manual">Open SCOREBOARD.md in markdown preview — verify all tables render correctly, no syntax errors</check>
-    <check type="manual">Verify all 32 completed projects appear in summary table</check>
-    <check type="manual">Verify top 5 projects have expanded detail sections</check>
-    <check type="manual">Spot-check 5 random projects: compare summary table data to actual round files, verify accuracy</check>
-    <check type="manual">Run: grep -E "successfully|iterative|strategic|TBD|N/A|Unknown" SCOREBOARD.md (should return no matches)</check>
-    <check type="manual">Test idempotency: run script twice, diff outputs (should be identical)</check>
+    <check type="build">File has valid TypeScript syntax (no parsing errors)</check>
+    <check type="manual">Approve route no longer contains rc.user check</check>
+    <check type="manual">Revoke route no longer contains rc.user check</check>
+    <check type="manual">No other code blocks accidentally removed</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="Requires generate_metrics_and_summary_section() function completed" />
-    <depends-on task-id="phase-1-task-4" reason="Requires generate_expanded_details_section() function completed" />
+    <depends-on task-id="phase-1-task-1" reason="Must verify target file exists before modifying it" />
   </dependencies>
 
-  <commit-message>feat(scripts): assemble and validate complete SCOREBOARD.md
-
-Add main orchestration and validation functions:
-- Assemble all sections into complete SCOREBOARD.md
-- Validate line count (≤200 lines, target ~165)
-- Validate markdown syntax and table formatting
-- Validate brand voice compliance (no marketing speak)
-- Spot-check data accuracy (5 random projects)
-- Idempotency test (reproducible output)
-
-Script now generates complete, validated scoreboard from filesystem data.
-
-Addresses: REQ-14, REQ-18
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+  <commit-message>N/A - changes will be committed in phase-1-task-11 with all other modifications</commit-message>
 </task-plan>
+
+---
+
+<task-plan id="phase-1-task-5" wave="2">
+  <title>Register membership plugin in Sunrise Yoga config</title>
+  <requirement>R2.3, R2.4 - Add plugin import and registration to astro.config.mjs</requirement>
+  <description>
+    Add the membership plugin to Sunrise Yoga's Astro configuration. This involves importing the
+    plugin descriptor function and adding it to the emdash plugins array. The plugin registration
+    follows the pattern documented in EMDASH-GUIDE.md section 6: import the descriptor, call it
+    with any options, and include it in the plugins array passed to emdash().
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs" reason="Configuration file to modify" />
+    <file path="/home/agent/shipyard-ai/plugins/membership/src/index.ts" reason="Plugin descriptor function to import" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6 - Plugin registration pattern documentation" />
+    <file path="/home/agent/shipyard-ai/rounds/membership-v2/decisions.md" reason="Specifies zero-config requirement and plugin ID" />
+  </context>
+
+  <steps>
+    <step order="1">Read the current astro.config.mjs to identify the emdash integration section</step>
+    <step order="2">Add import statement at top of file: `import { membershipPlugin } from "../../plugins/membership/src/index.js";` (adjust path as needed)</step>
+    <step order="3">Locate the emdash() function call in the integrations array</step>
+    <step order="4">Add a plugins array to the emdash configuration if it doesn't exist: `plugins: [membershipPlugin()]`</step>
+    <step order="5">If plugins array already exists, append membershipPlugin() to it</step>
+    <step order="6">Save the file</step>
+    <step order="7">Verify syntax by attempting to import the config (or run npm run build in dry-run mode)</step>
+  </steps>
+
+  <verification>
+    <check type="build">astro.config.mjs has valid JavaScript syntax</check>
+    <check type="manual">Import statement added for membershipPlugin</check>
+    <check type="manual">Plugin registered in emdash plugins array</check>
+    <check type="build">npm run build succeeds (validates configuration)</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-4" reason="Must understand registration pattern before modifying config" />
+  </dependencies>
+
+  <commit-message>N/A - changes will be committed in phase-1-task-11 with all other modifications</commit-message>
+</task-plan>
+
+---
+
+### Wave 3 (Sequential, after Wave 2) — Verification & Testing
+
+These tasks must run sequentially after code modifications to verify the fixes worked.
+
+---
+
+<task-plan id="phase-1-task-3" wave="3">
+  <title>Verify all banned patterns eliminated</title>
+  <requirement>R1.4 - Confirm zero violations remain in the modified file</requirement>
+  <description>
+    Run grep commands to verify that all banned patterns have been successfully removed from
+    plugins/membership/src/sandbox-entry.ts. The file must have zero matches for rc.user,
+    throw new Response, and rc.pathParams patterns. This verification confirms the Wave 2
+    edits were successful and the file is ready for deployment.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Modified file to verify" />
+    <file path="/home/agent/shipyard-ai/prds/membership-v2.md" reason="PRD defines banned patterns to check" />
+  </context>
+
+  <steps>
+    <step order="1">Use Grep to search for rc.user pattern: `grep -c "rc\.user" plugins/membership/src/sandbox-entry.ts || echo 0`</step>
+    <step order="2">Verify result is 0</step>
+    <step order="3">Use Grep to search for throw new Response in admin context: `grep -n "throw new Response" plugins/membership/src/sandbox-entry.ts | grep -E "(approve|revoke)" || echo "No matches"`</step>
+    <step order="4">Verify no matches in approve or revoke routes</step>
+    <step order="5">Use Grep to search for rc.pathParams: `grep -c "rc\.pathParams" plugins/membership/src/sandbox-entry.ts || echo 0`</step>
+    <step order="6">Verify result is 0</step>
+    <step order="7">Run comprehensive check: `grep -c "throw new Response\|rc\.user\|rc\.pathParams" plugins/membership/src/sandbox-entry.ts || echo 0`</step>
+    <step order="8">Verify total count is 0</step>
+  </steps>
+
+  <verification>
+    <check type="test">grep "rc\.user" returns 0 matches</check>
+    <check type="test">grep "throw new Response.*approve\|revoke" returns no matches</check>
+    <check type="test">grep "rc\.pathParams" returns 0 matches</check>
+    <check type="test">Combined grep for all banned patterns returns 0</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-2" reason="Must complete code modifications before verification" />
+  </dependencies>
+
+  <commit-message>N/A - verification task only</commit-message>
+</task-plan>
+
+---
 
 <task-plan id="phase-1-task-6" wave="3">
-  <title>Update STATUS.md with Current Counts</title>
-  <requirement>REQ-16: Update STATUS.md to reflect current idle state with accurate project counts (total shipped, failed, success rate)</requirement>
+  <title>Verify KV namespace binding configuration</title>
+  <requirement>R2.5 - Confirm KV namespace is properly configured for plugin storage</requirement>
   <description>
-    Update the agency STATUS.md file with current statistics from the scoreboard extraction. This ensures STATUS.md reflects the same aggregate metrics as SCOREBOARD.md (single source of truth from extraction script).
-
-    Update or add fields for:
-    - Total projects shipped
-    - Total projects failed
-    - Success rate percentage
-    - Current pipeline state (IDLE or ACTIVE)
-
-    This task has SHOULD priority (not blocking for v1 MVP, but completes the PRD requirement).
+    Verify that Cloudflare KV namespace binding is configured for the membership plugin to store
+    member data, plans, and gating rules. Check both astro.config.mjs and wrangler.jsonc for KV
+    bindings. The plugin accesses KV via ctx.kv in the plugin context, so the binding must exist
+    for the plugin to function. Document the binding configuration or flag as missing.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/STATUS.md" reason="Target file to update with current project counts and success metrics" />
-    <file path="/home/agent/shipyard-ai/scripts/update-scoreboard.sh" reason="Source of calculated metrics (TOTAL_SHIPPED, TOTAL_FAILED, SUCCESS_RATE) to write to STATUS.md" />
-    <file path="/home/agent/shipyard-ai/prds/scoreboard-update.md" reason="PRD line 52 specifies updating STATUS.md with accurate current state counts" />
-    <file path="/home/agent/shipyard-ai/.planning/requirements-analysis.md" reason="REQ-16 (SHOULD priority) with acceptance criteria for STATUS.md update" />
+    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs" reason="May contain KV binding in emdash config" />
+    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/wrangler.jsonc" reason="Cloudflare Workers KV binding configuration" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5 - Deployment and KV configuration patterns" />
+    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Shows ctx.kv usage patterns" />
   </context>
 
   <steps>
-    <step order="1">Read current /home/agent/shipyard-ai/STATUS.md to understand existing format and fields</step>
-    <step order="2">Extend scripts/update-scoreboard.sh with function update_status_file() that modifies STATUS.md</step>
-    <step order="3">Update or add "total_shipped: {count}" field with TOTAL_SHIPPED value</step>
-    <step order="4">Update or add "total_failed: {count}" field with TOTAL_FAILED value (may be 0)</step>
-    <step order="5">Update or add "success_rate: {percentage}" field with SUCCESS_RATE value</step>
-    <step order="6">Update "state:" field to reflect current pipeline state (IDLE if no active projects, ACTIVE otherwise)</step>
-    <step order="7">Preserve other fields in STATUS.md (don't remove existing content unrelated to project counts)</step>
-    <step order="8">Add timestamp or last_updated field showing when STATUS.md was updated</step>
-    <step order="9">Test: run script and verify STATUS.md is updated correctly with matching numbers from SCOREBOARD.md</step>
-    <step order="10">Verify STATUS.md remains valid YAML or markdown format (don't break existing parsers)</step>
+    <step order="1">Read examples/sunrise-yoga/wrangler.jsonc to check for kv_namespaces binding</step>
+    <step order="2">Look for binding like `kv_namespaces = [{ binding = "KV", id = "..." }]`</step>
+    <step order="3">If found, note the binding name (e.g., "KV")</step>
+    <step order="4">Read astro.config.mjs to see if KV binding is passed to emdash()</step>
+    <step order="5">Check if plugin context automatically provides ctx.kv or if explicit binding needed</step>
+    <step order="6">Review EMDASH-GUIDE.md section on KV storage for plugins</step>
+    <step order="7">Document findings: either "KV binding configured" or "KV binding missing - needs setup"</step>
+    <step order="8">If missing, flag as blocker and document required wrangler.jsonc changes</step>
   </steps>
 
   <verification>
-    <check type="manual">Run ./scripts/update-scoreboard.sh and verify STATUS.md file is updated</check>
-    <check type="manual">Compare metrics in STATUS.md vs SCOREBOARD.md — should match exactly (total_shipped, total_failed, success_rate)</check>
-    <check type="manual">Verify STATUS.md remains parseable (if YAML) or readable (if markdown)</check>
-    <check type="manual">Verify other fields in STATUS.md are preserved (not deleted by update)</check>
+    <check type="manual">KV namespace binding exists in wrangler.jsonc OR documented as auto-configured</check>
+    <check type="manual">Binding name documented for reference</check>
+    <check type="manual">If missing, blocker flagged with remediation steps</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Requires calculated aggregate metrics (TOTAL_SHIPPED, TOTAL_FAILED, SUCCESS_RATE)" />
+    <depends-on task-id="phase-1-task-5" reason="Config must be updated before verifying bindings" />
   </dependencies>
 
-  <commit-message>feat(scripts): update STATUS.md with current project counts
-
-Extend scoreboard script to update STATUS.md with:
-- Total shipped projects
-- Total failed projects
-- Success rate percentage
-- Last updated timestamp
-
-Ensures STATUS.md reflects same metrics as SCOREBOARD.md.
-
-Addresses: REQ-16
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+  <commit-message>N/A - verification task only</commit-message>
 </task-plan>
+
+---
 
 <task-plan id="phase-1-task-7" wave="3">
-  <title>Commit and Push SCOREBOARD.md</title>
-  <requirement>REQ-19: Commit generated SCOREBOARD.md, extraction script, and STATUS.md to repository and push to main</requirement>
+  <title>Execute smoke tests 1-3: Admin page, registration, status lookup</title>
+  <requirement>R3.1, R3.2, R3.3, R3.4 - Verify core plugin endpoints work end-to-end</requirement>
   <description>
-    Final task: commit all deliverables from this phase to git and push to origin/main. This makes the scoreboard publicly visible and completes the PRD success criteria.
-
-    Files to commit:
-    - /home/agent/shipyard-ai/scripts/update-scoreboard.sh (new extraction script)
-    - /home/agent/shipyard-ai/SCOREBOARD.md (newly generated scoreboard)
-    - /home/agent/shipyard-ai/STATUS.md (updated counts)
-
-    This task has SHOULD priority (not technically blocking, but completes the "committed and pushed" success criterion from PRD line 64).
+    Start the Sunrise Yoga dev server and run the first three smoke tests: admin page load,
+    member registration, and status lookup. These tests verify that the plugin is properly
+    registered, routes are accessible, and basic member operations work. Test 3 specifically
+    checks for double-encoding issues (a known past problem with KV serialization).
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/scripts/update-scoreboard.sh" reason="New file to commit — automated extraction script" />
-    <file path="/home/agent/shipyard-ai/SCOREBOARD.md" reason="Modified file to commit — newly generated scoreboard" />
-    <file path="/home/agent/shipyard-ai/STATUS.md" reason="Modified file to commit — updated with current counts" />
-    <file path="/home/agent/shipyard-ai/.git/" reason="Git repository for commit and push operations" />
-    <file path="/home/agent/shipyard-ai/prds/scoreboard-update.md" reason="PRD line 64 success criterion: 'Committed and pushed'" />
+    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs" reason="Contains plugin registration to test" />
+    <file path="/home/agent/shipyard-ai/prds/membership-v2.md" reason="PRD Phase 3 defines exact curl commands and expected results" />
+    <file path="/home/agent/shipyard-ai/rounds/membership-v2/decisions.md" reason="Test matrix with expected outputs" />
   </context>
 
   <steps>
-    <step order="1">Run git status to verify working tree state and see all modified/new files</step>
-    <step order="2">Run git add scripts/update-scoreboard.sh SCOREBOARD.md STATUS.md to stage all deliverables</step>
-    <step order="3">Run git status again to confirm all expected files are staged</step>
-    <step order="4">Create comprehensive commit message following conventional commits format with co-author attribution</step>
-    <step order="5">Run git commit with multi-line message describing: (1) Added automated scoreboard extraction script, (2) Generated SCOREBOARD.md with 32 projects, hybrid format, raw verdicts, (3) Updated STATUS.md with current counts, (4) Addresses PRD scoreboard-update and decisions.md locked requirements</step>
-    <step order="6">Run git log -1 to verify commit was created successfully</step>
-    <step order="7">Run git push origin main (or current branch if not on main)</step>
-    <step order="8">Verify push succeeded (no errors, all objects uploaded)</step>
-    <step order="9">Optional: visit GitHub repo in browser and verify SCOREBOARD.md renders correctly with all tables and links</step>
+    <step order="1">Start Sunrise Yoga dev server: `cd examples/sunrise-yoga && npm run dev` (run in background)</step>
+    <step order="2">Wait 10 seconds for server to fully start</step>
+    <step order="3">Run Test 1 - Admin page load: `curl -s http://localhost:4321/_emdash/api/plugins/membership/admin -H "Content-Type: application/json" -d '{"type":"page_load"}'`</step>
+    <step order="4">Verify response contains `"blocks":[...]` and no error fields, HTTP 200</step>
+    <step order="5">Run Test 2 - Member registration: `curl -s -X POST http://localhost:4321/_emdash/api/plugins/membership/register -H "Content-Type: application/json" -d '{"email":"test@example.com","plan":"basic"}'`</step>
+    <step order="6">Verify response is `{"success":true}` or similar success indicator, HTTP 200</step>
+    <step order="7">Run Test 3 - Status lookup: `curl -s http://localhost:4321/_emdash/api/plugins/membership/status -H "Content-Type: application/json" -d '{"email":"test@example.com"}'`</step>
+    <step order="8">Verify response is JSON object with email, plan, status fields (NOT a string, NOT double-encoded)</step>
+    <step order="9">Check for double-encoding: response should be `{"email":"test@example.com",...}` NOT `"{\"email\":\"test@example.com\",...}"`</step>
+    <step order="10">Document actual curl output for all 3 tests</step>
   </steps>
 
   <verification>
-    <check type="manual">Run git log -1 and verify commit message is comprehensive and accurate</check>
-    <check type="manual">Run git status — should show "nothing to commit, working tree clean"</check>
-    <check type="manual">Run git log --oneline -5 to confirm commit appears in history</check>
-    <check type="manual">Visit repository on GitHub and verify: (1) SCOREBOARD.md file visible at repo root, (2) Markdown renders correctly, (3) All tables display properly, (4) Links are clickable</check>
-    <check type="manual">Visit /scripts/update-scoreboard.sh on GitHub and verify it's marked as executable</check>
+    <check type="test">Test 1 returns blocks array, no errors</check>
+    <check type="test">Test 2 returns success response</check>
+    <check type="test">Test 3 returns properly typed MemberRecord object</check>
+    <check type="test">Test 3 response is NOT double-encoded JSON string</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="Requires SCOREBOARD.md to be generated and validated before committing" />
-    <depends-on task-id="phase-1-task-6" reason="Requires STATUS.md to be updated before committing (if task-6 completed)" />
+    <depends-on task-id="phase-1-task-3" reason="Code must be violation-free before testing" />
+    <depends-on task-id="phase-1-task-6" reason="KV binding must be verified before testing storage operations" />
   </dependencies>
 
-  <commit-message>feat: add automated scoreboard with complete project history
-
-Add automated extraction script and generated SCOREBOARD.md:
-
-- scripts/update-scoreboard.sh: Automated data extraction from prds/ and rounds/
-  - Extracts QA verdicts, board scores, ship dates, pipeline duration
-  - Calculates aggregate metrics (32 shipped, success rate, avg duration)
-  - Generates hybrid format: compact summary + top 5 expanded details
-  - Handles missing data gracefully with "—" (never guesses)
-  - Idempotent, completes in <5 minutes
-
-- SCOREBOARD.md: Complete project history (32 projects)
-  - Summary table: all projects with QA/board/deliverables (reverse chronological)
-  - Expanded details: top 5 recent projects with context/QA notes/board feedback
-  - Raw brand voice: "PASS on first try", "BLOCK (X cycles)", "REJECT" (no marketing speak)
-  - Target length: ~165 lines (Decision 1.8)
-
-- STATUS.md: Updated with current aggregate metrics
-
-Implements decisions from rounds/scoreboard-update/decisions.md:
-- Decision 1.2: Hybrid format (compact + expanded)
-- Decision 1.4: Raw verdicts (Steve wins)
-- Decision 1.5: Automated extraction (Elon wins)
-- Decision 1.6: Round timestamps (no daemon log parsing)
-- Decision 1.9: "—" for missing data (unanimous)
-
-Addresses PRD: /home/agent/shipyard-ai/prds/scoreboard-update.md
-Success criteria: All 32 projects visible, accurate data, committed & pushed
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+  <commit-message>N/A - testing task only</commit-message>
 </task-plan>
 
 ---
 
-## Risk Notes
+<task-plan id="phase-1-task-8" wave="3">
+  <title>Execute smoke tests 4-5: Block Kit admin actions</title>
+  <requirement>R3.5 - Verify admin UI Block Kit handlers return valid responses</requirement>
+  <description>
+    Run smoke tests for the admin Block Kit action handlers (view members, view plans). These
+    tests verify that the plugin's admin UI can render member lists and plan configurations
+    using Emdash's Block Kit JSON UI format. Each action should return a blocks array with
+    proper structure.
+  </description>
 
-### Risk 5.1: Inconsistent Data Formats (HIGH likelihood, MEDIUM impact)
-**Concern**: QA verdicts and board scores are stored inconsistently across round files (freeform markdown). Extraction logic may fail to find data in some projects.
+  <context>
+    <file path="/home/agent/shipyard-ai/prds/membership-v2.md" reason="PRD Phase 3 Test 5 defines curl commands" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6 - Block Kit format documentation" />
+  </context>
 
-**Mitigation**:
-- phase-1-task-1 implements multiple fallback grep patterns for QA verdicts (check qa-pass-*.md, final-verdict.md, board-verdict.md)
-- phase-1-task-1 implements multiple fallback patterns for board scores (check for "Average:", "Aggregate Score:", numeric patterns)
-- Liberal use of "—" when data not found (fail gracefully, don't block extraction)
-- phase-1-task-5 includes spot-check validation to identify projects with extraction failures
+  <steps>
+    <step order="1">Ensure dev server is still running from phase-1-task-7</step>
+    <step order="2">Run Test 4 - View members: `curl -s http://localhost:4321/_emdash/api/plugins/membership/admin -H "Content-Type: application/json" -d '{"type":"action","action_id":"view_members"}'`</step>
+    <step order="3">Verify response contains `"blocks":[...]` with member data, HTTP 200</step>
+    <step order="4">Run Test 5 - View plans: `curl -s http://localhost:4321/_emdash/api/plugins/membership/admin -H "Content-Type: application/json" -d '{"type":"action","action_id":"view_plans"}'`</step>
+    <step order="5">Verify response contains `"blocks":[...]` with plan configurations, HTTP 200</step>
+    <step order="6">Document actual curl output for both tests</step>
+  </steps>
 
-**Owner**: Executor of phase-1-task-1
+  <verification>
+    <check type="test">Test 4 returns valid Block Kit JSON with member list blocks</check>
+    <check type="test">Test 5 returns valid Block Kit JSON with plan list blocks</check>
+    <check type="test">Both responses have HTTP 200 status</check>
+  </verification>
 
----
+  <dependencies>
+    <depends-on task-id="phase-1-task-7" reason="Must run after basic tests and dev server is confirmed running" />
+  </dependencies>
 
-### Risk 5.5: Pipeline Duration Data Unavailable (MEDIUM likelihood, LOW impact)
-**Concern**: Round file timestamps may be missing or inconsistent, making duration calculation impossible for some projects.
-
-**Mitigation**:
-- phase-1-task-1 uses file modification timestamps (mtime) as approximate duration source
-- Accept "—" as valid data point when timestamps insufficient
-- Don't block v1 on complete duration data (Decision 1.6 explicitly defers daemon log parsing to v2)
-- Average duration calculation in phase-1-task-2 excludes "—" values (doesn't corrupt average)
-
-**Owner**: Executor of phase-1-task-1, phase-1-task-2
-
----
-
-### Risk 5.4: Scope Creep to 5,000-Line Monster (MEDIUM likelihood, HIGH impact)
-**Concern**: Engineer adds "just one more metric" and scoreboard becomes unreadable database dump.
-
-**Mitigation**:
-- Decision 1.8 locks v1 format at ~165 lines (40 summary + 125 expanded)
-- phase-1-task-5 includes line count validation (errors if >200 lines)
-- Decision 2 explicitly cuts: agent count, daemon logs, file enumeration, charts (WONT-1 through WONT-5)
-- This plan enforces constraint by only implementing locked v1 requirements
-
-**Owner**: Plan reviewer (reject any task additions not in requirements-analysis.md)
+  <commit-message>N/A - testing task only</commit-message>
+</task-plan>
 
 ---
 
-## Execution Timeline Estimate
+<task-plan id="phase-1-task-9" wave="3">
+  <title>Execute final smoke test: Banned patterns recheck</title>
+  <requirement>R3.6 - Final verification that no banned patterns exist in deployed code</requirement>
+  <description>
+    Run a comprehensive final check for all banned patterns in the source file. This is a safety
+    verification to ensure no patterns were accidentally reintroduced during earlier edits or
+    that additional violations weren't discovered during testing. This is the last gate before
+    documentation and deployment.
+  </description>
 
-**Total estimated time**: 3-4 hours for complete implementation and validation
+  <context>
+    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="File to verify" />
+    <file path="/home/agent/shipyard-ai/prds/membership-v2.md" reason="PRD Phase 3 Test 6 defines comprehensive grep pattern" />
+  </context>
 
-| Wave | Tasks | Estimated Time | Parallelizable |
-|------|-------|----------------|----------------|
-| Wave 1 | phase-1-task-1, phase-1-task-2 | 90-120 minutes | Yes (2 tasks) |
-| Wave 2 | phase-1-task-3, phase-1-task-4 | 60-90 minutes | Yes (2 tasks) |
-| Wave 3 | phase-1-task-5, phase-1-task-6, phase-1-task-7 | 45-60 minutes | Partial (task-6 parallel with task-5) |
+  <steps>
+    <step order="1">Run comprehensive banned pattern check: `grep -c "throw new Response\|rc\.user\|rc\.pathParams\|JSON\.stringify.*kv\|kv\.set.*JSON\.stringify" plugins/membership/src/sandbox-entry.ts || echo 0`</step>
+    <step order="2">Verify result is 0</step>
+    <step order="3">If non-zero, identify which pattern matched and flag as CRITICAL BLOCKER</step>
+    <step order="4">Document test result (PASS if 0, FAIL if >0)</step>
+  </steps>
 
-**Critical Path**: task-1 → task-2 → task-3 → task-5 → task-7 (required for MVP)
+  <verification>
+    <check type="test">Comprehensive grep returns 0 matches for all banned patterns</check>
+    <check type="test">No rc.user references</check>
+    <check type="test">No throw new Response in admin routes</check>
+    <check type="test">No rc.pathParams references</check>
+    <check type="test">No manual JSON.stringify KV double-encoding</check>
+  </verification>
 
-**Optional Path**: task-6 (STATUS.md update) is SHOULD priority, not blocking
+  <dependencies>
+    <depends-on task-id="phase-1-task-8" reason="Run as final verification after all other tests pass" />
+  </dependencies>
+
+  <commit-message>N/A - testing task only</commit-message>
+</task-plan>
 
 ---
 
-## Phase Completion Checklist
+### Wave 4 (Sequential, after Wave 3) — Documentation & Deployment
 
-Before marking phase-1 complete, verify:
-
-- [ ] All 7 task plans executed successfully (or 6 if task-6 skipped)
-- [ ] SCOREBOARD.md exists at repo root with all required sections
-- [ ] SCOREBOARD.md line count ≤200 (target ~165)
-- [ ] All 32 completed projects appear in summary table
-- [ ] Top 5 projects have expanded details sections
-- [ ] QA verdicts use only raw language: PASS/BLOCK/REJECT/"—"
-- [ ] Board scores are 0-10 or "—"
-- [ ] Aggregate metrics calculated correctly (verify manually)
-- [ ] Markdown renders correctly on GitHub (tables, links work)
-- [ ] Extraction script is executable: `chmod +x scripts/update-scoreboard.sh`
-- [ ] Script completes in <5 minutes
-- [ ] Script is idempotent (running twice produces identical output)
-- [ ] All deliverables committed to git
-- [ ] Changes pushed to origin/main
-- [ ] No scope creep: agent count, daemon logs, file enumeration, charts all absent (per WONT list)
+Final tasks to document results and commit/deploy the changes.
 
 ---
 
-**End of Phase 1 Plan**
+<task-plan id="phase-1-task-10" wave="4">
+  <title>Create comprehensive test results documentation</title>
+  <requirement>R4.1 - Document all smoke test results with actual outputs</requirement>
+  <description>
+    Create deliverables/membership-v2/TEST-RESULTS.md with complete documentation of all 6 smoke
+    tests. Include the exact curl commands used, actual response outputs, pass/fail status for
+    each test, and timestamp. This document serves as proof of testing and reference for future
+    regression testing (when automated after 30-day stability period).
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/prds/membership-v2.md" reason="PRD defines required test documentation format" />
+    <file path="/home/agent/shipyard-ai/rounds/membership-v2/decisions.md" reason="Specifies test matrix and expected outputs" />
+  </context>
+
+  <steps>
+    <step order="1">Create directory if needed: `mkdir -p deliverables/membership-v2`</step>
+    <step order="2">Create TEST-RESULTS.md file</step>
+    <step order="3">Add header with timestamp, test environment (dev server), and success criteria</step>
+    <step order="4">Document Test 1 (Admin page load): curl command, actual response, PASS/FAIL status</step>
+    <step order="5">Document Test 2 (Registration): curl command, actual response, PASS/FAIL status</step>
+    <step order="6">Document Test 3 (Status lookup): curl command, actual response, PASS/FAIL status, double-encoding check result</step>
+    <step order="7">Document Test 4 (View members): curl command, actual response, PASS/FAIL status</step>
+    <step order="8">Document Test 5 (View plans): curl command, actual response, PASS/FAIL status</step>
+    <step order="9">Document Test 6 (Banned patterns check): grep command, result count (must be 0), PASS/FAIL status</step>
+    <step order="10">Add summary section: total tests (6), passed, failed, overall result</step>
+    <step order="11">If any test failed, add BLOCKERS section with remediation steps</step>
+  </steps>
+
+  <verification>
+    <check type="manual">TEST-RESULTS.md file created in deliverables/membership-v2/</check>
+    <check type="manual">All 6 tests documented with actual outputs</check>
+    <check type="manual">Pass/fail status recorded for each test</check>
+    <check type="manual">Timestamp included</check>
+    <check type="manual">Summary shows 6/6 tests passed (or blockers documented if failures)</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-9" reason="All tests must complete before documentation" />
+  </dependencies>
+
+  <commit-message>N/A - documentation will be committed in phase-1-task-11</commit-message>
+</task-plan>
+
+---
+
+<task-plan id="phase-1-task-11" wave="4">
+  <title>Commit all changes to version control</title>
+  <requirement>R4.2 - Commit fixed source file, config changes, and test documentation</requirement>
+  <description>
+    Stage and commit all changes made during Phase 1: the fixed sandbox-entry.ts file with
+    violations removed, the updated Sunrise Yoga astro.config.mjs with plugin registration,
+    and the TEST-RESULTS.md documentation. Use a clear commit message following repo conventions
+    that references the Harbor plugin and violation fixes.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Modified file to commit" />
+    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs" reason="Modified config to commit" />
+    <file path="/home/agent/shipyard-ai/deliverables/membership-v2/TEST-RESULTS.md" reason="New documentation to commit" />
+    <file path="/home/agent/shipyard-ai/rounds/membership-v2/decisions.md" reason="Specifies commit message format" />
+  </context>
+
+  <steps>
+    <step order="1">Use Bash git status to verify modified files</step>
+    <step order="2">Stage sandbox-entry.ts: `git add plugins/membership/src/sandbox-entry.ts`</step>
+    <step order="3">Stage astro.config.mjs: `git add examples/sunrise-yoga/astro.config.mjs`</step>
+    <step order="4">Stage TEST-RESULTS.md: `git add deliverables/membership-v2/TEST-RESULTS.md`</step>
+    <step order="5">Verify staging with `git status` - should show 3 staged files</step>
+    <step order="6">Create commit with message: `git commit -m "fix: Harbor plugin - resolve 4 violations, register in Sunrise Yoga, verify via smoke tests"`</step>
+    <step order="7">Verify commit succeeded with `git log -1 --oneline`</step>
+    <step order="8">Verify working directory is clean with `git status`</step>
+  </steps>
+
+  <verification>
+    <check type="manual">3 files staged: sandbox-entry.ts, astro.config.mjs, TEST-RESULTS.md</check>
+    <check type="manual">Commit created with clear message referencing violations and Harbor</check>
+    <check type="manual">Git log shows new commit</check>
+    <check type="manual">Working directory clean (no uncommitted changes)</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-10" reason="Documentation must be created before committing" />
+  </dependencies>
+
+  <commit-message>fix: Harbor plugin - resolve 4 violations, register in Sunrise Yoga, verify via smoke tests</commit-message>
+</task-plan>
+
+---
+
+<task-plan id="phase-1-task-12" wave="4">
+  <title>Deploy to Sunrise Yoga and verify production functionality</title>
+  <requirement>R4.3, R4.4 - Deploy to Cloudflare Workers and verify in production</requirement>
+  <description>
+    Deploy the updated Sunrise Yoga site with the Harbor plugin to Cloudflare Workers. Run the
+    smoke tests again against the production deployment to ensure everything works in the live
+    environment. If deployment is not ready (env vars missing, KV namespace not created), document
+    the blockers and mark deployment as pending with remediation steps.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/wrangler.jsonc" reason="Cloudflare deployment configuration" />
+    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/package.json" reason="Deploy scripts" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5 - Cloudflare deployment steps" />
+    <file path="/home/agent/shipyard-ai/rounds/membership-v2/decisions.md" reason="Open questions about deployment target" />
+  </context>
+
+  <steps>
+    <step order="1">Navigate to Sunrise Yoga directory: `cd examples/sunrise-yoga`</step>
+    <step order="2">Verify wrangler.jsonc has valid configuration for D1, R2, and KV bindings</step>
+    <step order="3">If KV namespace missing, create it: `wrangler kv:namespace create "MEMBERSHIP_KV"` and update wrangler.jsonc</step>
+    <step order="4">Build the site: `npm run build`</step>
+    <step order="5">Deploy to Cloudflare: `npx wrangler deploy`</step>
+    <step order="6">Note the deployed URL from wrangler output (e.g., https://sunrise-yoga.seth-a02.workers.dev)</step>
+    <step order="7">Wait 30 seconds for deployment to propagate</step>
+    <step order="8">Rerun Test 1 against production URL (replace localhost:4321 with deployed URL)</step>
+    <step order="9">Rerun Tests 2-5 against production URL</step>
+    <step order="10">Document production test results (all must pass)</step>
+    <step order="11">If any test fails, investigate error logs: `wrangler tail` or Cloudflare dashboard</step>
+    <step order="12">Document deployment completion or blockers in TEST-RESULTS.md</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run build succeeds</check>
+    <check type="build">wrangler deploy succeeds</check>
+    <check type="test">All 5 smoke tests pass on production URL</check>
+    <check type="manual">Deployment URL documented</check>
+    <check type="manual">No 500 errors or auth failures in production</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-11" reason="Changes must be committed before deployment" />
+  </dependencies>
+
+  <commit-message>N/A - deployment task, no code changes</commit-message>
+</task-plan>
+
+---
+
+## RISK NOTES
+
+Based on the Risk Scanner Agent's assessment:
+
+### CRITICAL RISKS
+
+**Risk 1: KV Namespace Binding Missing**
+- **Status:** Medium likelihood, High impact
+- **Mitigation:** Task 6 verifies binding; if missing, create namespace via wrangler and update wrangler.jsonc
+- **Owner:** Task 6 executor
+
+**Risk 2: Environment Variables Missing**
+- **Status:** Medium likelihood, High impact
+- **Variables needed:** JWT_SECRET, STRIPE_WEBHOOK_SECRET, STRIPE_API_SECRET, APP_URL
+- **Mitigation:** Document in TEST-RESULTS.md if missing; add to wrangler secrets before deploy
+- **Owner:** Task 12 executor
+
+**Risk 3: Monolithic File Complexity**
+- **Status:** Low likelihood (for this phase), Medium impact
+- **Concern:** Single 3,600-line file concentrates all logic; high refactoring risk
+- **Mitigation:** DO NOT refactor in this phase; 30-day freeze policy
+- **Owner:** Code review (deferred to V2)
+
+### HIGH RISKS
+
+**Risk 4: Double-Encoding KV Data**
+- **Status:** Known past issue
+- **Mitigation:** Test 3 explicitly checks for double-encoding; if detected, tests BLOCKED
+- **Owner:** Task 7 executor
+
+**Risk 5: Dev Server Port Mismatch**
+- **Status:** Low likelihood, Low impact
+- **Concern:** PRD assumes localhost:4321, actual port may differ
+- **Mitigation:** Verify actual port when starting dev server in Task 7
+- **Owner:** Task 7 executor
+
+### MEDIUM RISKS
+
+**Risk 6: Integration Test Suite May Fail**
+- **Status:** Medium likelihood, Medium impact
+- **Concern:** Existing __tests__/integration.test.ts may have assertions expecting old code
+- **Mitigation:** Run `npm run test` after Task 3; if failures, investigate and fix
+- **Owner:** Optional post-Wave 3 verification
+
+---
+
+## EXECUTION TIMELINE
+
+- **Wave 1 (Research):** 5 minutes (tasks 1, 4 run in parallel)
+- **Wave 2 (Code changes):** 3 minutes (tasks 2, 5 run in parallel)
+- **Wave 3 (Verification & tests):** 12 minutes (tasks 3, 6, 7, 8, 9 run sequentially)
+- **Wave 4 (Documentation & deploy):** 10 minutes (tasks 10, 11, 12 run sequentially)
+- **Total estimated:** 30 minutes
+
+---
+
+## CRITICAL SUCCESS FACTORS
+
+1. **All 6 smoke tests must pass** - Partial success (5/6) is failure
+2. **Zero banned pattern violations** - Verified by grep returning 0
+3. **No code rewrites or refactors** - Only remove specified violation blocks
+4. **30-day code freeze** - No optimizations or improvements after deployment
+5. **Manual testing discipline** - Copy-paste curl commands exactly, document actual output
+
+---
+
+## NEXT STEPS AFTER PHASE 1
+
+1. **30-day monitoring period** - Watch error logs, no code changes
+2. **If stable:** Unlock automation (convert curls to CI script)
+3. **If unstable:** Root cause analysis, targeted fix only (no refactors)
+4. **V2 planning** - Only after 30-day stability proven
+
+---
+
+**Status:** Ready for execution
+**Owner:** Build agent (single session execution)
+**Timeline:** <30 minutes from start to deployment
+**Next step:** Execute Wave 1 tasks (phase-1-task-1, phase-1-task-4)
