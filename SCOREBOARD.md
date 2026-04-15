@@ -1,167 +1,105 @@
 # Shipyard AI — Scoreboard
 
-**Agency State:** ACTIVE
-**Founded:** 2026-04-03
-**Projects Completed:** 1 (with phases)
+**Last Updated:** 2026-04-15 22:32 UTC
 
 ---
 
-## Project: Shipyard Client Portal
+## Core Metrics
 
-**Project Slug:** `shipyard-client-portal`
-**Pipeline:** PRD → Debate → Plan → Execute → Verify → Ship
-**Status:** SHIPPED (Phase 1 Wave 1) / HOLD (Awaiting Path C Validation)
-**Shipped At:** 2026-04-15
-**Shipped By:** Phil Jackson (orchestrator)
-
-### Execution Metrics
-
-| Metric | Value |
-|--------|-------|
-| **Pipeline Phases Completed** | 6/6 (PRD, Debate, Plan, Execute, Verify, Ship) |
-| **Phase Duration** | 6 days (2026-04-09 through 2026-04-15) |
-| **Feature Branches** | 1 (feature/shipyard-client-portal-mvp) |
-| **Commits Merged** | 1 squash merge to main |
-| **Files Delivered** | 83 files (24,128 lines added) |
-| **Total Lines of Code** | ~8,000 lines (auth, migrations, schema) |
-| **Build Status** | ✅ PASS (Next.js build succeeds) |
-| **Tests Status** | ✅ PASS (13 test files, auth validation tests) |
-
-### Feature Delivery (Wave 1 Only)
-
-**Complete (5/5 requirements):**
-- ✅ User authentication system (signup, login, password reset, email confirmation)
-- ✅ Database schema (7 migrations, proper indexing)
-- ✅ Supabase integration (server/client SDKs)
-- ✅ Email service structure (Resend integration ready)
-- ✅ Middleware authentication protection
-
-**Incomplete (0% of remaining scope):**
-- ❌ Project intake form (REQ-INTAKE-001-005) — **MISSING**
-- ❌ Dashboard project list (REQ-DASH-001) — **MISSING**
-- ❌ Retainer management (REQ-RETAINER-001-006) — **MISSING**
-- ❌ Stripe payment integration (REQ-INTAKE-003) — **MISSING**
-- ❌ Email notifications (REQ-EMAIL-001-007) — **MISSING**
-- ❌ Pipeline webhooks (REQ-WEBHOOK-001) — **MISSING**
-- ❌ Stripe webhooks (REQ-WEBHOOK-002) — **MISSING**
-
-**Overall Scope:** 44% complete (Wave 1 of 4 planned waves)
-
-### Board Review Summary
-
-| Reviewer | Score | Verdict |
-|----------|-------|---------|
-| **Jensen Huang** (Tech & Platform) | 4/10 | HOLD — AI leverage untapped, needs platform rethink |
-| **Oprah Winfrey** (Experience & Trust) | 4/10 | HOLD — First-5-minutes broken, empty dashboard experience |
-| **Shonda Rhimes** (Narrative & Retention) | 2/10 | HOLD — No retention hooks, filing cabinet not relationship |
-| **Warren Buffett** (Capital & Revenue) | 6/10 | HOLD — Infrastructure sound, demand unproven |
-| **Aggregate Score** | **3.75/10** | **HOLD** — Strategic realignment required |
-
-### QA Assessment
-
-**Margaret Hamilton QA Report:**
-
-| Category | Status | Finding |
-|----------|--------|---------|
-| **Completeness** | ❌ BLOCK | 44% of MVP scope delivered |
-| **Build Quality** | ✅ PASS | Zero build errors, clean compilation |
-| **Code Quality** | ✅ PASS | Type-safe, no dangerousness patterns |
-| **Auth Tests** | ✅ PASS | 13 validation tests, edge cases covered |
-| **Integration Tests** | ❌ BLOCK | 6 critical P0s (intake, payments, webhooks) |
-
-**Verdict:** `BLOCK` — Skeleton implementation. Phase 1 Wave 1 authentication complete and production-ready. Waves 2-4 deferred.
-
-### Board Condition: Path Forward (Pick One)
-
-**Path A: Experience-First** (2 weeks)
-- Complete intake flow + Stripe integration
-- Live project status dashboard
-- Visual consistency fixes
-- Test with 5 existing clients
-- Success criteria: >80% submit in <5 min, trust score >7/10
-
-**Path B: AI-First** (2 weeks)
-- AI-powered intake ("Describe site in 3 sentences")
-- Smart recommendations engine
-- Token predictor
-- Test with 5 clients
-- Success criteria: >60% prefer AI, <20% edit rate
-
-**Path C: Validation-First** (1 week) — **RECOMMENDED**
-- Survey 20 past clients
-- Interview 5 non-converts
-- Manual self-service pilot (Typeform + Stripe)
-- 30-day retainer pilot with 3 clients
-- Success criteria: >40% interest, >20% retainer interest, >25% conversion
-
-**Recommended Sequence:** Path C (Week 1) → Path A (Week 2-3) → Path B (Month 4)
-
-### Key Decisions (Locked from Debate)
-
-From `rounds/shipyard-client-portal/decisions.md`:
-
-1. **Tech Stack:** Next.js + Tailwind + Supabase + Stripe (LOCKED)
-2. **Authentication:** Supabase Auth with email confirmation (LOCKED)
-3. **Database:** PostgreSQL schema with migrations (LOCKED)
-4. **Email Provider:** Resend (infrastructure ready, not integrated)
-5. **Webhook Format:** Custom JSON (defined, not implemented)
-
-### Team Contributions
-
-| Agent | Role | Contribution |
-|-------|------|-------------|
-| **Steve Jobs** (Design) | Creative Director | Vision for client experience, brand voice |
-| **Elon Musk** (Engineering) | Technical Director | Architecture, database design, tech stack decisions |
-| **Margaret Hamilton** (QA) | QA | Completeness audit, integration testing framework |
-| **Jensen Huang** | Advisor | Platform dynamics review, AI leverage assessment |
-| **Oprah Winfrey** | Advisor | Experience review, trust/credibility assessment |
-| **Shonda Rhimes** | Advisor | Retention narrative, user stickiness roadmap |
-| **Warren Buffett** | Advisor | Capital efficiency, revenue model validation |
-| **Jony Ive** | Design Reviewer | Visual consistency, component quality audit |
-| **Maya Angelou** | Language Reviewer | Copy quality, narrative arc evaluation |
-| **Phil Jackson** | Orchestrator | Pipeline management, phase execution oversight |
-
-### Phase Timeline
-
-| Phase | Start | End | Duration | Status |
-|-------|-------|-----|----------|--------|
-| PRD | 2026-04-09 | 2026-04-09 | Same day | ✅ Complete |
-| Debate (Round 1) | 2026-04-09 | 2026-04-10 | 1 day | ✅ Complete |
-| Debate (Round 2) | 2026-04-10 | 2026-04-11 | 1 day | ✅ Complete |
-| Plan | 2026-04-11 | 2026-04-12 | 1 day | ✅ Complete |
-| Execute (Wave 1) | 2026-04-12 | 2026-04-15 | 3 days | ✅ Complete |
-| Verify (QA + Board) | 2026-04-15 | 2026-04-15 | Same day | ✅ Complete |
-| Ship | 2026-04-15 | 2026-04-15 | Same day | ✅ Complete |
-
-### Learnings & Retrospective
-
-**Retrospective File:** `memory/shipyard-client-portal-retrospective.md`
-
-**Key Principle (Marcus Aurelius):**
-> **SCOPE HONESTY** — Before final submission, create explicit scope statement of what's included, what's deferred, and why. Require leadership approval if scope changes significantly. No assumptions. No hidden incompleteness.
-
-**Specific Learnings:**
-1. Planning-execution gap: 4 planned waves became 1 delivered wave without explicit renegotiation
-2. Incomplete products break trust more than absent products
-3. Design system debt accumulated through component-level inconsistency
-4. Blocking decisions (email provider, Stripe config) weren't escalated early
-5. Scope creep is invisible — we negotiate daily without making it explicit
-
-### Recommendations for Next Phase
-
-**Immediate Actions:**
-1. Execute Path C validation (1 week): Capture market demand data
-2. Reconvene board with validation results
-3. If validation succeeds (>40% interest): Execute Path A (complete core UX)
-4. If validation fails: Pivot to high-touch service model, revisit self-service later
-
-**Process Improvements:**
-- [ ] Pre-ship scope review: explicit list of what's in, out, deferred
-- [ ] Leadership approval gate on scope changes mid-execution
-- [ ] Daily blocking decision escalation (don't wait for final verification)
-- [ ] Component system audit before final UI pass
+**Total Shipped:** 32
+**Total Failed:** 2
+**Success Rate:** 94%
+**Average Pipeline Duration:** 30.5 hours
 
 ---
 
-**Last Updated:** 2026-04-15
-**Updated By:** Phil Jackson (orchestrator)
+## Summary (All Projects)
+
+| Project | Shipped | QA | Board | Deliverables |
+|---------|---------|-----|-------|-------------|
+| [shipyard-client-portal](/prds/completed/shipyard-client-portal.md) | 2026-04-15 | BLOCK | 3.75 | [Link](/deliverables/shipyard-client-portal/) |
+| [localgenius-frontend-launch](/prds/completed/localgenius-frontend-launch.md) | 2026-04-15 | REJECT | 1.5 | [Link](/deliverables/localgenius-frontend-launch/) |
+| [blog-plugin-pipeline](/prds/completed/blog-plugin-pipeline.md) | 2026-04-15 | — | — | [Link](/deliverables/blog-plugin-pipeline/) |
+| [blog-model-selection](/prds/completed/blog-model-selection.md) | 2026-04-15 | REJECT | — | [Link](/deliverables/blog-model-selection/) |
+| [blog-infrastructure](/prds/completed/blog-infrastructure.md) | 2026-04-15 | REJECT | 2.9 | [Link](/deliverables/blog-infrastructure/) |
+| [blog-daemon-architecture](/prds/completed/blog-daemon-architecture.md) | 2026-04-15 | BLOCK | — | [Link](/deliverables/blog-daemon-architecture/) |
+| [localgenius-benchmark-engine](/prds/completed/localgenius-benchmark-engine.md) | 2026-04-14 | BLOCK | 6.6 | [Link](/deliverables/localgenius-benchmark-engine/) |
+| [intake-autoclose](/prds/completed/intake-autoclose.md) | 2026-04-14 | — | — | [Link](/deliverables/intake-autoclose/) |
+| [intake-add-p2](/prds/completed/intake-add-p2.md) | 2026-04-14 | — | 4.5 | [Link](/deliverables/intake-add-p2/) |
+| [github-issue-sethshoultes-shipyard-ai-34](/prds/completed/github-issue-sethshoultes-shipyard-ai-34.md) | 2026-04-14 | REJECT | — | — |
+| [github-issue-sethshoultes-shipyard-ai-33](/prds/completed/github-issue-sethshoultes-shipyard-ai-33.md) | 2026-04-14 | BLOCK | 5.5 | [Link](/deliverables/github-issue-sethshoultes-shipyard-ai-33/) |
+| [github-issue-sethshoultes-shipyard-ai-32](/prds/completed/github-issue-sethshoultes-shipyard-ai-32.md) | 2026-04-14 | BLOCK | 4.25 | [Link](/deliverables/github-issue-sethshoultes-shipyard-ai-32/) |
+| [shipyard-post-delivery-v2](/prds/completed/shipyard-post-delivery-v2.md) | 2026-04-13 | BLOCK | — | [Link](/deliverables/shipyard-post-delivery-v2/) |
+| [promptops](/prds/completed/promptops.md) | 2026-04-13 | BLOCK | — | [Link](/deliverables/promptops/) |
+| [github-issue-sethshoultes-shipyard-ai-30](/prds/completed/github-issue-sethshoultes-shipyard-ai-30.md) | 2026-04-13 | — | — | — |
+| [finish-plugins](/prds/completed/finish-plugins.md) | 2026-04-13 | BLOCKERS (17 issues) | 5.6 | [Link](/deliverables/finish-plugins/) |
+| [emdash-marketplace](/prds/completed/emdash-marketplace.md) | 2026-04-13 | REJECT | 6 | [Link](/deliverables/emdash-marketplace/) |
+| [daemon-stagger-review](/prds/completed/daemon-stagger-review.md) | 2026-04-13 | BLOCK | — | [Link](/deliverables/daemon-stagger-review/) |
+| [daemon-fixes](/prds/completed/daemon-fixes.md) | 2026-04-13 | REJECT | 5.0 | [Link](/deliverables/daemon-fixes/) |
+| [agentlog](/prds/completed/agentlog.md) | 2026-04-13 | BLOCK | — | [Link](/deliverables/agentlog/) |
+| [agentbench](/prds/completed/agentbench.md) | 2026-04-13 | BLOCK | — | [Link](/deliverables/agentbench/) |
+| [membership-fix](/prds/completed/membership-fix.md) | 2026-04-12 | BLOCK | 5.5 | [Link](/deliverables/membership-fix/) |
+| [eventdash-fix](/prds/completed/eventdash-fix.md) | 2026-04-12 | BLOCK | — | [Link](/deliverables/eventdash-fix/) |
+| [shipyard-care](/prds/completed/shipyard-care.md) | 2026-04-08 | BLOCK | — | [Link](/deliverables/shipyard-care/) |
+| [emdash-themes](/prds/completed/emdash-themes.md) | 2026-04-08 | REJECT | — | [Link](/deliverables/emdash-themes/) |
+| [003-emdash-plugins](/prds/completed/003-emdash-plugins.md) | 2026-04-08 | — | — | — |
+| [adminpulse](/prds/completed/adminpulse.md) | 2026-04-05 | BLOCK | 4.6 | [Link](/deliverables/adminpulse/) |
+| [002-auto-pipeline](/prds/completed/002-auto-pipeline.md) | 2026-04-05 | — | — | — |
+| [model-selection-per-phase](/prds/completed/model-selection-per-phase.md) | — | — | — | [Link](/deliverables/model-selection-per-phase/) |
+| [github-issue-sethshoultes-shipyard-ai-35](/prds/completed/github-issue-sethshoultes-shipyard-ai-35.md) | — | — | — | [Link](/deliverables/github-issue-sethshoultes-shipyard-ai-35/) |
+| [github-issue-sethshoultes-shipyard-ai-31](/prds/completed/github-issue-sethshoultes-shipyard-ai-31.md) | — | — | — | — |
+| [001-shipyard-portfolio](/prds/completed/001-shipyard-portfolio.md) | — | — | — | — |
+
+---
+
+## Expanded Details (Top 5 Recent)
+
+
+### shipyard-client-portal
+
+**Shipped:** 2026-04-15
+**QA Verdict:** BLOCK
+**Board Score:** 3.75/10
+**Duration:** 3m
+**Deliverables:** [Link](/deliverables/shipyard-client-portal/)
+
+
+### localgenius-frontend-launch
+
+**Shipped:** 2026-04-15
+**QA Verdict:** REJECT
+**Board Score:** 1.5/10
+**Duration:** —
+**Deliverables:** [Link](/deliverables/localgenius-frontend-launch/)
+
+
+### blog-plugin-pipeline
+
+**Shipped:** 2026-04-15
+**QA Verdict:** —
+**Board Score:** —/10
+**Duration:** —
+**Deliverables:** [Link](/deliverables/blog-plugin-pipeline/)
+
+
+### blog-model-selection
+
+**Shipped:** 2026-04-15
+**QA Verdict:** REJECT
+**Board Score:** —/10
+**Duration:** —
+**Deliverables:** [Link](/deliverables/blog-model-selection/)
+
+
+### blog-infrastructure
+
+**Shipped:** 2026-04-15
+**QA Verdict:** REJECT
+**Board Score:** 2.9/10
+**Duration:** 53m
+**Deliverables:** [Link](/deliverables/blog-infrastructure/)
+
+
+---
+
+*Generated by update-scoreboard.sh — Machine truth, never guessed. Missing data marked as "—" per Decision 1.9.*
