@@ -1,13 +1,17 @@
 # Shipyard AI — Status
 
 ## Current State
-- **Agency state**: PLAN
+- **Agency state**: IDLE
 - **Founded**: 2026-04-03
 - **Server**: 8GB RAM / 4 vCPU (resized)
 - **Repo**: github.com/sethshoultes/shipyard-ai
 - **Domain**: shipyard.company
-- **Active projects**: 2
-- **Current branch**: `feature/phase3-wave1`
+- **Active projects**: 0
+- **Current branch**: `feature/scoreboard-update-execution`
+- **Total shipped**: 32
+- **Total failed**: 2
+- **Success rate**: 94%
+- **Last updated**: 2026-04-15
 
 ## Active Project: PRD-001 (Shipyard Portfolio)
 
