@@ -1,39 +1,41 @@
-# Sara Blakely Gut-Check: Blog Post Plan
+# Sara Blakely Gut-Check
 
-## Would a real customer pay for this?
+## Would a real customer pay?
 
-**No.** This is documentation, not product. No one pays for blog posts.
+**No. Not yet.**
 
-Real question: Would this make someone buy Shipyard? **Maybe.** Only if they're already shopping for autonomous dev tools and need proof it won't hallucinate garbage.
+You're selling pipeline credibility, not a product. Blog posts don't convert unless they end with "buy now" or "try free." Missing: What's the paid thing? Pipeline access? Emdash plugins? Consulting?
 
-## What's confusing? What makes someone bounce?
+If this is pure brand content: **maybe.** Only if reader already knows Shipyard exists and needs proof it won't ship garbage.
 
-- "Board verdicts" — what board? Sounds corporate theater.
-- 7 tasks, 3-4.5 hours for ONE blog post? Smells like overthinking.
-- "Relief mixed with envy" — can you actually deliver that emotion?
-- Missing: Why should non-Emdash users care? Where's the universal hook?
-- Wave 1/2/3 structure — planning theater. Readers don't care how you build it.
+## What's confusing? What causes bounce?
+
+- "Board verdicts" — corporate theater. Engineers smell fakery.
+- 3-4.5 hours for one blog post — process worship. Just write the damn thing.
+- "Relief mixed with envy" — vague. Can't test emotion.
+- Missing universal hook. Non-Emdash users think "so what?"
+- Wave planning — internal jargon. Reader sees nothing.
 
 ## 30-second elevator pitch
 
-"AI coded itself out of 443 mistakes. Fed it one API, watched it hallucinate every endpoint. Pipeline caught every error, fixed them all, shipped 7 production plugins. Zero human debugging. This is self-correcting AI showing its work."
+"AI hallucinated 443 API errors building 7 plugins. Pipeline caught every one, auto-fixed them, shipped production code. Zero human debugging. Watch AI correct itself."
 
-## What would you test with $0 marketing budget?
+## What to test first with $0 marketing budget?
 
-HN title: **"AI Hallucinated 443 API Errors. Then Fixed Them All."**
+Post ONE before/after code snippet to r/programming. Title: **"AI hallucinated throw new Response() 235 times. Here's how it fixed itself."**
 
-First paragraph needs teeth. Show ONE gnarly before/after code snippet in first 10 seconds of scrolling.
+Measure click-through on "see full breakdown" link. That's your signal.
 
-Track scroll depth. If 70%+ bounce before example 2, first example wasn't painful enough.
+HN title test: **"AI Hallucinated 443 API Errors. Then Fixed Them All."** — Front page or dead silence tells you if story resonates.
 
 ## What's the retention hook?
 
-**There isn't one.** Top-of-funnel demo content has no retention.
+**Missing.**
 
-What keeps them reading? Broken code that makes devs wince, then magically fixed. Repeat. Make them think: "This would've cost me 2 days."
+Blog posts are read-once. No email capture. No demo link. No waitlist. No "paste your code here."
 
-Bottom line: This better drive ONE action. "Try the pipeline" button. **Where is it?**
+**Fix:** End with live demo embed. "Drop broken code. Watch pipeline fix it in 60 seconds." Capture email to send results. Now you have leads.
 
 ---
 
-**Verdict:** Solid execution plan, weak product thinking. World's most thorough documentation of a demo. Demo might be fire — but this plan won't make anyone care unless code examples hit like gut punches. Ship fast. Test with real eyeballs. Iterate.
+**Verdict:** Execution plan is thorough. Product strategy is absent. Code examples better hit like gut punches or this is 4 hours wasted. Ship fast, get eyeballs, measure scroll depth. Stop planning, start testing.
