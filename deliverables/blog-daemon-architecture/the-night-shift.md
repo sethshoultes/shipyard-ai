@@ -28,7 +28,7 @@ The daemon is a TypeScript process that runs 24/7 on a DigitalOcean droplet with
 1. **Debate** — Steve Jobs and Elon Musk stake positions, challenge each other, Rick Rubin distills essence, Phil Jackson consolidates decisions
 2. **Plan** — A planner agent reads the decisions, generates XML task plans, Sara Blakely gut-checks for scope creep
 3. **Build** — Wave-based execution spawns sub-agents in parallel, each with fresh context for atomic tasks
-4. **QA** — Margaret Hamilton runs two passes: automated checks for placeholders, compilation, tests, and requirement traceability
+4. **QA** — Margaret Hamilton runs two passes: first validates all content is complete and production-ready (no TODOs or stub text), then runs compilation, tests, and requirement traceability checks
 5. **Ship** — Marcus Aurelius writes a retrospective, the daemon commits everything, merges to main, pushes to GitHub
 
 The entire pipeline is orchestrated by `pipeline.ts`, a 600-line file that spawns AI agents via the Claude SDK, tracks token usage, enforces timeouts, and retries on failure. No markdown state parsing. No brittle file checks. Just functions calling functions with retry logic and timeout protection.
