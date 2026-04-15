@@ -1,41 +1,29 @@
-# Sara Blakely Gut-Check
+# Sara Blakely Review: Phase 1 Plan
 
-## Would a real customer pay?
+## Would a customer pay?
+**No.** This is plumbing. Nobody pays for "markdown-driven posts" — they pay for insights that save them money/time/sanity. You're migrating file formats. Where's the customer value?
 
-**No. Not yet.**
+## What's confusing?
+- **8 tasks to move blog posts?** Reeks of over-engineering. Wave 1-2-3 structure makes it sound NASA-level when it's "copy markdown files and add routing."
+- **Who is this for?** Devs who want to blog? Companies who need content velocity? Unknown.
+- **"Critical constraint: static export"** — means nothing to non-devs. Translation: faster load times? Cheaper hosting? Say it.
 
-You're selling pipeline credibility, not a product. Blog posts don't convert unless they end with "buy now" or "try free." Missing: What's the paid thing? Pipeline access? Emdash plugins? Consulting?
+## 30-second pitch
+"We refactored our blog to use markdown files so future posts are easier to publish."
 
-If this is pure brand content: **maybe.** Only if reader already knows Shipyard exists and needs proof it won't ship garbage.
+That's not a pitch. That's an internal Slack update.
 
-## What's confusing? What causes bounce?
+## What to test first ($0 budget)
+You can't. This delivers zero user-facing value. Test with: **Do existing blog readers notice anything different?** If no = wasted effort. If yes = you broke something.
 
-- "Board verdicts" — corporate theater. Engineers smell fakery.
-- 3-4.5 hours for one blog post — process worship. Just write the damn thing.
-- "Relief mixed with envy" — vague. Can't test emotion.
-- Missing universal hook. Non-Emdash users think "so what?"
-- Wave planning — internal jargon. Reader sees nothing.
+Better question: Which of those 6 posts drives the most email signups? Double down on that topic. Forget the infra.
 
-## 30-second elevator pitch
+## Retention hook
+**None.** Infrastructure has no retention hook. Content does.
 
-"AI hallucinated 443 API errors building 7 plugins. Pipeline caught every one, auto-fixed them, shipped production code. Zero human debugging. Watch AI correct itself."
+If "the-night-shift" post gets 40% open rate and "portable-text" gets 8%, write 3 more daemon posts. That's retention. This plan optimizes the wrong thing.
 
-## What to test first with $0 marketing budget?
+## Real talk
+You're gold-plating a system that works. 4 hardcoded posts weren't the problem. Lack of killer content is. Ship one post that gets 100 backlinks, then worry about how it's stored.
 
-Post ONE before/after code snippet to r/programming. Title: **"AI hallucinated throw new Response() 235 times. Here's how it fixed itself."**
-
-Measure click-through on "see full breakdown" link. That's your signal.
-
-HN title test: **"AI Hallucinated 443 API Errors. Then Fixed Them All."** — Front page or dead silence tells you if story resonates.
-
-## What's the retention hook?
-
-**Missing.**
-
-Blog posts are read-once. No email capture. No demo link. No waitlist. No "paste your code here."
-
-**Fix:** End with live demo embed. "Drop broken code. Watch pipeline fix it in 60 seconds." Capture email to send results. Now you have leads.
-
----
-
-**Verdict:** Execution plan is thorough. Product strategy is absent. Code examples better hit like gut punches or this is 4 hours wasted. Ship fast, get eyeballs, measure scroll depth. Stop planning, start testing.
+Would I fund this? Not until you show me the content ROI first.
