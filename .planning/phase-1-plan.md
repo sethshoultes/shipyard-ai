@@ -1,633 +1,609 @@
-# Phase 1 Plan — Blog Infrastructure
+# Phase 1 Plan — Scoreboard Update (Automated Extraction)
 
 **Generated**: 2026-04-15
-**Project Slug**: blog-infrastructure
-**Requirements**: `/home/agent/shipyard-ai/.planning/REQUIREMENTS.md`
-**Total Tasks**: 8
+**Requirements**: /home/agent/shipyard-ai/prds/scoreboard-update.md + /home/agent/shipyard-ai/rounds/scoreboard-update/decisions.md
+**Total Tasks**: 7
 **Waves**: 3
-**Estimated Timeline**: 2-3 hours
-
----
-
-## Project Overview
-
-Convert the Shipyard AI blog from hardcoded posts to markdown-driven posts with dynamic routing. The blog currently has 4 hardcoded posts in `page.tsx` with inline content. After this phase, the blog will read from 6 markdown files in `blog/posts/` and render individual post pages at `/blog/[slug]`.
-
-**Critical Constraint**: Next.js static export (`output: "export"`) - all routes must be pre-generated at build time.
 
 ---
 
 ## Requirements Traceability
 
-| Requirement | Task(s) | Wave |
-|-------------|---------|------|
-| TR-009 (Install dependencies) | phase-1-task-1 | 1 |
-| TR-010 (Create blog utility) | phase-1-task-2 | 1 |
-| TR-012 (Create posts directory) | phase-1-task-3 | 1 |
-| FR-011, FR-012, FR-013 (Migrate posts to markdown) | phase-1-task-4 | 2 |
-| TR-011 (Create dynamic route page) | phase-1-task-5 | 2 |
-| FR-001, FR-003 (Update blog index) | phase-1-task-6 | 2 |
-| TR-008, QA-007 (Build and verify) | phase-1-task-7 | 3 |
-| QA-001, QA-008 (Deploy to Cloudflare Pages) | phase-1-task-8 | 3 |
+| Requirement | Task(s) | Wave | Priority |
+|-------------|---------|------|----------|
+| REQ-1: Extract completed projects list | phase-1-task-1 | 1 | MUST |
+| REQ-2–7: Extract QA, board, dates, duration, deliverables | phase-1-task-1, phase-1-task-2 | 1 | MUST |
+| REQ-8: Calculate aggregate metrics | phase-1-task-2 | 1 | MUST |
+| REQ-9: Handle missing data with "—" | phase-1-task-1, phase-1-task-2 | 1 | MUST |
+| REQ-10: Sort projects reverse chronological | phase-1-task-2 | 1 | MUST |
+| REQ-11: Generate core metrics section | phase-1-task-3 | 2 | MUST |
+| REQ-12: Generate summary table | phase-1-task-3 | 2 | MUST |
+| REQ-13: Generate expanded details for top 5 | phase-1-task-4 | 2 | MUST |
+| REQ-14: Assemble complete SCOREBOARD.md | phase-1-task-5 | 3 | MUST |
+| REQ-15: Implement raw brand voice | phase-1-task-3, phase-1-task-4 | 2 | MUST |
+| REQ-16: Update STATUS.md | phase-1-task-6 | 3 | SHOULD |
+| REQ-17: Build extraction script | phase-1-task-1, phase-1-task-2 | 1 | MUST |
+| REQ-18: Test extraction accuracy | phase-1-task-5 | 3 | MUST |
+| REQ-19: Commit and push | phase-1-task-7 | 3 | SHOULD |
 
 ---
 
 ## Wave Execution Order
 
-### Wave 1 (Parallel) — Setup & Infrastructure
+### Wave 1 (Parallel) — Data Extraction & Script Foundation
 
-These three tasks can run in parallel to set up the foundation for markdown-driven posts.
+**Focus**: Build the extraction engine and collect raw data from filesystem
 
-```xml
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Install Markdown Dependencies</title>
-  <requirement>TR-009: Add gray-matter, remark, and remark-html to package.json</requirement>
+  <title>Build Data Extraction Script Core</title>
+  <requirement>REQ-1, REQ-2, REQ-3, REQ-4, REQ-5, REQ-7, REQ-9, REQ-17: Extract all project data from prds/completed/ and rounds/ directories with graceful "—" fallback for missing data</requirement>
   <description>
-Install the required npm packages for parsing YAML frontmatter and converting markdown to HTML. These are build-time dependencies that run during static generation.
+    Create the automated extraction script that reads the filesystem and extracts all required data points for each project:
+    - Project names from prds/completed/
+    - QA verdicts (PASS/BLOCK/REJECT) from round files
+    - Board scores (0-10) from board-verdict.md files
+    - Ship dates from round file timestamps
+    - Pipeline duration (approximate from round file timestamps)
+    - Deliverables directory existence checks
 
-Per PRD §1: gray-matter parses frontmatter, remark + remark-html converts markdown to HTML.
+    Implements graceful fallback: any missing data returns "—" (never guesses, never blocks).
+
+    This task creates the foundation extraction script at /home/agent/shipyard-ai/scripts/update-scoreboard.sh with all core data extraction logic.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/website/package.json" reason="Dependencies file to update" />
+    <file path="/home/agent/shipyard-ai/prds/completed/" reason="Source directory for all shipped project PRDs — enumerate all .md files to get project list" />
+    <file path="/home/agent/shipyard-ai/rounds/" reason="Contains project-specific round directories with QA verdicts, board scores, and timestamps" />
+    <file path="/home/agent/shipyard-ai/deliverables/" reason="Contains project deliverable artifacts — verify existence for each project" />
+    <file path="/home/agent/shipyard-ai/rounds/scoreboard-update/decisions.md" reason="Locked decisions defining extraction rules: use '—' for missing data (Decision 1.9), no daemon log parsing (Decision 1.6), raw verdicts only (Decision 1.4)" />
+    <file path="/home/agent/shipyard-ai/scripts/lighthouse.sh" reason="Reference example for script structure, helper functions, associative arrays, and error handling patterns" />
+    <file path="/home/agent/shipyard-ai/.planning/requirements-analysis.md" reason="Detailed requirements REQ-1 through REQ-9 with acceptance criteria and implementation notes" />
   </context>
 
   <steps>
-    <step order="1">Navigate to website directory: cd /home/agent/shipyard-ai/website</step>
-    <step order="2">Install dependencies: npm install gray-matter remark remark-html</step>
-    <step order="3">Verify installation succeeded (check package.json and package-lock.json)</step>
-    <step order="4">Check for any peer dependency warnings or version conflicts</step>
+    <step order="1">Read /home/agent/shipyard-ai/scripts/lighthouse.sh to understand existing script patterns (helper functions, associative arrays, error handling with 2>/dev/null || true)</step>
+    <step order="2">Create /home/agent/shipyard-ai/scripts/update-scoreboard.sh with executable permissions (chmod +x)</step>
+    <step order="3">Implement function extract_completed_projects() that lists all .md files in prds/completed/ and returns project names (strip .md extension)</step>
+    <step order="4">Implement function extract_qa_verdict(project) that searches rounds/{project}/ for QA verdict files (qa-pass-*.md, final-verdict.md) and greps for PASS/BLOCK/REJECT keywords. Return "—" if not found.</step>
+    <step order="5">Implement function extract_board_score(project) that searches rounds/{project}/board-verdict.md for aggregate/average score patterns (e.g., "Average: 5.5/10", "Aggregate Score: 3.75/10"). Extract numerical value 0-10, return "—" if not found.</step>
+    <step order="6">Implement function extract_ship_date(project) that uses stat command to get modification date of newest file in rounds/{project}/, format as YYYY-MM-DD, return "—" if directory doesn't exist</step>
+    <step order="7">Implement function extract_pipeline_duration(project) that calculates time delta between oldest and newest files in rounds/{project}/ (use stat mtime). Return human-readable format (e.g., "3.2 hours", "2 days") or "—" if insufficient data. DO NOT parse daemon logs (per Decision 1.6).</step>
+    <step order="8">Implement function check_deliverables(project) that tests if /home/agent/shipyard-ai/deliverables/{project}/ directory exists. Return markdown link "[Link](/deliverables/{project}/)" or "—".</step>
+    <step order="9">Add error handling to all functions: use 2>/dev/null for file operations, default to "—" on any error, never exit on missing data</step>
+    <step order="10">Create main extraction loop that iterates through all completed projects and populates associative arrays with extracted data: PROJECT_QA["$project"], PROJECT_BOARD["$project"], PROJECT_DATE["$project"], PROJECT_DURATION["$project"], PROJECT_DELIVERABLES["$project"]</step>
+    <step order="11">Add logging/debugging output (to stderr) showing extraction progress and any missing data warnings</step>
+    <step order="12">Test extraction on 3 sample projects (e.g., shipyard-client-portal, blog-infrastructure, adminpulse) and verify output matches manual inspection of their round files</step>
   </steps>
 
   <verification>
-    <check type="build">cd /home/agent/shipyard-ai/website && npm list gray-matter remark remark-html</check>
-    <check type="manual">package.json shows all 3 dependencies in dependencies section</check>
-    <check type="build">npm run build</check>
+    <check type="manual">Run ./scripts/update-scoreboard.sh and verify it outputs debug logs showing successful extraction for all 32 projects</check>
+    <check type="manual">Spot-check 3 projects: manually inspect their rounds/ files and verify extracted QA verdict, board score, and ship date match reality</check>
+    <check type="manual">Verify projects with missing data (e.g., no board-verdict.md) correctly output "—" instead of errors or empty values</check>
+    <check type="manual">Confirm script completes in under 5 minutes for 32 projects</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies - this is Wave 1 -->
+    <!-- Independent task (wave 1) -->
   </dependencies>
 
-  <commit-message>deps: add markdown processing dependencies
+  <commit-message>feat(scripts): add data extraction engine for scoreboard
 
-Install gray-matter, remark, and remark-html for blog infrastructure:
-- gray-matter: Parse YAML frontmatter from markdown files
-- remark: Markdown processor
-- remark-html: Convert markdown AST to HTML
+Build automated extraction script with functions to extract:
+- Project names from prds/completed/
+- QA verdicts (PASS/BLOCK/REJECT) from round files
+- Board scores (0-10) from board-verdict.md
+- Ship dates and pipeline duration from timestamps
+- Deliverables directory existence
 
-Required for markdown-driven blog posts with dynamic routing.
+Implements graceful "—" fallback for all missing data per Decision 1.9.
+No daemon log parsing (Decision 1.6).
+
+Addresses: REQ-1 through REQ-7, REQ-9, REQ-17
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
-```
 
-```xml
 <task-plan id="phase-1-task-2" wave="1">
-  <title>Create Blog Utility Module</title>
-  <requirement>TR-006, TR-010: Create lib/blog.ts with markdown parsing functions</requirement>
+  <title>Implement Aggregate Metrics & Sorting Logic</title>
+  <requirement>REQ-8, REQ-6, REQ-10: Calculate total shipped/failed counts, success rate, average duration, identify top 5 recent projects, and sort all projects reverse chronological</requirement>
   <description>
-Create the blog utility module that exports getAllPostSlugs(), getAllPosts(), getPostBySlug(), and the BlogPost interface. This module handles all filesystem access and markdown parsing.
+    Extend the extraction script with calculation functions that process the raw extracted data:
+    - Count total shipped projects (files in prds/completed/)
+    - Count total failed projects (files in prds/failed/ if exists)
+    - Calculate success rate percentage
+    - Calculate average pipeline duration (excluding "—" values)
+    - Sort all projects by ship date (reverse chronological)
+    - Identify top 5 most recent projects for expanded details
 
-Per PRD §2, this module uses gray-matter for frontmatter parsing and remark for HTML conversion.
+    These functions consume the associative arrays populated by phase-1-task-1 and produce aggregate statistics and sorted project lists for markdown generation.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/prds/blog-infrastructure.md" reason="Contains exact code specification for lib/blog.ts in §2" />
-    <file path="/home/agent/shipyard-ai/website/next.config.ts" reason="Confirms static export configuration" />
+    <file path="/home/agent/shipyard-ai/scripts/update-scoreboard.sh" reason="Add calculation functions to existing extraction script created in phase-1-task-1" />
+    <file path="/home/agent/shipyard-ai/prds/completed/" reason="Count files for total shipped metric" />
+    <file path="/home/agent/shipyard-ai/prds/failed/" reason="Count files for total failed metric (if directory exists)" />
+    <file path="/home/agent/shipyard-ai/rounds/scoreboard-update/decisions.md" reason="Decision 1.2 specifies top 5 recent projects get expanded details; Decision 2 specifies reverse chronological sorting" />
+    <file path="/home/agent/shipyard-ai/.planning/requirements-analysis.md" reason="REQ-8, REQ-6, REQ-10 with detailed acceptance criteria for calculations" />
   </context>
 
   <steps>
-    <step order="1">Create directory: mkdir -p /home/agent/shipyard-ai/website/src/lib</step>
-    <step order="2">Create file: /home/agent/shipyard-ai/website/src/lib/blog.ts</step>
-    <step order="3">Implement BlogPost interface with fields: slug, title, description, date, tags[], content</step>
-    <step order="4">Implement getAllPostSlugs(): read files from src/app/blog/posts/, filter by .md extension, return slugs</step>
-    <step order="5">Implement getAllPosts(): map slugs to BlogPost objects, sort by date descending</step>
-    <step order="6">Implement getPostBySlug(slug): read file, parse frontmatter with gray-matter, convert markdown with remark+remark-html</step>
-    <step order="7">Set postsDirectory path: path.join(process.cwd(), 'src/app/blog/posts')</step>
-    <step order="8">Add TypeScript types and export all functions and interfaces</step>
+    <step order="1">Implement function calculate_total_shipped() that counts .md files in prds/completed/ directory</step>
+    <step order="2">Implement function calculate_total_failed() that counts .md files in prds/failed/ directory if it exists, returns 0 if directory doesn't exist</step>
+    <step order="3">Implement function calculate_success_rate() that computes: shipped / (shipped + failed) * 100, returns percentage with 1 decimal place (e.g., "94.1%"), handles division by zero</step>
+    <step order="4">Implement function calculate_average_duration() that averages all PROJECT_DURATION values that are not "—", converts to common unit (hours), returns "—" if insufficient data (less than 3 projects with duration)</step>
+    <step order="5">Implement function sort_projects_by_date() that sorts all projects by PROJECT_DATE in reverse chronological order (newest first), handles "—" dates by sorting them to end</step>
+    <step order="6">Implement function identify_top_5_recent() that takes sorted project list and returns first 5 project names (or fewer if less than 5 total projects)</step>
+    <step order="7">Create global variables to store calculated metrics: TOTAL_SHIPPED, TOTAL_FAILED, SUCCESS_RATE, AVG_DURATION, SORTED_PROJECTS (array), TOP_5_PROJECTS (array)</step>
+    <step order="8">Add function calls in main script flow: after extraction loop completes, call all calculation functions and populate global variables</step>
+    <step order="9">Add debug output showing calculated aggregate metrics and top 5 project names</step>
+    <step order="10">Test calculations: verify totals match manual count of prds/completed/ and prds/failed/, verify success rate calculation, verify top 5 projects are actually the most recent by date</step>
   </steps>
 
   <verification>
-    <check type="manual">File exists at /home/agent/shipyard-ai/website/src/lib/blog.ts</check>
-    <check type="manual">Exports BlogPost interface with correct fields</check>
-    <check type="manual">Exports getAllPostSlugs(), getAllPosts(), getPostBySlug() functions</check>
-    <check type="manual">Uses gray-matter for frontmatter parsing</check>
-    <check type="manual">Uses remark().use(html).processSync() for markdown conversion</check>
-    <check type="build">cd /home/agent/shipyard-ai/website && npx tsc --noEmit</check>
+    <check type="manual">Run script and verify TOTAL_SHIPPED matches manual count of files in prds/completed/ (should be 32)</check>
+    <check type="manual">Verify SUCCESS_RATE calculation: manually count failed projects, compute expected percentage, compare to script output</check>
+    <check type="manual">Verify TOP_5_PROJECTS list contains the 5 most recently shipped projects by checking their ship dates</check>
+    <check type="manual">Verify projects with "—" dates are excluded from top 5 or sorted to end of SORTED_PROJECTS list</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies - this is Wave 1 (can run in parallel with task 1) -->
+    <!-- Independent task (wave 1) - can run in parallel with phase-1-task-1, though logically builds on it -->
   </dependencies>
 
-  <commit-message>feat(blog): create blog utility module for markdown parsing
+  <commit-message>feat(scripts): add aggregate metrics and sorting logic
 
-Add lib/blog.ts with functions for markdown-driven blog:
-- getAllPostSlugs(): List all markdown files from blog/posts/
-- getAllPosts(): Parse all posts and sort by date
-- getPostBySlug(slug): Load and parse individual post
-- BlogPost interface: Type definition for post data
+Implement calculation functions for scoreboard statistics:
+- Total shipped/failed project counts
+- Success rate percentage
+- Average pipeline duration
+- Top 5 most recent projects identification
+- Reverse chronological sorting
 
-Uses gray-matter for YAML frontmatter, remark for HTML conversion.
-Posts directory: src/app/blog/posts/
+All calculations handle missing data ("—") gracefully.
+
+Addresses: REQ-6, REQ-8, REQ-10
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-3" wave="1">
-  <title>Create Posts Directory</title>
-  <requirement>TR-012: Create blog/posts/ directory for markdown files</requirement>
-  <description>
-Create the directory where all blog post markdown files will live. This establishes the canonical location for blog content.
-
-Per PRD architecture, posts go in src/app/blog/posts/ (not at the blog root).
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/website/src/app/blog/" reason="Parent directory for posts/" />
-  </context>
-
-  <steps>
-    <step order="1">Create directory: mkdir -p /home/agent/shipyard-ai/website/src/app/blog/posts</step>
-    <step order="2">Verify directory exists and is accessible</step>
-    <step order="3">Add .gitkeep file to ensure directory is tracked by git (optional)</step>
-  </steps>
-
-  <verification>
-    <check type="manual">Directory exists at /home/agent/shipyard-ai/website/src/app/blog/posts/</check>
-    <check type="build">ls -la /home/agent/shipyard-ai/website/src/app/blog/posts/</check>
-  </verification>
-
-  <dependencies>
-    <!-- No dependencies - this is Wave 1 -->
-  </dependencies>
-
-  <commit-message>feat(blog): create posts directory for markdown files
-
-Add src/app/blog/posts/ directory as canonical location for blog content.
-All blog posts will be stored as .md files in this directory.
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
 
 ---
 
-### Wave 2 (Parallel, after Wave 1) — Content & Routes
+### Wave 2 (Parallel, after Wave 1) — Markdown Generation
 
-These three tasks depend on Wave 1 completing but can run in parallel with each other.
+**Focus**: Generate markdown sections using extracted and calculated data
 
-```xml
+<task-plan id="phase-1-task-3" wave="2">
+  <title>Generate Core Metrics & Summary Table Sections</title>
+  <requirement>REQ-11, REQ-12, REQ-15: Generate SCOREBOARD.md header with aggregate metrics and summary table (all projects, 5 columns) using raw brand voice</requirement>
+  <description>
+    Build markdown generation functions for the first two sections of SCOREBOARD.md:
+
+    1. Header section with agency branding and core metrics (Total Shipped, Total Failed, Success Rate, Average Duration)
+    2. Summary table with all projects (one row per project, 5 columns: Project Name linked, Ship Date, QA Verdict, Board Score, Deliverables linked)
+
+    Implements raw brand voice per Decision 1.4: use exact verdicts "PASS on first try", "BLOCK (X cycles)", "REJECT" — no marketing speak. All missing data displayed as "—".
+
+    Target: ~40 lines for this section (32 project rows + headers + metrics).
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/scripts/update-scoreboard.sh" reason="Add markdown generation functions to script created in wave 1" />
+    <file path="/home/agent/shipyard-ai/prds/scoreboard-update.md" reason="PRD lines 26-48 provide template for SCOREBOARD.md structure and table format" />
+    <file path="/home/agent/shipyard-ai/rounds/scoreboard-update/decisions.md" reason="Decision 1.4 defines raw brand voice requirements; Decision 1.1 defines product name 'Scoreboard'; Decision 2 defines 5-column summary table structure" />
+    <file path="/home/agent/shipyard-ai/SCOREBOARD.md" reason="Existing scoreboard file (may have old content) — will be overwritten with new generated content" />
+    <file path="/home/agent/shipyard-ai/.planning/requirements-analysis.md" reason="REQ-11, REQ-12, REQ-15 with acceptance criteria for markdown format and brand voice" />
+  </context>
+
+  <steps>
+    <step order="1">Implement function generate_header() that outputs markdown with title "# Shipyard AI — Scoreboard" (per Decision 1.1) and agency metadata</step>
+    <step order="2">Implement function generate_core_metrics() that outputs bulleted list or table showing: Total Shipped (from TOTAL_SHIPPED), Total Failed (from TOTAL_FAILED), Success Rate (from SUCCESS_RATE), Average Pipeline Duration (from AVG_DURATION or "—")</step>
+    <step order="3">Implement function generate_summary_table_header() that outputs markdown table header with 5 columns: "| Project | Shipped | QA | Board | Deliverables |" plus separator row</step>
+    <step order="4">Implement function generate_summary_table_row(project) that creates one table row with: project name as markdown link to prds/completed/{project}.md, ship date (PROJECT_DATE), QA verdict (PROJECT_QA with raw language), board score (PROJECT_BOARD), deliverables link (PROJECT_DELIVERABLES)</step>
+    <step order="5">Ensure QA verdict formatting follows Decision 1.4 brand voice: output exactly "PASS on first try", "BLOCK (X cycles)", "REJECT", or "—" — validate no marketing phrases like "Successfully validated"</step>
+    <step order="6">Implement function generate_summary_table() that iterates through SORTED_PROJECTS array (reverse chronological order) and calls generate_summary_table_row() for each project</step>
+    <step order="7">Create function generate_metrics_and_summary_section() that combines header + core metrics + summary table into single markdown block</step>
+    <step order="8">Add output redirection to write this section to temporary file or accumulate in variable for final SCOREBOARD.md assembly</step>
+    <step order="9">Test output: verify markdown table syntax is valid (correct number of pipes, proper alignment), verify all 32 projects appear as rows, verify sorting is newest-first</step>
+    <step order="10">Validate brand voice: grep output for forbidden marketing terms ("successfully validated", "iterative refinement", "strategic alignment") — script should error if found</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Run script and inspect generated markdown — verify table renders correctly in GitHub markdown preview</check>
+    <check type="manual">Count rows in summary table: should be 32 (one per completed project)</check>
+    <check type="manual">Verify QA column uses only: "PASS on first try", "BLOCK (X cycles)", "REJECT", or "—" (no other variants)</check>
+    <check type="manual">Verify board scores are in range 0-10 or "—", no other values</check>
+    <check type="manual">Verify all project links point to /prds/completed/{project}.md format</check>
+    <check type="manual">Verify deliverables links point to /deliverables/{project}/ format or show "—"</check>
+    <check type="manual">Verify sorting: first row is most recent project by ship date</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-1" reason="Requires PROJECT_* associative arrays populated with extracted data" />
+    <depends-on task-id="phase-1-task-2" reason="Requires SORTED_PROJECTS array and calculated aggregate metrics (TOTAL_SHIPPED, SUCCESS_RATE, etc.)" />
+  </dependencies>
+
+  <commit-message>feat(scripts): generate core metrics and summary table sections
+
+Add markdown generation functions for:
+- Header with agency branding and "Scoreboard" title (Decision 1.1)
+- Core metrics: total shipped, failed, success rate, avg duration
+- Summary table: all 32 projects with 5 columns (name, date, QA, board, deliverables)
+
+Implements raw brand voice (Decision 1.4): PASS/BLOCK/REJECT only, no marketing speak.
+Reverse chronological sorting per Decision 2.
+
+Addresses: REQ-11, REQ-12, REQ-15
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
 <task-plan id="phase-1-task-4" wave="2">
-  <title>Migrate Blog Posts to Markdown Files</title>
-  <requirement>FR-011, FR-012, FR-013, FR-015: Create 6 markdown files and clean up orphans</requirement>
+  <title>Generate Expanded Details Section (Top 5 Projects)</title>
+  <requirement>REQ-13, REQ-15: Generate expanded context section for top 5 most recent projects with QA notes, board feedback, and deliverables list using raw brand voice</requirement>
   <description>
-Migrate the 4 existing hardcoded posts to markdown files and add the 2 new daemon posts. This creates exactly 6 markdown files in blog/posts/ with proper YAML frontmatter.
+    Build markdown generation for the expanded details section that provides deep context on the 5 most recent projects. For each of the top 5 projects, generate:
+    - Project name as H2 heading
+    - Context: What was built (extract from essence.md or PRD)
+    - QA Notes: Key blockers, iteration count, final verdict (extract from qa-pass-*.md files)
+    - Board Feedback: Score rationale, strategic notes (extract from board-verdict.md)
+    - Deliverables: Bulleted list with link to deliverables/ directory (no file enumeration per Decision 2)
 
-Existing posts (from page.tsx array):
-1. seven-plugins-zero-errors
-2. why-we-bet-on-emdash
-3. portable-text-for-agents
-4. three-sites-one-session
-
-New posts (from deliverables):
-5. the-night-shift
-6. model-selection-multi-agent
-
-Also clean up orphaned .md files from blog root.
+    Maintains raw brand voice throughout. Target: ~25 lines per project × 5 projects = ~125 lines total for this section.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/website/src/app/blog/page.tsx" reason="Contains 4 hardcoded posts to migrate" />
-    <file path="/home/agent/shipyard-ai/website/src/app/blog/the-night-shift.md" reason="Existing markdown file to move" />
-    <file path="/home/agent/shipyard-ai/website/src/app/blog/model-selection-multi-agent.md" reason="Existing markdown file to move" />
-    <file path="/home/agent/shipyard-ai/website/src/app/blog/seven-plugins-zero-errors.md" reason="Existing markdown file to move" />
-    <file path="/home/agent/shipyard-ai/deliverables/blog-daemon-architecture/the-night-shift.md" reason="Source for night-shift post" />
-    <file path="/home/agent/shipyard-ai/deliverables/blog-model-selection/model-selection-multi-agent.md" reason="Source for model-selection post" />
+    <file path="/home/agent/shipyard-ai/scripts/update-scoreboard.sh" reason="Add expanded details generation functions to script" />
+    <file path="/home/agent/shipyard-ai/rounds/" reason="Source for essence.md, qa-pass-*.md, board-verdict.md files to extract expanded context" />
+    <file path="/home/agent/shipyard-ai/rounds/scoreboard-update/decisions.md" reason="Decision 1.2 specifies top 5 projects get expanded details (~25 lines each); Decision 2 specifies no file enumeration in deliverables" />
+    <file path="/home/agent/shipyard-ai/.planning/requirements-analysis.md" reason="REQ-13 with detailed acceptance criteria for expanded details structure and content" />
   </context>
 
   <steps>
-    <step order="1">Read existing blog/page.tsx to extract hardcoded post content (4 posts)</step>
-    <step order="2">For "seven-plugins-zero-errors": Move existing blog/seven-plugins-zero-errors.md to blog/posts/, verify frontmatter</step>
-    <step order="3">For "why-we-bet-on-emdash": Create blog/posts/why-we-bet-on-emdash.md with frontmatter (title, date: 2026-04-04, description, tags) and content from page.tsx</step>
-    <step order="4">For "portable-text-for-agents": Create blog/posts/portable-text-for-agents.md with frontmatter and content from page.tsx</step>
-    <step order="5">For "three-sites-one-session": Create blog/posts/three-sites-one-session.md with frontmatter and content from page.tsx</step>
-    <step order="6">For "the-night-shift": Move blog/the-night-shift.md to blog/posts/ (already has frontmatter)</step>
-    <step order="7">For "model-selection-multi-agent": Move blog/model-selection-multi-agent.md to blog/posts/ (already has frontmatter)</step>
-    <step order="8">Verify all 6 files exist in blog/posts/ with valid YAML frontmatter</step>
-    <step order="9">Clean up: Remove any remaining .md files from blog/ root (orphaned files)</step>
-    <step order="10">Verify frontmatter schema: title, description, date, tags fields present</step>
+    <step order="1">Implement function extract_project_context(project) that reads rounds/{project}/essence.md and extracts 1-2 sentence summary of what was built, fallback to reading PRD if essence.md doesn't exist, return "—" if neither available</step>
+    <step order="2">Implement function extract_qa_notes(project) that reads rounds/{project}/qa-pass-*.md files and extracts: (a) key blockers mentioned, (b) number of BLOCK cycles if any, (c) final verdict with reasoning. Return 2-4 bullet points or "—" if no QA files found.</step>
+    <step order="3">Implement function extract_board_feedback(project) that reads rounds/{project}/board-verdict.md and extracts: (a) overall verdict (HOLD/PROCEED/REJECT), (b) aggregate score, (c) 1-2 key concerns or highlights from board members. Return 2-3 bullet points or "—" if no board verdict found.</step>
+    <step order="4">Implement function extract_deliverables_summary(project) that outputs single bullet: "- [View deliverables](/deliverables/{project}/)" if directory exists, or "- No deliverables directory" if not. DO NOT enumerate files (per Decision 2, WONT-3).</step>
+    <step order="5">Implement function generate_expanded_detail(project) that combines: H2 heading with project name, "Context:" section with extract_project_context() output, "QA Notes:" section with extract_qa_notes() output, "Board Feedback:" section with extract_board_feedback() output, "Deliverables:" section with extract_deliverables_summary() output</step>
+    <step order="6">Ensure all extracted text maintains raw brand voice: preserve original PASS/BLOCK/REJECT language from QA files, preserve HOLD/PROCEED/REJECT from board files, no marketing sanitization</step>
+    <step order="7">Implement function generate_expanded_details_section() that iterates through TOP_5_PROJECTS array and calls generate_expanded_detail() for each, with H1 heading "## Expanded Details (Recent Projects)" at top</step>
+    <step order="8">Add line count estimation: each project detail should target ~25 lines; log warning if any project exceeds 30 lines (indicates too verbose extraction)</step>
+    <step order="9">Test on actual top 5 projects: verify essence.md, QA files, board-verdict.md are parsed correctly and output makes sense</step>
+    <step order="10">Validate no file enumeration: grep output for patterns like "deliverables/{project}/file.md" (should not exist, only directory links allowed)</step>
   </steps>
 
   <verification>
-    <check type="manual">Exactly 6 .md files in /home/agent/shipyard-ai/website/src/app/blog/posts/</check>
-    <check type="manual">Each file has valid YAML frontmatter with title, date, description, tags</check>
-    <check type="manual">No .md files remain in /home/agent/shipyard-ai/website/src/app/blog/ root</check>
-    <check type="build">ls -1 /home/agent/shipyard-ai/website/src/app/blog/posts/*.md | wc -l</check>
-    <check type="manual">All slugs match: seven-plugins-zero-errors, why-we-bet-on-emdash, portable-text-for-agents, three-sites-one-session, the-night-shift, model-selection-multi-agent</check>
+    <check type="manual">Run script and verify expanded details section contains exactly 5 project subsections (or fewer if less than 5 total projects)</check>
+    <check type="manual">Verify each project subsection has all 4 components: Context, QA Notes, Board Feedback, Deliverables</check>
+    <check type="manual">Verify total line count for expanded details section is approximately 125 lines (5 projects × ~25 lines)</check>
+    <check type="manual">Verify no individual project subsection exceeds 30 lines</check>
+    <check type="manual">Verify deliverables section only links to directory, does not enumerate individual files</check>
+    <check type="manual">Spot-check 2 projects: manually read their round files and verify extracted context/QA/board feedback is accurate</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="Needs posts/ directory to exist" />
+    <depends-on task-id="phase-1-task-2" reason="Requires TOP_5_PROJECTS array with identified top 5 recent projects" />
   </dependencies>
 
-  <commit-message>feat(blog): migrate posts to markdown files
+  <commit-message>feat(scripts): generate expanded details for top 5 projects
 
-Convert 4 hardcoded posts to markdown and add 2 new daemon posts:
+Add markdown generation for expanded context section with:
+- Project context from essence.md
+- QA notes and blockers from qa-pass-*.md files
+- Board feedback and scores from board-verdict.md
+- Deliverables directory link (no file enumeration)
 
-Migrated from page.tsx:
-- seven-plugins-zero-errors.md
-- why-we-bet-on-emdash.md
-- portable-text-for-agents.md
-- three-sites-one-session.md
+Covers top 5 most recent projects per Decision 1.2.
+Maintains raw brand voice throughout (Decision 1.4).
+Target: ~25 lines per project, ~125 lines total.
 
-Added new posts:
-- the-night-shift.md (daemon architecture)
-- model-selection-multi-agent.md (model selection)
-
-All posts now in src/app/blog/posts/ with YAML frontmatter.
-Cleaned up orphaned .md files from blog root.
-
-Total: 6 markdown files ready for dynamic routing.
+Addresses: REQ-13, REQ-15
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-5" wave="2">
-  <title>Create Dynamic Post Route Page</title>
-  <requirement>TR-002, TR-003, TR-011, FR-002, FR-007-FR-010: Create blog/[slug]/page.tsx</requirement>
-  <description>
-Create the dynamic route page that renders individual blog posts at /blog/[slug]. This page uses generateStaticParams() to pre-generate all routes at build time and generateMetadata() for SEO.
-
-Per PRD §3, this page must work with static export, so generateStaticParams() is mandatory.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/prds/blog-infrastructure.md" reason="Contains exact code specification for [slug]/page.tsx in §3" />
-    <file path="/home/agent/shipyard-ai/website/src/app/blog/page.tsx" reason="Reference for styling patterns and design tokens" />
-    <file path="/home/agent/shipyard-ai/website/src/lib/blog.ts" reason="Blog utility functions to import" />
-  </context>
-
-  <steps>
-    <step order="1">Create directory: mkdir -p /home/agent/shipyard-ai/website/src/app/blog/[slug]</step>
-    <step order="2">Create file: /home/agent/shipyard-ai/website/src/app/blog/[slug]/page.tsx</step>
-    <step order="3">Import getAllPostSlugs, getPostBySlug from @/lib/blog</step>
-    <step order="4">Implement generateStaticParams(): return getAllPostSlugs().map(slug => ({ slug }))</step>
-    <step order="5">Implement generateMetadata({ params }): call getPostBySlug(params.slug), return Metadata with title, description, openGraph</step>
-    <step order="6">Implement default component: receive params.slug, call getPostBySlug(), render post</step>
-    <step order="7">Add styling matching existing blog: prose prose-invert, dark theme, monospace dates, same spacing</step>
-    <step order="8">Add back link to /blog at top of post</step>
-    <step order="9">Display metadata: date (monospace), title, tags (optional)</step>
-    <step order="10">Render content using dangerouslySetInnerHTML (content is already sanitized HTML from remark)</step>
-    <step order="11">Add TypeScript types for params: { params: { slug: string } }</step>
-  </steps>
-
-  <verification>
-    <check type="manual">File exists at /home/agent/shipyard-ai/website/src/app/blog/[slug]/page.tsx</check>
-    <check type="manual">Exports generateStaticParams() function</check>
-    <check type="manual">Exports generateMetadata() function</check>
-    <check type="manual">Default component renders post content</check>
-    <check type="manual">Styling matches existing blog (prose-invert, dark theme)</check>
-    <check type="manual">Back link to /blog visible</check>
-    <check type="manual">Date displayed in monospace font</check>
-    <check type="build">cd /home/agent/shipyard-ai/website && npx tsc --noEmit</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Needs lib/blog.ts functions" />
-    <depends-on task-id="phase-1-task-4" reason="Needs markdown files to generate routes" />
-  </dependencies>
-
-  <commit-message>feat(blog): create dynamic route for individual posts
-
-Add blog/[slug]/page.tsx to render individual post pages:
-
-Features:
-- generateStaticParams(): Pre-generate all post routes at build time
-- generateMetadata(): SEO with title, description, OpenGraph tags
-- Dynamic rendering from markdown files
-- Design matches existing blog (dark theme, prose-invert)
-- Monospace dates, back link to /blog
-- Works with static export (output: "export")
-
-Routes: /blog/seven-plugins-zero-errors, /blog/the-night-shift, etc.
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-6" wave="2">
-  <title>Update Blog Index to Use Markdown</title>
-  <requirement>FR-001, FR-003, FR-014: Replace hardcoded posts array with getAllPosts()</requirement>
-  <description>
-Refactor blog/page.tsx to read posts from markdown files instead of hardcoded array. Replace inline content with "Read more" links to individual post pages. Preserve hero section and subscribe CTA.
-
-Per PRD §4, keep existing hero/CTA sections unchanged - only modify the posts display logic.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/website/src/app/blog/page.tsx" reason="Blog index page to refactor" />
-    <file path="/home/agent/shipyard-ai/website/src/lib/blog.ts" reason="Import getAllPosts() from here" />
-  </context>
-
-  <steps>
-    <step order="1">Read current blog/page.tsx to understand structure</step>
-    <step order="2">Import getAllPosts from @/lib/blog</step>
-    <step order="3">Replace const posts = [...] with const posts = getAllPosts()</step>
-    <step order="4">Update post rendering: Remove inline content display</step>
-    <step order="5">Add "Read more" links: Link each post title or add explicit link to /blog/${post.slug}</step>
-    <step order="6">Display: date (monospace), title, description (from frontmatter)</step>
-    <step order="7">Keep hero section unchanged (lines ~214-228)</step>
-    <step order="8">Keep subscribe CTA unchanged (lines ~261-280)</step>
-    <step order="9">Verify styling remains consistent (same classes, same layout)</step>
-    <step order="10">Test that all 6 posts appear in index</step>
-  </steps>
-
-  <verification>
-    <check type="manual">Imports getAllPosts from @/lib/blog</check>
-    <check type="manual">No hardcoded posts array (removed)</check>
-    <check type="manual">Posts map includes Link to /blog/${post.slug}</check>
-    <check type="manual">Hero section preserved (unchanged)</check>
-    <check type="manual">Subscribe CTA preserved (unchanged)</check>
-    <check type="manual">Display shows date, title, description (not full content)</check>
-    <check type="build">cd /home/agent/shipyard-ai/website && npx tsc --noEmit</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Needs lib/blog.ts functions" />
-    <depends-on task-id="phase-1-task-4" reason="Needs markdown files to display" />
-  </dependencies>
-
-  <commit-message>feat(blog): update index to use markdown files
-
-Refactor blog/page.tsx to read from markdown instead of hardcoded array:
-
-Changes:
-- Replace hardcoded posts array with getAllPosts() from lib/blog
-- Display title, date, description from frontmatter
-- Add "Read more" links to /blog/[slug] pages
-- Remove inline content display
-
-Preserved:
-- Hero section unchanged
-- Subscribe CTA unchanged
-- Design and styling consistent
-
-Now shows all 6 markdown posts with links to individual pages.
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
 
 ---
 
-### Wave 3 (Sequential, after Wave 2) — Build & Deploy
+### Wave 3 (After Wave 2) — Assembly, Validation & Finalization
 
-These tasks must run sequentially after Wave 2 completes.
+**Focus**: Combine all sections, validate output, update related files, commit
 
-```xml
+<task-plan id="phase-1-task-5" wave="3">
+  <title>Assemble Complete SCOREBOARD.md & Validate</title>
+  <requirement>REQ-14, REQ-18: Combine all markdown sections into final SCOREBOARD.md file, validate formatting and data accuracy, ensure total length ≤200 lines (target ~165)</requirement>
+  <description>
+    Create the main orchestration function that assembles the complete SCOREBOARD.md file by combining:
+    1. Header + Core Metrics section (from phase-1-task-3)
+    2. Summary Table section (from phase-1-task-3)
+    3. Expanded Details section (from phase-1-task-4)
+    4. Closing metadata/notes if needed
+
+    Write the assembled content to /home/agent/shipyard-ai/SCOREBOARD.md (overwrite existing file).
+
+    Validate the output:
+    - Total line count ≤200 lines (target ~165 per Decision 1.8)
+    - Markdown syntax valid (renders correctly on GitHub)
+    - All data accurate (spot-check 5 random projects)
+    - No projects missing from summary table
+    - Brand voice compliance (no marketing speak)
+
+    This task represents the final output generation and quality validation before commit.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/scripts/update-scoreboard.sh" reason="Add main assembly and validation functions to complete the script" />
+    <file path="/home/agent/shipyard-ai/SCOREBOARD.md" reason="Target output file — will be overwritten with newly generated content" />
+    <file path="/home/agent/shipyard-ai/rounds/scoreboard-update/decisions.md" reason="Decision 1.8 specifies target length ~165 lines (max 200); Decision 1.9 requires validation of no guessed data" />
+    <file path="/home/agent/shipyard-ai/.planning/requirements-analysis.md" reason="REQ-14, REQ-18 with acceptance criteria for final assembly and validation" />
+  </context>
+
+  <steps>
+    <step order="1">Implement function assemble_scoreboard() that combines output from: generate_metrics_and_summary_section() + generate_expanded_details_section() into single markdown string</step>
+    <step order="2">Add optional footer section with metadata: generation timestamp, script version, link to update instructions</step>
+    <step order="3">Write assembled markdown to /home/agent/shipyard-ai/SCOREBOARD.md using cat or echo redirection (overwrite mode)</step>
+    <step order="4">Implement function validate_line_count() that counts total lines in SCOREBOARD.md, warns if exceeds 200, errors if exceeds 250</step>
+    <step order="5">Implement function validate_markdown_syntax() that checks for: balanced table pipes, no broken links (all /prds/completed/{project}.md files exist), no empty required sections</step>
+    <step order="6">Implement function validate_brand_voice() that greps SCOREBOARD.md for forbidden marketing terms: "successfully validated", "iterative refinement", "strategic alignment", "TBD", "N/A", "Unknown" — error if any found (should be "PASS"/"BLOCK"/"REJECT"/"—" only)</step>
+    <step order="7">Implement function spot_check_accuracy() that randomly selects 5 projects and compares SCOREBOARD.md data against source files (rounds/{project}/). Check: QA verdict matches, board score matches, ship date reasonable.</step>
+    <step order="8">Create main() function that orchestrates full script execution: extract_all_data() → calculate_metrics() → generate_markdown() → assemble_scoreboard() → validate_all() → output success message</step>
+    <step order="9">Add comprehensive error handling: if any validation fails, print detailed error report and exit 1 (non-zero). If all validations pass, print success summary with stats (projects processed, line count, missing data count)</step>
+    <step order="10">Run full script end-to-end: ./scripts/update-scoreboard.sh should complete successfully and generate valid SCOREBOARD.md</step>
+    <step order="11">Manually inspect generated SCOREBOARD.md: verify it renders correctly in markdown viewer, verify data looks accurate, verify ~165 line target met</step>
+    <step order="12">Test idempotency: run script twice, diff the two outputs — should be identical (no random variation)</step>
+  </steps>
+
+  <verification>
+    <check type="build">./scripts/update-scoreboard.sh (should exit 0 on success)</check>
+    <check type="manual">Verify SCOREBOARD.md file exists at /home/agent/shipyard-ai/SCOREBOARD.md</check>
+    <check type="manual">Count lines in SCOREBOARD.md: wc -l SCOREBOARD.md (should be ≤200, ideally ~165)</check>
+    <check type="manual">Open SCOREBOARD.md in markdown preview — verify all tables render correctly, no syntax errors</check>
+    <check type="manual">Verify all 32 completed projects appear in summary table</check>
+    <check type="manual">Verify top 5 projects have expanded detail sections</check>
+    <check type="manual">Spot-check 5 random projects: compare summary table data to actual round files, verify accuracy</check>
+    <check type="manual">Run: grep -E "successfully|iterative|strategic|TBD|N/A|Unknown" SCOREBOARD.md (should return no matches)</check>
+    <check type="manual">Test idempotency: run script twice, diff outputs (should be identical)</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-3" reason="Requires generate_metrics_and_summary_section() function completed" />
+    <depends-on task-id="phase-1-task-4" reason="Requires generate_expanded_details_section() function completed" />
+  </dependencies>
+
+  <commit-message>feat(scripts): assemble and validate complete SCOREBOARD.md
+
+Add main orchestration and validation functions:
+- Assemble all sections into complete SCOREBOARD.md
+- Validate line count (≤200 lines, target ~165)
+- Validate markdown syntax and table formatting
+- Validate brand voice compliance (no marketing speak)
+- Spot-check data accuracy (5 random projects)
+- Idempotency test (reproducible output)
+
+Script now generates complete, validated scoreboard from filesystem data.
+
+Addresses: REQ-14, REQ-18
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-6" wave="3">
+  <title>Update STATUS.md with Current Counts</title>
+  <requirement>REQ-16: Update STATUS.md to reflect current idle state with accurate project counts (total shipped, failed, success rate)</requirement>
+  <description>
+    Update the agency STATUS.md file with current statistics from the scoreboard extraction. This ensures STATUS.md reflects the same aggregate metrics as SCOREBOARD.md (single source of truth from extraction script).
+
+    Update or add fields for:
+    - Total projects shipped
+    - Total projects failed
+    - Success rate percentage
+    - Current pipeline state (IDLE or ACTIVE)
+
+    This task has SHOULD priority (not blocking for v1 MVP, but completes the PRD requirement).
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/STATUS.md" reason="Target file to update with current project counts and success metrics" />
+    <file path="/home/agent/shipyard-ai/scripts/update-scoreboard.sh" reason="Source of calculated metrics (TOTAL_SHIPPED, TOTAL_FAILED, SUCCESS_RATE) to write to STATUS.md" />
+    <file path="/home/agent/shipyard-ai/prds/scoreboard-update.md" reason="PRD line 52 specifies updating STATUS.md with accurate current state counts" />
+    <file path="/home/agent/shipyard-ai/.planning/requirements-analysis.md" reason="REQ-16 (SHOULD priority) with acceptance criteria for STATUS.md update" />
+  </context>
+
+  <steps>
+    <step order="1">Read current /home/agent/shipyard-ai/STATUS.md to understand existing format and fields</step>
+    <step order="2">Extend scripts/update-scoreboard.sh with function update_status_file() that modifies STATUS.md</step>
+    <step order="3">Update or add "total_shipped: {count}" field with TOTAL_SHIPPED value</step>
+    <step order="4">Update or add "total_failed: {count}" field with TOTAL_FAILED value (may be 0)</step>
+    <step order="5">Update or add "success_rate: {percentage}" field with SUCCESS_RATE value</step>
+    <step order="6">Update "state:" field to reflect current pipeline state (IDLE if no active projects, ACTIVE otherwise)</step>
+    <step order="7">Preserve other fields in STATUS.md (don't remove existing content unrelated to project counts)</step>
+    <step order="8">Add timestamp or last_updated field showing when STATUS.md was updated</step>
+    <step order="9">Test: run script and verify STATUS.md is updated correctly with matching numbers from SCOREBOARD.md</step>
+    <step order="10">Verify STATUS.md remains valid YAML or markdown format (don't break existing parsers)</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Run ./scripts/update-scoreboard.sh and verify STATUS.md file is updated</check>
+    <check type="manual">Compare metrics in STATUS.md vs SCOREBOARD.md — should match exactly (total_shipped, total_failed, success_rate)</check>
+    <check type="manual">Verify STATUS.md remains parseable (if YAML) or readable (if markdown)</check>
+    <check type="manual">Verify other fields in STATUS.md are preserved (not deleted by update)</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-2" reason="Requires calculated aggregate metrics (TOTAL_SHIPPED, TOTAL_FAILED, SUCCESS_RATE)" />
+  </dependencies>
+
+  <commit-message>feat(scripts): update STATUS.md with current project counts
+
+Extend scoreboard script to update STATUS.md with:
+- Total shipped projects
+- Total failed projects
+- Success rate percentage
+- Last updated timestamp
+
+Ensures STATUS.md reflects same metrics as SCOREBOARD.md.
+
+Addresses: REQ-16
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
 <task-plan id="phase-1-task-7" wave="3">
-  <title>Build and Verify Static Generation</title>
-  <requirement>TR-001, TR-008, QA-007: Build succeeds and all routes generate correctly</requirement>
+  <title>Commit and Push SCOREBOARD.md</title>
+  <requirement>REQ-19: Commit generated SCOREBOARD.md, extraction script, and STATUS.md to repository and push to main</requirement>
   <description>
-Run npm run build to verify that static generation works correctly. All blog post routes should be pre-generated as static HTML files. Verify no build errors and inspect the output directory.
+    Final task: commit all deliverables from this phase to git and push to origin/main. This makes the scoreboard publicly visible and completes the PRD success criteria.
 
-This is the critical verification that the markdown-driven blog works with Next.js static export.
+    Files to commit:
+    - /home/agent/shipyard-ai/scripts/update-scoreboard.sh (new extraction script)
+    - /home/agent/shipyard-ai/SCOREBOARD.md (newly generated scoreboard)
+    - /home/agent/shipyard-ai/STATUS.md (updated counts)
+
+    This task has SHOULD priority (not technically blocking, but completes the "committed and pushed" success criterion from PRD line 64).
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/website/next.config.ts" reason="Confirms output: 'export' configuration" />
-    <file path="/home/agent/shipyard-ai/website/package.json" reason="Build script definition" />
+    <file path="/home/agent/shipyard-ai/scripts/update-scoreboard.sh" reason="New file to commit — automated extraction script" />
+    <file path="/home/agent/shipyard-ai/SCOREBOARD.md" reason="Modified file to commit — newly generated scoreboard" />
+    <file path="/home/agent/shipyard-ai/STATUS.md" reason="Modified file to commit — updated with current counts" />
+    <file path="/home/agent/shipyard-ai/.git/" reason="Git repository for commit and push operations" />
+    <file path="/home/agent/shipyard-ai/prds/scoreboard-update.md" reason="PRD line 64 success criterion: 'Committed and pushed'" />
   </context>
 
   <steps>
-    <step order="1">Navigate to website directory: cd /home/agent/shipyard-ai/website</step>
-    <step order="2">Run build: npm run build</step>
-    <step order="3">Verify build exits with code 0 (no errors)</step>
-    <step order="4">Check build output for: "Exported X routes"</step>
-    <step order="5">Inspect out/ directory: ls out/blog/</step>
-    <step order="6">Verify individual post HTML files exist: ls out/blog/the-night-shift.html out/blog/model-selection-multi-agent.html</step>
-    <step order="7">Verify blog index exists: ls out/blog.html or out/blog/index.html</step>
-    <step order="8">Check for TypeScript errors: npx tsc --noEmit</step>
-    <step order="9">Run lint if available: npm run lint (optional)</step>
+    <step order="1">Run git status to verify working tree state and see all modified/new files</step>
+    <step order="2">Run git add scripts/update-scoreboard.sh SCOREBOARD.md STATUS.md to stage all deliverables</step>
+    <step order="3">Run git status again to confirm all expected files are staged</step>
+    <step order="4">Create comprehensive commit message following conventional commits format with co-author attribution</step>
+    <step order="5">Run git commit with multi-line message describing: (1) Added automated scoreboard extraction script, (2) Generated SCOREBOARD.md with 32 projects, hybrid format, raw verdicts, (3) Updated STATUS.md with current counts, (4) Addresses PRD scoreboard-update and decisions.md locked requirements</step>
+    <step order="6">Run git log -1 to verify commit was created successfully</step>
+    <step order="7">Run git push origin main (or current branch if not on main)</step>
+    <step order="8">Verify push succeeded (no errors, all objects uploaded)</step>
+    <step order="9">Optional: visit GitHub repo in browser and verify SCOREBOARD.md renders correctly with all tables and links</step>
   </steps>
 
   <verification>
-    <check type="build">cd /home/agent/shipyard-ai/website && npm run build</check>
-    <check type="manual">Build exits with code 0</check>
-    <check type="manual">No error messages in build output</check>
-    <check type="manual">out/blog/ directory contains HTML files for all posts</check>
-    <check type="build">ls /home/agent/shipyard-ai/website/out/blog/*.html</check>
-    <check type="manual">All 6 post routes generated as static HTML</check>
+    <check type="manual">Run git log -1 and verify commit message is comprehensive and accurate</check>
+    <check type="manual">Run git status — should show "nothing to commit, working tree clean"</check>
+    <check type="manual">Run git log --oneline -5 to confirm commit appears in history</check>
+    <check type="manual">Visit repository on GitHub and verify: (1) SCOREBOARD.md file visible at repo root, (2) Markdown renders correctly, (3) All tables display properly, (4) Links are clickable</check>
+    <check type="manual">Visit /scripts/update-scoreboard.sh on GitHub and verify it's marked as executable</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-4" reason="Needs markdown files" />
-    <depends-on task-id="phase-1-task-5" reason="Needs dynamic route page" />
-    <depends-on task-id="phase-1-task-6" reason="Needs updated index page" />
+    <depends-on task-id="phase-1-task-5" reason="Requires SCOREBOARD.md to be generated and validated before committing" />
+    <depends-on task-id="phase-1-task-6" reason="Requires STATUS.md to be updated before committing (if task-6 completed)" />
   </dependencies>
 
-  <commit-message>test(blog): verify static build with markdown posts
+  <commit-message>feat: add automated scoreboard with complete project history
 
-Run npm run build to confirm:
-✅ Static export works with markdown-driven blog
-✅ All 6 post routes pre-generated as HTML
-✅ Blog index renders correctly
-✅ No TypeScript errors
-✅ No build errors
+Add automated extraction script and generated SCOREBOARD.md:
 
-Output directory contains all expected static files.
+- scripts/update-scoreboard.sh: Automated data extraction from prds/ and rounds/
+  - Extracts QA verdicts, board scores, ship dates, pipeline duration
+  - Calculates aggregate metrics (32 shipped, success rate, avg duration)
+  - Generates hybrid format: compact summary + top 5 expanded details
+  - Handles missing data gracefully with "—" (never guesses)
+  - Idempotent, completes in <5 minutes
+
+- SCOREBOARD.md: Complete project history (32 projects)
+  - Summary table: all projects with QA/board/deliverables (reverse chronological)
+  - Expanded details: top 5 recent projects with context/QA notes/board feedback
+  - Raw brand voice: "PASS on first try", "BLOCK (X cycles)", "REJECT" (no marketing speak)
+  - Target length: ~165 lines (Decision 1.8)
+
+- STATUS.md: Updated with current aggregate metrics
+
+Implements decisions from rounds/scoreboard-update/decisions.md:
+- Decision 1.2: Hybrid format (compact + expanded)
+- Decision 1.4: Raw verdicts (Steve wins)
+- Decision 1.5: Automated extraction (Elon wins)
+- Decision 1.6: Round timestamps (no daemon log parsing)
+- Decision 1.9: "—" for missing data (unanimous)
+
+Addresses PRD: /home/agent/shipyard-ai/prds/scoreboard-update.md
+Success criteria: All 32 projects visible, accurate data, committed & pushed
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
-```
-
-```xml
-<task-plan id="phase-1-task-8" wave="3">
-  <title>Deploy to Cloudflare Pages</title>
-  <requirement>QA-001, QA-002, QA-003, QA-004, QA-008: Deploy and verify production</requirement>
-  <description>
-Deploy the static site to Cloudflare Pages and verify all blog routes are accessible. Test blog index and individual post pages with curl to confirm proper deployment.
-
-Per PRD §6-7, this is the final success criteria - the blog must be live and accessible.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/website/out/" reason="Static build output to deploy" />
-    <file path="/home/agent/shipyard-ai/prds/blog-infrastructure.md" reason="Deployment command in §6" />
-  </context>
-
-  <steps>
-    <step order="1">Ensure build succeeded from previous task (out/ directory exists)</step>
-    <step order="2">Navigate to website directory: cd /home/agent/shipyard-ai/website</step>
-    <step order="3">Deploy using wrangler: CLOUDFLARE_API_TOKEN=$CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID=$CLOUDFLARE_ACCOUNT_ID npx wrangler pages deploy out --project-name=shipyard-ai</step>
-    <step order="4">Wait for deployment to complete</step>
-    <step order="5">Verify blog index: curl -s https://www.shipyard.company/blog | grep -i "night shift"</step>
-    <step order="6">Verify individual post: curl -s https://www.shipyard.company/blog/the-night-shift | grep -i "title"</step>
-    <step order="7">Verify another post: curl -s https://www.shipyard.company/blog/model-selection-multi-agent | grep -i "model"</step>
-    <step order="8">Check meta tags: curl -s https://www.shipyard.company/blog/the-night-shift | grep "og:title"</step>
-    <step order="9">Verify all 6 posts accessible (test each URL)</step>
-  </steps>
-
-  <verification>
-    <check type="build">curl -s https://www.shipyard.company/blog</check>
-    <check type="manual">Blog index returns HTML with all 6 posts</check>
-    <check type="build">curl -s https://www.shipyard.company/blog/the-night-shift</check>
-    <check type="manual">Individual post returns full HTML content</check>
-    <check type="build">curl -s https://www.shipyard.company/blog/model-selection-multi-agent</check>
-    <check type="manual">Another post returns full HTML content</check>
-    <check type="manual">Meta tags present (title, og:title, og:description)</check>
-    <check type="manual">All 6 post URLs accessible</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-7" reason="Needs successful build output" />
-  </dependencies>
-
-  <commit-message>deploy(blog): publish markdown-driven blog to production
-
-Deploy blog infrastructure to Cloudflare Pages:
-
-✅ Blog index live at https://www.shipyard.company/blog
-✅ Individual posts at /blog/[slug]
-✅ All 6 posts accessible:
-   - seven-plugins-zero-errors
-   - why-we-bet-on-emdash
-   - portable-text-for-agents
-   - three-sites-one-session
-   - the-night-shift
-   - model-selection-multi-agent
-
-✅ Meta tags present for SEO
-✅ Static generation working correctly
-✅ Design matches existing aesthetic
-
-Blog infrastructure complete and live.
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-```
 
 ---
 
 ## Risk Notes
 
-### Critical Risks
+### Risk 5.1: Inconsistent Data Formats (HIGH likelihood, MEDIUM impact)
+**Concern**: QA verdicts and board scores are stored inconsistently across round files (freeform markdown). Extraction logic may fail to find data in some projects.
 
-1. **remark-html vs react-markdown Conflict**
-   - PRD specifies `remark-html`, Decisions mention `react-markdown`
-   - **Resolution**: Following PRD specification (remark-html) as it's the authoritative technical document
-   - remark-html is lighter and works better with static export
-   - Mitigation: Documented in REQUIREMENTS.md
+**Mitigation**:
+- phase-1-task-1 implements multiple fallback grep patterns for QA verdicts (check qa-pass-*.md, final-verdict.md, board-verdict.md)
+- phase-1-task-1 implements multiple fallback patterns for board scores (check for "Average:", "Aggregate Score:", numeric patterns)
+- Liberal use of "—" when data not found (fail gracefully, don't block extraction)
+- phase-1-task-5 includes spot-check validation to identify projects with extraction failures
 
-2. **Static Export Compatibility**
-   - All dynamic routes must use `generateStaticParams()`
-   - No server-side rendering or API routes allowed
-   - Mitigation: Task 5 explicitly implements generateStaticParams(), Task 7 verifies build
-
-3. **Content Migration Data Loss**
-   - Risk of losing content when converting hardcoded posts to markdown
-   - Mitigation: Task 4 carefully extracts content from page.tsx, verifies all 6 files
-
-### Medium Risks
-
-1. **Frontmatter Schema Inconsistency**
-   - Existing markdown files may have inconsistent frontmatter
-   - Mitigation: Task 4 normalizes frontmatter schema (title, description, date, tags)
-
-2. **Build Time Regression**
-   - Adding markdown parsing could slow build
-   - Mitigation: Only 6 posts in V1, build time should be <30 seconds
-
-3. **Design Consistency**
-   - Individual post pages must match existing aesthetic
-   - Mitigation: Task 5 explicitly copies styling from existing blog/page.tsx
-
-### Low Risks
-
-1. **Deployment Failure**
-   - Cloudflare Pages deployment could fail
-   - Mitigation: Task 7 verifies build locally first, Task 8 retries if needed
-
-2. **Missing Dependencies**
-   - npm install could fail due to version conflicts
-   - Mitigation: Task 1 checks for peer dependency warnings
+**Owner**: Executor of phase-1-task-1
 
 ---
 
-## Execution Strategy
+### Risk 5.5: Pipeline Duration Data Unavailable (MEDIUM likelihood, LOW impact)
+**Concern**: Round file timestamps may be missing or inconsistent, making duration calculation impossible for some projects.
 
-### Wave 1: Parallel Setup (Est. 15-20 min)
-- Tasks 1, 2, 3 run in parallel
-- Set up infrastructure and utilities
-- No cross-dependencies
+**Mitigation**:
+- phase-1-task-1 uses file modification timestamps (mtime) as approximate duration source
+- Accept "—" as valid data point when timestamps insufficient
+- Don't block v1 on complete duration data (Decision 1.6 explicitly defers daemon log parsing to v2)
+- Average duration calculation in phase-1-task-2 excludes "—" values (doesn't corrupt average)
 
-### Wave 2: Parallel Implementation (Est. 1-1.5 hours)
-- Tasks 4, 5, 6 can run in parallel after Wave 1
-- Task 4 (content migration) is most time-consuming
-- Task 5 and 6 are coding tasks
-
-### Wave 3: Sequential Build & Deploy (Est. 20-30 min)
-- Task 7 (build) must complete before Task 8 (deploy)
-- Critical verification before going live
-
-**Total Estimated Time:** 2-3 hours
+**Owner**: Executor of phase-1-task-1, phase-1-task-2
 
 ---
 
-## Quality Checkpoints
+### Risk 5.4: Scope Creep to 5,000-Line Monster (MEDIUM likelihood, HIGH impact)
+**Concern**: Engineer adds "just one more metric" and scoreboard becomes unreadable database dump.
 
-### After Wave 1 (Setup Complete)
-- [ ] Dependencies installed (gray-matter, remark, remark-html)
-- [ ] lib/blog.ts created with all required functions
-- [ ] posts/ directory exists
+**Mitigation**:
+- Decision 1.8 locks v1 format at ~165 lines (40 summary + 125 expanded)
+- phase-1-task-5 includes line count validation (errors if >200 lines)
+- Decision 2 explicitly cuts: agent count, daemon logs, file enumeration, charts (WONT-1 through WONT-5)
+- This plan enforces constraint by only implementing locked v1 requirements
 
-### After Wave 2 (Implementation Complete)
-- [ ] All 6 markdown files in posts/ with valid frontmatter
-- [ ] [slug]/page.tsx created with generateStaticParams
-- [ ] Blog index updated to use getAllPosts()
-- [ ] No hardcoded posts array remaining
-- [ ] TypeScript compiles with no errors
-
-### After Wave 3 (Deployed)
-- [ ] npm run build succeeds
-- [ ] All 6 post routes generated as static HTML
-- [ ] Deployed to Cloudflare Pages
-- [ ] Blog index accessible at /blog
-- [ ] All individual posts accessible at /blog/[slug]
-- [ ] Meta tags present on post pages
-- [ ] Design matches existing aesthetic
+**Owner**: Plan reviewer (reject any task additions not in requirements-analysis.md)
 
 ---
 
-## Success Criteria
+## Execution Timeline Estimate
 
-### Technical Success
-✅ npm run build succeeds with no errors
-✅ All 6 posts migrated to markdown with proper frontmatter
-✅ Static generation works for all routes
-✅ TypeScript types correct
-✅ Dependencies installed correctly
+**Total estimated time**: 3-4 hours for complete implementation and validation
 
-### Functional Success
-✅ Blog index lists all 6 posts with links
-✅ Individual posts render at /blog/[slug]
-✅ Meta tags present for SEO
-✅ Design matches existing blog aesthetic
-✅ Hero section and subscribe CTA preserved
+| Wave | Tasks | Estimated Time | Parallelizable |
+|------|-------|----------------|----------------|
+| Wave 1 | phase-1-task-1, phase-1-task-2 | 90-120 minutes | Yes (2 tasks) |
+| Wave 2 | phase-1-task-3, phase-1-task-4 | 60-90 minutes | Yes (2 tasks) |
+| Wave 3 | phase-1-task-5, phase-1-task-6, phase-1-task-7 | 45-60 minutes | Partial (task-6 parallel with task-5) |
 
-### Deployment Success
-✅ Live at https://www.shipyard.company/blog
-✅ All posts accessible via curl
-✅ No 404 errors on post routes
-✅ Committed and pushed to GitHub
+**Critical Path**: task-1 → task-2 → task-3 → task-5 → task-7 (required for MVP)
+
+**Optional Path**: task-6 (STATUS.md update) is SHOULD priority, not blocking
 
 ---
 
-**Planning Phase Complete. Ready for Execution.**
+## Phase Completion Checklist
+
+Before marking phase-1 complete, verify:
+
+- [ ] All 7 task plans executed successfully (or 6 if task-6 skipped)
+- [ ] SCOREBOARD.md exists at repo root with all required sections
+- [ ] SCOREBOARD.md line count ≤200 (target ~165)
+- [ ] All 32 completed projects appear in summary table
+- [ ] Top 5 projects have expanded details sections
+- [ ] QA verdicts use only raw language: PASS/BLOCK/REJECT/"—"
+- [ ] Board scores are 0-10 or "—"
+- [ ] Aggregate metrics calculated correctly (verify manually)
+- [ ] Markdown renders correctly on GitHub (tables, links work)
+- [ ] Extraction script is executable: `chmod +x scripts/update-scoreboard.sh`
+- [ ] Script completes in <5 minutes
+- [ ] Script is idempotent (running twice produces identical output)
+- [ ] All deliverables committed to git
+- [ ] Changes pushed to origin/main
+- [ ] No scope creep: agent count, daemon logs, file enumeration, charts all absent (per WONT list)
+
+---
+
+**End of Phase 1 Plan**

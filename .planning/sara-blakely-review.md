@@ -1,29 +1,24 @@
-# Sara Blakely Review: Phase 1 Plan
+# Sara Blakely Gut-Check — Phase 1 Plan
 
-## Would a customer pay?
-**No.** This is plumbing. Nobody pays for "markdown-driven posts" — they pay for insights that save them money/time/sanity. You're migrating file formats. Where's the customer value?
+## Would a real customer pay for this?
+No. It's infrastructure for the shop, not a product. Internal tool.
 
-## What's confusing?
-- **8 tasks to move blog posts?** Reeks of over-engineering. Wave 1-2-3 structure makes it sound NASA-level when it's "copy markdown files and add routing."
-- **Who is this for?** Devs who want to blog? Companies who need content velocity? Unknown.
-- **"Critical constraint: static export"** — means nothing to non-devs. Translation: faster load times? Cheaper hosting? Say it.
+## What's confusing? What would make someone bounce?
+- "Hybrid format" means nothing. Show me the actual output first.
+- Wave dependencies unclear — why can't task-1 and task-2 truly run parallel if task-2 needs task-1's arrays?
+- "~165 lines" is arbitrary. Why that number? Based on what user need?
+- 7 tasks for a markdown file is overengineered. This should be 3 tasks max.
 
-## 30-second pitch
-"We refactored our blog to use markdown files so future posts are easier to publish."
+## 30-second elevator pitch
+"We've shipped 32 projects but have zero proof. This auto-generates a scoreboard from our filesystem — shows what shipped, what failed, QA scores, board verdicts. No manual updates. Run one script, see your track record."
 
-That's not a pitch. That's an internal Slack update.
+## What would you test first with $0 marketing budget?
+Test extraction accuracy on 5 projects manually first. If the script gets verdicts wrong, entire scoreboard is fiction. Accuracy > format.
 
-## What to test first ($0 budget)
-You can't. This delivers zero user-facing value. Test with: **Do existing blog readers notice anything different?** If no = wasted effort. If yes = you broke something.
+## What's the retention hook?
+None. It's a one-time generation. No retention because no repeat user behavior. Script runs when someone needs updated numbers.
 
-Better question: Which of those 6 posts drives the most email signups? Double down on that topic. Forget the infra.
+## Honest Take
+Plan is solid but bloated. You're building a bash script, not launching a SaaS. Cut tasks 6 and 7 — commit manually. Merge tasks 1-2 into one extraction task. This should be: (1) Extract data, (2) Generate markdown, (3) Validate. Three tasks. Four hours is too long for a scoreboard generator.
 
-## Retention hook
-**None.** Infrastructure has no retention hook. Content does.
-
-If "the-night-shift" post gets 40% open rate and "portable-text" gets 8%, write 3 more daemon posts. That's retention. This plan optimizes the wrong thing.
-
-## Real talk
-You're gold-plating a system that works. 4 hardcoded posts weren't the problem. Lack of killer content is. Ship one post that gets 100 backlinks, then worry about how it's stored.
-
-Would I fund this? Not until you show me the content ROI first.
+Real risk: garbage in, garbage out. If round files are inconsistent (Risk 5.1), you'll spend 80% of time fixing extraction edge cases. Build the simplest parser that works for 80% of projects, show output, iterate.
