@@ -1,118 +1,106 @@
-# Round 1 — Elon Musk (Chief Product & Growth Officer)
+# Elon Musk — Chief Product & Growth Officer
+## First-Principles Analysis: Scoreboard Update PRD
 
-## Architecture: What's the simplest system that could work?
+### Architecture: What's the Simplest System That Could Work?
 
-**Grep + Parse + Write. Done.**
+**This is a bash script, not a product.**
 
-This isn't a web service. It's a **batch data aggregation script**. The PRD asks to:
-1. Read files from `prds/completed/` and `rounds/`
-2. Extract metrics (dates, verdicts, deliverables)
-3. Write markdown tables to `SCOREBOARD.md` and `STATUS.md`
+You need: `ls` + `grep` + markdown concatenation. Runtime: 2 seconds. The PRD says "read files, extract data, write markdown." That's a **linear file operation**. No API. No database. No framework. One agent session, 150 lines of code maximum.
 
-The simplest system: **One Python script** that iterates directories, parses markdown/logs, and outputs structured data.
+Current SCOREBOARD.md has 168 lines for **ONE project**. That's insane. The format is **vanity metrics theatre**—24 table rows for a portal that's 44% complete and BLOCKED by QA.
 
-- No API, no database, no server.
-- Input: File system. Output: Two markdown files.
-- Runtime: <5 seconds for 25-50 projects.
+Simplest system: **flat table, 5 columns, sorted by ship date**. Name, date, QA verdict, board score, deliverables link. That's it. Everything else is README archaeology.
 
-**Complexity budget: ~200 lines of Python.** Anything more is overengineering.
+### Performance: Where Are the Bottlenecks?
 
----
+**Bottleneck 1:** Manual data extraction. 32 completed PRDs × 5 data points = 160 file reads. If you grep/parse manually, that's 20+ minutes of agent token waste.
 
-## Performance: Where are the bottlenecks?
+**Bottleneck 2:** The PRD says "extract pipeline duration from daemon logs." Daemon logs aren't in scope here—they're in `/logs/` somewhere. Chasing timestamps across log files is a **scope trap**. If the data isn't in `rounds/`, write "—" and move on.
 
-There are **no bottlenecks**. This is I/O-bound on 25 markdown files. Modern SSDs read thousands of files per second.
+**10x path:** Structured metadata. Every shipped project should have a `meta.json`:
+```json
+{"name": "agentbench", "shipped": "2026-04-13", "qa": "PASS", "board": 8.5, "duration_hours": 12}
+```
 
-Worst case: 50 PRDs × 10 round files each × 100KB average = **50MB of text**. Reads in <100ms.
+Parse JSON, generate table. 0.3 seconds. But that's **v2**—don't build it now.
 
-The bottleneck is **parsing inconsistent formats** across rounds (some have QA verdicts, some don't; some have timestamps, some don't). That's a **logic problem**, not a performance problem.
+### Distribution: How Does This Reach 10,000 Users?
 
-**10x path?** There is none. This isn't a performance-critical system. Focus on **correctness** and **data quality**, not speed.
+**It doesn't. This is internal operations.**
 
----
+This scoreboard is for agency credibility—clients, investors, Claude ecosystem observers. The distribution question is: **"Does this make me want to hire Shipyard AI?"**
 
-## Distribution: How does this reach 10,000 users?
+Current answer: **No.** The scoreboard is a 168-line defense document explaining why a project got HELD. That's PR suicide.
 
-**It doesn't. This is internal tooling.**
+What 10,000 people want to see:
+- **Shipped count** (social proof)
+- **Success rate** (trust signal)
+- **Average turnaround** (speed signal)
+- **Top 3 projects** (proof of capability)
 
-The scoreboard is for **internal visibility** into the Shipyard AI pipeline. The "user" is you (the founder) and maybe future investors/clients who want proof of execution velocity.
+If you can't make the numbers look good, **don't publish the scoreboard yet**. Ship 10 more projects, then update. Premature transparency is weakness signaling.
 
-Distribution channel: **GitHub README**. If you want external reach:
-1. Add a public `/scoreboard` page to the Shipyard website (static HTML from this data)
-2. Tweet milestones ("Shipped 25 PRDs in 30 days — here's the data")
-3. Embed scoreboard on your landing page as social proof
+### What to CUT: Scope Creep Masquerading as V1
 
-But the PRD doesn't ask for this. It asks to **update a markdown file**. That's not a distribution play.
+**CUT:**
+1. **"Pipeline duration from daemon logs"** — requires log parsing infrastructure. Not in scope. Use round file timestamps or write "—".
+2. **"Agent count"** — vanity metric. Nobody cares if 5 agents or 50 agents built it. Cut it.
+3. **"Key deliverables"** — links to `/deliverables/{project}/` are enough. Don't enumerate files.
+4. **Failed projects section** — 2 failed PRDs out of 34 total is a **94% success rate**. Burying failures in a table is defensive. Just list the number.
 
----
+**KEEP:**
+- Total shipped, total failed, success rate (headline metrics)
+- Table: project name, ship date, QA verdict, board score (4 columns, no fluff)
 
-## What to CUT: Scope creep masquerading as v1
+**Target output:** 40 lines of markdown maximum. Current format would be 5,000+ lines for 32 projects. Unreadable.
 
-**Cut:**
-1. **"Average Pipeline Duration"** — The PRD says "from daemon logs, or estimate from timestamps." Daemon logs aren't specified. Estimating is guessing. This metric is **not required** for v1. Mark it "—" if unavailable.
-2. **"Agent count"** — Counting round files is a **proxy metric**, not ground truth. Some rounds have multi-agent files, some are solo. This adds complexity for low signal. **Cut or mark as estimate.**
-3. **"Key deliverables"** — Listing every file in `deliverables/{project}/` clutters the table. Most projects have 50+ files. **Cut this column.** Instead, add a link: `[View Deliverables](deliverables/{project}/)`.
+### Technical Feasibility: Can One Agent Session Build This?
 
-**Keep:**
-- Project name, shipped date, QA verdict, Board verdict (these are high-signal, clearly defined)
-- Total counts (shipped, failed, success rate)
+**Yes. Trivially.**
 
-**v2 features:**
-- Detailed timelines (requires daemon log parser)
-- Agent contributions per project (requires structured logs)
-- Cost/token tracking (requires instrumentation)
+Execution plan:
+1. `ls prds/completed/` → parse filenames → 32 projects (2 seconds)
+2. For each project, check if `rounds/{project}/` exists (1 second)
+3. If exists, `grep` for QA verdict + board score in round files (5 seconds per project = 160 seconds worst case)
+4. If not exists, mark as "—" (shipped before pipeline formalized)
+5. Generate markdown table (1 second)
+6. Write to `SCOREBOARD.md` (instant)
 
----
+**Total runtime estimate: 3-5 minutes.** One agent session, zero blockers.
 
-## Technical Feasibility: Can one agent session build this?
+**Risk:** QA/board verdict formats aren't standardized. Some rounds have structured reports, some don't. The agent will need fallback logic: if verdict not found, write "—". Don't block on missing data.
 
-**Yes. Easily.**
+### Scaling: What Breaks at 100x Usage?
 
-Task breakdown:
-1. Scan `prds/completed/` → list project names (5 min)
-2. For each project, read `rounds/{project}/` files (10 min)
-3. Extract QA verdict (grep "PASS|BLOCK"), Board verdict (grep "PROCEED|HOLD|REJECT"), dates (10 min)
-4. Parse `deliverables/{project}/` for file counts (5 min)
-5. Generate markdown table (5 min)
-6. Update `SCOREBOARD.md` and `STATUS.md` (5 min)
-7. Commit + push (2 min)
+**At 100 projects:** Markdown table with 100 rows is fine. Renders in <1 second on GitHub.
 
-**Total: ~45 minutes of agent work.**
+**At 3,200 projects (100× current):** GitHub markdown rendering slows. The scoreboard file is 8,000+ lines. That's when you need:
+- Pagination (top 50 recent, link to archive)
+- Separate `SCOREBOARD-ARCHIVE.md` for historical projects
+- JSON export for programmatic access
 
-Risk: **Data inconsistency**. Not all projects have the same round structure. Some have `qa-pass-2.md`, some have `board-verdict.md`, some have neither. The agent needs to handle missing data gracefully (write "—" instead of crashing).
+**But you're at 32 projects.** Don't solve problems you don't have. Linear markdown table scales to 500+ rows before it's a UX issue.
 
----
-
-## Scaling: What breaks at 100x usage?
-
-**100x = 2,500 PRDs.**
-
-At 2,500 projects:
-- File system still handles this trivially (modern FS supports millions of files)
-- Parsing 2,500 × 10 files = 25,000 files, ~2.5GB of text. Still reads in <1 second.
-- Markdown table with 2,500 rows is **unwieldy**. User can't parse it.
-
-**What breaks: Human readability.**
-
-Solutions:
-1. **Pagination**: Split into "Recent Projects" (last 50) and "Archive" (rest)
-2. **Filtering**: Add sections by status (Shipped, Failed, On Hold)
-3. **Search**: Generate a JSON export (`scoreboard.json`) for programmatic queries
-4. **Dashboard**: Build a static site generator (like Astro) to render interactive tables
-
-But at 2,500 PRDs, you have bigger problems (e.g., "Why are we shipping 2,500 PRDs? What's the revenue impact?"). The scoreboard becomes a **symptom**, not the core issue.
+**What actually breaks:** Inconsistent data formats. If every project structures QA/board reports differently, extraction logic becomes spaghetti. The real scaling solution is **standardized metadata** (see Performance section). Until then, manual `grep` + fallback to "—" is fine.
 
 ---
 
-## Final Verdict
+## Verdict: SHIP IT (with cuts)
 
-**PROCEED. This is a straightforward data aggregation task.**
+This is a **2-hour task** masquerading as a feature. One agent, one script, one commit.
 
-- **Architecture**: Simple script. No overengineering.
-- **Scope**: Cut "average duration" and "agent count" unless trivial to extract.
-- **Execution**: One agent session, <1 hour.
-- **Risk**: Low. Only risk is missing data (handle with "—").
+**Non-negotiables:**
+- Do NOT parse daemon logs. Use round file timestamps or skip duration.
+- Do NOT count agents. Vanity metric.
+- Do NOT enumerate deliverables. Link to directory.
+- Do NOT write 168 lines per project. 1 row = 1 project.
 
-**Recommendation**: Ship v1 with basic stats (project, date, QA, Board). Add advanced metrics (duration, agents, costs) in v2 when you have structured logging.
+**Success criteria:**
+- 32 rows in table (one per completed PRD)
+- 4 columns: Name | Shipped | QA | Board
+- Total at top: "32 shipped, 2 failed, 94% success rate"
+- Fits on one screen without scrolling (≤50 lines)
 
-Don't let perfect be the enemy of done. The goal is **visibility into 25 shipped projects**, not a BI platform.
+If you can't extract a data point, write "—". **Shipping incomplete data beats not shipping.**
+
+This should take 1 agent session. If it takes 2, the scope creeped.

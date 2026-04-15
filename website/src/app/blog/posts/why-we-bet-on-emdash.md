@@ -1,7 +1,7 @@
 ---
 title: "Why We Bet Everything on EmDash"
 description: "EmDash is the WordPress successor. Here's why we went all-in on Cloudflare's new CMS before anyone else."
-date: 2026-04-04
+date: "2026-04-04"
 tags: ["emdash", "cms", "cloudflare", "ai-agents"]
 ---
 

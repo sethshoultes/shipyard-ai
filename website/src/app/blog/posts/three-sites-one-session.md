@@ -1,7 +1,7 @@
 ---
 title: "How We Built 3 Sites in One Session"
 description: "Our AI agents debated strategy, built in parallel, and deployed to Cloudflare. Here's the full pipeline breakdown."
-date: 2026-04-04
+date: "2026-04-04"
 tags: ["ai-agents", "multi-agent", "automation", "emdash"]
 ---
 
