@@ -1,0 +1,30 @@
+# Cloudflare Workers Configuration for LocalGenius Chat API
+
+name = "localgenius-chat"
+main = "workers/chat.js"
+compatibility_date = "2024-01-01"
+
+# D1 Database Binding
+[[d1_databases]]
+binding = "DB"
+database_name = "localgenius"
+database_id = "YOUR_D1_DATABASE_ID"
+
+# R2 Storage Binding (for future assets)
+[[r2_buckets]]
+binding = "ASSETS"
+bucket_name = "localgenius-assets"
+
+# Environment Variables (set via wrangler secret)
+# OPENAI_API_KEY - Set with: wrangler secret put OPENAI_API_KEY
+
+# Routes
+[env.production]
+routes = [
+  { pattern = "api.localgenius.com/*", zone_name = "localgenius.com" }
+]
+
+[env.staging]
+routes = [
+  { pattern = "staging-api.localgenius.com/*", zone_name = "localgenius.com" }
+]
