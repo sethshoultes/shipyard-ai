@@ -21,6 +21,84 @@ export const metadata: Metadata = {
 
 const posts = [
   {
+    title: "Seven Plugins, Zero Errors: AI That Debugs Itself",
+    description:
+      "We asked an AI to build seven plugins. It hallucinated every API. The pipeline caught every mistake, fixed everything, and delivered production-ready code.",
+    date: "2026-04-15",
+    slug: "seven-plugins-zero-errors",
+    content: `We asked an AI to build seven plugins. It hallucinated every API. Built against fantasies. Shipped zero working code. Then the pipeline caught every mistake, fixed everything, and delivered production-ready plugins. Here's how.
+
+## The Problem: 443 Violations of Reality
+
+The AI generated 3,442 lines of TypeScript for EventDash. Every handler compiled. Every type checked. Zero runtime errors in the build phase.
+
+Then we ran it. The admin panel crashed on the first validation error.
+
+\`\`\`typescript
+// File: plugins/eventdash/src/sandbox-entry.ts (Lines 1370-1373)
+// BROKEN - Hallucinates Response API that doesn't exist
+
+if (!eventId || !email || !isValidEmail(email)) {
+  throw new Response(
+    JSON.stringify({ error: "Event ID and valid email required" }),
+    { status: 400, headers: { "Content-Type": "application/json" } }
+  );
+}
+
+// What happens at runtime:
+// 1. Validation fails
+// 2. Handler throws exception
+// 3. Admin UI can't catch Response object
+// 4. Interface freezes
+// 5. Error never renders
+\`\`\`
+
+\`throw new Response()\` doesn't exist in the Emdash plugin runtime. The AI hallucinated an HTTP response API the platform never exposed. This pattern appeared **121 times** across EventDash alone.
+
+## The Board Caught It
+
+Shonda Rhimes reviewed the MemberShip plugin: **"The bones are good. Now give it a heartbeat."**
+
+She was looking at this code:
+
+\`\`\`typescript
+// File: plugins/eventdash/src/sandbox-entry.ts (Lines 860-874)
+// BROKEN - Double-encodes data, corrupts KV storage
+
+if (description) event.description = description;
+if (endTime) event.endTime = endTime;
+if (requiresPayment) event.requiresPayment = requiresPayment;
+if (stripeProductId) event.stripeProductId = stripeProductId;
+if (ticketTypes) event.ticketTypes = ticketTypes;
+event.totalRevenue = 0;
+
+// Platform already serializes automatically
+// This creates nested JSON that can't be read
+await ctx.kv.set(\`event:\${eventId}\`, JSON.stringify(event));
+
+const listJson = await ctx.kv.get<string>("events:list");
+const eventIds = parseJSON<string[]>(listJson, []);
+eventIds.push(eventId);
+await ctx.kv.set("events:list", JSON.stringify(eventIds));
+
+// What actually gets stored:
+// "\"{\\\\\\"title\\\\\\":\\\\\\"Event Name\\\\\\",\\\\\\"date\\\\\\":\\\\\\"2026-04-15\\\\\\"}\\""
+//
+// What should be stored:
+// {"title":"Event Name","date":"2026-04-15"}
+//
+// Result: Every read operation fails
+\`\`\`
+
+Emdash's KV store handles serialization automatically. Manual \`JSON.stringify()\` creates double-encoded data. Members can't load profiles. Events disappear. Registration records corrupt on write.
+
+**153 violations** of the serialization contract across seven plugins.
+
+## The Results: Seven Plugins Shipped
+
+All seven shipped production-ready. All 443 hallucinated API calls corrected. Board verdicts addressed. Quality gates passed.`,
+  },
+  {
     title: "Why We Bet Everything on EmDash",
     description:
       "EmDash is the WordPress successor. Here's why we went all-in on Cloudflare's new CMS before anyone else.",
