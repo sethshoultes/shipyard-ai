@@ -1,31 +1,52 @@
-# Sara Blakely Review — Phase 1 Plan
+# Sara Blakely Review: Phase 1 Plan
 
-## Would a customer pay for this?
+## Would a real customer pay for this?
 
-No. This is plumbing. Zero customer-facing value. Internal tech debt fix.
+**No.** This isn't a product—it's plumbing.
 
-## What's confusing? What makes someone bounce?
+You're fixing broken code before shipping 4 new plugins. Customer doesn't see "plugin entrypoints" or "banned patterns." They see features that work (or don't).
 
-- **Too much process porn**: 400 lines for 5 file edits. Commit messages longer than code changes.
-- **Wave 1/Wave 2 theater**: All tasks are copy-paste identical. No real dependencies. Just do them.
-- **Risk section overkill**: "HIGH RISK: Untested Plugin Integration" for... adding 4 import lines? Come on.
+What does each plugin DO for the yoga studio owner?
+- **Membership**: manage subscriptions → YES, pay for this
+- **EventDash**: schedule classes → YES, pay for this
+- **CommerceKit**: sell retail → maybe, if they sell mats/shirts
+- **FormForge**: build forms → niche, already have Google Forms free
+- **ReviewPulse**: aggregate reviews → nice-to-have, not urgent
+- **SeoDash**: SEO tools → yes, IF they understand it
+
+**Value gap**: You're deploying 6 plugins but not explaining which 3 matter most to a yoga studio.
+
+## What's confusing? What would make someone bounce?
+
+- **"95 violations"** → sounds scary, customer thinks site's broken
+- **"Banned npm alias entrypoints"** → developer jargon, not customer benefit
+- **Wave 1/2/3/4** → implementation details, not outcomes
+- **No before/after clarity** → what CAN'T they do now? What WILL they do after?
+- **Zero screenshots or examples** → can't visualize the product
+
+Customer asks: "Will my site be down during this?" Plan doesn't say.
 
 ## 30-second elevator pitch
 
-"We're fixing a bug so our plugins work on Cloudflare Workers instead of crashing. It's a find-replace across 4 files. Takes 10 minutes."
+"Right now Sunrise Yoga runs with 2 plugins—membership and events. We're adding 4 more: e-commerce for retail, forms for lead capture, review aggregation, and SEO tools. All 6 will be live, tested, and working. Zero downtime. Done in 2 hours."
 
-## What would you test first with $0 budget?
+## What would you test first with $0 marketing budget?
 
-Nothing to test. This isn't a product. It's a hotfix. Run the build, ship it, move on.
+Put Sunrise Yoga live with just **Membership + EventDash**. Email 5 yoga studio owners: "Free tool to manage members and classes. Try it."
+
+Watch which features they click. Do they even WANT forms? Reviews? Or do they just need scheduling that doesn't suck?
+
+You're deploying 6 plugins but haven't proven anyone needs 4 of them.
 
 ## What's the retention hook?
 
-Wrong question. This is infrastructure. Users don't see it.
+**None visible.** Plan says "deploy all plugins" but not:
+- What makes studios come back daily?
+- What data gets locked in? (member rosters? class history?)
+- What happens if they switch to Mindbody?
 
-**The real question**: Why did this break? Why does the same pattern exist in 4 plugins? Sounds like copy-paste architecture. Fix the root cause or you'll be back here in 2 months.
+Retention comes from DATA GRAVITY. The more member info they add, the harder to leave. Plan should mention: "After 100 members added, switching costs = high."
 
-## Bottom line
+---
 
-Plan is technically correct but drowning in ceremony. You don't need a 400-line battle plan for a 4-file find-replace.
-
-Cut 80% of the words. Ship it today. Spend saved time figuring out why this pattern exists 4 times instead of once.
+**Bottom line**: Technically solid. Commercially unproven. You're shipping features, not solving a pain. Would I bet $5k on this? Only if you show me 3 studios begging for it.
