@@ -6,7 +6,7 @@
 
 ## Core Metrics
 
-**Total Shipped:** 32
+**Total Shipped:** 33
 **Total Failed:** 2
 **Success Rate:** 94%
 **Average Pipeline Duration:** 30.5 hours
@@ -17,6 +17,7 @@
 
 | Project | Shipped | QA | Board | Deliverables |
 |---------|---------|-----|-------|-------------|
+| [github-issue-sethshoultes-shipyard-ai-73](/prds/completed/github-issue-sethshoultes-shipyard-ai-73.md) | 2026-04-16 | PASS | 3.0 | [Link](/deliverables/github-issue-sethshoultes-shipyard-ai-73/) |
 | [shipyard-client-portal](/prds/completed/shipyard-client-portal.md) | 2026-04-15 | BLOCK | 3.75 | [Link](/deliverables/shipyard-client-portal/) |
 | [localgenius-frontend-launch](/prds/completed/localgenius-frontend-launch.md) | 2026-04-15 | REJECT | 1.5 | [Link](/deliverables/localgenius-frontend-launch/) |
 | [blog-plugin-pipeline](/prds/completed/blog-plugin-pipeline.md) | 2026-04-15 | — | — | [Link](/deliverables/blog-plugin-pipeline/) |
@@ -53,6 +54,16 @@
 ---
 
 ## Expanded Details (Top 5 Recent)
+
+
+### github-issue-sethshoultes-shipyard-ai-73
+
+**Shipped:** 2026-04-16
+**QA Verdict:** PASS
+**Board Score:** 3.0/10
+**Duration:** 1 day
+**Deliverables:** [Link](/deliverables/github-issue-sethshoultes-shipyard-ai-73/)
+**Summary:** Worker loaders binding for sandboxed plugins — infrastructure fix with immediate P0 impact. Board verdict: PROCEED with conditions. Consensus: necessary but strategically low-value. Instrumentation tracks plugin viability for future decisions.
 
 
 ### shipyard-client-portal
