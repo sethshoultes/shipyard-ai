@@ -3,22 +3,9 @@
 
 /// <reference types="emdash/locals" />
 
-import type { ContentBylineCredit, PortableTextBlock } from "emdash";
-
-export interface Page {
-  id: string;
-  slug: string | null;
-  status: string;
-  title: string;
-  content?: PortableTextBlock[];
-  createdAt: Date;
-  updatedAt: Date;
-  publishedAt: Date | null;
-  bylines?: ContentBylineCredit[];
-}
+import type { ContentBylineCredit } from "emdash";
 
 declare module "emdash" {
   interface EmDashCollections {
-    pages: Page;
   }
 }
