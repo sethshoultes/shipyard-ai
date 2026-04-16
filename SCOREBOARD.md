@@ -6,7 +6,7 @@
 
 ## Core Metrics
 
-**Total Shipped:** 35
+**Total Shipped:** 36
 **Total Failed:** 2
 **Success Rate:** 95%
 **Average Pipeline Duration:** 30.5 hours
@@ -17,6 +17,7 @@
 
 | Project | Shipped | QA | Board | Deliverables |
 |---------|---------|-----|-------|-------------|
+| [shipyard-self-serve-intake](/prds/completed/shipyard-self-serve-intake.md) | 2026-04-16 | PASS | 3.5 | [Link](/deliverables/shipyard-self-serve-intake/) |
 | [monetization-mvp](/prds/completed/monetization-mvp.md) | 2026-04-16 | HOLD | 4.0 | [Link](/deliverables/monetization-mvp/) |
 | [github-issue-sethshoultes-shipyard-ai-73](/prds/completed/github-issue-sethshoultes-shipyard-ai-73.md) | 2026-04-16 | PASS | 3.0 | [Link](/deliverables/github-issue-sethshoultes-shipyard-ai-73/) |
 | [shipyard-client-portal](/prds/completed/shipyard-client-portal.md) | 2026-04-15 | BLOCK | 3.75 | [Link](/deliverables/shipyard-client-portal/) |
@@ -56,6 +57,14 @@
 
 ## Expanded Details (Top 5 Recent)
 
+### shipyard-self-serve-intake
+
+**Shipped:** 2026-04-16
+**QA Verdict:** PASS
+**Board Score:** 3.5/10
+**Duration:** 2 weeks (debate → ship)
+**Deliverables:** [Link](/deliverables/shipyard-self-serve-intake/)
+**Summary:** GitHub webhook signature validation system with HMAC-SHA256 security. Production-grade implementation with 17 passing tests (100% pass rate). Board feedback: excellent technical foundation but no user experience. Verdict: PROCEED pending customer validation and user experience layer. Retrospective saved to memory.
 
 ### monetization-mvp
 

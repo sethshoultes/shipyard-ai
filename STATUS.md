@@ -7,12 +7,12 @@
 - **Repo**: github.com/sethshoultes/shipyard-ai
 - **Domain**: shipyard.company
 - **Active projects**: 0
-- **Current branch**: `feature/membership-production-fix`
-- **Total shipped**: 33
+- **Current branch**: `main`
+- **Total shipped**: 36
 - **Total failed**: 2
-- **Success rate**: 94%
+- **Success rate**: 95%
 - **Last updated**: 2026-04-16
-- **Last shipped**: monetization-mvp (2026-04-16)
+- **Last shipped**: shipyard-self-serve-intake (2026-04-16)
 
 ## Active Project: PRD-001 (Shipyard Portfolio)
 
