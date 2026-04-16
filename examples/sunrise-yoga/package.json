@@ -26,7 +26,10 @@
 		"better-sqlite3": "^11.10.0",
 		"emdash": "^0.1.0",
 		"react": "^19.2.4",
-		"react-dom": "^19.2.4"
+		"react-dom": "^19.2.4",
+		"@shipyard/commercekit": "file:../../plugins/commercekit",
+		"@shipyard/formforge": "file:../../plugins/formforge",
+		"@shipyard/reviewpulse": "file:../../plugins/reviewpulse"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.7"
