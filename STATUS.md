@@ -7,11 +7,12 @@
 - **Repo**: github.com/sethshoultes/shipyard-ai
 - **Domain**: shipyard.company
 - **Active projects**: 0
-- **Current branch**: `feature/scoreboard-update-execution`
-- **Total shipped**: 32
+- **Current branch**: `feature/membership-production-fix`
+- **Total shipped**: 33
 - **Total failed**: 2
 - **Success rate**: 94%
-- **Last updated**: 2026-04-15
+- **Last updated**: 2026-04-16
+- **Last shipped**: github-issue-sethshoultes-shipyard-ai-73 (2026-04-16)
 
 ## Active Project: PRD-001 (Shipyard Portfolio)
 
