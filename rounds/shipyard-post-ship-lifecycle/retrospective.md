@@ -1,92 +1,128 @@
-# Retrospective: Shipyard Post-Ship Lifecycle (Homeport)
-**Author:** Marcus Aurelius
+# Retrospective: Homeport Post-Ship Lifecycle
+**Observer:** Marcus Aurelius
 **Date:** 2026-04-16
 
 ---
 
 ## What Worked Well
 
-**Email craft:** World-class. Day 7/90 templates authentic, human, trust-building. "Your site is breathing on its own" = poetry, not corporate speak.
+**Email craft: World-class.**
+- Day 7/90 templates authentic, visceral, human
+- Voice held: "trusted mechanic," zero corporate speak
+- Maya/Jony reviews confirmed: "flawless," "every word earns its place"
+- Subject lines stopped readers: "Your site is breathing on its own now"
 
-**Strategic clarity:** Problem (memory decay), solution (lifecycle touchpoints), unit economics (99.9% margin) — clean thinking, well-documented.
+**Multi-lens review caught blind spots.**
+- Oprah: accessibility friction (706-line guide excludes non-technical users)
+- Jensen: moat weakness (copyable in 48h, needs Phase 2 data)
+- Shonda: content gaps (60 days of silence between emails)
+- Buffett: revenue tracking missing (conversion unproven)
 
-**Multi-lens review process:** Four board members caught what one would miss. Jensen saw no AI leverage. Oprah saw accessibility barriers. Shonda saw narrative gaps. Buffett saw unit economics. Collective intelligence worked.
+**Strategic clarity: Problem/solution/economics clean.**
+- Memory decay validated as real retention problem
+- Unit economics exceptional (99.99% margin, ~$0.02/customer/year)
+- Kill criteria defined upfront (<5% = kill, >15% = fund Phase 2)
 
-**Voice consistency:** "Trusted mechanic" tone held across all deliverables. Templates, demo script, config docs — same human speaking.
-
-**Documentation thoroughness:** AUDIT_REPORT.md = exemplar. Dense with meaning, zero filler. Resend setup guide comprehensive (though verbose).
+**Steve/Elon deal locked productive constraints.**
+- Steve: owns voice, veto on tone
+- Elon: owns speed, veto on scope creep
+- Both gave ground: Steve accepted plain text, Elon accepted 5-email cadence
 
 ---
 
 ## What Didn't Work
 
-**Documentation bloat:** 706-line setup guide before showing emails. Buried the heart under technical guts. Should lead with templates, defer DNS details.
+**Documentation bloat before value.**
+- 706-line setup guide before showing email templates
+- Led with technical complexity, not emotional hook
+- Jony: "Cut 40%, say it once not three times"
 
-**No implementation:** Built planning documents, reviews, roadmaps — but system doesn't exist yet. All promise, no proof. Can't test retention hypothesis without sending actual emails.
-
-**Phase 2 deferred:** Data moat (telemetry, build intelligence) is strategic differentiator. Pushed to future. Without it, emails copyable in 48 hours. Weak moat compounds slowly.
-
-**Onboarding friction:** Non-technical users excluded. DNS setup, SPF/DKIM/DMARC, 24-48 hour propagation = barrier. Solo founders can't execute this alone.
-
-**No content between emails:** 5 emails/365 days = radio silence. Day 30 flat, no tension. Missed opportunity for blog, case studies, peer comparison data.
-
-**Brand inconsistency:** Templates reference `aftercare.shipyard.ai`, config says `homeport@shipyard.ai`. Domain confusion unresolved.
-
----
-
-## What Agency Should Do Differently Next Time
-
-**Ship code, not just docs:** Retrospective reviewing paper, not product. Should evaluate working system + customer replies, not templates + setup guides.
-
-**Lead with emotional hook:** Show emails first (what customers receive), technical setup last (how to implement). Heart before machinery.
-
-**Parallel-track Phase 2:** Don't defer strategic moat. Begin telemetry infrastructure while shipping Phase 1. Data flywheel compounds only if started early.
-
-**Proof before scale:** Oprah correct — test 10-15 projects, measure open/reply/conversion rates, validate hypothesis. Don't build for 100 until proven for 10.
-
-**Simplify or scope-cut:** Either make DNS setup one-click, or accept limited audience. Current state excludes 70% of potential users. Choose accessibility or technical depth, not both halfway.
-
-**Close open loops faster:** Shonda roadmap excellent but came after board verdict. Should have been part of initial delivery. V1.1 features (serialized story, blog, peer comparison) strengthen retention — don't wait 90 days to plan them.
-
----
-
-## Key Learning to Carry Forward
-
-**World-class craft without distribution infrastructure is like building a cathedral in a forest — beautiful, unvisited, unable to prove its value until someone walks through the door.**
-
----
-
-## Process Adherence Score: 6/10
-
-**What followed process:**
-- Multi-reviewer board system (Oprah, Jensen, Shonda, Buffett) = excellent
-- Board verdict synthesized tensions, extracted conditions = good governance
-- Shonda retention roadmap addressed gaps proactively = strategic thinking
-- Voice reviews (Maya Angelou, Jony Ive) caught craft details = quality control
-
-**What broke process:**
-- No working implementation to review = deliverable was documentation, not product
-- Board reviewed templates + guides, not real email sends + customer replies
-- No success metrics yet measurable (open rates, reply rates, conversion) = hypothesis untested
-- Conditions set (Tier 1: prove system works) but can't be met without building first
-- Retrospective written before product ships = reviewing plan quality, not execution results
-
-**Process failure mode identified:**
-Agency built comprehensive planning layer (reviews, roadmaps, verdicts) on top of unbuilt product. Should have shipped small batch, gathered data, then convened board to review **results**, not **intentions**.
-
-**Evidence of process inversion:**
-- 9 markdown files totaling ~30K words
+**Planning theater replaced shipping.**
+- 9 markdown files, ~30K words
 - Zero customer emails sent
-- Zero reply data collected
-- Zero conversion events measured
+- Zero conversion data collected
+- Built comprehensive review layer on top of unbuilt product
 
-**What this reveals:**
-Planning theater substituted for shipping discipline. Board process worked well (diverse perspectives, clear conditions, honest critique), but applied prematurely. Can't retrospect what hasn't happened yet.
+**Phase 2 deferred = weak moat persists.**
+- All board members flagged: data compounding is the real advantage
+- Templates copyable in 48h by competitors
+- Intelligence layer (telemetry, benchmarks, recommendations) pushed to future
+- Year 1 moat: weak
+
+**Wrong workflow: review intentions, not outcomes.**
+- Board reviewed proposals, not results
+- Should have shipped to 10 customers, waited 30 days, then convened
+- Reviewed architecture documents instead of reply rates
+
+**Name inconsistency caught late.**
+- Templates showed `aftercare.shipyard.ai`, config said `homeport@shipyard.ai`
+- Brand confusion persisted through multiple review rounds
+- Fixed in final pass, should've been caught Day 1
+
+---
+
+## What Agency Should Do Differently
+
+**Ship small, review outcomes.**
+- No board review until product ships to ≥10 users
+- Collect ≥30 days of real data (open rates, replies, conversions)
+- Review what customers did, not what we predicted they'd do
+
+**Lead with value, not setup.**
+- Show email templates first (emotional hook)
+- Setup guide second (how to get it)
+- Documentation = obstacle between reader and outcome
+
+**Lock moat earlier.**
+- Phase 2 telemetry should ship with Phase 1, not 6 months later
+- Data compounding starts Day 1 or competitors catch up
+- Intelligence layer = competitive advantage, not "nice to have"
+
+**Ruthlessly cut documentation.**
+- One DNS example, not three identical providers
+- Action steps only, delete explanations of decisions already made
+- Resend guide: 300 lines max, not 706
+
+**Define "done" as running code, not approved plans.**
+- Margaret's QA: "Zero runnable code delivered"
+- Planning artifacts ≠ shippable product
+- Definition of done: customer receives email, replies, books work
+
+---
+
+## Key Learning
+
+**World-class craft without distribution infrastructure is a cathedral in a forest—beautiful, unvisited, unable to prove value until someone walks through the door.**
+
+---
+
+## Process Adherence Score: 4/10
+
+**Why:**
+- Followed multi-persona review process (Steve, Elon, Board, QA, Design)
+- Email templates met craft bar (100% on voice quality)
+- Strategic thinking documented thoroughly
+- **But:** Confused planning phase with shipping phase
+- **But:** No runnable code delivered (0 of 6 Worker modules built)
+- **But:** Reviewed intentions instead of outcomes
+- **But:** Documentation bloat contradicted "ship fast" mandate
+
+**Evidence of failure:**
+- Decisions.md Section 1.8: "48-72 hours to ship"
+- Actual: Planning docs only, no deployable system
+- QA verdict: 🔴 BLOCK — P0 issues (no code, no tests, no deployment config)
+
+**What 10/10 looks like:**
+- Day 0: Draft 5 email templates
+- Day 1: Build Worker (~300 lines TypeScript)
+- Day 2: Deploy, send to 10 customers
+- Day 30: Review open rates, reply rates, conversion
+- Day 31: Board review of *results*, not plans
 
 **Corrective action:**
-Next project: No board review until product ships to ≥10 users and collects ≥30 days of data. Review outcomes, not proposals.
+Next project—no retrospective until customers use the thing.
 
 ---
 
-**Marcus Aurelius**
-*"Waste no more time arguing what a good man should be. Be one."*
+**"First, see things as they are. Then, act accordingly."**
+— Marcus Aurelius
