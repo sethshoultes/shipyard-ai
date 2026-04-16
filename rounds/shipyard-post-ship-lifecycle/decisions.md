@@ -2,156 +2,115 @@
 ## Blueprint for Build Phase
 
 **Compiled by:** Phil Jackson, Zen Master
-**Date:** Build Phase Ready
-**Status:** Decisions Locked
+**Date:** April 16, 2026
+**Status:** Board Approved — PROCEED WITH CONDITIONS
 
 ---
 
 ## Executive Summary
 
-**Product Name:** Homeport (Steve) / Aftercare (existing) — **UNRESOLVED**
-**Core Insight:** Every agency ghosts their clients post-launch. We stay. We remember.
-**Delivery Timeline:** 48 hours to MVP (Elon) vs. 3 days (existing blueprint)
-**Success Metric:** 10%+ reply/revision request rate (Elon) vs. 5%+ (existing)
+**Product Name:** Homeport (customer-facing) / Aftercare (codebase)
+**Core Insight:** Agencies ghost. We don't. We remember.
+**Timeline:** 48-72 hours to MVP
+**Success Metric:** ≥10% reply/revision request rate
+**Kill Threshold:** <5% conversion after 90 days
+**Board Score:** 6/10 — Good hygiene, not theater (requires Phase 2 for moat)
 
 **Triangle Offense:** Steve writes. Elon ships. Data decides.
 
 ---
 
-## 1. Locked Decisions Matrix
+## 1. Key Decisions Matrix
 
-### Decision 1.1: Product Name
-**Proposed by:** Steve Jobs — "Homeport" (Round 1)
-**Challenged by:** Elon Musk — "call it `lifecycle-emails` in repo" (Round 2)
-**Existing decision:** "Aftercare" (locked in current blueprint)
-**Winner:** **CONTESTED**
+### Decision 1.1: Product Name — "HOMEPORT"
+**Proposed by:** Steve Jobs (Round 1)
+**Challenged by:** Elon Musk — "call it lifecycle-emails" (Round 2)
+**Winner:** **Steve (brand) + Elon (code)**
 
-**The debate:**
-- **Steve's case:** "Every ship needs a port to return to. One word. Memorable. Evocative." (R1)
-- **Elon's case:** "You're naming a feature before proving it works. Call it lifecycle-emails. If it works, users will name it." (R2)
-- **Existing blueprint:** "Aftercare" already locked, Steve proposed it in Round 1
+**Ruling:**
+- Customer-facing: **"Homeport"** (marketing, emails, docs)
+- Internal/technical: **"aftercare"** (repo name, Worker name, KV namespace)
+- Email domain: **`homeport@shipyard.ai`** (from config-decisions.md)
 
-**Phil's ruling:** **HOMEPORT wins on brand positioning, AFTERCARE stays in codebase.**
-- Customer-facing: "Homeport" (marketing, emails, docs)
-- Internal/technical: "aftercare" (repo name, Worker name, KV namespace)
-- **Why:** Steve's right that naming creates emotional real estate. Elon's right we shouldn't delay shipping for a rebrand. Use both.
+**Why:** Steve's right that naming creates emotional real estate. "Every ship needs a port to return to." One word. Memorable. Evocative.
+
+**Status:** ✅ LOCKED
 
 ---
 
-### Decision 1.2: Architecture — The 10% Version
+### Decision 1.2: Architecture — Ruthless Simplicity
 **Proposed by:** Elon Musk (Round 1, Round 2)
-**Challenged by:** Original PRD (database schema, lifecycle tracking)
-**Winner:** **Elon — ruthless simplicity**
+**Winner:** **Elon**
 
 **LOCKED ARCHITECTURE:**
 ```
 Cloudflare Workers + Scheduled Cron
 ├── KV Store (project data: email, name, URL, ship_date)
 ├── Resend API (email delivery)
-├── 5 email templates (hardcoded in Worker code)
+├── 5 email templates (plain text)
 └── Unsubscribe mechanism (KV flag update)
 ```
 
-**Elon's non-negotiables (all accepted):**
-1. No screenshots in V1 (no Puppeteer infrastructure)
-2. No performance metrics ("if we can measure" = we can't)
-3. Launch in 48 hours, not 2 weeks
+**Elon's Non-Negotiables (all accepted):**
+1. ❌ No screenshots in V1 (no Puppeteer infrastructure)
+2. ❌ No performance metrics ("if we can measure" = we can't)
+3. ✅ Ship in 48-72 hours, not 2 weeks
 
-**Steve's constraints (all accepted by Elon):**
-1. Emails must be craft-quality, not generic
-2. Voice must feel personal, not automated
-3. All 5 templates built in V1 code (even if only 2 deploy initially)
+**Steve's Constraints (all accepted):**
+1. ✅ Emails must be craft-quality, not generic
+2. ✅ Voice must feel personal, not automated
+3. ✅ All 5 templates built in V1 code
 
-**What's EXCLUDED:**
-- ❌ Screenshot generation (Puppeteer/Chrome)
-- ❌ Performance metrics (uptime, page speed)
-- ❌ Analytics dashboard (use Resend's built-in)
-- ❌ Database/complex schema
-- ❌ "Industry trends" content pipeline
-- ❌ Automated project capture (manual CSV → KV for V1)
-
-**Technical constraints:**
+**Technical Constraints:**
 - ~300 lines of TypeScript maximum
 - Single failure mode: Resend API availability
 - Debuggable in <60 seconds
 - Fully deletable in 5 minutes if experiment fails
 
-**Existing blueprint alignment:** ✅ Matches ("One Cloudflare Worker + One KV namespace + Five templates")
+**Status:** ✅ LOCKED
 
 ---
 
-### Decision 1.3: Email Cadence — Five Moments, One Year
-**Proposed by:** Consensus (essence.md, Steve Round 1)
-**Challenged by:** Elon Round 1 — "Ship Day 7 + Day 30 only, validate before adding more"
-**Counter-challenged by:** Steve Round 2 — "Five emails or nothing. This is a relationship, not a feature."
-**Winner:** **Steve (with Elon's phased deployment)**
+### Decision 1.3: Email Cadence — Five Moments
+**Proposed by:** Steve Jobs (Round 1)
+**Challenged by:** Elon — "Ship Day 7 + 30 only, validate first"
+**Winner:** **Steve (with Elon's measurement overlay)**
 
 **LOCKED CADENCE:**
-- Day 7: Honeymoon — pride and accomplishment
-- Day 30: Fresh memory — check-in with substance
-- Day 90: Where agencies vanish — we stay
-- Day 180: Update timing — 6 months is revision sweet spot
-- Day 365: Anniversary — "Look how far you've come"
+- **Day 7:** Honeymoon — pride and accomplishment ("Your site is breathing on its own")
+- **Day 30:** Fresh memory — substantive check-in (not "how are things?")
+- **Day 90:** Where agencies vanish — we stay ("Most agencies disappear around now")
+- **Day 180:** Update timing — 6-month revision sweet spot
+- **Day 365:** Anniversary — celebration + Year 2 preview
 
-**The compromise (Elon's Round 2 concession):**
-- "I said ship Day 7 and Day 30 only, measure, then decide. But Steve's rhythm (7, 30, 90, 180, 365) is actually perfect. I was wrong to suggest validating with two—ship all five, but keep them SIMPLE."
+**Elon's Round 2 Concession:**
+"I said ship Day 7 and Day 30 only, measure, then decide. But Steve's rhythm (7, 30, 90, 180, 365) is actually perfect. I was wrong to suggest validating with two—ship all five, but keep them SIMPLE."
 
-**Deployment strategy:**
-- Build all 5 templates in V1 code
-- **Deploy ALL FIVE immediately** (Steve won this)
-- Measure for 90 days
-- If <5% conversion, kill feature
-- If >15% conversion, fund V2 (screenshots, telemetry)
+**Deployment:** All 5 templates ship immediately. Measure for 90 days.
 
-**What's cut:** Day 14, Day 60, Day 120, monthly check-ins. Respect the inbox.
-
-**Existing blueprint alignment:** ✅ Matches
+**Status:** ✅ LOCKED
 
 ---
 
-### Decision 1.4: Email Format — Plain Text, Zero HTML
-**Proposed by:** Consensus (essence.md, Steve Round 1, Elon Round 1)
+### Decision 1.4: Email Format — Plain Text Only
+**Proposed by:** Consensus
 **Challenged by:** None
 **Winner:** **Unanimous**
 
 **LOCKED FORMAT:**
-- Plain text only
-- No HTML templates
+- Plain text only (no HTML)
 - No images, no branded headers
-- No screenshots (Elon's non-negotiable)
+- No screenshots (Elon's non-negotiable from Round 2)
 - "Automation that feels handwritten" (Steve)
 
-**Elon's position:** "Email body should be: 'Your site is live: [URL]. Reply if you need anything.' That's it."
-**Steve's counter:** "This is lazy. This is what every contractor sends. This is forgettable."
-**Resolution:** Plain text format locked, but copy quality is Steve's domain.
+**Why:** Deliverability > aesthetics. Human voice > corporate templates.
 
-**Existing blueprint alignment:** ✅ Matches
+**Status:** ✅ LOCKED
 
 ---
 
-### Decision 1.5: Personalization — Minimal Variables Only
-**Proposed by:** Steve Jobs (Round 1, Round 2 Non-Negotiable #2)
-**Challenged by:** None
-**Winner:** **Steve**
-
-**LOCKED PERSONALIZATION:**
-- Only `{projectName}` and `{siteUrl}` variables (existing blueprint)
-- Expanded to: `{name}`, `{project_url}`, `{ship_date}` (Elon's data model)
-- No per-industry content
-- No AI-generated trends
-- No fake personalization
-
-**Steve's principle:** "Personalization isn't merge tags. It's 'I looked at your site. Here's what I noticed.'"
-**Elon's constraint:** "You're describing a system that requires human review of every email. That doesn't scale past 100 customers."
-**Resolution:** Templates use merge tags, but voice must feel personal. If it smells automated, rewrite.
-
-**Existing blueprint alignment:** ✅ Matches
-
----
-
-### Decision 1.6: Brand Voice — Trusted Mechanic
-**Proposed by:** Steve Jobs (Round 1, essence.md)
-**Challenged by:** None
+### Decision 1.5: Brand Voice — "Trusted Mechanic"
+**Proposed by:** Steve Jobs (Round 1)
 **Winner:** **Steve (Elon accepted unconditionally)**
 
 **LOCKED VOICE:**
@@ -161,20 +120,18 @@ Cloudflare Workers + Scheduled Cron
 
 **Tone:** Trusted mechanic checking in. Confident, competent, human. We know what we built. We stand behind it.
 
-**Elon's Round 2 concession:** "The tone is everything. Steve's right that corporate email voice kills this. I'll give him that."
+**Elon's Round 2 Concession:**
+"The tone is everything. Steve's right that corporate email voice kills this. Make them human. Make them caring. Make them sound like we give a shit. I'll ship them word-for-word."
 
-**The Deal (Elon Round 2):**
-"Steve writes the five email templates. Make them human. Make them caring. Make them sound like we give a shit. I'll ship them word-for-word."
+**Voice Test:** "Would I send this to a friend?" If not, rewrite.
 
-**Voice test:** "Would I send this to a friend?" If not, rewrite.
-
-**Existing blueprint alignment:** ✅ Matches ("Trusted mechanic — someone who remembers your project")
+**Status:** ✅ LOCKED
 
 ---
 
-### Decision 1.7: Success Metrics — Data Decides
-**Proposed by:** Elon Musk (Round 1, Round 2 Non-Negotiable #2)
-**Challenged by:** Steve Jobs — "We're building presence, not measuring engagement"
+### Decision 1.6: Success Metrics — Data Decides
+**Proposed by:** Elon Musk (Round 1)
+**Challenged by:** Steve — "We're building presence, not measuring engagement"
 **Winner:** **Elon (with Steve's qualitative overlay)**
 
 **LOCKED METRICS:**
@@ -182,115 +139,61 @@ Cloudflare Workers + Scheduled Cron
 **Primary (Elon):**
 - Reply rate to lifecycle emails
 - Revision request conversion rate
-- Target: >10% conversion (Elon) vs. >5% (existing blueprint)
+- Target: **≥10% conversion** (more aggressive than original 5%)
 
 **Secondary (Resend analytics):**
-- Email open rate
-- Unsubscribe rate
+- Email open rate (target: 40-60% per Shonda)
+- Unsubscribe rate (kill switch at >15%)
 
 **Qualitative (Steve):**
-- "Mental real estate" — customer remembers us 6 months later
+- Mental real estate — customer remembers us 6 months later
 - "Did this email make them feel something?"
 
-**Decision framework:**
-- <5% conversion → Kill Homeport, focus on acquisition
-- 5-15% conversion → Iterate, refine templates
-- >15% conversion → Fund V2 (screenshots, telemetry)
+**Decision Framework:**
+- **<5%** → Kill Homeport, focus on acquisition
+- **5-15%** → Iterate, refine templates
+- **>15%** → Fund V2 (screenshots, telemetry, Phase 2)
 
-**Measurement period:** 90 days minimum
+**Measurement Period:** 90 days minimum
 
-**Elon's principle:** "Data decides the next move. Not aesthetics. Not intuition. Data."
-
-**Existing blueprint alignment:** ⚠️ **TARGET DIFFERS** (10% vs. 5%) — **Phil's ruling: Use Elon's 10% threshold** (more aggressive validation)
+**Status:** ✅ LOCKED
 
 ---
 
-### Decision 1.8: Distribution Strategy — Pride Over Footer Links
-**Proposed by:** Elon Musk Round 1 — "Built with Shipyard footer links on all sites"
-**Challenged by:** Steve Jobs Round 2 — "That's tacky. Footer links have the engagement rate of popup ads."
-**Winner:** **Steve**
-
-**LOCKED DECISION:**
-- ❌ NO "Built with Shipyard" footer links (rejected)
-- ✅ Distribution via customer pride → testimonials, referrals, social proof
-- ✅ Homeport itself is proof of care → differentiator in sales process
-
-**Steve's position (R2):**
-"Customers either (a) remove the footer link immediately because it looks cheap, or (b) leave it and nobody clicks it. Real distribution comes from customers *talking* about Shipyard. One customer who brags about us is worth 100 footer links."
-
-**Elon's counter (R1):**
-"Every shipped project should have a 'Built with Shipyard' footer link. That's 10,000 backlinks pointing to real, live proof. That's distribution."
-
-**Phil's ruling:** Steve wins. Footer badges deferred to separate distribution strategy (not part of Homeport MVP).
-
-**Existing blueprint alignment:** ✅ Matches (footer badges listed in "What does NOT ship")
-
----
-
-### Decision 1.9: Dashboard — Use Resend's, Build Nothing
-**Proposed by:** Elon Musk (Round 1, Round 2)
-**Challenged by:** Original PRD (custom email performance dashboard)
+### Decision 1.7: Dashboard — Use Resend's, Build Nothing
+**Proposed by:** Elon Musk
 **Winner:** **Elon**
 
 **LOCKED DECISION:**
 - ❌ No custom dashboard for email analytics
 - ✅ Use Resend's built-in analytics (open rate, click rate, bounce rate)
 
-**Steve's Round 2 concession:**
-"Elon's 'just use Resend's dashboard' is pragmatic—I'll give him that."
+**Elon's Argument:** "Don't build what you can buy for $0. Dashboards are where good products go to die."
 
-**Elon's argument:**
-"Don't build what you can buy for $0. Dashboards are where good products go to die."
+**Steve's Round 2 Concession:** "Elon's 'just use Resend's dashboard' is pragmatic—I'll give him that."
 
-**Existing blueprint alignment:** ✅ Matches
+**Status:** ✅ LOCKED
 
 ---
 
-### Decision 1.10: A/B Testing — Once During Dev, Never After
-**Proposed by:** Essence.md compromise
-**Challenged by:**
-- Steve Round 2 — "No A/B testing. Ever. Consistency is the brand."
-- Elon Round 2 — "Run the test. If 'Your site is alive' beats 'how's it going?' by 40%, use the winner."
-
-**Winner:** **Compromise holds (test once, lock winner)**
-
-**LOCKED PROCESS:**
-1. Test during V1 development (before launch)
-2. Lock winning copy
-3. Zero tests after ship
-4. No ongoing optimization
-
-**The balance:**
-- Elon gets to validate copy with data before launch
-- Steve gets consistency post-launch (no drift, no "optimization")
-
-**Existing blueprint alignment:** ✅ Matches
-
----
-
-### Decision 1.11: Timeline — 48 Hours to Ship
-**Proposed by:** Elon Musk (Round 1, Round 2 Non-Negotiable #1)
-**Challenged by:** Original PRD (2 weeks)
+### Decision 1.8: Timeline — 48-72 Hours to Ship
+**Proposed by:** Elon Musk
 **Winner:** **Elon**
 
 **LOCKED TIMELINE:**
-- 48 hours from commit to production (Elon Round 2)
-- 3 days (72 hours) in existing blueprint
-- **Phil's ruling:** 48 hours is the target, 72 hours is the deadline
+- **Target:** 48 hours from commit to production
+- **Deadline:** 72 hours (buffer for quality)
 
-**Elon's constraint:**
-"This is 300 lines of TypeScript. If it takes longer than 48 hours, the spec is wrong."
+**Elon's Constraint:** "This is 300 lines of TypeScript. If it takes longer than 48 hours, the spec is wrong."
 
-**Steve's Round 2 concession:**
-"If we build what actually matters—5 emails, scheduling, unsubscribe—it's 3 days."
+**Steve's Round 2 Concession:** "If we build what actually matters—5 emails, scheduling, unsubscribe—it's 3 days."
 
-**Existing blueprint alignment:** ⚠️ **DIFFERS** (48h vs. 72h) — **Phil's ruling: Ship in 48h, allow 72h buffer**
+**Status:** ✅ LOCKED
 
 ---
 
-### Decision 1.12: Feature Freeze — 90 Days Untouched
-**Proposed by:** Elon Musk (Round 2 Non-Negotiable #3), essence.md
-**Challenged by:** None
+### Decision 1.9: Feature Freeze — 90 Days Untouched
+**Proposed by:** Elon Musk (Round 2), essence.md
 **Winner:** **Unanimous**
 
 **LOCKED FREEZE:**
@@ -298,100 +201,73 @@ Cloudflare Workers + Scheduled Cron
 - "Test once. Ship. Never touch for 90 days." (essence.md)
 - Let one full lifecycle complete (365 days) before major changes
 
-**What's forbidden:**
-- ❌ No Day 14 emails
-- ❌ No surveys
-- ❌ No Slack integrations
-- ❌ No "quick improvements"
+**The Only Exception:** Spam/technical breaks — fix immediately. Otherwise, hands off.
 
-**The only exception:** If emails are landing in spam or broken technically, fix immediately. Otherwise, hands off.
-
-**Existing blueprint alignment:** ✅ Matches
+**Status:** ✅ LOCKED
 
 ---
 
-### Decision 1.13: Data Requirements — Fix the Pipeline
-**Proposed by:** Steve Jobs (Round 2)
-**Challenged by:** Elon Musk (as scope creep)
+### Decision 1.10: Distribution Strategy — NO Footer Links
+**Proposed by:** Elon — "Built with Shipyard footer badges"
+**Challenged by:** Steve — "That's tacky"
 **Winner:** **Steve**
 
-**LOCKED REQUIREMENTS:**
+**LOCKED DECISION:**
+- ❌ NO "Built with Shipyard" footer links (rejected)
+- ✅ Distribution via customer pride → testimonials, referrals, social proof
+- ✅ Homeport itself is proof of care → differentiator in sales process
 
-Homeport forces us to capture clean project data:
-- Customer email
-- Customer name
-- Project URL
-- Ship date
-- (Optional: project type, what we built)
+**Steve's Position (Round 2):**
+"Customers either (a) remove the footer link immediately because it looks cheap, or (b) leave it and nobody clicks it. Real distribution comes from customers *talking* about Shipyard. One customer who brags about us is worth 100 footer links."
 
-**V1 workaround:** Manual CSV upload to KV store
-**V1.1 requirement:** Automated capture from shipment pipeline
-
-**Steve's argument (R2):**
-"If we don't have clean project data, we can't send meaningful emails. Period. The constraint isn't email templates—it's the shipment pipeline. Homeport isn't a '2-day ship'—it's a forcing function to fix our data architecture."
-
-**Elon's concession:**
-"You're right that manual project entry doesn't scale. Auto-capture from pipeline is not V1.1—it's V1.0."
-
-**Phil's ruling:** Manual CSV acceptable for V1 launch, but automated capture must be V1.1 priority if conversion >10%.
-
-**Blocker identified:** If we don't have this data for at least 10 shipped projects, postpone Homeport and fix the system first.
-
-**Existing blueprint alignment:** ⚠️ **Expanded** (Steve added "forcing function" insight)
+**Status:** ✅ LOCKED
 
 ---
 
 ## 2. MVP Feature Set (What Ships in V1)
 
-### What Ships (Unanimous)
-1. ✅ **Five email templates** (plain text, Steve writes, Elon ships word-for-word)
-2. ✅ **Cloudflare Worker with scheduled cron** (daily check, sends emails at Day 7/30/90/180/365)
-3. ✅ **KV Store** (project data: `{email, name, project_url, ship_date, unsubscribed}`)
-4. ✅ **Resend API integration** (email delivery, analytics)
-5. ✅ **Unsubscribe mechanism** (one-click, KV flag update)
-6. ✅ **Reply forwarding** (to `aftercare@shipyard.ai` or designated inbox)
+### What Ships ✅
+1. **Five email templates** (plain text, Steve writes, Elon ships word-for-word)
+2. **Cloudflare Worker with scheduled cron** (daily check, sends emails at Day 7/30/90/180/365)
+3. **KV Store** (project data: `{email, name, project_url, ship_date, unsubscribed}`)
+4. **Resend API integration** (email delivery, analytics)
+5. **Unsubscribe mechanism** (one-click, KV flag update)
+6. **Reply forwarding** (to `homeport@shipyard.ai`)
 
-### What Does NOT Ship (Unanimous)
-- ❌ Screenshot generation (Puppeteer/headless Chrome)
-- ❌ Performance monitoring (uptime, page speed)
-- ❌ Analytics dashboard (use Resend's)
-- ❌ Database/complex schema (KV only)
-- ❌ Automated project data capture (manual CSV for V1)
-- ❌ "Industry trends" content
-- ❌ Special offers/discounts
-- ❌ "Built with Shipyard" footer badges
-- ❌ HTML email templates
-- ❌ Multi-channel (email only)
-- ❌ Site monitoring / health checks
-- ❌ Case studies
-- ❌ Per-industry customization
-- ❌ AI-generated content
-
-**Consensus achievements:** Both Steve and Elon agreed on all exclusions without debate.
+### What Does NOT Ship ❌
+- Screenshot generation (Puppeteer/headless Chrome)
+- Performance monitoring (uptime, page speed)
+- Analytics dashboard (use Resend's)
+- Database/complex schema (KV only)
+- Automated project data capture (manual CSV for V1)
+- "Industry trends" content
+- Special offers/discounts
+- "Built with Shipyard" footer badges
+- HTML email templates
+- Multi-channel (email only)
+- Site monitoring / health checks
+- Case studies
+- Per-industry customization
+- AI-generated content
 
 ---
 
 ## 3. File Structure (What Gets Built)
 
-**Consolidated from both blueprints:**
-
 ```
-/homeport  (or /aftercare — see Decision 1.1)
+/homeport  (or /aftercare in codebase)
 ├── /worker
 │   ├── index.ts                 # Main Worker entry point
-│   ├── scheduler.ts             # Cron job logic (daily check for projects hitting Day 7/30/90/180/365)
+│   ├── scheduler.ts             # Cron job logic
 │   ├── emails.ts                # Email template definitions
-│   │   ├── day7()              # "Your site is breathing on its own now"
-│   │   ├── day30()             # "It's been 30 days. Need any changes?"
+│   │   ├── day7()              # "Your site is breathing on its own"
+│   │   ├── day30()             # "It's been 30 days"
 │   │   ├── day90()             # "Ready for an update?"
-│   │   ├── day180()            # "Six months in. How's it going?"
-│   │   └── day365()            # "It's been a year. The web moved on."
+│   │   ├── day180()            # "Six months in"
+│   │   └── day365()            # "It's been a year"
 │   ├── resend.ts                # Resend API client
 │   ├── kv.ts                    # KV store operations
-│   │   ├── getProject()        # Fetch project data
-│   │   ├── isUnsubscribed()    # Check unsub status
-│   │   └── markUnsubscribed()  # Set unsub flag
-│   └── unsubscribe.ts           # Unsubscribe link handler (Worker endpoint)
+│   └── unsubscribe.ts           # Unsubscribe link handler
 ├── /templates
 │   ├── day-007.txt              # Plain text template (Steve writes)
 │   ├── day-030.txt
@@ -399,38 +275,109 @@ Homeport forces us to capture clean project data:
 │   ├── day-180.txt
 │   └── day-365.txt
 ├── /scripts
-│   └── csv-to-kv.ts             # Manual project upload script (for V1)
+│   └── csv-to-kv.ts             # Manual project upload script
 ├── /tests
 │   ├── emails.test.ts           # Email template rendering tests
 │   └── scheduler.test.ts        # Cron logic tests
 ├── wrangler.toml                # Cloudflare Worker config
-│   └── [[kv_namespaces]]        # AFTERCARE_KV or HOMEPORT_KV
 ├── package.json
 ├── tsconfig.json
-└── README.md                     # Voice guidelines, deployment instructions
+└── README.md                     # Voice guidelines, deployment
 ```
 
 **Data in Workers KV:**
 - Key: `project:{project_id}` → Value: `{email, name, project_url, ship_date}`
 - Key: `unsubscribed:{email}` → Value: `true` (if opted out)
 
-**No separate database. No API server. No frontend. Just one Worker and five text files.**
-
-**Total estimated lines of code:** ~300 TypeScript (Elon's cap)
+**Total estimated LOC:** ~300 TypeScript (Elon's cap)
 
 ---
 
-## 4. Open Questions (What Needs Resolution Before Build)
+## 4. Board Review Findings
 
-### 4.1 Project Data Source (🔴 CRITICAL)
-**Question:** Where does project data come from for the manual CSV upload?
-**Blocker level:** 🔴 Critical — can't launch without data
+### Board Score: 6/10 (Proceed with Conditions)
+- **Oprah:** 7/10 — Heart is there, friction too high
+- **Jensen:** 4/10 — CRM not AI, needs Phase 2 moat
+- **Shonda:** 6/10 — Good hygiene, not theater
+- **Buffett:** 7/10 — Excellent unit economics, weak moat
+
+### Points of Agreement (All Board Members)
+1. ✅ **Email quality is excellent** — Human voice, authentic tone (unanimous praise)
+2. ✅ **Unit economics outstanding** — 99.99% gross margin, minimal infrastructure risk
+3. ⚠️ **Current moat is weak** — Copyable in 48 hours by competitors
+4. 🔴 **Phase 2 telemetry is CRITICAL** — Data moat is the durable advantage
+
+### Points of Tension
+
+**1. AI Leverage (Jensen harsh, others forgiving)**
+- **Jensen:** "No AI. This is email automation. Could run on cron + SendGrid in 2010." (4/10)
+- **Others:** Evaluated as retention system, not AI product
+
+**2. Onboarding Complexity (Oprah critical)**
+- **Oprah:** "700 lines DNS records... excludes solo founders, non-technical users" (4/10 accessibility)
+- **Fix needed:** Simplified onboarding, video walkthrough
+
+**3. Content Strategy (Shonda urgent)**
+- **Shonda:** "No content between emails... Day 30 is dead air" (4/10 content)
+- **Recommendation:** Add blog, serialized insights, peer comparison
+
+**4. Launch Readiness**
+- **Oprah:** "Prove it works before scale" (10-15 projects first)
+- **Buffett:** "Ship it — minimal risk, $40 investment"
+- **Jensen:** "Ship Phase 1, commit to Phase 2 immediately"
+
+---
+
+## 5. Mandatory Conditions (Before Full Scale)
+
+### Tier 1: REQUIRED ⚠️
+
+**1. Prove the System Works (Oprah)**
+- Send first batch to 10-15 shipped projects
+- Collect reply data for 30 days
+- Measure: open rates, reply rates, conversion intent
+
+**2. Commit to Phase 2 Telemetry Roadmap (Jensen, Buffett)**
+- Lock timeline: Phase 2 ships within 6 months of Phase 1 launch
+- Instrument agents with time/token tracking
+- Define data schema for build intelligence
+- **Why:** "Without data compounding, this is a feature, not a moat" (Jensen)
+
+**3. Simplify Onboarding Path (Oprah)**
+- Create 5-step quick-start guide (not 50)
+- Video walkthrough for DNS setup
+- Pre-validated domain configuration checklist
+
+### Tier 2: RECOMMENDED (V1.1, Next 90 Days)
+
+**4. Add Content Between Emails (Shonda)**
+- Launch Homeport blog or case study hub
+- Reference learnings from shipped projects in emails
+- Create serialized insight arc (see Shonda retention roadmap)
+
+**5. Improve Day 30 Email (Shonda, Maya Angelou)**
+- Current subject weak: "It's been 30 days. How are things?"
+- Maya's rewrite: "Does it feel like yours yet?"
+- Add tension: security check, performance insight, or competitor analysis
+
+**6. Track LTV by Cohort (Buffett)**
+- Measure which project types generate most repeat revenue
+- Identify high-value customer segments
+- Test pricing elasticity on returning customers
+
+**7. Build Feedback Loop (Jensen)**
+- Extract themes from Phil's reply inbox
+- Feed insights into future customer recommendations
+- Start data flywheel: shipped projects → learnings → better builds
+
+---
+
+## 6. Open Questions (Resolve Before Build)
+
+### 6.1 Project Data Source 🔴 CRITICAL
+**Question:** Where does project data come from for manual CSV upload?
+**Blocker:** Can't launch without data
 **Owner:** Phil Jackson
-
-**Options:**
-1. Export from existing CRM/project management system
-2. Manual entry from completed project list
-3. Reveals we don't have clean shipped-project tracking (deeper problem)
 
 **Required CSV fields:**
 ```csv
@@ -438,554 +385,423 @@ project_id,customer_email,customer_name,project_url,ship_date
 proj_001,customer@example.com,Jane Doe,https://example.com,2024-01-15
 ```
 
-**Decision needed by:** Day 0 (before build starts)
+**Steve's Warning:** "If we're shipping projects without capturing this data, we're not a real agency."
 
-**Steve's warning:** "If we're shipping projects without capturing this data, we're not a real agency."
+**Decision needed by:** Day 0 (before build starts)
 
 ---
 
-### 4.2 Email "From" Address and Reply-To (🟡 MEDIUM)
+### 6.2 Email "From" Address 🟡 MEDIUM
 **Question:** What email address do Homeport emails come from?
-**Blocker level:** 🟡 Medium
-**Owner:** Steve Jobs (brand) + Elon Musk (deliverability)
+**Owner:** Steve (brand) + Elon (deliverability)
 
-**Options:**
-1. `homeport@shipyard.ai` (branded, requires domain setup)
-2. `aftercare@shipyard.ai` (matches codebase naming)
-3. `hello@shipyard.ai` (existing address, less distinct)
-4. Personal address (e.g., `phil@shipyard.ai`) for intimacy
+**Locked Decision (from config-decisions.md):**
+- **From:** `homeport@shipyard.ai`
+- **Reply-To:** `homeport@shipyard.ai`
+- Requires domain authentication (SPF/DKIM/DMARC)
 
-**Steve's preference:** Must feel like a human, not a system
-**Elon's constraint:** Must have proper SPF/DKIM setup for deliverability
+**Brand Inconsistency Found (Jony Ive Review):**
+- Templates reference `aftercare.shipyard.ai` (lines 19 in day-007, 19 in day-030, 23 in day-090)
+- Config says `homeport@shipyard.ai`
+- **FIX:** Change all template URLs to `homeport.shipyard.ai`
 
 **Decision needed by:** Day 1 (before Resend integration)
 
 ---
 
-### 4.3 Unsubscribe Flow (🟡 MEDIUM — Legal Requirement)
-**Question:** What happens when a customer unsubscribes?
-**Blocker level:** 🟡 Medium (CAN-SPAM compliance required)
-
-**Options:**
-1. One-click unsubscribe link → KV flag update → confirmation page
-2. "Reply STOP to unsubscribe" (simpler, less professional)
-3. Resend's built-in unsubscribe (automatically appended)
-4. Unsubscribe from all Shipyard emails vs. just Homeport
-
-**Legal requirement:** Must provide clear opt-out mechanism
-
-**Decision needed by:** Day 1 (before first email template finalized)
-
-**Elon's Round 2 position:** "Simple KV lookup to block future emails if unsubscribed. No complex preference management."
-
----
-
-### 4.4 Day 7 Email Content — Exact Copy (🔴 CRITICAL)
-**Question:** What exactly does the Day 7 email say?
-**Blocker level:** 🔴 Critical
-**Owner:** Steve Jobs (draft) → Elon Musk (review) → Phil Jackson (approve)
-
-**Steve's constraints:**
-- Must deliver emotion (pride, accomplishment)
-- Cannot be generic ("Your site is live: [URL]")
-- Must pass "automation smell test"
-- Subject: "Your site is breathing on its own now" (Steve Round 1)
-
-**Elon's constraints:**
-- No promises we can't keep 100% of the time
-- No features requiring additional infrastructure (screenshots, metrics)
-- If it can't be validated with data, cut it
-
-**Rejected version (Elon Round 2):**
-"Your site is live: [URL]. Reply if you need anything."
-→ Steve: "This is lazy. This is forgettable."
-
-**Draft needed by:** Day 1 (before build completes)
-
-**Existing blueprint draft (for reference):**
-```
-Subject: Your site is alive
-Body: We shipped your project 7 days ago. Here's what's happened since.
-  - [Your site URL]
-  - [Your admin]
-  - [How did we do?]
-CTA: Reply if something's off.
-```
-
----
-
-### 4.5 Reply Handling (🟡 MEDIUM)
-**Question:** What happens when a customer replies to a Homeport email?
-**Blocker level:** 🟡 Medium
+### 6.3 Reply Handling 🟡 MEDIUM
+**Question:** What happens when a customer replies?
 **Owner:** Phil Jackson
 
 **Options:**
-1. Goes to shared inbox (e.g., `homeport@shipyard.ai`) → manual response
-2. Goes to Phil's inbox → he handles personally
-3. Auto-reply with "Thanks, we'll be in touch" (defeats the purpose)
-4. Integrate with ticketing system (scope creep)
+1. Goes to `homeport@shipyard.ai` → Phil handles personally
+2. Shared inbox → team response
+3. Auto-reply (defeats the purpose)
 
-**Steve's constraint:** Must feel like a real human can respond
-**Elon's constraint:** Must scale beyond manual reply handling
+**Board Emphasis:**
+- **Shonda:** "Phil responds personally — major retention signal"
+- **Oprah:** "Reply-to goes to real person (Phil), not support@"
 
-**V1 decision:** Manual handling acceptable for low volume (<100 emails)
-**V1.1 requirement:** If reply rate >10%, need workflow for response management
+**V1 Decision:** Phil monitors personally, <24h SLA (from board-verdict.md)
+
+**V1.1 Requirement:** If reply rate >10%, need workflow for response management
 
 **Decision needed by:** Day 2 (before first email send)
 
-**SLA question:** What's the response time commitment? <24 hours? <48 hours?
+---
+
+### 6.4 Unsubscribe Flow 🟡 MEDIUM (Legal Requirement)
+**Question:** What happens when a customer unsubscribes?
+**Blocker:** CAN-SPAM compliance required
+
+**Locked Decision (from config-decisions.md):**
+- One-click unsubscribe link → KV flag update → confirmation page
+- URL format: `homeport.shipyard.ai/unsub?token={email}`
+
+**Legal Requirement:** Clear opt-out mechanism
+
+**Decision needed by:** Day 1 (before first email template finalized)
 
 ---
 
-### 4.6 Testing Strategy (🟢 LOW)
-**Question:** How do we test emails before sending to real customers?
-**Blocker level:** 🟢 Low (solvable during build)
+## 7. Risk Register (What Could Go Wrong)
 
-**Options:**
-1. Test mode flag in Worker → sends to internal team emails
-2. Staging KV namespace with test data
-3. Resend test API keys
-4. Manual send to Phil/Steve/Elon before go-live
+### 7.1 Technical Risks
 
-**Decision needed by:** During build (Day 1-2)
+**Risk: Customers Hate It (Unsubscribe >20%)**
+- **Likelihood:** 🟡 Medium
+- **Impact:** 🔴 High (kills feature)
+- **Mitigation:** Steve writes templates, test with internal team, kill switch at >15% unsub rate
+- **Owner:** Steve (quality) + Phil (monitoring)
 
----
+**Risk: No Project Data Exists (Can't Launch)**
+- **Likelihood:** 🔴 High
+- **Impact:** 🔴 High (blocks MVP)
+- **Mitigation:** Audit existing records immediately, manual backfill if needed, minimum 10 shipped projects
+- **Owner:** Phil Jackson
+- **Steve's Warning:** "If we have <10 shipped projects with clean data, postpone Homeport and fix the shipment pipeline first."
 
-### 4.7 Activation Threshold for Full Sequence (🟢 LOW)
-**Question:** At exactly what conversion rate do we validate success?
-**Blocker level:** 🟢 Low (post-MVP decision)
+**Risk: Email Deliverability Issues (Land in Spam)**
+- **Likelihood:** 🟡 Medium
+- **Impact:** 🔴 High (emails never seen)
+- **Mitigation:** SPF/DKIM/DMARC setup, test with Mail-Tester, plain text (better deliverability), warm up domain
+- **Owner:** Elon (setup) + Steve (content review for spam triggers)
 
-**Current framework:**
-- <5% = kill feature (focus on acquisition)
-- 5-15% = iterate on templates
-- >15% = fund V2 (screenshots, telemetry)
-
-**Open question:** All 5 emails deploy immediately (Steve won), so what triggers V2?
-
-**Decision needed by:** After 90-day measurement period
-
----
-
-### 4.8 Trigger Mechanism (🔴 CRITICAL)
-**Question:** How does Shipyard's main system trigger the Worker when a project ships?
-**Blocker level:** 🔴 Critical — can't automate without this
-**Owner:** Elon Musk (technical) + Phil Jackson (integration point)
-
-**Options:**
-1. Webhook from Shipyard backend → Worker endpoint (POST to `/trigger`)
-2. Cloudflare Queue integration
-3. Manual API call from agent after ship
-4. CSV upload triggers Worker to schedule emails
-
-**Required webhook payload:**
-```json
-{
-  "project_id": "proj_001",
-  "email": "customer@example.com",
-  "name": "Jane Doe",
-  "project_url": "https://example.com",
-  "ship_date": "2024-01-15"
-}
-```
-
-**Decision needed by:** Day 0 (defines V1 vs. V1.1 scope)
-
-**If webhook doesn't exist:** V1 = manual CSV upload, V1.1 = automated webhook
+**Risk: Workers KV Eventual Consistency → Duplicate Emails**
+- **Likelihood:** 🟡 Medium
+- **Impact:** 🟡 Medium (customer gets same email twice)
+- **Mitigation:** Use unique `scheduleId`, check KV before creating, accept rare duplicates
+- **Owner:** Elon
 
 ---
 
-### 4.9 Project Metadata Availability (🟡 MEDIUM)
-**Question:** What data is actually available when a project ships?
-**Blocker level:** 🟡 Medium
-**Owner:** Phil Jackson (audit existing systems)
+### 7.2 Product Risks
 
-**Assumptions:**
-- `project_id` (??)
-- `customer_email` (??)
-- `customer_name` (??)
-- `project_url` (??)
-- `ship_date` (??)
+**Risk: Conversion Rate Too Low (<5%)**
+- **Likelihood:** 🟡 Medium
+- **Impact:** 🟡 Medium (feature killed, but learning gained)
+- **Mitigation:** Accept as valid outcome (fast failure), ensure email quality is high
+- **Steve's Constraint:** "If we ship mediocre emails to 'validate the concept,' we'll validate nothing."
+- **Owner:** Phil (decision to kill) + Steve (ensure quality)
 
-**Unknown:**
-- Do we have all these fields today?
-- Are they captured consistently?
-- What's the source of truth?
+**Risk: Manual CSV Upload Becomes Bottleneck**
+- **Likelihood:** 🔴 High
+- **Impact:** 🟡 Medium (operational pain, doesn't scale)
+- **Mitigation:** Accept manual process for 90 days, V1.1 priority = automated capture if >10% conversion
+- **Elon's Threshold:** "At 10,000 shipped projects/year = 27 projects/day. Manual CSV = you're dead."
+- **Owner:** Elon (build automation when threshold hit)
 
-**Decision needed by:** Day 0 (before CSV structure is defined)
+**Risk: Voice Drift Over Time**
+- **Likelihood:** 🔴 High (if team expands)
+- **Impact:** 🔴 High ("Maximize your digital presence" corporate slop)
+- **Mitigation:** Lock templates in V1, never touch (Decision 1.9), document voice guidelines in README
+- **Owner:** Steve (enforce) + Phil (veto power on changes)
 
----
-
-## 5. Risk Register (What Could Go Wrong)
-
-### 5.1 Technical Risks
-
-#### Risk: Customers Hate It (Unsubscribe Rate >20%)
-**Likelihood:** 🟡 Medium
-**Impact:** 🔴 High (kills entire feature)
-**Root cause:** Emails feel automated, spammy, or provide no value
-
-**Mitigation:**
-- Steve writes templates (quality control)
-- Test with internal team first
-- Monitor unsubscribe rate daily in first 30 days
-- Kill switch: pause sends if unsub rate >15% in first week
-
-**Owner:** Steve Jobs (template quality) + Phil Jackson (monitoring)
+**Risk: Reply Inbox Not Monitored**
+- **Likelihood:** 🟡 Medium
+- **Impact:** 🔴 High (customer replies, gets ignored, brand promise broken)
+- **Mitigation:** Assign owner before ship, set <24h SLA
+- **Owner:** Phil Jackson
 
 ---
 
-#### Risk: No Project Data Exists (Can't Launch)
-**Likelihood:** 🔴 High
-**Impact:** 🔴 High (blocks entire MVP)
-**Root cause:** Shipyard doesn't have clean records of shipped projects
+### 7.3 Business Risks
 
-**Mitigation:**
-- Audit existing project records immediately (Day 0)
-- Manual backfill if needed
-- Delay launch if data doesn't exist (don't fake it)
-- **Minimum viable data:** 10 shipped projects with email, name, URL, ship date
+**Risk: Homeport Solves Retention, Not Acquisition**
+- **Likelihood:** 🔴 High (Elon flagged Round 1)
+- **Impact:** 🟡 Medium (fixes churn, doesn't drive growth)
+- **Elon's Challenge:** "This is a retention play when you don't have acquisition solved."
+- **Steve's Counter:** "Homeport helps acquisition—it's proof we care. That's a differentiator."
+- **Compromise:** Retention-focused, but becomes sales asset (proof of care)
 
-**Owner:** Phil Jackson
-
-**Steve's warning:** "If we have <10 shipped projects with clean data, postpone Homeport and fix the shipment pipeline first."
-
----
-
-#### Risk: Email Deliverability Issues (Land in Spam)
-**Likelihood:** 🟡 Medium
-**Impact:** 🔴 High (emails never seen = feature doesn't exist)
-**Root cause:** Improper domain setup, Resend reputation, spam filter triggers
-
-**Mitigation:**
-- Proper SPF/DKIM/DMARC setup before launch
-- Test deliverability with Mail-Tester.com
-- Plain text emails (no HTML) = better deliverability
-- Warm up sending domain (start with small batch)
-- Limit to 3 links max per email
-- No attachments, no spam trigger words
-
-**Owner:** Elon Musk (technical setup) + Steve Jobs (content review for spam triggers)
+**Risk: 48-Hour Timeline Unrealistic**
+- **Likelihood:** 🟡 Medium
+- **Impact:** 🟢 Low (delayed launch, recoverable)
+- **Mitigation:** Elon's 300-line cap enforced, 72h buffer allowed if quality maintained, Phil has veto on scope creep
+- **Owner:** Elon (timeline) + Phil (scope enforcement)
 
 ---
 
-#### Risk: Cloudflare Worker Alarm Fails to Fire
-**Likelihood:** 🟢 Low (Cloudflare SLA 99.99%)
-**Impact:** 🔴 High (email never sends, customer forgotten)
+## 8. Phase 2 Imperative (The Moat)
 
-**Mitigation:**
-- Monitor Worker logs daily for first 30 days
-- Set up Cloudflare alert if alarm fails
-- Manual retry mechanism via KV query
-- Accept rare failures vs. over-engineering redundancy
+### Why Phase 2 Is Non-Negotiable
 
-**Owner:** Elon Musk
+**Jensen's Warning (4/10 score):**
+"Lifecycle emails create retention hooks but miss compounding data moat entirely. Traditional agencies can copy this in 48 hours. **Zero proprietary data accumulation.** Without data compounding, this is a feature, not a moat."
 
----
+**Buffett's Assessment (7/10 score):**
+"Moat strength: Year 1 = Weak (anyone can clone templates). Year 2+ = Moderate **IF** Phase 2 telemetry ships. Long-term = Strong if customer LTV data + project patterns create recommendation engine."
 
-#### Risk: Workers KV Eventual Consistency → Duplicate Emails
-**Likelihood:** 🟡 Medium (KV is eventually consistent)
-**Impact:** 🟡 Medium (customer gets same email twice, looks sloppy)
+**Board Consensus:**
+All four board members emphasized Phase 2 telemetry as critical:
+- Jensen: "Commit to Phase 2 NOW"
+- Buffett: "Ship Phase 2 telemetry within 6 months"
+- Shonda: "Phase 2 exists in PRD but not in MVP story"
+- Oprah: (Implicitly through need for proof/evidence)
 
-**Mitigation:**
-- Use unique `scheduleId` per email
-- Check KV for existing schedule before creating new one
-- Accept rare duplicates vs. over-engineering deduplication
+### What Phase 2 Unlocks (6-Month Roadmap)
 
-**Elon's position:** "Accept that debugging is slower vs. building custom UI."
+**1. Project Telemetry Infrastructure**
+- Instrument every agent with time/token tracking
+- Capture revision reasons (structured data)
+- Log customer feedback from email replies
+- Store performance metrics if site monitoring added
 
----
+**2. Build Intelligence Layer**
+- Analyze patterns across projects
+- Surface insights: "Astro sites ship 30% faster than Next.js"
+- Feed recommendations into customer-facing agent prompts
 
-#### Risk: No Way to Debug Missing Emails
-**Likelihood:** 🟡 Medium (no custom dashboard)
-**Impact:** 🟡 Medium (can't troubleshoot customer complaints)
+**3. Customer-Facing Data Products**
+- Peer comparison: "Your site is in top 15% for uptime"
+- Performance benchmarks: "Industry average: 3.2s, yours: 1.8s"
+- Personalized insights in Day 90+ emails
 
-**Mitigation:**
-- Use Cloudflare Worker logs (shows all executions)
-- Use Resend dashboard (shows all sent emails)
-- Accept slower debugging in exchange for faster shipping
+**4. The Data Flywheel**
+Every project Shipyard ships teaches the system:
+- Which stacks ship fastest
+- Which patterns reduce revisions
+- Which features drive repeat business
+- Which customer requests correlate with success
 
-**Owner:** Elon Musk
+**This becomes competitive moat:**
+1. Shipyard builds 100 projects
+2. Learns operational patterns traditional agencies can't see
+3. Recommends better stacks, timelines, features for project 101
+4. Ships faster/better than competition
+5. Wins more projects → learns more → compounds advantage
 
----
-
-### 5.2 Product Risks
-
-#### Risk: Conversion Rate Too Low (<5%)
-**Likelihood:** 🟡 Medium
-**Impact:** 🟡 Medium (feature killed, but learning gained)
-**Root cause:** Customers don't need lifecycle emails, or positioning is wrong
-
-**Mitigation:**
-- Accept this as a valid outcome (fast failure)
-- Ensure email quality is high so we're testing the right thing
-- If killed, redirect effort to acquisition (Elon's point proven)
-
-**Steve's constraint:** "If we ship mediocre emails to 'validate the concept,' we'll validate nothing. Customers won't respond to mediocrity, and you'll declare lifecycle emails a failure when the real failure was execution."
-
-**Owner:** Phil Jackson (decision to kill) + Steve Jobs (ensure quality not compromised)
+**Phase 2 Timeline:** Lock commitment within 6 months of Phase 1 launch (board-verdict.md)
 
 ---
 
-#### Risk: Manual CSV Upload Becomes Bottleneck
-**Likelihood:** 🔴 High
-**Impact:** 🟡 Medium (operational pain, doesn't scale)
-**Root cause:** V1 has no automated project data capture
+## 9. Design Review Findings (Jony Ive + Maya Angelou)
 
-**Mitigation:**
-- Accept manual process for first 90 days
-- If Homeport proves successful (>10% conversion), V1.1 priority = automated capture
-- If shipping >1 project/day, automate immediately
+### Email Templates: WORLD-CLASS ✅
+**Jony Ive:** "Flawless. Every word earns its place."
+- Day 7: "Seven days. Your site shipped seven days ago" — rhythm, confidence
+- Line 9: "That's pride-worthy. Seriously." — human, not corporate
 
-**Elon's threshold:** "At 10x usage (10,000 shipped projects/year), manual CSV upload = 27 projects/day. You're dead."
+**Maya Angelou:** "Voice feels like someone who built this with their hands."
+- Day 7: YES — "Your site is breathing on its own now" (visceral)
+- Day 90: ALMOST — "We're still here (most agencies aren't)" (good contrast, slight smug edge)
 
-**Owner:** Elon Musk (build automation when threshold hit)
+### Weaknesses Found
 
----
+**Jony Ive — Documentation Bloat:**
+- resend-setup-guide.md: 706 lines, too many words
+- Cut 40% — say it once, not three times
+- Show one DNS provider example (Cloudflare), cut GoDaddy/Route53 identical patterns
 
-#### Risk: "Someone Remembers" Feeling Degrades at Scale
-**Likelihood:** 🟡 Medium
-**Impact:** 🔴 High (brand promise broken, customers unsubscribe)
-**Root cause:** Templates feel automated as volume increases
+**Maya Angelou — Weakest Lines:**
+1. **Day 30 subject:** ~~"It's been 30 days. How are things?"~~ → "Does it feel like yours yet?"
+2. **Day 180:** ~~"That's gold."~~ → "That's what changes everything."
+3. **Day 365:** ~~"The entire industry took steps you might not have noticed."~~ (condescending) → "A year moves faster than you think."
 
-**Mitigation:**
-- Never auto-generate content with AI
-- Never customize per-industry (maintain human voice)
-- Lock templates in V1, never change them
-- Steve's principle: "I'd rather send fewer emails—beautifully—than scale to spam"
-
-**Owner:** Steve Jobs (voice guardian)
-
----
-
-#### Risk: Voice Drift Over Time (Future Team Rewrites)
-**Likelihood:** 🔴 High (if team expands)
-**Impact:** 🔴 High ("Maximize your digital presence" corporate slop)
-**Root cause:** New team members "optimize" copy without understanding voice
-
-**Mitigation:**
-- **Lock templates in V1, never touch** (Decision 1.12)
-- Document voice guidelines in README.md
-- Steve's test: "Would I send this to a friend?" = quality gate
-- 90-day feature freeze prevents premature optimization
-
-**Owner:** Steve Jobs (enforce via README) + Phil Jackson (veto power on changes)
+**Brand Inconsistency (Jony Ive):**
+- Templates show `aftercare.shipyard.ai` in unsubscribe URLs
+- Config says `homeport@shipyard.ai`
+- **FIX REQUIRED:** Change all template URLs to `homeport.shipyard.ai`
 
 ---
 
-#### Risk: Reply Inbox Not Monitored (Trust Destroyed)
-**Likelihood:** 🟡 Medium (open question 4.5)
-**Impact:** 🔴 High (customer replies, gets ignored, brand promise broken)
-**Root cause:** No assigned owner, no SLA for response
+## 10. Retrospective Learnings (Marcus Aurelius)
 
-**Mitigation:**
-- **Must resolve before ship:** Assign owner of reply inbox
-- Set SLA for reply response (<24 hours target)
-- If no one can monitor, reconsider reply-focused metric
-- Start with manual handling, automate only if reply rate >10%
+### What Worked Well ✅
+- **Email craft:** World-class. Day 7/90 templates authentic, human, trust-building
+- **Strategic clarity:** Problem/solution/unit economics clean
+- **Multi-lens review:** Four board members caught what one would miss
+- **Voice consistency:** "Trusted mechanic" tone held across all deliverables
 
-**Owner:** Phil Jackson (assign responsibility)
+### What Didn't Work ❌
+- **Documentation bloat:** 706-line setup guide before showing emails
+- **No implementation:** Built planning documents, not actual system
+- **Phase 2 deferred:** Data moat pushed to future (weak moat compounds slowly)
+- **Onboarding friction:** Non-technical users excluded
+- **No content between emails:** 5 emails/365 days = radio silence
 
-**Elon's warning:** "If reply rate >10%, need workflow for response management."
+### Process Failure Identified 🔴
 
----
+**Marcus Aurelius:**
+"Agency built comprehensive planning layer (reviews, roadmaps, verdicts) on top of **unbuilt product**. Should have shipped small batch, gathered data, then convened board to review **results**, not **intentions**."
 
-### 5.3 Business Risks
+**Evidence:**
+- 9 markdown files totaling ~30K words
+- Zero customer emails sent
+- Zero reply data collected
+- Zero conversion events measured
 
-#### Risk: Homeport Solves Retention, Not Acquisition
-**Likelihood:** 🔴 High (Elon flagged this in Round 1)
-**Impact:** 🟡 Medium (fixes churn, doesn't drive growth)
-**Root cause:** Lifecycle emails don't bring in new customers
+**Corrective Action:**
+"Next project: No board review until product ships to ≥10 users and collects ≥30 days of data. Review outcomes, not proposals."
 
-**Mitigation:**
-- Accept that this PRD is retention-only
-- Separate effort needed for acquisition (deferred)
-- Don't confuse repeat customers with new customers
-
-**Elon's Round 1 challenge:**
-"Target: '20% of shipped projects generate revision orders'—but where are the 10,000 users? This is a retention play when you don't have acquisition solved. Why would someone ship with Shipyard the FIRST time?"
-
-**Steve's Round 2 counter:**
-"Homeport helps acquisition—it's proof we care about what happens after the sale. That's a differentiator we can sell before the first project ships."
-
-**Compromise:** Homeport is retention-focused, but becomes a sales asset (proof of care).
+**Key Learning:**
+"World-class craft without distribution infrastructure is like building a cathedral in a forest — beautiful, unvisited, unable to prove its value until someone walks through the door."
 
 ---
 
-#### Risk: 48-Hour Timeline is Unrealistic
-**Likelihood:** 🟡 Medium
-**Impact:** 🟢 Low (delayed launch, but recoverable)
-**Root cause:** Underestimated complexity, dependency blockers, scope creep
+## 11. The Deal (Steve ↔ Elon Agreement)
 
-**Mitigation:**
-- Elon's 300-line code cap enforced (hard limit)
-- If timeline slips, identify what got added beyond locked scope
-- Phil Jackson has veto power on any feature addition during build
-- 72-hour buffer allowed if quality maintained
+### Steve's Commitments ✅
+1. Write all 5 email templates with craft quality
+2. No dashboards, no screenshots, no metrics in V1 (accepted Elon's cuts)
+3. Accept plain text emails (no HTML, no images)
+4. Accept 48-72h timeline if email quality non-negotiable
+5. Trust Elon's architecture (Workers + KV + Resend)
+6. Accept templates use merge tags, not human review per send
 
-**Owner:** Elon Musk (timeline accountability) + Phil Jackson (scope enforcement)
-
----
-
-#### Risk: Steve and Elon Disagree During Execution
-**Likelihood:** 🟡 Medium
-**Impact:** 🟡 Medium (delays, quality vs. speed tension)
-**Root cause:** Creative vision (Steve) vs. technical constraints (Elon)
-
-**Mitigation:**
-- This locked decisions document = source of truth
-- "Steve writes, Elon ships word-for-word" agreement holds (Decision 1.6)
-- Phil Jackson = tie-breaker on all disputes
-
-**The Deal (Elon Round 2):**
-"I'll give Steve the tone, the cadence, and the positioning. He gives me the architecture, the timeline, and veto power on any feature that requires >1 day of eng work."
-
-**Owner:** Phil Jackson (referee)
-
----
-
-## 6. Success Criteria (What "Done" Looks Like)
-
-### Launch Readiness Checklist
-
-**Day 0 (Pre-Build):**
-- [ ] **Project data audit complete** (Phil) — Do we have 10+ shipped projects with clean data?
-- [ ] **CSV structure defined** (Phil) — Fields: project_id, email, name, project_url, ship_date
-- [ ] **"From" email address decided** (Steve + Elon) — homeport@, aftercare@, or personal?
-- [ ] **Unsubscribe flow designed** (Elon) — One-click KV flag or Resend built-in?
-- [ ] **Reply inbox assigned** (Phil) — Who monitors? What's the SLA?
-
-**Day 1 (Build):**
-- [ ] **Cloudflare Worker project scaffolded** (Elon)
-- [ ] **Resend account + domain authentication** (Elon) — SPF/DKIM/DMARC configured
-- [ ] **Day 7 email draft finalized** (Steve → Elon → Phil approval)
-- [ ] **Day 30 email draft finalized** (Steve → Elon → Phil approval)
-- [ ] **Day 90/180/365 drafts written** (Steve) — dormant but committed to code
-- [ ] **Worker core built** (Elon) — scheduler, KV operations, Resend integration
-- [ ] **CSV-to-KV upload script working** (Elon)
-- [ ] **Tests written** (Elon) — email rendering, cron logic
-
-**Day 2 (Ship):**
-- [ ] **Worker deployed to production** (Elon)
-- [ ] **KV store populated** (Phil) — Upload CSV with real project data
-- [ ] **Test emails sent to internal team** (Elon) — Deliverability confirmed
-- [ ] **Day 7/30/90/180/365 cron jobs active** (Elon)
-- [ ] **Unsubscribe mechanism functional** (Elon) — CAN-SPAM compliant
-- [ ] **Monitoring dashboard accessible** (Resend analytics)
-- [ ] **Voice review complete** (Steve) — Final check for "automation smell"
-- [ ] **Go-live approval** (Phil)
-
-### 90-Day Measurement Plan
-
-**Weeks 1-4:**
-- Projects shipped 7+ days ago → receive Day 7 email
-- Projects shipped 30+ days ago → receive Day 30 email
-
-**Weeks 5-8:**
-- Full cadence active (Day 7, 30, 90)
-- Monitor reply rate, unsubscribe rate
-
-**Weeks 9-12:**
-- Projects shipped 180+ days ago → receive Day 180 email
-- Calculate conversion rates
-
-**Metrics to track:**
-- Total emails sent (breakdown by Day 7/30/90/180/365)
-- Open rate (% who open) — via Resend
-- Reply rate (% who respond) — primary metric
-- Revision request rate (% who book follow-up work) — primary metric
-- Unsubscribe rate (% who opt out) — kill switch if >15%
-
-**Decision meeting:** Day 91
-**Attendees:** Steve Jobs, Elon Musk, Phil Jackson
-**Outcome:** Kill (<5%), iterate (5-15%), or scale (>15%) based on data
-
----
-
-## 7. The Deal (Steve ↔ Elon Agreement)
-
-### Steve's Commitments
-1. ✅ Write all 5 email templates (Day 7, 30, 90, 180, 365) with craft quality
-2. ✅ No dashboards, no screenshots, no metrics in V1 (accepted Elon's cuts)
-3. ✅ Accept plain text emails (no HTML, no images)
-4. ✅ Accept 48-hour timeline if email quality is non-negotiable
-5. ✅ Trust Elon's architecture (Workers + KV + Resend)
-6. ✅ Accept that templates use merge tags, not human review per send
-
-### Elon's Commitments
-1. ✅ Ship Steve's email templates word-for-word (no edits for brevity)
-2. ✅ Accept 5-email cadence (all deployed immediately, not phased)
-3. ✅ Build all 5 templates in V1 code
-4. ✅ Accept "Homeport" as customer-facing name
-5. ✅ Give Steve veto power on any "optimization" that compromises voice
-6. ✅ Accept that tone matters as much as speed
+### Elon's Commitments ✅
+1. Ship Steve's email templates word-for-word (no edits for brevity)
+2. Accept 5-email cadence (all deployed immediately, not phased)
+3. Build all 5 templates in V1 code
+4. Accept "Homeport" as customer-facing name
+5. Give Steve veto power on any "optimization" that compromises voice
+6. Accept that tone matters as much as speed
 
 ### The Deal (Elon's Round 2 Offer, Steve Accepted)
 **Elon:** "I'll give Steve the tone, the cadence, and the positioning. He gives me the architecture, the timeline, and veto power on any feature that requires >1 day of eng work."
 
-**Steve:** "Steve writes the five email templates. Make them human. Make them caring. Make them sound like we give a shit. I'll ship them word-for-word."
+**Steve:** "Make them human. Make them caring. Make them sound like we give a shit. I'll ship them word-for-word."
 
-**Locked:** ✅
-
-### Phil's Role
-- **Tie-breaker** when Steve and Elon disagree
-- **Scope enforcer** (no additions beyond locked decisions)
-- **Data source owner** (deliver clean project CSV by Day 0)
-- **Kill switch authority** (if metrics justify shutting down)
-- **Reply inbox** (assign owner, enforce SLA)
+**Status:** ✅ LOCKED
 
 ---
 
-## 8. Consensus Achievements (What Both Agreed On)
+## 12. Success Criteria (What "Done" Looks Like)
 
-**No debate required:**
+### Launch Readiness Checklist
 
-1. ✅ Five emails at Day 7, 30, 90, 180, 365 (no sixth email, no monthly check-ins)
-2. ✅ Plain text only (no HTML, no images, no branded templates)
-3. ✅ No upsell in emails (Day 7 is not "10% off your next project")
-4. ✅ Use Resend (don't build email infrastructure)
-5. ✅ No custom dashboard (use Resend's built-in analytics)
-6. ✅ Workers KV, not database (stateless, simple, deletable)
-7. ✅ Ship in 48-72 hours (if longer, scope is wrong)
-8. ✅ 90-day feature freeze (let it run untouched)
-9. ✅ No site monitoring (we're not Pingdom)
-10. ✅ Measure reply rate > open rate (data decides)
-11. ✅ No "Built with Shipyard" footer badges (tacky, deferred)
-12. ✅ No per-industry customization (same emails to everyone)
-13. ✅ No AI-generated content (human voice only)
+**Day 0 (Pre-Build):**
+- [ ] **Project data audit complete** (Phil) — 10+ shipped projects with clean data?
+- [ ] **CSV structure defined** (Phil) — Fields: project_id, email, name, project_url, ship_date
+- [ ] **"From" email confirmed:** `homeport@shipyard.ai` (locked from config)
+- [ ] **Unsubscribe flow designed** (Elon) — One-click KV flag
+- [ ] **Reply inbox assigned** (Phil) — Who monitors? <24h SLA
 
-**Where they compromised:**
+**Day 1 (Build):**
+- [ ] **Cloudflare Worker scaffolded** (Elon)
+- [ ] **Resend account + domain auth** (Elon) — SPF/DKIM/DMARC
+- [ ] **Day 7 email draft finalized** (Steve → Elon → Phil approval)
+- [ ] **Day 30 email draft finalized** (apply Maya's feedback)
+- [ ] **Day 90/180/365 drafts written** (Steve)
+- [ ] **Worker core built** (Elon) — scheduler, KV, Resend integration
+- [ ] **CSV-to-KV upload script** (Elon)
+- [ ] **Tests written** (Elon)
 
-| Issue | Steve's Position | Elon's Position | Compromise |
-|-------|------------------|-----------------|------------|
-| **A/B Testing** | Never test (consistency = brand) | Always test (data > opinions) | Test once during dev, lock winner |
-| **Success Metric** | Mental real estate (presence) | Reply rate (measurable) | Track both, optimize for replies |
-| **Timeline** | 3 days if emails are perfect | 48 hours by cutting scope | 48h target, 72h deadline |
-| **Email Count** | All 5 deployed immediately | Start with Day 7/30, validate | All 5 ship, measure 90 days |
-| **Distribution** | Word-of-mouth from great service | Footer badges, showcase | Retention ≠ acquisition (separate) |
-| **Scalability** | Human touch doesn't scale | Templates + merge tags scale | Templates feel personal, use variables |
+**Day 2 (Ship):**
+- [ ] **Worker deployed to production** (Elon)
+- [ ] **KV store populated** (Phil uploads CSV)
+- [ ] **Test emails sent to internal team** (Elon)
+- [ ] **Cron jobs active** (Day 7/30/90/180/365)
+- [ ] **Unsubscribe mechanism functional** (CAN-SPAM compliant)
+- [ ] **Brand inconsistency fixed:** All URLs → `homeport.shipyard.ai`
+- [ ] **Voice review complete** (Steve) — Final "automation smell" check
+- [ ] **Go-live approval** (Phil)
+
+### 90-Day Measurement Plan
+
+**Metrics to Track:**
+- Total emails sent (breakdown by Day 7/30/90/180/365)
+- Open rate (% who open) — via Resend
+- Reply rate (% who respond) — **primary metric**
+- Revision request rate (% who book follow-up work) — **primary metric**
+- Unsubscribe rate (% who opt out) — **kill switch if >15%**
+
+**Kill Switch Triggers:**
+- Unsubscribe rate >15% in first week → pause sends, review copy
+- Reply rate <1% after 50 emails → consider copy rewrite
+- Emails landing in spam (>10% bounce rate) → fix deliverability immediately
+
+**Decision Meeting:** Day 91
+**Attendees:** Steve Jobs, Elon Musk, Phil Jackson
+
+**Outcome:**
+- **<5%** → Kill Homeport, focus on acquisition
+- **5-15%** → Iterate, refine templates, measure another 90 days
+- **>15%** → Fund V2 (screenshots, telemetry, Phase 2)
 
 ---
 
-## 9. Next Actions (Immediate)
+## 13. Voice Lock (Steve's Final Word)
+
+**Email Copy Test:** "Would I send this to a friend?" If not, rewrite.
+
+**Voice Rules:**
+- Short sentences. No jargon.
+- No "solutions," "leverage," "ecosystem," "digital presence."
+- Sounds like one person, not a CRM.
+- No upsell. No "10% off next project."
+- Honest, not cutesy.
+- Confident, competent, human.
+
+**Examples:**
+
+❌ **Corporate:** "We hope your deployment experience met expectations and that your digital presence is performing optimally."
+
+❌ **Fake Casual:** "Hey there! Just checking in to see how things are going with your awesome new site! 😊"
+
+✅ **Shipyard:** "It's been 30 days. Your site is holding up beautifully. Page speed is solid. Uptime is 100%. You should be proud."
+
+**Locked Forever:** Templates written in V1 never change unless data proves they're broken (<5% reply rate).
+
+---
+
+## 14. Speed Lock (Elon's Final Word)
+
+**Technical Constraints:**
+- 300 lines of TypeScript maximum (hard cap)
+- 48 hours from commit to production (72-hour deadline)
+- Single failure mode: Resend API down
+- Zero infrastructure maintenance beyond Worker + KV
+- Debuggable in <60 seconds
+- Fully deletable in 5 minutes if experiment fails
+
+**If it takes longer than 72 hours, the spec is wrong.**
+
+**Delete > debug:** If something breaks, rewrite in a weekend rather than debug for a week.
+
+---
+
+## 15. Triangle Offense (Phil's Final Word)
+
+**Roles:**
+- **Steve:** Voice guardian. Writes all copy. Veto power on tone changes.
+- **Elon:** Speed enforcer. Builds infrastructure. Veto power on scope creep.
+- **Phil:** Tie-breaker. Data owner. Kill switch authority.
+
+**When Steve and Elon Disagree:**
+1. Check this document (locked decisions = source of truth)
+2. If not covered, Phil decides
+3. If Phil can't decide, run 48-hour experiment and measure
+
+**The Deal Holds:**
+- Steve writes, Elon ships word-for-word
+- Elon cuts scope, Steve accepts if quality maintained
+- Data decides the next move (not aesthetics, not intuition)
+
+---
+
+## 16. Next Actions (Immediate)
 
 ### Day 0 (Pre-Build) — DUE BEFORE BUILD STARTS
 
 **Phil Jackson:**
 - [ ] Audit shipped project records (do we have the data?)
-- [ ] Prepare CSV with at least 10 shipped projects (email, name, URL, ship_date)
-- [ ] Decide on "From" email address (homeport@ vs. aftercare@ vs. personal)
-- [ ] Assign reply inbox owner (who monitors? what SLA?)
+- [ ] Prepare CSV with ≥10 shipped projects (email, name, URL, ship_date)
+- [ ] Confirm "From" address: `homeport@shipyard.ai`
+- [ ] Assign reply inbox owner (Phil monitors personally, <24h SLA)
 - [ ] Approve unsubscribe flow design
-- [ ] Resolve trigger mechanism (webhook payload format or manual CSV process)
+- [ ] Resolve trigger mechanism (webhook or manual CSV)
 
 **Steve Jobs:**
-- [ ] Draft Day 7 email template (first draft for review)
-- [ ] Draft Day 30 email template (first draft for review)
+- [ ] Draft Day 7 email template (apply Jony/Maya feedback)
+- [ ] Draft Day 30 email template (use Maya's subject line)
 - [ ] Draft Day 90/180/365 templates (for code commit)
+- [ ] Fix Day 180 "That's gold" → "That's what changes everything"
+- [ ] Fix Day 365 condescending line
 
 **Elon Musk:**
-- [ ] Set up Resend account (if not already done)
-- [ ] Configure domain authentication (SPF/DKIM/DMARC for homeport@ or aftercare@)
+- [ ] Set up Resend account (if not done)
+- [ ] Configure domain authentication (SPF/DKIM/DMARC for homeport@shipyard.ai)
 - [ ] Scaffold Cloudflare Worker project structure
 
 ---
@@ -1000,7 +816,7 @@ CTA: Reply if something's off.
 - [ ] Deploy to staging for internal testing
 
 **Steve Jobs:**
-- [ ] Finalize Day 7 and Day 30 templates based on Elon's feedback
+- [ ] Finalize Day 7/30 templates based on Elon's feedback
 - [ ] Review Elon's implementation for "automation smell"
 - [ ] Approve or request rewrites
 
@@ -1016,9 +832,10 @@ CTA: Reply if something's off.
 **Elon Musk:**
 - [ ] Deploy Worker to Cloudflare production
 - [ ] Upload project CSV to KV store (Phil provides)
-- [ ] Activate Day 7, 30, 90, 180, 365 cron jobs
-- [ ] Send test emails to internal team (Phil, Steve, Elon)
+- [ ] Activate Day 7/30/90/180/365 cron jobs
+- [ ] Send test emails to internal team
 - [ ] Confirm Resend dashboard shows sent emails
+- [ ] **FIX:** Change all template unsubscribe URLs from `aftercare.shipyard.ai` → `homeport.shipyard.ai`
 
 **Steve Jobs:**
 - [ ] Final review of live email sends (tone, formatting)
@@ -1035,16 +852,11 @@ CTA: Reply if something's off.
 ### Day 3-90 (Measurement Period) — HANDS OFF
 
 **All:**
-- [ ] **Do not touch the code** (90-day feature freeze)
-- [ ] Monitor Resend dashboard weekly (open rate, unsub rate, reply rate)
-- [ ] Respond to customer replies within SLA (<24 hours)
-- [ ] Log any technical issues (Worker failures, deliverability problems)
-- [ ] Collect qualitative feedback (what do customers say when they reply?)
-
-**Kill switch triggers:**
-- If unsubscribe rate >15% in first week → pause sends, review copy
-- If reply rate <1% after 50 emails → consider copy rewrite
-- If emails landing in spam (>10% bounce rate) → fix deliverability immediately
+- [ ] **Do NOT touch the code** (90-day feature freeze)
+- [ ] Monitor Resend dashboard weekly (open, unsub, reply rates)
+- [ ] Respond to customer replies within <24h SLA (Phil)
+- [ ] Log technical issues (Worker failures, deliverability problems)
+- [ ] Collect qualitative feedback (what do customers say?)
 
 ---
 
@@ -1056,93 +868,47 @@ CTA: Reply if something's off.
 1. Review metrics (reply rate, revision requests, unsub rate)
 2. Qualitative review (what did customers say?)
 3. Decide: Kill (<5%), Iterate (5-15%), or Scale (>15%)
-
-**Outcomes:**
-- **Kill (<5%):** Shut down Homeport, redirect to acquisition efforts (Elon was right)
-- **Iterate (5-15%):** Rewrite templates, test variations, measure another 90 days
-- **Scale (>15%):** Fund V2 (screenshots, telemetry, automated project capture)
+4. **If >10%:** Lock Phase 2 commitment (telemetry within 6 months)
 
 ---
 
-## 10. Final Locked Position
+## 17. Final Locked Position
 
 **Product:** Homeport (customer-facing) / Aftercare (codebase)
 **Positioning:** "We're the agency that doesn't ghost you."
 **MVP Scope:** 5 lifecycle emails (Day 7/30/90/180/365), Cloudflare Workers, Resend API, manual project upload
-**Timeline:** 48 hours to production (72-hour buffer)
-**Success Metric:** 10%+ reply/revision request rate
+**Timeline:** 48-72 hours to production
+**Success Metric:** ≥10% reply/revision request rate
 **Kill Threshold:** <5% conversion after 90 days
 **Scale Threshold:** >15% conversion unlocks V2
+**Phase 2 Commitment:** Telemetry within 6 months if successful
 
 **Steve writes. Elon ships. Phil decides. Data judges.**
 
 ---
 
-## 11. Voice Lock (Steve's Final Word)
+## 18. Board Verdict Summary
 
-**Email copy test:** "Would I send this to a friend?"
-**If not, rewrite.**
+**Status:** ✅ PROCEED WITH CONDITIONS
 
-**Voice rules:**
-- Short sentences. No jargon.
-- No "solutions," "leverage," "ecosystem," "digital presence."
-- Sounds like one person, not a CRM.
-- No upsell. No "10% off next project."
-- Honest, not cutesy.
-- Confident, competent, human.
+**Aggregate Score:** 6/10
+- Good retention hygiene, not retention theater
+- Excellent unit economics (99.99% margin)
+- Weak moat Year 1 (copyable in 48h)
+- Phase 2 non-negotiable for durable advantage
 
-**Examples:**
+**Mandatory Before Full Scale:**
+1. Prove system works (10-15 project batch, 30 days)
+2. Lock Phase 2 telemetry roadmap (within 6 months)
+3. Simplify onboarding (accessibility for non-technical users)
 
-❌ **Corporate:** "We hope your deployment experience met expectations and that your digital presence is performing optimally."
+**Success Metrics for Next Review (90 days post-launch):**
+- ≥10% reply rate on lifecycle emails
+- ≥5% conversion rate on revision/update CTAs
+- <5% unsubscribe rate
+- Phase 2 data infrastructure design complete
 
-❌ **Fake Casual:** "Hey there! Just checking in to see how things are going with your awesome new site! 😊"
-
-✅ **Shipyard:** "It's been 30 days. Your site is holding up beautifully. Page speed is solid. Uptime is 100%. You should be proud."
-
-**Locked forever.** Templates written in V1 never change unless data proves they're broken (<5% reply rate).
-
----
-
-## 12. Speed Lock (Elon's Final Word)
-
-**Technical constraints:**
-- 300 lines of TypeScript maximum (hard cap)
-- 48 hours from commit to production (72-hour deadline)
-- Single failure mode: Resend API down
-- Zero infrastructure maintenance beyond Worker + KV
-- Debuggable in <60 seconds
-- Fully deletable in 5 minutes if experiment fails
-
-**If it takes longer than 72 hours, the spec is wrong.**
-
-**Delete > debug.** If something breaks, rewrite it in a weekend rather than debug for a week.
-
----
-
-## 13. Triangle Offense (Phil's Final Word)
-
-**Roles:**
-- **Steve:** Voice guardian. Writes all copy. Veto power on tone changes.
-- **Elon:** Speed enforcer. Builds infrastructure. Veto power on scope creep.
-- **Phil:** Tie-breaker. Data owner. Kill switch authority.
-
-**When Steve and Elon disagree:**
-1. Check this document (locked decisions = source of truth)
-2. If not covered, Phil decides
-3. If Phil can't decide, run a 48-hour experiment and measure
-
-**The Deal holds:**
-- Steve writes, Elon ships word-for-word
-- Elon cuts scope, Steve accepts if quality maintained
-- Data decides the next move (not aesthetics, not intuition)
-
----
-
-**Status:** BLUEPRINT LOCKED
-**Owner:** Development agent (following this blueprint)
-**Approval:** Phil Jackson (Zen Master) + Steve Jobs (Chief Design) + Elon Musk (Chief Product)
-
-**Ship when:** All Day 0 open questions resolved
+**Next Board Review:** 90 days post-launch (or when Phase 2 ships)
 
 ---
 
@@ -1151,11 +917,19 @@ CTA: Reply if something's off.
 > **The lock:** Test once. Ship. Never touch for 90 days.
 >
 > **The deal:** Speed without soul = noise. Soul without speed = vaporware. Ship both in 3 days.
+>
+> **What dies without:** Emails that feel handwritten.
+>
+> **What kills it:** Automation smell. Screenshot scope creep.
 
 ---
 
 *"Simple. Reliable. Unforgettable."* — Steve Jobs
 *"Ship now, iterate later."* — Elon Musk
 *"One triangle offense. Execute."* — Phil Jackson
+*"Make them binge. Make them care. Make them come back."* — Shonda Rhimes
+*"This is CRM, not AI leverage. Commit to Phase 2 NOW."* — Jensen Huang
+*"Heart is there, friction too high. Show proof."* — Oprah Winfrey
+*"Excellent unit economics. Needs Phase 2 to reach 9/10."* — Warren Buffett
 
-**End of Blueprint.**
+**END OF BLUEPRINT — READY FOR BUILD**

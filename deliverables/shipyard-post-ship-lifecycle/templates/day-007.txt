@@ -16,4 +16,6 @@ Otherwise: nice work shipping something real into the world.
 
 Homeport is Shipyard's way of staying close to what we build. We don't ghost you after launch.
 
-Unsubscribe: https://aftercare.shipyard.ai/unsub?token={email}
+Unsubscribe: https://homeport.shipyard.ai/unsub?token={email}
+
+// LOCKED for 90-day measurement. Do not edit without data evidence.

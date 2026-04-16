@@ -1,4 +1,4 @@
-Subject: It's been 30 days. How are things?
+Subject: Does it feel like yours yet?
 
 Hi {name},
 
@@ -16,4 +16,6 @@ Just reply here and let me know.
 
 Homeport is Shipyard's way of staying close to what we build. We don't ghost you after launch.
 
-Unsubscribe: https://aftercare.shipyard.ai/unsub?token={email}
+Unsubscribe: https://homeport.shipyard.ai/unsub?token={email}
+
+// LOCKED for 90-day measurement. Do not edit without data evidence.

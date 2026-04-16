@@ -1,81 +1,91 @@
 # Round 1: Elon Musk — Chief Product & Growth Officer
 
-## Architecture: Delete Half of This
+## Architecture: What's the Simplest System That Could Work?
 
-**Simplest system that works:** Cloudflare Workers + scheduled cron + Resend API. That's it. No database initially—use KV store with project ID as key. 5 email templates in code. Ship in 2 days, not 2 weeks.
+**Strip this down to physics.** You need: (1) Store email + ship date, (2) Cron job checks timestamps, (3) Send email. That's it.
 
-The proposed schema is over-engineered. You don't need `tokenBudget`, `tokensUsed`, `projectType` for V1. You need: email, name, project URL, ship date. Add fields when you have evidence they matter.
+The data model is bloated. You don't need `lifecycleEmails` object tracking every send state. **One field:** `lastEmailSentAt: Date`. Scheduler logic: `daysSinceShip = now - shippedAt`. Send email based on thresholds (7, 30, 90, 180, 365). Idempotency: don't send twice if already sent within threshold window.
 
-**Cut the "Shipped Project Database"**—use existing order/project data. Don't duplicate state. If you don't have that data structure yet, that's the real problem.
+**No dashboard in MVP.** You're building retention mechanics, not analytics porn. Track sends, yes. Pretty graphs? V2.
 
-## Performance: The Wrong Bottleneck
+Use **Cloudflare Workers + D1** (SQL at the edge). No separate database service. No KV complexity. SQL `SELECT * FROM projects WHERE shippedAt < DATE('now', '-7 days')` is faster to write and debug than KV key management.
 
-This PRD optimizes email delivery when the actual bottleneck is **getting 10,000 shipped projects**.
+## Performance: Where Are the Bottlenecks?
 
-If Shipyard ships 1 project/day, you're optimizing for 365 email sends/year. That's a rounding error. Any transactional email service handles this in their sleep.
+Daily cron scanning all projects is O(n). At 10,000 projects, this is still <100ms query with proper indexing. **Non-issue.**
 
-The 10x path: **reduce time-to-ship by 50%**, not perfect lifecycle emails. One extra shipped project/week >>> fancy email analytics.
+Real bottleneck: **email deliverability**. Transactional email services rate-limit. Postmark: 10,000/month free tier, then $1.50/1k. At scale, you'll batch sends. Use `Promise.allSettled()` with concurrency limit (50 concurrent).
 
-## Distribution: You're Solving the Wrong Problem
+**Email template rendering:** Don't use heavy frameworks. Plain HTML + template literals. Render time should be <1ms per email.
 
-Target: "20% of shipped projects generate revision orders"—but where are the 10,000 users? This is a retention play when you don't have acquisition solved.
+## Distribution: How Does This Reach 10,000 Users Without Paid Ads?
 
-**First-principles question:** Why would someone ship with Shipyard the FIRST time? Answer that, then worry about repeat customers.
+This feature **is** the distribution engine. Each email is a reminder that Shipyard exists.
 
-If the answer is "word of mouth from amazing shipped projects," then lifecycle emails add 5% lift. If the answer is "we don't know," this is premature optimization.
+Do the math:
+- 1,000 shipped projects
+- 5 emails/year/project = 5,000 touchpoints
+- 50% open rate = 2,500 opens
+- 20% click-through on "Schedule an update" = 500 warm leads
+- 10% conversion = **50 new projects** from lifecycle emails alone
 
-**Real distribution:** Every shipped project should have a "Built with Shipyard" footer link. That's 10,000 backlinks pointing to real, live proof. That's distribution.
+**Viral loop:** Day 7 email includes "Built with Shipyard" badge. Prompt customer to add it to footer. Every shipped site becomes a billboard.
 
-## What to CUT
+**Content play:** Day 90 email's "case study of similar project" is growth leverage. Customer sees "We built 50 e-commerce sites last quarter" = social proof + FOMO.
 
-**Kill Phase 2 entirely.** Project telemetry is interesting but irrelevant until you have 1,000+ shipped projects. Right now it's scope creep disguised as "competitive moat."
+## What to CUT: Scope Creep Detection
 
-**Kill:**
-- Day 90, 180, 365 emails in V1. Ship Day 7 and Day 30 only. Validate open rates before writing more templates.
-- Email open tracking dashboard—use Resend's built-in analytics. Don't build what you can buy for $0.
-- "Industry trends relevant to their site type"—who writes this content? This is a time sink with no ROI measurement.
-- "Special offer for returning customers"—what's the offer? If you don't know, delete this line.
+**Cut from MVP:**
+1. **"Basic performance metrics (uptime, page speed)"** — You don't monitor sites. Don't promise what you can't deliver. Say "Hope your site is performing well" instead of fake metrics.
+2. **Open tracking in MVP** — Just send emails. Track later. You need 100 sends before open rates matter statistically.
+3. **Click tracking in MVP** — Use UTM parameters to measure in existing analytics. Don't build custom tracking.
+4. **A/B testing** — You have no volume. Write good copy, ship it, iterate when you have 1,000 sends.
+5. **"Industry trends relevant to their site type"** — Hand-waving. You'll spend 10 hours researching trends per email. Just say "Web is evolving, let's refresh your site."
 
-**Day 7 email only needs:** "Your site is live: [URL]. Reply to this email if you need anything."
+**Phase 2 (Project Telemetry)** is the real product. Emails are customer retention. Telemetry is **operational AI** — knowing "React sites ship 40% faster than Vue" lets you guide customers better. But email sequence proves retention value first. Correct sequencing.
 
-That's the MVP. Anything else is LARPing as a marketing automation platform.
+## Technical Feasibility: Can One Agent Session Build This?
 
-## Technical Feasibility: Yes, But Wrong Scope
+**Yes.**
 
-**Can one agent session build this?** As spec'd: no. Too many moving parts, unclear integration points, vague requirements ("industry trends").
+Scope for single session:
+1. Cloudflare Worker with scheduled trigger (50 lines)
+2. D1 database schema (10 lines SQL)
+3. 5 email templates (HTML, 100 lines each = 500 lines total)
+4. Postmark API integration (20 lines)
+5. Manual project entry endpoint (30 lines)
 
-**Can one agent session build the REAL V1?** Yes:
-1. Cloudflare Worker with scheduled cron trigger
-2. Two email templates (Day 7, Day 30)
-3. Resend integration
-4. Manual CSV of shipped projects → KV store
-5. Unsubscribe link → KV update
+Total: ~600 lines of code. **4-6 hour session** for competent agent.
 
-This is 200 lines of TypeScript. Ship today.
+Pipeline integration (auto-populate shipped projects) is separate session. Don't couple it to MVP.
 
-## Scaling: What Actually Breaks
+## Scaling: What Breaks at 100x Usage?
 
-**At 100x usage (10,000 shipped projects/year):**
-- Email sends: 50,000/year → any service handles this
-- KV reads: negligible
-- Worker invocations: 365 cron jobs/year → free tier
+At 100,000 shipped projects:
+- Daily cron queries entire table: **Needs indexing** on `shippedAt`. Add compound index on `(shippedAt, lastEmailSentAt)`.
+- 100k projects × 5 emails/year = **500k emails/year** = 1,370/day. Well within Postmark limits. Cost: ~$75/month.
+- D1 storage: 100k rows × ~500 bytes = **50MB**. Free tier is 5GB. Non-issue.
 
-Nothing breaks. This system scales to 100,000 projects without architecture changes.
+**What actually breaks:** Email reputation. If 5% spam complaints, you're blacklisted. Mitigation: Double opt-in (customer confirms email at project start), clear unsubscribe, reputable transactional service with good defaults.
 
-**What DOES break:** Manual project entry. If you're manually CSV-uploading 27 projects/day, you're dead. Auto-capture from pipeline is not V1.1—it's V1.0.
+## First-Principles Challenges to PRD
 
-## The Real Question
+**1. "Repeat customer rate 30% within 12 months" is vanity metric.**
+Real metric: **Revenue from lifecycle emails ÷ Cost of system**. If you spend $500/month (email service + maintenance) and generate $5k/month in repeat business, ROI is 10x. That's the number that matters.
 
-Why are repeat customers 30%? Is that based on industry benchmarks, or aspirational? If traditional agencies see 60% repeat rate, then 30% means Shipyard is broken. If agencies see 10%, then 30% means you're 3x better—but why?
+**2. "Special offer for returning customers" (Day 180 email) is discount poison.**
+You're training customers to wait for discounts. Instead: "Priority scheduling for past customers" or "Free site audit." Scarcity > Discounts.
 
-**Thesis to validate:** Customers don't return because they don't need a second website, not because they forgot about Shipyard. If true, lifecycle emails are a band-aid on a business model problem.
+**3. Manual project entry is technical debt from day 1.**
+Just build the pipeline integration. It's 30 lines of code to call `createShippedProject()` when deployment completes. Don't create two-week lag for automation you know you need.
 
-**Counter-thesis:** Customers DO need ongoing work (updates, redesigns, new pages) but Shipyard positioned itself as "one-and-done." If true, lifecycle emails unlock latent demand.
+**4. "2-week MVP, 2-week V1.1" timeline is padded.**
+Single competent engineer ships MVP in 3 days. Week 1 if you're being conservative. Two weeks suggests you're building the bloated version (dashboard, tracking, etc.). Resist.
 
-Which is it? Run the experiment, but bet small. Two emails, two weeks of dev time, manual entry. If Day 30 emails generate 10%+ revision requests, double down. If not, kill it and fix acquisition.
+## Bottom Line
 
-## Verdict
+This is a **good bet**. Low cost ($500/month at scale), measurable revenue impact, defensible (operational data moat in Phase 2).
 
-**Ship the 10% version:** Day 7 + Day 30 emails, Cloudflare Workers, Resend, manual project CSV. Live in 48 hours.
+Execute fast, measure ruthlessly, cut mercilessly. If Day 7 emails have <30% open rate after 100 sends, the copy is bad or customers don't care. Fix or kill. Don't build V1.1 until MVP proves the hypothesis.
 
-Measure reply rate and revision requests for 90 days. If hit 10% conversion, fund V2. If not, this PRD dies and you focus on the real problem: why aren't there 10,000 shipped projects yet?
+Ship it.

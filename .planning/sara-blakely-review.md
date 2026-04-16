@@ -1,32 +1,40 @@
-# Sara Blakely Review — Shipyard Self-Serve Intake
+# Sara Blakely Gut Check — Homeport MVP
 
 ## Would a customer pay?
-**No.** This is internal workflow automation. No revenue model. It's a cost-saver, not a revenue generator. You're building faster intake for *your* team, not selling to customers.
+
+**No. Not yet.**
+
+This is free followup. Good for retention, terrible for revenue. Zero monetization path. You're selling peace of mind after the sale — customers expect that for free with agencies. Airlines don't charge for landing.
 
 ## What's confusing?
-- "Zero-click" but requires adding `intake-request` label — that's manual. Not zero-click.
-- Why keyword matching instead of just using AI worker from start? Over-engineered.
-- Dashboard is read-only — so what happens after PRD created? Where's action?
-- "Invisible power" — opening issue IS the form. You're replacing Jira with GitHub issues.
 
-## 30-second elevator pitch
-"Open GitHub issue with special label → bot analyzes it → posts PRD in 30 seconds. No forms. No meetings. No waiting."
+- "Homeport" sounds like a boat dock, not email nurture
+- Why 5 touchpoints? Why those days? Feels arbitrary, not customer-driven
+- "Trusted Mechanic" voice is vague — show me the words, not the concept
+- What problem does this solve? Ghosting? Build quality? Upsells? Pick one.
+- CSV upload is manual busywork — why not auto-trigger on ship?
 
-## What would I test first ($0 budget)?
-- Post fake GitHub webhook with urgent bug report. Does PRD make sense? Is priority right?
-- Post vague feature request. Does confidence scoring work? Does it default safely?
-- Post 10 issues at once. Does rate limiting hold up?
-- Read bot comment. Does it sound human or robotic? Would I trust it?
+## 30-second pitch
 
-## What's the retention hook?
-**Lack one.** This is one-shot automation. User opens issue, gets PRD, walks away. No loop. No stickiness. No reason to come back beyond "I have another request."
+"After we ship your site, most agencies disappear. We send 5 plain-text check-ins over the year — Day 7, 30, 90, 180, 365 — so you know we're still here if something breaks or you want to grow."
 
-Retention needs: status updates in GitHub issue comments. "PRD reviewed. Team starting work Monday." "Feature deployed. Close this issue?" That's the loop.
+**Missing hook:** Why should I care? What's in it for me beyond warm fuzzies?
 
-## Biggest risk?
-False confidence. Keyword matching will misclassify. User opens "urgent bug" → system says p2 → trust broken. One bad classification kills adoption.
+## Test with $0 budget
 
-## Bottom line
-It's clever infrastructure. But where's user delight? Bot comments need personality. Dashboard needs action buttons. System needs to *close the loop* — not just generate PRD and disappear.
+Send Day 7 manually to last 10 customers. Track:
+- Reply rate (not open rate — that's vanity)
+- What they say (feature requests? bugs? confusion?)
+- Unsubscribe rate
 
-**Would I ship it?** Yes, but stripped down. Cut AI worker integration for v1. Keyword matching only. Prove users open issues. Then add AI.
+Kill if <20% reply. You need signal, not noise.
+
+## Retention hook
+
+**Weak.** You're hoping gratitude converts to repeat business. Hope isn't a strategy.
+
+Real retention = remind them you exist *when they need you*.
+Day 90 should say: "Your competitors just added X. Want to stay ahead?"
+Day 365: "Your site's a year old. Here's what's outdated now."
+
+Give value, don't ask for pats on the back.

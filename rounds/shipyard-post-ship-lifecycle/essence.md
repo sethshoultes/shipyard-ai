@@ -1,31 +1,42 @@
-# Aftercare — The Essence
+# Homeport — The Essence
 
-**What is this?**
-Agency that doesn't ghost you.
+**What it REALLY is:**
+We're the agency that doesn't ghost you.
 
 **The feeling:**
-Someone remembers your project.
+Relief. Someone's still watching.
 
-**What must be perfect:**
-Day 7 email.
+**The one thing that must be perfect:**
+Day 7 email voice—human, not CRM.
 
 **Creative direction:**
-Trusted mechanic checking in.
+Craft over automation.
 
 ---
 
-**The truth:**
-Every agency vanishes post-launch.
-We stay. We remember.
+**The gap:**
+Agencies disappear. We stay.
 
-**The system:**
-Five emails. Five moments. One year.
-Plain text. Human voice. Zero automation smell.
+**The weakness:**
+No moat. Templates copyable in 48 hours.
+
+**The future moat:**
+Phase 2 telemetry—1000 projects = intelligence.
 
 **The lock:**
-Test once. Ship. Never touch for 90 days.
+Ship. Don't touch for 90 days.
+
+**Board verdict:**
+6/10. Good hygiene, not theater.
+Phase 2 non-negotiable.
+
+---
+
+**What dies without:**
+Emails that feel handwritten.
+
+**What kills it:**
+Automation smell. Screenshot scope creep.
 
 **The deal:**
-Speed without soul = noise.
-Soul without speed = vaporware.
-Ship both in 3 days.
+Steve writes. Elon ships. Data decides.

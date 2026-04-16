@@ -6,7 +6,7 @@ One year. {project_url} has been living in the world for a full year.
 
 That matters. Most things don't last a year. Most web projects get orphaned or forgotten or replaced. But you kept this one running. People are using it. It's doing its job. It's part of your business now.
 
-In one year on the web, everything changes. The browser landscape shifts. Security standards evolve. Design thinking moves forward. Your competition learned something. Your users' expectations rose. The entire industry took steps you might not have noticed.
+In one year on the web, everything changes. The browser landscape shifts. Security standards evolve. Design thinking moves forward. Your competition learned something. Your users' expectations rose. A year moves faster than you think.
 
 Your site was built to adapt to some of that. Standards-based, clean code, forward-thinking. But it was also built in a moment in time. Twelve months is a long time in internet years.
 
@@ -22,4 +22,6 @@ Thanks for shipping something real with Shipyard. Let's see what you build next.
 
 Homeport is Shipyard's way of staying close to what we build. We don't ghost you after launch.
 
-Unsubscribe: https://aftercare.shipyard.ai/unsub?token={email}
+Unsubscribe: https://homeport.shipyard.ai/unsub?token={email}
+
+// LOCKED for 90-day measurement. Do not edit without data evidence.
