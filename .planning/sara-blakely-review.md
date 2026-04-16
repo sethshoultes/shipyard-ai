@@ -1,40 +1,21 @@
-# Sara Blakely Gut Check — Homeport MVP
+# Sara Blakely Gut Check — Phase 1 Plan
 
-## Would a customer pay?
+## Would a customer pay for this?
+No. This is fixing broken shit they already paid for.
 
-**No. Not yet.**
+## What's confusing? What makes someone bounce?
+Nothing confusing. It's a hotfix. Either it fixes the crashes or it doesn't.
 
-This is free followup. Good for retention, terrible for revenue. Zero monetization path. You're selling peace of mind after the sale — customers expect that for free with agencies. Airlines don't charge for landing.
+## 30-second elevator pitch
+"Your membership plugin is broken. Can't see settings, crashes on member list. Two bugs, two null guards, one dashboard handler. Ships in 30 minutes."
 
-## What's confusing?
+## What would you test first with $0 budget?
+Click the admin page. Does it load? Click members. Does it crash? That's it. No users, no funnel.
 
-- "Homeport" sounds like a boat dock, not email nurture
-- Why 5 touchpoints? Why those days? Feels arbitrary, not customer-driven
-- "Trusted Mechanic" voice is vague — show me the words, not the concept
-- What problem does this solve? Ghosting? Build quality? Upsells? Pick one.
-- CSV upload is manual busywork — why not auto-trigger on ship?
+## What's the retention hook?
+Wrong question. This isn't a product. It's emergency surgery on a broken plugin blocking revenue on yoga.shipyard.company.
 
-## 30-second pitch
+## Honest feedback
+Plan is fine. Over-engineered for a 2-line fix. Don't need 4 tasks and waves for adding null guards and a page handler. Just fix it, commit once, test once, ship.
 
-"After we ship your site, most agencies disappear. We send 5 plain-text check-ins over the year — Day 7, 30, 90, 180, 365 — so you know we're still here if something breaks or you want to grow."
-
-**Missing hook:** Why should I care? What's in it for me beyond warm fuzzies?
-
-## Test with $0 budget
-
-Send Day 7 manually to last 10 customers. Track:
-- Reply rate (not open rate — that's vanity)
-- What they say (feature requests? bugs? confusion?)
-- Unsubscribe rate
-
-Kill if <20% reply. You need signal, not noise.
-
-## Retention hook
-
-**Weak.** You're hoping gratitude converts to repeat business. Hope isn't a strategy.
-
-Real retention = remind them you exist *when they need you*.
-Day 90 should say: "Your competitors just added X. Want to stay ahead?"
-Day 365: "Your site's a year old. Here's what's outdated now."
-
-Give value, don't ask for pats on the back.
+Stop treating production hotfixes like product launches.

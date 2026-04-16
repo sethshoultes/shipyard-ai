@@ -2207,9 +2207,63 @@ export default definePlugin({
 
 					// EmDash admin routes are behind admin authentication by default.
 					// The admin handler is not marked public: true, so only authenticated admin users can reach it.
+
+					// Root admin dashboard
+					if (interaction.type === "page_load" && (!interaction.page || interaction.page === "/")) {
+						const listJson = await ctx.kv.get<string>("members:list") ?? "[]";
+						const memberEmails = parseJSON<string[]>(listJson, []);
+
+						const plansJson = await ctx.kv.get<string>("plans") ?? "[]";
+						const plans = parseJSON<PlanConfig[]>(plansJson, DEFAULT_PLANS);
+
+						return {
+							blocks: [
+								{
+									type: "header",
+									text: "MemberShip — Membership Management",
+								},
+								{
+									type: "stats",
+									stats: [
+										{
+											label: "Total Members",
+											value: memberEmails.length.toString(),
+										},
+										{
+											label: "Active Plans",
+											value: plans.length.toString(),
+										},
+									],
+								},
+								{
+									type: "actions",
+									blockId: "dashboard-actions",
+									elements: [
+										{
+											type: "button",
+											text: "Manage Members",
+											action_id: "navigate_members",
+											style: "primary",
+										},
+										{
+											type: "button",
+											text: "Manage Plans",
+											action_id: "navigate_plans",
+										},
+										{
+											type: "button",
+											text: "Settings",
+											action_id: "navigate_settings",
+										},
+									],
+								},
+							],
+						};
+					}
+
 					// Members page
 					if (interaction.type === "page_load" && interaction.page === "/members") {
-						const listJson = await ctx.kv.get<string>("members:list");
+						const listJson = await ctx.kv.get<string>("members:list") ?? "[]";
 						const memberEmails = parseJSON<string[]>(listJson, []);
 
 						const members = [];

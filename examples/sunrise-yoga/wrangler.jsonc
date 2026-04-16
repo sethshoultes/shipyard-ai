@@ -4,7 +4,5 @@
   "compatibility_flags": ["nodejs_compat"],
   "d1_databases": [{"binding": "DB", "database_name": "sunrise-yoga", "database_id": "acbadfb7-90c8-4d26-8249-ed07c9da0998"}],
   "r2_buckets": [{"binding": "MEDIA", "bucket_name": "sunrise-yoga-media"}],
-  "observability": {"enabled": true},
-  // Required for sandboxed plugins per EMDASH-GUIDE.md Section 6
-  "worker_loaders": [{"binding": "LOADER"}]
+  "observability": {"enabled": true}
 }
