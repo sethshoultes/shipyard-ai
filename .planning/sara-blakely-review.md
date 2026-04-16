@@ -1,36 +1,32 @@
-# Sara Blakely Gut-Check: Phase 1 Plan
+# Sara Blakely Review — Shipyard Self-Serve Intake
 
-## Would a customer pay for this?
+## Would a customer pay?
+**No.** This is internal workflow automation. No revenue model. It's a cost-saver, not a revenue generator. You're building faster intake for *your* team, not selling to customers.
 
-**NO.** This isn't a product — it's internal plumbing.
-
-Issue #74 is bug fix work. Fixes a Cloudflare Workers deployment blocker. Nobody pays for deployment fixes. They pay for what the fix *enables* — but that's not articulated here.
-
-## What's confusing? What makes someone bounce?
-
-- **It's already done.** Why am I reviewing a completed plan? Feels like busywork.
-- **Zero customer language.** All tech jargon. Who uses EventDash? Why do they care?
-- **No "before/after" pain story.** What broke? Who was frustrated? How does this unblock them?
-- **"Deployment blocker" buried at line 399.** That's the headline! Lead with it.
+## What's confusing?
+- "Zero-click" but requires adding `intake-request` label — that's manual. Not zero-click.
+- Why keyword matching instead of just using AI worker from start? Over-engineered.
+- Dashboard is read-only — so what happens after PRD created? Where's action?
+- "Invisible power" — opening issue IS the form. You're replacing Jira with GitHub issues.
 
 ## 30-second elevator pitch
+"Open GitHub issue with special label → bot analyzes it → posts PRD in 30 seconds. No forms. No meetings. No waiting."
 
-"Sunrise Yoga couldn't deploy event tracking to production. We fixed the plugin loader so it works on Cloudflare. Now devs can ship event analytics without worrying about bundler quirks."
+## What would I test first ($0 budget)?
+- Post fake GitHub webhook with urgent bug report. Does PRD make sense? Is priority right?
+- Post vague feature request. Does confidence scoring work? Does it default safely?
+- Post 10 issues at once. Does rate limiting hold up?
+- Read bot comment. Does it sound human or robotic? Would I trust it?
 
-## What would I test with $0 marketing budget?
+## What's the retention hook?
+**Lack one.** This is one-shot automation. User opens issue, gets PRD, walks away. No loop. No stickiness. No reason to come back beyond "I have another request."
 
-Can't test this — it's infrastructure. But if EventDash is the product:
-- Find 3 devs trying to deploy Astro + Cloudflare Workers
-- Have them install EventDash
-- Watch where they get stuck
-- Fix that next
+Retention needs: status updates in GitHub issue comments. "PRD reviewed. Team starting work Monday." "Feature deployed. Close this issue?" That's the loop.
 
-## Retention hook?
+## Biggest risk?
+False confidence. Keyword matching will misclassify. User opens "urgent bug" → system says p2 → trust broken. One bad classification kills adoption.
 
-**None here.** This is a one-time fix. Retention comes from EventDash itself — if it delivers value (analytics? insights?), people keep using it.
+## Bottom line
+It's clever infrastructure. But where's user delight? Bot comments need personality. Dashboard needs action buttons. System needs to *close the loop* — not just generate PRD and disappear.
 
-## Honest take
-
-Well-executed *engineering* plan. Terrible *customer* plan. Reads like commit log, not value story. If this were a pitch deck, I'd pass — no problem articulation, no user empathy, no "why should I care."
-
-Fix: Reframe around user pain. "Devs waste 4 hours debugging deployment. We make it instant."
+**Would I ship it?** Yes, but stripped down. Cut AI worker integration for v1. Keyword matching only. Prove users open issues. Then add AI.
