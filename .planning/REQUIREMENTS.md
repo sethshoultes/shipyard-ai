@@ -1,187 +1,201 @@
-# WorkerKit v1 — Requirements Document
+# Requirements: membership-deploy
 
-**Project:** WorkerKit
-**Version:** 1.0
-**Date:** 2026-04-15
-**Status:** Ready for Build
+**Generated**: 2026-04-16
+**Project**: membership-deploy
+**Source PRD**: /home/agent/shipyard-ai/prds/membership-deploy.md
+**Source Decisions**: /home/agent/shipyard-ai/rounds/membership-deploy/decisions.md
 
 ---
 
 ## Executive Summary
 
-WorkerKit is a zero-dependency CLI tool that generates production-ready Cloudflare Workers applications in under 60 seconds. It scaffolds a complete project with Hono framework, D1 database, Clerk authentication, Workers AI, and Stripe payments—all pre-configured and ready to deploy.
+Deploy the clean membership plugin from `deliverables/membership-fix/` to `plugins/membership/src/`. This is a 3-file copy operation with zero banned patterns, complete endpoint testing, and full user flow validation. Binary outcome: works completely or rollback immediately.
 
-**Core Promise:** Zero-to-deployed business app in under 60 seconds. Projects die in setup. WorkerKit gives you momentum.
+**Scope**: SMALL AND FOCUSED
+- Copy 3 files (sandbox-entry.ts, auth.ts, email.ts)
+- Verify zero banned patterns
+- Test 3 API endpoints
+- Document results
+- Commit and push
 
-**Build Constraint:** Must ship v1 within 6-hour build session.
-
----
-
-## Requirements Traceability
-
-| REQ ID | Category | Description | Priority | Source |
-|--------|----------|-------------|----------|--------|
-| REQ-001 | CLI | Create interactive CLI scaffold generator accessible via `npx create-workerkit@latest my-app` command. | MUST | PRD §1, Decisions §2 |
-| REQ-002 | CLI | Support 5 interactive prompts (project name, auth, database, AI, payments) to customize generated project. | MUST | PRD §1, Decisions §4 |
-| REQ-003 | CLI | Support flag-based fast path for power users: `--template=api --skip-prompts` to bypass interactive mode. | MUST | Decisions §4 |
-| REQ-004 | CLI | Generate complete project structure from templates using zero external dependencies (Node builtins only: fs, path, readline). | MUST | Decisions §2 |
-| REQ-005 | CLI | Produce clear, confident console output with minimal verbosity (no emojis, no chatty language). | MUST | Decisions §4 |
-| REQ-006 | CLI | Display actionable error messages instead of stack traces when configuration is missing. | MUST | Decisions §9 |
-| REQ-007 | CLI | Complete project generation in under 20 seconds on fast connections and under 45 seconds on slow connections. | MUST | Decisions §2, §7 |
-| REQ-008 | Project Structure | Generate flat, navigable project directory with clear comments explaining each file's purpose. | MUST | Decisions §7 |
-| REQ-009 | Project Structure | Include .env.example with all required API keys documented and setup URLs provided. | MUST | Decisions §5, §9 |
-| REQ-010 | Project Structure | Generate wrangler.toml with inline comments explaining every setting (account ID, D1 bindings, AI bindings, secrets). | MUST | PRD §2, Decisions §5 |
-| REQ-011 | Project Structure | Generate package.json with zero WorkerKit runtime dependencies (only Hono, Wrangler, TypeScript standard deps). | MUST | Decisions §2 |
-| REQ-012 | Project Structure | Include tsconfig.json configured for TypeScript strict mode. | MUST | PRD §2 |
-| REQ-013 | Project Structure | Create src/index.ts as main Hono application entry point with working Hello World endpoint. | MUST | Decisions §7 |
-| REQ-014 | Framework | Use Hono as the sole HTTP framework (no alternatives in v1). | MUST | Decisions §3 |
-| REQ-015 | Framework | Support hot reload during local development via `wrangler dev`. | MUST | Decisions §3 |
-| REQ-016 | Framework | Provide example public routes (GET /health, GET /) and auth-protected routes. | MUST | Decisions §7 |
-| REQ-017 | Database | Use D1 as the sole database option (no alternatives in v1). | MUST | Decisions §3 |
-| REQ-018 | Database | Generate D1 migration file (0001_create_users.sql) with example users table and CRUD comments. | MUST | Decisions §7 |
-| REQ-019 | Database | Create src/db.ts with simple, direct query wrapper for D1 database operations. | MUST | Decisions §7 |
-| REQ-020 | Database | Include inline comments in migration files explaining D1 binding and database creation process. | MUST | Decisions §5 |
-| REQ-021 | AI Integration | Create src/ai.ts with simple abstraction layer supporting primary (Workers AI) and fallback (Claude) providers. | MUST | PRD §3, Decisions §7 |
-| REQ-022 | AI Integration | Default to Workers AI (@cf/meta/llama-2-7b-chat-int8) for primary AI completions. | MUST | Decisions §3 |
-| REQ-023 | AI Integration | Implement automatic fallback to Anthropic Claude API when Workers AI fails or API key is provided. | MUST | PRD §3, Decisions §3 |
-| REQ-024 | AI Integration | Provide simple `ai.chat(prompt)` function that auto-routes to appropriate provider without user configuration. | MUST | Decisions §1 (Open Q #1) |
-| REQ-025 | AI Integration | Include graceful error handling with clear messages (e.g., "Workers AI quota exceeded. Add ANTHROPIC_API_KEY for fallback."). | MUST | Decisions §9 |
-| REQ-026 | AI Integration | Generate example API endpoint (POST /api/chat) demonstrating AI functionality. | MUST | Decisions §7 |
-| REQ-027 | Authentication | Use Clerk as the sole authentication provider (no alternatives in v1). | MUST | Decisions §3 |
-| REQ-028 | Authentication | Create src/auth.ts with JWT validation middleware for Clerk token verification. | MUST | Decisions §7 |
-| REQ-029 | Authentication | Enable `npm run dev` to work without Clerk API keys (mock/skip auth in local development). | MUST | Decisions §1 (Open Q #3) |
-| REQ-030 | Authentication | Document Clerk API key setup with step-by-step instructions and dashboard URL in .env.example. | MUST | Decisions §5, §9 |
-| REQ-031 | Payments | Integrate Stripe with minimal scope: checkout session creation and webhook handling. | MUST | Decisions §3 |
-| REQ-032 | Payments | Create src/payments.ts with Stripe checkout endpoint for one-time payment flows. | MUST | Decisions §7 |
-| REQ-033 | Payments | Implement Stripe webhook handler for `checkout.session.completed` event. | MUST | Decisions §7 |
-| REQ-034 | Payments | Include Stripe webhook signature verification code with security-critical comments in webhook handler. | MUST | Decisions §9 |
-| REQ-035 | Payments | Document Stripe webhook setup process in README with security emphasis. | MUST | Decisions §9 |
-| REQ-036 | Payments | Add STRIPE_WEBHOOK_SECRET to .env.example with setup URL and warning. | MUST | Decisions §9 |
-| REQ-037 | Configuration | Generate fully configured wrangler.toml without requiring manual binding setup. | MUST | Decisions §5 |
-| REQ-038 | Configuration | Provide transparent, editable configuration files with excellent inline documentation (no hidden magic). | MUST | Decisions §5 |
-| REQ-039 | Types | Create src/types/env.d.ts with TypeScript bindings for all Cloudflare Workers environment variables. | MUST | PRD §2 |
-| REQ-040 | Types | Ensure generated code is fully type-safe and compilable in TypeScript strict mode. | MUST | Decisions §7 |
-| REQ-041 | Documentation | Generate excellent README with 30-second quickstart and clear setup steps. | MUST | PRD §2, Decisions §7 |
-| REQ-042 | Documentation | Include "Want to swap X? Here's how" sections in README (Auth.js, direct Anthropic, etc.). | MUST | Decisions §7 |
-| REQ-043 | Documentation | Add README section: "Local dev (no keys needed)" vs "Deploy (keys required)" guidance. | MUST | Decisions §1 (Open Q #3) |
-| REQ-044 | Documentation | Create comprehensive D1 setup and migration instructions in README. | MUST | Decisions §7 |
-| REQ-045 | Documentation | Include troubleshooting section addressing missing API keys with direct dashboard links. | MUST | Decisions §9 |
-| REQ-046 | Documentation | Add "AI Troubleshooting" section with error scenarios and fallback strategies. | MUST | Decisions §9 |
-| REQ-047 | Documentation | Document D1 pricing with cost transparency and estimated costs for generated template. | MUST | Decisions §9 |
-| REQ-048 | Documentation | Add "🔒 CRITICAL: Secure your Stripe webhooks" section to README. | MUST | Decisions §9 |
-| REQ-049 | Documentation | Include deployment to Cloudflare Workers steps with `npm run deploy` command. | MUST | PRD §5, Decisions §7 |
-| REQ-050 | Documentation | Add "Built with WorkerKit" badge to every generated README with link to project. | MUST | Decisions §6 |
-| REQ-051 | Distribution | Publish CLI package to npm as `create-workerkit` at @latest version. | MUST | PRD §5, Decisions §7 |
-| REQ-052 | Distribution | Create public GitHub repository with excellent README documentation. | MUST | Decisions §6 |
-| REQ-053 | Distribution | Apply GitHub tags for discoverability: cloudflare-workers, cloudflare-template, hono, d1. | MUST | Decisions §6 |
-| REQ-054 | Distribution | Enable GitHub template system for generated projects. | MUST | Decisions §6 |
-| REQ-055 | Testing | Verify CLI generates files without errors. | MUST | Decisions §8 |
-| REQ-056 | Testing | Verify `npm install && npm run dev` works on fresh machine without global dependencies. | MUST | Decisions §8 |
-| REQ-057 | Testing | Verify localhost server runs without any API keys (mock mode). | MUST | Decisions §8 |
-| REQ-058 | Testing | Verify all 5 integrations have working examples (Hono, D1, AI, Clerk, Stripe). | MUST | Decisions §8 |
-| REQ-059 | Testing | Verify README setup takes less than 5 minutes for first-time user. | MUST | Decisions §8 |
-| REQ-060 | Testing | Test error messages for missing configuration and bad API keys. | MUST | Decisions §8 |
-| REQ-061 | Quality | Ensure zero dependencies in CLI (only Node builtins). | MUST | Decisions §2, §8 |
-| REQ-062 | Quality | Ensure generated code has zero WorkerKit runtime dependencies. | MUST | Decisions §2, §8 |
-| REQ-063 | Quality | Lock dependency versions in generated package.json for stability. | MUST | Decisions §9 |
-| REQ-064 | Quality | All configuration files must remain editable without breaking the project. | MUST | Decisions §8 |
-| REQ-065 | Brand | Establish confident, precise, warm brand voice (not corporate, not cutesy). | MUST | Decisions §4 |
-| REQ-066 | Brand | Use product name "WorkerKit" for v1 launch. | MUST | Decisions §1 |
+**NOT in Scope**:
+- Renaming to "Portal"
+- Copy/UX rewrites
+- Pre-commit hooks (post-ship)
+- Directory structure unification (post-ship)
+- CI/CD automation (post-ship)
 
 ---
 
-## Summary Statistics
+## Requirements Traceability Matrix
 
-**Total Atomic Requirements:** 66
+### Pre-Deploy Validation
 
-**By Priority:**
-- MUST: 66 (100%)
-- SHOULD: 0
-- COULD: 0
+| REQ-ID | Priority | Requirement | Success Criteria | Acceptance Test |
+|--------|----------|-------------|------------------|-----------------|
+| REQ-001 | MUST | Dev server running on port 4324 | Server responds to HTTP requests | `curl -s http://localhost:4324/_emdash/api/plugins/membership/admin \| head -1` returns valid response |
+| REQ-002 | MUST | Source files exist in deliverables/ | All 3 files present | `test -f deliverables/membership-fix/sandbox-entry.ts && test -f deliverables/membership-fix/auth.ts && test -f deliverables/membership-fix/email.ts` |
+| REQ-003 | MUST | Destination directory writable | plugins/membership/src/ exists | `test -d plugins/membership/src/ && test -w plugins/membership/src/` |
+| REQ-004 | MUST | Fail fast if server unavailable | Clear error, halt immediately | Attempt deploy without server, verify halt with error message |
 
-**By Category:**
-- CLI: 7 requirements
-- Project Structure: 5 requirements
-- Framework: 3 requirements
-- Database (D1): 4 requirements
-- AI Integration: 6 requirements
-- Authentication (Clerk): 4 requirements
-- Payments (Stripe): 7 requirements
-- Configuration: 2 requirements
-- Types: 2 requirements
-- Documentation: 9 requirements
-- Distribution: 5 requirements
-- Testing: 6 requirements
-- Quality: 5 requirements
-- Brand: 2 requirements
+### File Deployment
 
----
+| REQ-ID | Priority | Requirement | Success Criteria | Acceptance Test |
+|--------|----------|-------------|------------------|-----------------|
+| REQ-005 | MUST | Copy sandbox-entry.ts | File copied successfully | `cp deliverables/membership-fix/sandbox-entry.ts plugins/membership/src/` exits 0 |
+| REQ-006 | MUST | Copy auth.ts (if exists) | File copied or skipped gracefully | `cp deliverables/membership-fix/auth.ts plugins/membership/src/auth.ts 2>/dev/null \|\| true` |
+| REQ-007 | MUST | Copy email.ts (if exists) | File copied or skipped gracefully | `cp deliverables/membership-fix/email.ts plugins/membership/src/email.ts 2>/dev/null \|\| true` |
+| REQ-008 | MUST | Zero banned patterns in all files | Count = 0 for all patterns | `grep -c "throw new Response\|rc\.user\|rc\.pathParams" plugins/membership/src/*.ts` returns 0 for each file |
+| REQ-009 | MUST | Commit with clear message | Commit includes "0 banned pattern violations" | `git log --oneline -1 \| grep "0 banned pattern violations"` |
 
-## Key Constraints
+### Endpoint Testing
 
-1. **Time Budget:** 6 hours maximum for complete v1 build
-2. **Zero Dependencies:** CLI uses Node builtins only (fs, path, readline)
-3. **Single Stack:** Hono + D1 + Clerk + Workers AI + Stripe (no alternatives)
-4. **Generation Speed:** <20s fast connection, <45s slow connection
-5. **Zero Runtime Dependencies:** Generated projects have no WorkerKit dependency
-6. **Transparent Configuration:** All config files must be editable with inline comments
-7. **Security-First:** Stripe webhook signature verification is non-negotiable
+| REQ-ID | Priority | Requirement | Success Criteria | Acceptance Test |
+|--------|----------|-------------|------------------|-----------------|
+| REQ-010 | MUST | Admin endpoint returns 200 | HTTP 200 with valid JSON | `curl -s http://localhost:4324/_emdash/api/plugins/membership/admin -H "Content-Type: application/json" -d '{"type":"page_load"}' \| head -5` shows response |
+| REQ-011 | MUST | Register endpoint returns 200 | HTTP 200 with valid JSON | `curl -s -X POST http://localhost:4324/_emdash/api/plugins/membership/register -H "Content-Type: application/json" -d '{"email":"smoketest@example.com","plan":"basic"}' \| head -5` shows response |
+| REQ-012 | MUST | Status endpoint returns 200 | HTTP 200 with valid JSON | `curl -s http://localhost:4324/_emdash/api/plugins/membership/status -H "Content-Type: application/json" -d '{"email":"smoketest@example.com"}' \| head -5` shows response |
+| REQ-013 | MUST | Fail if any endpoint non-200 | Deployment halts immediately | All 3 endpoints must return 200 or rollback |
 
----
+### Full User Flow Testing (Steve's Requirement)
 
-## Deferred to Post-v1
+| REQ-ID | Priority | Requirement | Success Criteria | Acceptance Test |
+|--------|----------|-------------|------------------|-----------------|
+| REQ-014 | MUST | User visits members-only page | Page loads without error | Manual: Navigate to membership entry point |
+| REQ-015 | MUST | User enters email address | Email input accepts valid format | Manual: Type email, form accepts |
+| REQ-016 | MUST | User receives magic link | Email delivered with clickable link | Manual: Check inbox, verify link present |
+| REQ-017 | MUST | Magic link grants access | Clicking link shows protected content | Manual: Click link, verify authentication |
+| REQ-018 | MUST | Session persists | Page refresh maintains auth | Manual: Refresh page after REQ-017, still authenticated |
 
-- Auth.js integration
-- Turso database option
-- Multi-AI provider configuration
-- Advanced Stripe features (subscriptions, customer portal)
-- TypeScript type generation from D1 schema
-- Plugin system
-- Template variants (full-stack, minimal, etc.)
-- Color/spinner CLI output
-- Interactive setup wizard beyond 5 questions
+### Negative Testing
 
----
+| REQ-ID | Priority | Requirement | Success Criteria | Acceptance Test |
+|--------|----------|-------------|------------------|-----------------|
+| REQ-019 | MUST | Invalid email rejected | System shows error for bad format | Manual: Submit "invalidemail", verify error |
+| REQ-020 | MUST | Error message terse and factual | Message is 1-2 sentences, no chatty copy | Manual: Read error, verify brevity |
+| REQ-021 | MUST | Expired link shows error | Clear error for invalid/expired links | Manual: Use expired link, verify error |
+| REQ-022 | MUST | Expired link error terse | Message is 1-2 sentences, factual | Manual: Read error, verify brevity |
 
-## Critical Success Factors
+### Documentation
 
-1. **CLI generates valid projects 100% of the time** (no syntax errors)
-2. **Generated projects run locally without API keys** (mock mode)
-3. **All 5 integrations have working examples** (Hono, D1, AI, Clerk, Stripe)
-4. **README enables 5-minute setup** for first-time users
-5. **Stripe webhooks are secure by default** (signature verification included)
-6. **Error messages are actionable** (no stack traces, link to dashboard)
+| REQ-ID | Priority | Requirement | Success Criteria | Acceptance Test |
+|--------|----------|-------------|------------------|-----------------|
+| REQ-026 | MUST | TEST-RESULTS.md created | File exists with all sections | `test -f deliverables/membership-v2/TEST-RESULTS.md` |
+| REQ-027 | MUST | Banned pattern counts documented | All 3 patterns listed with count 0 | `grep "throw new Response.*0" deliverables/membership-v2/TEST-RESULTS.md` |
+| REQ-028 | MUST | API test results documented | All 3 endpoints listed with status codes | `grep -E "(Admin\|Register\|Status).*200" deliverables/membership-v2/TEST-RESULTS.md` |
+| REQ-029 | MUST | Notes section completed | Section exists (can be empty) | `grep "## Notes" deliverables/membership-v2/TEST-RESULTS.md` |
+| REQ-030 | MUST | README updated | Deployment confirmation added | `grep "0 banned patterns" README.md` or equivalent |
+| REQ-031 | MUST | All changes committed | Git log shows files | `git log --name-only -1 \| grep "plugins/membership"` |
+| REQ-032 | MUST | Changes pushed to remote | Remote up to date | `git status \| grep "nothing to commit"` |
 
----
+### Quality Standards
 
-## Risk Mitigation Priorities
-
-| Priority | Risk | Mitigation | Owner |
-|----------|------|-----------|-------|
-| 1 | Clerk auth fails | Zero-config mock mode for local dev | Build Phase |
-| 2 | D1 setup unclear | Pre-flight validation + excellent comments | Build Phase |
-| 3 | Stripe insecure | Webhook signature verification required | Build Phase |
-| 4 | Timeline blown | Hard checkpoints every hour | Build Phase |
-| 5 | Generated code broken | Post-generation validation | Build Phase |
-| 6 | Testing gaps | Fail-fast test suite for critical paths | Build Phase |
+| REQ-ID | Priority | Requirement | Success Criteria | Acceptance Test |
+|--------|----------|-------------|------------------|-----------------|
+| REQ-023 | SHOULD | Manual code review | Visual inspection confirms zero patterns | Developer review of source files |
+| REQ-024 | MUST | Binary outcome enforcement | All pass or complete rollback | Test failure scenario, verify rollback |
+| REQ-025 | SHOULD | Single session deployment | Total time < 2 hours | Timestamp start to finish < 120 minutes |
 
 ---
 
-## Definition of Done
+## Out of Scope (Explicitly Deferred)
 
-WorkerKit v1 is complete when:
-
-- [ ] `npx create-workerkit my-app` generates complete project
-- [ ] `cd my-app && npm install && npm run dev` works on fresh machine
-- [ ] Localhost runs without any API keys (mock mode)
-- [ ] All 5 integrations have working examples
-- [ ] README setup takes <5 minutes
-- [ ] CLI package published to npm as `create-workerkit@latest`
-- [ ] GitHub repo is public with tags applied
-- [ ] Generated code passes TypeScript compilation
-- [ ] Stripe webhooks have signature verification
-- [ ] Error messages tested (missing keys, bad config)
+| Item | Reason | Deferred To |
+|------|--------|-------------|
+| Brand renaming ("Portal") | Not touching user-facing copy in this deploy | Post-ship UX sprint |
+| Copy/UX rewrites | Deliverables already has final copy | Post-ship if needed |
+| Pre-commit hooks | Process fix, not deploy blocker | Post-ship automation |
+| Directory unification | Technical debt, acknowledged | Post-ship cleanup |
+| CI/CD automation | Infrastructure improvement | Post-ship enhancement |
+| Admin dashboards | v2+ feature | Future release |
+| Member analytics | v2+ feature | Future release |
+| Feature flags/A-B testing | v2+ feature | Future release |
+| Enterprise features | v2+ feature | Future release |
 
 ---
 
-*This requirements document is the contract for WorkerKit v1. All 66 requirements are MUST-ship for launch.*
+## Banned Patterns Reference
+
+**Zero tolerance for:**
+1. `throw new Response` — Use `throw new Error()` instead
+2. `rc.user` — Use typed extraction pattern instead
+3. `rc.pathParams` — Use typed input object instead
+
+**Verification command:**
+```bash
+grep -c "throw new Response\|rc\.user\|rc\.pathParams" plugins/membership/src/*.ts
+```
+
+Expected output: All counts = 0
+
+---
+
+## Success Criteria (Binary Gate)
+
+**✅ DEPLOY SUCCESS** requires ALL of:
+- [ ] All 3 files copied (or confirmed not needed)
+- [ ] Zero banned patterns verified
+- [ ] All 3 endpoints return HTTP 200
+- [ ] Complete user flow works end-to-end
+- [ ] Negative tests handled gracefully
+- [ ] TEST-RESULTS.md complete and accurate
+- [ ] All changes committed and pushed
+- [ ] Total time < 2 hours
+
+**❌ DEPLOY FAILURE** if ANY of:
+- Server not available → HALT at REQ-004
+- Any banned patterns → ROLLBACK at REQ-008
+- Any endpoint fails → ROLLBACK at REQ-013
+- User flow breaks → ROLLBACK immediately
+- Partial deployment → ROLLBACK completely
+- Multi-session execution → Project failure
+
+---
+
+## Risk Register
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|-----------|
+| Server unavailable | MEDIUM | HIGH | Fail fast with clear error (REQ-004) |
+| Incomplete user flow | MEDIUM | HIGH | Mandatory end-to-end test (REQ-014-018) |
+| Banned pattern regression | LOW | MEDIUM | Automated grep verification (REQ-008) |
+| Scope creep | MEDIUM | MEDIUM | Ruthless discipline, locked scope |
+| Partial ship | MEDIUM | MEDIUM | Binary outcome enforcement (REQ-024) |
+
+---
+
+## Decision Alignment
+
+This requirements document aligns with:
+
+**Decision 1 (Elon)**: Ship scope is locked at 3-file copy
+**Decision 2 (Steve)**: Full user flow testing is mandatory
+**Decision 3 (Both)**: Zero banned patterns, binary outcomes
+**Decision 4 (Elon)**: Post-ship process fixes deferred
+**Decision 5 (Steve)**: Design philosophy deferred to post-ship
+
+---
+
+## Verification Commands
+
+```bash
+# Pre-deploy check
+curl -s http://localhost:4324/_emdash/api/plugins/membership/admin || echo "SERVER NOT RUNNING"
+
+# Banned pattern check
+grep -r "throw new Response\|rc\.user\|rc\.pathParams" deliverables/membership-fix/ && echo "PATTERNS FOUND" || echo "CLEAN"
+
+# Endpoint tests
+curl -s http://localhost:4324/_emdash/api/plugins/membership/admin -H "Content-Type: application/json" -d '{"type":"page_load"}' | head -1
+curl -s -X POST http://localhost:4324/_emdash/api/plugins/membership/register -H "Content-Type: application/json" -d '{"email":"test@example.com","plan":"basic"}' | head -1
+curl -s http://localhost:4324/_emdash/api/plugins/membership/status -H "Content-Type: application/json" -d '{"email":"test@example.com"}' | head -1
+
+# Commit verification
+git log --oneline -1 | grep "0 banned pattern violations"
+```
+
+---
+
+**Total Requirements**: 32 (28 MUST, 2 SHOULD, 2 deferred categories)
+**Critical Path**: REQ-001 → REQ-004 → REQ-005-007 → REQ-008 → REQ-010-013 → REQ-026-032
+**Blocking Gates**: Server check (REQ-004), Pattern check (REQ-008), Endpoint validation (REQ-013)
