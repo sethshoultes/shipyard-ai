@@ -1,0 +1,14 @@
+name = "shipyard-aftercare"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+[[kv_namespaces]]
+binding = "AFTERCARE_KV"
+id = "placeholder-id"
+preview_id = "placeholder-preview-id"
+
+[[triggers]]
+crons = ["0 0 * * *"]
+
+[vars]
+FROM_EMAIL = "homeport@shipyard.ai"
