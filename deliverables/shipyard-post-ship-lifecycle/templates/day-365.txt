@@ -1,0 +1,25 @@
+Subject: Happy Anniversary
+
+Hi {name},
+
+One year. {project_url} has been living in the world for a full year.
+
+That matters. Most things don't last a year. Most web projects get orphaned or forgotten or replaced. But you kept this one running. People are using it. It's doing its job. It's part of your business now.
+
+In one year on the web, everything changes. The browser landscape shifts. Security standards evolve. Design thinking moves forward. Your competition learned something. Your users' expectations rose. The entire industry took steps you might not have noticed.
+
+Your site was built to adapt to some of that. Standards-based, clean code, forward-thinking. But it was also built in a moment in time. Twelve months is a long time in internet years.
+
+What would a year of usage, a year of data, a year of learning teach you if you listened to it? What would you change if you could change anything? What worked better than you expected? What didn't work at all?
+
+Sometimes the answer is "everything is still perfect and I don't need anything." That's rare, but it happens. More often, there's something worth exploring—not because something is broken, but because you know more now than you did a year ago.
+
+If you want to build on this, refresh it, update it, or just talk through what the next chapter looks like—I'm here. You know where to find me.
+
+Thanks for shipping something real with Shipyard. Let's see what you build next.
+
+—
+
+Homeport is Shipyard's way of staying close to what we build. We don't ghost you after launch.
+
+Unsubscribe: https://aftercare.shipyard.ai/unsub?token={email}

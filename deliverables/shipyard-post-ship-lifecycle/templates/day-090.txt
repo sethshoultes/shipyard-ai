@@ -1,0 +1,23 @@
+Subject: We're still here (most agencies aren't)
+
+Hi {name},
+
+Ninety days. Most web agencies disappear around now. They've moved on to the next project, the next client. You're old news.
+
+I'm not like that. I'm still thinking about {project_url}.
+
+This is the moment where things either hold up or start showing cracks. Security patches accumulate. Browser behavior changes. User expectations shift. If your site is built right, it glides through this. If it's not, ninety days reveals the problems.
+
+How's it performing? Any issues? Any features you wish worked differently? Any security concerns that have come up? Any traffic patterns that surprised you?
+
+This is also the sweet spot for updates. If you've been sitting on ideas—a new section, a redesign of a page, better mobile experience, faster load times—now is when returns on that investment are highest. Real data from real usage teaches you what actually matters.
+
+If you want to talk through an update, I'm here. If everything is holding strong and you're happy, I'm glad to hear it.
+
+Just reply and let me know.
+
+—
+
+Homeport is Shipyard's way of staying close to what we build. We don't ghost you after launch.
+
+Unsubscribe: https://aftercare.shipyard.ai/unsub?token={email}

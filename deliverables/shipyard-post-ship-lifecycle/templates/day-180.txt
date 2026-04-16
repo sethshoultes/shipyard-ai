@@ -1,0 +1,25 @@
+Subject: Time for a refresh?
+
+Hi {name},
+
+Six months. That's the point where things get interesting.
+
+In six months on the web, a lot moves. Security standards shift. Browsers add features. Design trends change. Your users' expectations evolve. The thing that felt cutting-edge in month one might feel basic now.
+
+More importantly: what have you learned from real people using {project_url}? What behavior surprised you? What could work better? What would make this thing worth twice as much to your business?
+
+This is the sweet spot for refreshes. Not because your site is broken—it's probably not. But because now you have real data. Real traffic patterns. Real feedback. That's gold.
+
+Some refreshes are big—a redesign that reflects what you've learned. Some are small—a feature that turned out to matter more than you thought, or a page that needs restructuring. Some are just updates—new browser support, faster performance, better security.
+
+The best time to refresh is when you have something to refresh *from*. Not guesses. Not trends. Real information.
+
+If you want to dig into this together, I'm interested. If you're happy where you are, that's legitimate too.
+
+Let me know.
+
+—
+
+Homeport is Shipyard's way of staying close to what we build. We don't ghost you after launch.
+
+Unsubscribe: https://aftercare.shipyard.ai/unsub?token={email}
