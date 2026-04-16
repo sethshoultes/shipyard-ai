@@ -1,52 +1,29 @@
-# Sara Blakely Review: Phase 1 Plan
+# Sara Blakely Review: EventDash Fix Plan
 
-## Would a real customer pay for this?
+**Would a customer pay?** No. This isn't a product — it's technical debt cleanup. No customer wakes up wanting "fewer banned patterns."
 
-**No.** This isn't a product—it's plumbing.
+**What's confusing?**
+- 95 violations → 133 lines. Where'd the code go? Did you delete features or just fluff?
+- "Already fixed" but making a 6-task plan to verify? Just run the damn tests.
+- Wave 1, 2, 3 for what? Grep, compile, write docs? This is 30 minutes of work stretched into a process.
 
-You're fixing broken code before shipping 4 new plugins. Customer doesn't see "plugin entrypoints" or "banned patterns." They see features that work (or don't).
+**30-second pitch:**
+"We broke our own rules 95 times. We're fixing the code so it follows platform patterns. Zero new features. Zero customer impact. Just compliance."
 
-What does each plugin DO for the yoga studio owner?
-- **Membership**: manage subscriptions → YES, pay for this
-- **EventDash**: schedule classes → YES, pay for this
-- **CommerceKit**: sell retail → maybe, if they sell mats/shirts
-- **FormForge**: build forms → niche, already have Google Forms free
-- **ReviewPulse**: aggregate reviews → nice-to-have, not urgent
-- **SeoDash**: SEO tools → yes, IF they understand it
+**$0 marketing test:**
+Can't test compliance. Either it works or it doesn't. Run the build, load the plugin, create an event. If it doesn't crash, ship it.
 
-**Value gap**: You're deploying 6 plugins but not explaining which 3 matter most to a yoga studio.
+**Retention hook:**
+None. Customers don't know or care about "throw new Response" vs return objects. If the plugin works exactly the same, this is invisible.
 
-## What's confusing? What would make someone bounce?
+**Gut check:**
+You're treating routine maintenance like it's a product launch. The work is done — file went from 3,442 lines to 133. Just verify it compiles and works. This plan has more documentation tasks than code changes.
 
-- **"95 violations"** → sounds scary, customer thinks site's broken
-- **"Banned npm alias entrypoints"** → developer jargon, not customer benefit
-- **Wave 1/2/3/4** → implementation details, not outcomes
-- **No before/after clarity** → what CAN'T they do now? What WILL they do after?
-- **Zero screenshots or examples** → can't visualize the product
+**What I'd do:**
+1. Run TypeScript build
+2. Load plugin in staging
+3. Create/list/view one event
+4. Ship if it works
+5. Write one commit message
 
-Customer asks: "Will my site be down during this?" Plan doesn't say.
-
-## 30-second elevator pitch
-
-"Right now Sunrise Yoga runs with 2 plugins—membership and events. We're adding 4 more: e-commerce for retail, forms for lead capture, review aggregation, and SEO tools. All 6 will be live, tested, and working. Zero downtime. Done in 2 hours."
-
-## What would you test first with $0 marketing budget?
-
-Put Sunrise Yoga live with just **Membership + EventDash**. Email 5 yoga studio owners: "Free tool to manage members and classes. Try it."
-
-Watch which features they click. Do they even WANT forms? Reviews? Or do they just need scheduling that doesn't suck?
-
-You're deploying 6 plugins but haven't proven anyone needs 4 of them.
-
-## What's the retention hook?
-
-**None visible.** Plan says "deploy all plugins" but not:
-- What makes studios come back daily?
-- What data gets locked in? (member rosters? class history?)
-- What happens if they switch to Mindbody?
-
-Retention comes from DATA GRAVITY. The more member info they add, the harder to leave. Plan should mention: "After 100 members added, switching costs = high."
-
----
-
-**Bottom line**: Technically solid. Commercially unproven. You're shipping features, not solving a pain. Would I bet $5k on this? Only if you show me 3 studios begging for it.
+Six tasks, three waves, requirements matrix for internal refactoring? The codebase needed a surgeon. This plan brought a committee.
