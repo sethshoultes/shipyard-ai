@@ -1,345 +1,256 @@
-# Requirements: worker_loaders Binding for Sandboxed Plugins
+# Requirements Traceability: GitHub Issue #75
+## Deploy Sunrise Yoga + Verify Plugins
 
-**Project:** GitHub Issue #73 - Fix wrangler.jsonc worker_loaders binding
-**Slug:** `github-issue-sethshoultes-shipyard-ai-73`
 **Generated:** 2026-04-16
-**Phase:** 1 (Manual Configuration - Ship within 24 hours)
+**Source:** `/home/agent/shipyard-ai/prds/github-issue-sethshoultes-shipyard-ai-75.md`
+**Decisions:** `/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-75/decisions.md`
+**Project Slug:** `github-issue-sethshoultes-shipyard-ai-75`
 
 ---
 
-## Atomic Requirements (Phase 1 Only)
+## Atomic Requirements
 
-### Configuration Requirements
+### REQ-1: Verify Prerequisites Are Fixed
+**Success Criteria:**
+- wrangler.jsonc contains `worker_loaders` binding
+- Plugin entrypoint files exist and export correctly
+- No configuration syntax errors
 
-- **REQ-1:** Add `worker_loaders` binding to `examples/sunrise-yoga/wrangler.jsonc` with exact structure `"worker_loaders": [{ "binding": "LOADER" }]`
-  - **Source:** PRD, EMDASH-GUIDE.md Section 6
-  - **Priority:** P0 (Existential)
-  - **Verification:** File inspection confirms binding present with exact syntax
-
-- **REQ-2:** Binding name MUST be `LOADER` (singular, standardized, non-negotiable)
-  - **Source:** Decisions - Decision 3
-  - **Priority:** P0
-  - **Rationale:** Emdash conventions require this exact binding name
-  - **Verification:** String match in wrangler.jsonc
-
-- **REQ-3:** Binding must be required in configuration (no optional configuration)
-  - **Source:** Decisions - Decision 3, "What's NOT in v1"
-  - **Priority:** P0
-  - **Verification:** No conditional logic around binding usage
-
-- **REQ-4:** Custom binding names must not be supported (locked to `LOADER` only)
-  - **Source:** Decisions - Decision 3, "What's NOT in v1"
-  - **Priority:** P0
-  - **Verification:** Code review confirms no variable binding names
-
-### Build & Deployment Requirements
-
-- **REQ-5:** Build must succeed after adding the binding
-  - **Source:** PRD Success Criteria
-  - **Priority:** P0
-  - **Verification:** `npm run build` exits with code 0
-
-- **REQ-6:** Deploy verification must confirm sandboxed plugins load successfully in production
-  - **Source:** Decisions MVP Phase 1
-  - **Priority:** P0
-  - **Verification:** Post-deploy smoke test of plugin routes
-
-- **REQ-7:** Changes must be committed to repository
-  - **Source:** PRD Success Criteria
-  - **Priority:** P0
-  - **Verification:** `git log` shows commit with wrangler.jsonc modification
-
-### Error Handling Requirements
-
-- **REQ-8:** Configuration must fail at build time (not runtime) if `worker_loaders` binding is missing
-  - **Source:** Decisions - Decision 2 (Fail-Fast Philosophy)
-  - **Priority:** P0
-  - **Verification:** Build with missing binding produces clear error before deploy
-
-- **REQ-9:** Error messages must be explicit and actionable when binding is missing
-  - **Source:** Decisions - Decision 2
-  - **Priority:** P0
-  - **Format:** "worker_loaders binding required. Add to wrangler.jsonc: {...}"
-  - **Verification:** Error message inspection confirms actionable guidance
-
-- **REQ-10:** No graceful degradation allowed; system must fail loudly if binding missing
-  - **Source:** Decisions "What's NOT in v1"
-  - **Priority:** P0
-  - **Rationale:** "No silent failures. No debugging archaeology"
-  - **Verification:** Test deployment without binding produces loud failure
-
-### Documentation Requirements
-
-- **REQ-11:** One-line setup documentation must be provided with surgical, concise instructions
-  - **Source:** Decisions MVP Phase 1
-  - **Priority:** P0
-  - **Format:** "Add this. Deploy. Done."
-  - **Location:** `docs/plugin-deployment.md` or inline in error messages
-  - **Verification:** Documentation exists and is under 50 words
-
-- **REQ-12:** Documentation must not include philosophical explanations, only actionable steps
-  - **Source:** Decisions MVP Phase 1, Decision 5
-  - **Priority:** P0
-  - **Rationale:** Steve Jobs' "Don't explain why, just tell them what to add"
-  - **Verification:** Documentation review confirms no "why" content
-
-### Instrumentation Requirements
-
-- **REQ-13:** Usage instrumentation must track % of users with sandboxed plugins enabled
-  - **Source:** Decisions - Decision 6
-  - **Priority:** P0
-  - **Purpose:** Data decides if plugins deserve more resources
-  - **Verification:** Telemetry endpoint confirms plugin usage tracking
-
-- **REQ-14:** Error rate metrics must be tracked before and after fix deployment
-  - **Source:** Decisions - Decision 6
-  - **Priority:** P0
-  - **Decision Point:** If <5% usage at 2-week mark, deprecate plugin system
-  - **Verification:** Monitoring dashboard shows error rate metrics
-
----
-
-## Success Criteria
-
-### Phase 1 Success (24 hours)
-- [ ] `worker_loaders` binding present in `examples/sunrise-yoga/wrangler.jsonc`
-- [ ] Build succeeds: `npm run build` exits successfully
-- [ ] Deploy verification passes: plugins load in production without INTERNAL_ERROR
-- [ ] Changes committed to git with descriptive commit message
-- [ ] Zero production runtime errors related to missing binding
-- [ ] One-line documentation exists and is accessible
-- [ ] Usage instrumentation deployed and collecting data
-
-### Long-Term Success (2 weeks post-Phase 1)
-- [ ] Usage data shows >5% of users leveraging sandboxed plugins (else deprecate)
-- [ ] Zero support tickets about missing binding
-- [ ] Developer feedback: "It just worked"
-- [ ] No scaling issues at current load
-- [ ] Error rates reduced to zero for binding-related failures
-
----
-
-## Constraints from Locked Decisions
-
-### 1. Binding Name (Decision 3)
-Binding name is locked to `LOADER` (singular). No custom naming flexibility allowed. This is non-negotiable per EMDASH-GUIDE.md Section 6.
-
-### 2. Fail-Fast Philosophy (Decision 2)
-System must fail at build time, NEVER at runtime. No silent failures or runtime debugging archaeology permitted. Build validation catches misconfiguration before deploy.
-
-### 3. Configuration Approach (Decision 3)
-Phase 1 uses manual configuration only. Auto-detection/injection deferred to Phase 2. One-line manual config is the immediate solution.
-
-### 4. Priority & Urgency (Decision 4)
-This is P0 - Existential fix. Broken plugins in production = broken promise to users. Every hour of delay = users churning.
-
-### 5. Design Philosophy (Decision 5)
-Best infrastructure is invisible infrastructure. Zero-surprise deployment is the UX goal. "Relief" is the emotional outcome, not excitement.
-
-### 6. Documentation Style (Decision 3)
-Docs must be surgical one-step instructions with format: "Add this. Deploy. Done." No "why" explanations, only actionable "what."
-
-### 7. Quality vs Delivery (Decision 4)
-For Phase 1, working > wonderful. Quality matters, but delivery speed is critical.
-
-### 8. Timeline Split (Decision 1)
-- **Phase 1 (NOW - within 24 hours):** Manual binding configuration
-- **Phase 2 (Within days):** Auto-detection and injection at build time
-
----
-
-## Out of Scope (Phase 2 or Rejected)
-
-### Phase 2 Deferred Items
-- Auto-detection of sandboxed plugin usage
-- Automatic injection of binding at build time
-- Build-time validation logic (comprehensive)
-- Build tool plugin development (custom script vs Wrangler plugin vs CLI tool)
-- Backward compatibility migration guide
-- Scaling architecture for 1,000+ plugins
-
-### Explicitly Rejected (Never)
-- Custom binding names (explicitly rejected by Steve)
-- Optional configuration (explicitly rejected - must be required)
-- Branding/naming exercises (rejected by Elon as "design theater")
-- Complex documentation explaining "why" (rejected by Steve)
-- Graceful degradation (rejected - fail loud, fail fast)
-
----
-
-## Verification Methods
-
-### 1. Configuration Presence
-**Method:** File inspection
+**Test:**
 ```bash
-grep -q '"worker_loaders"' examples/sunrise-yoga/wrangler.jsonc && echo "PASS" || echo "FAIL"
+npx wrangler whoami
+cat wrangler.jsonc | grep -q "worker_loaders"
 ```
-
-### 2. Build Verification
-**Method:** Build execution
-```bash
-cd examples/sunrise-yoga && npm run build
-# Exit code 0 = PASS, non-zero = FAIL
-```
-
-### 3. Deployment Verification
-**Method:** Deploy to production-like environment
-```bash
-cd examples/sunrise-yoga && \
-  source /home/agent/shipyard-ai/.env && \
-  export CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID && \
-  npm run build && \
-  npx wrangler deploy
-# Check for deployment success
-```
-
-### 4. Plugin Loading Test
-**Method:** Post-deploy smoke test
-```bash
-curl -I https://sunrise-yoga.seth-a02.workers.dev/_emdash/api/manifest
-# Expected: 200 OK, not 500 INTERNAL_ERROR
-```
-
-### 5. Git Commit Verification
-**Method:** Git log inspection
-```bash
-git log -1 --oneline -- examples/sunrise-yoga/wrangler.jsonc
-# Should show recent commit with binding addition
-```
-
-### 6. Error Message Validation
-**Method:** Intentionally break config and verify error
-```bash
-# Temporarily remove binding from test config
-# Run build
-# Verify error message is clear and actionable
-```
-
-### 7. Documentation Validation
-**Method:** Manual review
-- Verify docs exist in one location
-- Confirm "Add this. Deploy. Done." format
-- Word count <50 words
-- No philosophical explanations
-
-### 8. Instrumentation Deployment
-**Method:** Check production telemetry
-```bash
-# Verify metrics endpoint exists
-curl https://sunrise-yoga.seth-a02.workers.dev/_emdash/api/telemetry
-# Should include plugin usage tracking
-```
-
-### 9. No Runtime Failures
-**Method:** Production monitoring
-- Monitor Cloudflare Workers logs for 24+ hours
-- Filter for "worker_loaders" or "INTERNAL_ERROR"
-- Zero occurrences = PASS
-
-### 10. Test Creation
-**Method:** Automated test suite
-- Create `plugin-binding.test.ts`
-- Verify binding exists in deployed Worker
-- Verify plugins load successfully
-- Run in CI/CD pipeline
 
 ---
 
-## Technical Context
+### REQ-2: Fix EventDash Plugin Registration
+**Success Criteria:**
+- EventDash plugin imported in astro.config.mjs
+- EventDash plugin added to plugins array
+- EventDash dependency added to package.json
 
-### Current State (Problem)
-```jsonc
-// examples/sunrise-yoga/wrangler.jsonc
-{
-  "name": "sunrise-yoga",
-  "compatibility_date": "2026-03-29",
-  "compatibility_flags": ["nodejs_compat"],
-  "d1_databases": [...],
-  "r2_buckets": [...],
-  "observability": {"enabled": true}
-  // MISSING: worker_loaders binding
-}
+**Current State (BROKEN):**
+```javascript
+// astro.config.mjs - ONLY membership registered
+plugins: [membershipPlugin()]
 ```
 
-**Symptom:** Membership plugin routes return `{"error": "INTERNAL_ERROR"}` in production.
+**Required State:**
+```javascript
+import { membershipPlugin } from "../../plugins/membership/src/index.js";
+import { eventdashPlugin } from "../../plugins/eventdash/src/index.js";
 
-### Required State (Solution)
-```jsonc
-// examples/sunrise-yoga/wrangler.jsonc
-{
-  "name": "sunrise-yoga",
-  "compatibility_date": "2026-03-29",
-  "compatibility_flags": ["nodejs_compat"],
-  "d1_databases": [...],
-  "r2_buckets": [...],
-  "observability": {"enabled": true},
-  "worker_loaders": [
-    {
-      "binding": "LOADER"
-    }
-  ]
-}
+plugins: [membershipPlugin(), eventdashPlugin()]
 ```
 
-**Result:** Membership plugin loads in sandboxed Worker isolate, routes return valid responses.
-
-### Reference Implementation
-See EMDASH-GUIDE.md Section 6 (lines 1005-1013) for canonical configuration:
-
-> To enable sandboxing, configure `worker_loaders` in `wrangler.jsonc`:
-> ```jsonc
-> {
->   "worker_loaders": [{ "binding": "LOADER" }]
-> }
-> ```
-> Sandboxed plugins require Cloudflare Workers with paid plan ($5/mo minimum).
+**Test:**
+```bash
+grep -q "eventdashPlugin" astro.config.mjs
+grep -q "eventdash" package.json
+```
 
 ---
 
-## Timeline & Resource Allocation
+### REQ-3: Fix EventDash Plugin Entrypoint Path
+**Success Criteria:**
+- EventDash uses absolute file path (not npm alias)
+- Matches membership plugin pattern
 
-**Total Phase 1 Time Budget:** <1 hour
+**Current State (BROKEN):**
+```typescript
+// plugins/eventdash/src/index.ts
+entrypoint: "@shipyard/eventdash/sandbox"  // NPM alias fails in Workers
+```
 
-| Task | Estimated Time | Owner |
-|------|---------------|-------|
-| Add binding to wrangler.jsonc | 2 minutes | Engineer |
-| Write one-line setup doc | 5 minutes | Engineer |
-| Test deploy verification | 10 minutes | Engineer |
-| Add usage instrumentation | 20 minutes | Engineer |
-| Ship to production | 1 minute | Engineer |
-| Monitor for 24 hours | Passive | DevOps |
+**Required State:**
+```typescript
+const currentDir = dirname(fileURLToPath(import.meta.url));
+const entrypointPath = join(currentDir, "sandbox-entry.ts");
+entrypoint: entrypointPath  // Absolute path
+```
 
-**Decision Gate:** At 2-week mark post-deployment, review usage data. If <5% of users leverage sandboxed plugins, deprecate entire plugin system in next major version.
-
----
-
-## Risk Mitigation
-
-### High-Severity Risks
-
-1. **Users Don't Read Docs** → Make error message the documentation
-2. **Silent Regression** → Add build-time validation
-3. **Plugin System Not Valuable** → Ship instrumentation immediately, measure usage
-4. **Testing Gaps** → Add integration tests for binding presence
-
-### Medium-Severity Risks
-
-1. **Migration Complexity (Phase 1→2)** → Auto-detection respects existing manual config
-2. **Deployment Validation** → Add post-deploy smoke tests
+**Test:**
+```bash
+grep -q "fileURLToPath" plugins/eventdash/src/index.ts
+```
 
 ---
 
-## Kill Switch Decision Criteria
+### REQ-4: Build Sunrise Yoga Application
+**Success Criteria:**
+- `npm run build` completes with exit code 0
+- No TypeScript compilation errors
+- Build artifacts generated in dist/
 
-**Trigger:** If usage data shows <5% of users leveraging sandboxed plugins 2 weeks post-deployment.
-
-**Action:** Deprecate entire plugin system in next major version. Do not invest in Phase 2.
-
-**Rationale:** "We're fixing infrastructure for a feature nobody uses. What % of users actually need this?" - Elon (Decisions, Risk #3)
+**Test:**
+```bash
+npm run build
+test -f dist/server/entry.mjs
+```
 
 ---
 
-**Requirements Status:** LOCKED
-**Owner:** Engineering Lead
-**Review Date:** 2 weeks post-Phase 1 deployment
-**Last Updated:** 2026-04-16
+### REQ-5: Deploy to Cloudflare Production
+**Success Criteria:**
+- `npx wrangler deploy` completes successfully
+- Production URL accessible
+- Environment variables properly set
+
+**Test:**
+```bash
+export CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID
+npx wrangler deploy
+```
+
+---
+
+### REQ-6: Verify Manifest Endpoint
+**Success Criteria:**
+- GET /api/manifest returns HTTP 200
+- Response is valid JSON
+- No INTERNAL_ERROR in response
+
+**Test:**
+```bash
+curl -s https://yoga.shipyard.company/_emdash/api/manifest | jq .
+```
+
+---
+
+### REQ-7: Verify Both Plugins in Manifest
+**Success Criteria:**
+- Manifest includes membership plugin
+- Manifest includes eventdash plugin
+- Exactly 2 plugins present (no more, no less)
+
+**Test:**
+```bash
+curl -s https://yoga.shipyard.company/_emdash/api/manifest | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+plugins = {p.get('id') for p in d.get('plugins',[])}
+assert plugins == {'membership', 'eventdash'}, f'Expected membership+eventdash, got {plugins}'
+print('PASS: Both plugins verified')
+"
+```
+
+---
+
+### REQ-8: Test Membership Plugin Admin Route
+**Success Criteria:**
+- POST /api/membership/admin returns non-500 status
+- Response does not contain INTERNAL_ERROR
+- Response is valid JSON
+
+**Test:**
+```bash
+curl -s https://yoga.shipyard.company/_emdash/api/plugins/membership/admin \
+  -H "Content-Type: application/json" \
+  -d '{"type":"page_load"}' | python3 -c "
+import json,sys
+resp=json.load(sys.stdin)
+assert 'INTERNAL_ERROR' not in str(resp), 'INTERNAL_ERROR found'
+print('PASS: Membership plugin healthy')
+"
+```
+
+---
+
+### REQ-9: Test EventDash Plugin Admin Route
+**Success Criteria:**
+- POST /api/eventdash/admin returns non-500 status
+- Response does not contain INTERNAL_ERROR
+- Response is valid JSON
+
+**Test:**
+```bash
+curl -s https://yoga.shipyard.company/_emdash/api/plugins/eventdash/admin \
+  -H "Content-Type: application/json" \
+  -d '{"type":"page_load"}' | python3 -c "
+import json,sys
+resp=json.load(sys.stdin)
+assert 'INTERNAL_ERROR' not in str(resp), 'INTERNAL_ERROR found'
+print('PASS: EventDash plugin healthy')
+"
+```
+
+---
+
+### REQ-10: Commit and Push Changes
+**Success Criteria:**
+- All changes committed with proper message
+- Commit references Issue #75
+- Changes pushed to origin main
+- Git status clean
+
+**Test:**
+```bash
+git add .
+git commit -m "fix: Deploy Sunrise Yoga with verified plugins
+
+- Fixed wrangler.jsonc plugin paths
+- Verified membership and eventdash plugins load correctly
+- All smoke tests passing
+- Manifest endpoint returns clean JSON
+
+Resolves #75"
+git push origin main
+```
+
+---
+
+## Dependency Graph
+
+```
+REQ-1 (Prerequisites)
+  ↓
+REQ-2, REQ-3 (Fix Configurations - Parallel)
+  ↓
+REQ-4 (Build)
+  ↓
+REQ-5 (Deploy)
+  ↓
+REQ-6 (Manifest)
+  ↓
+REQ-7, REQ-8, REQ-9 (Verification Tests - Parallel)
+  ↓
+REQ-10 (Commit)
+```
+
+---
+
+## Traceability Matrix
+
+| Requirement | PRD Section | Decisions Reference | Priority |
+|-------------|-------------|---------------------|----------|
+| REQ-1 | Prerequisites | Decision 1 (Bash + curl) | MUST-HAVE |
+| REQ-2 | Steps | Decision 1 (Fix config) | MUST-HAVE |
+| REQ-3 | Prerequisites | Decision 2 (Zero errors) | MUST-HAVE |
+| REQ-4 | Steps | Decision 1 (Build) | MUST-HAVE |
+| REQ-5 | Steps | Decision 1 (Deploy) | MUST-HAVE |
+| REQ-6 | Smoke Test | Decision 2 (Manifest is truth) | MUST-HAVE |
+| REQ-7 | Smoke Test | Decision 2 (Python assertion) | MUST-HAVE |
+| REQ-8 | Smoke Test | Decision 2 (No INTERNAL_ERROR) | MUST-HAVE |
+| REQ-9 | Smoke Test | Decision 2 (No INTERNAL_ERROR) | MUST-HAVE |
+| REQ-10 | Success Criteria | Decision 1 (Commit & push) | MUST-HAVE |
+
+---
+
+## Critical Findings from Research
+
+### Configuration Gaps (High Risk)
+1. **EventDash not registered** - astro.config.mjs only has membership
+2. **EventDash uses npm alias** - should use absolute path like membership
+3. **EventDash missing from package.json** - no dependency entry
+
+### Files to Modify
+1. `/home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs`
+2. `/home/agent/shipyard-ai/examples/sunrise-yoga/package.json`
+3. `/home/agent/shipyard-ai/plugins/eventdash/src/index.ts`
+
+### Verified Working Configuration
+- wrangler.jsonc ✓ (worker_loaders present)
+- Membership plugin ✓ (uses absolute paths)
+- Build system ✓ (npm scripts ready)
+- Cloudflare resources ✓ (D1, R2 configured)
