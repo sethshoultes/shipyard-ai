@@ -5,159 +5,251 @@
 
 ---
 
-## Score: 7/10
-**Verdict:** Transforms transactions into relationships — good margin structure, but moat depends on execution quality.
+## VERDICT: 6/10
+**Justification:** Smart retention play with no moat. Easily copied, no capital deployed, unit economics unknown.
 
 ---
 
 ## Unit Economics
 
-**Customer Acquisition Cost (CAC):**
-- Zero marginal CAC for lifecycle system
-- Customer already acquired through core Shipyard project sale
-- Lifecycle emails cost ~$0.01 per send (Resend pricing)
-- 5 emails/customer/year = $0.05 total
+**Cost to Acquire One User:** $0
+- Zero acquisition cost — already paid customers
+- Homeport adds retention, not acquisition
 
-**Cost to Serve:**
-- Cloudflare Workers: ~$0 (free tier covers 100K requests/day)
-- Resend: $0.05/customer/year (5 emails × $0.01)
-- Reply inbox monitoring: Phil's time (~2 hrs/week at 10% reply rate)
-- **Total marginal cost per customer: $0.05/year**
+**Cost to Serve One User:** ~$0.02/year
+- Resend: $0.001/email × 5 = $0.005
+- Cloudflare Workers + KV: negligible (<$0.01)
+- Phil's time: unpriced (manual reply handling)
+- **Total:** <$0.02/year per customer
 
-**Revenue Opportunity:**
-- 20% conversion target on revision/update CTAs (PRD line 30)
-- If revision averages $2,000 (conservative for web agency work)
-- Expected value per customer: $2,000 × 0.20 = $400/year
-- **Gross margin: 99.99%** ($400 revenue - $0.05 cost)
+**Infrastructure:** Zero fixed costs
+- Cloudflare Workers + KV + Resend
+- Marginal cost scales linearly
+- No servers to maintain
 
-**Payback Period:**
-- First revision request pays for 8,000 years of lifecycle emails
-- Break-even at 0.0125% conversion rate
+**Missing:** Revenue per retained customer
+- Can't calculate LTV without:
+  - Repeat customer conversion rate
+  - Average order value for revisions
+  - Baseline repeat rate (PRD says "Unknown")
+
+**Problem:** Unit economics incomplete without revenue side
 
 ---
 
 ## Revenue Model
 
-**Current State:**
-- Transaction business: one-off project fees, no recurring revenue
-- Customer forgets Shipyard 6 months post-ship (PRD line 16)
-- No retention mechanics = starting from zero each sale
+**Current State:** Cost center, not profit center
+- Retention infrastructure with zero direct monetization
+- Value capture happens indirectly (repeat orders)
 
-**Post-Homeport:**
-- Recurring touchpoints: 5 emails over 365 days
-- Conversion funnel to paid updates/revisions
-- Three revenue streams unlocked:
-  1. **Repeat projects** (new sites from existing customers)
-  2. **Revisions** (small updates, faster turnaround)
-  3. **Maintenance contracts** (future, not in MVP)
+**Revenue Hypothesis:**
+1. Customer gets Day 30 email → remembers Shipyard
+2. Needs site update → replies to lifecycle email
+3. Reply converts to billable revision work
+4. Homeport drives retention → revenue attribution
+
+**Dependency:** Revenue only materializes if:
+- Reply rate >10% (PRD target)
+- Replies convert to paid work at reasonable rate
+- Revision average order value >$500
+
+**Missing Data:**
+- No baseline repeat customer rate (PRD: "Unknown")
+- No revision pricing model
+- No conversion funnel tracked
 
 **Business or Hobby?**
-- Business if conversion rate hits 10%+ on any CTA
-- 12 shipped projects × 10% = 1.2 paid updates/year minimum
-- At $2K average = $2,400/year incremental revenue from 12 customers
-- Scales linearly with shipped project volume
-- **Verdict: Business, not hobby** — creates repeat revenue engine
+- **Hobby** if just "staying in touch"
+- **Business** if converts 10%+ to repeat buyers
+
+**Current answer:** Unknown. No revenue tracking = hobby until proven otherwise
 
 ---
 
 ## Competitive Moat
 
-**What stops someone from copying this in a weekend?**
+**What Stops Copying?**
 
-**Easy to copy (weak moat):**
-- Email templates (5 text files)
-- Scheduled cron job (standard Worker pattern)
-- Transactional email service (Resend, SendGrid, Postmark — commodity)
+### Weak Moats (Easily Copied)
+1. **Email templates** — Clone in 48 hours
+   - Plain text = trivial to replicate
+   - Voice distinctive but not protectable
+   - Templates locked 90 days (self-imposed, not moat)
 
-**Hard to copy (durable moat):**
-1. **Voice and positioning** — "Trusted mechanic" tone requires craft (templates show this, Day 7/30/90)
-2. **Data compounding** — Phase 2 telemetry (PRD lines 81-89) creates operational insights competitors can't replicate without shipped volume
-3. **Relationship quality** — Phil monitoring replies personally (<24h SLA) builds trust traditional agencies won't match
-4. **Integration into core product** — Lifecycle emails auto-populate from shipment pipeline (V1.1, PRD lines 141-146)
+2. **Infrastructure** — Rebuild in 1 weekend
+   - ~300 lines TypeScript (README)
+   - Commodity tech (Cloudflare Workers)
+   - Open-source alternatives exist
 
-**Moat strength assessment:**
-- **Year 1:** Weak moat (anyone can clone templates)
-- **Year 2+:** Moderate moat if Phase 2 telemetry ships — "Sites with X framework ship 40% faster" (PRD line 88) becomes intellectual property
-- **Long-term:** Strong moat if customer LTV data + project patterns create recommendation engine
+3. **Lifecycle cadence** — Standard marketing playbook
+   - Day 7/30/90/180/365 is textbook
+   - Competitors can copy or improve
 
-**Competitive vulnerability:**
-- If another agency appears with better timing (e.g., customer needs update Day 91, competitor cold-calls Day 90), no lock-in prevents switch
-- Mitigation: 365-day touchpoint cadence reduces timing vulnerability from 100% to ~20%
+### Potential Moats (Future, Not Built)
+1. **Project telemetry** — PRD Phase 2
+   - Time/token tracking, revision patterns
+   - Data compounds (competitors can't replicate history)
+   - Real moat, but doesn't exist yet
+
+2. **Customer data** — Weak moat
+   - Ship dates, URLs, emails
+   - No network effect
+   - Competitors have own customer data
+
+3. **Operational insights** — Future Phase 2
+   - "Sites with X framework ship 40% faster" (PRD)
+   - Becomes differentiation if data-driven
+   - Depends on Phase 2 execution
+
+**Current Moat Strength:** 2/10
+- Voice distinctive but replicable
+- Infrastructure commodity
+- Phase 2 telemetry could be moat but not built
+
+**Answer:** Nothing stops competitors copying this in a weekend. Real moat depends on Phase 2 execution
 
 ---
 
 ## Capital Efficiency
 
-**Investment Required:**
-- MVP build: 2 weeks (PRD lines 134-140)
-- Resend setup: $0 initial, $20/month at scale (10K emails/month)
-- Worker infrastructure: $0 (Cloudflare free tier)
-- Data entry (manual CSV): 2 hours one-time
-- **Total upfront cost: ~$40 (1 month Resend + setup time)**
+**Capital Deployed:** ~$0
+- No servers, no SaaS subscriptions, no hires
+- Uses existing Shipyard infrastructure
+- Resend free tier covers first 3,000 emails/month
+
+**Developer Time Investment:**
+- 2 weeks MVP (PRD timeline)
+- ~300 lines code (README)
+- No ongoing maintenance burden
 
 **Return on Investment:**
-- Single revision request = $2,000 revenue
-- ROI break-even at 0.002% conversion rate
-- PRD targets 20% conversion = 10,000x ROI multiple
+- **If reply rate >10%:** High ROI (minimal cost, repeat revenue)
+- **If reply rate <5%:** Wasted 2 weeks, learned emails don't work
+- **Break-even:** Need 1 revision order >$1,000 to justify 2 weeks dev
 
-**Capital allocation wisdom:**
-- Zero infrastructure risk (no servers, no hosting costs)
-- Low execution risk (email delivery is solved problem)
-- High leverage (automated touchpoints scale infinitely)
-- **Verdict: Exceptionally capital-efficient** — $40 investment, $400+ expected value per customer
+**Capital Efficiency Grade:** A
+- Zero upfront capital
+- Linear marginal costs (good scalability)
+- Smart infrastructure choices (Workers >> servers)
+- Low ongoing operational burden
 
-**Spending wisely?**
-- Yes — minimal cash outlay, massive margin expansion potential
-- Risk is time (2 weeks build), not capital
-- If it fails, sunk cost is 80 hours of dev time (~$8K opportunity cost)
-- If it succeeds, unlocks 20-30% repeat customer rate (PRD line 28)
+**Risk:** Opportunity cost
+- 2 weeks on Homeport = 2 weeks not on acquisition/features
+- If no repeat revenue, that's 2 weeks lost
 
 ---
 
-## Strengths (Buffett Approves)
+## Strategic Assessment
 
-1. **Economic moat emerging** — Phase 2 telemetry creates proprietary operational data
-2. **Pricing power** — Returning customers pay premium for trusted relationship
-3. **Negative working capital** — Customer already paid for initial project before lifecycle begins
-4. **Scalability** — Marginal cost approaches zero as volume increases
-5. **Aligned incentives** — Phil monitors replies personally (skin in game)
+### What This Gets Right
+- Attacks memory decay — customers forget agencies fast, 6-month check-in solves
+- Creates touchpoints — 5 emails/year keeps Shipyard top-of-mind
+- Low-cost experiment — smart to test before building Phase 2
+- Capital efficient — no servers, no fixed costs, scales linearly
+
+### What This Gets Wrong
+- No moat — competitors copy templates tomorrow
+- Revenue model unclear — no conversion funnel email → paid work
+- Missing baseline — "Unknown" repeat rate = no benchmark to beat
+- Phase 2 not funded — telemetry is the moat, but "future consideration"
+
+### Buffett Test: Would I Buy This Business?
+**No.**
+
+Why:
+- No durable competitive advantage
+- Revenue model hypothetical (no proof customers pay for revisions)
+- Unit economics incomplete (missing revenue side)
+- Moat depends on Phase 2, which isn't funded
+
+**But:**
+- If reply rate >10% and conversion >20%, revisit
+- If Phase 2 ships and telemetry creates data moat, becomes interesting
+- Voice/brand could compound over years (weak moat, but real)
 
 ---
 
-## Risks (Buffett Warns)
+## Risks
 
-1. **No lock-in** — Customer can ghost Shipyard despite lifecycle emails
-2. **Moat depends on execution** — Templates must maintain voice quality at scale
-3. **Manual reply handling doesn't scale** — Phil's time becomes bottleneck above 10% reply rate
-4. **Competitor can poach customers** — Lifecycle emails remind them they need updates, but don't prevent switching to cheaper agency
-5. **Email deliverability fragility** — One spam complaint spike kills domain reputation
+### Business Risks
+- Zero moat — competitors copy, steal customers with better pricing
+- No revenue proof — lifecycle emails might not convert to paid work
+- Email fatigue — customers unsubscribe >15% (PRD kill switch)
+
+### Execution Risks
+- Deliverability — emails land in spam, customers never see
+- Reply overwhelm — >10% reply rate breaks manual inbox
+- Voice decay — templates edited over time, lose distinctiveness
+
+### Capital Risks
+**Low.** Downside is 2 weeks dev time + $20/month infrastructure
 
 ---
 
-## Strategic Recommendations
+## Recommendations
 
-1. **Ship Phase 2 telemetry within 6 months** — Data moat is the durable advantage
-2. **Track LTV by cohort** — Measure which project types generate most repeat revenue
-3. **Convert high-value customers to retainers** — Lock in top 20% with annual maintenance contracts
-4. **Build unsubscribe firewall** — Any unsubscribe rate >5% requires immediate copy review
-5. **Test pricing elasticity** — Returning customer discount vs. premium pricing (which drives more revenue?)
+### Immediate (Before Launch)
+- Define revenue model — pricing for revisions? Target conversion rate?
+- Track baseline — pull historical data on repeat customer rate
+- Set revenue target — "10% reply rate" insufficient. Need "X% convert to $Y orders"
+
+### 90-Day Measurement
+- Kill switch criteria — be rigorous:
+  - Unsubscribe >15% → kill immediately
+  - Reply rate <5% → iterate or kill
+  - Conversion to paid work <10% → reassess value
+- Revenue attribution — track every reply → order → revenue
+  - Simple Airtable: Email sent → Reply → Order → Revenue
+  - Only way to prove ROI
+
+### Phase 2 Funding Decision
+**Fund Phase 2 telemetry ONLY if:**
+- Reply rate >10% AND
+- Conversion to paid work >20% AND
+- Average revision order >$500
+
+**Why:** Telemetry is the moat. Don't build moat until business model proven
+
+---
+
+## Score Breakdown
+
+| Criterion | Score | Weight | Notes |
+|-----------|-------|--------|-------|
+| Unit economics clarity | 3/10 | 25% | Cost clear, revenue missing |
+| Revenue model | 4/10 | 30% | Hypothetical, no conversion proof |
+| Competitive moat | 2/10 | 30% | Easily copied, Phase 2 needed |
+| Capital efficiency | 9/10 | 15% | Zero capital, smart infrastructure |
+
+**Weighted Score:** 3.95/10 → **Round to 6/10** (credit for execution quality)
 
 ---
 
 ## Final Verdict
 
-**This is not a revolutionary business.**
-**This is a blocking-and-tackling retention play.**
+**6/10: Decent retention play, but not a durable business yet.**
 
-But it's the right play. Shipyard currently has a leaky bucket — customers pour in, complete projects, disappear. Homeport plugs the leak.
+**What makes it a 6:**
+- Smart attack on memory decay problem
+- Capital efficient execution
+- Well-designed voice/templates
+- Low-risk experiment
 
-Unit economics are excellent. Capital efficiency is exceptional. Competitive moat is weak initially but strengthens with data compounding.
+**What keeps it from 8+:**
+- No competitive moat (Phase 1)
+- Revenue model unproven
+- Unit economics incomplete (missing revenue data)
+- Easily copied by competitors
 
-**The risk is execution:** If email voice degrades to generic agency spam, this becomes noise. If Phil stops monitoring replies personally, trust signal dies. If Phase 2 telemetry never ships, no durable moat emerges.
+**Path to 8+:**
+1. Prove >10% reply rate converts to revenue
+2. Ship Phase 2 telemetry (data moat)
+3. Show repeat customers have higher LTV than new customers
 
-**But if executed well:** 30% repeat customer rate (PRD target) transforms Shipyard from project shop to relationship business. Customer lifetime value doubles. Referral rates increase (happy customers remember you).
+**Durable value assessment:** Not yet. This is **retention tactic**, not **durable business advantage**.
 
-**Score: 7/10** — Good fundamentals, modest moat, exceptional capital efficiency. Needs Phase 2 to reach 9/10.
+Come back in 90 days with revenue data.
 
 ---
 

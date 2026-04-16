@@ -3,121 +3,102 @@
 ---
 
 **NARRATOR:**
-You shipped a website three weeks ago.
+You ship. They pay. Then...nothing.
 
-[SCREEN: Calendar flips — launch day, then days passing]
-
-**NARRATOR:**
-Since then? Silence.
-No update from your agency.
-No check-in. No "hey, is it still working?"
-
-[SCREEN: Empty inbox. Tumbleweed GIF.]
+[SCREEN: Inbox. Months of silence. Ghost town.]
 
 **NARRATOR:**
-Most agencies ghost after launch. You already paid.
+You've moved on. They've moved on. Six months later, they don't remember your name. When they need work, they call someone else.
 
-[SCREEN: Email drafts folder — "Should I ask if something's wrong?" Never sent.]
+Most agencies lose 80% of clients within a year. Not because the work was bad. Because they disappeared.
 
-**NARRATOR:**
-You're wondering: Is the site fine, or is something broken and I just don't know yet?
-
-[SCREEN: Website analytics showing traffic. Everything looks... fine?]
+[SCREEN: Close-up of a shipped project. Beautiful site. Nobody checking in.]
 
 **NARRATOR:**
-Here's what's different.
+This is the problem. You build something great, then you vanish. There's no relationship. No memory. No reason to come back.
 
 ---
 
-[SCREEN: Inbox notification — "Your site is breathing on its own now" from homeport@shipyard.ai]
+[SCREEN: Terminal. `wrangler deploy` command executing.]
 
 **NARRATOR:**
-Day 7. Email from Homeport.
+Homeport fixes that.
 
-[SCREEN: Email opens — plain text, no marketing fluff]
+Five emails. Five moments. Automated, but human.
 
-> "Seven days. Your site shipped seven days ago, and it's been running clean.
-> I built it. I know how it works. The fact that it's humming along without needing me—that matters.
-> If something feels off, reply to this email. I'm here."
+[SCREEN: Calendar view. Day 7, 30, 90, 180, 365 markers lighting up.]
 
 **NARRATOR:**
-Not a bot. Not a drip campaign. A human who remembers.
+Day 7: "Your site is breathing on its own now."
 
-[SCREEN: Reply button. Cursor hovers.]
-
-**NARRATOR:**
-You reply: "Actually, the contact form's been wonky."
-
-[SCREEN: Response arrives — same day]
-
-> "On it. I'll check the logs and push a fix by tonight."
+[SCREEN: Plain text email. No logos. No screenshots. Just words.]
 
 **NARRATOR:**
-Done. Fixed. Before you even knew it was urgent.
+No corporate jargon. No upsell. Just a builder checking in on something they care about.
+
+[SCREEN: Scroll through Day 7 email template.]
+
+> "I built this for you. I know how it works, where it's resilient, what could trip it up. The fact that it's humming along without needing me—that matters."
+
+**NARRATOR:**
+Day 30: "Does it feel like yours yet?"
+
+[SCREEN: Day 30 email. Personal. Direct.]
+
+> "Real use teaches you things. If you want to update something, I can help with that."
+
+**NARRATOR:**
+This is where most agencies send nothing. You send empathy.
 
 ---
 
-[SCREEN: Timeline visualization — Day 30, Day 90, Day 180, Day 365]
+[SCREEN: Dashboard. Cloudflare Workers cron scheduler running at 9 AM UTC.]
 
 **NARRATOR:**
-Day 30: "How are things? Real use teaches you what needs tweaking."
+Under the hood: 300 lines of TypeScript. Cloudflare Workers. Resend API. Plain text templates locked for 90 days.
 
-[SCREEN: Day 30 email opens]
-
-**NARRATOR:**
-Day 90: "This is when cracks show. Security patches. Browser changes. How's it holding?"
-
-[SCREEN: Day 90 email opens — mentions security updates, performance]
+[SCREEN: Code snippet showing template rendering with {name}, {project_url} personalization.]
 
 **NARRATOR:**
-Day 180: "Traffic spike? New feature idea? Let's talk."
+No HTML. No images. No automation smell. Just one human talking to another.
+
+[SCREEN: Email client. Reply from customer: "Actually, we've been thinking about adding a new section..."]
 
 **NARRATOR:**
-Day 365: "One year. Most sites are abandoned by now. Yours isn't."
+Day 90: "We're still here. Most agencies aren't."
 
-[SCREEN: Customer testimonial overlays — "I forgot agencies could care this much."]
+[SCREEN: Day 90 email scrolling.]
+
+> "Ninety days reveals the problems. How's it performing? Any issues? This is the sweet spot for updates."
+
+[SCREEN: More replies coming in. Revision requests. Questions. Conversations.]
+
+**NARRATOR:**
+You're not selling. You're present. That's the difference.
 
 ---
 
-[SCREEN: Homeport dashboard — shows 12 shipped projects, email send dates, reply rate: 14%]
+[SCREEN: Metrics dashboard. Reply rate: 12%. Revision requests: 3 out of 12 projects.]
 
 **NARRATOR:**
-Homeport runs automatically after you ship.
-No manual check-ins. No forgetting.
-Plain text emails. Human replies. Real care.
+The payoff: Mental real estate.
 
-[SCREEN: Code snippet flies by — Cloudflare Worker, scheduled cron, KV store]
+When they need work, they don't Google. They reply to your email. Because you never left.
 
-**NARRATOR:**
-Built on Cloudflare Workers. Costs pennies. Scales forever.
-
-[SCREEN: Email template editor — shows Day 7, Day 30 templates side by side]
+[SCREEN: Split screen. Left: competitor inbox empty. Right: Homeport inbox with active conversations.]
 
 **NARRATOR:**
-Every email feels personal because it is.
+This isn't a drip campaign. It's a relationship infrastructure.
+
+Five emails. One year. Built in 48 hours.
+
+[SCREEN: Terminal showing deployment complete. Worker live. First email scheduled.]
+
+**NARRATOR:**
+Homeport. Every ship needs a port to return to.
+
+[SCREEN: Fade to black. URL appears: `homeport.shipyard.ai`]
 
 ---
 
-[SCREEN: Split screen — LEFT: typical agency (crickets after launch), RIGHT: Shipyard with Homeport (timeline of emails, replies, fixes)]
-
-**NARRATOR:**
-Most agencies disappear.
-
-[SCREEN: RIGHT side lights up — "Reply: Can we add a blog section?" → "Let's do it."]
-
-**NARRATOR:**
-We don't.
-
----
-
-[SCREEN: Logo reveal — "Homeport by Shipyard" with tagline]
-
-**NARRATOR:**
-Homeport.
-Someone remembers your project.
-
-[SCREEN: Fade to black, URL appears: shipyard.ai/homeport]
-
----
-
-**END**
+**[END - Runtime: 2:00]**
