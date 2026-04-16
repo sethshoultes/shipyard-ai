@@ -1,0 +1,19 @@
+name = "homeport"
+main = "worker/index.ts"
+compatibility_date = "2024-01-01"
+
+# KV namespace for project data
+[[kv_namespaces]]
+binding = "PROJECTS"
+id = "your-kv-namespace-id-here"
+
+# Cron trigger - runs daily at 9 AM UTC
+[triggers]
+crons = ["0 9 * * *"]
+
+# Environment variables
+[vars]
+ENVIRONMENT = "production"
+
+# Secrets (set with: wrangler secret put RESEND_API_KEY)
+# RESEND_API_KEY = "re_xxxxxxxxxxxx"
