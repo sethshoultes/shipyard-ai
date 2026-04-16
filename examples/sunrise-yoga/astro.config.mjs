@@ -8,7 +8,6 @@ import { eventdashPlugin } from "../../plugins/eventdash/src/index.js";
 import { commercekitPlugin } from "../../plugins/commercekit/src/index.js";
 import { formforgePlugin } from "../../plugins/formforge/src/index.js";
 import { reviewpulsePlugin } from "../../plugins/reviewpulse/src/index.js";
-import { seodashPlugin } from "../../plugins/seodash/src/index.js";
 
 export default defineConfig({
   site: "https://yoga.shipyard.company",
@@ -25,7 +24,6 @@ export default defineConfig({
         commercekitPlugin(),
         formforgePlugin(),
         reviewpulsePlugin(),
-        seodashPlugin(),
       ],
     }),
   ],
