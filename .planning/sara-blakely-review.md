@@ -1,47 +1,35 @@
-# Sara Blakely Gut-Check — Phase 1 Plan (worker_loaders Fix)
+# Sara Blakely Gut-Check — Phase 1 Plan
 
-**Date:** 2026-04-16
-**Reviewer:** Sara Blakely (Customer Obsession Lens)
+## Would a customer pay for this?
+**No.** Config plumbing. Zero customer value. No one wakes up wanting "plugins registered correctly."
 
----
+They want: Events that sell, members who pay, yoga classes that fill. This is foundation, not product.
 
-## Would a real customer pay for this?
+## Confusing / Bounce Triggers
+- Six tasks to fix three config lines? Over-engineered.
+- "Wave 1, Wave 2" sounds military. Just ship it.
+- Zero customer language. All tech jargon.
+- Risk section reads paranoid. Know the risks? Fix them.
+- 30-line commit message? No one reads that.
 
-**No.** This is fixing broken infrastructure. Customers don't pay for broken things to work — they expect it.
+## 30-Second Elevator Pitch
+"Shipyard makes it dead-simple to run a yoga studio online — events, memberships, payments. Fixing backend so two key features actually load. Not sexy, blocks everything else."
 
----
+## Test First With $0 Marketing Budget
+- Install EventDash on ONE real yoga studio site
+- Call owner: "Can you create an event and charge for it?"
+- If she can't figure it out in 60 seconds, it's broken
+- Watch her screen, don't talk. Her confusion = your roadmap.
 
-## What's confusing? What would make someone bounce?
+## Retention Hook
+**Missing.** No hook in this plan because it's infrastructure.
 
-- "Worker_loaders binding" — nobody knows what that means
-- "Sandboxed plugin execution" — jargon hell
-- "Dynamic Worker Loader provisions isolated V8 contexts" — sounds like rocket science for adding a config line
-- User just wants membership plugin to not crash. All this complexity makes them think Emdash is fragile.
+Real hook candidates:
+- Auto-fill events from Google Calendar (zero-effort setup)
+- One-tap "Copy Last Event" (teachers repeat schedules)
+- SMS reminder 1hr before class (shows up = revenue)
 
----
+## Bottom Line
+Plan is solid technically. Over-engineered emotionally.
 
-## 30-second elevator pitch
-
-"Membership plugin crashes in production. One line of config fixes it. Ship today. Monitor for 2 weeks. If nobody uses plugins, kill the feature."
-
----
-
-## What would you test first with $0 marketing budget?
-
-Deploy. Watch logs for 48 hours. Count how many sites actually use plugins. If <3 sites, deprecate plugins entirely. Stop building features nobody needs.
-
----
-
-## What's the retention hook?
-
-**There is none.** This is damage control. Customer already churned when plugin returned 500 errors. Fix stops *more* churn, doesn't create retention.
-
----
-
-## Real talk
-
-This plan is engineering theater. 3 tasks, formal dependencies, "wave execution" — for adding ONE line of JSON. Ship the fix in 5 minutes. Watch real usage. Kill plugins if nobody cares. Done.
-
-Stop planning infrastructure. Start shipping features customers beg for.
-
-**Ship it? Yes — but with ruthless follow-up. 2 weeks, if usage is weak, sunset plugins.**
+Ship fast, prove it works, move to features customers can feel.
