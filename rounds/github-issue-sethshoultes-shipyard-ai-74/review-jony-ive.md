@@ -1,270 +1,282 @@
-# Design Review: Issue #74 Deliverables
+# Jony Ive Design Review: Issue #74 Deliverables
 
-**Reviewer:** Jony Ive (Design Philosophy)
-**Date:** April 16, 2026
-**Subject:** EventDash plugin entrypoint fix deliverables
+## Verdict: 6/10 — Functional bureaucracy masquerading as clarity
 
 ---
 
-## Visual Hierarchy: FAILED
+## Visual Hierarchy: Broken
 
-Most important thing should be most visible.
+**Most important = most buried**
 
-**code-diff.patch:**
-- Commit message buried at top (lines 1-33)
-- Actual changes start line 35
-- User must scroll through 34 lines of preamble to see code
-- **Fix:** Put diff first. Metadata second.
+VISUAL_DIFF.md line 76: table comparing before/after
+- Should be line 1
+- Instead: 75 lines of preamble
 
-**verification-checklist.md:**
-- Title requires 4 lines (lines 1-7)
-- First actual content: line 10
-- Checkboxes lost in bash output noise
-- Lines 16-17: Output text breaks visual rhythm
-- **Fix:** Remove redundant bash output. Show result only.
+SUMMARY.md line 1: wall of markdown noise
+- "Issue #74: EventDash Plugin Entrypoint Fix — Summary"
+- User doesn't care about issue numbers first
+- Lead with impact: "EventDash now works in production"
 
-**execution-summary.md:**
-- "Executive Summary" header (line 11) fights with title
-- Real summary starts line 13
-- Two lines for metadata that could be one
-- **Fix:** Remove redundant "Executive Summary" label.
+execution-summary.md lines 1-16: metadata overload
+- Project slug, executor, commit hash BEFORE the story
+- Nobody needs 8 lines of throat-clearing
 
-**execution-report.md:**
-- Clean header structure (lines 1-7) ✓
-- "Executive Summary" redundant again (line 10)
-- Timeline buried under metadata
+**Fix:** Invert every document. Verdict first. Evidence after.
 
 ---
 
-## Whitespace: MIXED
+## Whitespace: Suffocating
 
-Room to breathe matters.
-
-**code-diff.patch:**
-- No whitespace between commit message sections
-- Dense paragraph blocks (lines 16-20, 26-29)
-- **Fix:** Add blank line between "Changes:", "Technical Details:", "Build Status:"
-
-**verification-checklist.md:**
-- Good: Section separators with `---` (lines 8, 44, etc.)
-- Bad: Bash blocks run together with checkboxes
-- Bad: Line 16-17 output crushes checkbox
-- **Fix:** Remove inline bash output. Trust results.
-
-**execution-summary.md:**
-- Good: Section separators present
-- Bad: Dense code blocks without spacing (lines 23-47)
-- Bad: Table immediately after header (line 64) — no breathing room
-- **Fix:** Add blank line before tables.
-
-**execution-report.md:**
-- Excellent spacing in timeline section (lines 20-41)
-- Consistent `---` separators throughout ✓
-- Tables have proper spacing ✓
-
----
-
-## Consistency: FAILED
-
-Patterns must repeat.
-
-**Across all files:**
-- Two formats for status indicators:
-  - `✅ COMPLETE` (execution-summary.md line 4)
-  - `✅ PASS` (verification-checklist.md line 19)
-  - `✅ PRODUCTION READY` (execution-report.md line 211)
-- Three different checkbox styles:
-  - `- [x]` in verification-checklist.md
-  - `- ✅` in execution-summary.md (line 356)
-  - `- ⬜` in execution-report.md (line 350)
-- **Fix:** Pick one. Use everywhere.
-
-**Headers:**
-- H2 usage inconsistent:
-  - "## Executive Summary" (execution-summary.md line 11)
-  - "## What Was Implemented" (execution-summary.md line 19)
-  - "## What Was Found" (execution-report.md line 45)
-- **Fix:** Use parallel structure. All gerunds or all nouns.
-
----
-
-## Craft: FAILED
-
-Details must reward inspection.
-
-**verification-checklist.md:**
-- Lines 15-32: Bash commands with inline output
-- Output format breaks reading flow
-- Example (lines 15-19):
+BLOCKERS.md line 1: "# Issue #74: Deployment Blockers & Follow-Up Issues"
+- Breathe
+- Make it:
   ```
-  - [x] **File exists at expected path**
-    ```bash
-    ls -la /home/agent/shipyard-ai/plugins/eventdash/src/sandbox-entry.ts
-    # Output: -rw-r--r-- 1 agent agent 111251 Apr 16 07:32 sandbox-entry.ts
-    ```
+  # Production Blocker
+
+  Cloudflare account needs upgrade.
   ```
-- **Fix:** Show command OR result. Not both. Choose based on value.
 
-**code-diff.patch:**
-- Lines 5-8: Commit message title and body
-- No visual distinction between title and body
-- Three-line body could be one paragraph
-- **Fix:** Blank line after title. Single paragraph for body.
+verification-checklist.md lines 10-43: 34 lines to say "file exists"
+- Checkbox theater
+- Could be: `✅ sandbox-entry.ts exists (109KB)`
 
-**execution-summary.md:**
-- Lines 72-103: Tables use pipes but alignment varies
-- "Status" column width inconsistent
-- **Fix:** Align all table columns. Equal spacing.
+execution-report.md lines 20-39: timeline with 6 items, each 3 sub-bullets
+- Looks like a legal contract
+- Should feel like progress
 
-**execution-report.md:**
-- Line 240: "(7,891 words)" — unnecessary character count
-- Line 250: "(4,238 words)" — distracts from content
-- **Fix:** Remove word counts. Trust quality over quantity.
+**Pattern:**
+- Headers cramped against content (no breathing room)
+- Dense paragraphs pretending to be scannable
+- Bullet points used as decoration, not information design
+
+**Fix:** Double vertical spacing. Half the words.
 
 ---
 
-## What Would Make This Quieter But More Powerful
+## Consistency: Fragmented
 
-### 1. Radical Reduction
+**7 different document formats for same story**
 
-**verification-checklist.md:**
-Remove bash command noise entirely:
+SUMMARY.md: executive brief (13 lines)
+execution-summary.md: epic novel (406 lines)
+execution-report.md: middle manager's diary (444 lines)
+verification-checklist.md: audit trail (657 lines)
+VISUAL_DIFF.md: actually useful (101 lines)
+BLOCKERS.md: incident report (87 lines)
+wave-1-verification-results.md: test log (84 lines)
 
+**Why?**
+- Some start with metadata. Some with impact.
+- Some use tables. Some use code blocks. Some use prose.
+- Some explain. Some prove. Some repeat.
+
+**None of them talk to each other.**
+
+VISUAL_DIFF.md shows the actual change (12 lines of code)
+execution-summary.md re-describes the same 12 lines for 100+ lines
+verification-checklist.md proves it works with grep commands
+execution-report.md tells the story again
+
+**Fix:** One source of truth. Everything else points to it.
+
+---
+
+## Craft: Database export masquerading as documentation
+
+### Good details (rare):
+
+VISUAL_DIFF.md lines 78-84: comparison table
+- Clean
+- Scannable
+- Tells the story at a glance
+
+BLOCKERS.md lines 7-23: concrete problem statement
+- Error code, error message, 3 options
+- Actionable
+
+### Bad details (everywhere):
+
+execution-summary.md line 214: commit details section
+- Author, date, message, files, format, breaking change, references
+- Looks like git log vomit
+- User has git. Don't repeat git.
+
+verification-checklist.md lines 52-99: bash command theater
+```bash
+grep -n "fileURLToPath" plugins/eventdash/src/index.ts
+# Output: 1:import { fileURLToPath } from "node:url";
+```
+- I believe you
+- Don't make me watch you prove it
+
+execution-report.md lines 120-144: code metrics
+- "Comment ratio: 64%"
+- "Complexity: O(1)"
+- Pretending precision = insight
+
+**These aren't details that reward inspection. They're cargo cult metrics.**
+
+---
+
+## What Would Make It Quieter But More Powerful?
+
+### 1. One document. Three sections.
+
+**review.md:**
 ```markdown
-- [x] File exists at expected path
-  111,251 bytes, UTF-8 text
+# EventDash: Production Ready
 
-- [x] Contains valid TypeScript
-  Starts with emdash imports
+Plugin now resolves paths at runtime instead of build time.
+Works in Cloudflare Workers. 12 lines changed.
+
+## What changed
+[VISUAL_DIFF.md lines 9-72 — the actual code]
+
+## Deployment blocker
+Cloudflare account needs paid plan ($20/mo).
+Error 10195. Upgrade or deploy elsewhere.
+
+## Verification
+✅ Build passes (59s, 245 modules)
+✅ Pattern matches membership plugin
+⚠️  9 test failures (unrelated, different issue)
 ```
 
-Current version: 656 lines
-Reduced version: ~200 lines
-**Impact:** Same information. 70% less noise.
+**That's it. 15 lines. Everything else is searchable git history.**
 
----
+### 2. Kill the performance
 
-### 2. Single Status System
+Every document starts with:
+- Project slug
+- Execution date
+- Status emoji
+- Executor name
+- Separator line
 
-Unify all status indicators:
+**Nobody reads stage directions. Start with the scene.**
 
-```markdown
-✅ Complete
-⚠️ Blocked
-❌ Failed
-⏸️ Paused
+### 3. Tables over paragraphs
+
+execution-summary.md lines 64-71: requirements table — **good**
+execution-report.md lines 372-383: success metrics — **redundant**
+
+Keep tables. Cut prose commentary. Numbers speak.
+
+### 4. Inline comments > external verification
+
+verification-checklist.md proves code has comments explaining "why file paths"
+**The code itself already does this. Trust it.**
+
+Don't verify documentation exists. Make documentation un-ignorable.
+
+### 5. Stop numbering things that aren't steps
+
+BLOCKERS.md line 27: table with issue numbers, titles, priority, owner, time
+- Good
+- But don't number the surrounding sections (## 1., ## 2.)
+- Implies sequence where there is none
+
+### 6. Design for skimming
+
+**Current:** Must read 1,800 lines to know project is complete but blocked
+**Better:** Scannable hierarchy:
+```
+DONE ✅
+  Code: 12 lines, matches pattern, build passes
+
+BLOCKED ⚠️
+  Deploy: needs $20 Cloudflare upgrade
+
+IRRELEVANT ℹ️
+  Tests: 9 failures (different issue)
 ```
 
-Apply everywhere. No exceptions.
-
-Current: 3 systems competing
-Unified: 1 system, 4 states
-**Impact:** Instant recognition. No interpretation needed.
-
 ---
 
-### 3. Hierarchy Through Absence
+## Specific Line-Level Fixes
 
-**code-diff.patch:**
-Move commit metadata to bottom:
+### VISUAL_DIFF.md
+- **Line 1:** Delete "Issue #74:" — user knows context
+- **Lines 9-34:** Move to line 75
+- **Lines 76-84:** Move to line 1
+- **Line 87:** Delete "---" separator noise
 
-```diff
-diff --git a/plugins/eventdash/src/index.ts
-[... all changes ...]
-
----
-Commit: 7055563552f5dc16d9b577e13ef5f80acef0866e
-Author: Phil Jackson
-Date: Thu Apr 16 07:32:21 2026 +0000
-```
-
-Current: Metadata dominates
-Revised: Code dominates
-**Impact:** User sees changes immediately.
-
----
-
-### 4. Eliminate Redundancy
-
-**All summaries:**
-Remove "Executive Summary" headers. Title already declares it.
-
-**All checklists:**
-Remove inline command output. Results suffice.
-
-**All reports:**
-Remove word counts. Quality > quantity signals.
-
-Lines saved: ~150 across all files
-Value lost: Zero
-
----
-
-### 5. Visual Rhythm
-
-Add consistent spacing before tables:
-
-```markdown
-## Requirements Verification
-
-| Requirement | Status | Evidence |
-```
-
-Should be:
-
-```markdown
-## Requirements Verification
-
-| Requirement | Status | Evidence |
-```
-
-Small change. Massive impact on readability.
-
----
-
-## Specific Line Numbers
-
-### code-diff.patch
-- **Lines 1-34:** Move to end
-- **Lines 16-20:** Add blank lines between sections
-- **Lines 26-29:** Compress to single paragraph
-
-### verification-checklist.md
-- **Lines 1-7:** Compress to 3 lines
-- **Lines 15-41:** Remove bash commands, keep results only
-- **Lines 52-98:** Remove grep output text, show line numbers only
-- **Entire file:** Replace `✅ PASS` with `✅`
+### SUMMARY.md
+- **Line 1:** "EventDash works in production" not "Issue #74: EventDash Plugin Entrypoint Fix — Summary"
+- **Line 3:** Delete status emoji ritual
+- **Lines 7-11:** Collapse to "Needs: Cloudflare upgrade ($20/mo), market test (10 hosts)"
 
 ### execution-summary.md
-- **Line 11:** Remove "Executive Summary" header
-- **Line 64:** Add blank line before table
-- **Lines 72-103:** Align all table columns uniformly
-- **Line 356-371:** Unify checkbox system
+- **Lines 1-16:** Cut to "# EventDash Entrypoint Fix Complete"
+- **Lines 21-58:** Delete implementation details (redundant with VISUAL_DIFF.md)
+- **Lines 212-226:** Delete commit details (redundant with git log)
+- **Lines 299-373:** Cut 80%. Recommendations = bullets, not novellas.
+
+### BLOCKERS.md
+- **Line 1:** "# Production Blocker" not "Issue #74: Deployment Blockers & Follow-Up Issues"
+- **Lines 5-7:** Delete metadata header
+- **Lines 27-50:** Keep table. Delete commentary.
+
+### verification-checklist.md
+- **Entire file:** Collapse to 30 lines of assertions, not 657 lines of proof
+- **Alternative:** Delete file. Move critical checks to CI config where they belong.
 
 ### execution-report.md
-- **Line 10:** Remove "Executive Summary" header
-- **Line 240:** Remove "(7,891 words)"
-- **Line 250:** Remove "(4,238 words)"
-- **Lines 20-41:** Keep as reference — best spacing in set
+- **Lines 1-7:** Cut to "# EventDash: Complete"
+- **Lines 120-144:** Delete code metrics poetry
+- **Lines 245-277:** Delete deliverables section (meta-documentation is narcissism)
 
 ---
 
-## Summary
+## The Problem
 
-These deliverables work. But they shout when they should whisper.
+These documents optimize for **appearance of rigor** over **transfer of understanding**.
 
-**Core issue:** Every detail gets equal visual weight. Reader must filter manually.
+Every file proves the work was thorough.
+None of them make the next reader faster.
 
-**Solution:** Hierarchy through reduction. Power through absence.
+**Engineering artifacts ≠ documentation.**
 
-Current state: Comprehensive but exhausting
-Desired state: Essential and effortless
+Git diffs, build logs, test output = artifacts (machine-readable)
+Documentation = curated narrative (human-optimized)
 
-Most important change: Remove 40% of content. Say same thing.
-
-That's design.
+Currently: 7 documents, 1,800 lines, repeating the same 12-line change
+**Should be:** 1 document, 50 lines, linking to artifacts
 
 ---
 
-**Status:** ⚠️ Functional but not refined
-**Recommendation:** Ship functional. Refine template for next issue.
+## How This Should Feel
+
+User opens folder.
+Sees: **review.md**
+
+Scans first 10 lines:
+- What: path resolution fix
+- Why: Cloudflare compatibility
+- Status: code done, deploy blocked, cost $20
+
+Decides: read more or act?
+
+If read more: sections expand into tables, code diffs, verification
+If act: blocker section has error code + 3 options
+
+**Current experience:** archaeologist sifting through 7 scrolls to find the prophecy
+**Better experience:** headline, lede, details, action
+
+---
+
+## Final Assessment
+
+**Craft:** 7/10 — tables are clean, code blocks formatted correctly
+**Hierarchy:** 3/10 — most important info buried or repeated 7x
+**Whitespace:** 4/10 — dense paragraphs, cramped headers
+**Consistency:** 2/10 — different format per file, no shared logic
+**Power:** 5/10 — comprehensive but exhausting
+
+**Overall: 6/10**
+
+Works. Doesn't sing.
+Proves diligence. Doesn't teach.
+Searchable. Not scannable.
+
+**Make it quiet. Make it fast. Make it inarguable.**

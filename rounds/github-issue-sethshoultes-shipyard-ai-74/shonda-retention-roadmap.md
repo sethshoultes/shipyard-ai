@@ -1,360 +1,493 @@
-# Shonda's Retention Roadmap: EventDash v1.1
-## What Keeps Users Coming Back
-
-**Author:** Shonda Rhimes
+# Shonda's Retention Roadmap: What Keeps Users Coming Back
+**EventDash v1.1 Feature Strategy**
+**Author:** Shonda Rhimes, Board Member
 **Date:** April 16, 2026
-**Context:** Post-entrypoint fix, pre-product-market fit
 
 ---
 
-## The Current Problem
+## The Problem: Events Are Drama, But EventDash Is Flat
 
-EventDash v1.0 has working code but zero retention mechanics.
+**Current state:** EventDash is a database with forms.
+- Create event (data entry)
+- Register attendees (more data entry)
+- View list (spreadsheet)
+- Repeat
 
-**What's missing:**
-- No reason to return tomorrow
-- No emotional investment in the outcome
-- No incomplete loops that create anticipation
-- No content flywheel that drives discovery
-- No social proof or community
+**Missing:** The emotional arc that makes users addicted.
 
-**Result:** Even if we fix deployment and ship, users try once and ghost.
-
----
-
-## Retention Fundamentals
-
-### **What brings people back:**
-
-1. **Anticipation** — something coming they care about
-2. **Incompletion** — loops opened, not closed
-3. **Social stakes** — others see their participation
-4. **Variable rewards** — unexpected delights
-5. **Identity** — "I'm the person who..."
-
-### **What EventDash lacks today:**
-
-All five. It's transactional: register event → done.
+**Insight:** People don't come back for features. They come back for feelings.
 
 ---
 
-## v1.1 Feature Strategy: The Comeback Loop
+## What Keeps Users Coming Back: The Retention Psychology
 
-### **Core insight:**
-Event registration isn't the product. **Anticipation of the event** is the product.
+### 1. **Anticipation** (Before Event)
+*"I can't wait to see who's coming!"*
 
-Shift from:
-- "I registered" (done, closed loop)
+**Current:** Static registration list.
 
-To:
-- "I'm counting down to this" (open loop, daily check-ins)
+**v1.1 Hooks:**
+- **Real-time registration feed:** "Sarah just registered! 🎉" (live updates)
+- **Countdown timer:** "3 days until Sunrise Yoga Retreat" (mounting excitement)
+- **Capacity milestones:** "You're 80% full! 🔥" (progress dopamine)
+- **Social reveals:** "2 of your Instagram followers registered" (connection tease)
 
----
-
-## v1.1 Features (Ranked by Retention Impact)
-
-### **Tier 1: Must-Have (Ship First)**
-
-#### 1. **Event Countdown Dashboard**
-
-**What it is:**
-Homepage widget showing "X days until [Event Name]"
-
-**Why it matters:**
-- Creates daily check-in habit
-- Anticipation builds over time
-- Visual progress (14 days → 7 days → tomorrow!)
-- Emotionally ties user to future outcome
-
-**User story:**
-*"Sarah registers for yoga retreat. Every morning she checks her Sunrise Yoga site: '9 days until Mountain Retreat.' She feels excitement build. On day of, she's primed to show up."*
-
-**Retention hook:**
-Open loop. Countdown incomplete until event happens.
+**Why it works:** Anticipation creates daily check-in habit. Users log in to see "what's new?"
 
 ---
 
-#### 2. **Attendee Social Proof**
+### 2. **Anxiety** (Before Event)
+*"What if nobody shows up?"*
 
-**What it is:**
-Public attendee list (opt-in) with avatars/names
+**Current:** No visibility into conversion funnel.
 
-**Why it matters:**
-- FOMO: "12 people registered, I should too"
-- Social commitment: "My friends see I'm going"
-- Community preview: "I'll know these people"
-- Identity: "I'm part of this group"
+**v1.1 Hooks:**
+- **Conversion tracking:** "247 views → 18 registrations (7.3%)" (data anxiety)
+- **Benchmark comparison:** "Similar events averaged 25 registrations by now" (FOMO)
+- **Risk alerts:** "Only 3 registrations with 10 days left" (healthy pressure)
+- **Rescue prompts:** "Boost this event? $20 gets 500 targeted impressions" (agency)
 
-**User story:**
-*"Maya sees '23 yogis attending' with smiling faces. Clicks through, recognizes a friend. Registers immediately. Now her face is on the wall—public commitment made."*
-
-**Retention hook:**
-Social stakes. Backing out feels harder when others know you're in.
+**Why it works:** Anxiety drives action. But give users tools to relieve it (ads, email nudges, social shares).
 
 ---
 
-#### 3. **One-Click Share Generator**
+### 3. **Relief** (Threshold Achieved)
+*"We hit the minimum! Event is happening!"*
 
-**What it is:**
-"Share My Registration" button → pre-formatted social post
+**Current:** No celebration of wins.
 
-**Why it matters:**
-- Content flywheel: attendees recruit attendees
-- Organic distribution: social proof spreads
-- Host benefits: free marketing per registration
-- Attendees benefit: "I'm doing something cool" signal
+**v1.1 Hooks:**
+- **Milestone celebrations:** "🎊 You hit 20 registrations! Event confirmed." (confetti animation)
+- **Unlocks:** "Full house! Photo gallery feature now active" (reward)
+- **Share moments:** "Post your success: 'My retreat sold out in 4 days!'" (social proof generator)
+- **Revenue tracking:** "You've earned $680 this month 💰" (tangible validation)
 
-**Example post:**
-*"Just signed up for @SunriseYoga Mountain Retreat! 🧘‍♀️ June 10-12. Who's in? [registration link]"*
-
-**User story:**
-*"Carlos registers, hits 'Share to Instagram,' posts in seconds. Three friends see it, two register. Carlos sees '🎉 2 friends joined via your link!' notification. Feels like host, not just attendee."*
-
-**Retention hook:**
-Variable reward. Sometimes friends register, sometimes not. Uncertainty drives engagement.
+**Why it works:** Relief creates emotional peak. Users associate EventDash with winning feeling.
 
 ---
 
-### **Tier 2: High-Value (Ship Second)**
+### 4. **Pride** (Event Success)
+*"Look what I built!"*
 
-#### 4. **Pre-Event Updates Feed**
+**Current:** Event happens, then... silence.
 
-**What it is:**
-Host posts updates → attendees get notifications
+**v1.1 Hooks:**
+- **Auto-generated recap:** "Your event had 42 attendees, 93% attendance rate, 4.8⭐ avg rating"
+- **Shareable achievements:** "I just hosted my 10th sold-out event 🔥" (badge system)
+- **Attendee testimonials:** "What attendees said: 'Life-changing experience!'" (social proof)
+- **Photo gallery:** Attendees upload photos → host gets "Your event in pictures" story
+
+**Why it works:** Pride demands an audience. Make success shareable → users recruit users.
+
+---
+
+### 5. **FOMO** (Urgency)
+*"I need to act NOW or I'll miss out!"*
+
+**Current:** Events are static. No urgency.
+
+**v1.1 Hooks:**
+- **Limited seats counter:** "Only 5 spots left" (scarcity)
+- **Early bird pricing:** "Price increases in 48 hours" (deadline)
+- **Waitlist drama:** "12 people waitlisted — someone just canceled, claim their spot?"
+- **Live activity feed:** "3 people viewing this event right now 👀" (social proof + competition)
+
+**Why it works:** FOMO converts lurkers to registrants. Urgency beats procrastination.
+
+---
+
+## The Retention Loop: How Emotions Compound
+
+### Week Before Event
+**Monday:** Host creates event → feels **anticipation** (countdown starts)
+**Wednesday:** First registration → feels **relief** ("it's happening!")
+**Friday:** 5 more registrations → feels **pride** (shares on social)
+
+### Week Of Event
+**Tuesday:** 15 registrations → hits capacity threshold → **celebration animation**
+**Thursday:** Event happens → attendees upload photos → **pride content generated**
+**Saturday:** Host sees recap ("42 attendees, 4.8⭐") → **dopamine hit**
+
+### Week After Event
+**Monday:** Attendees share testimonials → **social proof accumulates**
+**Wednesday:** Host gets "Plan your next event?" prompt → **anticipation restarts**
+**Friday:** Creates next event → **loop repeats**
+
+**Key:** Every emotional peak is an opportunity to re-engage. Never let a win go silent.
+
+---
+
+## v1.1 Feature Roadmap: Retention Hooks
+
+### Tier 1: Must-Have (Launch Blockers)
+*These features are table stakes for retention. Ship or die.*
+
+#### 1.1.1 Real-Time Registration Notifications
+**What:** Live feed shows new registrations as they happen.
+
+**UX:**
+- Host dashboard: "Sarah Johnson registered 2 minutes ago 🎉"
+- Mobile push notification: "You have 3 new registrations!"
+- Email digest: "Daily recap: 7 new registrations yesterday"
+
+**Why:** Creates check-in habit. Users log in daily to see "who's new?"
+
+**Implementation:**
+- WebSocket connection or SSE (Server-Sent Events)
+- Fallback: 30-second polling for older browsers
+- Rate limit: Max 1 push notification per hour (avoid spam)
+
+---
+
+#### 1.1.2 Progress Tracking Dashboard
+**What:** Visual representation of event success metrics.
+
+**Metrics displayed:**
+- **Capacity:** "18/50 seats filled (36%)" with progress bar
+- **Revenue:** "$720 earned, $1,800 potential" with money-bar animation
+- **Conversion:** "247 views → 18 registrations (7.3%)"
+- **Trajectory:** "At this rate, you'll sell out in 8 days"
+
+**Why:** Anxiety + agency = engagement. Show the gap, then offer tools to close it.
+
+**Implementation:**
+- Recharts or Chart.js for visualizations
+- Daily snapshot stored (enables "compare to this time last event")
+- Export to PNG (shareable progress screenshots)
+
+---
+
+#### 1.1.3 Milestone Celebrations
+**What:** Automated congratulations when thresholds hit.
+
+**Triggers:**
+- First registration: "🎉 Your event has its first attendee!"
+- 50% capacity: "Halfway there! 🔥"
+- 100% capacity: "SOLD OUT! You're amazing! 🎊" (confetti animation)
+- Revenue milestones: "$500 earned! 💰"
+
+**UX:**
+- Full-screen modal with animation (can't miss it)
+- Social share button: "I just sold out my event in 3 days!"
+- Unlocks feature: "You've unlocked: Premium event page themes"
+
+**Why:** Positive reinforcement. Brain associates EventDash with winning.
+
+**Implementation:**
+- Frontend: Framer Motion for confetti animations
+- Backend: Event triggers on registration count thresholds
+- Personalization: "Faster than 73% of similar events!" (if data exists)
+
+---
+
+### Tier 2: Competitive Advantage (Differentiation)
+*Features competitors don't have. These are your moat.*
+
+#### 1.1.4 Social Proof Engine
+**What:** Attendee activity becomes marketing content.
+
+**Features:**
+- **"Who else is going?" tease:** "3 of your Instagram followers registered"
+- **Live activity feed:** "12 people viewed this event in the last hour"
+- **Attendee avatars:** Circular avatar stack (like Clubhouse room participants)
+- **Testimonial capture:** "Rate this event" prompt 24 hours after → auto-displays on next event page
+
+**Why:** Social proof converts. People register because others are registering.
+
+**Implementation:**
+- OAuth integration: "Connect Instagram to see which friends are attending"
+- Privacy toggle: "Show my attendance publicly" (opt-in)
+- Aggregate anonymized data: "37 yoga teachers attended events like this"
+
+---
+
+#### 1.1.5 Content Flywheel
+**What:** Every event generates shareable content that recruits next users.
+
+**Content types:**
+- **Event landing pages:** Auto-generated, shareable URLs (sunrise-yoga-retreat.eventdash.co)
+- **Post-event recaps:** "42 attendees, 4.8⭐ rating, see photos" (public page)
+- **Host profile pages:** "Sarah's Events" (portfolio of past events, star ratings)
+- **Attendee badges:** "I attended Sunrise Yoga Retreat 🧘‍♀️" (share to social)
+
+**Why:** Content IS the distribution. Every share is a free ad.
+
+**Implementation:**
+- SEO-optimized event pages (schema.org markup for Google Events)
+- Open Graph tags for rich social previews
+- Photo upload widget (attendees contribute content)
+- "Share your attendance" button (one-click social post)
+
+---
+
+#### 1.1.6 Email Cliffhangers
+**What:** Every email ends with curiosity driver.
 
 **Examples:**
-- "What to bring: yoga mat, water bottle, sunscreen ☀️"
-- "Meet your instructors: [video]"
-- "Weather looks perfect! 🌤️"
-- "Only 3 spots left!"
+- After registration: "3 people you know are attending. See who? [View attendee list]"
+- Before event: "Host is planning a surprise for attendees 👀"
+- After event: "See what happened at Sunrise Yoga Retreat [Unlock photo gallery]"
 
-**Why it matters:**
-- Re-engages between registration and event
-- Builds anticipation through drip content
-- Creates host→attendee communication channel
-- Prevents "registered and forgot"
+**Why:** Cliffhangers drive click-through. Users can't resist unresolved tension.
 
-**User story:**
-*"Sarah registered 2 months ago. Week before event, gets notification: 'Packing list for Mountain Retreat.' Opens site, reads updates, gets excited again. Brings correct gear. Better experience."*
-
-**Retention hook:**
-Serialized content. Each update is cliffhanger for next.
+**Implementation:**
+- Email templates with A/B tested subject lines
+- Personalization: "{{ attendee_name }}, your event is tomorrow!"
+- Triggered sequences: Day-of reminder, post-event thank you, next-event prompt
 
 ---
 
-#### 5. **Post-Event Memory Wall**
+### Tier 3: Retention Multipliers (Advanced)
+*Once users are hooked, these keep them forever.*
 
-**What it is:**
-After event ends: photo upload, testimonials, "We were there" badge
+#### 1.1.7 Streak & Gamification
+**What:** Reward consistent hosting behavior.
 
-**Why it matters:**
-- Completes narrative arc (before → during → after)
-- User-generated content for next event marketing
-- Identity reinforcement: "I'm someone who does retreats"
-- Social proof for skeptics
+**Features:**
+- **Hosting streak:** "5 months in a row with events! 🔥"
+- **Badges:** "Early Bird" (first 100 users), "Sold-Out Streak" (3 consecutive full events)
+- **Leaderboard:** "Top hosts this month" (opt-in, public)
+- **Levels:** Bronze → Silver → Gold host (unlocks features like custom domains)
 
-**User story:**
-*"Event ends Sunday. Monday, Sarah gets prompt: 'Share your favorite moment from Mountain Retreat.' Uploads sunset yoga photo. Site displays it publicly. Next month, new visitor sees photos, reads testimonials, registers for next retreat."*
+**Why:** Streaks create loss aversion. Users don't want to break chain.
 
-**Retention hook:**
-Closed loop becomes open loop. "That was amazing" becomes "When's the next one?"
-
----
-
-#### 6. **Waitlist + Notification Engine**
-
-**What it is:**
-Event sells out → "Join Waitlist" → notify if spot opens OR when next event announced
-
-**Why it matters:**
-- Captures demand when can't fulfill
-- FOMO amplifier: "Sold out" = desirable
-- Re-engagement trigger: email when action possible
-- Data: see demand before scheduling next event
-
-**User story:**
-*"Retreat sells out. Maya joins waitlist. Gets email: 'Someone canceled—spot available for 24 hours!' Registers immediately. OR: 'Next retreat announced—early access for waitlist.' Books before public launch."*
-
-**Retention hook:**
-Scarcity + exclusive access. Waitlist members feel VIP.
+**Implementation:**
+- Badge system with visual icons
+- Monthly email: "Your hosting stats for March"
+- Public profiles: "Gold host since January 2026"
 
 ---
 
-### **Tier 3: Nice-to-Have (Future Iterations)**
+#### 1.1.8 Predictive Prompts
+**What:** AI suggests next action based on pattern recognition.
 
-#### 7. **Recurring Event Subscription**
+**Examples:**
+- "You usually host events on Saturdays. Create your next one?"
+- "Similar events charge $50. You're charging $30. Increase price?"
+- "Events with photos get 2x more registrations. Add photos?"
 
-**What it is:**
-"Auto-register me for all monthly yoga sessions"
+**Why:** Removes decision fatigue. Platform becomes proactive partner.
 
-**Why it matters:**
-- Reduces friction: decide once, attend forever
-- Predictable revenue for host
-- Habit formation: "First Sunday is yoga"
-- Retention ceiling: subscription = commitment
-
-**User story:**
-*"Sarah offers monthly full moon yoga. Carlos subscribes: $30/month, auto-registered. Calendar blocks first Sunday automatically. Misses one, no problem—already paid, keeps subscription."*
-
-**Retention hook:**
-Sunk cost. Canceling subscription feels like loss.
+**Implementation:**
+- Basic: Rule-based triggers (if event ended + 7 days → prompt next event)
+- Advanced: ML model predicts churn risk → intervention (if no event in 60 days → "We miss you" email)
 
 ---
 
-#### 8. **Friend Invite Credits**
+#### 1.1.9 Community Features
+**What:** Connect hosts to each other.
 
-**What it is:**
-"Bring a friend free" or "Refer 3, get next event free"
+**Features:**
+- **Host directory:** "Find yoga teachers near you hosting events"
+- **Co-hosting:** "Invite another host to collaborate on event"
+- **Host forum:** "Share tips: How I sold out my first retreat"
+- **Mentorship:** "New hosts matched with experienced hosts"
 
-**Why it matters:**
-- Incentivizes attendee recruitment
-- Lowers acquisition cost (attendees do marketing)
-- Network effects: friends bring friends
-- Social experience > solo experience
+**Why:** Community creates switching costs. Users stay for people, not features.
 
-**User story:**
-*"Maya refers 3 friends to Summer Solstice Yoga. All register. Maya gets free entry to next event. Brings different friend group. Now two social circles overlap—community grows."*
-
-**Retention hook:**
-Economic + social. Free stuff + reputation as connector.
-
----
-
-#### 9. **Host Dashboard: Engagement Score**
-
-**What it is:**
-Host sees: "Your attendees are 73% engaged (12/16 viewed updates, 8 shared registration)"
-
-**Why it matters:**
-- Feedback loop: host sees what drives engagement
-- Gamification for hosts: "How engaged is my community?"
-- Data-driven: which updates work? Which events retain?
-- Host retention: engaged hosts create better events
-
-**User story:**
-*"Sarah sees: 'Your retreat has 85% engagement vs. 60% average.' Feels pride. Sees: 'Update about packing list was most-viewed.' Uses that insight for next event."*
-
-**Retention hook:**
-For hosts, not attendees. Keeps hosts using platform.
+**Implementation:**
+- Forum: Discourse integration or custom-built
+- Matching algorithm: Location + event type + experience level
+- Moderation: Automated spam detection, human review for flags
 
 ---
 
-## v1.1 Roadmap: Ship Order
+## User Journey: Before vs. After v1.1
 
-### **Sprint 1: The Comeback Loop (Weeks 1-2)**
-1. Event Countdown Dashboard
-2. Attendee Social Proof
-3. One-Click Share Generator
+### Current v1.0 Experience (Flat Line)
 
-**Goal:** Users have reason to return daily + spread event organically.
+**Day 1:** Host creates event → sees blank registration list → closes tab
+**Day 7:** Manually checks EventDash → 2 registrations → "hmm, okay" → closes tab
+**Day 14:** Event happens → host doesn't log back in (nothing to see)
+**Day 30:** Forgets EventDash exists → churn
 
-### **Sprint 2: The Engagement Layer (Weeks 3-4)**
-4. Pre-Event Updates Feed
-5. Post-Event Memory Wall
-6. Waitlist + Notification Engine
-
-**Goal:** Fill time between registration and event with touchpoints.
-
-### **Sprint 3: The Retention Ceiling (Weeks 5-6)**
-7. Recurring Event Subscription
-8. Friend Invite Credits
-9. Host Dashboard: Engagement Score
-
-**Goal:** Convert one-time attendees into repeat customers.
+**Retention rate:** ~20% (industry standard for tools without hooks)
 
 ---
 
-## Success Metrics
+### v1.1 Experience (Emotional Roller Coaster)
 
-### **v1.0 (current):**
-- Sign-ups per event: [unknown]
-- Return visits: 0 (no reason to return)
-- Social shares: 0 (no share mechanism)
-- Days between registration and event: [unknown]
+**Day 1:** Host creates event → countdown starts (⏰ "14 days until event!") → feels **anticipation**
 
-### **v1.1 (target):**
-- **Daily active users:** 40% of registered attendees check countdown
-- **Social amplification:** 30% of attendees share registration
-- **Pre-event engagement:** 60% view at least one update
-- **Post-event contribution:** 20% upload photo or testimonial
-- **Repeat attendance:** 25% register for second event within 90 days
+**Day 3:** First registration → push notification 🎉 → logs in → sees "1/50 seats filled" progress bar → shares to Instagram → feels **pride**
 
----
+**Day 5:** Email: "You're trending! 3 people viewed your event today 👀" → logs in to check analytics → feels **curiosity**
 
-## The Narrative Arc v1.1 Unlocks
+**Day 7:** Hits 10 registrations → milestone celebration modal (confetti 🎊) → unlocks "custom event themes" → feels **achievement**
 
-### **Before (v1.0):**
-1. User discovers event
-2. User registers
-3. *(14-day void)*
-4. User hopefully remembers to attend
+**Day 9:** Email: "Only 5 days left! You're at 45% capacity" → anxiety → clicks "Boost event" → buys $20 ad → feels **agency**
 
-**No story. No retention.**
+**Day 12:** Hits 25 registrations (50% capacity) → celebration → email: "You're on track to sell out!" → feels **relief**
 
-### **After (v1.1):**
+**Day 14:** Event happens → 23 attendees show up (93% attendance)
 
-**Act 1: Discovery → Commitment**
-1. User sees event, reads testimonials (social proof)
-2. Sees attendee faces, recognizes friend (FOMO)
-3. Registers, shares on Instagram (social stakes)
+**Day 15:** Email: "See your event recap" → clicks → sees "4.8⭐ avg rating, 23 attendees, $920 revenue" + photo gallery → feels **pride** → shares recap to social media
 
-**Act 2: Anticipation → Engagement**
-4. Sees countdown daily (open loop)
-5. Gets pre-event updates (serialized content)
-6. Invites friend, gets credit (variable reward)
+**Day 16:** Prompt: "Your attendees loved it! Plan your next event?" → creates next event → **loop restarts**
 
-**Act 3: Experience → Identity**
-7. Attends event (payoff)
-8. Uploads photo to memory wall (contribution)
-9. Gets "Next event announced!" email (new loop opens)
-
-**Complete narrative. Retention baked in.**
+**Retention rate target:** 60%+ (hooks + emotions + content flywheel)
 
 ---
 
-## Why This Matters
+## Metrics That Matter: How We'll Know It's Working
 
-**v1.0 answered:** "Can we register people for events?"
-**v1.1 answers:** "Can we make people care about coming back?"
+### Activation (Did user feel first magic moment?)
+- **First registration time:** Median < 48 hours (event creates momentum)
+- **Return visit rate:** 70%+ of hosts log in within 7 days of creating event
 
-One is infrastructure. One is a product.
+### Engagement (Is user coming back?)
+- **Daily Active Hosts (DAH):** Hosts who log in daily during event countdown period
+- **Check-in frequency:** Average logins per host during event lifecycle (target: 8+)
+- **Feature adoption:** % of hosts who use notifications, progress tracking, milestones
 
-EventDash isn't event registration software.
-**EventDash is anticipation software that happens to use events.**
+### Retention (Does user stick around?)
+- **Event-to-event return rate:** % of hosts who create 2nd event within 60 days (target: 50%+)
+- **Monthly Active Hosts (MAH):** Hosts who create ≥1 event per month
+- **Churn rate:** % of hosts who don't create event in 90 days (target: <30%)
 
-The countdown, the community, the content, the identity—that's the product.
+### Virality (Does user recruit others?)
+- **Social shares per event:** Average shares of event pages, recaps, badges (target: 3+)
+- **Referral rate:** % of new users who came from existing user's shared content (target: 30%+)
+- **Organic traffic:** % of event page visitors from social vs. direct/paid (target: 50%+ social)
 
-Registration is just the entry point.
-
----
-
-## Final Thought
-
-> "You want to know what makes a show people binge?
-> It's not plot. It's not budget. It's not stars.
-> It's: **What question am I desperate to see answered next?**
->
-> v1.0 has no questions.
-> v1.1 is full of them:
-> - Who else is going?
-> - How many days left?
-> - Did my friend register?
-> - What's the packing list?
-> - When's the next one?
->
-> Build products that leave people curious.
-> They'll come back to find out."
-
-— Shonda Rhimes, April 16, 2026
+### Monetization (Will user pay?)
+- **Willingness to pay:** % of users who upgrade to paid tier after free trial
+- **Revenue per host:** Average monthly revenue generated through events (proves value)
+- **Feature-gated conversions:** % who upgrade to unlock premium features (custom domains, advanced analytics)
 
 ---
 
-**Next Steps:**
+## Implementation Priorities: What to Ship First
 
-1. Validate assumptions: Interview 5 event hosts about what attendees ask
-2. Wireframe countdown + social proof UI
-3. Ship Tier 1 features in 2-week sprint
-4. Measure: daily return rate before vs. after
-5. Iterate based on engagement data
+### Sprint 1 (Week 1-2): Foundation Hooks
+**Goal:** Get users to return within 7 days
 
-Let's make people excited to come back.
+**Ship:**
+1. Real-time registration notifications (push + email)
+2. Progress tracking dashboard (capacity, revenue, conversion)
+3. Milestone celebrations (first registration, 50%, 100%)
+
+**Success metric:** 70%+ of hosts log in within 7 days of creating event
+
+---
+
+### Sprint 2 (Week 3-4): Social Proof
+**Goal:** Turn attendees into marketers
+
+**Ship:**
+1. Shareable event landing pages (SEO + Open Graph)
+2. "Who else is going?" social reveals
+3. Post-event recap generator (auto-creates shareable content)
+
+**Success metric:** 3+ social shares per event (on average)
+
+---
+
+### Sprint 3 (Week 5-6): Email Cliffhangers
+**Goal:** Re-engage users who go silent
+
+**Ship:**
+1. Triggered email sequences (registration, reminder, recap, next-event prompt)
+2. Curiosity-driven subject lines A/B testing
+3. Personalized prompts ("You usually host on Saturdays...")
+
+**Success metric:** 40%+ email open rate, 15%+ click-through rate
+
+---
+
+### Sprint 4 (Week 7-8): Retention Multipliers
+**Goal:** Lock in long-term users
+
+**Ship:**
+1. Streak tracking ("5 months in a row!")
+2. Badge system (Early Bird, Sold-Out Streak, Gold Host)
+3. Predictive prompts ("Create your next event?")
+
+**Success metric:** 50%+ of hosts create 2nd event within 60 days
+
+---
+
+## Business Model Integration: How Retention Drives Revenue
+
+### Free Tier (Hook)
+**What's included:**
+- Unlimited events
+- Up to 50 registrations per event
+- Basic email notifications
+- Standard event landing pages
+
+**Goal:** Get users addicted to dopamine hits (milestone celebrations, social proof).
+
+**Why free?** Prove value before asking for money. Users need to feel "I can't live without this."
+
+---
+
+### Pro Tier ($50/month) (Monetization)
+**What's unlocked:**
+- Unlimited registrations (no cap)
+- Custom branding (remove EventDash logo, add yours)
+- Advanced analytics (conversion funnel, attendee demographics)
+- Priority email placement (your events featured in discovery feed)
+- Streak badges (visible flex for premium users)
+
+**Trigger:** Upgrade prompt when free tier hits limit ("You have 51 registrations! Upgrade to continue.")
+
+**Why it converts:** Loss aversion (users don't want to turn away registrants).
+
+---
+
+### Premium Tier ($150/month) (Whales)
+**What's unlocked:**
+- Everything in Pro
+- Custom domain (your-brand.com instead of eventdash.co)
+- White-label option (fully rebrand as your platform)
+- API access (integrate with your CRM, marketing tools)
+- Dedicated account manager (concierge support)
+
+**Target:** Established studios/venues hosting 10+ events/month.
+
+**Why it converts:** Status + control (brand matters to serious businesses).
+
+---
+
+## The North Star: What Success Looks Like
+
+**6 months from now (October 2026):**
+- **300 active hosts** creating events monthly
+- **60% retention rate** (hosts create 2nd event within 60 days)
+- **$15k MRR** (50 Pro, 10 Premium subscribers)
+- **3,000 events hosted** (proof of platform utility)
+- **12k social shares** (viral growth engine working)
+
+**User testimonial we're chasing:**
+> "I used to dread event planning. Now I'm addicted to watching registrations roll in. EventDash makes me feel like a rockstar event host."
+> — Sarah, Sunrise Yoga Studio
+
+**That's retention.** Not features. **Feelings.**
+
+---
+
+## Final Word: Events Are Stories
+
+Every event is a story:
+- **Setup:** Host creates event (anticipation)
+- **Conflict:** Will anyone register? (anxiety)
+- **Climax:** Registration threshold hit! (relief)
+- **Resolution:** Event happens, attendees rave (pride)
+- **Sequel hook:** "Plan your next event?" (loop restarts)
+
+**EventDash v1.1 mission:** Make every event feel like a season finale that demands a sequel.
+
+**Build that, and users will never leave.**
+
+---
+
+**Roadmap owner:** Shonda Rhimes
+**Collaboration:** Product, Engineering, Marketing
+**Review cadence:** Bi-weekly sprint demos (must show emotion, not just features)
+**Success definition:** Users who can't stop talking about how EventDash makes them *feel*
+
+---
+
+*"You're not building event software. You're building the emotional engine that makes hosts fall in love with hosting."*
+**— Shonda Rhimes, April 16, 2026**

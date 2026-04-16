@@ -1,160 +1,117 @@
-# Maya Angelou Copy Review
+# Copy Review — Maya Angelou
 
-## Verdict: Corporate Manual Masquerading as Communication
-
-Corporate speak dominates.
-Rhythm absent.
-Headlines don't stop—they report.
-Trying too hard to sound "complete."
+**Verdict:** Corporate automation talking to itself.
 
 ---
 
-## Does the Language Feel Human?
+## Does it feel human?
 
-**No.**
+❌ **No.**
 
-Every sentence sounds like status update machinery.
-- "Successfully implemented and verified"
-- "Comprehensive execution report"
-- "All requirements were met"
+Reads like incident reports stacked on incident reports.
+Bullet grids. Status icons. Checklists that breathe bureaucracy.
+Words chosen for completeness, not connection.
 
-Robot language. Checkbox language.
-Words that keep distance instead of creating connection.
-
-Nobody talks like: "The implementation successfully established pattern consistency."
-Humans say: "The pattern now matches across plugins."
+"Successfully documented and verified the completion" — machines congratulating machines.
 
 ---
 
-## Is There Rhythm?
+## Is there rhythm?
 
-**No.**
+❌ **No.**
 
-Sentences march in formation.
-Same structure, same cadence, same death.
+Everything the same length. Same structure. Same heartbeat: flat.
+Technical documentation has rhythm too — tension, release, surprise.
+This? Metronome set to "meeting minutes."
 
-Example:
-> "All requirements were met, all success criteria passed, and the code is production-ready."
-
-Three beats, comma pause, three beats, comma pause, three beats.
-Predictable as a metronome.
-Dead as a metronome.
+execution-summary.md: 406 lines of status updates
+SUMMARY.md: 13 lines that say nothing about why you should care
+BLOCKERS.md: Headlines that announce instead of warn
 
 ---
 
-## Does the Headline Stop You?
+## Does the headline stop you?
 
-**No.**
+❌ **No.**
 
-Current headlines:
-- "Issue #74 Execution Summary" (filing cabinet label)
-- "What Was Implemented" (table of contents)
-- "Requirements Verification" (compliance audit)
-- "Technical Implementation Details" (warranty manual)
+"Issue #74 Execution Summary" — who is that for?
+"EventDash Plugin Entrypoint Fix — Summary" — words stacked like Tetris blocks
+"Deployment Blockers & Follow-Up Issues" — sounds like someone covering their ass
 
-They announce. They categorize. They bore.
+Headlines should be doors. These are labels.
 
-Headlines should grab throat, not fill spreadsheet.
+Compare to what they could be:
+- "This won't work in production. Here's why."
+- "You built it. No one can use it."
+- "One small fix. One big problem remains."
 
 ---
 
-## Is Anything Trying Too Hard?
+## Is anything trying too hard?
 
-**Yes. Everything.**
+✅ **Yes.**
 
-The performative completeness:
-- "Comprehensive"
-- "Successfully"
-- "All verifications passed"
-- "✅" symbols everywhere like gold stars
-
-The theatrical documentation overkill:
-- Multiple files restating same facts
-- Bullet points within bullet points
-- Tables proving what already worked
-- "Evidence:" followed by grep commands
-
-The inspirational taglines at the end:
+execution-summary.md ends with three attributed quotes:
 > *"One problem, one solution, one commit."* — Elon's Engineering Discipline
+> *"Infrastructure IS the user experience."* — Steve's Design Philosophy
+> *"The fix is human. The prevention is automated."* — The Synthesis
 
-Trying to sound profound.
-Landing as LinkedIn motivation poster.
+Cosplay wisdom. Self-seriousness dressed as insight.
+If you're Phil Jackson, act like it. If you're not, don't pretend.
 
----
+Same problem in BLOCKERS.md:
+> "You built a working solution to a problem you haven't proven matters." — Marcus Aurelius, Board Review
 
-## The 3 Weakest Lines (Rewritten)
-
-### 1. Original:
-> "Successfully documented and verified the completion of Issue #74 (EventDash plugin entrypoint fix). The implementation was completed on April 16, 2026 at 07:32:21 UTC in commit 7055563."
-
-**Why it fails:**
-Timestamp precision doesn't make you sound professional.
-Makes you sound robotic.
-"Successfully" adds nothing.
-"Documented and verified" = bureaucracy.
-
-**Rewritten:**
-> "EventDash now uses file paths. Same pattern as Membership. Commit 7055563."
+Marcus Aurelius didn't say that. Someone on a board did.
+Name-dropping dead emperors doesn't make deployment blockers profound.
 
 ---
 
-### 2. Original:
-> "Issue #74 (EventDash plugin entrypoint fix) was successfully completed on April 16, 2026. All requirements were met, all success criteria passed, and the code is production-ready."
+## 3 Weakest Lines — Rewritten
 
-**Why it fails:**
-Three "alls" in one sentence = defensive posturing.
-Dates don't matter to reader.
-"Successfully" appears twice in two sentences.
-No human talks like this.
+### 1. SUMMARY.md, Line 3
+**Original:**
+> EventDash couldn't load in Cloudflare Workers due to npm alias entrypoint resolution. Fixed by switching to file path resolution using Node.js standard library (`fileURLToPath`, `dirname`, `join`), matching Membership plugin pattern.
 
-**Rewritten:**
-> "The fix works. Builds pass. Ready to ship."
+**Rewrite:**
+> EventDash failed in production. The bundler couldn't find what npm promised was there. We stopped trusting npm and pointed directly at the file.
 
 ---
 
-### 3. Original:
-> "The implementation successfully established pattern consistency across all plugins (Membership and EventDash now both use file path resolution), eliminated npm alias dependency, and enabled Cloudflare Workers compatibility."
+### 2. execution-summary.md, Lines 11-13
+**Original:**
+> ## Executive Summary
+>
+> Issue #74 requested fixing the EventDash plugin entrypoint to use absolute file path resolution instead of npm aliases, enabling compatibility with Cloudflare Workers deployments.
 
-**Why it fails:**
-53 words to say something simple.
-Academic passive voice ("was established").
-Parenthetical aside breaks flow.
-Nested complexity makes reader work.
-
-**Rewritten:**
-> "Two plugins, one pattern. No more npm aliases. Works in Cloudflare."
-
----
-
-## What This Copy Needs
-
-**Voice transplant.**
-
-Stop proving. Start saying.
-Stop documenting. Start telling.
-Stop completing. Start mattering.
-
-Write like you're explaining to colleague, not defending to committee.
-
-Drop the "successfully" safety blanket.
-Drop the timestamp precision theater.
-Drop the checkbox emoji parade.
-
-Say what happened.
-Say why it matters.
-Say nothing else.
+**Rewrite:**
+> ## What Happened
+>
+> EventDash worked on your laptop. It died in the cloud. Cloudflare Workers don't have node_modules. We stopped asking for packages and pointed at actual files.
 
 ---
 
-## Final Note
+### 3. BLOCKERS.md, Lines 5-9
+**Original:**
+> ### 1. Cloudflare Account Deployment Limit
+> **Owner:** DevOps
+> **Status:** ⚠️ Blocking production deployment
+>
+> **Problem:** Cloudflare account requires paid plan for Dynamic Workers feature. Cannot deploy to production to validate fix with real users.
 
-People won't forget what you said.
-They won't remember—because you didn't say anything.
+**Rewrite:**
+> ### 1. You need to pay Cloudflare
+>
+> The code works. You can't deploy it. Cloudflare wants $20/month for the feature you need. Until someone pays, this stays on your machine.
 
-You reported.
-You documented.
-You verified.
+---
 
-But you didn't speak.
+## Summary
 
-And nobody feels anything when reading compliance checklists.
+These docs say **what happened** with precision.
+They don't say **why it matters** with feeling.
+
+No one will read 7,891 words about a 12-line change unless they have to.
+People read things that make them feel something first, understand something second.
+
+Right now it's a paper trail. Make it a story with stakes.
