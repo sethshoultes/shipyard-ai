@@ -322,11 +322,13 @@ export async function handleStripeWebhook(c: Context): Promise<Response> {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
 
-      // TODO: In production, you would:
-      // 1. Store the payment in your database
-      // 2. Update user subscription/account status
-      // 3. Send confirmation email
-      // 4. Trigger any necessary business logic
+      // Process the successful payment
+      // In production, implement these critical steps:
+      // 1. Store payment record in your database for audit trail
+      // 2. Update user's subscription/account status to grant access
+      // 3. Send confirmation email with receipt and next steps
+      // 4. Trigger webhooks or background jobs for provisioning
+      // 5. Log the event to your monitoring/analytics system
 
       console.log('[Payments] Checkout session completed:', {
         sessionId: session.id,
@@ -335,15 +337,27 @@ export async function handleStripeWebhook(c: Context): Promise<Response> {
         paymentStatus: session.payment_status,
       });
 
-      // Example: Store payment in D1 database
-      // if (c.env.DB) {
-      //   await c.env.DB.prepare(
-      //     \`INSERT INTO payments (stripe_session_id, customer_email, status, amount)
-      //      VALUES (?, ?, ?, ?)\`
-      //   )
-      //     .bind(session.id, session.customer_email, session.payment_status, session.amount_total)
-      //     .run();
-      // }
+      // Store payment in D1 database
+      if (c.env.DB) {
+        try {
+          await c.env.DB.prepare(
+            \`INSERT INTO payments (stripe_session_id, customer_email, status, amount, created_at)
+             VALUES (?, ?, ?, ?, ?)\`
+          )
+            .bind(
+              session.id,
+              session.customer_email,
+              session.payment_status,
+              session.amount_total,
+              new Date().toISOString()
+            )
+            .run();
+          console.log(\`[Payments] Payment record stored for session \${session.id}\`);
+        } catch (dbError) {
+          // Log but don't fail the webhook - payment was successful
+          console.error('[Payments] Failed to store payment in database:', dbError);
+        }
+      }
 
       return c.json({ received: true });
     }

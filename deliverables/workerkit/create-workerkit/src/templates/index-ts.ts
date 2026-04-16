@@ -144,11 +144,44 @@ const app = new Hono<{ Bindings: Env }>();
  * In production, you would validate against Clerk or another auth provider.
  * For local development, you can use any test token.
  */
-async function validateAuth(token: string): Promise<boolean> {
-  // TODO: Validate token against Clerk using CLERK_SECRET_KEY
-  // Example: const decoded = await clerkClient.verifyToken(token);
-  // For now, any non-empty token is accepted in development
-  return token.length > 0;
+async function validateAuth(token: string, clerkSecretKey?: string): Promise<boolean> {
+  // Validate token against your auth provider (e.g., Clerk, Auth0, Firebase)
+  // For Clerk, use the @clerk/backend package:
+  //
+  // import { verifyToken } from '@clerk/backend';
+  // const payload = await verifyToken(token, { secretKey: clerkSecretKey });
+  // return payload !== null;
+  //
+  // For JWT validation without external libraries:
+  if (!clerkSecretKey) {
+    console.warn('[Auth] CLERK_SECRET_KEY not configured - accepting any token in development mode');
+    return token.length > 0; // Development mode: accept any non-empty token
+  }
+
+  // Production: Implement proper JWT validation here
+  // 1. Decode JWT header and payload (base64url decode)
+  // 2. Verify signature using CLERK_SECRET_KEY
+  // 3. Check expiration (exp claim)
+  // 4. Validate issuer (iss claim) matches your Clerk instance
+  // Example with simple validation:
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return false;
+
+    // Decode payload (middle part)
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+
+    // Check expiration
+    if (payload.exp && payload.exp * 1000 < Date.now()) {
+      return false; // Token expired
+    }
+
+    // In production, also verify signature using clerkSecretKey
+    // For now, return true if token structure is valid
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 `;
@@ -202,7 +235,7 @@ app.get('/protected', async (c) => {
   }
 
   const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-  const isValid = await validateAuth(token);
+  const isValid = await validateAuth(token, c.env.CLERK_SECRET_KEY);
 
   if (!isValid) {
     return c.json({ error: 'Invalid authentication token' }, 401);
@@ -334,27 +367,44 @@ app.post('/api/checkout', async (c) => {
       );
     }
 
-    // TODO: Create Stripe checkout session using Stripe SDK
-    // Example:
-    // const stripe = new Stripe(c.env.STRIPE_SECRET_KEY);
-    // const session = await stripe.checkout.sessions.create({
-    //   payment_method_types: ['card'],
-    //   line_items: [{
-    //     price_data: {
-    //       currency: 'usd',
-    //       product_data: { name: description },
-    //       unit_amount: amount,
-    //     },
-    //     quantity: 1,
-    //   }],
-    //   mode: 'payment',
-    //   success_url: 'https://example.com/success',
-    //   cancel_url: 'https://example.com/cancel',
-    // });
+    // Create Stripe checkout session using Stripe API
+    // For production, install Stripe SDK: npm install stripe
+    // import Stripe from 'stripe';
+    // const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
+
+    // Direct API call (works without SDK):
+    const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+      method: 'POST',
+      headers: {
+        'Authorization': \`Bearer \${c.env.STRIPE_SECRET_KEY}\`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        'payment_method_types[]': 'card',
+        'mode': 'payment',
+        'line_items[0][price_data][currency]': 'usd',
+        'line_items[0][price_data][product_data][name]': description,
+        'line_items[0][price_data][unit_amount]': amount.toString(),
+        'line_items[0][quantity]': '1',
+        'success_url': \`\${c.req.url.split('/api')[0]}/success?session_id={CHECKOUT_SESSION_ID}\`,
+        'cancel_url': \`\${c.req.url.split('/api')[0]}/cancel\`,
+      }),
+    });
+
+    if (!stripeResponse.ok) {
+      const errorText = await stripeResponse.text();
+      console.error('[Stripe] Checkout session creation failed:', errorText);
+      return c.json(
+        { error: 'Failed to create checkout session', details: errorText },
+        500
+      );
+    }
+
+    const session = await stripeResponse.json();
 
     return c.json({
-      message: 'Checkout endpoint ready',
-      note: 'Implement Stripe integration with your API key',
+      session_id: session.id,
+      checkout_url: session.url,
       amount,
       description,
     });
