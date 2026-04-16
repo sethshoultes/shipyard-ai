@@ -8,7 +8,13 @@ interface Event {
   createdAt: string;
 }
 
-/** Safely parse an event value that may be double-serialized (old data) or an object (new data). */
+/**
+ * Safely parse an event value that may be double-serialized (old data) or an object (new data).
+ * This function handles legacy data that was stored with JSON.stringify wrapping.
+ *
+ * @param value - The value retrieved from KV storage (may be string or object)
+ * @returns Parsed Event object or null if invalid
+ */
 function parseEvent(value: unknown): Event | null {
   if (!value) return null;
   let obj: any = value;

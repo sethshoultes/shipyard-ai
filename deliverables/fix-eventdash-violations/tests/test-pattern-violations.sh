@@ -12,7 +12,7 @@ echo ""
 
 # Test 1: All patterns combined (must be 0)
 echo "[1/6] Testing all patterns combined..."
-COUNT=$(grep -c "throw new Response\|rc\.user\|rc\.pathParams\|JSON\.stringify.*kv\|kv\.set.*JSON\.stringify" "$SANDBOX_ENTRY" || echo "0")
+COUNT=$(grep -E "throw new Response|rc\.user|rc\.pathParams|JSON\.stringify.*kv|kv\.set.*JSON\.stringify" "$SANDBOX_ENTRY" | wc -l)
 if [ "$COUNT" -eq 0 ]; then
   echo "✓ PASS: All patterns combined = 0 violations"
 else
@@ -23,7 +23,7 @@ echo ""
 
 # Test 2: throw new Response (must be 0)
 echo "[2/6] Testing 'throw new Response' pattern..."
-COUNT=$(grep -c "throw new Response" "$SANDBOX_ENTRY" || echo "0")
+COUNT=$(grep "throw new Response" "$SANDBOX_ENTRY" | wc -l)
 if [ "$COUNT" -eq 0 ]; then
   echo "✓ PASS: throw new Response = 0"
 else
@@ -35,7 +35,7 @@ echo ""
 
 # Test 3: rc.user (must be 0)
 echo "[3/6] Testing 'rc.user' pattern..."
-COUNT=$(grep -c "rc\.user" "$SANDBOX_ENTRY" || echo "0")
+COUNT=$(grep "rc\.user" "$SANDBOX_ENTRY" | wc -l)
 if [ "$COUNT" -eq 0 ]; then
   echo "✓ PASS: rc.user = 0"
 else
@@ -47,7 +47,7 @@ echo ""
 
 # Test 4: rc.pathParams (must be 0)
 echo "[4/6] Testing 'rc.pathParams' pattern..."
-COUNT=$(grep -c "rc\.pathParams" "$SANDBOX_ENTRY" || echo "0")
+COUNT=$(grep "rc\.pathParams" "$SANDBOX_ENTRY" | wc -l)
 if [ "$COUNT" -eq 0 ]; then
   echo "✓ PASS: rc.pathParams = 0"
 else
@@ -59,19 +59,19 @@ echo ""
 
 # Test 5: JSON.stringify with kv (must be 0)
 echo "[5/6] Testing 'JSON.stringify.*kv' pattern..."
-COUNT=$(grep -c "JSON\.stringify.*kv\|kv\.set.*JSON\.stringify" "$SANDBOX_ENTRY" || echo "0")
+COUNT=$(grep -E "JSON\.stringify.*kv|kv\.set.*JSON\.stringify" "$SANDBOX_ENTRY" | wc -l)
 if [ "$COUNT" -eq 0 ]; then
   echo "✓ PASS: JSON.stringify with kv = 0"
 else
   echo "✗ FAIL: JSON.stringify with kv = $COUNT (expected 0)"
-  grep -n "JSON\.stringify.*kv\|kv\.set.*JSON\.stringify" "$SANDBOX_ENTRY" || true
+  grep -n -E "JSON\.stringify.*kv|kv\.set.*JSON\.stringify" "$SANDBOX_ENTRY" || true
   FAILED=1
 fi
 echo ""
 
 # Test 6: JSON.parse (0 or 1 in parseEvent is acceptable)
 echo "[6/6] Testing 'JSON.parse' pattern (0-1 acceptable in parseEvent helper)..."
-COUNT=$(grep -c "JSON\.parse" "$SANDBOX_ENTRY" || echo "0")
+COUNT=$(grep "JSON\.parse" "$SANDBOX_ENTRY" | wc -l)
 if [ "$COUNT" -le 1 ]; then
   echo "✓ PASS: JSON.parse = $COUNT (0-1 acceptable for legacy data)"
   if [ "$COUNT" -eq 1 ]; then

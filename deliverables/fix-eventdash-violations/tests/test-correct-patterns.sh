@@ -26,7 +26,7 @@ echo "[2/5] Testing KV.set pattern..."
 if grep -q 'kv\.set' "$SANDBOX_ENTRY"; then
   echo "✓ Found kv.set calls"
   # Verify they don't use JSON.stringify (already tested in violations, but double-check)
-  COUNT=$(grep -c 'kv\.set.*JSON\.stringify' "$SANDBOX_ENTRY" || echo "0")
+  COUNT=$(grep 'kv\.set.*JSON\.stringify' "$SANDBOX_ENTRY" | wc -l)
   if [ "$COUNT" -eq 0 ]; then
     echo "✓ PASS: kv.set uses direct object storage (no JSON.stringify)"
     EXAMPLE=$(grep -m1 'kv\.set' "$SANDBOX_ENTRY" || true)
