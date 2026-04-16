@@ -10,6 +10,9 @@ import {
   closeReadlineInterface,
 } from './prompts.js';
 import { generateWranglerToml, validateWranglerToml } from './templates/wrangler-toml.js';
+import { generateEnvDts, validateEnvDts } from './templates/env-dts.js';
+import { generateReadme, validateReadme } from './templates/readme-md.js';
+import { generatePaymentsTs } from './templates/payments-ts.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -262,6 +265,7 @@ ANTHROPIC_API_KEY=your_anthropic_api_key
   if (options.payments) {
     envExample += `# Stripe Configuration
 STRIPE_SECRET_KEY=your_stripe_secret_key
+# ⚠️ WITHOUT THIS, YOUR PAYMENTS ARE NOT VERIFIED - GET IT FROM: https://dashboard.stripe.com/webhooks
 STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
 STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
 
@@ -274,11 +278,14 @@ STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
   );
 
   // Create main index.ts
-  const indexTs = `import { Hono } from 'hono';
+  let indexTs = `import { Hono } from 'hono';
+${options.payments ? "import { handleStripeWebhook } from './payments';" : ''}
 
 type Bindings = {
   ${options.database ? 'DB: D1Database;' : ''}
   ${options.ai ? 'AI: Ai;' : ''}
+  ${options.payments ? 'STRIPE_SECRET_KEY?: string;' : ''}
+  ${options.payments ? 'STRIPE_WEBHOOK_SECRET?: string;' : ''}
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -293,6 +300,11 @@ app.get('/', (c) => {
   return c.json({ message: 'Hello from WorkerKit!' });
 });
 
+${options.payments ? `// Stripe webhook handler
+// CRITICAL: This endpoint receives Stripe webhook events
+// Webhook signature verification is mandatory - do not skip!
+app.post('/api/stripe-webhook', handleStripeWebhook);
+` : ''}
 export default app;
 `;
 
@@ -301,16 +313,28 @@ export default app;
     indexTs
   );
 
-  // Create env.d.ts for types
-  const envDts = `declare global {
-  interface CloudflareEnv {
-    ${options.database ? 'DB: D1Database;' : ''}
-    ${options.ai ? 'AI: Ai;' : ''}
-  }
-}
+  // Generate env.d.ts for TypeScript type definitions
+  const envDts = generateEnvDts({
+    needsDatabase: options.database,
+    needsAI: options.ai,
+    needsKV: false,
+    needsAuth: options.auth,
+    needsPayments: options.payments,
+  });
 
-export {};
-`;
+  // Validate the generated env.d.ts
+  const envDtsValidation = validateEnvDts(envDts, {
+    needsDatabase: options.database,
+    needsAI: options.ai,
+    needsKV: false,
+    needsAuth: options.auth,
+    needsPayments: options.payments,
+  });
+  if (!envDtsValidation.isValid) {
+    throw new Error(
+      `Generated env.d.ts failed validation:\n${envDtsValidation.errors.map((err) => `  - ${err}`).join('\n')}`
+    );
+  }
 
   await fs.writeFile(
     path.join(projectDir, 'src', 'types', 'env.d.ts'),
@@ -339,60 +363,32 @@ CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
     );
   }
 
-  // Create README.md
-  const readmeMd = `# ${options.name}
+  // Create payments.ts if payments enabled
+  if (options.payments) {
+    const paymentsTs = generatePaymentsTs();
 
-Built with [WorkerKit](https://github.com/shipyard-ai/create-workerkit) - Zero-to-deployed business app in under 60 seconds.
+    await fs.writeFile(
+      path.join(projectDir, 'src', 'payments.ts'),
+      paymentsTs
+    );
+  }
 
-## Quick Start
+  // Create README.md using comprehensive generator
+  const readmeMd = generateReadme({
+    projectName: options.name,
+    needsAuth: options.auth,
+    needsDatabase: options.database,
+    needsAI: options.ai,
+    needsPayments: options.payments,
+  });
 
-1. \`\`\`bash
-   npm install
-   \`\`\`
-
-2. \`\`\`bash
-   cp .env.example .env
-   # Edit .env and add your configuration
-   \`\`\`
-
-3. \`\`\`bash
-   npm run dev
-   \`\`\`
-
-4. Visit [http://localhost:8787](http://localhost:8787)
-
-## Deploying
-
-\`\`\`bash
-npm run deploy
-\`\`\`
-
-## Project Structure
-
-\`\`\`
-${options.name}/
-├── src/
-│   ├── index.ts           # Main Hono application
-│   ├── routes/            # API routes
-│   └── types/             # TypeScript type definitions
-${options.database ? '├── migrations/        # D1 database migrations\n' : ''}├── wrangler.toml        # Cloudflare Workers configuration
-├── package.json
-└── tsconfig.json
-\`\`\`
-
-## Documentation
-
-- [Hono Documentation](https://hono.dev)
-- [Cloudflare Workers](https://workers.cloudflare.com)
-${options.database ? '- [D1 Database](https://developers.cloudflare.com/d1/)' : ''}
-${options.auth ? '- [Clerk Authentication](https://clerk.com)' : ''}
-${options.ai ? '- [Workers AI](https://developers.cloudflare.com/workers-ai/)' : ''}
-${options.payments ? '- [Stripe Integration](https://stripe.com)' : ''}
-
-## License
-
-MIT
-`;
+  // Validate the generated README
+  const readmeValidation = validateReadme(readmeMd);
+  if (!readmeValidation.isValid) {
+    throw new Error(
+      `Generated README.md failed validation:\n${readmeValidation.errors.map((err) => `  - ${err}`).join('\n')}`
+    );
+  }
 
   await fs.writeFile(
     path.join(projectDir, 'README.md'),
@@ -439,7 +435,7 @@ async function main(): Promise<void> {
         auth: true,
         database: true,
         ai: true,
-        payments: false,
+        payments: true,
       };
     } else if (args.projectName) {
       // Project name provided, validate it and prompt for services
