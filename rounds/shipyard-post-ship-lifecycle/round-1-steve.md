@@ -1,84 +1,114 @@
 # Steve Jobs — Chief Design & Brand Officer
-## Post-Ship Lifecycle: The Positions
+## Shipyard Post-Ship Lifecycle: Design & Brand Positions
 
 ---
 
-## Product Naming: **Aftercare**
+### Product Naming
 
-Not "post-ship lifecycle system." Not "customer retention emails." **Aftercare.**
+**"Homeport"**
 
-One word. Human. Medical, even — because we're treating relationships like something precious that needs ongoing care. When a project ships, the **care** doesn't stop. This is what separates craftspeople from vending machines.
-
----
-
-## Design Philosophy: **The Invisible Hand**
-
-The system must be **completely invisible to us** and **perfectly timed for them**. No dashboards to manage. No manual triggers. No "remember to send the 30-day email."
-
-This works like gravity — constant, reliable, unseeable. The customer experiences it as thoughtfulness. We experience it as automation that never fails.
-
-**Insanely great = automation that feels handwritten.**
+Every ship needs a port to return to. This isn't lifecycle management—that's software engineer speak. It's not "customer retention email sequence"—that's marketing garbage. It's **Homeport**. The place your customers come back to. One word. Memorable. Evocative.
 
 ---
 
-## User Experience: The First 30 Seconds
+### Design Philosophy: What Makes This Insanely Great?
 
-Day 7 email arrives. Subject line: **"Your site is alive."**
+This is the difference between selling someone a car and becoming their mechanic for life.
 
-They open it. First line: "We shipped your project 7 days ago. Here's what's happened since."
+**The insight:** Most agencies ghost their clients after shipping. They take the money and vanish. We're doing the opposite—we're *staying*. Not in an annoying, needy way. In a **"we actually care what happens to your site"** way.
 
-Three links, maximum. Their site. Their admin. One "How did we do?" button.
+Insanely great means the emails feel like they're from a person who genuinely wants to know how things are going. Not a CRM drip campaign. Not a marketing funnel. A real human checking in.
 
-That's it. **No clutter. No upsell. Just confidence.**
-
-They should feel: "These people are still watching. They care." Not: "These people want more money."
+If the customer can smell automation, we've failed.
 
 ---
 
-## Brand Voice: **The Trusted Mechanic**
+### User Experience: The First 30 Seconds
 
-We're not marketers. We're the mechanic who calls you when your oil change is due — not because they need your money, but because they know what happens if you wait too long.
+**Day 7 email arrives.**
 
-Every email sounds like it's from **one person who remembers your project**. Not a CRM. Not a drip campaign. A craftsperson checking in.
+Subject: "Your site is breathing on its own now"
 
-Short sentences. No jargon. No "solutions" or "leverage" or "ecosystem." Just: "Your site. Still running. Here's what's next."
+They open it. First line: *"Remember when this was just an idea? Look at it now."*
 
----
+A single, beautiful screenshot of their live site. Their URL in large, proud type. Nothing else. Just pride.
 
-## What to Say NO To
+Below: "Here's what we delivered" — admin link, docs, one-click feedback. That's it.
 
-**NO to site monitoring.** The PRD says "out of scope" but doesn't go far enough. This is a **permanent no**. We're not Pingdom. Monitoring is a distraction that turns us into an infrastructure company.
+**The feeling:** Pride. Accomplishment. "We did this together."
 
-**NO to performance metrics in emails.** "Your site loaded in 1.2 seconds" — who cares? That's vanity data. If their site is slow, they already know. If it's fast, they don't need us to tell them.
-
-**NO to "Happy Anniversary" celebrations.** Day 365 should not be a party. It should be: "It's been a year. The web moved on. You should too." Honest, not cutesy.
-
-**NO to A/B testing subject lines.** We're not optimizing for opens. We're building trust. Send the same five emails to everyone, forever. Consistency is the brand.
-
-**NO to click tracking beyond "did they request a revision."** We don't need heatmaps of email engagement. We need to know: Did this turn into work? Yes or no.
+**Not:** "Here's a transactional confirmation email with 8 CTAs and a footer full of legal copy."
 
 ---
 
-## The Emotional Hook: **Someone Remembers**
+### Brand Voice: How This Product Speaks
 
-The web is full of agencies who disappear after the invoice clears. **We don't.**
+Like a craftsman who cares about their work after it leaves the workshop.
 
-The emotional core is this: **"They didn't forget about me."**
+- **Not corporate:** "We hope your deployment experience met expectations."
+- **Not casual:** "Hey there! Just checking in lol 😊"
+- **Shipyard voice:** "It's been 30 days. Your site is holding up beautifully. Page speed is solid. Uptime is 100%. You should be proud."
 
-Day 30 arrives. They open the email. They think: "Oh. They're still there." That's the feeling. Not delight. Not surprise. **Reassurance.**
-
-When they need another site — 6 months, 18 months, whenever — they don't Google "web design agency." They reply to one of our emails. Because we're still in their inbox. Still watching. Still caring.
+Confident. Competent. Human. We know what we built. We stand behind it. We're checking in because we *care*, not because a marketing playbook told us to.
 
 ---
 
-## The Real Product
+### What to Say NO To
 
-This isn't an email system. **It's a memory system.**
+**NO to dashboards.** Not in MVP. Phil's PRD mentions a "dashboard for viewing email performance"—absolutely not. That's for us to obsess over internally, not to build. Dashboards are where good products go to die. Focus on the email experience.
 
-Traditional agencies lose to whoever shows up at the right moment. We win because **we never leave.** Five emails a year. Each one a reminder: We built your last site. We remember. We're ready.
+**NO to performance metrics in emails.** "Basic performance metrics (if we can measure: uptime, page speed)" — if you have to say "if we can measure," the answer is no. Don't promise what you can't deliver perfectly. Ship it when it's ready, not when it's half-baked.
 
-That's the moat. Not features. Not dashboards. **Presence.**
+**NO to "Special offers for returning customers."** This isn't a Groupon. We're not discounting our way into relationships. If they come back, it's because they trust us, not because we gave them 15% off.
 
-Build it like it'll run for 10 years without touching it. No complexity. No customization. Five templates. Five triggers. Done forever.
+**NO to more than 5 emails in year one.** The PRD has it right. Day 7, 30, 90, 180, 365. Perfect rhythm. Don't get greedy. Respect their inbox.
 
-**Simple. Reliable. Unforgettable.**
+**NO to "How's it going?" check-ins without substance.** Every email must deliver value or pride. Never send an email just to "stay top of mind." That's spam.
+
+---
+
+### The Emotional Hook: Why Will People LOVE This?
+
+Because **nobody else does this.**
+
+Every agency, every freelancer, every SaaS tool—they all disappear after the invoice is paid. The silence is deafening.
+
+Homeport breaks that pattern. We stay. We care. We remember.
+
+**The emotional truth:** When your site goes live, you feel vulnerable. You put something into the world. You hope it works. You hope people like it. And then... silence.
+
+Homeport says: "We're still here. Your site is doing great. You should be proud."
+
+**That's the hook.** We're the agency that doesn't ghost you.
+
+---
+
+### The One Thing That Must Be Perfect
+
+**The Day 7 email.**
+
+If we nail this, everything else follows. This email sets the tone for the entire relationship.
+
+It cannot be automated-feeling. It cannot be generic. It must feel like a human being took a moment to look at their site, appreciate it, and reach out.
+
+Personalization isn't merge tags. It's *"I looked at your site. Here's what I noticed. Here's what I'm proud of."*
+
+If we can't do that perfectly, we shouldn't ship Homeport at all.
+
+---
+
+### What Success Looks Like
+
+**Six months from now:**
+
+A customer gets the Day 180 email. They think: "Damn, Shipyard really does care." They click "Schedule an update" not because they need one, but because they *want* to work with us again.
+
+**That's the win.** Not the 20% conversion rate. Not the email open metrics. The feeling of "I want to work with these people again."
+
+Metrics follow emotion. Never the reverse.
+
+---
+
+**Stake your position. Ship Homeport. Make it impossibly good.**
+
+— Steve

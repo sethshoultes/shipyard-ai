@@ -1,104 +1,81 @@
 # Round 1: Elon Musk — Chief Product & Growth Officer
 
-## Architecture: What's the Simplest System That Could Work?
+## Architecture: Delete Half of This
 
-**This is overengineered.**
+**Simplest system that works:** Cloudflare Workers + scheduled cron + Resend API. That's it. No database initially—use KV store with project ID as key. 5 email templates in code. Ship in 2 days, not 2 weeks.
 
-You don't need a "daily cron job" that queries databases and calculates due dates. That's enterprise thinking.
+The proposed schema is over-engineered. You don't need `tokenBudget`, `tokensUsed`, `projectType` for V1. You need: email, name, project URL, ship date. Add fields when you have evidence they matter.
 
-**Simplest system:** Cloudflare Worker triggered on project completion. Schedule 5 emails with `Date.now() + [7, 30, 90, 180, 365] days`. Use Cloudflare Durable Objects or Workers KV to store scheduled emails. When a Worker alarm fires, send the email via Resend (simplest API, best deliverability). Done.
+**Cut the "Shipped Project Database"**—use existing order/project data. Don't duplicate state. If you don't have that data structure yet, that's the real problem.
 
-**Cut this:** The entire "shipped project tracking database" with lifecycle email state. You don't need a database schema with nested objects tracking sent/opened/clicked. Store the absolute minimum: `{email, projectName, siteUrl, scheduleId}`. Email service handles open/click tracking.
+## Performance: The Wrong Bottleneck
 
-**Data model should be:** One record per scheduled email, not one record per project. Each email is independent. Simplifies everything.
+This PRD optimizes email delivery when the actual bottleneck is **getting 10,000 shipped projects**.
 
----
+If Shipyard ships 1 project/day, you're optimizing for 365 email sends/year. That's a rounding error. Any transactional email service handles this in their sleep.
 
-## Performance: Where Are the Bottlenecks?
+The 10x path: **reduce time-to-ship by 50%**, not perfect lifecycle emails. One extra shipped project/week >>> fancy email analytics.
 
-**There are no bottlenecks.** This is 5 emails per project. If you ship 1,000 projects/year, that's 5,000 emails/year = 14 emails/day. A single Worker can handle 100,000 emails/day.
+## Distribution: You're Solving the Wrong Problem
 
-**The real bottleneck is writing good emails.** If the Day 30 email says "How's it going?" nobody will click. That's not a technical problem, it's a copywriting problem.
+Target: "20% of shipped projects generate revision orders"—but where are the 10,000 users? This is a retention play when you don't have acquisition solved.
 
-**10x path:** Forget email open rates. Focus on **reply rate**. One real conversation with a customer is worth 100 opened emails. Make the Day 30 email a question they actually want to answer: "What's the one thing you wish worked differently?" Not "How's it going?"
+**First-principles question:** Why would someone ship with Shipyard the FIRST time? Answer that, then worry about repeat customers.
 
----
+If the answer is "word of mouth from amazing shipped projects," then lifecycle emails add 5% lift. If the answer is "we don't know," this is premature optimization.
 
-## Distribution: How Does This Reach 10,000 Users Without Paid Ads?
+**Real distribution:** Every shipped project should have a "Built with Shipyard" footer link. That's 10,000 backlinks pointing to real, live proof. That's distribution.
 
-**It doesn't.** This PRD is retention, not acquisition. The board is right—retention is a D—but fixing retention doesn't create distribution.
+## What to CUT
 
-**Distribution comes from making shipped projects viral.** Every site Shipyard builds should have a subtle "Built with Shipyard AI" badge in the footer. Make it beautiful. Make it cool. Make developers *want* to click it.
+**Kill Phase 2 entirely.** Project telemetry is interesting but irrelevant until you have 1,000+ shipped projects. Right now it's scope creep disguised as "competitive moat."
 
-**Real distribution:**
-- Public showcase of every shipped project (with customer permission)
-- Leaderboard of fastest ships
-- Open-source the email templates so other agencies copy them (and link back to Shipyard)
+**Kill:**
+- Day 90, 180, 365 emails in V1. Ship Day 7 and Day 30 only. Validate open rates before writing more templates.
+- Email open tracking dashboard—use Resend's built-in analytics. Don't build what you can buy for $0.
+- "Industry trends relevant to their site type"—who writes this content? This is a time sink with no ROI measurement.
+- "Special offer for returning customers"—what's the offer? If you don't know, delete this line.
 
-**This PRD gets you repeat customers, not new customers.** Don't confuse the two.
+**Day 7 email only needs:** "Your site is live: [URL]. Reply to this email if you need anything."
 
----
+That's the MVP. Anything else is LARPing as a marketing automation platform.
 
-## What to CUT: Scope Creep & V2 Features Masquerading as V1
+## Technical Feasibility: Yes, But Wrong Scope
 
-**CUT:**
-1. **"Basic performance metrics (uptime, page speed)"** — You don't have site monitoring. Don't fake it. If you can't measure it, don't mention it.
-2. **"Industry trends relevant to their site type"** — This requires a content team. You're not Mailchimp. Cut.
-3. **"Case study of another similar project"** — Who writes these? Where do they come from? V2.
-4. **"Summary of web standards changes since launch"** — Same problem. Content team you don't have.
-5. **"Dashboard for viewing email performance"** — Just use your email service's dashboard. Don't build what Resend already built.
+**Can one agent session build this?** As spec'd: no. Too many moving parts, unclear integration points, vague requirements ("industry trends").
 
-**V1 is 5 emails with personalization variables.** That's it. If you can't build it in 3 days, you're overthinking it.
+**Can one agent session build the REAL V1?** Yes:
+1. Cloudflare Worker with scheduled cron trigger
+2. Two email templates (Day 7, Day 30)
+3. Resend integration
+4. Manual CSV of shipped projects → KV store
+5. Unsubscribe link → KV update
 
----
+This is 200 lines of TypeScript. Ship today.
 
-## Technical Feasibility: Can One Agent Session Build This?
+## Scaling: What Actually Breaks
 
-**Yes, but only if you cut the cruft.**
+**At 100x usage (10,000 shipped projects/year):**
+- Email sends: 50,000/year → any service handles this
+- KV reads: negligible
+- Worker invocations: 365 cron jobs/year → free tier
 
-One agent can:
-- Set up Resend account
-- Write 5 email templates (HTML + text)
-- Build Cloudflare Worker that schedules emails on project completion
-- Store schedule in Workers KV
-- Handle unsubscribe with a simple KV lookup
+Nothing breaks. This system scales to 100,000 projects without architecture changes.
 
-One agent **cannot:**
-- Write "industry trends" content for every project type
-- Build a custom dashboard
-- Integrate site monitoring
-- Create a complex database schema with nested lifecycle tracking
+**What DOES break:** Manual project entry. If you're manually CSV-uploading 27 projects/day, you're dead. Auto-capture from pipeline is not V1.1—it's V1.0.
 
-**The 2-week timeline is a lie.** If you actually build what the PRD describes (dashboard, pipeline integration, tracking), it's 6 weeks. If you build what you actually need (5 emails, scheduling, unsubscribe), it's 3 days.
+## The Real Question
 
----
+Why are repeat customers 30%? Is that based on industry benchmarks, or aspirational? If traditional agencies see 60% repeat rate, then 30% means Shipyard is broken. If agencies see 10%, then 30% means you're 3x better—but why?
 
-## Scaling: What Breaks at 100x Usage?
+**Thesis to validate:** Customers don't return because they don't need a second website, not because they forgot about Shipyard. If true, lifecycle emails are a band-aid on a business model problem.
 
-**Nothing breaks.** Email is solved. Resend scales to millions. Cloudflare Workers scale infinitely.
+**Counter-thesis:** Customers DO need ongoing work (updates, redesigns, new pages) but Shipyard positioned itself as "one-and-done." If true, lifecycle emails unlock latent demand.
 
-**What breaks is content.** If you ship 100,000 projects/year (100x current), you can't write personalized "industry trends" for each one. You'd need AI content generation, which means quality drops, which means customers unsubscribe.
+Which is it? Run the experiment, but bet small. Two emails, two weeks of dev time, manual entry. If Day 30 emails generate 10%+ revision requests, double down. If not, kill it and fix acquisition.
 
-**Better scaling approach:** Make the emails simpler as you scale, not more complex. Day 7: "Your site is live." Day 30: "Need any changes?" Day 90: "Ready for an update?" No fluff. No fake personalization. Just clear CTAs.
+## Verdict
 
----
+**Ship the 10% version:** Day 7 + Day 30 emails, Cloudflare Workers, Resend, manual project CSV. Live in 48 hours.
 
-## Final Verdict
-
-**Ship this, but ship 10% of what's in the PRD.**
-
-The board is right: retention is broken. But the solution isn't a "lifecycle email sequence with personalized industry trends and performance metrics." It's 5 simple emails that give customers a reason to reply.
-
-**Build:**
-- 5 email templates (handwritten, no AI slop)
-- Cloudflare Worker scheduler
-- Resend integration
-- Unsubscribe handling
-
-**Don't build:**
-- Dashboard (use Resend's)
-- Database schema (use KV)
-- "Industry trends" (you're not a publisher)
-- Site monitoring (you're not Pingdom)
-
-**Ship in 3 days. Measure reply rate, not open rate. If nobody replies, your emails suck. Fix the copy, not the infrastructure.**
+Measure reply rate and revision requests for 90 days. If hit 10% conversion, fund V2. If not, this PRD dies and you focus on the real problem: why aren't there 10,000 shipped projects yet?
