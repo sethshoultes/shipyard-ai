@@ -1,0 +1,18 @@
+{
+  "name": "create-workerkit",
+  "version": "1.0.0",
+  "description": "Zero-to-deployed business app in under 60 seconds",
+  "type": "module",
+  "main": "src/index.ts",
+  "bin": {
+    "create-workerkit": "./bin/create-workerkit"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "node src/index.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
