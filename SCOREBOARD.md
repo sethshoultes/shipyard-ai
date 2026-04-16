@@ -6,7 +6,7 @@
 
 ## Core Metrics
 
-**Total Shipped:** 36
+**Total Shipped:** 37
 **Total Failed:** 2
 **Success Rate:** 95%
 **Average Pipeline Duration:** 30.5 hours
@@ -17,6 +17,7 @@
 
 | Project | Shipped | QA | Board | Deliverables |
 |---------|---------|-----|-------|-------------|
+| [deploy-all-plugins](/prds/deploy-all-plugins.md) | 2026-04-16 | PASS | 5.5 | [Link](/deliverables/deploy-all-plugins/) |
 | [shipyard-self-serve-intake](/prds/completed/shipyard-self-serve-intake.md) | 2026-04-16 | PASS | 3.5 | [Link](/deliverables/shipyard-self-serve-intake/) |
 | [monetization-mvp](/prds/completed/monetization-mvp.md) | 2026-04-16 | HOLD | 4.0 | [Link](/deliverables/monetization-mvp/) |
 | [github-issue-sethshoultes-shipyard-ai-73](/prds/completed/github-issue-sethshoultes-shipyard-ai-73.md) | 2026-04-16 | PASS | 3.0 | [Link](/deliverables/github-issue-sethshoultes-shipyard-ai-73/) |
@@ -56,6 +57,16 @@
 ---
 
 ## Expanded Details (Top 5 Recent)
+
+### deploy-all-plugins
+
+**Shipped:** 2026-04-16
+**QA Verdict:** PASS
+**Board Score:** 5.5/10
+**Duration:** 1 day (blocked → implemented → shipped)
+**Deliverables:** [Link](/deliverables/deploy-all-plugins/)
+**Retrospective:** [memory/deploy-all-plugins-retrospective.md](/memory/deploy-all-plugins-retrospective.md)
+**Summary:** Sunrise Yoga full plugin deployment — P0 hotfix combining 6 plugins (membership, eventdash, commercekit, formforge, reviewpulse, seodash). QA initially blocked on missing implementation code. Implementation phase delivered complete fixes: registered all 6 plugins in astro.config.mjs, fixed entrypoint patterns (file path resolution replacing banned npm aliases) in 3 plugins. Build verified, smoke tests pass. Key learning: Plans are not deliverables; code comes first. Principle: When P0 blockers found, fix immediately—don't defer to next cycle.
 
 ### shipyard-self-serve-intake
 
