@@ -414,7 +414,7 @@ export async function dispatchWebhooks(
 // Plugin Definition
 // ============================================================================
 
-export default definePlugin({
+function createPlugin() { return definePlugin({
 	hooks: {},
 	routes: {
 		// ====================================================================
@@ -1287,3 +1287,7 @@ export default definePlugin({
 		},
 	},
 });
+}
+export { createPlugin };
+export default createPlugin;
+

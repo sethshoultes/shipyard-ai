@@ -35,7 +35,7 @@ async function loadEvents(kv: any): Promise<Event[]> {
     .sort((a: Event, b: Event) => a.date.localeCompare(b.date));
 }
 
-export default definePlugin({
+function createPlugin() { return definePlugin({
   routes: {
     events: {
       public: true,
@@ -137,3 +137,7 @@ export default definePlugin({
     },
   },
 });
+}
+export { createPlugin };
+export default createPlugin;
+

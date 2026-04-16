@@ -928,7 +928,7 @@ const DEFAULT_PLANS: PlanConfig[] = [
 	},
 ];
 
-export default definePlugin({
+function createPlugin() { return definePlugin({
 	/**
 	 * Hook: Initialize plugin on install
 	 */
@@ -3638,3 +3638,7 @@ export default definePlugin({
 		],
 	},
 } as any);
+}
+export { createPlugin };
+export default createPlugin;
+

@@ -185,7 +185,7 @@ async function getStatsCache(ctx: PluginContext): Promise<ReviewStats> {
 // Plugin definition — v1 MVP
 // ---------------------------------------------------------------------------
 
-export default definePlugin({
+function createPlugin() { return definePlugin({
 	hooks: {
 		"plugin:install": {
 			handler: async (_event: unknown, ctx: PluginContext) => {
@@ -794,3 +794,7 @@ export default definePlugin({
 		},
 	},
 });
+}
+export { createPlugin };
+export default createPlugin;
+
