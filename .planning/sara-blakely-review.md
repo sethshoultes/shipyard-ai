@@ -1,26 +1,37 @@
-# Sara Blakely Review — Phase 1 Plan
+# Sara Blakely Customer Review — WorkerKit v1
 
-**Would a customer pay?** No. This is internal plumbing. Zero user-facing value. You're fixing TypeScript lint errors. Nobody wakes up wanting "fewer banned patterns."
+**Would a real customer pay for this?**
+No. It's free, so wrong question.
+Real question: will devs USE it? Yes — if speed promise is real.
+But only if it works on first try. One missing API key error kills trust.
 
-**What's confusing?**
-- "Harbor" codename — why hide it?
-- "Binary membership validator" — meaningless jargon
-- 30-day freeze — feels defensive, not confident
+**What's confusing? What would make someone bounce?**
+- "Zero-config local dev" buried in Wave 2. Lead with that.
+- Mock mode is brilliant but invisible. Scream it in README line 1.
+- "D1 database binding" means nothing. Say "your data at the edge, zero cold starts."
+- Five integrations feels like five things to configure. Wrong frame. Say "five features, zero setup."
+- Stripe security warnings buried. Devs skip warnings. Make signature verification impossible to remove.
 
-**Bounce triggers:**
-- 3,600-line file you won't refactor
-- "Surgical fix, not a refactor" screams tech debt
-- Tests are manual curls, not automated
+**30-second elevator pitch:**
+Build a paid SaaS on Cloudflare in under 60 seconds. No boilerplate, no config files, no bullshit. Type `npx create-workerkit my-app`, get auth, database, AI, and payments ready to deploy. Runs on your laptop without API keys. Ships to production in 5 minutes.
 
-**30-second pitch:**
-"We're fixing code violations in a membership plugin so we can deploy it to one test site. No new features. Just making it not break."
+**What would you test first with $0 marketing budget?**
+- Post to Cloudflare Discord with live demo video (terminal recording, 60-second timer on screen).
+- Tweet at indie hackers shipping side projects. Tag #buildinpublic.
+- Find one dev who wasted 6 hours on Clerk + D1 setup this week. Watch them use it. Record reaction.
+- Hacker News "Show HN" with title: "I built this because I was sick of losing weekends to boilerplate."
 
-**Test with $0 marketing:**
-Wrong question. This isn't a product. It's maintenance.
+**What's the retention hook?**
+Generated code has ZERO WorkerKit dependency. That's the trap — but also the escape hatch.
+Real hook: time saved compounds. First project saves 6 hours. Second saves another 6. By project three, you're a customer for life.
+But hook only works if generated code is SO clean they want to use it again. Not "technically correct" — actually beautiful.
 
-**Retention hook:**
-None. You're fixing your own mess, not solving a customer problem.
+**Gut check:**
+- 6-hour budget is tight but doable if you cut scope ruthlessly.
+- Mock mode is genius. Triple down on that in marketing.
+- Stripe security warnings won't work. Make it impossible to ship without signature verification.
+- "Built with WorkerKit" badge is weak retention. Real retention: make generated code the best Cloudflare Workers example on the internet.
+- Test with actual beginners, not just experienced devs. They're your TAM.
 
-**Honest truth:** This reads like a team scared to touch their own code. "Copy, don't rewrite" and "30-day freeze" are red flags. If one file is 3,600 lines and you're afraid to refactor it, you have bigger problems than TypeScript violations.
-
-You're not shipping a product. You're patching a tire. Do it fast, then build something customers actually want.
+**One more thing:**
+Drop the "excellent README" language. Make it a 3-minute video instead. Nobody reads.

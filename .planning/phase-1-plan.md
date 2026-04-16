@@ -1,680 +1,1020 @@
-# Phase 1 Plan — MEMBERSHIP-V2 (HARBOR)
+# Phase 1 Plan — WorkerKit v1
 
 **Generated**: 2026-04-15
-**Requirements**: `/home/agent/shipyard-ai/prds/membership-v2.md`, `/home/agent/shipyard-ai/rounds/membership-v2/decisions.md`
-**Total Tasks**: 12
-**Waves**: 4
+**Requirements**: `/home/agent/shipyard-ai/.planning/REQUIREMENTS.md`
+**Total Tasks**: 18
+**Waves**: 3
+**Time Budget**: 6 hours
 
 ---
 
 ## EXECUTIVE SUMMARY
 
-**What we're building:** Fix 4 banned pattern violations in the membership plugin and deploy to Sunrise Yoga for smoke testing.
+**What we're building:** A zero-dependency CLI tool (`create-workerkit`) that generates production-ready Cloudflare Workers applications with Hono, D1, Clerk auth, Workers AI, and Stripe payments—all in under 60 seconds.
 
-**Why it matters:** The Harbor plugin (internal codename for MemberShip v2) is a production-grade binary membership validator for Emdash CMS. Currently blocked by 4 TypeScript violations using banned patterns (`rc.user` checks and `throw new Response` in admin routes).
+**Why it matters:** Projects die in setup. WorkerKit eliminates 4-6 hours of boilerplate configuration, letting developers ship their first feature on day one instead of day three.
 
-**Core principle:** Copy working code, don't rewrite. This is a surgical fix, not a refactor.
+**Core promise:** `npx create-workerkit my-app` → working localhost in <20 seconds → deployed to production in <5 minutes.
 
 **Critical constraints:**
-- Do NOT rewrite, refactor, or optimize the working code
-- 30-day code freeze after deployment (no changes, no optimizations)
-- Manual smoke tests required (automation deferred 30 days)
-- Zero new features beyond binary membership checks
+- **6-hour time budget** - Must ship complete v1 within single build session
+- **Zero dependencies** - CLI uses Node builtins only (fs, path, readline)
+- **Single opinionated stack** - Hono + D1 + Clerk + Workers AI + Stripe (no alternatives)
+- **Security-first** - Stripe webhook signature verification is non-negotiable
+- **Zero runtime dependencies** - Generated projects have no WorkerKit dependency
 
 **Success criteria:**
-- ✅ 0 banned pattern violations (verified by grep)
-- ✅ All 6 smoke tests pass (100% success rate required)
-- ✅ Plugin registered in Sunrise Yoga
-- ✅ Test documentation complete
-- ✅ Code committed and deployed
+- ✅ CLI generates valid projects with zero syntax errors
+- ✅ Generated projects run locally without API keys (mock mode)
+- ✅ All 5 integrations have working examples (Hono, D1, AI, Clerk, Stripe)
+- ✅ README enables 5-minute setup for first-time users
+- ✅ Stripe webhooks are secure by default (signature verification included)
+- ✅ Published to npm as `create-workerkit@latest`
 
 ---
 
 ## REQUIREMENTS TRACEABILITY
 
-| Requirement | Task(s) | Wave | Source |
-|-------------|---------|------|--------|
-| R1.1 - Verify source files exist | phase-1-task-1 | 1 | PRD Phase 1 |
-| R1.2 - Remove `approve` route violations | phase-1-task-2 | 2 | PRD Phase 1 |
-| R1.3 - Remove `revoke` route violations | phase-1-task-2 | 2 | PRD Phase 1 |
-| R1.4 - Verify violations eliminated | phase-1-task-3 | 3 | PRD Phase 1 |
-| R2.1 - Read Sunrise Yoga config | phase-1-task-4 | 1 | PRD Phase 2 |
-| R2.2 - Locate plugin descriptor | phase-1-task-4 | 1 | PRD Phase 2 |
-| R2.3 - Add plugin import | phase-1-task-5 | 2 | PRD Phase 2 |
-| R2.4 - Register in emdash config | phase-1-task-5 | 2 | PRD Phase 2 |
-| R2.5 - Verify KV binding | phase-1-task-6 | 3 | PRD Phase 2 |
-| R3.1-3.6 - Execute smoke tests | phase-1-task-7, phase-1-task-8, phase-1-task-9 | 3 | PRD Phase 3 |
-| R4.1 - Document test results | phase-1-task-10 | 4 | PRD Phase 4 |
-| R4.2 - Commit changes | phase-1-task-11 | 4 | PRD Phase 4 |
-| R4.3 - Deploy | phase-1-task-12 | 4 | PRD Phase 4 |
+| Requirement | Task(s) | Wave | Coverage |
+|-------------|---------|------|----------|
+| REQ-001 to REQ-007 (CLI) | phase-1-task-1, task-2 | 1 | Complete |
+| REQ-008 to REQ-013 (Project Structure) | phase-1-task-3, task-4, task-5 | 1 | Complete |
+| REQ-014 to REQ-016 (Hono Framework) | phase-1-task-6 | 2 | Complete |
+| REQ-017 to REQ-020 (D1 Database) | phase-1-task-7 | 2 | Complete |
+| REQ-021 to REQ-026 (AI Integration) | phase-1-task-8 | 2 | Complete |
+| REQ-027 to REQ-030 (Clerk Auth) | phase-1-task-9 | 2 | Complete |
+| REQ-031 to REQ-036 (Stripe Payments) | phase-1-task-10 | 2 | Complete |
+| REQ-037 to REQ-040 (Config & Types) | phase-1-task-11 | 2 | Complete |
+| REQ-041 to REQ-050 (Documentation) | phase-1-task-12 | 2 | Complete |
+| REQ-051 to REQ-054 (Distribution) | phase-1-task-16 | 3 | Complete |
+| REQ-055 to REQ-060 (Testing) | phase-1-task-13, task-14, task-15 | 3 | Complete |
+| REQ-061 to REQ-064 (Quality) | All tasks | All | Complete |
+| REQ-065 to REQ-066 (Brand) | phase-1-task-1, task-12 | 1, 2 | Complete |
 
 ---
 
 ## WAVE EXECUTION ORDER
 
-### Wave 1 (Parallel) — Research & Verification
+### Wave 1 (Parallel) — Foundation & CLI Core
 
-Tasks can run in parallel as they only read files and gather information.
+**Estimated Duration:** 2 hours
+**Goal:** Build CLI scaffold generator with interactive prompts and file generation infrastructure
+
+Tasks can run in parallel after task-1 completes (task-1 creates project structure, tasks 2-5 operate independently).
 
 ---
 
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Verify source and target files exist</title>
-  <requirement>R1.1 - Verify clean deliverable file and target source file exist with expected line counts</requirement>
+  <title>Initialize CLI Project Structure & Entry Point</title>
+  <requirement>REQ-001, REQ-004, REQ-061, REQ-066 - Create CLI scaffold generator with zero dependencies</requirement>
   <description>
-    Confirm that the clean reference implementation exists at deliverables/membership-fix/sandbox-entry.ts
-    (3,441 lines, 0 violations) and the target file exists at plugins/membership/src/sandbox-entry.ts
-    (3,600 lines, 4 violations). This verification ensures we have the correct files before making changes.
+    Initialize the create-workerkit CLI package structure with package.json, bin/create-workerkit entry point, and core file structure. Establish zero-dependency architecture using Node builtins (fs, path, readline) only. Set up project naming as "WorkerKit" per brand requirements.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/membership-fix/sandbox-entry.ts" reason="Clean reference file with 0 violations" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Target file with 4 violations to fix" />
-    <file path="/home/agent/shipyard-ai/prds/membership-v2.md" reason="PRD with file location details" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Emdash plugin system documentation" />
+    <file path="/home/agent/shipyard-ai/prds/workerkit.md" reason="Complete PRD with CLI requirements and architecture" />
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason="Locked decisions on zero-dependency constraint and CLI structure" />
+    <file path="/home/agent/shipyard-ai/projects/tuned/cli/package.json" reason="Reference pattern for CLI package.json structure" />
+    <file path="/home/agent/shipyard-ai/projects/tuned/cli/bin/tuned" reason="Reference shebang entry point pattern" />
   </context>
 
   <steps>
-    <step order="1">Use Bash to count lines in deliverable file: `wc -l /home/agent/shipyard-ai/deliverables/membership-fix/sandbox-entry.ts`</step>
-    <step order="2">Verify deliverable has ~3,441 lines</step>
-    <step order="3">Use Bash to count lines in target file: `wc -l /home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts`</step>
-    <step order="4">Verify target has ~3,600 lines (159 lines difference is expected)</step>
-    <step order="5">Use Grep to count violations in deliverable: `grep -c "rc\.user" deliverables/membership-fix/sandbox-entry.ts || echo 0`</step>
-    <step order="6">Confirm deliverable has 0 violations</step>
-    <step order="7">Use Grep to count violations in target: `grep -c "rc\.user" plugins/membership/src/sandbox-entry.ts`</step>
-    <step order="8">Confirm target has 2 violations (approve and revoke routes)</step>
+    <step order="1">Create directory structure: `mkdir -p create-workerkit/{bin,src,templates}`</step>
+    <step order="2">Generate package.json with name "create-workerkit", version "1.0.0", type "module", bin entry pointing to "bin/create-workerkit", no dependencies (only devDependencies for TypeScript)</step>
+    <step order="3">Create bin/create-workerkit shebang entry point: `#!/usr/bin/env node` followed by import of main CLI module</step>
+    <step order="4">Create src/index.ts as main CLI logic entry point with parseArgs() using Node's process.argv</step>
+    <step order="5">Add README.md with project tagline: "Zero-to-deployed business app in under 60 seconds"</step>
+    <step order="6">Initialize git repo: `git init` and create .gitignore (node_modules, dist, .DS_Store)</step>
+    <step order="7">Verify no external dependencies in package.json (only @types/* and typescript in devDependencies)</step>
   </steps>
 
   <verification>
-    <check type="manual">Deliverable file exists with ~3,441 lines</check>
-    <check type="manual">Target file exists with ~3,600 lines</check>
-    <check type="manual">Deliverable has 0 rc.user violations</check>
-    <check type="manual">Target has 2 rc.user violations (4 total violations including throw new Response)</check>
+    <check type="build">npm install && npm run build (TypeScript compilation)</check>
+    <check type="manual">Verify bin/create-workerkit is executable: `chmod +x bin/create-workerkit && ./bin/create-workerkit --version`</check>
+    <check type="manual">Confirm zero runtime dependencies: `cat package.json | grep dependencies` shows only devDependencies</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies - this is a Wave 1 verification task -->
+    <!-- No dependencies - this is the first task -->
   </dependencies>
 
-  <commit-message>N/A - verification task only, no code changes</commit-message>
+  <commit-message>chore: initialize create-workerkit CLI project structure
+
+Zero-dependency CLI scaffold with Node builtins only. Project structure:
+- bin/create-workerkit (entry point)
+- src/index.ts (main logic)
+- templates/ (code generation templates)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+---
+
+<task-plan id="phase-1-task-2" wave="1">
+  <title>Implement Interactive Prompts & CLI Argument Parser</title>
+  <requirement>REQ-002, REQ-003, REQ-005, REQ-007 - Interactive prompts with flag-based fast path</requirement>
+  <description>
+    Build interactive CLI prompt system using Node's readline builtin for 5 questions: project name, auth (Clerk), database (D1), AI (Workers AI), payments (Stripe). Support flag-based fast path (--skip-prompts). Output must be minimal and confident (no emojis, no chatty language).
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/projects/tuned/cli/src/commands/rollback.ts" reason="Reference pattern for readline-based interactive prompts" />
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason="Brand voice requirements: confident, precise, minimal output" />
+  </context>
+
+  <steps>
+    <step order="1">Create src/prompts.ts module with readline-based prompt functions: promptText(), promptBoolean()</step>
+    <step order="2">Implement parseArgs() function to handle CLI flags: --name, --skip-prompts, --version, --help</step>
+    <step order="3">Build collectAnswers() function that prompts for: project name (required), needsAuth (default: y), needsDatabase (default: y), needsAI (default: y), needsPayments (default: n)</step>
+    <step order="4">Add validation for project name: lowercase alphanumeric + hyphens only, max 50 chars, no special chars</step>
+    <step order="5">Implement --skip-prompts flag path that uses defaults: auth=true, db=true, ai=true, payments=false</step>
+    <step order="6">Add console output with minimal branding: "Creating [project-name]..." (no spinners, no emojis)</step>
+    <step order="7">Add timing logic to track generation speed (target: <20s fast connection, <45s slow)</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Run CLI with prompts: `./bin/create-workerkit test-app` and answer all 5 questions</check>
+    <check type="manual">Run CLI with flags: `./bin/create-workerkit test-app2 --skip-prompts` (should complete instantly)</check>
+    <check type="manual">Test invalid names: `./bin/create-workerkit Test_App!` (should reject with clear error)</check>
+    <check type="manual">Verify brand voice: console output is confident and minimal (no "🎉 Yay!")</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-1" reason="Requires CLI project structure and entry point" />
+  </dependencies>
+
+  <commit-message>feat(cli): add interactive prompts with flag-based fast path
+
+Implements 5-question setup flow:
+- Project name (validated)
+- Auth (Clerk) - default yes
+- Database (D1) - default yes
+- AI (Workers AI) - default yes
+- Payments (Stripe) - default no
+
+Supports --skip-prompts for instant generation.
+Brand voice: confident, precise, minimal output.
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+---
+
+<task-plan id="phase-1-task-3" wave="1">
+  <title>Generate package.json Template</title>
+  <requirement>REQ-011, REQ-062, REQ-063 - Zero WorkerKit runtime dependencies, locked versions</requirement>
+  <description>
+    Create template generation logic for package.json that includes Hono, Wrangler, TypeScript, and conditional dependencies (Clerk SDK if auth selected, Stripe SDK if payments selected). Lock dependency versions for stability. Zero WorkerKit runtime dependency.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/projects/tuned/worker/package.json" reason="Reference for minimal Cloudflare Workers package.json" />
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason="Locked dependency versions requirement for stability" />
+  </context>
+
+  <steps>
+    <step order="1">Create src/templates/package-json.ts with generatePackageJson(config) function</step>
+    <step order="2">Define base dependencies: hono (^4.x), @cloudflare/workers-types (^4.x), wrangler (^3.x), typescript (^5.x)</step>
+    <step order="3">Add conditional dependency: @clerk/backend (^1.x) if config.needsAuth === true</step>
+    <step order="4">Add conditional dependency: stripe (^15.x) if config.needsPayments === true</step>
+    <step order="5">Generate scripts object: dev (wrangler dev), deploy (wrangler deploy), build (wrangler build), typecheck (tsc --noEmit), test (node tests/run.js)</step>
+    <step order="6">Set package name to user's project name, version to 0.0.1, type to "module"</step>
+    <step order="7">Add engines constraint: node >= 18.0.0 (Cloudflare Workers compatibility)</step>
+    <step order="8">Verify generated JSON is valid with JSON.parse() before writing to file</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Generate sample package.json: `generatePackageJson({ name: 'test-app', needsAuth: true, needsPayments: true })` and verify JSON is valid</check>
+    <check type="manual">Confirm no WorkerKit dependency in generated package.json (grep for "workerkit")</check>
+    <check type="manual">Verify dependency versions are locked (e.g., "^4.x" not "*")</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-1" reason="Requires CLI project structure" />
+  </dependencies>
+
+  <commit-message>feat(templates): add package.json generator with locked dependencies
+
+Generates package.json with:
+- Base deps: Hono, Wrangler, TypeScript, Cloudflare Workers types
+- Conditional: Clerk SDK (if auth), Stripe SDK (if payments)
+- Scripts: dev, deploy, build, typecheck, test
+- Zero WorkerKit runtime dependency
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
 <task-plan id="phase-1-task-4" wave="1">
-  <title>Research Sunrise Yoga configuration and plugin registration</title>
-  <requirement>R2.1, R2.2 - Understand how to register the membership plugin in Sunrise Yoga's Astro config</requirement>
+  <title>Generate wrangler.toml Template</title>
+  <requirement>REQ-010, REQ-037, REQ-038, REQ-064 - Fully configured wrangler.toml with excellent inline comments</requirement>
   <description>
-    Read Sunrise Yoga's astro.config.mjs to understand the current emdash configuration and plugin
-    registration pattern. Locate the membership plugin descriptor (plugins/membership/src/index.ts)
-    to determine the correct import path and function name. Verify the plugin follows Emdash's
-    descriptor pattern as documented in EMDASH-GUIDE.md section 6.
+    Create template for wrangler.toml with D1 database binding, Workers AI binding, KV namespace (optional), and inline comments explaining every setting. Must be transparent and editable without breaking the project.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs" reason="Target configuration file where plugin needs to be registered" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/index.ts" reason="Plugin descriptor with registration metadata" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6 - Plugin System registration documentation" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/package.json" reason="Package exports and module metadata" />
+    <file path="/home/agent/shipyard-ai/projects/tuned/worker/wrangler.toml" reason="Reference for Cloudflare Workers wrangler.toml structure with D1 and KV bindings" />
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason="Transparent configuration philosophy with inline comments" />
   </context>
 
   <steps>
-    <step order="1">Read /home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs to understand current emdash() integration</step>
-    <step order="2">Note the database binding (d1({ binding: "DB" })) and storage binding (r2({ binding: "MEDIA" }))</step>
-    <step order="3">Check if a plugins array exists in the emdash configuration</step>
-    <step order="4">Read /home/agent/shipyard-ai/plugins/membership/src/index.ts to find the plugin descriptor function</step>
-    <step order="5">Verify the descriptor exports a function (likely `membershipPlugin()`)</step>
-    <step order="6">Check package.json exports to understand import path (@shipyard/membership vs relative path)</step>
-    <step order="7">Review EMDASH-GUIDE.md section 6 "Registering Plugins in astro.config.mjs" for the correct pattern</step>
-    <step order="8">Document the exact import statement and registration line needed</step>
+    <step order="1">Create src/templates/wrangler-toml.ts with generateWranglerToml(config) function</step>
+    <step order="2">Generate main section with: name (from project name), main = "src/index.ts", compatibility_date = today's date (YYYY-MM-DD), compatibility_flags = ["nodejs_compat"]</step>
+    <step order="3">Add D1 database binding with inline comments: "# D1 Database - Cloudflare's SQLite at the edge | Run: wrangler d1 create ${projectName}_db"</step>
+    <step order="4">Add Workers AI binding with inline comments: "# Workers AI - Run LLMs at the edge | Free tier: generous daily quota"</step>
+    <step order="5">Add placeholder account_id with comment: "# Your Cloudflare account ID - Get it: dash.cloudflare.com → Workers & Pages → Account ID"</step>
+    <step order="6">Add KV namespace binding (optional) with comment: "# KV Namespace - Key-value storage for sessions/cache (optional)"</step>
+    <step order="7">Add observability section: { enabled: true } with comment explaining dashboard access</step>
+    <step order="8">Validate TOML syntax before returning (no external parser; manual validation of structure)</step>
   </steps>
 
   <verification>
-    <check type="manual">Confirmed Sunrise Yoga's current emdash configuration structure</check>
-    <check type="manual">Located membership plugin descriptor function name</check>
-    <check type="manual">Determined correct import path for the plugin</check>
-    <check type="manual">Documented registration pattern matching Emdash conventions</check>
+    <check type="manual">Generate sample wrangler.toml and verify it contains inline comments for every section</check>
+    <check type="manual">Verify D1 binding name matches src/index.ts usage (binding = "DB")</check>
+    <check type="manual">Confirm file is editable: user can change account_id without breaking anything</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies - this is a Wave 1 research task -->
+    <depends-on task-id="phase-1-task-1" reason="Requires CLI project structure" />
   </dependencies>
 
-  <commit-message>N/A - research task only, no code changes</commit-message>
+  <commit-message>feat(templates): add wrangler.toml generator with inline documentation
+
+Generates wrangler.toml with:
+- D1 database binding (DB)
+- Workers AI binding (AI)
+- KV namespace (optional)
+- Inline comments explaining every setting
+- Transparent and editable configuration
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-### Wave 2 (Parallel, after Wave 1) — Code Modifications
-
-These tasks modify code but can run in parallel as they affect different files.
-
----
-
-<task-plan id="phase-1-task-2" wave="2">
-  <title>Remove banned patterns from approve and revoke routes</title>
-  <requirement>R1.2, R1.3 - Eliminate 4 violations by removing rc.user guard blocks from admin routes</requirement>
+<task-plan id="phase-1-task-5" wave="1">
+  <title>Generate tsconfig.json & .gitignore Templates</title>
+  <requirement>REQ-012, REQ-040 - TypeScript strict mode, type-safe compilation</requirement>
   <description>
-    Remove the redundant admin authentication checks from the approve and revoke routes in
-    plugins/membership/src/sandbox-entry.ts. Each route contains a 4-line block checking rc.user
-    and throwing new Response errors. These checks are unnecessary because Emdash authenticates
-    requests before they reach plugin route handlers (per EMDASH-GUIDE.md section 6). Removing
-    these blocks eliminates all 4 banned pattern violations.
+    Create tsconfig.json template configured for Cloudflare Workers with strict mode enabled. Generate .gitignore to exclude node_modules, dist, wrangler output, and .env files.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Target file containing the 4 violations to remove" />
-    <file path="/home/agent/shipyard-ai/deliverables/membership-fix/sandbox-entry.ts" reason="Clean reference showing violations already removed" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Documents that route handlers receive authenticated context" />
-    <file path="/home/agent/shipyard-ai/prds/membership-v2.md" reason="PRD Phase 1 with exact violation patterns to remove" />
+    <file path="/home/agent/shipyard-ai/projects/tuned/worker/tsconfig.json" reason="Reference for Cloudflare Workers TypeScript configuration" />
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason="TypeScript strict mode requirement" />
   </context>
 
   <steps>
-    <step order="1">Read plugins/membership/src/sandbox-entry.ts to locate the approve route (around line 1233)</step>
-    <step order="2">Identify the 4-line admin check block: `const adminUser = rc.user as Record... if (!adminUser || !adminUser.isAdmin) { throw new Response(...) }`</step>
-    <step order="3">Use Edit tool to remove the entire 4-line block from the approve route</step>
-    <step order="4">Locate the revoke route (around line 1285)</step>
-    <step order="5">Identify the identical 4-line admin check block</step>
-    <step order="6">Use Edit tool to remove the entire 4-line block from the revoke route</step>
-    <step order="7">Save the file</step>
-    <step order="8">Verify no syntax errors were introduced by reading the modified sections</step>
+    <step order="1">Create src/templates/tsconfig.ts with generateTsConfig() function</step>
+    <step order="2">Set compilerOptions: target = "ES2022", module = "ES2022", lib = ["ES2022"], strict = true, types = ["@cloudflare/workers-types"]</step>
+    <step order="3">Configure module resolution: moduleResolution = "node", resolveJsonModule = true, esModuleInterop = true</step>
+    <step order="4">Set output options: outDir = "./dist", declaration = true, skipLibCheck = true</step>
+    <step order="5">Define include: ["src/**/*"], exclude: ["node_modules", "dist", ".wrangler"]</step>
+    <step order="6">Create src/templates/gitignore.ts with generateGitignore() function</step>
+    <step order="7">Generate .gitignore content: node_modules/, dist/, .wrangler/, .env, .dev.vars, *.log, .DS_Store</step>
   </steps>
 
   <verification>
-    <check type="build">File has valid TypeScript syntax (no parsing errors)</check>
-    <check type="manual">Approve route no longer contains rc.user check</check>
-    <check type="manual">Revoke route no longer contains rc.user check</check>
-    <check type="manual">No other code blocks accidentally removed</check>
+    <check type="manual">Generate tsconfig.json and verify strict mode is enabled</check>
+    <check type="manual">Confirm types array includes @cloudflare/workers-types</check>
+    <check type="manual">Verify .gitignore excludes sensitive files (.env, .dev.vars)</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Must verify target file exists before modifying it" />
+    <depends-on task-id="phase-1-task-1" reason="Requires CLI project structure" />
   </dependencies>
 
-  <commit-message>N/A - changes will be committed in phase-1-task-11 with all other modifications</commit-message>
+  <commit-message>feat(templates): add tsconfig.json and .gitignore generators
+
+TypeScript config:
+- Strict mode enabled
+- Target: ES2022 (Workers runtime)
+- Types: @cloudflare/workers-types
+- Fully type-safe compilation
+
+Gitignore: node_modules, dist, .wrangler, .env, logs
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-<task-plan id="phase-1-task-5" wave="2">
-  <title>Register membership plugin in Sunrise Yoga config</title>
-  <requirement>R2.3, R2.4 - Add plugin import and registration to astro.config.mjs</requirement>
+### Wave 2 (Parallel) — Generate Code Templates & Documentation
+
+**Estimated Duration:** 3 hours
+**Goal:** Generate all source code templates (Hono app, D1, AI, Auth, Stripe) and comprehensive documentation
+
+All tasks in this wave can run in parallel after Wave 1 completes.
+
+---
+
+<task-plan id="phase-1-task-6" wave="2">
+  <title>Generate Hono Application Template (src/index.ts)</title>
+  <requirement>REQ-013, REQ-014, REQ-015, REQ-016 - Hono framework with example routes and hot reload</requirement>
   <description>
-    Add the membership plugin to Sunrise Yoga's Astro configuration. This involves importing the
-    plugin descriptor function and adding it to the emdash plugins array. The plugin registration
-    follows the pattern documented in EMDASH-GUIDE.md section 6: import the descriptor, call it
-    with any options, and include it in the plugins array passed to emdash().
+    Create src/index.ts template with Hono application entry point, public routes (GET /health, GET /), and auth-protected route example. Support hot reload via wrangler dev.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs" reason="Configuration file to modify" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/index.ts" reason="Plugin descriptor function to import" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6 - Plugin registration pattern documentation" />
-    <file path="/home/agent/shipyard-ai/rounds/membership-v2/decisions.md" reason="Specifies zero-config requirement and plugin ID" />
+    <file path="/home/agent/shipyard-ai/projects/tuned/worker/src/index.ts" reason="Reference for Cloudflare Worker entry point with bindings" />
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason="Hono as sole framework, example routes requirement" />
   </context>
 
   <steps>
-    <step order="1">Read the current astro.config.mjs to identify the emdash integration section</step>
-    <step order="2">Add import statement at top of file: `import { membershipPlugin } from "../../plugins/membership/src/index.js";` (adjust path as needed)</step>
-    <step order="3">Locate the emdash() function call in the integrations array</step>
-    <step order="4">Add a plugins array to the emdash configuration if it doesn't exist: `plugins: [membershipPlugin()]`</step>
-    <step order="5">If plugins array already exists, append membershipPlugin() to it</step>
-    <step order="6">Save the file</step>
-    <step order="7">Verify syntax by attempting to import the config (or run npm run build in dry-run mode)</step>
+    <step order="1">Create src/templates/index-ts.ts with generateIndexTs(config) function</step>
+    <step order="2">Import Hono from 'hono' and create app instance: `const app = new Hono<{ Bindings: Env }>()`</step>
+    <step order="3">Add GET /health route returning { status: 'ok', timestamp: Date.now() }</step>
+    <step order="4">Add GET / route returning welcome message with project name</step>
+    <step order="5">If config.needsAuth, add GET /protected route with auth middleware import</step>
+    <step order="6">If config.needsDatabase, add example GET /api/users route with D1 query</step>
+    <step order="7">If config.needsAI, add POST /api/chat route with AI service import</step>
+    <step order="8">If config.needsPayments, add POST /api/checkout route with Stripe import</step>
+    <step order="9">Add export default app at bottom for Cloudflare Workers export</step>
+    <step order="10">Include inline comments explaining each route and binding usage</step>
   </steps>
 
   <verification>
-    <check type="build">astro.config.mjs has valid JavaScript syntax</check>
-    <check type="manual">Import statement added for membershipPlugin</check>
-    <check type="manual">Plugin registered in emdash plugins array</check>
-    <check type="build">npm run build succeeds (validates configuration)</check>
+    <check type="manual">Generate index.ts with all features enabled and verify TypeScript compiles without errors</check>
+    <check type="manual">Verify Hono app export matches Cloudflare Workers format (export default app)</check>
+    <check type="manual">Confirm GET /health route exists in all variants</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-4" reason="Must understand registration pattern before modifying config" />
+    <depends-on task-id="phase-1-task-3" reason="Requires package.json to know which dependencies are included" />
   </dependencies>
 
-  <commit-message>N/A - changes will be committed in phase-1-task-11 with all other modifications</commit-message>
+  <commit-message>feat(templates): add Hono application entry point template
+
+Generates src/index.ts with:
+- Hono app with typed bindings
+- Public routes: GET /health, GET /
+- Conditional routes: /protected (auth), /api/users (db), /api/chat (ai), /api/checkout (payments)
+- Hot reload support via wrangler dev
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-### Wave 3 (Sequential, after Wave 2) — Verification & Testing
-
-These tasks must run sequentially after code modifications to verify the fixes worked.
-
----
-
-<task-plan id="phase-1-task-3" wave="3">
-  <title>Verify all banned patterns eliminated</title>
-  <requirement>R1.4 - Confirm zero violations remain in the modified file</requirement>
+<task-plan id="phase-1-task-7" wave="2">
+  <title>Generate D1 Database Integration (db.ts & migration)</title>
+  <requirement>REQ-018, REQ-019, REQ-020 - D1 migration file, query wrapper, inline comments</requirement>
   <description>
-    Run grep commands to verify that all banned patterns have been successfully removed from
-    plugins/membership/src/sandbox-entry.ts. The file must have zero matches for rc.user,
-    throw new Response, and rc.pathParams patterns. This verification confirms the Wave 2
-    edits were successful and the file is ready for deployment.
+    Create src/db.ts with simple D1 query wrapper and migrations/0001_create_users.sql with example users table. Include inline comments explaining D1 binding and setup process.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Modified file to verify" />
-    <file path="/home/agent/shipyard-ai/prds/membership-v2.md" reason="PRD defines banned patterns to check" />
+    <file path="/home/agent/shipyard-ai/projects/tuned/worker/schema.sql" reason="Reference for D1 database schema and migration file structure" />
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason="D1 as sole database, simple query wrapper requirement" />
   </context>
 
   <steps>
-    <step order="1">Use Grep to search for rc.user pattern: `grep -c "rc\.user" plugins/membership/src/sandbox-entry.ts || echo 0`</step>
-    <step order="2">Verify result is 0</step>
-    <step order="3">Use Grep to search for throw new Response in admin context: `grep -n "throw new Response" plugins/membership/src/sandbox-entry.ts | grep -E "(approve|revoke)" || echo "No matches"`</step>
-    <step order="4">Verify no matches in approve or revoke routes</step>
-    <step order="5">Use Grep to search for rc.pathParams: `grep -c "rc\.pathParams" plugins/membership/src/sandbox-entry.ts || echo 0`</step>
-    <step order="6">Verify result is 0</step>
-    <step order="7">Run comprehensive check: `grep -c "throw new Response\|rc\.user\|rc\.pathParams" plugins/membership/src/sandbox-entry.ts || echo 0`</step>
-    <step order="8">Verify total count is 0</step>
+    <step order="1">Create src/templates/db-ts.ts with generateDbTs() function</step>
+    <step order="2">Generate src/db.ts with query() helper function that wraps D1 prepare().bind().all()</step>
+    <step order="3">Add error handling with clear messages: "Database query failed. Ensure D1 is created: wrangler d1 create ${projectName}_db"</step>
+    <step order="4">Add inline comments explaining D1 binding usage and Cloudflare env.DB access</step>
+    <step order="5">Create src/templates/migration-sql.ts with generateMigration() function</step>
+    <step order="6">Generate migrations/0001_create_users.sql with CREATE TABLE users (id TEXT PRIMARY KEY, email TEXT UNIQUE NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)</step>
+    <step order="7">Add inline SQL comments: "-- D1 Database Migration | Run: wrangler d1 execute ${projectName}_db --local --file migrations/0001_create_users.sql"</step>
+    <step order="8">Add CREATE INDEX on email column for query performance</step>
   </steps>
 
   <verification>
-    <check type="test">grep "rc\.user" returns 0 matches</check>
-    <check type="test">grep "throw new Response.*approve\|revoke" returns no matches</check>
-    <check type="test">grep "rc\.pathParams" returns 0 matches</check>
-    <check type="test">Combined grep for all banned patterns returns 0</check>
+    <check type="manual">Generate db.ts and verify query() function handles errors gracefully</check>
+    <check type="manual">Verify migration SQL is valid SQLite syntax (no PostgreSQL-specific features)</check>
+    <check type="manual">Confirm inline comments explain D1 setup process</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Must complete code modifications before verification" />
+    <depends-on task-id="phase-1-task-4" reason="Requires wrangler.toml to know D1 binding name" />
   </dependencies>
 
-  <commit-message>N/A - verification task only</commit-message>
+  <commit-message>feat(templates): add D1 database integration templates
+
+Generates:
+- src/db.ts: Simple query wrapper with error handling
+- migrations/0001_create_users.sql: Example users table
+- Inline comments explaining D1 binding and setup
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-<task-plan id="phase-1-task-6" wave="3">
-  <title>Verify KV namespace binding configuration</title>
-  <requirement>R2.5 - Confirm KV namespace is properly configured for plugin storage</requirement>
+<task-plan id="phase-1-task-8" wave="2">
+  <title>Generate AI Service Abstraction (ai.ts)</title>
+  <requirement>REQ-021, REQ-022, REQ-023, REQ-024, REQ-025, REQ-026 - Workers AI with Claude fallback</requirement>
   <description>
-    Verify that Cloudflare KV namespace binding is configured for the membership plugin to store
-    member data, plans, and gating rules. Check both astro.config.mjs and wrangler.jsonc for KV
-    bindings. The plugin accesses KV via ctx.kv in the plugin context, so the binding must exist
-    for the plugin to function. Document the binding configuration or flag as missing.
+    Create src/ai.ts with simple abstraction layer that defaults to Workers AI (@cf/meta/llama-2-7b-chat-int8) and automatically falls back to Anthropic Claude if Workers AI fails or ANTHROPIC_API_KEY is provided. Include graceful error handling with clear messages.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs" reason="May contain KV binding in emdash config" />
-    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/wrangler.jsonc" reason="Cloudflare Workers KV binding configuration" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5 - Deployment and KV configuration patterns" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Shows ctx.kv usage patterns" />
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason="AI abstraction scope: simple ai.chat() function with auto-routing" />
   </context>
 
   <steps>
-    <step order="1">Read examples/sunrise-yoga/wrangler.jsonc to check for kv_namespaces binding</step>
-    <step order="2">Look for binding like `kv_namespaces = [{ binding = "KV", id = "..." }]`</step>
-    <step order="3">If found, note the binding name (e.g., "KV")</step>
-    <step order="4">Read astro.config.mjs to see if KV binding is passed to emdash()</step>
-    <step order="5">Check if plugin context automatically provides ctx.kv or if explicit binding needed</step>
-    <step order="6">Review EMDASH-GUIDE.md section on KV storage for plugins</step>
-    <step order="7">Document findings: either "KV binding configured" or "KV binding missing - needs setup"</step>
-    <step order="8">If missing, flag as blocker and document required wrangler.jsonc changes</step>
+    <step order="1">Create src/templates/ai-ts.ts with generateAiTs() function</step>
+    <step order="2">Generate src/ai.ts with chat(prompt, options) function as primary API</step>
+    <step order="3">Implement Workers AI call: env.AI.run('@cf/meta/llama-2-7b-chat-int8', { prompt, max_tokens: 512 })</step>
+    <step order="4">Wrap in try-catch for automatic Claude fallback on quota exceeded or rate limit errors</step>
+    <step order="5">Implement claudeChat() fallback function using fetch to Anthropic API (if ANTHROPIC_API_KEY exists)</step>
+    <step order="6">Add error message if both fail: "Workers AI quota exceeded. Add ANTHROPIC_API_KEY to .env for Claude fallback. Get key: https://console.anthropic.com/account/keys"</step>
+    <step order="7">Add inline comments explaining quota limits and fallback strategy</step>
+    <step order="8">Generate example POST /api/chat route in routes/api.ts demonstrating usage</step>
   </steps>
 
   <verification>
-    <check type="manual">KV namespace binding exists in wrangler.jsonc OR documented as auto-configured</check>
-    <check type="manual">Binding name documented for reference</check>
-    <check type="manual">If missing, blocker flagged with remediation steps</check>
+    <check type="manual">Generate ai.ts and verify Workers AI is called first (primary)</check>
+    <check type="manual">Verify Claude fallback only triggers if ANTHROPIC_API_KEY exists or Workers AI fails</check>
+    <check type="manual">Test error message clarity: simulate quota exceeded and verify message is actionable</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="Config must be updated before verifying bindings" />
+    <depends-on task-id="phase-1-task-4" reason="Requires wrangler.toml to know AI binding name" />
   </dependencies>
 
-  <commit-message>N/A - verification task only</commit-message>
+  <commit-message>feat(templates): add AI service abstraction with Workers AI + Claude fallback
+
+Generates src/ai.ts with:
+- Primary: Workers AI (@cf/meta/llama-2-7b-chat-int8)
+- Fallback: Anthropic Claude (if API key provided)
+- Auto-routing on quota exceeded
+- Clear error messages with setup URLs
+- Example POST /api/chat route
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-<task-plan id="phase-1-task-7" wave="3">
-  <title>Execute smoke tests 1-3: Admin page, registration, status lookup</title>
-  <requirement>R3.1, R3.2, R3.3, R3.4 - Verify core plugin endpoints work end-to-end</requirement>
+<task-plan id="phase-1-task-9" wave="2">
+  <title>Generate Clerk Authentication Middleware (auth.ts)</title>
+  <requirement>REQ-028, REQ-029, REQ-030 - Clerk JWT validation with zero-config local dev mode</requirement>
   <description>
-    Start the Sunrise Yoga dev server and run the first three smoke tests: admin page load,
-    member registration, and status lookup. These tests verify that the plugin is properly
-    registered, routes are accessible, and basic member operations work. Test 3 specifically
-    checks for double-encoding issues (a known past problem with KV serialization).
+    Create src/auth.ts with Clerk JWT validation middleware that works without API keys in local development (mock mode) and validates real JWTs in production. Include clear setup instructions in .env.example.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs" reason="Contains plugin registration to test" />
-    <file path="/home/agent/shipyard-ai/prds/membership-v2.md" reason="PRD Phase 3 defines exact curl commands and expected results" />
-    <file path="/home/agent/shipyard-ai/rounds/membership-v2/decisions.md" reason="Test matrix with expected outputs" />
+    <file path="/home/agent/shipyard-ai/projects/tuned/worker/src/lib/auth.ts" reason="Reference for auth validation pattern in Cloudflare Workers" />
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason="Zero-config local dev requirement: mock auth without API keys" />
   </context>
 
   <steps>
-    <step order="1">Start Sunrise Yoga dev server: `cd examples/sunrise-yoga && npm run dev` (run in background)</step>
-    <step order="2">Wait 10 seconds for server to fully start</step>
-    <step order="3">Run Test 1 - Admin page load: `curl -s http://localhost:4321/_emdash/api/plugins/membership/admin -H "Content-Type: application/json" -d '{"type":"page_load"}'`</step>
-    <step order="4">Verify response contains `"blocks":[...]` and no error fields, HTTP 200</step>
-    <step order="5">Run Test 2 - Member registration: `curl -s -X POST http://localhost:4321/_emdash/api/plugins/membership/register -H "Content-Type: application/json" -d '{"email":"test@example.com","plan":"basic"}'`</step>
-    <step order="6">Verify response is `{"success":true}` or similar success indicator, HTTP 200</step>
-    <step order="7">Run Test 3 - Status lookup: `curl -s http://localhost:4321/_emdash/api/plugins/membership/status -H "Content-Type: application/json" -d '{"email":"test@example.com"}'`</step>
-    <step order="8">Verify response is JSON object with email, plan, status fields (NOT a string, NOT double-encoded)</step>
-    <step order="9">Check for double-encoding: response should be `{"email":"test@example.com",...}` NOT `"{\"email\":\"test@example.com\",...}"`</step>
-    <step order="10">Document actual curl output for all 3 tests</step>
+    <step order="1">Create src/templates/auth-ts.ts with generateAuthTs() function</step>
+    <step order="2">Generate src/auth.ts with authMiddleware(c, next) Hono middleware function</step>
+    <step order="3">Check if CLERK_SECRET_KEY environment variable exists; if not, enable mock mode</step>
+    <step order="4">In mock mode: attach dummy user { id: 'local-dev', email: 'dev@example.com' } and call next()</step>
+    <step order="5">In production mode: extract Authorization header, validate JWT with Clerk SDK</step>
+    <step order="6">Return 401 with actionable error if auth fails: "Missing: CLERK_SECRET_KEY in .env | Get it: https://dashboard.clerk.com/api-keys"</step>
+    <step order="7">Add inline comments explaining mock mode and when production mode activates</step>
+    <step order="8">Generate example protected route in index.ts demonstrating middleware usage</step>
   </steps>
 
   <verification>
-    <check type="test">Test 1 returns blocks array, no errors</check>
-    <check type="test">Test 2 returns success response</check>
-    <check type="test">Test 3 returns properly typed MemberRecord object</check>
-    <check type="test">Test 3 response is NOT double-encoded JSON string</check>
+    <check type="manual">Generate auth.ts and verify mock mode activates when CLERK_SECRET_KEY is missing</check>
+    <check type="manual">Test protected route without API key: should return 200 with mock user in local dev</check>
+    <check type="manual">Verify error message includes direct link to Clerk dashboard</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="Code must be violation-free before testing" />
-    <depends-on task-id="phase-1-task-6" reason="KV binding must be verified before testing storage operations" />
+    <depends-on task-id="phase-1-task-3" reason="Requires package.json to know if Clerk SDK is included" />
   </dependencies>
 
-  <commit-message>N/A - testing task only</commit-message>
+  <commit-message>feat(templates): add Clerk authentication middleware with zero-config dev mode
+
+Generates src/auth.ts with:
+- Mock mode for local dev (no API keys needed)
+- Production mode with Clerk JWT validation
+- Actionable error messages with dashboard URLs
+- Example protected route in index.ts
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-<task-plan id="phase-1-task-8" wave="3">
-  <title>Execute smoke tests 4-5: Block Kit admin actions</title>
-  <requirement>R3.5 - Verify admin UI Block Kit handlers return valid responses</requirement>
+<task-plan id="phase-1-task-10" wave="2">
+  <title>Generate Stripe Payment Integration (payments.ts)</title>
+  <requirement>REQ-032, REQ-033, REQ-034, REQ-035, REQ-036 - Stripe checkout + webhook with signature verification</requirement>
   <description>
-    Run smoke tests for the admin Block Kit action handlers (view members, view plans). These
-    tests verify that the plugin's admin UI can render member lists and plan configurations
-    using Emdash's Block Kit JSON UI format. Each action should return a blocks array with
-    proper structure.
+    Create src/payments.ts with Stripe checkout session creation and webhook handler for checkout.session.completed event. CRITICAL: Include webhook signature verification with security-critical comments. Add prominent security warnings in README and .env.example.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/prds/membership-v2.md" reason="PRD Phase 3 Test 5 defines curl commands" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6 - Block Kit format documentation" />
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason="Stripe security requirements: webhook signature verification is non-negotiable" />
   </context>
 
   <steps>
-    <step order="1">Ensure dev server is still running from phase-1-task-7</step>
-    <step order="2">Run Test 4 - View members: `curl -s http://localhost:4321/_emdash/api/plugins/membership/admin -H "Content-Type: application/json" -d '{"type":"action","action_id":"view_members"}'`</step>
-    <step order="3">Verify response contains `"blocks":[...]` with member data, HTTP 200</step>
-    <step order="4">Run Test 5 - View plans: `curl -s http://localhost:4321/_emdash/api/plugins/membership/admin -H "Content-Type: application/json" -d '{"type":"action","action_id":"view_plans"}'`</step>
-    <step order="5">Verify response contains `"blocks":[...]` with plan configurations, HTTP 200</step>
-    <step order="6">Document actual curl output for both tests</step>
+    <step order="1">Create src/templates/payments-ts.ts with generatePaymentsTs() function</step>
+    <step order="2">Generate src/payments.ts with createCheckoutSession(c) route handler</step>
+    <step order="3">Add Stripe SDK import and checkout session creation logic: Stripe().checkout.sessions.create({ mode: 'payment', ... })</step>
+    <step order="4">Generate handleStripeWebhook(c) route handler for POST /api/stripe-webhook</step>
+    <step order="5">CRITICAL: Implement webhook signature verification using crypto.createHmac with timing-safe comparison</step>
+    <step order="6">Add error if STRIPE_WEBHOOK_SECRET is missing in production: "CRITICAL: STRIPE_WEBHOOK_SECRET not configured. You are vulnerable to fraud."</step>
+    <step order="7">Include security-critical inline comments: "⚠️ Signature verification is required to prevent payment fraud"</step>
+    <step order="8">Generate .env.example entry with prominent warning: "# ⚠️ WITHOUT THIS, YOUR PAYMENTS ARE NOT VERIFIED"</step>
   </steps>
 
   <verification>
-    <check type="test">Test 4 returns valid Block Kit JSON with member list blocks</check>
-    <check type="test">Test 5 returns valid Block Kit JSON with plan list blocks</check>
-    <check type="test">Both responses have HTTP 200 status</check>
+    <check type="manual">Generate payments.ts and verify webhook signature verification code exists</check>
+    <check type="manual">Test webhook without signature header: should return 403 Forbidden</check>
+    <check type="manual">Confirm .env.example has security warning about webhook secret</check>
+    <check type="test">Test rejects unsigned webhook requests (status 403)</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-7" reason="Must run after basic tests and dev server is confirmed running" />
+    <depends-on task-id="phase-1-task-3" reason="Requires package.json to know if Stripe SDK is included" />
   </dependencies>
 
-  <commit-message>N/A - testing task only</commit-message>
+  <commit-message>feat(templates): add Stripe payment integration with mandatory signature verification
+
+Generates src/payments.ts with:
+- Checkout session creation endpoint
+- Webhook handler for checkout.session.completed
+- REQUIRED webhook signature verification (security-critical)
+- Timing-safe comparison to prevent attacks
+- Actionable error if webhook secret missing
+- Security warnings in code and .env.example
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-<task-plan id="phase-1-task-9" wave="3">
-  <title>Execute final smoke test: Banned patterns recheck</title>
-  <requirement>R3.6 - Final verification that no banned patterns exist in deployed code</requirement>
+<task-plan id="phase-1-task-11" wave="2">
+  <title>Generate TypeScript Environment Types (env.d.ts)</title>
+  <requirement>REQ-039, REQ-040 - TypeScript bindings for Cloudflare Workers environment</requirement>
   <description>
-    Run a comprehensive final check for all banned patterns in the source file. This is a safety
-    verification to ensure no patterns were accidentally reintroduced during earlier edits or
-    that additional violations weren't discovered during testing. This is the last gate before
-    documentation and deployment.
+    Create src/types/env.d.ts with TypeScript interface definitions for all Cloudflare Workers bindings: D1Database, Ai, KVNamespace, and environment variables (CLERK_SECRET_KEY, STRIPE_API_KEY, etc.).
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="File to verify" />
-    <file path="/home/agent/shipyard-ai/prds/membership-v2.md" reason="PRD Phase 3 Test 6 defines comprehensive grep pattern" />
+    <file path="/home/agent/shipyard-ai/projects/tuned/worker/src/index.ts" reason="Reference for Cloudflare Workers env types and bindings" />
   </context>
 
   <steps>
-    <step order="1">Run comprehensive banned pattern check: `grep -c "throw new Response\|rc\.user\|rc\.pathParams\|JSON\.stringify.*kv\|kv\.set.*JSON\.stringify" plugins/membership/src/sandbox-entry.ts || echo 0`</step>
-    <step order="2">Verify result is 0</step>
-    <step order="3">If non-zero, identify which pattern matched and flag as CRITICAL BLOCKER</step>
-    <step order="4">Document test result (PASS if 0, FAIL if >0)</step>
+    <step order="1">Create src/templates/env-dts.ts with generateEnvDts(config) function</step>
+    <step order="2">Generate src/types/env.d.ts with Env interface extending Cloudflare Workers types</step>
+    <step order="3">Add DB: D1Database binding if config.needsDatabase</step>
+    <step order="4">Add AI: Ai binding if config.needsAI</step>
+    <step order="5">Add optional KV: KVNamespace binding (commented out)</step>
+    <step order="6">Define environment variables: CLERK_SECRET_KEY (if auth), STRIPE_API_KEY, STRIPE_WEBHOOK_SECRET (if payments), ANTHROPIC_API_KEY (if AI)</step>
+    <step order="7">Import @cloudflare/workers-types for D1Database, Ai, KVNamespace types</step>
   </steps>
 
   <verification>
-    <check type="test">Comprehensive grep returns 0 matches for all banned patterns</check>
-    <check type="test">No rc.user references</check>
-    <check type="test">No throw new Response in admin routes</check>
-    <check type="test">No rc.pathParams references</check>
-    <check type="test">No manual JSON.stringify KV double-encoding</check>
+    <check type="build">Generate env.d.ts and verify TypeScript compilation succeeds</check>
+    <check type="manual">Confirm Env interface matches wrangler.toml bindings (DB, AI)</check>
+    <check type="manual">Verify environment variable types are string | undefined</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-8" reason="Run as final verification after all other tests pass" />
+    <depends-on task-id="phase-1-task-4" reason="Requires wrangler.toml to know which bindings are configured" />
   </dependencies>
 
-  <commit-message>N/A - testing task only</commit-message>
+  <commit-message>feat(templates): add TypeScript environment types for Workers bindings
+
+Generates src/types/env.d.ts with:
+- D1Database binding (DB)
+- Workers AI binding (AI)
+- KV namespace (optional, commented)
+- Environment variables: CLERK_SECRET_KEY, STRIPE_API_KEY, etc.
+- Full type safety for Cloudflare Workers environment
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-### Wave 4 (Sequential, after Wave 3) — Documentation & Deployment
-
-Final tasks to document results and commit/deploy the changes.
-
----
-
-<task-plan id="phase-1-task-10" wave="4">
-  <title>Create comprehensive test results documentation</title>
-  <requirement>R4.1 - Document all smoke test results with actual outputs</requirement>
+<task-plan id="phase-1-task-12" wave="2">
+  <title>Generate Comprehensive README.md</title>
+  <requirement>REQ-041 to REQ-050 - Excellent README with quickstart, setup, troubleshooting, security warnings</requirement>
   <description>
-    Create deliverables/membership-v2/TEST-RESULTS.md with complete documentation of all 6 smoke
-    tests. Include the exact curl commands used, actual response outputs, pass/fail status for
-    each test, and timestamp. This document serves as proof of testing and reference for future
-    regression testing (when automated after 30-day stability period).
+    Create README.md template with 30-second quickstart, D1 setup instructions, API key setup for Clerk/Stripe/Anthropic, troubleshooting section with direct dashboard links, critical security section for Stripe webhooks, deployment steps, and "Built with WorkerKit" badge.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/prds/membership-v2.md" reason="PRD defines required test documentation format" />
-    <file path="/home/agent/shipyard-ai/rounds/membership-v2/decisions.md" reason="Specifies test matrix and expected outputs" />
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason="README requirements: excellent documentation, troubleshooting, security warnings, brand voice" />
   </context>
 
   <steps>
-    <step order="1">Create directory if needed: `mkdir -p deliverables/membership-v2`</step>
-    <step order="2">Create TEST-RESULTS.md file</step>
-    <step order="3">Add header with timestamp, test environment (dev server), and success criteria</step>
-    <step order="4">Document Test 1 (Admin page load): curl command, actual response, PASS/FAIL status</step>
-    <step order="5">Document Test 2 (Registration): curl command, actual response, PASS/FAIL status</step>
-    <step order="6">Document Test 3 (Status lookup): curl command, actual response, PASS/FAIL status, double-encoding check result</step>
-    <step order="7">Document Test 4 (View members): curl command, actual response, PASS/FAIL status</step>
-    <step order="8">Document Test 5 (View plans): curl command, actual response, PASS/FAIL status</step>
-    <step order="9">Document Test 6 (Banned patterns check): grep command, result count (must be 0), PASS/FAIL status</step>
-    <step order="10">Add summary section: total tests (6), passed, failed, overall result</step>
-    <step order="11">If any test failed, add BLOCKERS section with remediation steps</step>
+    <step order="1">Create src/templates/readme-md.ts with generateReadme(config) function</step>
+    <step order="2">Add hero section with project name and tagline: "Built with WorkerKit – Zero-to-deployed in under 60 seconds"</step>
+    <step order="3">Add 30-second quickstart: npm install, wrangler d1 create, npm run dev (with exact commands)</step>
+    <step order="4">Add "Local dev (no keys needed)" section explaining mock mode for auth and payments</step>
+    <step order="5">Add "Deploy (keys required)" section with Clerk, Stripe, Anthropic API key setup instructions and dashboard URLs</step>
+    <step order="6">Add "D1 Database Setup" section with wrangler d1 commands and migration instructions</step>
+    <step order="7">Add "🔒 CRITICAL: Secure your Stripe webhooks" section with webhook signature verification explanation</step>
+    <step order="8">Add "AI Troubleshooting" section explaining Workers AI quota and Claude fallback</step>
+    <step order="9">Add "Troubleshooting" section with common errors (missing API keys, D1 not created) and direct dashboard links</step>
+    <step order="10">Add "Deployment" section with wrangler deploy command and custom domain setup</step>
+    <step order="11">Add "Want to swap X?" sections for Auth.js, direct Anthropic, etc.</step>
+    <step order="12">Add "Built with WorkerKit" badge at bottom with link to GitHub repo</step>
   </steps>
 
   <verification>
-    <check type="manual">TEST-RESULTS.md file created in deliverables/membership-v2/</check>
-    <check type="manual">All 6 tests documented with actual outputs</check>
-    <check type="manual">Pass/fail status recorded for each test</check>
-    <check type="manual">Timestamp included</check>
-    <check type="manual">Summary shows 6/6 tests passed (or blockers documented if failures)</check>
+    <check type="manual">Generate README and verify it has all required sections</check>
+    <check type="manual">Verify "Built with WorkerKit" badge exists with correct link</check>
+    <check type="manual">Confirm security warning for Stripe webhooks is prominent (uses 🔒 emoji)</check>
+    <check type="manual">Test that all dashboard URLs are correct (Clerk, Stripe, Anthropic)</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-9" reason="All tests must complete before documentation" />
+    <depends-on task-id="phase-1-task-6" reason="Requires knowledge of generated routes" />
+    <depends-on task-id="phase-1-task-7" reason="Requires D1 migration file name" />
+    <depends-on task-id="phase-1-task-9" reason="Requires knowledge of auth setup" />
+    <depends-on task-id="phase-1-task-10" reason="Requires knowledge of Stripe webhook setup" />
   </dependencies>
 
-  <commit-message>N/A - documentation will be committed in phase-1-task-11</commit-message>
+  <commit-message>feat(templates): add comprehensive README with quickstart and security warnings
+
+Generates README.md with:
+- 30-second quickstart
+- Local dev (no keys) vs Deploy (keys required) sections
+- D1 database setup with exact commands
+- 🔒 CRITICAL security section for Stripe webhooks
+- AI troubleshooting (quota, fallback)
+- Troubleshooting with dashboard links
+- Deployment guide
+- "Want to swap X?" sections
+- "Built with WorkerKit" badge
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-<task-plan id="phase-1-task-11" wave="4">
-  <title>Commit all changes to version control</title>
-  <requirement>R4.2 - Commit fixed source file, config changes, and test documentation</requirement>
+### Wave 3 (Sequential) — Testing, Validation & Distribution
+
+**Estimated Duration:** 1 hour
+**Goal:** Validate generated projects work correctly, test critical paths, and publish to npm
+
+Tasks in this wave must run sequentially as they depend on complete code generation from Wave 2.
+
+---
+
+<task-plan id="phase-1-task-13" wave="3">
+  <title>Implement Post-Generation Validation</title>
+  <requirement>REQ-055, REQ-056, REQ-057 - Verify CLI generates valid projects and runs without errors</requirement>
   <description>
-    Stage and commit all changes made during Phase 1: the fixed sandbox-entry.ts file with
-    violations removed, the updated Sunrise Yoga astro.config.mjs with plugin registration,
-    and the TEST-RESULTS.md documentation. Use a clear commit message following repo conventions
-    that references the Harbor plugin and violation fixes.
+    Add validation logic that runs after project generation to verify all files were created, package.json and wrangler.toml are valid, TypeScript compiles without errors, and generated project can npm install successfully.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Modified file to commit" />
-    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs" reason="Modified config to commit" />
-    <file path="/home/agent/shipyard-ai/deliverables/membership-v2/TEST-RESULTS.md" reason="New documentation to commit" />
-    <file path="/home/agent/shipyard-ai/rounds/membership-v2/decisions.md" reason="Specifies commit message format" />
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason="Post-generation validation requirement to catch errors before user sees them" />
   </context>
 
   <steps>
-    <step order="1">Use Bash git status to verify modified files</step>
-    <step order="2">Stage sandbox-entry.ts: `git add plugins/membership/src/sandbox-entry.ts`</step>
-    <step order="3">Stage astro.config.mjs: `git add examples/sunrise-yoga/astro.config.mjs`</step>
-    <step order="4">Stage TEST-RESULTS.md: `git add deliverables/membership-v2/TEST-RESULTS.md`</step>
-    <step order="5">Verify staging with `git status` - should show 3 staged files</step>
-    <step order="6">Create commit with message: `git commit -m "fix: Harbor plugin - resolve 4 violations, register in Sunrise Yoga, verify via smoke tests"`</step>
-    <step order="7">Verify commit succeeded with `git log -1 --oneline`</step>
-    <step order="8">Verify working directory is clean with `git status`</step>
+    <step order="1">Create src/validate.ts with validateGeneratedProject(projectDir) function</step>
+    <step order="2">Verify all expected files exist: package.json, wrangler.toml, tsconfig.json, src/index.ts, README.md</step>
+    <step order="3">Validate package.json is valid JSON: JSON.parse(fs.readFileSync('package.json'))</step>
+    <step order="4">Validate wrangler.toml has correct structure (manual check for required keys: name, main, compatibility_date)</step>
+    <step order="5">Verify no placeholder values remain: grep for "your_account_id_here" and warn user</step>
+    <step order="6">Test TypeScript compilation: run tsc --noEmit in generated project directory</step>
+    <step order="7">If validation fails, throw clear error with file path and reason</step>
+    <step order="8">Add validation call to CLI after file generation: validateGeneratedProject(projectPath)</step>
   </steps>
 
   <verification>
-    <check type="manual">3 files staged: sandbox-entry.ts, astro.config.mjs, TEST-RESULTS.md</check>
-    <check type="manual">Commit created with clear message referencing violations and Harbor</check>
-    <check type="manual">Git log shows new commit</check>
-    <check type="manual">Working directory clean (no uncommitted changes)</check>
+    <check type="build">Generate test project and verify validation passes without errors</check>
+    <check type="manual">Intentionally corrupt package.json (invalid JSON) and verify validation catches it</check>
+    <check type="manual">Remove required file (src/index.ts) and verify validation fails with clear error</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-10" reason="Documentation must be created before committing" />
+    <depends-on task-id="phase-1-task-3" reason="Requires package.json template" />
+    <depends-on task-id="phase-1-task-4" reason="Requires wrangler.toml template" />
+    <depends-on task-id="phase-1-task-6" reason="Requires index.ts template" />
   </dependencies>
 
-  <commit-message>fix: Harbor plugin - resolve 4 violations, register in Sunrise Yoga, verify via smoke tests</commit-message>
+  <commit-message>feat(cli): add post-generation validation
+
+Validates generated projects:
+- All expected files exist
+- package.json is valid JSON
+- wrangler.toml has required fields
+- No placeholder values remain
+- TypeScript compiles without errors
+- Clear error messages if validation fails
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-<task-plan id="phase-1-task-12" wave="4">
-  <title>Deploy to Sunrise Yoga and verify production functionality</title>
-  <requirement>R4.3, R4.4 - Deploy to Cloudflare Workers and verify in production</requirement>
+<task-plan id="phase-1-task-14" wave="3">
+  <title>Create End-to-End Test Suite</title>
+  <requirement>REQ-058, REQ-059, REQ-060 - Verify all integrations work, test error messages</requirement>
   <description>
-    Deploy the updated Sunrise Yoga site with the Harbor plugin to Cloudflare Workers. Run the
-    smoke tests again against the production deployment to ensure everything works in the live
-    environment. If deployment is not ready (env vars missing, KV namespace not created), document
-    the blockers and mark deployment as pending with remediation steps.
+    Create automated test suite that generates a test project, runs npm install, starts wrangler dev, and tests all critical endpoints (health, auth, database, AI, payments). Verify error messages for missing configuration.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/wrangler.jsonc" reason="Cloudflare deployment configuration" />
-    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/package.json" reason="Deploy scripts" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 5 - Cloudflare deployment steps" />
-    <file path="/home/agent/shipyard-ai/rounds/membership-v2/decisions.md" reason="Open questions about deployment target" />
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason="Testing requirements: verify all 5 integrations, test error messages" />
   </context>
 
   <steps>
-    <step order="1">Navigate to Sunrise Yoga directory: `cd examples/sunrise-yoga`</step>
-    <step order="2">Verify wrangler.jsonc has valid configuration for D1, R2, and KV bindings</step>
-    <step order="3">If KV namespace missing, create it: `wrangler kv:namespace create "MEMBERSHIP_KV"` and update wrangler.jsonc</step>
-    <step order="4">Build the site: `npm run build`</step>
-    <step order="5">Deploy to Cloudflare: `npx wrangler deploy`</step>
-    <step order="6">Note the deployed URL from wrangler output (e.g., https://sunrise-yoga.seth-a02.workers.dev)</step>
-    <step order="7">Wait 30 seconds for deployment to propagate</step>
-    <step order="8">Rerun Test 1 against production URL (replace localhost:4321 with deployed URL)</step>
-    <step order="9">Rerun Tests 2-5 against production URL</step>
-    <step order="10">Document production test results (all must pass)</step>
-    <step order="11">If any test fails, investigate error logs: `wrangler tail` or Cloudflare dashboard</step>
-    <step order="12">Document deployment completion or blockers in TEST-RESULTS.md</step>
+    <step order="1">Create tests/e2e.test.ts with end-to-end test suite</step>
+    <step order="2">Test 1: Generate project with all features enabled: run CLI with --skip-prompts</step>
+    <step order="3">Test 2: Run npm install in generated project and verify no errors</step>
+    <step order="4">Test 3: Start wrangler dev and wait for server to be ready</step>
+    <step order="5">Test 4: Call GET /health endpoint and verify 200 response</step>
+    <step order="6">Test 5: Call GET /protected endpoint without auth and verify mock mode works (200 response in dev)</step>
+    <step order="7">Test 6: Simulate missing CLERK_SECRET_KEY in production and verify actionable error message</step>
+    <step order="8">Test 7: Call POST /api/stripe-webhook without signature and verify 403 Forbidden</step>
+    <step order="9">Test 8: Verify README.md has "Built with WorkerKit" badge</step>
+    <step order="10">Clean up: stop wrangler dev and remove test project</step>
   </steps>
 
   <verification>
-    <check type="build">npm run build succeeds</check>
-    <check type="build">wrangler deploy succeeds</check>
-    <check type="test">All 5 smoke tests pass on production URL</check>
-    <check type="manual">Deployment URL documented</check>
-    <check type="manual">No 500 errors or auth failures in production</check>
+    <check type="test">Run tests/e2e.test.ts and verify all tests pass</check>
+    <check type="manual">Verify test suite completes in under 2 minutes</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-11" reason="Changes must be committed before deployment" />
+    <depends-on task-id="phase-1-task-13" reason="Requires validation logic" />
+    <depends-on task-id="phase-1-task-6" reason="Requires index.ts template with routes" />
+    <depends-on task-id="phase-1-task-9" reason="Requires auth middleware" />
+    <depends-on task-id="phase-1-task-10" reason="Requires Stripe webhook handler" />
   </dependencies>
 
-  <commit-message>N/A - deployment task, no code changes</commit-message>
+  <commit-message>test: add end-to-end test suite for generated projects
+
+Tests:
+- CLI generates valid project
+- npm install succeeds
+- wrangler dev starts successfully
+- GET /health returns 200
+- Auth mock mode works without API keys
+- Error messages are actionable
+- Stripe webhook rejects unsigned requests
+- README has WorkerKit badge
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-## RISK NOTES
+<task-plan id="phase-1-task-15" wave="3">
+  <title>Generate .env.example Template</title>
+  <requirement>REQ-009, REQ-030, REQ-036 - Document all API keys with setup URLs and security warnings</requirement>
+  <description>
+    Create .env.example template with all required and optional environment variables documented. Include setup URLs for each service (Clerk, Stripe, Anthropic) and security warnings for critical secrets.
+  </description>
 
-Based on the Risk Scanner Agent's assessment:
+  <context>
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason=".env.example must have excellent inline documentation" />
+  </context>
 
-### CRITICAL RISKS
+  <steps>
+    <step order="1">Create src/templates/env-example.ts with generateEnvExample(config) function</step>
+    <step order="2">Add header comment: "# Environment Variables for [project name] | Copy to .env and fill in your values"</step>
+    <step order="3">Add Clerk section (if auth enabled): CLERK_SECRET_KEY with comment "Get from: https://dashboard.clerk.com → API Keys → Secret Key"</step>
+    <step order="4">Add Stripe section (if payments enabled): STRIPE_API_KEY and STRIPE_WEBHOOK_SECRET with security warning "⚠️ WITHOUT THIS, PAYMENTS ARE NOT VERIFIED"</step>
+    <step order="5">Add Anthropic section (if AI enabled): ANTHROPIC_API_KEY with comment "(Optional, for Claude fallback) Get from: https://console.anthropic.com/account/keys"</step>
+    <step order="6">Add "Local Development" section explaining which keys are optional for npm run dev</step>
+    <step order="7">Add "Production Deployment" section listing required keys for wrangler deploy</step>
+  </steps>
 
-**Risk 1: KV Namespace Binding Missing**
-- **Status:** Medium likelihood, High impact
-- **Mitigation:** Task 6 verifies binding; if missing, create namespace via wrangler and update wrangler.jsonc
-- **Owner:** Task 6 executor
+  <verification>
+    <check type="manual">Generate .env.example and verify all API keys have setup URLs</check>
+    <check type="manual">Confirm STRIPE_WEBHOOK_SECRET has security warning</check>
+    <check type="manual">Verify distinction between optional (local dev) and required (production) is clear</check>
+  </verification>
 
-**Risk 2: Environment Variables Missing**
-- **Status:** Medium likelihood, High impact
-- **Variables needed:** JWT_SECRET, STRIPE_WEBHOOK_SECRET, STRIPE_API_SECRET, APP_URL
-- **Mitigation:** Document in TEST-RESULTS.md if missing; add to wrangler secrets before deploy
-- **Owner:** Task 12 executor
+  <dependencies>
+    <depends-on task-id="phase-1-task-9" reason="Requires knowledge of auth environment variables" />
+    <depends-on task-id="phase-1-task-10" reason="Requires knowledge of Stripe environment variables" />
+    <depends-on task-id="phase-1-task-8" reason="Requires knowledge of AI environment variables" />
+  </dependencies>
 
-**Risk 3: Monolithic File Complexity**
-- **Status:** Low likelihood (for this phase), Medium impact
-- **Concern:** Single 3,600-line file concentrates all logic; high refactoring risk
-- **Mitigation:** DO NOT refactor in this phase; 30-day freeze policy
-- **Owner:** Code review (deferred to V2)
+  <commit-message>feat(templates): add .env.example with setup URLs and security warnings
 
-### HIGH RISKS
+Generates .env.example with:
+- Clerk: CLERK_SECRET_KEY (dashboard URL included)
+- Stripe: STRIPE_API_KEY, STRIPE_WEBHOOK_SECRET (⚠️ security warning)
+- Anthropic: ANTHROPIC_API_KEY (optional, for fallback)
+- Local dev vs Production sections
+- Clear comments explaining which keys are required
 
-**Risk 4: Double-Encoding KV Data**
-- **Status:** Known past issue
-- **Mitigation:** Test 3 explicitly checks for double-encoding; if detected, tests BLOCKED
-- **Owner:** Task 7 executor
-
-**Risk 5: Dev Server Port Mismatch**
-- **Status:** Low likelihood, Low impact
-- **Concern:** PRD assumes localhost:4321, actual port may differ
-- **Mitigation:** Verify actual port when starting dev server in Task 7
-- **Owner:** Task 7 executor
-
-### MEDIUM RISKS
-
-**Risk 6: Integration Test Suite May Fail**
-- **Status:** Medium likelihood, Medium impact
-- **Concern:** Existing __tests__/integration.test.ts may have assertions expecting old code
-- **Mitigation:** Run `npm run test` after Task 3; if failures, investigate and fix
-- **Owner:** Optional post-Wave 3 verification
-
----
-
-## EXECUTION TIMELINE
-
-- **Wave 1 (Research):** 5 minutes (tasks 1, 4 run in parallel)
-- **Wave 2 (Code changes):** 3 minutes (tasks 2, 5 run in parallel)
-- **Wave 3 (Verification & tests):** 12 minutes (tasks 3, 6, 7, 8, 9 run sequentially)
-- **Wave 4 (Documentation & deploy):** 10 minutes (tasks 10, 11, 12 run sequentially)
-- **Total estimated:** 30 minutes
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
 
 ---
 
-## CRITICAL SUCCESS FACTORS
+<task-plan id="phase-1-task-16" wave="3">
+  <title>Publish CLI to npm & Create GitHub Repository</title>
+  <requirement>REQ-051, REQ-052, REQ-053, REQ-054 - Publish to npm, GitHub repo with tags</requirement>
+  <description>
+    Build CLI package, publish to npm as create-workerkit@latest, create public GitHub repository with README, apply discoverability tags (cloudflare-workers, hono, d1), and enable GitHub template system.
+  </description>
 
-1. **All 6 smoke tests must pass** - Partial success (5/6) is failure
-2. **Zero banned pattern violations** - Verified by grep returning 0
-3. **No code rewrites or refactors** - Only remove specified violation blocks
-4. **30-day code freeze** - No optimizations or improvements after deployment
-5. **Manual testing discipline** - Copy-paste curl commands exactly, document actual output
+  <context>
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason="Distribution strategy: npm package + GitHub repo + tags for SEO" />
+  </context>
+
+  <steps>
+    <step order="1">Run npm run build to compile TypeScript CLI to JavaScript</step>
+    <step order="2">Test CLI locally: npm link and run create-workerkit test-project</step>
+    <step order="3">Verify generated project works: cd test-project && npm install && npm run dev</step>
+    <step order="4">Create GitHub repository: github.com/[org]/create-workerkit (public)</step>
+    <step order="5">Copy CLI README.md to GitHub repo with installation instructions</step>
+    <step order="6">Apply GitHub topics: cloudflare-workers, cloudflare-template, hono, d1, typescript, cli-tool</step>
+    <step order="7">Enable GitHub template repository setting (Settings → Template repository checkbox)</step>
+    <step order="8">Publish to npm: npm publish --access public</step>
+    <step order="9">Verify npm package is live: npm view create-workerkit</step>
+    <step order="10">Test published package: npx create-workerkit@latest test-app</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Verify npm package is published: https://www.npmjs.com/package/create-workerkit</check>
+    <check type="manual">Verify GitHub repo is public with correct tags</check>
+    <check type="manual">Test installation: npx create-workerkit@latest test-final && cd test-final && npm install && npm run dev</check>
+    <check type="manual">Verify GitHub template setting is enabled</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-13" reason="Requires validation to ensure CLI works before publishing" />
+    <depends-on task-id="phase-1-task-14" reason="Requires tests to pass before publishing" />
+  </dependencies>
+
+  <commit-message>release: publish create-workerkit v1.0.0 to npm
+
+Published:
+- npm package: create-workerkit@1.0.0
+- GitHub repo: public with tags (cloudflare-workers, hono, d1)
+- GitHub template: enabled
+- Verified: npx create-workerkit@latest works end-to-end
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
 
 ---
 
-## NEXT STEPS AFTER PHASE 1
+<task-plan id="phase-1-task-17" wave="3">
+  <title>Run Final Verification & Generate Test Report</title>
+  <requirement>All requirements - Final verification that v1 is complete</requirement>
+  <description>
+    Execute final verification checklist from REQUIREMENTS.md to confirm all 66 requirements are met. Generate test report documenting verification results and known issues.
+  </description>
 
-1. **30-day monitoring period** - Watch error logs, no code changes
-2. **If stable:** Unlock automation (convert curls to CI script)
-3. **If unstable:** Root cause analysis, targeted fix only (no refactors)
-4. **V2 planning** - Only after 30-day stability proven
+  <context>
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Definition of Done checklist" />
+  </context>
+
+  <steps>
+    <step order="1">Run final test: npx create-workerkit@latest final-test --skip-prompts</step>
+    <step order="2">Verify step 1: CLI generates complete project (check all files exist)</step>
+    <step order="3">Verify step 2: cd final-test && npm install && npm run dev works on fresh machine</step>
+    <step order="4">Verify step 3: Localhost runs without any API keys (mock mode confirmed)</step>
+    <step order="5">Verify step 4: All 5 integrations have working examples (test each route)</step>
+    <step order="6">Verify step 5: README setup takes <5 minutes (manual timer test)</step>
+    <step order="7">Verify step 6: CLI package published to npm (check npmjs.com)</step>
+    <step order="8">Verify step 7: GitHub repo is public with tags applied</step>
+    <step order="9">Verify step 8: Generated code passes TypeScript compilation (tsc --noEmit)</step>
+    <step order="10">Verify step 9: Stripe webhooks have signature verification (grep for 'signature')</step>
+    <step order="11">Verify step 10: Error messages tested (missing keys, bad config)</step>
+    <step order="12">Generate test report: tests/verification-report.md with results and timestamp</step>
+  </steps>
+
+  <verification>
+    <check type="manual">All 10 verification steps from Definition of Done pass</check>
+    <check type="manual">Test report documents any known issues or limitations</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-16" reason="Requires published npm package" />
+  </dependencies>
+
+  <commit-message>test: final verification report for WorkerKit v1.0.0
+
+Verification results:
+- All 66 requirements met
+- Definition of Done: 10/10 checks passed
+- Known issues: [documented in report]
+- Ready for launch
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
 
 ---
 
-**Status:** Ready for execution
-**Owner:** Build agent (single session execution)
-**Timeline:** <30 minutes from start to deployment
-**Next step:** Execute Wave 1 tasks (phase-1-task-1, phase-1-task-4)
+<task-plan id="phase-1-task-18" wave="3">
+  <title>Launch Preparation & Documentation</title>
+  <requirement>REQ-052, REQ-053 - GitHub repo README and launch prep</requirement>
+  <description>
+    Prepare WorkerKit for public launch: finalize GitHub README with installation instructions, contributing guide, license, and launch checklist. Document distribution strategy and success metrics.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/rounds/workerkit/decisions.md" reason="Distribution strategy: Cloudflare partnership, GitHub discoverability" />
+  </context>
+
+  <steps>
+    <step order="1">Create GitHub repository README.md with: hero image/logo placeholder, tagline, installation command, features list, quick example</step>
+    <step order="2">Add "Why WorkerKit?" section explaining the 4-6 hour setup problem</step>
+    <step order="3">Add "What You Get" section listing Hono, D1, Clerk, Workers AI, Stripe integrations</step>
+    <step order="4">Add installation instructions: npx create-workerkit@latest my-app</step>
+    <step order="5">Add "Zero-to-deployed in 60 seconds" quickstart with exact commands</step>
+    <step order="6">Create CONTRIBUTING.md with guidelines for community contributions</step>
+    <step order="7">Add LICENSE file (MIT license)</step>
+    <step order="8">Create CHANGELOG.md with v1.0.0 release notes</step>
+    <step order="9">Add GitHub issue templates: bug report, feature request</step>
+    <step order="10">Document success metric tracking: npm weekly downloads (target: 500/week by month 1)</step>
+  </steps>
+
+  <verification>
+    <check type="manual">GitHub README is compelling and includes installation command</check>
+    <check type="manual">CONTRIBUTING.md exists and is clear</check>
+    <check type="manual">MIT license file exists</check>
+    <check type="manual">Issue templates are set up</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-16" reason="Requires GitHub repository" />
+  </dependencies>
+
+  <commit-message>docs: prepare WorkerKit for public launch
+
+Added:
+- GitHub README with hero, installation, quickstart
+- CONTRIBUTING.md for community
+- LICENSE (MIT)
+- CHANGELOG.md (v1.0.0)
+- GitHub issue templates
+- Success metrics documentation
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+---
+
+## Risk Notes
+
+Based on comprehensive risk analysis, these are the critical watchpoints during build:
+
+### 🔴 Critical Risks (Address Immediately)
+
+1. **Clerk Auth Integration (R1)**
+   - **Risk:** Users forget to add CLERK_SECRET_KEY → auth breaks silently
+   - **Mitigation:** Zero-config mock mode for local dev (task-9)
+   - **Verification:** Test protected routes work without API key in dev mode
+
+2. **D1 Database Setup (R2)**
+   - **Risk:** Users forget to run `wrangler d1 create` → runtime errors
+   - **Mitigation:** Pre-flight validation + excellent inline comments (task-7)
+   - **Verification:** Error message explains exact wrangler command to run
+
+3. **Stripe Webhook Security (R7)**
+   - **Risk:** Developers skip signature verification → payment fraud vulnerability
+   - **Mitigation:** Signature verification REQUIRED in generated code with loud errors (task-10)
+   - **Verification:** Webhook handler rejects unsigned requests (403)
+
+4. **6-Hour Timeline (R3)**
+   - **Risk:** Integration testing exceeds time budget → incomplete features shipped
+   - **Mitigation:** Hard hourly checkpoints, ruthless scope cuts if behind
+   - **Checkpoints:**
+     - Hour 2: Wave 1 complete (CLI + templates)
+     - Hour 5: Wave 2 complete (all integrations)
+     - Hour 6: Wave 3 complete (testing + publish)
+
+### 🟡 High Risks (Monitor Closely)
+
+5. **Workers AI Quota (R5)**
+   - **Risk:** Users hit quota, don't understand fallback → blame WorkerKit
+   - **Mitigation:** Clear quota error messages with setup URL for Claude fallback (task-8)
+   - **Verification:** Error message includes "Add ANTHROPIC_API_KEY for fallback"
+
+6. **Template Validation (R6)**
+   - **Risk:** Generated code has syntax errors → bad first impression
+   - **Mitigation:** Post-generation validation runs TypeScript compilation (task-13)
+   - **Verification:** CLI catches syntax errors before declaring success
+
+---
+
+## Time Checkpoints
+
+| Checkpoint | Time | Tasks Complete | Status Check |
+|-----------|------|----------------|--------------|
+| CP1 | Hour 2 | Wave 1 (tasks 1-5) | CLI generates valid files? |
+| CP2 | Hour 5 | Wave 2 (tasks 6-12) | All integrations have working code? |
+| CP3 | Hour 6 | Wave 3 (tasks 13-18) | Tests pass + npm published? |
+
+**Hard stop rule:** If behind by >30 minutes at any checkpoint, cut scope immediately.
+
+**Scope cut priority** (what to cut first if time runs out):
+1. Task-18 (launch prep) - defer to post-v1
+2. Task-14 (E2E tests) - reduce to smoke tests only
+3. Task-8 AI integration - simplify to Workers AI only (remove Claude fallback)
+4. Task-10 Stripe - reduce to checkout only (remove webhook)
+
+---
+
+## Post-Wave 3 (Sara Blakely Review)
+
+After phase plan completion, auto-trigger Sara Blakely customer gut-check to validate product-market fit before execution begins.
+
+---
+
+*This phase plan is the execution blueprint for WorkerKit v1. All 18 tasks must complete successfully within 6 hours to ship.*

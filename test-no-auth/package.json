@@ -1,0 +1,18 @@
+{
+  "name": "test-no-auth",
+  "version": "1.0.0",
+  "description": "Built with WorkerKit",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "hono": "^4.0.0",
+    "wrangler": "^3.0.0",
+    "typescript": "^5.0.0"
+  }
+}
