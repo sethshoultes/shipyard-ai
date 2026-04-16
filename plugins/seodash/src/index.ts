@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import type { PluginDescriptor } from "emdash";
 
 /**
@@ -16,11 +18,17 @@ import type { PluginDescriptor } from "emdash";
  * Astro: SeoHead for meta tag injection, SocialPreview for OG/Twitter previews
  */
 export function seodashPlugin(): PluginDescriptor {
+	// NOTE: Use real file path instead of npm alias (@shipyard/seodash/sandbox)
+	// The alias works in local dev via node_modules but fails in Cloudflare Workers
+	// which only has access to bundled code. Bundler resolves absolute paths correctly.
+	const currentDir = dirname(fileURLToPath(import.meta.url));
+	const entrypointPath = join(currentDir, "sandbox-entry.ts");
+
 	return {
 		id: "seodash",
 		version: "1.0.0",
 		format: "standard",
-		entrypoint: "@shipyard/seodash/sandbox",
+		entrypoint: entrypointPath,
 		capabilities: [],
 		options: {},
 		adminPages: [

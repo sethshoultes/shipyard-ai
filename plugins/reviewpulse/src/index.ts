@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import type { PluginDescriptor } from "emdash";
 
 /**
@@ -17,11 +19,17 @@ import type { PluginDescriptor } from "emdash";
  * Astro: ReviewWidget for displaying ratings on site pages
  */
 export function reviewpulsePlugin(): PluginDescriptor {
+	// NOTE: Use real file path instead of npm alias (@shipyard/reviewpulse/sandbox)
+	// The alias works in local dev via node_modules but fails in Cloudflare Workers
+	// which only has access to bundled code. Bundler resolves absolute paths correctly.
+	const currentDir = dirname(fileURLToPath(import.meta.url));
+	const entrypointPath = join(currentDir, "sandbox-entry.ts");
+
 	return {
 		id: "reviewpulse",
 		version: "1.0.0",
 		format: "standard",
-		entrypoint: "@shipyard/reviewpulse/sandbox",
+		entrypoint: entrypointPath,
 		capabilities: ["email:send"],
 		options: {},
 		adminPages: [
