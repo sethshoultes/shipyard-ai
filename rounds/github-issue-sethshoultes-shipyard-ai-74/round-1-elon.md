@@ -1,51 +1,61 @@
-# Elon's Analysis: EventDash Entrypoint Fix
+# Round 1: Elon's First-Principles Analysis
 
-## Architecture: Simplest System That Works
-This is a **copy-paste job**. Membership plugin already solved this. File path resolution instead of npm alias. Done. The pattern exists, tested, working. Zero invention needed. Implementation time: 5 minutes.
+## Architecture: What's the simplest system that could work?
 
-The Node.js path resolution (`fileURLToPath` + `dirname` + `join`) is standard library. No dependencies. No magic. Works in bundlers because it resolves at runtime to absolute paths.
+**This is a 15-minute bug fix, not architecture.**
 
-## What to CUT
-**Everything except the core fix.**
+Copy-paste the Membership plugin's working pattern. That's it. Three lines of code changed. Any developer spending more than 20 minutes on this is overthinking.
 
-The PRD adds "register EventDash in astro.config.mjs" — that's **scope creep**. This is a bug fix, not a feature enablement ticket. If EventDash isn't registered, that's a separate issue. Fix the entrypoint bug. Ship it. Move on.
+The pattern is already proven in production. File paths resolve at build time. Zero runtime overhead. Zero npm dependency hell.
 
-Cut: astro.config.mjs registration (make it issue #75 if it matters).
+## Performance: Where are the bottlenecks?
 
-## Technical Feasibility
-Can one agent session build this? **Yes, trivially.**
+**There are no bottlenecks here.** This is build-time path resolution. Static analysis. The bundler handles it. Performance impact: 0ms.
 
-1. Read `plugins/membership/src/index.ts` (the working reference)
-2. Read `plugins/eventdash/src/index.ts` (the broken file)
-3. Copy the pattern over
-4. Verify `sandbox-entry.ts` exists at expected location
-5. Commit
+The npm alias path was *slower* because it added resolver complexity. File paths are dumb-simple. Fast compilation = fast iteration = better dev experience.
 
-Total complexity: 1/10. This is mechanical code surgery.
+## Distribution: How does this reach 10,000 users without paid ads?
 
-## Performance
-**Non-issue.** File path resolution happens once at plugin init. Zero runtime cost. The npm alias was broken, not slow — this fixes correctness, not speed.
+**Irrelevant question for a bug fix.** But the meta-question matters: Cloudflare Workers won't deploy broken code. Fixing this unblocks deployment. No deployment = 0 users forever.
 
-## Scaling
-**Irrelevant.** This is a build-time/deploy-time fix. Whether 1 user or 1M users deploy on Cloudflare Workers, the entrypoint resolution happens once per deployment, not per request.
+The real distribution play is making the plugin system reliable enough that developers trust it. Every bug like this erodes trust. Ship fast, fix fast, build credibility.
 
-## Distribution
-This is infrastructure. Users don't see it. It unblocks Cloudflare Workers deployments, which is table stakes for edge compute distribution. Without this fix, EventDash is **dead in production** on Workers. With it, it works. Binary outcome.
+## What to CUT: What's scope creep?
 
-## The 10x Path
-There is none. This is a bug fix. The 10x path is **don't create this bug again**:
-- Add a linter rule that catches npm alias patterns in entrypoints
-- Add integration test that builds for Cloudflare Workers target
-- Better: generate entrypoints from a template so this pattern can't drift
+**Everything except the literal 3-line change is scope creep.**
 
-## What Breaks at 100x Usage?
-Nothing related to this fix. File path resolution is deterministic. If the sandbox entry file exists, it resolves. If it doesn't, it fails immediately (good failure mode).
+The PRD mentions "also register EventDash in astro.config.mjs" — that's a separate concern. If EventDash isn't registered yet, maybe it's not ready. Don't bundle unrelated work into a critical path bug fix.
+
+Ship the path fix NOW. Test registration separately. Atomic commits win.
+
+## Technical Feasibility: Can one agent session build this?
+
+**Yes. Trivially.** This is:
+1. Read `plugins/membership/src/index.ts` (working reference)
+2. Edit `plugins/eventdash/src/index.ts` (apply pattern)
+3. Test build
+4. Commit
+
+Total time budget: 10 minutes if the agent doesn't overthink. 60 minutes if it does exploratory analysis first.
+
+The only risk is if `sandbox-entry.ts` doesn't exist or has the wrong name. Check file structure first.
+
+## Scaling: What breaks at 100x usage?
+
+**Nothing in this specific fix.** File paths scale infinitely.
+
+The bigger scaling question: why did this pattern need fixing *twice*? (Membership already fixed, now EventDash.) If there are 10 plugins, are 8 of them still broken?
+
+Real scaling fix: create a `createPluginDescriptor()` helper that enforces the file path pattern. Codify best practices once, reuse everywhere. That's how you avoid fixing the same bug 10 times.
 
 ## Bottom Line
-This is a **4-line code change**. The PRD is 62 lines for a problem that's already solved in another file.
 
-**Ship the fix. Cut the scope creep. Add the linter. Next.**
+This is a **P0 bug** because it blocks deployment, but it's a **P3 complexity fix** because it's just copy-paste.
+
+**Ship it in <20 minutes or kill it.** If there are blockers (missing files, weird build setup), surface them immediately. Don't spend a day debugging a 3-line change.
+
+The meta-lesson: plugin system needs better guardrails. File path pattern should be the default, not something developers discover by breaking production.
 
 ---
 
-**Recommendation:** Approve for immediate implementation. Single-session build. Zero risk.
+**Final verdict:** ✅ Ship. Cut the astro.config registration unless it's already tested. One bug, one fix, one commit.

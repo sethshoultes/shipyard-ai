@@ -1,80 +1,45 @@
-# Steve Jobs — Chief Design & Brand Officer
+# Steve Jobs — Design & Brand Position
 ## Issue #74: EventDash Entrypoint Fix
 
 ---
 
 ## Product Naming
+**EventDash is PERFECT.** One word. Kinetic. It evokes speed, movement, energy — exactly what event management should feel like. The dash is the sprint to make your event happen. Keep it.
 
-**EventDash** — It's perfect. One word. It MOVES. You hear it and you know: events, fast, now. Keep it.
+## Design Philosophy: Invisible Infrastructure
+This fix is about **trust**. When you flip a light switch, you don't think about the electrical grid. When you use EventDash, you shouldn't think about bundlers, npm aliases, or entrypoint resolution.
 
-But "entrypoint"? That's engineer-speak. Internally, call it what it is: **The Gateway**. Every plugin has one gateway. One path in. Simplicity.
-
----
-
-## Design Philosophy: What Makes This Insanely Great?
-
-**Consistency is the soul of craft.**
-
-This isn't about fixing a bug. This is about creating a **pattern language** that every developer can trust. When you open Membership, you see file paths. When you open EventDash, you should see the SAME pattern. Not npm aliases. Not clever abstractions. Just: "Here's where the code lives."
-
-The Membership plugin already nailed this. We're not inventing — we're **aligning**. That's design discipline.
-
----
+The plugin should work *everywhere*, *immediately*, *without explanation*. That's what "it just works" means. This bug violates our core design principle: **technology should disappear**.
 
 ## User Experience: The First 30 Seconds
+A developer adds `eventdashPlugin()` to their config. They run build. **It works.** That's the entire experience. No error messages. No Stack Overflow searches. No "works locally but fails in production" nightmares.
 
-A developer clones Shipyard. They open `plugins/eventdash/src/index.ts`. They see:
+The first 30 seconds should feel like *relief* — the relief of not having to fight your tools.
 
-```typescript
-const entrypointPath = join(currentDir, "sandbox-entry.ts");
-```
-
-**Instant clarity.** No magic. No confusion. They understand in 3 seconds what would take 30 minutes to debug on Cloudflare Workers.
-
-That's the difference between frustration and flow. We're designing for **cognitive ease**.
-
----
-
-## Brand Voice: How This Product Speaks
-
-**"It just works."**
-
-Shipyard doesn't apologize for complexity. It ELIMINATES it. Our plugins don't ask you to configure package.json, npm aliases, or bundler hacks. They say: "This file. Right here. Done."
-
-Our voice is **confident silence**. When something works perfectly, you don't notice it. That's the highest compliment.
-
----
+## Brand Voice
+EventDash speaks with *confidence and clarity*. It doesn't apologize. It doesn't explain itself. It registers, it builds, it ships. The code is self-documenting. The paths are explicit. No magic strings. No clever abstractions that leak.
 
 ## What to Say NO To
+**NO to npm aliases for unpublished packages.** This is architectural dishonesty — pretending something is published when it isn't. It's a lie that creates fragility.
 
-**Say NO to:**
-- npm aliases in entrypoints (they lie about where code lives)
-- "It works locally" as a success metric (Cloudflare is reality)
-- One-off solutions (if Membership solved it, EventDash copies it)
-- Clever code (clarity beats cleverness every single time)
+**NO to "it works in dev."** Dev is not production. If it doesn't work everywhere, it doesn't work.
 
-**Simplicity means removing.** We're not adding a feature. We're removing a point of failure.
+**NO to following Membership's pattern "sort of."** Either copy the exact pattern that works, or have a damn good reason not to. Consistency is not the hobgoblin of small minds — it's the foundation of reliability.
 
----
+## The Emotional Hook
+Developers will LOVE EventDash because **it respects their time**.
 
-## The Emotional Hook: Why Will People LOVE This?
+Every minute spent debugging bundler configuration is a minute stolen from building something meaningful. This fix is about giving that time back. It's about treating developers like they deserve tools that work, not puzzles to solve.
 
-Because **it doesn't break**.
+When EventDash just works — in local dev, in Cloudflare Workers, in every environment — developers feel *powerful*. They feel like they can build anything. That's the emotional promise: **we handle the infrastructure so you can focus on your craft**.
 
-Developers will deploy to Cloudflare Workers and their EventDash plugin will just... work. No 3am debugging. No "works on my machine" shame. No Stack Overflow rabbit holes.
+## The Standard We're Setting
+This isn't just a bug fix. It's a statement about what quality means at Great Minds Agency. Quality means file paths that resolve. Quality means builds that succeed. Quality means keeping promises.
 
-They'll feel what we felt when the first iPhone woke up from sleep instantly: **"Wait, that's it? It just... works?"**
+If we ship EventDash with this bug, we're telling users: "Close enough." And close enough is the enemy of great.
 
-That shock of simplicity — THAT is the hook.
-
-This isn't a bug fix. This is a **trust moment**.
+**Fix the entrypoint. Use file paths. Ship something that works. That's the job.**
 
 ---
 
-## The Standard
-
-From now on, EVERY plugin in Shipyard uses file paths. Not aliases. Not shortcuts. We set the pattern. Others follow.
-
-**Great design is obvious in hindsight.**
-
-Let's make this obvious.
+*"Real artists ship." — But they ship things that work.*

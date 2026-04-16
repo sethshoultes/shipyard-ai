@@ -1,24 +1,24 @@
 # Essence
 
-**What it's really about:**
-Make infrastructure invisible so developers trust the platform.
+**What this is really about:**
+Making infrastructure disappear.
 
 **The feeling:**
-Relief. It just works. No debugging at 3am.
+Relief. It just works.
 
 **The one thing that must be perfect:**
-Consistency across all plugins. Same pattern, zero exceptions.
+Consistency.
 
 **Creative direction:**
-Silence is the highest compliment.
+Trust through silence.
 
 ---
 
-**The tension:**
-Steve wants pattern language. Elon wants automated enforcement.
+**The harsh truth:**
+- Fixed code nobody needs yet
+- Proved nothing to users
+- Drowned win in documentation
+- Board score: 2.75/10
 
-**The synthesis:**
-Document the standard. Let tools enforce it. Ship both.
-
-**The rule:**
-File paths, not aliases. Always.
+**What actually matters:**
+File paths, not promises.

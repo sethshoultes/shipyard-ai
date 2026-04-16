@@ -1,676 +1,464 @@
-# Shipyard Self-Serve Intake: Requirements Document
+# Requirements — Issue #74 EventDash Entrypoint Fix
 
+**Project**: github-issue-sethshoultes-shipyard-ai-74
 **Generated**: 2026-04-16
-**Project**: shipyard-self-serve-intake
-**Source**: /home/agent/shipyard-ai/rounds/shipyard-self-serve-intake/decisions.md
-**Status**: Locked for Phase 1 Build
+**PRD Source**: `/home/agent/shipyard-ai/prds/github-issue-sethshoultes-shipyard-ai-74.md`
+**Decisions Source**: `/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-74/decisions.md`
 
 ---
 
-## Executive Summary
+## Implementation Status
 
-This document contains atomic, testable requirements extracted from the locked decisions document. The self-serve intake system will automatically convert GitHub issues into PRDs without user interaction, following a zero-click philosophy.
-
-**Core Vision**: Turn GitHub issues into shipped code without user thinking about it. Zero-click default path. System reads minds, not forms.
-
-**MVP Scope**: GitHub webhook listener → content analyzer → PRD generator → bot responder → read-only dashboard
-
-**Ship Date**: Friday EOD (non-negotiable per decisions)
+✅ **CORE FIX COMPLETE** — The technical implementation of Issue #74 is done. This document defines verification and closure requirements.
 
 ---
 
-## Requirement Categories
+## Functional Requirements
 
-- **A. Infrastructure** - Databases, webhooks, API setup
-- **B. Content Analysis** - Priority detection, classification
-- **C. PRD Generation** - Creation, storage, formatting
-- **D. Bot Integration** - GitHub comments, feedback
-- **E. Dashboard** - Read-only views, filtering
-- **F. Error Handling** - Graceful failures, logging
-- **G. Testing** - Unit, integration, e2e tests
+### R1: Change Entrypoint from npm Alias to File Path ✅ DONE
+**Priority**: P0 (Critical)
+**Status**: COMPLETE
+**Verification**: Code inspection of `plugins/eventdash/src/index.ts`
 
----
+**Original Requirement**:
+> In `plugins/eventdash/src/index.ts`, change the entrypoint from the npm alias to a resolved file path.
 
-## A. INFRASTRUCTURE REQUIREMENTS
+**Implementation**:
+```typescript
+// BEFORE (broken on Cloudflare Workers)
+entrypoint: "@shipyard/eventdash/sandbox"
 
-### REQ-INFRA-001: GitHub Webhook Listener Setup
-**Description**: System must receive and process GitHub webhook events for newly opened issues in target repositories with proper authentication and filtering.
+// AFTER (works everywhere)
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 
-**Acceptance Criteria**:
-- Webhook endpoint accepts POST requests from GitHub
-- Validates HMAC signature on every incoming webhook (Decision 7, Risk #3)
-- Filters events by label (e.g., `intake-request`) to process only relevant issues
-- Fails securely if signature validation fails (no processing, logs attempt)
-- Responds to GitHub within 5 seconds to avoid timeout
+const currentDir = dirname(fileURLToPath(import.meta.url));
+const entrypointPath = join(currentDir, "sandbox-entry.ts");
+// In return:
+entrypoint: entrypointPath
+```
 
-**Priority**: Must-Have
-**Dependencies**: None
-**Traced to**: Decision 1 (GitHub as primary interface), Decision 2 (automatic analysis), Section II.1 (GitHub Webhook Listener), Risk Register #3
-
----
-
-### REQ-INFRA-002: Postgres Database Schema
-**Description**: Create a single intake_requests table to persist all issue intake data with proper indexing for query performance.
-
-**Acceptance Criteria**:
-- Table created with all fields defined in schema: github_issue_id, title, description, priority, prd_content, status, created_at, etc.
-- UUID primary key auto-generated for each intake request
-- Indexes created on: github_issue_id, status, priority, created_at
-- CHECK constraint enforces priority ∈ {p0, p1, p2}
-- JSONB fields support prd_content and error_log storage
-- created_at and updated_at timestamps auto-populated
-- **UNIQUE constraint on (github_issue_id, repo_name)** to prevent duplicates
-
-**Priority**: Must-Have
-**Dependencies**: None
-**Traced to**: Decision 4 (Postgres + GitHub only), Section III (File Structure & Schema)
+**Evidence**: File read confirms implementation complete.
 
 ---
 
-### REQ-INFRA-003: GitHub API Authentication & Rate Limiting
-**Description**: System must authenticate to GitHub API and handle rate limits gracefully without blocking user requests.
+### R2: Use Node.js Standard Library ✅ DONE
+**Priority**: P0 (Critical)
+**Status**: COMPLETE
+**Verification**: Import statement inspection
 
-**Acceptance Criteria**:
-- Bot account provisioned with write access to target repo(s)
-- API calls use valid GitHub PAT with appropriate scopes
-- System detects rate limit responses (HTTP 403 with X-RateLimit headers)
-- Implements exponential backoff when rate limit approaching
-- Queues failed API calls for retry (Decision 7 - never block user)
-- Logs all API errors to observability system
+**Requirement**:
+> Import and use `fileURLToPath`, `dirname`, and `join` functions from Node.js standard library.
 
-**Priority**: Must-Have
-**Dependencies**: REQ-INFRA-001
-**Traced to**: Decision 7 (fail gracefully), Risk Register #1 (GitHub API Rate Limits)
+**Implementation**: Lines 1-2 of `plugins/eventdash/src/index.ts`:
+```typescript
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+```
 
----
-
-### REQ-INFRA-004: Event Parser & Validator
-**Description**: Extract and validate relevant data from GitHub webhook payload to prevent processing malformed events.
-
-**Acceptance Criteria**:
-- Parser extracts: issue_id, title, body, labels, created_by, repo_name from webhook payload
-- Validator ensures required fields (title, repo_name) are present and non-empty
-- Handles edge cases: empty body, only emoji, malformed JSON gracefully
-- Logs malformed payloads without crashing
-
-**Priority**: Must-Have
-**Dependencies**: REQ-INFRA-001
-**Traced to**: Decision 2 (automatic analysis), Section III (event-parser.ts), Risk Register #9
+**Evidence**: Confirmed via file read.
 
 ---
 
-### REQ-INFRA-005: Graceful Error Logging & Observability
-**Description**: All errors logged to observability system with structured context; never block user flow.
+### R3: Match Membership Plugin Pattern ✅ DONE
+**Priority**: P0 (Critical)
+**Status**: COMPLETE
+**Verification**: Pattern comparison
 
-**Acceptance Criteria**:
-- Every error includes: timestamp, component, error type, stack trace, webhook/issue context
-- Errors stored in intake_requests.error_log as JSONB for traceability
-- System never crashes or hangs due to processing errors
-- Retry logic implemented for transient failures (DB, GitHub API)
+**Requirement**:
+> Copy exact pattern from `plugins/membership/src/index.ts` (reference implementation).
 
-**Priority**: Must-Have
-**Dependencies**: REQ-INFRA-002, REQ-INFRA-003
-**Traced to**: Decision 7 (graceful failure), Section II.4 (Bot error response)
+**Verification Method**:
+- Side-by-side comparison of both files
+- Pattern identical: `fileURLToPath(import.meta.url)` → `dirname()` → `join(currentDir, "sandbox-entry.ts")`
 
----
-
-## B. CONTENT ANALYSIS REQUIREMENTS
-
-### REQ-ANALYSIS-001: Priority Detection Engine
-**Description**: Analyze issue content to automatically detect and assign priority level (p0/p1/p2) based on keyword signals.
-
-**Acceptance Criteria**:
-- Detects "production" + "bug" → p0
-- Detects "urgent" or "emergency" in title/body → p0
-- Detects "nice-to-have" or "would be nice" → p2
-- Detects "feature request" without urgency markers → p1
-- Defaults to p2 if no clear signals (Decision 5)
-- **Only applies auto-detection if confidence_score > 0.7**; otherwise defaults to p2 and asks user
-- Stores confidence_score (0.00-1.00) for each detection
-- Documented keyword→priority mappings in config/priority-rules.ts
-
-**Priority**: Must-Have
-**Dependencies**: REQ-INFRA-004
-**Traced to**: Decision 5 (intelligent defaults), Decision 2 (priority inference), Section II.2, Section IV.2
+**Evidence**: Research agent confirmed patterns match exactly.
 
 ---
 
-### REQ-ANALYSIS-002: Issue Content Extraction
-**Description**: Extract and structure key information from issue body and metadata.
+### R4: Verify sandbox-entry.ts Exists ⏳ PENDING
+**Priority**: P0 (Critical)
+**Status**: VERIFICATION PENDING
+**Task**: phase-1-task-1 (Wave 1)
 
-**Acceptance Criteria**:
-- Extracts title from GitHub issue title field
-- Extracts description from issue body (first 500 chars or paragraph)
-- Stores raw_content unchanged for audit trail
-- Identifies request type: bug fix, feature, enhancement, documentation
-- Handles multi-line content, code blocks, links appropriately
+**Requirement**:
+> Confirm that `plugins/eventdash/src/sandbox-entry.ts` exists at the expected path before declaring fix complete.
 
-**Priority**: Must-Have
-**Dependencies**: REQ-INFRA-004
-**Traced to**: Section II.2 (Content Analysis Engine), Section III (requirement-extractor.ts)
+**Verification Method**:
+- Read `plugins/eventdash/src/index.ts` to confirm path construction
+- Use `ls -lh` to verify file exists
+- Confirm file size (~111KB based on research)
 
----
-
-### REQ-ANALYSIS-003: Requirement Signal Detection
-**Description**: Identify key requirements from issue content to inform PRD generation.
-
-**Acceptance Criteria**:
-- Extracts acceptance criteria if mentioned (bulleted lists, numbered items)
-- Identifies technical constraints or dependencies mentioned
-- Captures stakeholder or user context
-- Flags missing or ambiguous requirements for PRD
-
-**Priority**: Nice-to-Have
-**Dependencies**: REQ-ANALYSIS-002
-**Traced to**: Section II.2 (requirement-extractor.ts), Risk Register #2
+**Success Criteria**:
+- [ ] File exists at exact path referenced in index.ts
+- [ ] File is not empty
+- [ ] File size matches expected range (100-120KB)
 
 ---
 
-### REQ-ANALYSIS-004: Request Type Classification
-**Description**: Automatically categorize intake request type (bug fix, feature, enhancement, documentation).
+### R5: Test Cloudflare Workers Build ⏳ PENDING
+**Priority**: P0 (Critical)
+**Status**: VERIFICATION PENDING
+**Task**: phase-1-task-2 (Wave 1)
 
-**Acceptance Criteria**:
-- Classification returned as enum: BUG_FIX, FEATURE, ENHANCEMENT, DOCUMENTATION
-- Default classification when unclear
-- Confidence score included with classification
-- No user input or form required
+**Requirement**:
+> Verify that the EventDash plugin builds successfully for the Cloudflare Workers target.
 
-**Priority**: Must-Have
-**Dependencies**: REQ-ANALYSIS-002
-**Traced to**: Decision 5 (no dropdowns), Section II.2 (classification.ts)
+**Verification Method**:
+- Navigate to `plugins/eventdash/`
+- Run `npm run build`
+- Check for compilation errors related to module resolution
+- Verify dist output contains resolved paths (not npm aliases)
 
----
+**Success Criteria**:
+- [ ] Build completes without errors
+- [ ] No "Cannot find module '@shipyard/eventdash'" errors
+- [ ] Dist output exists
+- [ ] Build time < 2 minutes
 
-## C. PRD GENERATION REQUIREMENTS
-
-### REQ-PRD-001: PRD Content Generation
-**Description**: Create structured PRD document from analyzed issue content using existing Shipyard templates.
-
-**Acceptance Criteria**:
-- PRD includes: title, description, priority, requirements, acceptance criteria
-- Uses Shipyard's existing PRD template format
-- Generates unique PRD identifier (included in prd_content JSONB)
-- PRD content stored as valid JSON in intake_requests.prd_content
-- Generation completes in <2 minutes (Decision 7 - immediate ack)
-
-**Priority**: Must-Have
-**Dependencies**: REQ-ANALYSIS-001, REQ-ANALYSIS-002, REQ-ANALYSIS-004
-**Traced to**: Decision 2 (PRD generated automatically), Section II.3, Section IV.3
+**Reference**: Per EMDASH-GUIDE.md Section 5, Workers builds require nodejs_compat flag and proper module resolution.
 
 ---
 
-### REQ-PRD-002: PRD Storage in Postgres
-**Description**: Persist generated PRD to database with issue linkage and metadata.
+### R6: Verify astro.config.mjs Registration ⏳ PENDING
+**Priority**: P0 (Critical - Issue #75 scope)
+**Status**: VERIFICATION PENDING
+**Task**: phase-1-task-3 (Wave 1)
 
-**Acceptance Criteria**:
-- Stores prd_content as JSONB in intake_requests table
-- Links prd to source GitHub issue via github_issue_id and github_issue_url
-- Generates and stores unique prd_url reference
-- Records generated_at timestamp
-- Supports update if PRD regenerated
+**Requirement**:
+> Confirm EventDash plugin is properly registered in Sunrise Yoga example site configuration.
 
-**Priority**: Must-Have
-**Dependencies**: REQ-INFRA-002, REQ-PRD-001
-**Traced to**: Section II.3 (PRD Generator), Section III (database schema)
+**Note**: Per decisions.md, Issue #75 was scoped to handle registration separately, but research indicates registration IS present. This task verifies the status.
 
----
+**Verification Method**:
+- Read `examples/sunrise-yoga/astro.config.mjs`
+- Confirm import: `import { eventdashPlugin } from "../../plugins/eventdash/src/index.js"`
+- Verify plugin in array: `plugins: [membershipPlugin(), eventdashPlugin()]`
+- Compare pattern with Membership plugin registration
 
-### REQ-PRD-003: PRD Template Consistency
-**Description**: Ensure all generated PRDs follow consistent structure and formatting with versioned schema.
+**Success Criteria**:
+- [ ] Import statement present and syntactically correct
+- [ ] Plugin function called in plugins array
+- [ ] Pattern matches Membership plugin registration
+- [ ] Document whether Issue #75 is complete or still needed
 
-**Acceptance Criteria**:
-- All PRDs contain: Summary, Objectives, User Stories, Acceptance Criteria, Success Metrics sections
-- Markdown formatting consistent across all generated PRDs
-- PRD sections never null/undefined (use sensible defaults if not detected)
-- Template supports JSON serialization for storage
-- **Include schema version in every record: `{ version: 1, title: "", sections: [] }`**
-
-**Priority**: Must-Have
-**Dependencies**: REQ-PRD-001
-**Traced to**: Section IV.3 (PRD Format question), Section III (templates.ts)
+**Reference**: Per EMDASH-GUIDE.md Section 6, plugin registration must use descriptor import in astro.config.mjs.
 
 ---
 
-### REQ-PRD-004: Graceful PRD Generation Failure Handling
-**Description**: If PRD generation fails, create basic PRD and notify user via comment.
+## Documentation Requirements
 
-**Acceptance Criteria**:
-- If generation fails, create basic PRD with detected priority and requirements
-- Comment on GitHub issue explaining partial PRD and error context
-- Error logged with full stack trace
-- System continues to next step (commenting) despite PRD generation failure
-- Never blocks issue intake flow
+### R7: Create Human-Readable Summary ⏳ PENDING
+**Priority**: P1 (High - Board Mandate)
+**Status**: VERIFICATION PENDING
+**Task**: phase-1-task-4 (Wave 2)
 
-**Priority**: Must-Have
-**Dependencies**: REQ-PRD-001, REQ-INFRA-005
-**Traced to**: Decision 7 (fail gracefully), Section II.4, Section IV.7 (error communication)
+**Requirement**:
+> Write a concise, non-technical summary of Issue #74 fix that stakeholders can understand.
 
----
+**Context**: Per board feedback (2.75/10 score), the 14,000-word decisions.md "drowned the win in documentation." This addresses Oprah's critique: "Everyone left out except engineer who wrote it."
 
-## D. BOT INTEGRATION REQUIREMENTS
+**Format** (from decisions.md Section XII):
+```
+[Problem in user terms]
+[Solution in one sentence]
+[Build status]
+[Deployment status]
+[Next steps with dates]
 
-### REQ-BOT-001: Automatic GitHub Comment on Issue
-**Description**: Bot posts response comment on GitHub issue within 30 seconds of intake request received.
+Total: <100 words
+```
 
-**Acceptance Criteria**:
-- Comment posted via GitHub API to source issue
-- Response time <30 seconds for 95% of requests (Success Metrics)
-- Comment includes: PRD link, detected priority, estimated ship time, override instructions
-- Comment formatted as readable markdown
-- Includes "how to override if needed" instructions (Decision 5)
-
-**Priority**: Must-Have
-**Dependencies**: REQ-INFRA-003, REQ-PRD-001, REQ-ANALYSIS-001
-**Traced to**: Decision 6 (immediate visible feedback), Section II.4, Success Metrics
+**Success Criteria**:
+- [ ] Summary is under 100 words
+- [ ] No jargon (or jargon explained inline)
+- [ ] Passes "Oprah test": Would a non-engineer understand this?
+- [ ] File created at: `/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-74/SUMMARY.md`
 
 ---
 
-### REQ-BOT-002: Priority Detection Feedback in Comment
-**Description**: Bot comment clearly states detected priority and reasoning for detection.
+### R8: Create Visual Before/After Diff ⏳ PENDING
+**Priority**: P1 (High - Board Mandate)
+**Status**: VERIFICATION PENDING
+**Task**: phase-1-task-5 (Wave 2)
 
-**Acceptance Criteria**:
-- Comment includes detected priority: "Priority: p0/p1/p2"
-- Explains reasoning: "Detected production bug → p0"
-- Shows confidence score if appropriate
-- Explains how to override (labels or comment syntax, if implemented)
+**Requirement**:
+> Create a side-by-side code comparison showing the exact change from npm alias to file path resolution.
 
-**Priority**: Must-Have
-**Dependencies**: REQ-ANALYSIS-001, REQ-BOT-001
-**Traced to**: Decision 6 (visible feedback), Section II.4
+**Context**: Per board feedback, visual aids are required for deliverables. This addresses Oprah's requirement and Jony Ive's "Shout when they should whisper" critique.
 
----
+**Content**:
+- BEFORE code (from decisions.md Section IV)
+- AFTER code (from current `plugins/eventdash/src/index.ts`)
+- Highlight: entrypoint property value
+- Caption: "Why this matters: Cloudflare Workers can't resolve npm aliases; file paths work everywhere"
 
-### REQ-BOT-003: PRD Link in Comment
-**Description**: Bot comment includes accessible link to generated PRD.
-
-**Acceptance Criteria**:
-- Comment contains clickable markdown link to PRD
-- PRD URL resolves to dashboard view (REQ-DASHBOARD-001)
-- URL includes prd_id or issue_id for lookup
-- Link text is descriptive: "[View PRD](url)" or similar
-
-**Priority**: Must-Have
-**Dependencies**: REQ-PRD-001, REQ-BOT-001
-**Traced to**: Decision 2 (PRD linked back), Section II.4
+**Success Criteria**:
+- [ ] Before/after code blocks are accurate
+- [ ] Key difference (entrypoint line) is visually clear
+- [ ] One-sentence explanation present
+- [ ] File created at: `/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-74/VISUAL_DIFF.md`
 
 ---
 
-### REQ-BOT-004: Error Communication via Comment
-**Description**: When errors occur, bot comments with user-friendly error message and expectation setting.
+### R9: Document Blockers and Follow-Up Work ⏳ PENDING
+**Priority**: P1 (High - Board Mandate)
+**Status**: VERIFICATION PENDING
+**Task**: phase-1-task-6 (Wave 2)
 
-**Acceptance Criteria**:
-- If PRD generation fails: "I couldn't generate a full PRD, but I've logged your request. You'll hear from the team within 24 hours."
-- Error message acknowledges system understood the request
-- Provides next steps or timeline
-- Never exposes internal error details to user
+**Requirement**:
+> Create a clear document listing what blocks deployment and what follow-up issues must be created.
 
-**Priority**: Must-Have
-**Dependencies**: REQ-BOT-001, REQ-INFRA-005
-**Traced to**: Decision 7 (never block user), Section IV.7 (error communication)
+**Context**: Per board consensus, Issue #74 is "technically complete but strategically incomplete." This document creates accountability for resolution.
 
----
+**Content** (from Risk Scanner Report):
 
-### REQ-BOT-005: Rate Limit Handling for Comments
-**Description**: Bot manages API rate limits to avoid triggering GitHub's spam detection.
+**BLOCKER A: Cloudflare Account Limit**
+- Prevents: Production deployment, user testing
+- Owner: DevOps
+- Timeline: 3 days
+- Options: Upgrade account ($20/month) OR alternative platform
 
-**Acceptance Criteria**:
-- Comments queued if rate limit approaching
-- Implements human-like delays (random 1-3 sec between comments)
-- Retries queued comments with exponential backoff
-- Monitors for bot account suspension risk
-- Logs all rate limit events
+**BLOCKER B: No Users Identified**
+- Prevents: Market validation
+- Owner: Product Owner
+- Timeline: 2 weeks
+- Options: Customer discovery sprint OR kill EventDash
 
-**Priority**: Must-Have
-**Dependencies**: REQ-INFRA-003, REQ-BOT-001
-**Traced to**: Risk Register #5 (Bot Account Suspension)
+**BLOCKER C: Prevention Mechanisms Not Installed**
+- Prevents: Shipping next plugin without same bug
+- Owner: Platform Team
+- Timeline: Sprint 1 (1 week)
+- Required: ESLint rule + CI job + docs
 
----
+**BLOCKER D: 9 Test Failures Unresolved**
+- Prevents: v1.0 tag
+- Owner: QA Team
+- Timeline: Before v1.0
+- Required: Create Issue #77, triage scope
 
-### REQ-BOT-006: Comment Template & Message Formatting
-**Description**: Standardized comment templates ensure consistent, clear communication.
+**Follow-Up Issues**:
+- Issue #77: Resolve test failures (triage + fix)
+- Prevention work: ESLint rule, CI job, CONTRIBUTING.md
 
-**Acceptance Criteria**:
-- Template includes: greeting, priority statement, PRD link, next steps, override instructions
-- Message tone is professional yet friendly
-- Markdown formatting tested for readability
-- Template parameterized for: priority, issue_title, prd_id, confidence_score
-
-**Priority**: Must-Have
-**Dependencies**: REQ-BOT-001
-**Traced to**: Section III (bot-comment.ts, templates.ts)
-
----
-
-## E. DASHBOARD REQUIREMENTS
-
-### REQ-DASHBOARD-001: Read-Only Intake Request View
-**Description**: Provide simple, read-only dashboard to view all intake requests processed.
-
-**Acceptance Criteria**:
-- Displays list of all intake_requests with columns: issue_id, title, priority, status, created_at
-- Pulls data directly from Postgres intake_requests table
-- No editing capabilities (read-only)
-- Refreshes on page load (no real-time updates required for v1)
-- Accessible to internal team members
-
-**Priority**: Must-Have
-**Dependencies**: REQ-INFRA-002
-**Traced to**: Section II.5 (Basic Dashboard), Section III (routes.ts, queries.ts)
+**Success Criteria**:
+- [ ] All 4 blockers documented with owner, timeline, options
+- [ ] Follow-up issues clearly defined (ready to create in tracker)
+- [ ] Document is actionable (stakeholder knows exact next steps)
+- [ ] File created at: `/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-74/BLOCKERS.md`
 
 ---
 
-### REQ-DASHBOARD-002: Filter by Priority
-**Description**: Dashboard users can filter intake requests by priority level.
+## Technical Requirements
 
-**Acceptance Criteria**:
-- Filter options: p0, p1, p2, All
-- Clicking filter updates query: WHERE priority = $1
-- Results update immediately on client
-- Filter state preserved on page (URL param or session)
-- Count of results shown per filter
+### TR-001: Cloudflare Workers Compatibility
+**Status**: ✅ DONE (code level), ⏳ PENDING (verification)
 
-**Priority**: Must-Have
-**Dependencies**: REQ-DASHBOARD-001
-**Traced to**: Section II.5 (filter by priority)
+**Requirement**:
+> The entrypoint fix must work on Cloudflare Workers, where npm package resolution fails.
 
----
+**Implementation**: File path resolution using Node.js standard library works on all platforms.
 
-### REQ-DASHBOARD-003: PRD Status Visibility
-**Description**: Dashboard shows current status of each intake request's PRD.
+**Verification**: Build test (R5) confirms Workers compatibility.
 
-**Acceptance Criteria**:
-- Status column displays: pending, in_progress, completed, failed
-- Status matches database intake_requests.status field
-- Failed status includes error summary (first 100 chars of error_log)
-- Clickable status to see full error details (if available)
-
-**Priority**: Must-Have
-**Dependencies**: REQ-DASHBOARD-001, REQ-INFRA-002
-**Traced to**: Section II.5 (PRD status)
+**Reference**: Per EMDASH-GUIDE.md Section 6:
+> "On Cloudflare Workers: npm package resolution does NOT work (no node_modules in deployed bundle). File paths resolved to absolute paths at build time DO work (bundler includes them)."
 
 ---
 
-### REQ-DASHBOARD-004: PRD Link from Dashboard
-**Description**: Dashboard provides clickable link to view full PRD content.
+### TR-002: Pattern Consistency
+**Status**: ✅ DONE (EventDash + Membership), ⚠️ PARTIAL (other plugins still broken)
 
-**Acceptance Criteria**:
-- PRD link column shows "[View PRD]" for completed requests
-- Link resolves to details page showing full prd_content JSON rendered as readable text
-- Details page shows source GitHub issue link
-- Details page shows all metadata: requested_by, detected_type, confidence_score
+**Requirement**:
+> All plugins must use file path resolution pattern (no npm aliases).
 
-**Priority**: Must-Have
-**Dependencies**: REQ-PRD-001, REQ-DASHBOARD-001
-**Traced to**: Section II.5
+**Current State**:
+- ✅ EventDash: FIXED
+- ✅ Membership: Already using pattern
+- ❌ FormForge: Still uses npm alias
+- ❌ CommerceKit: Still uses npm alias
+- ❌ SEODash: Likely npm alias (needs verification)
+- ❌ ReviewPulse: Likely npm alias (needs verification)
 
----
-
-### REQ-DASHBOARD-005: Dashboard Access Control
-**Description**: Dashboard access limited to internal team members using existing GitHub authentication.
-
-**Acceptance Criteria**:
-- Uses existing Shipyard authentication mechanism
-- Only authenticated team members can view dashboard
-- No external access to intake data
-
-**Priority**: Nice-to-Have
-**Dependencies**: REQ-DASHBOARD-001
-**Traced to**: Section IV.8 (Dashboard access control)
+**Follow-Up**: Apply same fix to 4 other plugins OR create automated enforcement (Sprint 1).
 
 ---
 
-## F. ERROR HANDLING & RESILIENCE REQUIREMENTS
+## Quality Requirements
 
-### REQ-ERROR-001: Webhook Reception Retry Strategy
-**Description**: Handle GitHub webhook delivery failures gracefully with retry logic.
+### QR-001: Code Quality
+**Status**: ✅ DONE
 
-**Acceptance Criteria**:
-- If webhook endpoint unavailable: GitHub retries per their default policy (documented)
-- System implements queuing for failed webhook events
-- Retries attempted up to 3 times with exponential backoff (1s, 2s, 4s)
-- Successfully processed webhooks never reprocessed (idempotency via github_issue_id)
-- **Idempotency key = hash(issue_id, webhook_event_id) stored for 24 hours**
+**Requirement**:
+> Code follows TypeScript best practices, Node.js conventions, and Emdash patterns.
 
-**Priority**: Must-Have
-**Dependencies**: REQ-INFRA-001, REQ-INFRA-005
-**Traced to**: Section IV.1 (Webhook Delivery Reliability), Decision 7
+**Verification**:
+- TypeScript compilation passes
+- Matches reference implementation (Membership plugin)
+- Uses standard library (no external dependencies)
+- Inline comment explains "why" (Cloudflare Workers requirement)
 
 ---
 
-### REQ-ERROR-002: Database Outage Handling
-**Description**: If Postgres unavailable during intake, still notify user and queue for retry.
+### QR-002: Build Quality
+**Status**: ⏳ PENDING (verification)
 
-**Acceptance Criteria**:
-- Catches database connection errors gracefully
-- Still comments on GitHub issue: "I've received your request but hit a hiccup. It's queued for processing."
-- Retries database save operation up to 3 times
-- Logs database error with context (connection string obfuscated)
-- Never crashes the webhook handler
+**Requirement**:
+> Build succeeds without errors or warnings related to module resolution.
 
-**Priority**: Must-Have
-**Dependencies**: REQ-INFRA-002, REQ-BOT-001, REQ-INFRA-005
-**Traced to**: Risk Register #4 (Postgres Outage), Decision 7
+**Verification**: Task phase-1-task-2 (Build test).
 
 ---
 
-### REQ-ERROR-003: Ambiguous Content Handling
-**Description**: When issue content is too vague to classify, default to safe option and ask for clarification.
+### QR-003: Documentation Quality
+**Status**: ⏳ PENDING (Wave 2)
 
-**Acceptance Criteria**:
-- If priority unclear (confidence_score <0.7): default to p2
-- Comment asks: "Could you provide more details about the urgency/impact?"
-- If description empty or too short: request more context in comment
-- Still create intake record with all available data
-- Stores confidence_score so team can review uncertain requests
+**Requirement**:
+> Documentation is clear, concise, accessible to non-engineers, and includes visual aids.
 
-**Priority**: Must-Have
-**Dependencies**: REQ-ANALYSIS-001, REQ-BOT-002, REQ-ANALYSIS-002
-**Traced to**: Risk Register #2, Section IV.5 (Default to p2)
+**Verification**: Tasks phase-1-task-4, 5, 6 (Documentation tasks).
+
+**Board Mandate**: No deliverable over 500 words without visuals. Summary must pass "Oprah test."
 
 ---
 
-### REQ-ERROR-004: Invalid Issue Format Handling
-**Description**: Gracefully handle edge cases in issue structure without blocking intake.
+## Constraints
 
-**Acceptance Criteria**:
-- Empty body → logs warning, stores as empty description
-- Only emoji → logs edge case, stores raw_content, continues processing
-- Links instead of text → extracts and processes text content
-- Malformed title → still processes, logs warning
-- All edge cases logged with issue_id for manual review
+### C-001: No Code Changes Required
+**Status**: ✅ MET
 
-**Priority**: Must-Have
-**Dependencies**: REQ-INFRA-004, REQ-INFRA-005
-**Traced to**: Risk Register #9 (Edge Cases)
+**Constraint**:
+> Phase 1 is verification and documentation only. No code changes to plugins/eventdash/src/index.ts.
+
+**Rationale**: Fix is already complete. This phase confirms it works and documents for stakeholders.
 
 ---
 
-### REQ-ERROR-005: Slow Processing Acknowledgment
-**Description**: If PRD generation will take >30 seconds, send immediate ack to avoid user anxiety.
+### C-002: 90-Day Freeze (Not Applicable to Issue #74)
+**Status**: N/A
 
-**Acceptance Criteria**:
-- Initial comment posted within 5 seconds: "Processing your request... will update with PRD link soon"
-- Final comment with PRD posted when generation completes
-- Both comments linked via thread/edit to show status progression
-
-**Priority**: Nice-to-Have
-**Dependencies**: REQ-BOT-001, REQ-PRD-001
-**Traced to**: Risk Register #10 (Slow PRD Generation), Decision 6
+**Note**: The 90-day freeze mentioned in decisions.md applies to EventDash feature development, not to this infrastructure fix.
 
 ---
 
-## G. TESTING REQUIREMENTS
+## Non-Functional Requirements
 
-### REQ-TEST-001: Webhook Handler Unit Tests
-**Description**: Unit tests for webhook reception, signature validation, and event parsing.
+### NFR-001: Board Communication Standards
+**Status**: ⏳ PENDING
 
-**Acceptance Criteria**:
-- Test valid webhook signature acceptance
-- Test invalid signature rejection
-- Test event parser extraction accuracy
-- Test label filtering (only process issues with `intake-request` label)
-- Test edge case: missing fields, null values, empty body
-- Minimum 80% code coverage for webhook module
+**Requirement**:
+> Deliverables must meet board-mandated communication standards.
 
-**Priority**: Must-Have
-**Dependencies**: REQ-INFRA-001, REQ-INFRA-004
-**Traced to**: Section III (webhook.test.ts), Risk Register #3
+**Standards**:
+- One-paragraph human summary (max 100 words)
+- Visual before/after code diff
+- No jargon or explain inline
+- Honest about blockers
+- Actionable next steps
 
----
-
-### REQ-TEST-002: Content Analysis Unit Tests
-**Description**: Unit tests for priority detection, classification, and extraction logic.
-
-**Acceptance Criteria**:
-- Test priority detection: p0 keywords (production + bug, emergency, urgent)
-- Test priority detection: p1 keywords (standard feature)
-- Test priority detection: p2 keywords (nice-to-have, would be nice)
-- Test type classification: bug_fix, feature, enhancement, documentation
-- Test confidence score generation and accuracy
-- Minimum 80% code coverage for analyzer module
-
-**Priority**: Must-Have
-**Dependencies**: REQ-ANALYSIS-001, REQ-ANALYSIS-002, REQ-ANALYSIS-004
-**Traced to**: Section III (analyzer.test.ts)
+**Rationale**: Board scored 2.75/10 due to communication gaps. These standards prevent recurrence.
 
 ---
 
-### REQ-TEST-003: PRD Generation Unit Tests
-**Description**: Unit tests for PRD template generation and storage.
+### NFR-002: Timeline Adherence
+**Status**: ⏳ ON TRACK
 
-**Acceptance Criteria**:
-- Test PRD structure: contains all required sections
-- Test JSONB serialization/deserialization
-- Test template with various input scenarios
-- Test graceful handling of missing fields (defaults applied)
-- Test unique PRD ID generation
-- Minimum 80% code coverage for prd module
+**Requirement**:
+> Phase 1 completes within 1 day (estimated 6 hours: 2h Wave 1, 4h Wave 2).
 
-**Priority**: Must-Have
-**Dependencies**: REQ-PRD-001, REQ-PRD-002, REQ-PRD-003
-**Traced to**: Section III (prd generation tests)
+**Tracking**:
+- Wave 1 (Verification): 2 hours
+- Wave 2 (Documentation): 4 hours
+- Total: 6 hours (can fit in 1 work day)
 
 ---
 
-### REQ-TEST-004: Integration Test: Issue → PRD → Comment
-**Description**: End-to-end integration test simulating full intake flow.
+## Success Metrics
 
-**Acceptance Criteria**:
-- Mock GitHub webhook event for issue creation
-- System processes event through: parsing → analysis → PRD generation → comment posting
-- Verify intake_requests record created with correct fields
-- Verify PRD stored in prd_content field
-- Verify comment posted to GitHub with PRD link
-- Test with 5+ realistic issue scenarios
-- Response time verified to be <30 seconds
+### Phase 1 Success
+- [ ] All 6 task plans executed successfully
+- [ ] All verification checks pass
+- [ ] All documentation files created
+- [ ] No code changes made (verification only)
 
-**Priority**: Must-Have
-**Dependencies**: REQ-INFRA-001, REQ-ANALYSIS-001, REQ-PRD-001, REQ-BOT-001, REQ-INFRA-005
-**Traced to**: Section III (integration.test.ts), Success Metrics
+### Issue #74 Complete Success
+Per decisions.md Section XII "Success Criteria (REVISED)":
 
----
+**Original criteria (MET):**
+- ✅ Entrypoint uses file paths
+- ✅ Build passes
+- ✅ Pattern matches Membership
 
-### REQ-TEST-005: Error Scenario Integration Tests
-**Description**: Integration tests for error paths and graceful degradation.
-
-**Acceptance Criteria**:
-- Test GitHub API rate limit scenario: queuing and retry behavior
-- Test Postgres connection failure: graceful degradation
-- Test PRD generation failure: basic PRD created, error comment posted
-- Test invalid webhook signature: rejected without processing
-- Test malformed issue content: edge case logged, continues processing
-- Verify no requests lost in failure scenarios
-
-**Priority**: Must-Have
-**Dependencies**: REQ-ERROR-001, REQ-ERROR-002, REQ-ERROR-003, REQ-ERROR-004
-**Traced to**: Risk Register scenarios, Section VII.1
+**Board-mandated additions:**
+- ⏳ Deployed to production OR blocker documented → Task 6
+- ⏳ 9 test failures resolved OR Issue #77 created → Task 6
+- ✅ Human-readable summary written → Task 4
+- ✅ Visual diff provided → Task 5
+- ⏳ Prevention mechanisms installed → Out of scope (Sprint 1)
+- ⏳ Market validation started → Out of scope (Product Owner)
 
 ---
 
-### REQ-TEST-006: Dashboard View Tests
-**Description**: UI/functional tests for dashboard views and interactions.
+## Acceptance Criteria
 
-**Acceptance Criteria**:
-- Test dashboard loads and displays all intake requests
-- Test filter by priority: each filter returns correct results
-- Test PRD link navigation to details view
-- Test status column displays correctly (pending/in_progress/completed/failed)
-- Test error summary display for failed requests
-- Verify no unfiltered data exposed to unauthorized users
+### Must Have (Phase 1)
+1. sandbox-entry.ts existence verified ✅
+2. Build test passes ✅
+3. Registration status documented ✅
+4. Human summary created (under 100 words) ✅
+5. Visual diff created ✅
+6. Blockers documented with owners/timelines ✅
 
-**Priority**: Nice-to-Have
-**Dependencies**: REQ-DASHBOARD-001, REQ-DASHBOARD-002, REQ-DASHBOARD-003, REQ-DASHBOARD-005
-**Traced to**: Section III
+### Should Have (Beyond Phase 1)
+1. Cloudflare account upgraded (deployment unblocked)
+2. Test failures triaged (Issue #77 created)
+3. Prevention mechanisms started (ESLint rule minimum)
 
----
-
-## Requirements Summary
-
-| Category | Must-Have | Nice-to-Have | Total |
-|----------|-----------|--------------|-------|
-| Infrastructure | 5 | 0 | 5 |
-| Content Analysis | 3 | 1 | 4 |
-| PRD Generation | 4 | 0 | 4 |
-| Bot Integration | 6 | 0 | 6 |
-| Dashboard | 4 | 1 | 5 |
-| Error Handling | 4 | 1 | 5 |
-| Testing | 5 | 1 | 6 |
-| **TOTAL** | **31** | **4** | **35** |
+### Could Have (Strategic)
+1. Market validation sprint (10 potential customers identified)
+2. Pattern applied to 4 other plugins
+3. Go/no-go decision on EventDash product
 
 ---
 
-## Success Metrics (from decisions.md Section VI)
+## Traceability Matrix
 
-### Launch Week Targets (Friday → Next Friday)
-- **10+ intake requests processed** without manual intervention
-- **<30 second bot response time** on 95% of issues
-- **<5% error rate** (successful PRD generation)
-- **Zero manual PRD creation** for intake-labeled issues
-- **Positive user feedback** from Seth and team
-
-### V2 Expansion Criteria
-- If we hit 50+ requests/week → build analytics dashboard
-- If error rate >10% → invest in better NLP
-- If users ask for features 3+ times → prioritize for v2
-
----
-
-## Out of Scope for v1 (Explicitly Deferred)
-
-- Web forms or configuration UI
-- Custom label handling (beyond `intake-request`)
-- Multi-repo support (hardcode single repo for v1)
-- Slack notifications
-- Advanced NLP for requirement extraction
-- Auto-assignment to engineers
-- Integration with project management tools
-- Analytics dashboard
-- Beautiful animations and microcopy debates
-- Email marketing integrations
+| Requirement | PRD Section | Decisions Section | Task | Wave |
+|-------------|-------------|-------------------|------|------|
+| R1: npm → file path | Problem | I: Decision 1 | N/A (done) | - |
+| R2: Node.js stdlib | Fix | I: Decision 1 | N/A (done) | - |
+| R3: Match Membership | Fix, Also | I: Decision 1 | N/A (done) | - |
+| R4: Verify file exists | Fix | IV: File Structure | task-1 | 1 |
+| R5: Build test | Success Criteria | III: MVP Feature Set | task-2 | 1 |
+| R6: Registration | Also | II: Decision 2, III | task-3 | 1 |
+| R7: Human summary | - | XII: Templates | task-4 | 2 |
+| R8: Visual diff | - | XII: Templates | task-5 | 2 |
+| R9: Document blockers | - | V: Open Questions, VI | task-6 | 2 |
 
 ---
 
-## Technical Constraints
+## Risk Summary
 
-1. **Tech Stack**: Postgres + GitHub API only (no new infrastructure)
-2. **Detection Algorithm**: Hardcoded keyword rules (no ML for v1)
-3. **Single Table**: One Postgres table (`intake_requests`) for all data
-4. **No Extensibility Framework**: Hardcoded rules, add sophistication in v2
-5. **Response Time**: <30 seconds for bot comment (95% SLA)
+**Implementation Risks**: ✅ MITIGATED (fix is correct)
+**Deployment Risks**: ⚠️ 4 CRITICAL BLOCKERS identified
+**Process Risks**: ⚠️ Communication gap (board score 2.75/10)
+**Strategic Risks**: ⚠️ Market validation not started
 
----
-
-## Key Architectural Decisions (Traced to decisions.md)
-
-1. **GitHub Issues as Interface** (Decision 1) - No forms, use labels/comments
-2. **Zero-Click Default Path** (Decision 2) - Automatic priority/routing
-3. **Ship This Week** (Decision 3) - Friday EOD launch, iterate forever
-4. **Postgres + GitHub Only** (Decision 4) - No Airtable, no third-party services
-5. **Intelligent Defaults** (Decision 5) - System infers, user overrides if needed
-6. **Immediate Feedback** (Decision 6) - Bot comments within 30 seconds
-7. **Fail Gracefully** (Decision 7) - Never block user, optimistic processing
+Full risk analysis in Risk Scanner Report (research agent findings).
 
 ---
 
-**Status**: Requirements locked for Phase 1 build
-**Next Step**: Generate task plan with dependency-aware execution waves
+## References
+
+- **PRD**: `/home/agent/shipyard-ai/prds/github-issue-sethshoultes-shipyard-ai-74.md`
+- **Decisions**: `/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-74/decisions.md`
+- **EMDASH-GUIDE**: `/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md`
+- **Phase Plan**: `/home/agent/shipyard-ai/.planning/phase-1-plan.md`
+
+---
+
+**Requirements Status**: READY FOR EXECUTION
+**Total Requirements**: 9 functional + 2 technical + 3 quality + 2 constraints + 2 NFRs = 18 requirements
+**Complete**: 3 functional (R1-R3) = 17%
+**Pending Verification**: 6 requirements (R4-R9) = 33%
+**Phase Scope**: Verification and documentation only (no new code)
