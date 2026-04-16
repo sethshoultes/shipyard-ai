@@ -1,35 +1,36 @@
-# Sara Blakely Gut-Check — Phase 1 Plan
+# Sara Blakely Gut-Check: Phase 1 Plan
 
 ## Would a customer pay for this?
-**No.** Config plumbing. Zero customer value. No one wakes up wanting "plugins registered correctly."
 
-They want: Events that sell, members who pay, yoga classes that fill. This is foundation, not product.
+**NO.** This isn't a product — it's internal plumbing.
 
-## Confusing / Bounce Triggers
-- Six tasks to fix three config lines? Over-engineered.
-- "Wave 1, Wave 2" sounds military. Just ship it.
-- Zero customer language. All tech jargon.
-- Risk section reads paranoid. Know the risks? Fix them.
-- 30-line commit message? No one reads that.
+Issue #74 is bug fix work. Fixes a Cloudflare Workers deployment blocker. Nobody pays for deployment fixes. They pay for what the fix *enables* — but that's not articulated here.
 
-## 30-Second Elevator Pitch
-"Shipyard makes it dead-simple to run a yoga studio online — events, memberships, payments. Fixing backend so two key features actually load. Not sexy, blocks everything else."
+## What's confusing? What makes someone bounce?
 
-## Test First With $0 Marketing Budget
-- Install EventDash on ONE real yoga studio site
-- Call owner: "Can you create an event and charge for it?"
-- If she can't figure it out in 60 seconds, it's broken
-- Watch her screen, don't talk. Her confusion = your roadmap.
+- **It's already done.** Why am I reviewing a completed plan? Feels like busywork.
+- **Zero customer language.** All tech jargon. Who uses EventDash? Why do they care?
+- **No "before/after" pain story.** What broke? Who was frustrated? How does this unblock them?
+- **"Deployment blocker" buried at line 399.** That's the headline! Lead with it.
 
-## Retention Hook
-**Missing.** No hook in this plan because it's infrastructure.
+## 30-second elevator pitch
 
-Real hook candidates:
-- Auto-fill events from Google Calendar (zero-effort setup)
-- One-tap "Copy Last Event" (teachers repeat schedules)
-- SMS reminder 1hr before class (shows up = revenue)
+"Sunrise Yoga couldn't deploy event tracking to production. We fixed the plugin loader so it works on Cloudflare. Now devs can ship event analytics without worrying about bundler quirks."
 
-## Bottom Line
-Plan is solid technically. Over-engineered emotionally.
+## What would I test with $0 marketing budget?
 
-Ship fast, prove it works, move to features customers can feel.
+Can't test this — it's infrastructure. But if EventDash is the product:
+- Find 3 devs trying to deploy Astro + Cloudflare Workers
+- Have them install EventDash
+- Watch where they get stuck
+- Fix that next
+
+## Retention hook?
+
+**None here.** This is a one-time fix. Retention comes from EventDash itself — if it delivers value (analytics? insights?), people keep using it.
+
+## Honest take
+
+Well-executed *engineering* plan. Terrible *customer* plan. Reads like commit log, not value story. If this were a pitch deck, I'd pass — no problem articulation, no user empathy, no "why should I care."
+
+Fix: Reframe around user pain. "Devs waste 4 hours debugging deployment. We make it instant."
