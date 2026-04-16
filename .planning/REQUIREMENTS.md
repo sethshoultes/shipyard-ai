@@ -1,201 +1,231 @@
-# Requirements: membership-deploy
+# Requirements: Membership Production Fix
 
-**Generated**: 2026-04-16
-**Project**: membership-deploy
-**Source PRD**: /home/agent/shipyard-ai/prds/membership-deploy.md
-**Source Decisions**: /home/agent/shipyard-ai/rounds/membership-deploy/decisions.md
-
----
-
-## Executive Summary
-
-Deploy the clean membership plugin from `deliverables/membership-fix/` to `plugins/membership/src/`. This is a 3-file copy operation with zero banned patterns, complete endpoint testing, and full user flow validation. Binary outcome: works completely or rollback immediately.
-
-**Scope**: SMALL AND FOCUSED
-- Copy 3 files (sandbox-entry.ts, auth.ts, email.ts)
-- Verify zero banned patterns
-- Test 3 API endpoints
-- Document results
-- Commit and push
-
-**NOT in Scope**:
-- Renaming to "Portal"
-- Copy/UX rewrites
-- Pre-commit hooks (post-ship)
-- Directory structure unification (post-ship)
-- CI/CD automation (post-ship)
+**Project:** membership-production-fix
+**Generated:** 2026-04-16
+**Source Documents:**
+- PRD: `/home/agent/shipyard-ai/prds/membership-production-fix.md`
+- Decisions: `/home/agent/shipyard-ai/rounds/membership-production-fix/decisions.md`
 
 ---
 
-## Requirements Traceability Matrix
+## Problem Statement
 
-### Pre-Deploy Validation
+The MemberShip plugin is registered in `examples/sunrise-yoga/astro.config.mjs` and the site builds + deploys successfully. But the plugin is **NOT** showing in the Emdash manifest at production (`https://yoga.shipyard.company/_emdash/api/manifest` returns `[]`).
 
-| REQ-ID | Priority | Requirement | Success Criteria | Acceptance Test |
-|--------|----------|-------------|------------------|-----------------|
-| REQ-001 | MUST | Dev server running on port 4324 | Server responds to HTTP requests | `curl -s http://localhost:4324/_emdash/api/plugins/membership/admin \| head -1` returns valid response |
-| REQ-002 | MUST | Source files exist in deliverables/ | All 3 files present | `test -f deliverables/membership-fix/sandbox-entry.ts && test -f deliverables/membership-fix/auth.ts && test -f deliverables/membership-fix/email.ts` |
-| REQ-003 | MUST | Destination directory writable | plugins/membership/src/ exists | `test -d plugins/membership/src/ && test -w plugins/membership/src/` |
-| REQ-004 | MUST | Fail fast if server unavailable | Clear error, halt immediately | Attempt deploy without server, verify halt with error message |
+Plugin routes return errors:
+- `/plugins/membership/admin` → `{"error":{"code":"UNAUTHORIZED","message":"Authentication required"}}`
+- `/plugins/membership/register` → `{"error":{"code":"INTERNAL_ERROR","message":"Plugin route error"}}`
 
-### File Deployment
-
-| REQ-ID | Priority | Requirement | Success Criteria | Acceptance Test |
-|--------|----------|-------------|------------------|-----------------|
-| REQ-005 | MUST | Copy sandbox-entry.ts | File copied successfully | `cp deliverables/membership-fix/sandbox-entry.ts plugins/membership/src/` exits 0 |
-| REQ-006 | MUST | Copy auth.ts (if exists) | File copied or skipped gracefully | `cp deliverables/membership-fix/auth.ts plugins/membership/src/auth.ts 2>/dev/null \|\| true` |
-| REQ-007 | MUST | Copy email.ts (if exists) | File copied or skipped gracefully | `cp deliverables/membership-fix/email.ts plugins/membership/src/email.ts 2>/dev/null \|\| true` |
-| REQ-008 | MUST | Zero banned patterns in all files | Count = 0 for all patterns | `grep -c "throw new Response\|rc\.user\|rc\.pathParams" plugins/membership/src/*.ts` returns 0 for each file |
-| REQ-009 | MUST | Commit with clear message | Commit includes "0 banned pattern violations" | `git log --oneline -1 \| grep "0 banned pattern violations"` |
-
-### Endpoint Testing
-
-| REQ-ID | Priority | Requirement | Success Criteria | Acceptance Test |
-|--------|----------|-------------|------------------|-----------------|
-| REQ-010 | MUST | Admin endpoint returns 200 | HTTP 200 with valid JSON | `curl -s http://localhost:4324/_emdash/api/plugins/membership/admin -H "Content-Type: application/json" -d '{"type":"page_load"}' \| head -5` shows response |
-| REQ-011 | MUST | Register endpoint returns 200 | HTTP 200 with valid JSON | `curl -s -X POST http://localhost:4324/_emdash/api/plugins/membership/register -H "Content-Type: application/json" -d '{"email":"smoketest@example.com","plan":"basic"}' \| head -5` shows response |
-| REQ-012 | MUST | Status endpoint returns 200 | HTTP 200 with valid JSON | `curl -s http://localhost:4324/_emdash/api/plugins/membership/status -H "Content-Type: application/json" -d '{"email":"smoketest@example.com"}' \| head -5` shows response |
-| REQ-013 | MUST | Fail if any endpoint non-200 | Deployment halts immediately | All 3 endpoints must return 200 or rollback |
-
-### Full User Flow Testing (Steve's Requirement)
-
-| REQ-ID | Priority | Requirement | Success Criteria | Acceptance Test |
-|--------|----------|-------------|------------------|-----------------|
-| REQ-014 | MUST | User visits members-only page | Page loads without error | Manual: Navigate to membership entry point |
-| REQ-015 | MUST | User enters email address | Email input accepts valid format | Manual: Type email, form accepts |
-| REQ-016 | MUST | User receives magic link | Email delivered with clickable link | Manual: Check inbox, verify link present |
-| REQ-017 | MUST | Magic link grants access | Clicking link shows protected content | Manual: Click link, verify authentication |
-| REQ-018 | MUST | Session persists | Page refresh maintains auth | Manual: Refresh page after REQ-017, still authenticated |
-
-### Negative Testing
-
-| REQ-ID | Priority | Requirement | Success Criteria | Acceptance Test |
-|--------|----------|-------------|------------------|-----------------|
-| REQ-019 | MUST | Invalid email rejected | System shows error for bad format | Manual: Submit "invalidemail", verify error |
-| REQ-020 | MUST | Error message terse and factual | Message is 1-2 sentences, no chatty copy | Manual: Read error, verify brevity |
-| REQ-021 | MUST | Expired link shows error | Clear error for invalid/expired links | Manual: Use expired link, verify error |
-| REQ-022 | MUST | Expired link error terse | Message is 1-2 sentences, factual | Manual: Read error, verify brevity |
-
-### Documentation
-
-| REQ-ID | Priority | Requirement | Success Criteria | Acceptance Test |
-|--------|----------|-------------|------------------|-----------------|
-| REQ-026 | MUST | TEST-RESULTS.md created | File exists with all sections | `test -f deliverables/membership-v2/TEST-RESULTS.md` |
-| REQ-027 | MUST | Banned pattern counts documented | All 3 patterns listed with count 0 | `grep "throw new Response.*0" deliverables/membership-v2/TEST-RESULTS.md` |
-| REQ-028 | MUST | API test results documented | All 3 endpoints listed with status codes | `grep -E "(Admin\|Register\|Status).*200" deliverables/membership-v2/TEST-RESULTS.md` |
-| REQ-029 | MUST | Notes section completed | Section exists (can be empty) | `grep "## Notes" deliverables/membership-v2/TEST-RESULTS.md` |
-| REQ-030 | MUST | README updated | Deployment confirmation added | `grep "0 banned patterns" README.md` or equivalent |
-| REQ-031 | MUST | All changes committed | Git log shows files | `git log --name-only -1 \| grep "plugins/membership"` |
-| REQ-032 | MUST | Changes pushed to remote | Remote up to date | `git status \| grep "nothing to commit"` |
-
-### Quality Standards
-
-| REQ-ID | Priority | Requirement | Success Criteria | Acceptance Test |
-|--------|----------|-------------|------------------|-----------------|
-| REQ-023 | SHOULD | Manual code review | Visual inspection confirms zero patterns | Developer review of source files |
-| REQ-024 | MUST | Binary outcome enforcement | All pass or complete rollback | Test failure scenario, verify rollback |
-| REQ-025 | SHOULD | Single session deployment | Total time < 2 hours | Timestamp start to finish < 120 minutes |
+**Root Cause:** The plugin descriptor uses entrypoint `@shipyard/membership/sandbox` which cannot be resolved at build time because it's a fake npm alias that doesn't exist.
 
 ---
 
-## Out of Scope (Explicitly Deferred)
+## Atomic Requirements
 
-| Item | Reason | Deferred To |
-|------|--------|-------------|
-| Brand renaming ("Portal") | Not touching user-facing copy in this deploy | Post-ship UX sprint |
-| Copy/UX rewrites | Deliverables already has final copy | Post-ship if needed |
-| Pre-commit hooks | Process fix, not deploy blocker | Post-ship automation |
-| Directory unification | Technical debt, acknowledged | Post-ship cleanup |
-| CI/CD automation | Infrastructure improvement | Post-ship enhancement |
-| Admin dashboards | v2+ feature | Future release |
-| Member analytics | v2+ feature | Future release |
-| Feature flags/A-B testing | v2+ feature | Future release |
-| Enterprise features | v2+ feature | Future release |
+### Phase 1: Immediate Fix (10-minute time budget)
+
+**REQ-1: Fix membership plugin entrypoint path**
+- **Description:** Replace fake npm alias `@shipyard/membership/sandbox` with real file path
+- **Acceptance Criteria:** Plugin descriptor's entrypoint field resolves to actual file location
+- **Verification:** Build completes without module resolution errors
+- **Files:** `plugins/membership/src/index.ts`
+
+**REQ-2: Update Sunrise Yoga plugin registration**
+- **Description:** Ensure astro.config.mjs correctly imports and registers membership plugin
+- **Acceptance Criteria:** Plugin appears in emdash integration config
+- **Verification:** Build succeeds with plugin loaded
+- **Files:** `examples/sunrise-yoga/astro.config.mjs`
+
+**REQ-3: Configure worker_loaders if needed**
+- **Description:** Add worker_loaders binding to wrangler.jsonc if required for sandboxed plugins
+- **Acceptance Criteria:** Cloudflare deployment accepts configuration
+- **Verification:** Wrangler validation passes
+- **Files:** `examples/sunrise-yoga/wrangler.jsonc`
+
+**REQ-4: Build and deploy to production**
+- **Description:** Execute build and deployment workflow
+- **Acceptance Criteria:** Deployment completes successfully
+- **Verification:** `npm run build && npx wrangler deploy` succeeds
+- **Files:** Build artifacts
+
+**REQ-5: Verify plugin in production manifest**
+- **Description:** Confirm membership plugin appears in manifest API
+- **Acceptance Criteria:** Manifest returns `["membership"]` in plugins array
+- **Verification:** `curl https://yoga.shipyard.company/_emdash/api/manifest | jq .plugins`
+- **Files:** None (runtime verification)
+
+**REQ-6: Verify plugin routes accessible**
+- **Description:** Ensure plugin routes return proper responses (not INTERNAL_ERROR)
+- **Acceptance Criteria:** Routes return 200/302/401, never 500 with INTERNAL_ERROR
+- **Verification:** Manual curl tests to plugin routes
+- **Files:** None (runtime verification)
+
+### Phase 2: Convention System (30-minute time budget)
+
+**REQ-7: Create plugin resolver module**
+- **Description:** Build convention-based plugin path resolution system
+- **Acceptance Criteria:** Resolver maps plugin names to entrypoint files
+- **Verification:** `resolvePluginEntrypoint("membership")` returns correct path
+- **Files:** `shipyard-core/plugin-resolver.ts` (NEW)
+
+**REQ-8: Implement naming convention**
+- **Description:** Plugin name → `plugins/<name>/sandbox.ts` convention
+- **Acceptance Criteria:** "membership" resolves to `plugins/membership/sandbox.ts`
+- **Verification:** Unit tests pass for convention mapping
+- **Files:** `shipyard-core/plugin-resolver.ts`
+
+**REQ-9: Create build validator**
+- **Description:** Build-time validation that fails loudly on broken plugins
+- **Acceptance Criteria:** Build throws error (not warning) for unresolvable plugins
+- **Verification:** Build fails with clear message for invalid entrypoints
+- **Files:** `shipyard-core/build-validator.ts` (NEW)
+
+**REQ-10: Modify plugin loader**
+- **Description:** Update plugin loader to use convention resolver
+- **Acceptance Criteria:** Loader accepts string array and auto-resolves entrypoints
+- **Verification:** `loadPlugins(["membership"])` works
+- **Files:** `shipyard-core/plugin-loader.ts` (MODIFY)
+
+**REQ-11: Support simplified plugin registration**
+- **Description:** Enable `plugins: ["membership"]` syntax in astro.config
+- **Acceptance Criteria:** String array accepted instead of descriptor objects
+- **Verification:** Build succeeds with simplified syntax
+- **Files:** `examples/sunrise-yoga/astro.config.mjs`
+
+**REQ-12: Create canonical example**
+- **Description:** Document zero-config plugin registration pattern
+- **Acceptance Criteria:** 5-line reference implementation
+- **Verification:** Example can be copy-pasted and used as-is
+- **Files:** `examples/sunrise-yoga/astro.config.mjs` (as reference)
+
+### Testing Requirements
+
+**REQ-13: Unit test - plugin resolver**
+- **Description:** Test plugin name resolution
+- **Acceptance Criteria:** Resolver returns correct paths for valid plugin names
+- **Verification:** Test suite passes
+- **Files:** `tests/plugin-resolver.test.ts` (NEW)
+
+**REQ-14: Unit test - resolver error handling**
+- **Description:** Test resolver throws on missing plugins
+- **Acceptance Criteria:** Error thrown for non-existent plugin names
+- **Verification:** Test suite passes
+- **Files:** `tests/plugin-resolver.test.ts`
+
+**REQ-15: Unit test - build validator**
+- **Description:** Test validator fails on invalid entrypoints
+- **Acceptance Criteria:** Throws error when entrypoint doesn't exist
+- **Verification:** Test suite passes
+- **Files:** `tests/build-validator.test.ts` (NEW)
+
+**REQ-16: Integration test - multi-plugin build**
+- **Description:** Test multiple plugins load without conflicts
+- **Acceptance Criteria:** Build with `["membership", "formforge"]` succeeds
+- **Verification:** Integration test passes
+- **Files:** Integration test suite
+
+### Deployment Requirements
+
+**REQ-17: Commit changes**
+- **Description:** Git commit all modifications with clear message
+- **Acceptance Criteria:** All changes committed, working tree clean
+- **Verification:** `git status` shows clean working tree
+- **Files:** All modified files
+
+**REQ-18: Deploy within time budget**
+- **Description:** Complete both phases in ≤40 minutes
+- **Acceptance Criteria:** Hardcode fix (10 min) + convention system (30 min)
+- **Verification:** Timestamp verification
+- **Files:** None (process metric)
+
+**REQ-19: Production verification**
+- **Description:** Verify plugin works in production
+- **Acceptance Criteria:** Manifest shows plugin, routes accessible
+- **Verification:** Smoke tests pass on production URL
+- **Files:** None (runtime verification)
 
 ---
 
-## Banned Patterns Reference
+## Success Criteria
 
-**Zero tolerance for:**
-1. `throw new Response` — Use `throw new Error()` instead
-2. `rc.user` — Use typed extraction pattern instead
-3. `rc.pathParams` — Use typed input object instead
+### Build Phase Success
+- ✅ Plugin loads in production (manifest verification)
+- ✅ `plugins: ["membership"]` convention works
+- ✅ Build fails loudly on broken plugins
+- ✅ Total implementation time: ≤40 minutes
+- ✅ Zero manual configuration required
 
-**Verification command:**
-```bash
-grep -c "throw new Response\|rc\.user\|rc\.pathParams" plugins/membership/src/*.ts
-```
-
-Expected output: All counts = 0
-
----
-
-## Success Criteria (Binary Gate)
-
-**✅ DEPLOY SUCCESS** requires ALL of:
-- [ ] All 3 files copied (or confirmed not needed)
-- [ ] Zero banned patterns verified
-- [ ] All 3 endpoints return HTTP 200
-- [ ] Complete user flow works end-to-end
-- [ ] Negative tests handled gracefully
-- [ ] TEST-RESULTS.md complete and accurate
-- [ ] All changes committed and pushed
-- [ ] Total time < 2 hours
-
-**❌ DEPLOY FAILURE** if ANY of:
-- Server not available → HALT at REQ-004
-- Any banned patterns → ROLLBACK at REQ-008
-- Any endpoint fails → ROLLBACK at REQ-013
-- User flow breaks → ROLLBACK immediately
-- Partial deployment → ROLLBACK completely
-- Multi-session execution → Project failure
+### Product Validation Success (post-build)
+- 📊 10+ real members using plugin
+- 📊 >10% signup completion rate
+- 📊 <1% error rate in production
+- 📊 Zero developer support tickets on plugin loading
 
 ---
 
-## Risk Register
+## Out of Scope (v1)
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|-----------|
-| Server unavailable | MEDIUM | HIGH | Fail fast with clear error (REQ-004) |
-| Incomplete user flow | MEDIUM | HIGH | Mandatory end-to-end test (REQ-014-018) |
-| Banned pattern regression | LOW | MEDIUM | Automated grep verification (REQ-008) |
-| Scope creep | MEDIUM | MEDIUM | Ruthless discipline, locked scope |
-| Partial ship | MEDIUM | MEDIUM | Binary outcome enforcement (REQ-024) |
-
----
-
-## Decision Alignment
-
-This requirements document aligns with:
-
-**Decision 1 (Elon)**: Ship scope is locked at 3-file copy
-**Decision 2 (Steve)**: Full user flow testing is mandatory
-**Decision 3 (Both)**: Zero banned patterns, binary outcomes
-**Decision 4 (Elon)**: Post-ship process fixes deferred
-**Decision 5 (Steve)**: Design philosophy deferred to post-ship
+Per decisions document, these are **CUT from v1**:
+- ❌ "Read all the docs" steps
+- ❌ "Compare with other sites" debugging patterns
+- ❌ Smoke tests beyond manifest verification
+- ❌ Cloudflare internals exposed to developers
+- ❌ Multiple plugin configuration patterns
+- ❌ "Passport" rebranding
 
 ---
 
-## Verification Commands
+## Risk Mitigation
 
-```bash
-# Pre-deploy check
-curl -s http://localhost:4324/_emdash/api/plugins/membership/admin || echo "SERVER NOT RUNNING"
+### Risk 1: Speed vs Quality Death Spiral
+- **Mitigation:** Lock 40-minute timeline—both fixes in ONE session
+- **Owner:** Execute both phases without breaks
 
-# Banned pattern check
-grep -r "throw new Response\|rc\.user\|rc\.pathParams" deliverables/membership-fix/ && echo "PATTERNS FOUND" || echo "CLEAN"
+### Risk 2: Build System Doesn't Fail Loudly
+- **Mitigation:** Build-time validation MUST throw errors, not warnings
+- **Owner:** Build validator implementation (REQ-9)
 
-# Endpoint tests
-curl -s http://localhost:4324/_emdash/api/plugins/membership/admin -H "Content-Type: application/json" -d '{"type":"page_load"}' | head -1
-curl -s -X POST http://localhost:4324/_emdash/api/plugins/membership/register -H "Content-Type: application/json" -d '{"email":"test@example.com","plan":"basic"}' | head -1
-curl -s http://localhost:4324/_emdash/api/plugins/membership/status -H "Content-Type: application/json" -d '{"email":"test@example.com"}' | head -1
-
-# Commit verification
-git log --oneline -1 | grep "0 banned pattern violations"
-```
+### Risk 3: Convention Doesn't Match Developer Mental Model
+- **Mitigation:** Single canonical example + loud build errors
+- **Owner:** Documentation (REQ-12) + validation (REQ-9)
 
 ---
 
-**Total Requirements**: 32 (28 MUST, 2 SHOULD, 2 deferred categories)
-**Critical Path**: REQ-001 → REQ-004 → REQ-005-007 → REQ-008 → REQ-010-013 → REQ-026-032
-**Blocking Gates**: Server check (REQ-004), Pattern check (REQ-008), Endpoint validation (REQ-013)
+## Technical Approach
+
+### Phase 1: Hardcode Fix
+1. Change entrypoint in `plugins/membership/src/index.ts` to:
+   ```typescript
+   entrypoint: "./plugins/membership/dist/sandbox-entry.js"
+   ```
+2. Verify file exists or build plugin to create it
+3. Test build: `cd examples/sunrise-yoga && npm run build`
+4. Deploy: `npx wrangler deploy`
+5. Verify: `curl https://yoga.shipyard.company/_emdash/api/manifest`
+
+### Phase 2: Convention System
+1. Create `shipyard-core/plugin-resolver.ts`:
+   ```typescript
+   export function resolvePluginEntrypoint(name: string): string {
+     return `plugins/${name}/sandbox.ts`;
+   }
+   ```
+2. Create `shipyard-core/build-validator.ts`:
+   ```typescript
+   export function validatePluginExists(entrypoint: string): void {
+     if (!fs.existsSync(entrypoint)) {
+       throw new Error(`Plugin entrypoint not found: ${entrypoint}`);
+     }
+   }
+   ```
+3. Modify plugin loader to use resolver
+4. Update astro.config.mjs to use string array syntax
+5. Test with multiple plugins
+
+---
+
+## References
+
+- **EMDASH-GUIDE.md Section 6:** Plugin System architecture
+- **Decisions Document:** 40-minute timeline, convention over configuration
+- **PRD:** Entrypoint resolution issue and verification steps

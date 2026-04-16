@@ -1,104 +1,87 @@
-# Phase 1 Plan — membership-deploy
+# Phase 1 Plan — Membership Production Fix
 
 **Generated**: 2026-04-16
 **Requirements**: `/home/agent/shipyard-ai/.planning/REQUIREMENTS.md`
-**Total Tasks**: 9
+**Total Tasks**: 12
 **Waves**: 3
-**Time Budget**: 2 hours maximum
+**Time Budget**: 40 minutes maximum (10 min immediate fix + 30 min convention system)
 
 ---
 
-## EXECUTIVE SUMMARY
+## Requirements Traceability
 
-**What we're deploying:** Clean membership plugin files from `deliverables/membership-fix/` to `plugins/membership/src/` with zero banned patterns and complete validation.
-
-**Why it matters:** The clean deliverable eliminates 4 banned pattern violations and has never been tested on a live Emdash site. Users are waiting for a working membership system.
-
-**Core promise:** Binary outcome - works completely or rollback immediately. No partial ships. No scope creep.
-
-**Critical constraints:**
-- **3-file copy only** - sandbox-entry.ts, auth.ts, email.ts (scope locked per Decision 1)
-- **Zero banned patterns** - No exceptions, no grandfathering (Decision 3)
-- **Full user flow testing** - Email → magic link → access required (Decision 2, Steve's requirement)
-- **Single session** - Complete in <2 hours or fail (Decision 3)
-- **Server prerequisite** - Port 4324 must be running, fail fast if not (Decision 2, Elon's requirement)
-
-**Critical Risk Alert:**
-⚠️ **FILE DIVERGENCE DETECTED** - Codebase Scout and Risk Scanner both report that `plugins/membership/src/sandbox-entry.ts` is 145 lines NEWER than `deliverables/membership-fix/sandbox-entry.ts`. The destination has improvements (parseJSON safety, better error messages) that would be lost if we copy from source.
-
-**Decision Required Before Execution:**
-- **Option A**: Copy from deliverables (original plan, loses improvements)
-- **Option B**: Keep current src/ version (violates copy scope)
-- **Option C**: Skip sandbox-entry.ts, copy only auth.ts + email.ts
-
-This plan assumes **Option C** based on Codebase Scout recommendation. auth.ts and email.ts are identical between source/dest, so copying them is safe. sandbox-entry.ts in destination is already clean (0 banned patterns) and newer.
+| Requirement | Task(s) | Wave |
+|-------------|---------|------|
+| REQ-1 (Fix entrypoint path) | phase-1-task-1 | 1 |
+| REQ-2 (Update astro.config) | phase-1-task-1 | 1 |
+| REQ-3 (Configure worker_loaders) | phase-1-task-2 | 1 |
+| REQ-4 (Build and deploy) | phase-1-task-3 | 1 |
+| REQ-5 (Verify manifest) | phase-1-task-4 | 2 |
+| REQ-6 (Verify routes) | phase-1-task-4 | 2 |
+| REQ-7 (Create resolver) | phase-1-task-5 | 2 |
+| REQ-8 (Implement convention) | phase-1-task-5 | 2 |
+| REQ-9 (Create validator) | phase-1-task-6 | 2 |
+| REQ-10 (Modify loader) | phase-1-task-7 | 2 |
+| REQ-11 (Simplified registration) | phase-1-task-8 | 2 |
+| REQ-12 (Canonical example) | phase-1-task-8 | 2 |
+| REQ-13-16 (Tests) | phase-1-task-9 | 2 |
+| REQ-17-19 (Deployment) | phase-1-task-10, phase-1-task-11, phase-1-task-12 | 3 |
 
 ---
 
-## REQUIREMENTS TRACEABILITY
+## Wave Execution Order
 
-| Requirement | Task(s) | Wave | Coverage |
-|-------------|---------|------|----------|
-| REQ-001 to REQ-004 (Pre-Deploy Validation) | phase-1-task-1 | 1 | Complete |
-| REQ-005 to REQ-009 (File Deployment) | phase-1-task-2 | 1 | Partial (auth.ts, email.ts only) |
-| REQ-010 to REQ-013 (Endpoint Testing) | phase-1-task-3 | 2 | Complete |
-| REQ-014 to REQ-018 (Full User Flow) | phase-1-task-4 | 2 | Complete |
-| REQ-019 to REQ-022 (Negative Testing) | phase-1-task-5 | 2 | Complete |
-| REQ-023 to REQ-025 (Quality Standards) | phase-1-task-6 | 2 | Complete |
-| REQ-026 to REQ-032 (Documentation) | phase-1-task-7 | 3 | Complete |
+### Wave 1 (Parallel) — Immediate Fix (10-minute budget)
 
----
-
-## WAVE EXECUTION ORDER
-
-### Wave 1 (Sequential) — Pre-Deploy Validation & File Copy
-
-**Estimated Duration:** 10 minutes
-**Goal:** Verify prerequisites and copy clean files
+**Goal:** Fix broken entrypoint, configure deployment, build and deploy to production
 
 ---
 
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Pre-Deploy Validation - Server Check & File Verification</title>
-  <requirement>REQ-001, REQ-002, REQ-003, REQ-004 - Verify server running and files exist</requirement>
+  <title>Fix Plugin Entrypoint Path</title>
+  <requirement>REQ-1, REQ-2 - Replace npm alias with real file path</requirement>
   <description>
-    Validate that dev server is running on port 4324, all source files exist in deliverables/membership-fix/, destination directory is writable, and fail fast with clear error if any check fails. This is the critical blocking gate per Decision 2 (Elon's requirement).
+    Fix the membership plugin descriptor entrypoint from fake npm alias `@shipyard/membership/sandbox` to actual resolvable path. Per research findings, the plugin uses package.json exports to resolve paths, so we need to ensure the entrypoint resolves correctly.
+
+    **Critical Finding from Research:** The plugin's package.json already has the correct export mapping (`"./sandbox": "./src/sandbox-entry.ts"`), so the entrypoint should work IF the package is resolvable. The issue is that the astro.config is importing the descriptor correctly but the build-time module resolution fails.
+
+    **Solution:** Keep the current pattern (it's correct per Emdash architecture) but ensure the plugin is properly linked/available during build.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/prds/membership-deploy.md" reason="PRD defines 3-step deployment process" />
-    <file path="/home/agent/shipyard-ai/rounds/membership-deploy/decisions.md" reason="Decision 2 mandates server check with fail-fast" />
-    <file path="/home/agent/shipyard-ai/deliverables/membership-fix/" reason="Source files location" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/" reason="Destination directory" />
+    <file path="/home/agent/shipyard-ai/plugins/membership/src/index.ts" reason="Plugin descriptor with entrypoint definition" />
+    <file path="/home/agent/shipyard-ai/plugins/membership/package.json" reason="Package exports configuration" />
+    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs" reason="Plugin registration in site config" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6 defines plugin system architecture" />
   </context>
 
   <steps>
-    <step order="1">Check server health: `curl -s -m 5 http://localhost:4324/_emdash/api/plugins/membership/admin -H "Content-Type: application/json" -d '{"type":"page_load"}' || exit 1`</step>
-    <step order="2">If curl fails, echo "DEPLOYMENT BLOCKED: Dev server not running on port 4324. Start server before deploying." and exit 1</step>
-    <step order="3">Verify source files exist: `test -f deliverables/membership-fix/auth.ts && test -f deliverables/membership-fix/email.ts && test -f deliverables/membership-fix/sandbox-entry.ts || exit 1`</step>
-    <step order="4">If files missing, echo "DEPLOYMENT BLOCKED: Source files not found in deliverables/membership-fix/" and exit 1</step>
-    <step order="5">Verify destination directory: `test -d plugins/membership/src/ && test -w plugins/membership/src/ || exit 1`</step>
-    <step order="6">If directory check fails, echo "DEPLOYMENT BLOCKED: Destination plugins/membership/src/ not writable" and exit 1</step>
-    <step order="7">Echo "✅ Pre-deploy validation passed: Server running, files exist, destination writable"</step>
+    <step order="1">Read current plugin descriptor: `/home/agent/shipyard-ai/plugins/membership/src/index.ts`</step>
+    <step order="2">Read plugin package.json to verify exports: `/home/agent/shipyard-ai/plugins/membership/package.json`</step>
+    <step order="3">Verify the export mapping `"./sandbox": "./src/sandbox-entry.ts"` exists</step>
+    <step order="4">Check if sunrise-yoga has the plugin as a dependency - run `cat /home/agent/shipyard-ai/examples/sunrise-yoga/package.json | grep membership`</step>
+    <step order="5">If missing, add plugin as local dependency: `"@shipyard/membership": "file:../../plugins/membership"` to sunrise-yoga package.json</step>
+    <step order="6">Run `cd /home/agent/shipyard-ai/examples/sunrise-yoga && npm install` to link the plugin</step>
+    <step order="7">Verify the plugin can be imported: Check that astro.config.mjs import works</step>
   </steps>
 
   <verification>
-    <check type="test">curl http://localhost:4324/_emdash/api/plugins/membership/admin returns HTTP 200</check>
-    <check type="test">All 3 source files verified to exist</check>
-    <check type="test">Destination directory writable</check>
-    <check type="manual">Error messages are clear and actionable (no stack traces)</check>
+    <check type="test">Plugin package exports include "./sandbox" mapping</check>
+    <check type="test">Sunrise yoga package.json includes @shipyard/membership dependency</check>
+    <check type="test">npm install completes without errors</check>
+    <check type="manual">Import statement in astro.config.mjs resolves correctly</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies - this is the first validation gate -->
+    <!-- No dependencies - this is wave 1 task -->
   </dependencies>
 
-  <commit-message>chore(membership): pre-deploy validation - server check passed
+  <commit-message>fix(membership): link plugin to sunrise-yoga for build resolution
 
-Verified prerequisites for membership plugin deployment:
-- Dev server responding on port 4324
-- Source files exist in deliverables/membership-fix/
-- Destination plugins/membership/src/ writable
+Added @shipyard/membership as local file dependency in sunrise-yoga.
+Plugin entrypoint @shipyard/membership/sandbox now resolves via package.json exports.
+
+Technical approach verified against EMDASH-GUIDE.md Section 6 (Plugin System).
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -106,171 +89,143 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 ---
 
 <task-plan id="phase-1-task-2" wave="1">
-  <title>Deploy Clean Files - Copy auth.ts and email.ts</title>
-  <requirement>REQ-005, REQ-006, REQ-007, REQ-008, REQ-009 - Copy files and verify zero banned patterns</requirement>
+  <title>Configure Worker Loaders for Sandboxed Plugins</title>
+  <requirement>REQ-3 - Add worker_loaders binding if needed</requirement>
   <description>
-    Copy auth.ts and email.ts from deliverables/membership-fix/ to plugins/membership/src/. SKIP sandbox-entry.ts per Codebase Scout recommendation (destination is newer with improvements). Verify zero banned patterns in all deployed files. This implements Decision 3's quality standard.
+    Check if wrangler.jsonc has worker_loaders binding configured for sandboxed plugin execution. Per EMDASH-GUIDE.md lines 1005-1014, sandboxed plugins require this binding on Cloudflare.
 
-    CRITICAL DECISION: Based on Codebase Scout analysis, sandbox-entry.ts in src/ is 145 lines newer with parseJSON safety improvements. Copying from deliverables would LOSE these improvements. Since destination already has 0 banned patterns, we keep it.
+    **Research Finding:** Current wrangler.jsonc has D1, R2, and KV bindings but may be missing worker_loaders.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/membership-fix/auth.ts" reason="Source file - identical to destination per Codebase Scout" />
-    <file path="/home/agent/shipyard-ai/deliverables/membership-fix/email.ts" reason="Source file - identical to destination per Codebase Scout" />
-    <file path="/home/agent/shipyard-ai/deliverables/membership-fix/sandbox-entry.ts" reason="Source file - OLDER than destination, will NOT be copied" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/" reason="Destination directory for clean files" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Banned patterns reference - section 6.6 Plugin System" />
+    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/wrangler.jsonc" reason="Cloudflare configuration file" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Lines 1005-1014 document worker_loaders requirement" />
+    <file path="/home/agent/shipyard-ai/plugins/membership/src/index.ts" reason="Plugin descriptor shows format: standard (sandboxed)" />
   </context>
 
   <steps>
-    <step order="1">Copy auth.ts: `cp /home/agent/shipyard-ai/deliverables/membership-fix/auth.ts /home/agent/shipyard-ai/plugins/membership/src/auth.ts`</step>
-    <step order="2">Copy email.ts: `cp /home/agent/shipyard-ai/deliverables/membership-fix/email.ts /home/agent/shipyard-ai/plugins/membership/src/email.ts`</step>
-    <step order="3">SKIP sandbox-entry.ts - echo "⚠️  Skipping sandbox-entry.ts: destination is newer with improvements (145 lines, parseJSON safety)"</step>
-    <step order="4">Verify banned patterns in auth.ts: `grep -c "throw new Response\|rc\.user\|rc\.pathParams" plugins/membership/src/auth.ts` (expect 0)</step>
-    <step order="5">Verify banned patterns in email.ts: `grep -c "throw new Response\|rc\.user\|rc\.pathParams" plugins/membership/src/email.ts` (expect 0)</step>
-    <step order="6">Verify banned patterns in sandbox-entry.ts: `grep -c "throw new Response\|rc\.user\|rc\.pathParams" plugins/membership/src/sandbox-entry.ts` (expect 0)</step>
-    <step order="7">If any pattern count > 0, echo "DEPLOYMENT FAILED: Banned patterns detected" and rollback copied files immediately</step>
-    <step order="8">Echo "✅ Files deployed: auth.ts, email.ts copied. sandbox-entry.ts kept (newer). Zero banned patterns verified."</step>
+    <step order="1">Read current wrangler.jsonc: `/home/agent/shipyard-ai/examples/sunrise-yoga/wrangler.jsonc`</step>
+    <step order="2">Check if "worker_loaders" binding exists in configuration</step>
+    <step order="3">If missing, add worker_loaders configuration: `"worker_loaders": [{"binding": "LOADER"}]`</step>
+    <step order="4">Verify JSON is valid after modification</step>
+    <step order="5">Document change if added, otherwise note that configuration was already correct</step>
   </steps>
 
   <verification>
-    <check type="test">grep -c "throw new Response" plugins/membership/src/*.ts returns 0 for all files</check>
-    <check type="test">grep -c "rc\.user" plugins/membership/src/*.ts returns 0 for all files</check>
-    <check type="test">grep -c "rc\.pathParams" plugins/membership/src/*.ts returns 0 for all files</check>
-    <check type="manual">Confirm auth.ts and email.ts match source, sandbox-entry.ts unchanged</check>
+    <check type="test">wrangler.jsonc is valid JSON</check>
+    <check type="test">worker_loaders binding present in configuration</check>
+    <check type="manual">Configuration matches EMDASH-GUIDE.md requirements</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Must pass pre-deploy validation first" />
+    <!-- No dependencies - this is wave 1 task -->
   </dependencies>
 
-  <commit-message>fix: deploy clean membership plugin — 0 banned pattern violations
+  <commit-message>config(sunrise-yoga): add worker_loaders for sandboxed plugins
 
-Deployed clean files from deliverables/membership-fix/:
-- ✅ auth.ts copied (209 LOC, 0 violations)
-- ✅ email.ts copied (580 LOC, 0 violations)
-- ⚠️  sandbox-entry.ts KEPT (destination newer, 0 violations)
+Added worker_loaders binding to wrangler.jsonc per Emdash requirements.
+Required for sandboxed plugin execution on Cloudflare Workers.
 
-Verified zero instances of banned patterns:
-- throw new Response: 0
-- rc.user: 0
-- rc.pathParams: 0
-
-Destination sandbox-entry.ts retained per Codebase Scout recommendation:
-src/ version is 145 lines newer with parseJSON safety improvements.
+Reference: EMDASH-GUIDE.md lines 1005-1014
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-### Wave 2 (Sequential) — Testing & Quality Verification
-
-**Estimated Duration:** 45 minutes
-**Goal:** Validate endpoints, test complete user flow, verify negative cases
-
----
-
-<task-plan id="phase-1-task-3" wave="2">
-  <title>Endpoint Smoke Tests - Verify 3 API Routes</title>
-  <requirement>REQ-010, REQ-011, REQ-012, REQ-013 - Test admin, register, status endpoints</requirement>
+<task-plan id="phase-1-task-3" wave="1">
+  <title>Build and Deploy to Production</title>
+  <requirement>REQ-4 - Execute build and deployment workflow</requirement>
   <description>
-    Test all 3 membership plugin endpoints to verify they return HTTP 200 with valid JSON. Fail immediately if any endpoint returns non-200 status. This implements the smoke test requirement from PRD Step 2.
+    Build the sunrise-yoga site and deploy to production Cloudflare Workers. This validates that the plugin registration fix works and gets the plugin loaded in production.
+
+    **Critical:** Source environment variables from .env file before deployment.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/prds/membership-deploy.md" reason="Step 2 defines 3 endpoint tests with curl commands" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Route definitions for admin, register, status" />
+    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/" reason="Site to build and deploy" />
+    <file path="/home/agent/shipyard-ai/.env" reason="Environment variables for deployment" />
+    <file path="/home/agent/shipyard-ai/prds/membership-production-fix.md" reason="Deploy command reference at lines 83-90" />
   </context>
 
   <steps>
-    <step order="1">Test admin endpoint: `curl -s http://localhost:4324/_emdash/api/plugins/membership/admin -H "Content-Type: application/json" -d '{"type":"page_load"}' > /tmp/test-admin.json`</step>
-    <step order="2">Check admin response: `cat /tmp/test-admin.json | head -5` and verify HTTP 200 in response</step>
-    <step order="3">Test register endpoint: `curl -s -X POST http://localhost:4324/_emdash/api/plugins/membership/register -H "Content-Type: application/json" -d '{"email":"smoketest@example.com","plan":"basic"}' > /tmp/test-register.json`</step>
-    <step order="4">Check register response: `cat /tmp/test-register.json | head -5` and verify HTTP 200 in response</step>
-    <step order="5">Test status endpoint: `curl -s http://localhost:4324/_emdash/api/plugins/membership/status -H "Content-Type: application/json" -d '{"email":"smoketest@example.com"}' > /tmp/test-status.json`</step>
-    <step order="6">Check status response: `cat /tmp/test-status.json | head -5` and verify HTTP 200 in response</step>
-    <step order="7">If ANY endpoint fails, echo "DEPLOYMENT FAILED: Endpoint test failed" and exit 1</step>
-    <step order="8">Echo "✅ All 3 endpoints passed: Admin [200], Register [200], Status [200]"</step>
+    <step order="1">Change to sunrise-yoga directory: `cd /home/agent/shipyard-ai/examples/sunrise-yoga`</step>
+    <step order="2">Source environment variables: `source /home/agent/shipyard-ai/.env`</step>
+    <step order="3">Export required vars: `export CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID`</step>
+    <step order="4">Run build: `npm run build` (verify completes without errors)</step>
+    <step order="5">Deploy to Cloudflare: `npx wrangler deploy`</step>
+    <step order="6">Verify deployment completes successfully</step>
+    <step order="7">Note the deployment URL (should be yoga.shipyard.company)</step>
   </steps>
 
   <verification>
-    <check type="test">Admin endpoint returns 200: curl http://localhost:4324/_emdash/api/plugins/membership/admin</check>
-    <check type="test">Register endpoint returns 200: curl POST to /register</check>
-    <check type="test">Status endpoint returns 200: curl to /status</check>
-    <check type="manual">All JSON responses are valid and parseable</check>
+    <check type="build">npm run build exits with code 0</check>
+    <check type="build">No module resolution errors during build</check>
+    <check type="test">npx wrangler deploy succeeds</check>
+    <check type="manual">Deployment URL confirmed</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Files must be deployed before testing endpoints" />
+    <!-- No dependencies in wave 1 - but logically depends on task-1 and task-2 -->
   </dependencies>
 
-  <commit-message>test(membership): verify API endpoints - all 3 routes passing
+  <commit-message>deploy(sunrise-yoga): deploy with membership plugin fix
 
-Smoke test results:
-- /_emdash/api/plugins/membership/admin: 200 OK
-- /_emdash/api/plugins/membership/register: 200 OK
-- /_emdash/api/plugins/membership/status: 200 OK
-
-All endpoints returning valid JSON responses.
+Deployed to production with fixed plugin registration.
+Build completed successfully with plugin entrypoint resolved.
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
+
+---
+
+### Wave 2 (Parallel after Wave 1) — Convention System & Verification (30-minute budget)
+
+**Goal:** Implement convention-based plugin resolution and verify production deployment
 
 ---
 
 <task-plan id="phase-1-task-4" wave="2">
-  <title>Full User Flow Test - Email → Magic Link → Access</title>
-  <requirement>REQ-014, REQ-015, REQ-016, REQ-017, REQ-018 - Complete user journey validation</requirement>
+  <title>Verify Plugin in Production</title>
+  <requirement>REQ-5, REQ-6 - Verify manifest and plugin routes</requirement>
   <description>
-    Test the complete membership user flow from visiting members-only page through email entry, magic link receipt, authentication, and session persistence. This is Steve's non-negotiable requirement from Decision 2: "Either test the complete journey or admit we don't know if it works."
-
-    This is a MANUAL test requiring browser interaction and email checking. Document each step's outcome.
+    Verify that the membership plugin appears in the production manifest and that plugin routes are accessible (not returning INTERNAL_ERROR). This confirms the immediate fix worked.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/membership-deploy/decisions.md" reason="Decision 2 mandates full user flow test, lines 40-62" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Route handlers for registration and magic link" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/email.ts" reason="Magic link email generation logic" />
+    <file path="/home/agent/shipyard-ai/prds/membership-production-fix.md" reason="Smoke test commands at lines 92-104" />
   </context>
 
   <steps>
-    <step order="1">MANUAL: Open browser to http://localhost:4324 and navigate to members-only page/content</step>
-    <step order="2">MANUAL: Verify page loads without error, shows membership entry point</step>
-    <step order="3">MANUAL: Enter valid email address (e.g., test@example.com) in email input field</step>
-    <step order="4">MANUAL: Verify form accepts email without error, submission succeeds</step>
-    <step order="5">MANUAL: Check email inbox for magic link (may be dev/test email service depending on setup)</step>
-    <step order="6">MANUAL: Verify email received with clickable magic link</step>
-    <step order="7">MANUAL: Click magic link in email</step>
-    <step order="8">MANUAL: Verify browser redirects to protected content and shows authenticated state</step>
-    <step order="9">MANUAL: Refresh page in browser</step>
-    <step order="10">MANUAL: Verify session persists (still authenticated after refresh)</step>
-    <step order="11">Document results: Each step PASS or FAIL with brief note</step>
-    <step order="12">If ANY step fails, mark deployment as FAILED and prepare rollback</step>
+    <step order="1">Test manifest: `curl -s https://yoga.shipyard.company/_emdash/api/manifest | python3 -c "import json,sys; d=json.load(sys.stdin); print([p.get('id') for p in d.get('plugins',[])])"`</step>
+    <step order="2">Verify output includes "membership" in plugins list</step>
+    <step order="3">Test admin route: `curl -s https://yoga.shipyard.company/_emdash/api/plugins/membership/admin -H "Content-Type: application/json" -d '{"type":"page_load"}' | head -10`</step>
+    <step order="4">Verify response is not INTERNAL_ERROR (expect 200 or auth error)</step>
+    <step order="5">Test register route: `curl -s -X POST https://yoga.shipyard.company/_emdash/api/plugins/membership/register -H "Content-Type: application/json" -d '{"email":"test@example.com","plan":"basic"}' | head -10`</step>
+    <step order="6">Verify response is not INTERNAL_ERROR</step>
+    <step order="7">Document results: Manifest shows plugin, routes accessible</step>
   </steps>
 
   <verification>
-    <check type="manual">User can access members-only page entry point</check>
-    <check type="manual">Email input accepts valid format</check>
-    <check type="manual">Magic link email delivered</check>
-    <check type="manual">Clicking link grants access to protected content</check>
-    <check type="manual">Session persists after page refresh</check>
+    <check type="test">Manifest API returns ["membership"] in plugins array</check>
+    <check type="test">Admin route returns 200 or 401/302 (not 500 INTERNAL_ERROR)</check>
+    <check type="test">Register route returns valid response (not INTERNAL_ERROR)</check>
+    <check type="manual">All smoke tests pass</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="Endpoints must be working before testing full flow" />
+    <depends-on task-id="phase-1-task-3" reason="Must deploy before verifying production" />
   </dependencies>
 
-  <commit-message>test(membership): full user flow validated - email to access working
+  <commit-message>test(membership): verify production deployment - plugin loading
 
-User flow test results (MANUAL):
-✅ User visits members-only page - PASS
-✅ Email input accepts valid format - PASS
-✅ Magic link email delivered - PASS
-✅ Magic link grants access - PASS
-✅ Session persists after refresh - PASS
+Production verification results:
+✅ Plugin appears in manifest
+✅ Admin route accessible
+✅ Register route accessible
+✅ No INTERNAL_ERROR responses
 
-Complete user journey working end-to-end per Decision 2 requirement.
+Immediate fix confirmed working.
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -278,48 +233,45 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 ---
 
 <task-plan id="phase-1-task-5" wave="2">
-  <title>Negative Testing - Invalid Email & Expired Links</title>
-  <requirement>REQ-019, REQ-020, REQ-021, REQ-022 - Verify error handling and messages</requirement>
+  <title>Create Convention-Based Plugin Resolver</title>
+  <requirement>REQ-7, REQ-8 - Build plugin name → path resolution system</requirement>
   <description>
-    Test error paths: invalid email format rejection and expired magic link handling. Verify error messages are terse, factual, and user-friendly (no chatty copy, 1-2 sentences max). This implements Decision 2's negative testing requirement.
+    Create a plugin resolver module that implements the convention: plugin name "membership" → "plugins/membership/sandbox.ts". This eliminates the need for manual path configuration.
+
+    **Decision Rationale:** Per decisions.md, convention over configuration prevents 100 future developers from wasting 5 hours each debugging paths.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/membership-deploy/decisions.md" reason="Decision 2 lines 58-62 mandate negative testing with terse errors" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Email validation and magic link verification logic" />
+    <file path="/home/agent/shipyard-ai/rounds/membership-production-fix/decisions.md" reason="Decision 2 defines convention system (lines 24-48)" />
   </context>
 
   <steps>
-    <step order="1">MANUAL: Navigate to membership email entry form</step>
-    <step order="2">MANUAL: Submit invalid email format (e.g., "invalidemail" or "test@")</step>
-    <step order="3">MANUAL: Verify system shows error message (not success)</step>
-    <step order="4">MANUAL: Check error message is terse (1-2 sentences) and factual (e.g., "Invalid email format" not "Oops! That doesn't look quite right...")</step>
-    <step order="5">MANUAL: Attempt to use expired or invalid magic link (construct malformed URL or use old link if available)</step>
-    <step order="6">MANUAL: Verify system shows clear error for expired/invalid link</step>
-    <step order="7">MANUAL: Check expired link error message is terse and factual (e.g., "This link has expired" not "Uh oh! Looks like this link is no longer valid...")</step>
-    <step order="8">Document error messages: Confirm brevity and tone match Decision 5's "Confident silence" principle</step>
+    <step order="1">Create shipyard-core directory if needed: `mkdir -p /home/agent/shipyard-ai/shipyard-core`</step>
+    <step order="2">Create plugin-resolver.ts with resolvePluginEntrypoint function</step>
+    <step order="3">Implement convention: `plugins/${name}/sandbox.ts`</step>
+    <step order="4">Add path existence validation</step>
+    <step order="5">Add error handling for missing plugins</step>
+    <step order="6">Export function for use by plugin loader</step>
   </steps>
 
   <verification>
-    <check type="manual">Invalid email format rejected gracefully</check>
-    <check type="manual">Invalid email error message is 1-2 sentences, factual</check>
-    <check type="manual">Expired magic link shows error</check>
-    <check type="manual">Expired link error message is 1-2 sentences, factual</check>
+    <check type="test">resolvePluginEntrypoint("membership") returns "plugins/membership/sandbox.ts"</check>
+    <check type="test">Function throws error for non-existent plugin names</check>
+    <check type="manual">Code is clean, well-documented, follows TypeScript best practices</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-4" reason="Must test positive flow before negative cases" />
+    <depends-on task-id="phase-1-task-4" reason="Verify immediate fix works before building convention system" />
   </dependencies>
 
-  <commit-message>test(membership): negative test cases validated
+  <commit-message>feat(core): add convention-based plugin resolver
 
-Error handling test results (MANUAL):
-✅ Invalid email rejected - PASS
-✅ Error message terse and factual - PASS (1-2 sentences)
-✅ Expired link shows error - PASS
-✅ Expired link error terse - PASS (factual, no chatty copy)
+Created shipyard-core/plugin-resolver.ts implementing:
+- Convention: plugin name → plugins/<name>/sandbox.ts
+- Path validation and error handling
+- Zero-config plugin loading foundation
 
-All error paths handled gracefully per Decision 2 requirements.
+Per Decision 2: Convention over configuration.
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -327,297 +279,390 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 ---
 
 <task-plan id="phase-1-task-6" wave="2">
-  <title>Quality Verification - Code Review & Binary Outcome Check</title>
-  <requirement>REQ-023, REQ-024, REQ-025 - Manual review and deployment standard enforcement</requirement>
+  <title>Create Build-Time Validator</title>
+  <requirement>REQ-9 - Build validation that fails loudly</requirement>
   <description>
-    Perform manual code review to verify zero banned patterns (triple-check), confirm binary outcome principle is maintained (no partial deployments), and verify total execution time is within 2-hour budget. This implements Decision 3's quality standard.
+    Create a build validator that checks plugin entrypoints exist and throws errors (not warnings) when paths are invalid. This catches broken plugins at build time before they cause production issues.
+
+    **Decision Rationale:** Per decisions.md Decision 3, "Build fails LOUDLY if plugin won't work in production."
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/membership-deploy/decisions.md" reason="Decision 3 mandates binary outcome and quality standards" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/" reason="All deployed files for review" />
+    <file path="/home/agent/shipyard-ai/rounds/membership-production-fix/decisions.md" reason="Decision 3 mandates loud build failures (lines 53-63)" />
   </context>
 
   <steps>
-    <step order="1">Manual code review: Open plugins/membership/src/sandbox-entry.ts and visually inspect for banned patterns</step>
-    <step order="2">Manual code review: Open plugins/membership/src/auth.ts and visually inspect for banned patterns</step>
-    <step order="3">Manual code review: Open plugins/membership/src/email.ts and visually inspect for banned patterns</step>
-    <step order="4">Automated re-check: Run `grep -r "throw new Response\|rc\.user\|rc\.pathParams" plugins/membership/src/*.ts` and verify output is empty</step>
-    <step order="5">Binary outcome check: Verify all previous tasks (1-5) passed - if ANY failed, rollback ALL changes</step>
-    <step order="6">Time budget check: Calculate elapsed time from task-1 start to now - must be < 120 minutes</step>
-    <step order="7">If time > 120 minutes, mark deployment as FAILED (violated single-session requirement)</step>
-    <step order="8">Echo "✅ Quality verification passed: Code reviewed, binary outcome maintained, time budget met"</step>
+    <step order="1">Create build-validator.ts in shipyard-core</step>
+    <step order="2">Implement validatePluginExists function that checks file existence</step>
+    <step order="3">Throw clear error (not warning) when entrypoint doesn't exist</step>
+    <step order="4">Include helpful error message with file path and resolution suggestion</step>
+    <step order="5">Add validation for plugin descriptor fields</step>
+    <step order="6">Export function for build system integration</step>
   </steps>
 
   <verification>
-    <check type="manual">Visual code review confirms zero banned patterns</check>
-    <check type="test">Automated grep confirms zero banned patterns</check>
-    <check type="manual">All previous tasks passed (no partial deployment)</check>
-    <check type="manual">Total time < 120 minutes</check>
+    <check type="test">Validator throws error for invalid entrypoint paths</check>
+    <check type="test">Error messages are clear and actionable</check>
+    <check type="test">Validator passes for valid plugin configurations</check>
+    <check type="manual">Error output helps developers fix issues quickly</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="Must complete all tests before quality verification" />
+    <depends-on task-id="phase-1-task-5" reason="Validator uses resolver to check paths" />
   </dependencies>
 
-  <commit-message>chore(membership): quality verification complete - all standards met
+  <commit-message>feat(core): add build-time plugin validator
 
-Quality gates passed:
-✅ Manual code review: 0 banned patterns
-✅ Automated verification: 0 banned patterns
-✅ Binary outcome: All tests passed, no partial deployment
-✅ Time budget: Completed within 2-hour limit
+Created shipyard-core/build-validator.ts:
+- Validates plugin entrypoints exist before build
+- Throws errors (not warnings) for missing files
+- Clear, actionable error messages
 
-Ready for documentation phase.
+Per Decision 3: Make wrong things impossible at build time.
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-### Wave 3 (Sequential) — Documentation & Finalization
-
-**Estimated Duration:** 20 minutes
-**Goal:** Document results, commit all changes, push to remote
-
----
-
-<task-plan id="phase-1-task-7" wave="3">
-  <title>Document Test Results & Update README</title>
-  <requirement>REQ-026, REQ-027, REQ-028, REQ-029, REQ-030 - Create TEST-RESULTS.md and update README</requirement>
+<task-plan id="phase-1-task-7" wave="2">
+  <title>Modify Plugin Loader</title>
+  <requirement>REQ-10 - Update loader to use convention resolver</requirement>
   <description>
-    Write comprehensive test results to deliverables/membership-v2/TEST-RESULTS.md with structured sections for banned pattern check, API test results, and notes. Update README.md with deployment confirmation. This implements PRD Step 3.
+    Modify the plugin loader to accept string array syntax and use the convention resolver to auto-resolve entrypoints. This enables `plugins: ["membership"]` instead of descriptor objects.
+
+    **Note:** This may need to be implemented in Emdash core rather than shipyard-ai if the plugin loader is part of the framework.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/prds/membership-deploy.md" reason="Step 3 defines TEST-RESULTS.md format" />
-    <file path="/home/agent/shipyard-ai/deliverables/membership-v2/" reason="Destination for test results" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/README.md" reason="Plugin README to update" />
+    <file path="/home/agent/shipyard-ai/shipyard-core/plugin-resolver.ts" reason="Convention resolver to use" />
+    <file path="/home/agent/shipyard-ai/shipyard-core/build-validator.ts" reason="Validator to integrate" />
   </context>
 
   <steps>
-    <step order="1">Create directory if needed: `mkdir -p deliverables/membership-v2`</step>
-    <step order="2">Write TEST-RESULTS.md with sections: ## MemberShip v2 — Test Results</step>
-    <step order="3">Add Banned Pattern Check section with counts for throw new Response (0), rc.user (0), rc.pathParams (0), Total violations (0)</step>
-    <step order="4">Add API Tests section with status codes and pass/fail for Admin page_load (200 PASS), Register (200 PASS), Status (200 PASS)</step>
-    <step order="5">Add Notes section documenting: "sandbox-entry.ts kept from destination (newer with improvements), auth.ts and email.ts copied from deliverables"</step>
-    <step order="6">Update plugins/membership/README.md: Add deployment confirmation statement "MemberShip plugin deployed with 0 banned pattern violations"</step>
-    <step order="7">Add reference to TEST-RESULTS.md in README: "See deliverables/membership-v2/TEST-RESULTS.md for full test results"</step>
+    <step order="1">Locate or create plugin loader module in shipyard-core</step>
+    <step order="2">Add support for string array input: `plugins: string[]`</step>
+    <step order="3">For each string, call resolvePluginEntrypoint to get path</step>
+    <step order="4">Call validatePluginExists before loading</step>
+    <step order="5">Load plugin using resolved path</step>
+    <step order="6">Maintain backwards compatibility with descriptor object syntax</step>
   </steps>
 
   <verification>
-    <check type="test">test -f deliverables/membership-v2/TEST-RESULTS.md</check>
-    <check type="test">grep "Banned Pattern Check" deliverables/membership-v2/TEST-RESULTS.md</check>
-    <check type="test">grep "API Tests" deliverables/membership-v2/TEST-RESULTS.md</check>
-    <check type="test">grep "0 banned pattern violations" plugins/membership/README.md</check>
-    <check type="manual">All sections complete and accurate</check>
+    <check type="test">loadPlugins(["membership"]) resolves and loads plugin</check>
+    <check type="test">loadPlugins([descriptorObject]) still works (backwards compatible)</check>
+    <check type="test">Build fails loudly when plugin string doesn't resolve</check>
+    <check type="manual">API is intuitive and well-documented</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-6" reason="Must complete quality verification before documenting" />
+    <depends-on task-id="phase-1-task-6" reason="Needs validator for build-time checks" />
   </dependencies>
 
-  <commit-message>docs(membership): add deployment test results and README update
+  <commit-message>feat(core): add string array support to plugin loader
 
-Created deliverables/membership-v2/TEST-RESULTS.md:
-- Banned pattern counts: All 0
-- API test results: All endpoints 200 PASS
-- Notes: File deployment strategy documented
+Modified plugin loader to accept plugins: ["membership"] syntax:
+- Uses convention resolver for path resolution
+- Integrates build validator for loud failures
+- Maintains backwards compatibility with descriptor objects
 
-Updated plugins/membership/README.md:
-- Deployment confirmation added
-- Reference to TEST-RESULTS.md
+Per Decision 2: Zero-config plugin loading.
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-<task-plan id="phase-1-task-8" wave="3">
-  <title>Final Commit & Push to Remote</title>
-  <requirement>REQ-031, REQ-032 - Commit all changes and push to remote</requirement>
+<task-plan id="phase-1-task-8" wave="2">
+  <title>Update Astro Config with Convention Syntax</title>
+  <requirement>REQ-11, REQ-12 - Simplified registration and canonical example</requirement>
   <description>
-    Create final git commit with all deployment changes (plugins/membership/src/, deliverables/membership-v2/, README updates) and push to remote repository. Verify clean git status after push.
+    Update sunrise-yoga's astro.config.mjs to use the new convention-based syntax: `plugins: ["membership"]`. This serves as the canonical 5-line example.
+
+    **Decision Rationale:** Per decisions.md Decision 5, "Documentation is an apology for bad design" - make the example self-explanatory.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/.git/" reason="Git repository" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/" reason="Deployed files" />
-    <file path="/home/agent/shipyard-ai/deliverables/membership-v2/" reason="Test results" />
+    <file path="/home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs" reason="Site config to update" />
+    <file path="/home/agent/shipyard-ai/rounds/membership-production-fix/decisions.md" reason="Decision 5 defines documentation philosophy (lines 83-93)" />
   </context>
 
   <steps>
-    <step order="1">Add all changes: `git add plugins/membership/src/auth.ts plugins/membership/src/email.ts plugins/membership/README.md deliverables/membership-v2/TEST-RESULTS.md`</step>
-    <step order="2">Verify staged changes: `git status` should show 4 files staged</step>
-    <step order="3">Create commit with clear message documenting deployment</step>
-    <step order="4">Push to remote: `git push origin main` (or current branch)</step>
-    <step order="5">Verify push successful: `git status` should show "nothing to commit, working tree clean"</step>
-    <step order="6">Verify remote is up to date: `git log origin/main --oneline -1` matches local HEAD</step>
+    <step order="1">Read current astro.config.mjs</step>
+    <step order="2">Replace `plugins: [membershipPlugin()]` with `plugins: ["membership"]`</step>
+    <step order="3">Remove import statement: `import { membershipPlugin } from ...` (no longer needed)</step>
+    <step order="4">Add comment explaining convention: `// Plugin names resolve to plugins/<name>/sandbox.ts`</step>
+    <step order="5">Verify configuration is clean and minimal (5 lines or less for plugin config)</step>
+    <step order="6">Test build to ensure convention system works</step>
   </steps>
 
   <verification>
-    <check type="test">git status shows nothing to commit</check>
-    <check type="test">git log --name-only -1 shows plugins/membership files</check>
-    <check type="test">git log --name-only -1 shows TEST-RESULTS.md</check>
-    <check type="manual">Remote repository updated successfully</check>
+    <check type="test">Build succeeds with new syntax</check>
+    <check type="test">Plugin still loads correctly</check>
+    <check type="manual">Config is clean, minimal, self-explanatory</check>
+    <check type="manual">Serves as canonical example (copy-paste ready)</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-7" reason="Must complete documentation before final commit" />
+    <depends-on task-id="phase-1-task-7" reason="Plugin loader must support string syntax first" />
   </dependencies>
 
-  <commit-message>feat(membership): deployment complete - clean plugin with 0 violations
+  <commit-message>refactor(sunrise-yoga): use convention-based plugin syntax
 
-Deployment summary:
-✅ auth.ts deployed from deliverables (209 LOC, 0 violations)
-✅ email.ts deployed from deliverables (580 LOC, 0 violations)
-✅ sandbox-entry.ts retained from src/ (newer, 0 violations)
-✅ All 3 API endpoints tested: 200 PASS
-✅ Full user flow validated: email → magic link → access
-✅ Negative tests passed: invalid email, expired link
-✅ Quality verification: binary outcome maintained
-✅ Documentation complete: TEST-RESULTS.md created
+Simplified plugin registration:
+- Before: import + function call + descriptor object
+- After: plugins: ["membership"]
 
-Zero banned patterns verified:
-- throw new Response: 0
-- rc.user: 0
-- rc.pathParams: 0
-
-Time budget: Completed in <2 hours (single session)
-Scope: Locked per Decision 1 (3-file focus)
-Quality: Zero tolerance per Decision 3
+Serves as canonical 5-line example per Decision 5.
+Zero manual configuration required.
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-<task-plan id="phase-1-task-9" wave="3">
-  <title>Sara Blakely Customer Gut-Check (Auto-Trigger)</title>
+<task-plan id="phase-1-task-9" wave="2">
+  <title>Create Unit and Integration Tests</title>
+  <requirement>REQ-13, REQ-14, REQ-15, REQ-16 - Test coverage for new components</requirement>
+  <description>
+    Create comprehensive test suites for plugin resolver, build validator, and multi-plugin builds. Ensures the convention system is robust and well-tested.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/shipyard-core/plugin-resolver.ts" reason="Module to test" />
+    <file path="/home/agent/shipyard-ai/shipyard-core/build-validator.ts" reason="Module to test" />
+  </context>
+
+  <steps>
+    <step order="1">Create tests directory: `mkdir -p /home/agent/shipyard-ai/tests`</step>
+    <step order="2">Create plugin-resolver.test.ts with unit tests</step>
+    <step order="3">Test: resolvePluginEntrypoint("membership") returns correct path</step>
+    <step order="4">Test: resolver throws error for non-existent plugins</step>
+    <step order="5">Create build-validator.test.ts with unit tests</step>
+    <step order="6">Test: validator fails on invalid entrypoints</step>
+    <step order="7">Test: validator passes for valid configurations</step>
+    <step order="8">Create integration test for multi-plugin builds</step>
+    <step order="9">Run test suite: `npm test` (or equivalent)</step>
+  </steps>
+
+  <verification>
+    <check type="test">All unit tests pass</check>
+    <check type="test">Integration tests pass</check>
+    <check type="test">Test coverage is comprehensive</check>
+    <check type="manual">Tests are well-documented and maintainable</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-8" reason="Need full system working before integration tests" />
+  </dependencies>
+
+  <commit-message>test(core): add comprehensive test coverage for plugin system
+
+Created test suites:
+- plugin-resolver.test.ts: Convention resolution tests
+- build-validator.test.ts: Build-time validation tests
+- Integration tests for multi-plugin scenarios
+
+All tests passing.
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+---
+
+### Wave 3 (Sequential after Wave 2) — Deployment & Finalization
+
+**Goal:** Commit changes, verify production, finalize deployment
+
+---
+
+<task-plan id="phase-1-task-10" wave="3">
+  <title>Commit All Changes</title>
+  <requirement>REQ-17 - Git commit with clear message</requirement>
+  <description>
+    Commit all implementation changes with a clear, comprehensive commit message documenting both the immediate fix and the convention system.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/" reason="Repository root" />
+  </context>
+
+  <steps>
+    <step order="1">Stage all modified files: `git add -A`</step>
+    <step order="2">Review staged changes: `git status`</step>
+    <step order="3">Create commit with comprehensive message documenting both phases</step>
+    <step order="4">Include technical details and decision references</step>
+    <step order="5">Verify commit created successfully</step>
+  </steps>
+
+  <verification>
+    <check type="test">git status shows clean working tree</check>
+    <check type="test">git log shows commit with clear message</check>
+    <check type="manual">Commit message references requirements and decisions</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-9" reason="All work complete before committing" />
+  </dependencies>
+
+  <commit-message>feat(membership): fix production plugin loading + convention system
+
+Phase 1: Immediate Fix (10 min)
+✅ Fixed plugin entrypoint resolution by adding local dependency
+✅ Configured worker_loaders for sandboxed execution
+✅ Deployed to production - plugin now loading
+✅ Verified manifest shows membership plugin
+✅ Verified routes accessible (no INTERNAL_ERROR)
+
+Phase 2: Convention System (30 min)
+✅ Created plugin-resolver.ts for convention-based resolution
+✅ Created build-validator.ts for loud build failures
+✅ Modified plugin loader to support string array syntax
+✅ Updated astro.config to use plugins: ["membership"]
+✅ Added comprehensive test coverage
+
+Technical Approach:
+- Verified against EMDASH-GUIDE.md Section 6
+- Follows package.json exports pattern
+- Convention: plugin name → plugins/<name>/sandbox.ts
+- Build validation throws errors (not warnings)
+
+Decision Alignment:
+- Decision 1: Hardcode fix + convention in 40 minutes ✅
+- Decision 2: Convention over configuration ✅
+- Decision 3: Self-verifying build system ✅
+- Decision 4: Ship timeline 40 minutes ✅
+- Decision 5: Zero documentation needed (self-explanatory) ✅
+
+Total time: ≤40 minutes
+Zero banned patterns: N/A (build system fix, not code change)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+---
+
+<task-plan id="phase-1-task-11" wave="3">
+  <title>Final Production Verification</title>
+  <requirement>REQ-18, REQ-19 - Deploy within budget and verify production</requirement>
+  <description>
+    Final verification that the plugin works in production and the implementation was completed within the 40-minute time budget.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/rounds/membership-production-fix/decisions.md" reason="Decision 4 mandates 40-minute timeline" />
+  </context>
+
+  <steps>
+    <step order="1">Calculate total elapsed time from task-1 start</step>
+    <step order="2">Verify time ≤ 40 minutes (10 min phase 1 + 30 min phase 2)</step>
+    <step order="3">Re-test production manifest: `curl https://yoga.shipyard.company/_emdash/api/manifest`</step>
+    <step order="4">Re-test plugin routes to confirm no regressions</step>
+    <step order="5">Document final production state</step>
+    <step order="6">Confirm all success criteria met</step>
+  </steps>
+
+  <verification>
+    <check type="test">Total time ≤ 40 minutes</check>
+    <check type="test">Production manifest shows membership plugin</check>
+    <check type="test">Plugin routes accessible</check>
+    <check type="manual">All success criteria from requirements met</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-10" reason="Verify after commit" />
+  </dependencies>
+
+  <commit-message>verify(membership): production deployment confirmed - all criteria met
+
+Final production verification:
+✅ Plugin in manifest
+✅ Routes accessible
+✅ Convention system working
+✅ Build fails loudly on errors
+✅ Time budget: ≤40 minutes
+
+Success criteria achieved:
+- Plugin loads in production ✅
+- Zero manual configuration required ✅
+- Build fails loudly on broken plugins ✅
+- Total implementation time ≤40 minutes ✅
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+---
+
+<task-plan id="phase-1-task-12" wave="3">
+  <title>Sara Blakely Customer Gut-Check</title>
   <requirement>SKILL.md Step 7 - Customer perspective validation</requirement>
   <description>
-    Automatic post-deployment review from Sara Blakely's customer perspective. Gut-check the deployment from a real user's viewpoint: Would a customer pay for this? What would make them say "shut up and take my money"? What feels like engineering vanity vs customer value?
-
-    This is an automated quality gate per the agency-plan skill requirements.
+    Spawn a haiku sub-agent as Sara Blakely to gut-check the implementation from a customer perspective. Would a customer pay for this? What feels like engineering vanity vs customer value?
   </description>
 
   <context>
     <file path="/home/agent/great-minds-plugin/skills/agency-plan/SKILL.md" reason="Step 7 mandates Sara Blakely review" />
-    <file path="/home/agent/shipyard-ai/.planning/phase-1-plan.md" reason="This deployment plan" />
-    <file path="/home/agent/shipyard-ai/prds/membership-deploy.md" reason="Original PRD for customer context" />
+    <file path="/home/agent/shipyard-ai/.planning/phase-1-plan.md" reason="This plan" />
+    <file path="/home/agent/shipyard-ai/prds/membership-production-fix.md" reason="Original PRD" />
   </context>
 
   <steps>
-    <step order="1">Spawn haiku sub-agent as Sara Blakely with gut-check prompt</step>
-    <step order="2">Agent reads phase-1-plan.md and membership-deploy.md</step>
-    <step order="3">Agent answers honestly from customer perspective: Would they pay? What's the hook? Engineering vanity vs value?</step>
+    <step order="1">Spawn haiku sub-agent with Sara Blakely persona</step>
+    <step order="2">Agent reads phase-1-plan.md and membership-production-fix.md</step>
+    <step order="3">Agent answers: Would a customer pay? What's the hook? Engineering vanity vs value?</step>
     <step order="4">Agent writes to .planning/sara-blakely-review.md</step>
-    <step order="5">Review results: If Sara flags major customer-value gaps, consider before closing deployment</step>
+    <step order="5">Review results for critical customer concerns</step>
   </steps>
 
   <verification>
-    <check type="test">test -f .planning/sara-blakely-review.md</check>
-    <check type="manual">Review Sara's feedback for critical customer concerns</check>
-    <check type="manual">No major red flags that would require rollback</check>
+    <check type="test">Sara Blakely review file created</check>
+    <check type="manual">Review customer perspective feedback</check>
+    <check type="manual">No major red flags requiring changes</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-8" reason="Must complete deployment before customer review" />
+    <depends-on task-id="phase-1-task-11" reason="Complete all work before customer review" />
   </dependencies>
 
   <commit-message>review(membership): Sara Blakely customer gut-check complete
 
-Post-deployment customer perspective review completed.
-See .planning/sara-blakely-review.md for full analysis.
+Customer perspective review completed.
+See .planning/sara-blakely-review.md for analysis.
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-## RISK NOTES
+## Risk Notes
 
-### Critical Risks Identified by Research Agents
+**Critical Risks from Research Agents:**
 
-**1. FILE DIVERGENCE (HIGH PRIORITY)**
-- **Issue**: sandbox-entry.ts in src/ is 145 lines newer than deliverables/
-- **Impact**: Copying from deliverables would LOSE improvements (parseJSON safety, better error messages)
-- **Mitigation**: Keep src/ version, copy only auth.ts and email.ts
-- **Status**: Addressed in task-2 plan
+1. **Plugin Package Linking** - The plugin may not be resolvable if not properly linked as a dependency. Mitigation: Add as local file dependency in task-1.
 
-**2. SERVER AVAILABILITY (HIGH PRIORITY)**
-- **Issue**: Dev server on port 4324 must be running
-- **Impact**: All endpoint tests fail if server unavailable
-- **Mitigation**: Fail-fast pre-check in task-1 with clear error message
-- **Status**: Addressed in task-1 plan
+2. **Build Time Validation** - No existing loud failures for broken plugins. Mitigation: Build validator in task-6.
 
-**3. INCOMPLETE USER FLOW TESTING (MEDIUM PRIORITY)**
-- **Issue**: Steve's requirement for complete email → link → access flow
-- **Impact**: False confidence if we only test endpoints
-- **Mitigation**: Dedicated manual test task (task-4) with step-by-step validation
-- **Status**: Addressed in task-4 plan
+3. **Time Budget** - 40 minutes is tight for both phases. Mitigation: Clear scope, ruthless discipline, parallel execution where possible.
 
-**4. SCOPE CREEP (MEDIUM PRIORITY)**
-- **Issue**: Temptation to add improvements during deployment
-- **Impact**: Violates binary outcome principle, extends timeline
-- **Mitigation**: Locked scope in all task plans, ruthless discipline
-- **Status**: Monitored throughout
-
-**5. PARTIAL DEPLOYMENT (MEDIUM PRIORITY)**
-- **Issue**: Could deploy 2/3 files and declare success
-- **Impact**: Violates binary outcome principle
-- **Mitigation**: Quality verification task (task-6) enforces all-or-nothing
-- **Status**: Addressed in task-6 plan
+4. **Convention System Complexity** - Risk of over-engineering. Mitigation: Keep resolver simple (single function, clear convention).
 
 ---
 
-## TRACEABILITY TO EMDASH GUIDE
+## Definition of Done
 
-Per CLAUDE.md requirement: "Verify technical approach by reading actual documentation or source code — do NOT guess at API surfaces."
+Phase 1 is complete when:
 
-### Emdash Plugin System (docs/EMDASH-GUIDE.md)
-
-**Section 6: Plugin System (lines 898-1207)**
-- Confirmed plugin structure: `definePlugin()` in sandbox-entry.ts
-- Confirmed banned patterns are Emdash anti-patterns (not documented in guide but inferred from codebase standards)
-- Route handlers use `PluginContext` object (line 958-972)
-- KV storage for plugin data (line 962: `ctx.kv`)
-- Email service via `ctx.email` (line 972)
-
-**Specific API References:**
-- Plugin routes: Lines 1023-1047 show Block Kit admin UI pattern
-- Storage pattern: Lines 1111-1126 show KV storage usage
-- Hook system: Lines 975-993 define available hooks
-
-**Technical Validation:**
-- auth.ts implements JWT pattern (lines not directly in guide, but standard practice)
-- email.ts uses Resend API with ctx.email fallback (referenced line 972)
-- sandbox-entry.ts follows `definePlugin()` pattern (lines 1082-1158)
-
-All technical approaches verified against actual Emdash documentation.
-
----
-
-## DEFINITION OF DONE
-
-membership-deploy is complete when:
-
-- [x] Pre-deploy validation passes (server check, files exist)
-- [x] Files deployed with zero banned patterns
-- [x] All 3 endpoints return HTTP 200
-- [x] Complete user flow tested (email → magic link → access)
-- [x] Negative tests pass (invalid email, expired link)
-- [x] Quality verification complete (code review, binary outcome)
-- [x] TEST-RESULTS.md created with all sections
-- [x] README updated with deployment confirmation
-- [x] All changes committed with clear messages
-- [x] Changes pushed to remote
-- [x] Sara Blakely review complete
-- [x] Total time < 2 hours
+- [ ] Plugin loads in production (manifest verification)
+- [ ] Plugin routes accessible (no INTERNAL_ERROR)
+- [ ] Convention system implemented (plugins: ["membership"] works)
+- [ ] Build fails loudly on broken plugins
+- [ ] Tests passing
+- [ ] Changes committed with clear message
+- [ ] Total time ≤40 minutes
+- [ ] Sara Blakely review complete
 
 ---
 
 **Plan Status**: READY FOR EXECUTION
-**Critical Decision**: File divergence resolved (keep src/ sandbox-entry.ts, copy auth.ts + email.ts only)
-**Time Budget**: 2 hours maximum
-**Quality Standard**: Binary outcome - all tests pass or rollback completely
+**Time Budget**: 40 minutes maximum
+**Quality Standard**: Binary outcome - works completely or rollback
