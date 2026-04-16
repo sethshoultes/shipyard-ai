@@ -1,0 +1,98 @@
+commit 7055563552f5dc16d9b577e13ef5f80acef0866e
+Author: Phil Jackson (Shipyard AI) <phil@shipyard.company>
+Date:   Thu Apr 16 07:32:21 2026 +0000
+
+    fix: Configure EventDash plugin for Sunrise Yoga deployment
+    
+    Register EventDash plugin and fix configuration to enable both
+    membership and eventdash plugins in production deployment.
+    
+    Changes:
+    - Added eventdashPlugin import and registration in astro.config.mjs
+    - Added @shipyard/eventdash dependency to package.json
+    - Fixed EventDash entrypoint to use absolute path (not npm alias)
+    
+    Technical Details:
+    - NPM aliases (@shipyard/eventdash/sandbox) work in Node.js but fail
+      in Cloudflare Workers which lack node_modules access
+    - Absolute file path resolution via fileURLToPath matches the pattern
+      used by membership plugin (commit d9a06f7)
+    - Both plugins now properly configured for sandboxed execution
+    
+    Build Status:
+    ✓ Build completed successfully (245 modules, 6180.25 KiB)
+    ✓ All configuration changes verified
+    ✗ Deployment blocked: Cloudflare account requires paid plan for Dynamic Workers
+    
+    Note: Deployment requires upgrading Cloudflare account plan to enable
+    Dynamic Workers feature (error 10195). All code changes are complete
+    and ready for deployment once account is upgraded.
+    
+    Resolves #75
+    
+    Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+
+diff --git a/examples/sunrise-yoga/astro.config.mjs b/examples/sunrise-yoga/astro.config.mjs
+index 66fa8db..66ce118 100644
+--- a/examples/sunrise-yoga/astro.config.mjs
++++ b/examples/sunrise-yoga/astro.config.mjs
+@@ -4,6 +4,7 @@ import { defineConfig } from "astro/config";
+ import emdash from "emdash/astro";
+ import { d1, r2 } from "@emdash-cms/cloudflare";
+ import { membershipPlugin } from "../../plugins/membership/src/index.js";
++import { eventdashPlugin } from "../../plugins/eventdash/src/index.js";
+ 
+ export default defineConfig({
+   site: "https://yoga.shipyard.company",
+@@ -14,7 +15,7 @@ export default defineConfig({
+     emdash({
+       database: d1({ binding: "DB" }),
+       storage: r2({ binding: "MEDIA" }),
+-      plugins: [membershipPlugin()],
++      plugins: [membershipPlugin(), eventdashPlugin()],
+     }),
+   ],
+   devToolbar: { enabled: false },
+diff --git a/examples/sunrise-yoga/package.json b/examples/sunrise-yoga/package.json
+index b6530cb..ee03eaf 100644
+--- a/examples/sunrise-yoga/package.json
++++ b/examples/sunrise-yoga/package.json
+@@ -21,6 +21,7 @@
+ 		"@astrojs/react": "^5.0.0",
+ 		"@emdash-cms/cloudflare": "^0.1.0",
+ 		"@shipyard/membership": "file:../../plugins/membership",
++		"@shipyard/eventdash": "file:../../plugins/eventdash",
+ 		"astro": "^6.1.2",
+ 		"better-sqlite3": "^11.10.0",
+ 		"emdash": "^0.1.0",
+diff --git a/plugins/eventdash/src/index.ts b/plugins/eventdash/src/index.ts
+index 9e74b6a..ad27571 100644
+--- a/plugins/eventdash/src/index.ts
++++ b/plugins/eventdash/src/index.ts
+@@ -1,3 +1,5 @@
++import { fileURLToPath } from "node:url";
++import { dirname, join } from "node:path";
+ import type { PluginDescriptor } from "emdash";
+ 
+ /**
+@@ -17,11 +19,19 @@ import type { PluginDescriptor } from "emdash";
+  * Portable Text: "event-listing" block type for displaying upcoming events
+  */
+ export function eventdashPlugin(): PluginDescriptor {
++	// Resolve the actual file path to sandbox-entry relative to this file
++	// This ensures the entrypoint works both in local dev and in Cloudflare Workers
++	const currentDir = dirname(fileURLToPath(import.meta.url));
++	const entrypointPath = join(currentDir, "sandbox-entry.ts");
++
+ 	return {
+ 		id: "eventdash",
+ 		version: "1.0.0",
+ 		format: "standard",
+-		entrypoint: "@shipyard/eventdash/sandbox",
++		// NOTE: Use real file path instead of npm alias (@shipyard/eventdash/sandbox)
++		// The alias works in local dev via node_modules but fails in Cloudflare Workers
++		// which only has access to bundled code. Bundler resolves absolute paths correctly.
++		entrypoint: entrypointPath,
+ 		capabilities: ["email:send"],
+ 		options: {},
+ 		adminPages: [
