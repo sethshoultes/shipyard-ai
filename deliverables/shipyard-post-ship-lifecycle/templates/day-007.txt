@@ -1,0 +1,19 @@
+Subject: Your site is breathing on its own now
+
+Hi {name},
+
+Seven days. Your site shipped seven days ago, and it's been running clean.
+
+I built {project_url} for you. I know how it works, where it's resilient, what could trip it up. The fact that it's humming along without needing me to jump in—that matters. That's the whole point.
+
+Your site doesn't need you to hold its hand. That's pride-worthy. Seriously.
+
+If something feels off—a page loads weird, a form isn't working, a feature you thought you had isn't there—reply to this email. I'm here for that.
+
+Otherwise: nice work shipping something real into the world.
+
+—
+
+Homeport is Shipyard's way of staying close to what we build. We don't ghost you after launch.
+
+Unsubscribe: https://aftercare.shipyard.ai/unsub?token={email}

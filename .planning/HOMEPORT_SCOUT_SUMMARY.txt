@@ -1,0 +1,165 @@
+HOMEPORT CODEBASE SCOUT - MISSION COMPLETE
+==========================================
+
+Project: shipyard-post-ship-lifecycle (Homeport / Aftercare)
+Date: April 16, 2026
+Status: Ready for Build Phase
+
+REPORT LOCATION:
+/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md (874 lines)
+
+KEY FINDINGS:
+=============
+
+✅ EXISTING WORKER INFRASTRUCTURE:
+  - 3 production Cloudflare Workers deployed
+  - contact-form: Resend API integration proven
+  - prd-chat: Workers AI, multiple endpoints, complex logic
+  - wardrobe-analytics: KV/D1, rate limiting, README template
+  - Wrangler 3.x configuration patterns
+  - TypeScript + package.json + tsconfig standardized
+
+✅ EMAIL SERVICE (RESEND):
+  - Already integrated in /workers/contact-form
+  - Bearer token auth pattern proven
+  - Error handling established
+  - Ready to adapt for plain text emails (Homeport requirement)
+
+✅ DATABASE PATTERNS:
+  - /packages/db/schema/sites.ts (project/site data)
+  - /packages/db/schema/subscriptions.ts (reference for V1.1)
+  - Drizzle ORM patterns established
+  - Can serve as backup source for automated capture
+
+✅ PROJECT DATA STRUCTURES:
+  - Sites table: url, name, subscriptionId, tier, status, timestamps
+  - Subscriptions table: Stripe integration, status tracking
+  - Alignment with Homeport needs: ~80% match (missing email, ship_date)
+
+✅ TESTING INFRASTRUCTURE:
+  - Vitest available via Wrangler
+  - No existing Worker tests (must build own)
+  - Example structure provided in report
+
+❌ CRITICAL BLOCKERS (Must resolve before build):
+  - Project data availability (Phil must audit Day 0)
+  - From email address decision (Steve/Elon)
+  - Reply inbox assignment (Phil)
+  - Trigger mechanism unclear (webhook or manual CSV?)
+
+⚠️ GAPS REQUIRING BUILD:
+  - Scheduled cron jobs (no existing patterns)
+  - Email template system (plain text, function-based)
+  - Unsubscribe mechanism (KV flag + Worker endpoint)
+  - CSV-to-KV upload utility
+  - Daily trigger scheduler
+
+REUSABLE CODE PATTERNS:
+=======================
+
+From /workers/contact-form/src/index.ts:
+  - Resend API fetch (lines 123-146) → 100% reusable
+  - CORS headers function (lines 53-61) → 100% reusable
+  - Input sanitization (lines 32-42) → 90% reusable
+  - XSS prevention (lines 25-30) → 90% reusable
+  - Error response format → 100% reusable
+  - Environment typing → 100% reusable
+
+From /workers/wardrobe-analytics/README.md:
+  - Excellent documentation template
+  - Deployment instructions structure
+  - Database schema documentation pattern
+  - API endpoint documentation format
+
+DEPENDENCIES NEEDED:
+====================
+
+None (matching Elon's constraint).
+
+package.json:
+  - @cloudflare/workers-types (already established)
+  - typescript (already established)
+  - wrangler (already established)
+  - vitest (for testing, optional)
+
+Environment Variables:
+  - RESEND_API_KEY (secret, must be set via wrangler secret)
+  - FROM_EMAIL (var, decision pending)
+
+RECOMMENDED FILE STRUCTURE:
+===========================
+
+/aftercare/
+├── wrangler.toml
+├── package.json
+├── tsconfig.json
+├── src/
+│   ├── index.ts (main Worker entry)
+│   ├── scheduler.ts (cron logic)
+│   ├── emails.ts (5 template functions)
+│   ├── resend.ts (API wrapper)
+│   ├── kv.ts (KV operations)
+│   └── unsubscribe.ts (unsub endpoint)
+├── scripts/
+│   └── csv-to-kv.ts (manual upload)
+├── tests/
+│   ├── emails.test.ts
+│   ├── scheduler.test.ts
+│   └── kv.test.ts
+└── README.md (voice guidelines, deployment)
+
+ESTIMATED BUILD TIME:
+=====================
+
+Core components: ~290-450 lines TypeScript
+Testing: ~6 hours
+Timeline: 48 hours (target), 72 hours (buffer)
+
+Day 0 (Pre-Build): Data audit + decisions
+Day 1 (24h): Core Worker + tests
+Day 2 (24h): Deploy + verify
+
+RISK FLAGS:
+===========
+
+Critical:
+  - No project data existence confirmed (BLOCKER)
+  - Email deliverability setup incomplete (SPF/DKIM/DMARC)
+  - Reply inbox not assigned (trust builder)
+
+High:
+  - 48-hour timeline ambitious (mitigated by 72h buffer)
+  - Voice consistency risk if team changes templates
+
+Medium:
+  - KV eventual consistency → duplicates (accept & handle)
+  - Manual CSV upload scalability (defer to V1.1)
+  - No existing scheduled cron patterns (must build new)
+
+NEXT STEPS:
+===========
+
+1. Phil: Audit shipped project records (minimum 10 projects with clean data)
+2. Steve/Elon: Decide on From email address
+3. Phil: Assign reply inbox owner
+4. Elon: Set up Resend domain authentication
+5. Steve: Draft Day 7 and Day 30 email templates
+6. Elon: Begin Worker scaffold with patterns from contact-form
+
+BUILD READINESS CHECKLIST:
+==========================
+
+Documentation: ✅ Locked decisions (decisions.md)
+Infrastructure: ✅ Workers + Resend proven
+Patterns: ✅ Code examples available
+Dependencies: ✅ No external packages needed
+Data: ❌ PENDING audit result
+Decisions: ⚠️ From email, reply owner pending
+
+STATUS: Ready for build upon resolution of 3 blockers (data, email address, reply owner)
+
+Report prepared by: Codebase Scout Agent
+Files analyzed: 20+
+Pattern matches found: 15+
+Reusable code patterns: 8
+Recommended reference files: 6

@@ -1,0 +1,19 @@
+Subject: It's been 30 days. How are things?
+
+Hi {name},
+
+Thirty days in. Your site is still up. The servers are responding. No surprises, which is what you want.
+
+I've been thinking about {project_url} since we shipped it. Not obsessing—just checking in the way you'd expect someone who cares about their work to do.
+
+Is everything working the way we planned? Are there revisions you've been meaning to make—something that looked good in the design but feels different now that real people are using it? A feature that needs tweaking? Copy that doesn't read right? That's normal. Real use teaches you things.
+
+If you want to update something, I can help with that. If everything is genuinely perfect and you don't need anything, that's fine too.
+
+Just reply here and let me know.
+
+—
+
+Homeport is Shipyard's way of staying close to what we build. We don't ghost you after launch.
+
+Unsubscribe: https://aftercare.shipyard.ai/unsub?token={email}

@@ -1,623 +1,1592 @@
-# Phase 1 Plan — membership-deploy
+# Phase 1 Plan — Homeport (Aftercare) Post-Ship Lifecycle Emails
 
-**Generated**: 2026-04-16
-**Requirements**: `/home/agent/shipyard-ai/.planning/REQUIREMENTS.md`
-**Total Tasks**: 9
-**Waves**: 3
-**Time Budget**: 2 hours maximum
-
----
-
-## EXECUTIVE SUMMARY
-
-**What we're deploying:** Clean membership plugin files from `deliverables/membership-fix/` to `plugins/membership/src/` with zero banned patterns and complete validation.
-
-**Why it matters:** The clean deliverable eliminates 4 banned pattern violations and has never been tested on a live Emdash site. Users are waiting for a working membership system.
-
-**Core promise:** Binary outcome - works completely or rollback immediately. No partial ships. No scope creep.
-
-**Critical constraints:**
-- **3-file copy only** - sandbox-entry.ts, auth.ts, email.ts (scope locked per Decision 1)
-- **Zero banned patterns** - No exceptions, no grandfathering (Decision 3)
-- **Full user flow testing** - Email → magic link → access required (Decision 2, Steve's requirement)
-- **Single session** - Complete in <2 hours or fail (Decision 3)
-- **Server prerequisite** - Port 4324 must be running, fail fast if not (Decision 2, Elon's requirement)
-
-**Critical Risk Alert:**
-⚠️ **FILE DIVERGENCE DETECTED** - Codebase Scout and Risk Scanner both report that `plugins/membership/src/sandbox-entry.ts` is 145 lines NEWER than `deliverables/membership-fix/sandbox-entry.ts`. The destination has improvements (parseJSON safety, better error messages) that would be lost if we copy from source.
-
-**Decision Required Before Execution:**
-- **Option A**: Copy from deliverables (original plan, loses improvements)
-- **Option B**: Keep current src/ version (violates copy scope)
-- **Option C**: Skip sandbox-entry.ts, copy only auth.ts + email.ts
-
-This plan assumes **Option C** based on Codebase Scout recommendation. auth.ts and email.ts are identical between source/dest, so copying them is safe. sandbox-entry.ts in destination is already clean (0 banned patterns) and newer.
+**Generated:** 2026-04-16
+**Requirements:** `/home/agent/shipyard-ai/.planning/HOMEPORT-REQUIREMENTS.md`
+**Total Tasks:** 20
+**Waves:** 3
+**Timeline:** 48-72 hours (Day 0 blockers + Day 1 build + Day 2 ship)
+**Project:** shipyard-post-ship-lifecycle (Homeport / Aftercare)
 
 ---
 
-## REQUIREMENTS TRACEABILITY
+## Executive Summary
 
-| Requirement | Task(s) | Wave | Coverage |
-|-------------|---------|------|----------|
-| REQ-001 to REQ-004 (Pre-Deploy Validation) | phase-1-task-1 | 1 | Complete |
-| REQ-005 to REQ-009 (File Deployment) | phase-1-task-2 | 1 | Partial (auth.ts, email.ts only) |
-| REQ-010 to REQ-013 (Endpoint Testing) | phase-1-task-3 | 2 | Complete |
-| REQ-014 to REQ-018 (Full User Flow) | phase-1-task-4 | 2 | Complete |
-| REQ-019 to REQ-022 (Negative Testing) | phase-1-task-5 | 2 | Complete |
-| REQ-023 to REQ-025 (Quality Standards) | phase-1-task-6 | 2 | Complete |
-| REQ-026 to REQ-032 (Documentation) | phase-1-task-7 | 3 | Complete |
+**Homeport** is a 5-email lifecycle system that remembers customers after project deployment. The MVP ships in 48-72 hours using Cloudflare Workers + KV Store + Resend API.
+
+**Three waves of work:**
+- **Wave 1 (Foundation):** Independent setup tasks (Parallel)
+- **Wave 2 (Core Implementation):** Feature development (Parallel after Wave 1)
+- **Wave 3 (Integration & Launch):** End-to-end testing and go-live (Sequential after Wave 2)
+
+**Success Metric:** 10%+ reply/revision request rate after 90 days
 
 ---
 
-## WAVE EXECUTION ORDER
+## Requirements Traceability
 
-### Wave 1 (Sequential) — Pre-Deploy Validation & File Copy
+| Requirement | Task(s) | Wave |
+|-------------|---------|------|
+| R1: Email Templates | task-4, task-5, task-6 | 1, 2, 2 |
+| R2: Scheduler Logic | task-1, task-9 | 1, 2 |
+| R3: KV Operations | task-7, task-12 | 2, 2 |
+| R4: Resend API Client | task-8 | 2 |
+| R5: Unsubscribe Endpoint | task-10 | 2 |
+| R6: CSV-to-KV Script | task-11 | 2 |
+| R7: Email Template Tests | task-12 | 2 |
+| R8: Scheduler Tests | task-13 | 2 |
+| R9: Worker Scaffold | task-1, task-2, task-3 | 1, 1, 1 |
+| R10: Resend Config | Day 0 blocker | Pre-Wave 1 |
 
-**Estimated Duration:** 10 minutes
-**Goal:** Verify prerequisites and copy clean files
+---
+
+## Wave Execution Order
+
+### Wave 1 (Parallel — Foundation & Pre-Build Setup)
+
+These tasks establish infrastructure, resolve critical blockers, and scaffold the project. They can run in parallel.
 
 ---
 
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Pre-Deploy Validation - Server Check & File Verification</title>
-  <requirement>REQ-001, REQ-002, REQ-003, REQ-004 - Verify server running and files exist</requirement>
+  <title>Resolve Project Data Blocker — Audit and CSV Preparation</title>
+  <requirement>R10 (Resend Config), Day 0 Blocker 1</requirement>
   <description>
-    Validate that dev server is running on port 4324, all source files exist in deliverables/membership-fix/, destination directory is writable, and fail fast with clear error if any check fails. This is the critical blocking gate per Decision 2 (Elon's requirement).
+    Audit existing shipped projects in Shipyard to verify we have clean data (customer email, name, URL, ship date) for at least 10 projects. This is the critical blocker that determines whether we can launch in 48 hours or must postpone.
+
+    Outcome: CSV file with format: project_id, customer_email, customer_name, project_url, ship_date
+    If data gap exists, escalate immediately and decide: (a) backfill manually, (b) postpone, or (c) test with partial data.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/prds/membership-deploy.md" reason="PRD defines 3-step deployment process" />
-    <file path="/home/agent/shipyard-ai/rounds/membership-deploy/decisions.md" reason="Decision 2 mandates server check with fail-fast" />
-    <file path="/home/agent/shipyard-ai/deliverables/membership-fix/" reason="Source files location" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/" reason="Destination directory" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/decisions.md" reason="Section 4.1 - Project Data Source (blocker definition)" />
+    <file path="/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md" reason="Section 8.1 Blocker 1 - Project Data Availability (risk assessment)" />
+    <file path="/home/agent/shipyard-ai/packages/db/schema/sites.ts" reason="Reference for site data structure (url, name fields)" />
+    <file path="/home/agent/shipyard-ai/prds/shipyard-post-ship-lifecycle.md" reason="PRD context for shipped projects" />
   </context>
 
   <steps>
-    <step order="1">Check server health: `curl -s -m 5 http://localhost:4324/_emdash/api/plugins/membership/admin -H "Content-Type: application/json" -d '{"type":"page_load"}' || exit 1`</step>
-    <step order="2">If curl fails, echo "DEPLOYMENT BLOCKED: Dev server not running on port 4324. Start server before deploying." and exit 1</step>
-    <step order="3">Verify source files exist: `test -f deliverables/membership-fix/auth.ts && test -f deliverables/membership-fix/email.ts && test -f deliverables/membership-fix/sandbox-entry.ts || exit 1`</step>
-    <step order="4">If files missing, echo "DEPLOYMENT BLOCKED: Source files not found in deliverables/membership-fix/" and exit 1</step>
-    <step order="5">Verify destination directory: `test -d plugins/membership/src/ && test -w plugins/membership/src/ || exit 1`</step>
-    <step order="6">If directory check fails, echo "DEPLOYMENT BLOCKED: Destination plugins/membership/src/ not writable" and exit 1</step>
-    <step order="7">Echo "✅ Pre-deploy validation passed: Server running, files exist, destination writable"</step>
+    <step order="1">List all completed projects by checking /home/agent/shipyard-ai/prds/completed/ directory (or CRM/project management system)</step>
+    <step order="2">For each project, identify: customer_email, customer_name, project_url, ship_date. Check project records, invoices, or contact list.</step>
+    <step order="3">Create CSV file with header: project_id, customer_email, customer_name, project_url, ship_date</step>
+    <step order="4">Populate at least 10 rows with validated data (no blanks, verify emails are correct)</step>
+    <step order="5">If less than 10 projects with clean data exist, document the gap and escalate to Phil/Elon (decision: backfill, postpone, or test with partial data)</step>
+    <step order="6">Save CSV to /tmp/shipyard-projects.csv or shared location for later upload</step>
   </steps>
 
   <verification>
-    <check type="test">curl http://localhost:4324/_emdash/api/plugins/membership/admin returns HTTP 200</check>
-    <check type="test">All 3 source files verified to exist</check>
-    <check type="test">Destination directory writable</check>
-    <check type="manual">Error messages are clear and actionable (no stack traces)</check>
+    <check type="manual">CSV file contains minimum 10 rows of project data</check>
+    <check type="manual">All 5 required fields present for each row (email, name, URL, date)</check>
+    <check type="manual">Sample email addresses are valid format (contain @domain)</check>
+    <check type="manual">Ship dates are ISO 8601 format or convertible to it</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies - this is the first validation gate -->
+    <!-- No dependencies - this is Wave 1 blocker resolution -->
   </dependencies>
 
-  <commit-message>chore(membership): pre-deploy validation - server check passed
+  <commit-message>chore(data): audit shipped projects and prepare initial CSV for Homeport KV upload
 
-Verified prerequisites for membership plugin deployment:
-- Dev server responding on port 4324
-- Source files exist in deliverables/membership-fix/
-- Destination plugins/membership/src/ writable
+Conduct data availability assessment for Homeport MVP launch.
+Identify 10+ shipped projects with clean customer email, name, URL, and ship date.
+Create CSV seed data for manual KV population.
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+This task is a Day 0 blocker - must complete before Wave 1 build starts.
+  </commit-message>
 </task-plan>
 
 ---
 
 <task-plan id="phase-1-task-2" wave="1">
-  <title>Deploy Clean Files - Copy auth.ts and email.ts</title>
-  <requirement>REQ-005, REQ-006, REQ-007, REQ-008, REQ-009 - Copy files and verify zero banned patterns</requirement>
+  <title>Decide Critical Configuration: "From" Email Address and Reply Inbox Owner</title>
+  <requirement>Blocker 2 (Email "From" Address), Blocker 3 (Reply Handling)</requirement>
   <description>
-    Copy auth.ts and email.ts from deliverables/membership-fix/ to plugins/membership/src/. SKIP sandbox-entry.ts per Codebase Scout recommendation (destination is newer with improvements). Verify zero banned patterns in all deployed files. This implements Decision 3's quality standard.
+    Make two critical product decisions before Resend configuration:
+    1. Which email address do Homeport emails come from? (homeport@, aftercare@, personal, etc.)
+    2. Who monitors and responds to customer replies? (shared inbox, Phil personally, or auto-reply)
 
-    CRITICAL DECISION: Based on Codebase Scout analysis, sandbox-entry.ts in src/ is 145 lines newer with parseJSON safety improvements. Copying from deliverables would LOSE these improvements. Since destination already has 0 banned patterns, we keep it.
+    These decisions drive domain setup, Resend configuration, and operational workflow.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/membership-fix/auth.ts" reason="Source file - identical to destination per Codebase Scout" />
-    <file path="/home/agent/shipyard-ai/deliverables/membership-fix/email.ts" reason="Source file - identical to destination per Codebase Scout" />
-    <file path="/home/agent/shipyard-ai/deliverables/membership-fix/sandbox-entry.ts" reason="Source file - OLDER than destination, will NOT be copied" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/" reason="Destination directory for clean files" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Banned patterns reference - section 6.6 Plugin System" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/decisions.md" reason="Section 4.2 - Email From Address (decision options), Section 4.5 - Reply Handling" />
+    <file path="/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md" reason="Section 8.1 Blockers 2 & 3 (impact and options)" />
+    <file path="/home/agent/shipyard-ai/workers/contact-form/src/index.ts" reason="Reference: existing contact-form uses hello@shipyard.company" />
   </context>
 
   <steps>
-    <step order="1">Copy auth.ts: `cp /home/agent/shipyard-ai/deliverables/membership-fix/auth.ts /home/agent/shipyard-ai/plugins/membership/src/auth.ts`</step>
-    <step order="2">Copy email.ts: `cp /home/agent/shipyard-ai/deliverables/membership-fix/email.ts /home/agent/shipyard-ai/plugins/membership/src/email.ts`</step>
-    <step order="3">SKIP sandbox-entry.ts - echo "⚠️  Skipping sandbox-entry.ts: destination is newer with improvements (145 lines, parseJSON safety)"</step>
-    <step order="4">Verify banned patterns in auth.ts: `grep -c "throw new Response\|rc\.user\|rc\.pathParams" plugins/membership/src/auth.ts` (expect 0)</step>
-    <step order="5">Verify banned patterns in email.ts: `grep -c "throw new Response\|rc\.user\|rc\.pathParams" plugins/membership/src/email.ts` (expect 0)</step>
-    <step order="6">Verify banned patterns in sandbox-entry.ts: `grep -c "throw new Response\|rc\.user\|rc\.pathParams" plugins/membership/src/sandbox-entry.ts` (expect 0)</step>
-    <step order="7">If any pattern count > 0, echo "DEPLOYMENT FAILED: Banned patterns detected" and rollback copied files immediately</step>
-    <step order="8">Echo "✅ Files deployed: auth.ts, email.ts copied. sandbox-entry.ts kept (newer). Zero banned patterns verified."</step>
+    <step order="1">Review options in decisions.md Section 4.2 for "From" address (homeport@, aftercare@, hello@, personal)</step>
+    <step order="2">Consider deliverability (SPF/DKIM setup cost) vs. brand differentiation</step>
+    <step order="3">Make decision: record chosen address (e.g., homeport@shipyard.ai)</step>
+    <step order="4">Review options in decisions.md Section 4.5 for reply handling (shared inbox vs. personal vs. auto-reply)</step>
+    <step order="5">Decide: who owns reply inbox monitoring? What's the SLA (<24h, <48h)?</step>
+    <step order="6">Document decisions in team communication (Slack, email, or decision log)</step>
   </steps>
 
   <verification>
-    <check type="test">grep -c "throw new Response" plugins/membership/src/*.ts returns 0 for all files</check>
-    <check type="test">grep -c "rc\.user" plugins/membership/src/*.ts returns 0 for all files</check>
-    <check type="test">grep -c "rc\.pathParams" plugins/membership/src/*.ts returns 0 for all files</check>
-    <check type="manual">Confirm auth.ts and email.ts match source, sandbox-entry.ts unchanged</check>
+    <check type="manual">From email address confirmed and documented</check>
+    <check type="manual">Reply inbox owner assigned with explicit name (Phil, shared team, etc.)</check>
+    <check type="manual">Reply SLA defined (<24 hours, <48 hours, or custom)</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Must pass pre-deploy validation first" />
+    <!-- No dependencies - this is Wave 1 decision gate -->
   </dependencies>
 
-  <commit-message>fix: deploy clean membership plugin — 0 banned pattern violations
+  <commit-message>chore(config): decide From email address and reply inbox owner for Homeport
 
-Deployed clean files from deliverables/membership-fix/:
-- ✅ auth.ts copied (209 LOC, 0 violations)
-- ✅ email.ts copied (580 LOC, 0 violations)
-- ⚠️  sandbox-entry.ts KEPT (destination newer, 0 violations)
+Configure critical product decisions before Resend setup:
+- From email address: [recorded decision, e.g., homeport@shipyard.ai]
+- Reply inbox owner: [name/team]
+- Reply SLA: [<24h, <48h, or custom]
 
-Verified zero instances of banned patterns:
-- throw new Response: 0
-- rc.user: 0
-- rc.pathParams: 0
-
-Destination sandbox-entry.ts retained per Codebase Scout recommendation:
-src/ version is 145 lines newer with parseJSON safety improvements.
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+These decisions drive Day 0 pre-build setup and operational workflow.
+  </commit-message>
 </task-plan>
 
 ---
 
-### Wave 2 (Sequential) — Testing & Quality Verification
-
-**Estimated Duration:** 45 minutes
-**Goal:** Validate endpoints, test complete user flow, verify negative cases
-
----
-
-<task-plan id="phase-1-task-3" wave="2">
-  <title>Endpoint Smoke Tests - Verify 3 API Routes</title>
-  <requirement>REQ-010, REQ-011, REQ-012, REQ-013 - Test admin, register, status endpoints</requirement>
+<task-plan id="phase-1-task-3" wave="1">
+  <title>Cloudflare Workers Project Scaffold and wrangler.toml Configuration</title>
+  <requirement>R9 (Worker Scaffold), R2 (Scheduler Logic), R10 (Resend Config)</requirement>
   <description>
-    Test all 3 membership plugin endpoints to verify they return HTTP 200 with valid JSON. Fail immediately if any endpoint returns non-200 status. This implements the smoke test requirement from PRD Step 2.
+    Create the Cloudflare Workers project directory structure, configure wrangler.toml with KV namespace and scheduled cron, set up package.json with TypeScript and testing, and validate the build compiles cleanly.
+
+    This scaffolding enables all subsequent development tasks. The Worker will export both a scheduled handler (cron job) and HTTP routes (unsubscribe endpoint).
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/prds/membership-deploy.md" reason="Step 2 defines 3 endpoint tests with curl commands" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Route definitions for admin, register, status" />
+    <file path="/home/agent/shipyard-ai/workers/contact-form/wrangler.toml" reason="Reference configuration for basic Worker setup" />
+    <file path="/home/agent/shipyard-ai/workers/contact-form/package.json" reason="Reference npm scripts and dependencies" />
+    <file path="/home/agent/shipyard-ai/workers/prd-chat/wrangler.toml" reason="Reference for compatibility flags if needed" />
+    <file path="/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md" reason="Section 6 - Recommended File Structure, Section 7 - Dependencies" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/decisions.md" reason="Section 1.2 - Architecture (Workers + KV structure)" />
   </context>
 
   <steps>
-    <step order="1">Test admin endpoint: `curl -s http://localhost:4324/_emdash/api/plugins/membership/admin -H "Content-Type: application/json" -d '{"type":"page_load"}' > /tmp/test-admin.json`</step>
-    <step order="2">Check admin response: `cat /tmp/test-admin.json | head -5` and verify HTTP 200 in response</step>
-    <step order="3">Test register endpoint: `curl -s -X POST http://localhost:4324/_emdash/api/plugins/membership/register -H "Content-Type: application/json" -d '{"email":"smoketest@example.com","plan":"basic"}' > /tmp/test-register.json`</step>
-    <step order="4">Check register response: `cat /tmp/test-register.json | head -5` and verify HTTP 200 in response</step>
-    <step order="5">Test status endpoint: `curl -s http://localhost:4324/_emdash/api/plugins/membership/status -H "Content-Type: application/json" -d '{"email":"smoketest@example.com"}' > /tmp/test-status.json`</step>
-    <step order="6">Check status response: `cat /tmp/test-status.json | head -5` and verify HTTP 200 in response</step>
-    <step order="7">If ANY endpoint fails, echo "DEPLOYMENT FAILED: Endpoint test failed" and exit 1</step>
-    <step order="8">Echo "✅ All 3 endpoints passed: Admin [200], Register [200], Status [200]"</step>
+    <step order="1">Create directory: /home/agent/shipyard-ai/workers/aftercare/</step>
+    <step order="2">Create subdirectories: src/, tests/, scripts/, (optional: templates/)</step>
+    <step order="3">Copy wrangler.toml from contact-form and customize:
+      - name = "shipyard-aftercare"
+      - Add [[kv_namespaces]] binding = "AFTERCARE_KV" (get namespace ID from Cloudflare dashboard)
+      - Add [[triggers]] crons = ["0 0 * * *"] for daily UTC midnight execution
+      - Add [vars] section: FROM_EMAIL = "homeport@shipyard.ai" (or chosen address from task-2)
+      - Compatibility date = "2024-12-01" (or current)
+    </step>
+    <step order="4">Copy package.json structure from prd-chat:
+      - Add scripts: dev, deploy, test, test:run, typecheck
+      - Dependencies: @cloudflare/workers-types, wrangler, vitest, typescript (dev only)
+    </step>
+    <step order="5">Copy and customize tsconfig.json (standard TypeScript config)</step>
+    <step order="6">Create src/index.ts with skeleton Worker export:
+      - Export default object with: scheduled() handler and route handlers for GET /unsub
+    </step>
+    <step order="7">Run: cd /home/agent/shipyard-ai/workers/aftercare && npm install</step>
+    <step order="8">Verify build: npm run typecheck (should pass with no errors)</step>
   </steps>
 
   <verification>
-    <check type="test">Admin endpoint returns 200: curl http://localhost:4324/_emdash/api/plugins/membership/admin</check>
-    <check type="test">Register endpoint returns 200: curl POST to /register</check>
-    <check type="test">Status endpoint returns 200: curl to /status</check>
-    <check type="manual">All JSON responses are valid and parseable</check>
+    <check type="build">npm run typecheck succeeds</check>
+    <check type="manual">wrangler.toml contains AFTERCARE_KV binding</check>
+    <check type="manual">wrangler.toml contains cron trigger: "0 0 * * *"</check>
+    <check type="manual">FROM_EMAIL variable set in [vars] section</check>
+    <check type="manual">src/index.ts exports default object with scheduled and route handlers</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Files must be deployed before testing endpoints" />
+    <!-- No dependencies - this is Wave 1 infrastructure -->
   </dependencies>
 
-  <commit-message>test(membership): verify API endpoints - all 3 routes passing
+  <commit-message>chore(scaffold): initialize Cloudflare Workers project for Homeport (aftercare)
 
-Smoke test results:
-- /_emdash/api/plugins/membership/admin: 200 OK
-- /_emdash/api/plugins/membership/register: 200 OK
-- /_emdash/api/plugins/membership/status: 200 OK
+Create project structure with wrangler.toml, package.json, and TypeScript config.
+Configure KV namespace binding (AFTERCARE_KV) and daily cron trigger (0 0 * * *).
+Set up npm scripts: dev, deploy, test, typecheck.
 
-All endpoints returning valid JSON responses.
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+Worker skeleton ready for implementation in Wave 2.
+  </commit-message>
 </task-plan>
 
 ---
 
-<task-plan id="phase-1-task-4" wave="2">
-  <title>Full User Flow Test - Email → Magic Link → Access</title>
-  <requirement>REQ-014, REQ-015, REQ-016, REQ-017, REQ-018 - Complete user journey validation</requirement>
+<task-plan id="phase-1-task-4" wave="1">
+  <title>Configure Resend Account and Domain Authentication (Pre-Build Setup)</title>
+  <requirement>R10 (Resend Config), R4 (Resend API Client)</requirement>
   <description>
-    Test the complete membership user flow from visiting members-only page through email entry, magic link receipt, authentication, and session persistence. This is Steve's non-negotiable requirement from Decision 2: "Either test the complete journey or admit we don't know if it works."
+    Set up Resend transactional email account (if not already done), authenticate the sending domain (homeport@shipyard.ai or chosen address from task-2), and verify email deliverability before the first email send.
 
-    This is a MANUAL test requiring browser interaction and email checking. Document each step's outcome.
+    This is a pre-build task that must complete before Wave 2 Resend API integration. Domain authentication (SPF/DKIM/DMARC) takes 24-48 hours to propagate, so start immediately.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/membership-deploy/decisions.md" reason="Decision 2 mandates full user flow test, lines 40-62" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Route handlers for registration and magic link" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/email.ts" reason="Magic link email generation logic" />
+    <file path="/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md" reason="Section 2 - Email Service Integration (Resend), Section 8.1 Blocker 2" />
+    <file path="/home/agent/shipyard-ai/workers/contact-form/src/index.ts" reason="Reference Resend API integration pattern (lines 123-146)" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/decisions.md" reason="Section 5.1 Risk - Email Deliverability Issues" />
   </context>
 
   <steps>
-    <step order="1">MANUAL: Open browser to http://localhost:4324 and navigate to members-only page/content</step>
-    <step order="2">MANUAL: Verify page loads without error, shows membership entry point</step>
-    <step order="3">MANUAL: Enter valid email address (e.g., test@example.com) in email input field</step>
-    <step order="4">MANUAL: Verify form accepts email without error, submission succeeds</step>
-    <step order="5">MANUAL: Check email inbox for magic link (may be dev/test email service depending on setup)</step>
-    <step order="6">MANUAL: Verify email received with clickable magic link</step>
-    <step order="7">MANUAL: Click magic link in email</step>
-    <step order="8">MANUAL: Verify browser redirects to protected content and shows authenticated state</step>
-    <step order="9">MANUAL: Refresh page in browser</step>
-    <step order="10">MANUAL: Verify session persists (still authenticated after refresh)</step>
-    <step order="11">Document results: Each step PASS or FAIL with brief note</step>
-    <step order="12">If ANY step fails, mark deployment as FAILED and prepare rollback</step>
+    <step order="1">Sign up for Resend account at resend.com (if not already done) or access existing account</step>
+    <step order="2">In Resend dashboard, add sending domain: homeport@shipyard.ai (or chosen address from task-2)</step>
+    <step order="3">Resend generates SPF record: v=spf1 include:resend.com ~all (copy this)</step>
+    <step order="4">In domain registrar (Cloudflare, Route53, GoDaddy, etc.), add SPF TXT record to shipyard.ai DNS</step>
+    <step order="5">In Resend dashboard, enable DKIM signing for the domain and verify completion</step>
+    <step order="6">Create DMARC policy: v=DMARC1; p=quarantine; rua=mailto:[admin-email] and add to DNS as _dmarc TXT record</step>
+    <step order="7">Resend dashboard shows domain as "Verified" (may take 1-2 hours for DNS propagation)</step>
+    <step order="8">In Resend dashboard, generate API key and save securely (will be set via wrangler secret put in Wave 2)</step>
+    <step order="9">Send test email via Resend API to internal email (your inbox) to confirm delivery</step>
+    <step order="10">Test email with Mail-Tester.com: forward test email to mail@mail-tester.com and check score (should be >9/10)</step>
   </steps>
 
   <verification>
-    <check type="manual">User can access members-only page entry point</check>
-    <check type="manual">Email input accepts valid format</check>
-    <check type="manual">Magic link email delivered</check>
-    <check type="manual">Clicking link grants access to protected content</check>
-    <check type="manual">Session persists after page refresh</check>
+    <check type="manual">Resend dashboard shows domain as Verified</check>
+    <check type="manual">SPF record appears in domain DNS (use dig/nslookup to verify)</check>
+    <check type="manual">DKIM enabled in Resend dashboard</check>
+    <check type="manual">Test email lands in inbox (not spam folder)</check>
+    <check type="manual">Mail-Tester score is >9/10 (no spam triggers)</check>
+    <check type="manual">Resend API key generated and available</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="Endpoints must be working before testing full flow" />
+    <!-- No dependencies, but must complete before Wave 2 task-8 (Resend API implementation) -->
   </dependencies>
 
-  <commit-message>test(membership): full user flow validated - email to access working
+  <commit-message>chore(email): configure Resend account and domain authentication
 
-User flow test results (MANUAL):
-✅ User visits members-only page - PASS
-✅ Email input accepts valid format - PASS
-✅ Magic link email delivered - PASS
-✅ Magic link grants access - PASS
-✅ Session persists after refresh - PASS
+Set up Resend transactional email service with domain authentication for:
+- From address: [homeport@shipyard.ai or chosen address]
+- SPF, DKIM, DMARC records configured in DNS
+- Domain verified in Resend dashboard
+- Deliverability tested with Mail-Tester (score >9/10)
 
-Complete user journey working end-to-end per Decision 2 requirement.
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+Ready for Wave 2 Resend API integration.
+  </commit-message>
 </task-plan>
 
 ---
 
-<task-plan id="phase-1-task-5" wave="2">
-  <title>Negative Testing - Invalid Email & Expired Links</title>
-  <requirement>REQ-019, REQ-020, REQ-021, REQ-022 - Verify error handling and messages</requirement>
+<task-plan id="phase-1-task-5" wave="1">
+  <title>Draft Day 7 and Day 30 Email Templates (Steve's Work)</title>
+  <requirement>R1 (Email Templates), Wave 1 Foundation</requirement>
   <description>
-    Test error paths: invalid email format rejection and expired magic link handling. Verify error messages are terse, factual, and user-friendly (no chatty copy, 1-2 sentences max). This implements Decision 2's negative testing requirement.
+    Steve Jobs writes the critical Day 7 and Day 30 email templates. These are the first emails customers receive and set the tone for the entire Homeport product. All copy must pass the voice test: "Would I send this to a friend?"
+
+    Day 7 focuses on pride and accomplishment. Day 30 checks in with substance.
+    Both templates must be plain text, personalized with {name} and {project_url} only, and include an unsubscribe link.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/membership-deploy/decisions.md" reason="Decision 2 lines 58-62 mandate negative testing with terse errors" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Email validation and magic link verification logic" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/essence.md" reason="Voice principles and tone guidelines" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/decisions.md" reason="Section 1.4 (Plain Text Format), Section 1.6 (Brand Voice), Section 4.4 (Day 7 Email Content)" />
+    <file path="/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md" reason="Section 2.2 (Plain Text Advantages), Section 11 (Voice Lock)" />
   </context>
 
   <steps>
-    <step order="1">MANUAL: Navigate to membership email entry form</step>
-    <step order="2">MANUAL: Submit invalid email format (e.g., "invalidemail" or "test@")</step>
-    <step order="3">MANUAL: Verify system shows error message (not success)</step>
-    <step order="4">MANUAL: Check error message is terse (1-2 sentences) and factual (e.g., "Invalid email format" not "Oops! That doesn't look quite right...")</step>
-    <step order="5">MANUAL: Attempt to use expired or invalid magic link (construct malformed URL or use old link if available)</step>
-    <step order="6">MANUAL: Verify system shows clear error for expired/invalid link</step>
-    <step order="7">MANUAL: Check expired link error message is terse and factual (e.g., "This link has expired" not "Uh oh! Looks like this link is no longer valid...")</step>
-    <step order="8">Document error messages: Confirm brevity and tone match Decision 5's "Confident silence" principle</step>
+    <step order="1">Read essence.md and decisions.md Section 1.6 (Brand Voice) for tone guidelines</step>
+    <step order="2">Write Day 7 template with subject line. Focus: pride and accomplishment after 7 days.
+      - Include {name} personalization
+      - Include {project_url} link
+      - Keep tone: "Your site is breathing on its own now" (reference from decisions.md)
+      - Plain text only (no HTML formatting)
+      - ~150-200 words
+      - End with invitation to reply if something's off
+      - Include unsubscribe link in footer
+    </step>
+    <step order="3">Write Day 30 template with subject line. Focus: check-in with substance after 30 days.
+      - Include {name} personalization
+      - Include {project_url} link
+      - Show that we've been watching: mention something about their project (e.g., "uptime", "page speed")
+      - Plain text only
+      - ~150-200 words
+      - Offer to discuss revisions or updates
+      - Include unsubscribe link in footer
+    </step>
+    <step order="4">Run both templates through voice test: Would I send this to a friend? If not, rewrite.</step>
+    <step order="5">Format templates as plain text and save to /tmp/day-7-draft.txt and /tmp/day-30-draft.txt</step>
+    <step order="6">Submit drafts to Elon and Phil for technical and content review before Wave 2 implementation</step>
   </steps>
 
   <verification>
-    <check type="manual">Invalid email format rejected gracefully</check>
-    <check type="manual">Invalid email error message is 1-2 sentences, factual</check>
-    <check type="manual">Expired magic link shows error</check>
-    <check type="manual">Expired link error message is 1-2 sentences, factual</check>
+    <check type="manual">Day 7 template is plain text (no HTML tags)</check>
+    <check type="manual">Day 30 template is plain text (no HTML tags)</check>
+    <check type="manual">Both include {name} and {project_url} merge variables</check>
+    <check type="manual">Both include unsubscribe link (placeholder: https://aftercare.shipyard.ai/unsub?token={email})</check>
+    <check type="manual">Tone passes "Would I send to friend?" test (subjective approval from Steve)</check>
+    <check type="manual">No corporate jargon, no emoji, no fake casual language</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-4" reason="Must test positive flow before negative cases" />
+    <!-- No dependencies - this is Steve's async writing work, parallel to Elon's Wave 1 tasks -->
   </dependencies>
 
-  <commit-message>test(membership): negative test cases validated
+  <commit-message>docs(templates): draft Day 7 and Day 30 email templates (Steve)
 
-Error handling test results (MANUAL):
-✅ Invalid email rejected - PASS
-✅ Error message terse and factual - PASS (1-2 sentences)
-✅ Expired link shows error - PASS
-✅ Expired link error terse - PASS (factual, no chatty copy)
+Write high-quality plain text email templates for the critical first touchpoints:
+- Day 7: Pride and accomplishment messaging
+- Day 30: Substance check-in with caring tone
 
-All error paths handled gracefully per Decision 2 requirements.
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+Templates personalized with {name} and {project_url} only.
+Voice review complete - passes "send to friend" test.
+Ready for implementation in Wave 2.
+  </commit-message>
 </task-plan>
 
 ---
 
-<task-plan id="phase-1-task-6" wave="2">
-  <title>Quality Verification - Code Review & Binary Outcome Check</title>
-  <requirement>REQ-023, REQ-024, REQ-025 - Manual review and deployment standard enforcement</requirement>
+<task-plan id="phase-1-task-6" wave="1">
+  <title>Draft Day 90, Day 180, and Day 365 Email Templates (Steve's Work)</title>
+  <requirement>R1 (Email Templates), Wave 1 Foundation</requirement>
   <description>
-    Perform manual code review to verify zero banned patterns (triple-check), confirm binary outcome principle is maintained (no partial deployments), and verify total execution time is within 2-hour budget. This implements Decision 3's quality standard.
+    Steve writes the three remaining email templates (Day 90, 180, 365). These are deployed in V1 but measure effectiveness over the 90-day lifecycle. Each template has distinct messaging: Day 90 positions Homeport as the agency that "stays" (vs. competitors who disappear), Day 180 offers refresh/update opportunities, Day 365 celebrates the anniversary.
+
+    All templates must maintain consistent voice, be plain text, and pass the voice test.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/membership-deploy/decisions.md" reason="Decision 3 mandates binary outcome and quality standards" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/" reason="All deployed files for review" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/essence.md" reason="Voice principles and tone guidelines" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/decisions.md" reason="Section 1.3 (Email Cadence), Section 1.6 (Brand Voice)" />
+    <file path="/home/agent/shipyard-ai/prds/shipyard-post-ship-lifecycle.md" reason="PRD Section (Phase 1) for messaging ideas for Day 90, 180, 365" />
   </context>
 
   <steps>
-    <step order="1">Manual code review: Open plugins/membership/src/sandbox-entry.ts and visually inspect for banned patterns</step>
-    <step order="2">Manual code review: Open plugins/membership/src/auth.ts and visually inspect for banned patterns</step>
-    <step order="3">Manual code review: Open plugins/membership/src/email.ts and visually inspect for banned patterns</step>
-    <step order="4">Automated re-check: Run `grep -r "throw new Response\|rc\.user\|rc\.pathParams" plugins/membership/src/*.ts` and verify output is empty</step>
-    <step order="5">Binary outcome check: Verify all previous tasks (1-5) passed - if ANY failed, rollback ALL changes</step>
-    <step order="6">Time budget check: Calculate elapsed time from task-1 start to now - must be < 120 minutes</step>
-    <step order="7">If time > 120 minutes, mark deployment as FAILED (violated single-session requirement)</step>
-    <step order="8">Echo "✅ Quality verification passed: Code reviewed, binary outcome maintained, time budget met"</step>
+    <step order="1">Write Day 90 template with subject line. Focus: "We're still here" (where agencies vanish).
+      - Include {name} personalization
+      - Include {project_url} link
+      - Acknowledge 90 days have passed, highlight that most agencies go silent here
+      - Offer proactive support or updates
+      - Plain text, ~150-200 words
+      - Include unsubscribe link
+    </step>
+    <step order="2">Write Day 180 template with subject line. Focus: "Time for a refresh?" (6-month milestone).
+      - Include {name} personalization
+      - Include {project_url} link
+      - Mention web standards changes, security updates, or design trends
+      - Offer to discuss revisions or improvements
+      - Plain text, ~150-200 words
+      - Include unsubscribe link
+    </step>
+    <step order="3">Write Day 365 template with subject line. Focus: "Happy Anniversary!" (1-year milestone).
+      - Include {name} personalization
+      - Include {project_url} link
+      - Celebrate the project and the relationship
+      - Reflect on how the web has changed in a year
+      - Plant the seed for next project
+      - Plain text, ~150-200 words
+      - Include unsubscribe link
+    </step>
+    <step order="4">Run all three templates through voice test: consistent with Day 7 and 30? Would I send to friend?</step>
+    <step order="5">Save drafts to /tmp/day-90-draft.txt, /tmp/day-180-draft.txt, /tmp/day-365-draft.txt</step>
+    <step order="6">Submit to Elon and Phil for technical review before Wave 2 implementation</step>
   </steps>
 
   <verification>
-    <check type="manual">Visual code review confirms zero banned patterns</check>
-    <check type="test">Automated grep confirms zero banned patterns</check>
-    <check type="manual">All previous tasks passed (no partial deployment)</check>
-    <check type="manual">Total time < 120 minutes</check>
+    <check type="manual">Day 90 template is plain text (no HTML)</check>
+    <check type="manual">Day 180 template is plain text (no HTML)</check>
+    <check type="manual">Day 365 template is plain text (no HTML)</check>
+    <check type="manual">All three include {name} and {project_url} variables</check>
+    <check type="manual">All three include unsubscribe link</check>
+    <check type="manual">Tone consistent with Day 7 and 30 templates</check>
+    <check type="manual">Voice test passed (subjective)</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="Must complete all tests before quality verification" />
+    <!-- Depends on task-5 (day 7/30 drafts) for consistency, but can be done in parallel -->
   </dependencies>
 
-  <commit-message>chore(membership): quality verification complete - all standards met
+  <commit-message>docs(templates): draft Day 90, Day 180, and Day 365 email templates (Steve)
 
-Quality gates passed:
-✅ Manual code review: 0 banned patterns
-✅ Automated verification: 0 banned patterns
-✅ Binary outcome: All tests passed, no partial deployment
-✅ Time budget: Completed within 2-hour limit
+Write remaining lifecycle email templates for extended lifecycle:
+- Day 90: "We're still here" (vs. agencies that vanish)
+- Day 180: "Time for a refresh?" (6-month milestone)
+- Day 365: "Happy Anniversary!" (1-year celebration)
 
-Ready for documentation phase.
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+All templates maintain consistent voice with Day 7/30.
+Ready for Wave 2 implementation and testing.
+  </commit-message>
 </task-plan>
 
 ---
 
-### Wave 3 (Sequential) — Documentation & Finalization
+### Wave 1 Summary
 
-**Estimated Duration:** 20 minutes
-**Goal:** Document results, commit all changes, push to remote
+**Wave 1 Status:** 6 tasks establishing critical blockers, infrastructure, and content
+
+**Parallel execution:** Tasks 1-6 can run simultaneously on Day 0-1
+- Tasks 1-4: Operational/infrastructure decisions and setup (Phil, Elon)
+- Tasks 5-6: Creative writing in parallel (Steve)
+- Task 3 enables all Wave 2 tasks
+
+**Outcome by end of Wave 1:**
+- ✅ Project data validated (minimum 10 shipped projects in CSV)
+- ✅ Critical decisions locked (From address, reply inbox, scaffold)
+- ✅ Worker project scaffolded and TypeScript compiling
+- ✅ Resend domain verified and API key ready
+- ✅ All 5 email templates drafted and approved
+- ✅ Ready to start Wave 2 implementation
 
 ---
 
-<task-plan id="phase-1-task-7" wave="3">
-  <title>Document Test Results & Update README</title>
-  <requirement>REQ-026, REQ-027, REQ-028, REQ-029, REQ-030 - Create TEST-RESULTS.md and update README</requirement>
+## Wave 2 (Parallel after Wave 1 — Core Implementation)
+
+These tasks implement the core Homeport functionality. They depend on Wave 1 foundation but can run in parallel with each other.
+
+---
+
+<task-plan id="phase-1-task-7" wave="2">
+  <title>Implement KV Store Operations Module (get/set/unsub/dedup)</title>
+  <requirement>R3 (KV Operations), R2 (Scheduler Logic)</requirement>
   <description>
-    Write comprehensive test results to deliverables/membership-v2/TEST-RESULTS.md with structured sections for banned pattern check, API test results, and notes. Update README.md with deployment confirmation. This implements PRD Step 3.
+    Build the KV store interface module (kv.ts) that handles all interactions with Cloudflare KV: project data retrieval, unsubscribe status checks, email send history (deduplication), and schedule tracking.
+
+    This module abstracts KV operations so the scheduler and email sending logic doesn't deal with raw key naming.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/prds/membership-deploy.md" reason="Step 3 defines TEST-RESULTS.md format" />
-    <file path="/home/agent/shipyard-ai/deliverables/membership-v2/" reason="Destination for test results" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/README.md" reason="Plugin README to update" />
+    <file path="/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md" reason="Section 3.2 (KV Store Design with key structure)" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/decisions.md" reason="Section 1.2 (KV Store design), Section 5.1 Risk (eventual consistency)" />
+    <file path="/home/agent/shipyard-ai/workers/contact-form/src/index.ts" reason="Reference for TypeScript patterns in Workers" />
   </context>
 
   <steps>
-    <step order="1">Create directory if needed: `mkdir -p deliverables/membership-v2`</step>
-    <step order="2">Write TEST-RESULTS.md with sections: ## MemberShip v2 — Test Results</step>
-    <step order="3">Add Banned Pattern Check section with counts for throw new Response (0), rc.user (0), rc.pathParams (0), Total violations (0)</step>
-    <step order="4">Add API Tests section with status codes and pass/fail for Admin page_load (200 PASS), Register (200 PASS), Status (200 PASS)</step>
-    <step order="5">Add Notes section documenting: "sandbox-entry.ts kept from destination (newer with improvements), auth.ts and email.ts copied from deliverables"</step>
-    <step order="6">Update plugins/membership/README.md: Add deployment confirmation statement "MemberShip plugin deployed with 0 banned pattern violations"</step>
-    <step order="7">Add reference to TEST-RESULTS.md in README: "See deliverables/membership-v2/TEST-RESULTS.md for full test results"</step>
+    <step order="1">Create file: src/kv.ts</step>
+    <step order="2">Define TypeScript interface: ProjectData { email, name, project_url, ship_date, project_name?, unsubscribed? }</step>
+    <step order="3">Implement function: getProject(projectId: string): Promise<ProjectData | null>
+      - Read KV key: project:{projectId}
+      - Parse JSON and return, or return null if not found
+      - No error thrown, just return null
+    </step>
+    <step order="4">Implement function: isUnsubscribed(email: string): Promise<boolean>
+      - Read KV key: unsubscribed:{email}
+      - Return true if key exists, false otherwise
+    </step>
+    <step order="5">Implement function: markUnsubscribed(email: string): Promise<void>
+      - Write KV key: unsubscribed:{email} = "true"
+      - No error handling needed (accept eventual consistency)
+    </step>
+    <step order="6">Implement function: recordSentEmail(projectId: string, day: number): Promise<void>
+      - Write KV key: schedule:{projectId}:{day} = Date.now().toString()
+      - Use this for deduplication (scheduler checks this before sending)
+    </step>
+    <step order="7">Implement function: hasSentEmail(projectId: string, day: number): Promise<boolean>
+      - Read KV key: schedule:{projectId}:{day}
+      - Return true if key exists, false otherwise
+    </step>
+    <step order="8">Export all functions as named exports</step>
+    <step order="9">Add JSDoc comments explaining each function (no verbose comments, keep concise)</step>
   </steps>
 
   <verification>
-    <check type="test">test -f deliverables/membership-v2/TEST-RESULTS.md</check>
-    <check type="test">grep "Banned Pattern Check" deliverables/membership-v2/TEST-RESULTS.md</check>
-    <check type="test">grep "API Tests" deliverables/membership-v2/TEST-RESULTS.md</check>
-    <check type="test">grep "0 banned pattern violations" plugins/membership/README.md</check>
-    <check type="manual">All sections complete and accurate</check>
+    <check type="build">npm run typecheck succeeds</check>
+    <check type="manual">All 5 functions exported from src/kv.ts</check>
+    <check type="manual">ProjectData interface defined with required fields</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-6" reason="Must complete quality verification before documenting" />
+    <depends-on task-id="phase-1-task-3" reason="KV module builds on Worker scaffold (AFTERCARE_KV binding must exist in wrangler.toml)" />
   </dependencies>
 
-  <commit-message>docs(membership): add deployment test results and README update
+  <commit-message>feat(kv): implement KV store operations module
 
-Created deliverables/membership-v2/TEST-RESULTS.md:
-- Banned pattern counts: All 0
-- API test results: All endpoints 200 PASS
-- Notes: File deployment strategy documented
+Build abstraction layer for Cloudflare KV interactions:
+- getProject(projectId): fetch project data by ID
+- isUnsubscribed(email): check unsubscribe flag
+- markUnsubscribed(email): set unsubscribe flag
+- recordSentEmail(projectId, day): track sent emails (deduplication)
+- hasSentEmail(projectId, day): check if already sent
 
-Updated plugins/membership/README.md:
-- Deployment confirmation added
-- Reference to TEST-RESULTS.md
+Uses KV key structure: project:{id}, unsubscribed:{email}, schedule:{id}:{day}
+Gracefully handles KV misses (return null/false, no errors).
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+Ready for scheduler integration in task-9.
+  </commit-message>
 </task-plan>
 
 ---
 
-<task-plan id="phase-1-task-8" wave="3">
-  <title>Final Commit & Push to Remote</title>
-  <requirement>REQ-031, REQ-032 - Commit all changes and push to remote</requirement>
+<task-plan id="phase-1-task-8" wave="2">
+  <title>Implement Resend API Client Wrapper</title>
+  <requirement>R4 (Resend API Client), R1 (Email Templates)</requirement>
   <description>
-    Create final git commit with all deployment changes (plugins/membership/src/, deliverables/membership-v2/, README updates) and push to remote repository. Verify clean git status after push.
+    Build lightweight Resend API client (resend.ts) that wraps the HTTP API for email sending. This client handles authentication, request formatting, response validation, and error logging — but NOT retry logic (accept single-send-only in V1).
+
+    The client is kept minimal (~30-50 lines) to match Elon's 300-line code cap.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/.git/" reason="Git repository" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/" reason="Deployed files" />
-    <file path="/home/agent/shipyard-ai/deliverables/membership-v2/" reason="Test results" />
+    <file path="/home/agent/shipyard-ai/workers/contact-form/src/index.ts" reason="Reference Resend API integration pattern (lines 123-146)" />
+    <file path="/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md" reason="Section 2 (Resend Integration Pattern)" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/decisions.md" reason="Section 1.4 (Plain text format requirement)" />
   </context>
 
   <steps>
-    <step order="1">Add all changes: `git add plugins/membership/src/auth.ts plugins/membership/src/email.ts plugins/membership/README.md deliverables/membership-v2/TEST-RESULTS.md`</step>
-    <step order="2">Verify staged changes: `git status` should show 4 files staged</step>
-    <step order="3">Create commit with clear message documenting deployment</step>
-    <step order="4">Push to remote: `git push origin main` (or current branch)</step>
-    <step order="5">Verify push successful: `git status` should show "nothing to commit, working tree clean"</step>
-    <step order="6">Verify remote is up to date: `git log origin/main --oneline -1` matches local HEAD</step>
+    <step order="1">Create file: src/resend.ts</step>
+    <step order="2">Define TypeScript interface: EmailInput { to: string, subject: string, text: string, replyTo?: string }</step>
+    <step order="3">Implement function: sendEmail(env: Env, input: EmailInput): Promise<{id: string, ok: boolean}>
+      - Fetch to https://api.resend.com/emails with POST method
+      - Set headers: Authorization: Bearer ${env.RESEND_API_KEY}, Content-Type: application/json
+      - Request body: { from: env.FROM_EMAIL, to: [input.to], subject, text, reply_to: input.replyTo }
+      - Check response.ok and log success/failure
+      - Parse response JSON and extract email ID
+      - Return { id, ok: response.ok }
+      - If response fails, log to console (no throw, let caller decide)
+    </step>
+    <step order="4">Define Env interface with RESEND_API_KEY and FROM_EMAIL variables</step>
+    <step order="5">Add minimal error logging (console.error for failures)</step>
+    <step order="6">Add JSDoc comments</step>
+    <step order="7">Export sendEmail as named export</step>
   </steps>
 
   <verification>
-    <check type="test">git status shows nothing to commit</check>
-    <check type="test">git log --name-only -1 shows plugins/membership files</check>
-    <check type="test">git log --name-only -1 shows TEST-RESULTS.md</check>
-    <check type="manual">Remote repository updated successfully</check>
+    <check type="build">npm run typecheck succeeds</check>
+    <check type="manual">sendEmail function uses Bearer token auth</check>
+    <check type="manual">Request body includes from, to, subject, text, reply_to fields</check>
+    <check type="manual">Function returns object with id and ok properties</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-7" reason="Must complete documentation before final commit" />
+    <depends-on task-id="phase-1-task-4" reason="Resend domain setup and API key generation must complete before this can be tested" />
+    <depends-on task-id="phase-1-task-3" reason="Worker environment variables (RESEND_API_KEY, FROM_EMAIL) must be configured in wrangler.toml" />
   </dependencies>
 
-  <commit-message>feat(membership): deployment complete - clean plugin with 0 violations
+  <commit-message>feat(resend): implement Resend API client wrapper
 
-Deployment summary:
-✅ auth.ts deployed from deliverables (209 LOC, 0 violations)
-✅ email.ts deployed from deliverables (580 LOC, 0 violations)
-✅ sandbox-entry.ts retained from src/ (newer, 0 violations)
-✅ All 3 API endpoints tested: 200 PASS
-✅ Full user flow validated: email → magic link → access
-✅ Negative tests passed: invalid email, expired link
-✅ Quality verification: binary outcome maintained
-✅ Documentation complete: TEST-RESULTS.md created
+Build lightweight email sending client:
+- sendEmail(env, {to, subject, text, replyTo}): sends via Resend API
+- Bearer token authentication via RESEND_API_KEY secret
+- Returns email ID and success flag
+- Logs failures to console (no retry logic in V1)
 
-Zero banned patterns verified:
-- throw new Response: 0
-- rc.user: 0
-- rc.pathParams: 0
+Pattern copied from proven contact-form Worker integration.
+Uses plain text emails only (no HTML).
 
-Time budget: Completed in <2 hours (single session)
-Scope: Locked per Decision 1 (3-file focus)
-Quality: Zero tolerance per Decision 3
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+Ready for scheduler integration in task-9.
+  </commit-message>
 </task-plan>
 
 ---
 
-<task-plan id="phase-1-task-9" wave="3">
-  <title>Sara Blakely Customer Gut-Check (Auto-Trigger)</title>
-  <requirement>SKILL.md Step 7 - Customer perspective validation</requirement>
+<task-plan id="phase-1-task-9" wave="2">
+  <title>Implement Email Template Functions (5 templates: Day 7, 30, 90, 180, 365)</title>
+  <requirement>R1 (Email Templates), R7 (Email Template Tests)</requirement>
   <description>
-    Automatic post-deployment review from Sara Blakely's customer perspective. Gut-check the deployment from a real user's viewpoint: Would a customer pay for this? What would make them say "shut up and take my money"? What feels like engineering vanity vs customer value?
+    Convert Steve's plain text email drafts into TypeScript functions. Each function takes ProjectData, returns a string containing the email body with personalization (name, URL) applied.
 
-    This is an automated quality gate per the agency-plan skill requirements.
+    Functions are tested in task-12, so keep them pure (no side effects, deterministic output).
   </description>
 
   <context>
-    <file path="/home/agent/great-minds-plugin/skills/agency-plan/SKILL.md" reason="Step 7 mandates Sara Blakely review" />
-    <file path="/home/agent/shipyard-ai/.planning/phase-1-plan.md" reason="This deployment plan" />
-    <file path="/home/agent/shipyard-ai/prds/membership-deploy.md" reason="Original PRD for customer context" />
+    <file path="/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md" reason="Section 4.2 (Email template as pure functions example)" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/decisions.md" reason="Section 1.4 (Plain Text Format)" />
+    <file path="[Task 5 output]" reason="Steve's Day 7/30 drafts" />
+    <file path="[Task 6 output]" reason="Steve's Day 90/180/365 drafts" />
   </context>
 
   <steps>
-    <step order="1">Spawn haiku sub-agent as Sara Blakely with gut-check prompt</step>
-    <step order="2">Agent reads phase-1-plan.md and membership-deploy.md</step>
-    <step order="3">Agent answers honestly from customer perspective: Would they pay? What's the hook? Engineering vanity vs value?</step>
-    <step order="4">Agent writes to .planning/sara-blakely-review.md</step>
-    <step order="5">Review results: If Sara flags major customer-value gaps, consider before closing deployment</step>
+    <step order="1">Create file: src/emails.ts</step>
+    <step order="2">Define TypeScript interface: ProjectData { name: string, project_url: string, project_name?: string, ship_date?: string }</step>
+    <step order="3">Implement function: formatDay7(data: ProjectData): string
+      - Use Steve's Day 7 draft text
+      - Replace {name} with data.name
+      - Replace {project_url} with data.project_url
+      - Add unsubscribe link with placeholder token
+      - Return plain text string (no HTML)
+    </step>
+    <step order="4">Implement function: formatDay30(data: ProjectData): string (similar pattern)</step>
+    <step order="5">Implement function: formatDay90(data: ProjectData): string (similar pattern)</step>
+    <step order="6">Implement function: formatDay180(data: ProjectData): string (similar pattern)</step>
+    <step order="7">Implement function: formatDay365(data: ProjectData): string (similar pattern)</step>
+    <step order="8">Create helper function: getEmailTemplate(day: number): (data: ProjectData) => string
+      - Takes day number (7, 30, 90, 180, 365)
+      - Returns corresponding format function
+      - Used by scheduler to select template
+    </step>
+    <step order="9">Export all format functions and getEmailTemplate</step>
+    <step order="10">Add JSDoc comments with example usage</step>
   </steps>
 
   <verification>
-    <check type="test">test -f .planning/sara-blakely-review.md</check>
-    <check type="manual">Review Sara's feedback for critical customer concerns</check>
-    <check type="manual">No major red flags that would require rollback</check>
+    <check type="build">npm run typecheck succeeds</check>
+    <check type="manual">All 5 format functions exported</check>
+    <check type="manual">getEmailTemplate(7) returns formatDay7 function</check>
+    <check type="manual">Sample output includes {name} and {project_url} replaced with test values</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-8" reason="Must complete deployment before customer review" />
+    <depends-on task-id="phase-1-task-5" reason="Day 7/30 email drafts from Steve" />
+    <depends-on task-id="phase-1-task-6" reason="Day 90/180/365 email drafts from Steve" />
   </dependencies>
 
-  <commit-message>review(membership): Sara Blakely customer gut-check complete
+  <commit-message>feat(emails): implement email template functions for all 5 lifecycle emails
 
-Post-deployment customer perspective review completed.
-See .planning/sara-blakely-review.md for full analysis.
+Convert Steve's plain text templates into pure TypeScript functions:
+- formatDay7(data: ProjectData): string
+- formatDay30(data: ProjectData): string
+- formatDay90(data: ProjectData): string
+- formatDay180(data: ProjectData): string
+- formatDay365(data: ProjectData): string
+- getEmailTemplate(day): returns format function by day number
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+Templates personalize with {name} and {project_url} merge variables.
+All templates plain text, include unsubscribe link in footer.
+
+Ready for scheduler integration in task-10 and testing in task-12.
+  </commit-message>
 </task-plan>
 
 ---
 
-## RISK NOTES
+<task-plan id="phase-1-task-10" wave="2">
+  <title>Implement Unsubscribe Endpoint (GET /unsub?token=...)</title>
+  <requirement>R5 (Unsubscribe Endpoint), R3 (KV Operations)</requirement>
+  <description>
+    Build the one-click unsubscribe endpoint that handles unsub links from emails. Decodes the token (base64-encoded email), marks the user as unsubscribed in KV, and returns a confirmation page.
 
-### Critical Risks Identified by Research Agents
+    This endpoint is part of the Worker's HTTP route handler (alongside the cron scheduled handler).
+  </description>
 
-**1. FILE DIVERGENCE (HIGH PRIORITY)**
-- **Issue**: sandbox-entry.ts in src/ is 145 lines newer than deliverables/
-- **Impact**: Copying from deliverables would LOSE improvements (parseJSON safety, better error messages)
-- **Mitigation**: Keep src/ version, copy only auth.ts and email.ts
-- **Status**: Addressed in task-2 plan
+  <context>
+    <file path="/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md" reason="Section 3.2 (Unsubscribe token management with base64 encoding)" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/decisions.md" reason="Section 4.3 (Unsubscribe Flow - one-click KV flag)" />
+    <file path="/home/agent/shipyard-ai/workers/contact-form/src/index.ts" reason="Reference for Worker route handler pattern" />
+  </context>
 
-**2. SERVER AVAILABILITY (HIGH PRIORITY)**
-- **Issue**: Dev server on port 4324 must be running
-- **Impact**: All endpoint tests fail if server unavailable
-- **Mitigation**: Fail-fast pre-check in task-1 with clear error message
-- **Status**: Addressed in task-1 plan
+  <steps>
+    <step order="1">Create file: src/unsubscribe.ts (or add to src/index.ts directly)</step>
+    <step order="2">Implement function: handleUnsubscribe(request: Request, env: Env): Promise<Response>
+      - Parse query param: token from URL (new URL(request.url).searchParams.get('token'))
+      - Decode token: Buffer.from(token, 'base64').toString('utf-8') to get email address
+      - Call markUnsubscribed(email) from kv.ts to set KV flag
+      - Return Response with 200 status and plain text confirmation: "You've been unsubscribed from Homeport emails."
+      - Handle invalid token gracefully (return generic 404 or confirmation)
+    </step>
+    <step order="3">In src/index.ts, add route handler for GET /unsub:
+      - Check if request.url contains /unsub
+      - Call handleUnsubscribe and return response
+      - This is part of the Worker's default export fetch handler
+    </step>
+    <step order="4">Add JSDoc comments with example unsubscribe URL</step>
+  </steps>
 
-**3. INCOMPLETE USER FLOW TESTING (MEDIUM PRIORITY)**
-- **Issue**: Steve's requirement for complete email → link → access flow
-- **Impact**: False confidence if we only test endpoints
-- **Mitigation**: Dedicated manual test task (task-4) with step-by-step validation
-- **Status**: Addressed in task-4 plan
+  <verification>
+    <check type="manual">Route GET /unsub?token=... is handled</check>
+    <check type="manual">Token decoding works (test with base64-encoded email)</check>
+    <check type="manual">Confirmation page returns 200 status</check>
+    <check type="manual">KV flag is set after unsub (verify in KV dashboard)</check>
+  </verification>
 
-**4. SCOPE CREEP (MEDIUM PRIORITY)**
-- **Issue**: Temptation to add improvements during deployment
-- **Impact**: Violates binary outcome principle, extends timeline
-- **Mitigation**: Locked scope in all task plans, ruthless discipline
-- **Status**: Monitored throughout
+  <dependencies>
+    <depends-on task-id="phase-1-task-7" reason="Requires markUnsubscribed function from kv.ts" />
+    <depends-on task-id="phase-1-task-3" reason="Worker route handler framework" />
+  </dependencies>
 
-**5. PARTIAL DEPLOYMENT (MEDIUM PRIORITY)**
-- **Issue**: Could deploy 2/3 files and declare success
-- **Impact**: Violates binary outcome principle
-- **Mitigation**: Quality verification task (task-6) enforces all-or-nothing
-- **Status**: Addressed in task-6 plan
+  <commit-message>feat(unsub): implement one-click unsubscribe endpoint
 
----
+Add GET /unsub?token={encoded_email} route to Worker:
+- Decodes base64 token to extract email address
+- Calls KV markUnsubscribed(email) to set unsubscribe flag
+- Returns 200 confirmation: "You've been unsubscribed from Homeport emails."
+- Handles invalid tokens gracefully
 
-## TRACEABILITY TO EMDASH GUIDE
+CAN-SPAM compliant one-click unsubscribe mechanism.
 
-Per CLAUDE.md requirement: "Verify technical approach by reading actual documentation or source code — do NOT guess at API surfaces."
-
-### Emdash Plugin System (docs/EMDASH-GUIDE.md)
-
-**Section 6: Plugin System (lines 898-1207)**
-- Confirmed plugin structure: `definePlugin()` in sandbox-entry.ts
-- Confirmed banned patterns are Emdash anti-patterns (not documented in guide but inferred from codebase standards)
-- Route handlers use `PluginContext` object (line 958-972)
-- KV storage for plugin data (line 962: `ctx.kv`)
-- Email service via `ctx.email` (line 972)
-
-**Specific API References:**
-- Plugin routes: Lines 1023-1047 show Block Kit admin UI pattern
-- Storage pattern: Lines 1111-1126 show KV storage usage
-- Hook system: Lines 975-993 define available hooks
-
-**Technical Validation:**
-- auth.ts implements JWT pattern (lines not directly in guide, but standard practice)
-- email.ts uses Resend API with ctx.email fallback (referenced line 972)
-- sandbox-entry.ts follows `definePlugin()` pattern (lines 1082-1158)
-
-All technical approaches verified against actual Emdash documentation.
+Ready for integration testing in Wave 3.
+  </commit-message>
+</task-plan>
 
 ---
 
-## DEFINITION OF DONE
+<task-plan id="phase-1-task-11" wave="2">
+  <title>Implement Scheduled Cron Job Logic (Daily scheduler that sends emails)</title>
+  <requirement>R2 (Scheduler Logic), R3 (KV Operations), R4 (Resend API Client)</requirement>
+  <description>
+    Build the scheduled cron handler that runs daily at UTC midnight, scans KV for projects at each milestone (Day 7, 30, 90, 180, 365), and sends emails via Resend.
 
-membership-deploy is complete when:
+    This is the core business logic of Homeport. The scheduler:
+    1. Iterates KV projects with ship_date
+    2. Calculates elapsed days: (now - ship_date) / 86400
+    3. Identifies projects matching Day 7, 30, 90, 180, 365 (±1 day tolerance)
+    4. Skips already-sent emails (checks schedule:{id}:{day} in KV)
+    5. Skips unsubscribed users
+    6. Sends email and records sent date
+  </description>
 
-- [x] Pre-deploy validation passes (server check, files exist)
-- [x] Files deployed with zero banned patterns
-- [x] All 3 endpoints return HTTP 200
-- [x] Complete user flow tested (email → magic link → access)
-- [x] Negative tests pass (invalid email, expired link)
-- [x] Quality verification complete (code review, binary outcome)
-- [x] TEST-RESULTS.md created with all sections
-- [x] README updated with deployment confirmation
-- [x] All changes committed with clear messages
-- [x] Changes pushed to remote
-- [x] Sara Blakely review complete
-- [x] Total time < 2 hours
+  <context>
+    <file path="/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md" reason="Section 8.1 Gap 1 (Scheduled Cron Jobs pattern)" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/decisions.md" reason="Section 1.2 Architecture (Scheduler logic), Section 5.1 Risk (eventual consistency)" />
+  </context>
+
+  <steps>
+    <step order="1">Create file: src/scheduler.ts</step>
+    <step order="2">Implement function: getElapsedDays(shipDate: string): number
+      - Parse ship_date as ISO 8601 (Date.parse(shipDate))
+      - Calculate (now - shipDate) / 86400 (milliseconds to seconds to days)
+      - Return Math.floor(elapsed)
+    </step>
+    <step order="3">Implement function: getNextMilestone(elapsedDays: number): number | null
+      - Check if elapsedDays matches Day 7 (±1: 6-8), return 7
+      - Check if elapsedDays matches Day 30 (±1: 29-31), return 30
+      - Check if elapsedDays matches Day 90 (±1: 89-91), return 90
+      - Check if elapsedDays matches Day 180 (±1: 179-181), return 180
+      - Check if elapsedDays matches Day 365 (±1: 364-366), return 365
+      - Return null if no match
+    </step>
+    <step order="4">Implement main cron handler: handleScheduledEvent(event, env: Env, ctx: ExecutionContext): Promise<void>
+      - (This will be called by Worker scheduled trigger)
+      - Iterate all projects in KV (note: KV doesn't have list(), so use wildcard key iteration)
+      - For each project with ship_date:
+        - Get elapsed days
+        - Get next milestone (day to send)
+        - Skip if already sent (hasSentEmail check)
+        - Skip if unsubscribed (isUnsubscribed check)
+        - Get email template (formatDay{X})
+        - Send email via Resend
+        - Record sent (recordSentEmail)
+        - Log result to console
+      - Handle errors gracefully (log, don't crash entire job)
+    </step>
+    <step order="5">In src/index.ts, add scheduled export:
+      export default {
+        async scheduled(event, env, ctx) {
+          return handleScheduledEvent(event, env, ctx);
+        }
+      }
+    </step>
+    <step order="6">Add JSDoc comments with execution example</step>
+  </steps>
+
+  <verification>
+    <check type="manual">getElapsedDays correctly calculates days since ship_date</check>
+    <check type="manual">getNextMilestone returns 7, 30, 90, 180, or 365 based on elapsed days</check>
+    <check type="manual">Scheduler skips already-sent emails (deduplication)</check>
+    <check type="manual">Scheduler skips unsubscribed users</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-7" reason="Uses KV operations (getProject, isUnsubscribed, hasSentEmail, recordSentEmail)" />
+    <depends-on task-id="phase-1-task-8" reason="Uses sendEmail from Resend client" />
+    <depends-on task-id="phase-1-task-9" reason="Uses getEmailTemplate to select template by day" />
+    <depends-on task-id="phase-1-task-3" reason="Worker scaffold with scheduled trigger configuration" />
+  </dependencies>
+
+  <commit-message>feat(scheduler): implement daily scheduled cron job for lifecycle emails
+
+Build core scheduler logic that runs daily at UTC midnight (0 0 * * *):
+- Scans KV for projects with ship_date
+- Calculates elapsed days: (now - ship_date) / 86400
+- Identifies projects at Day 7, 30, 90, 180, 365 milestones (±1 day tolerance)
+- Skips already-sent emails (checks schedule:{id}:{day})
+- Skips unsubscribed users (checks unsubscribed:{email})
+- Sends email via Resend API
+- Records sent date in KV for deduplication
+
+Handles KV eventual consistency gracefully (accepts rare duplicates).
+Logs all executions to Cloudflare Worker logs.
+
+Core business logic complete. Ready for Wave 2 integration.
+  </commit-message>
+</task-plan>
 
 ---
 
-**Plan Status**: READY FOR EXECUTION
-**Critical Decision**: File divergence resolved (keep src/ sandbox-entry.ts, copy auth.ts + email.ts only)
-**Time Budget**: 2 hours maximum
-**Quality Standard**: Binary outcome - all tests pass or rollback completely
+<task-plan id="phase-1-task-12" wave="2">
+  <title>Build CSV-to-KV Import Script (Manual project data upload)</title>
+  <requirement>R6 (CSV-to-KV Script), R3 (KV Operations)</requirement>
+  <description>
+    Create Node.js CLI script that parses the shipped project CSV (from task-1) and uploads each project record to KV store. This script runs once manually per CSV import and is the mechanism for V1 project initialization (before automated webhook in V1.1).
+
+    Script should be idempotent (can run multiple times) and handle errors per-row (continue processing if one row fails).
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md" reason="Section 3.2 (CSV Upload Format), Section 10.1 (CSV to KV script estimate)" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/decisions.md" reason="Section 4.1 (Project Data Source - manual CSV for V1)" />
+  </context>
+
+  <steps>
+    <step order="1">Create file: scripts/csv-to-kv.ts</step>
+    <step order="2">Implement CSV parser:
+      - Read CSV file passed as CLI argument (process.argv[2])
+      - Parse header row: project_id, customer_email, customer_name, project_url, ship_date
+      - Parse each data row, validate required fields
+      - Skip empty rows
+    </step>
+    <step order="3">Implement KV uploader using Wrangler CLI:
+      - For each row, construct ProjectData object
+      - Call wrangler kv:key put --namespace-id AFTERCARE_KV project:{project_id} "{json_data}"
+      - Or use Node wrangler SDK to batch upload
+    </step>
+    <step order="4">Error handling:
+      - Log which rows succeeded/failed
+      - Continue processing even if one row fails
+      - Exit with code 0 on success, 1 if all rows failed
+    </step>
+    <step order="5">Add usage instructions: `node scripts/csv-to-kv.ts ./projects.csv`</step>
+    <step order="6">Optional: add --dry-run flag to preview without uploading</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Script reads CSV file correctly</check>
+    <check type="manual">Script validates required fields (email, URL, date)</check>
+    <check type="manual">Script uploads to KV with key format project:{id}</check>
+    <check type="manual">Script logs success/failure per row</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-1" reason="Requires CSV from project data audit" />
+  </dependencies>
+
+  <commit-message>chore(scripts): implement CSV-to-KV import script for manual project upload
+
+Build Node.js CLI for uploading shipped projects to KV store:
+- Reads CSV: project_id, customer_email, customer_name, project_url, ship_date
+- Validates required fields, skips empty rows
+- Uploads each row as KV key: project:{project_id}
+- Logs success/failure per row, continues on errors
+- Exit code 0 on success, 1 on failure
+
+Usage: npm run csv-to-kv ./projects.csv
+
+V1 mechanism for manual project initialization (V1.1 will use webhook).
+
+Ready for Wave 3 data population.
+  </commit-message>
+</task-plan>
+
+---
+
+<task-plan id="phase-1-task-13" wave="2">
+  <title>Write Unit Tests — Email Template Rendering</title>
+  <requirement>R7 (Email Template Tests), R1 (Email Templates)</requirement>
+  <description>
+    Build Vitest unit test suite that verifies email templates correctly interpolate variables and produce expected output. Tests ensure that {name} and {project_url} merge variables are replaced correctly, unsubscribe links appear, and output is plain text (no HTML).
+
+    Minimal test suite (~30 tests across 5 templates) covering happy path and edge cases.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md" reason="Section 4.2 (Example test structure for email templates)" />
+  </context>
+
+  <steps>
+    <step order="1">Create file: tests/emails.test.ts</step>
+    <step order="2">Import all email template functions from src/emails.ts</step>
+    <step order="3">Create mock ProjectData: { name: "Jane Doe", project_url: "https://example.com", project_name: "My Site" }</step>
+    <step order="4">For each template (Day 7, 30, 90, 180, 365):
+      - Test that {name} is replaced: expect(result).toContain("Jane Doe")
+      - Test that {project_url} is replaced: expect(result).toContain("https://example.com")
+      - Test that unsubscribe link appears: expect(result).toContain("unsub?token=")
+      - Test that output is plain text (no HTML): expect(result).not.toMatch(/<[^>]+>/g)
+      - Test with empty name: expect output handles gracefully
+    </step>
+    <step order="5">Test getEmailTemplate function:
+      - expect(getEmailTemplate(7)).toBe(formatDay7)
+      - expect(getEmailTemplate(30)).toBe(formatDay30)
+      - etc.
+    </step>
+    <step order="6">Add setup/teardown if needed (minimal for these tests)</step>
+    <step order="7">Run all tests: npm run test:run (should show all passing)</step>
+  </steps>
+
+  <verification>
+    <check type="test">npm run test:run — all email template tests pass</check>
+    <check type="manual">All 5 template functions have test coverage</check>
+    <check type="manual">Tests verify {name} and {project_url} replacement</check>
+    <check type="manual">Tests verify unsubscribe link presence</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-9" reason="Email template functions from src/emails.ts" />
+  </dependencies>
+
+  <commit-message>test(emails): write unit tests for email template rendering
+
+Build comprehensive test suite for email templates:
+- Test each template (Day 7, 30, 90, 180, 365)
+- Verify {name} merge variable replacement
+- Verify {project_url} merge variable replacement
+- Verify unsubscribe link appears in footer
+- Verify output is plain text (no HTML)
+- Test getEmailTemplate() function selector
+
+All tests pass before Wave 3 integration.
+  </commit-message>
+</task-plan>
+
+---
+
+<task-plan id="phase-1-task-14" wave="2">
+  <title>Write Unit Tests — Scheduler Logic (Milestone detection, deduplication)</title>
+  <requirement>R8 (Scheduler Tests), R2 (Scheduler Logic)</requirement>
+  <description>
+    Build Vitest unit test suite that verifies scheduler logic correctly:
+    - Calculates elapsed days from ship_date
+    - Detects Day 7, 30, 90, 180, 365 milestones (±1 day tolerance)
+    - Skips already-sent emails (deduplication)
+    - Skips unsubscribed users
+
+    Tests use mocked time and KV to avoid external dependencies.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md" reason="Section 4.2 (Example test structure for scheduler)" />
+  </context>
+
+  <steps>
+    <step order="1">Create file: tests/scheduler.test.ts</step>
+    <step order="2">Import scheduler functions: getElapsedDays, getNextMilestone from src/scheduler.ts</step>
+    <step order="3">Test getElapsedDays:
+      - Ship 7 days ago: expect(getElapsedDays(dateMinusDays(7))).toBe(7)
+      - Ship 30 days ago: expect(getElapsedDays(dateMinusDays(30))).toBe(30)
+      - Ship 365 days ago: expect(getElapsedDays(dateMinusDays(365))).toBe(365)
+      - Handle timezone: test in UTC
+    </step>
+    <step order="4">Test getNextMilestone:
+      - 7 days elapsed → returns 7
+      - 6 days elapsed → returns null
+      - 8 days elapsed → returns null (wait until 30)
+      - 30 days elapsed → returns 30
+      - 89 days elapsed → returns null
+      - 90 days elapsed → returns 90
+      - etc. for 180, 365
+      - Edge: 30.5 days → returns null (±1 day, not ±.5)
+    </step>
+    <step order="5">Test deduplication (mock KV):
+      - hasSentEmail(projectId, 7) returns true if already sent → skip email
+      - hasSentEmail returns false → proceed with send
+    </step>
+    <step order="6">Test unsubscribe skip (mock KV):
+      - isUnsubscribed(email) returns true → skip email
+      - isUnsubscribed returns false → proceed with send
+    </step>
+    <step order="7">Run all tests: npm run test:run (should show all passing)</step>
+  </steps>
+
+  <verification>
+    <check type="test">npm run test:run — all scheduler tests pass</check>
+    <check type="manual">Tests cover all 5 milestones (7, 30, 90, 180, 365)</check>
+    <check type="manual">Tests verify ±1 day tolerance</check>
+    <check type="manual">Tests verify deduplication skip</check>
+    <check type="manual">Tests verify unsubscribe skip</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-11" reason="Scheduler functions from src/scheduler.ts" />
+  </dependencies>
+
+  <commit-message>test(scheduler): write unit tests for milestone detection and deduplication
+
+Build test suite for scheduler logic:
+- Test getElapsedDays(shipDate): verify day calculation
+- Test getNextMilestone(days): verify Day 7/30/90/180/365 detection
+- Test ±1 day tolerance (e.g., 6-8 days triggers Day 7)
+- Test deduplication: hasSentEmail returns true → skip
+- Test unsubscribe skip: isUnsubscribed returns true → skip
+
+Mocked time and KV interactions (no external dependencies in tests).
+All tests pass before Wave 3 integration.
+  </commit-message>
+</task-plan>
+
+---
+
+<task-plan id="phase-1-task-15" wave="2">
+  <title>Integrate All Modules into Worker (src/index.ts main handler)</title>
+  <requirement>R2 (Scheduler), R1 (Email Templates), R4 (Resend), R3 (KV), R5 (Unsub)</requirement>
+  <description>
+    Stitch together all Worker modules into a complete src/index.ts that exports:
+    1. scheduled() handler for daily cron
+    2. Route handler for GET /unsub
+    3. Fallback handler for other routes (404)
+
+    This is the final assembly of Wave 2 implementation before testing.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/workers/contact-form/src/index.ts" reason="Reference for Worker export pattern and route handling" />
+  </context>
+
+  <steps>
+    <step order="1">Open src/index.ts (skeleton created in task-3)</step>
+    <step order="2">Import all modules:
+      - import { handleScheduledEvent } from './scheduler'
+      - import { handleUnsubscribe } from './unsubscribe'
+      - import { sendEmail } from './resend'
+      - import { getProject, isUnsubscribed } from './kv'
+      - etc.
+    </step>
+    <step order="3">Implement default export with two handlers:
+
+      export default {
+        async scheduled(event, env, ctx) {
+          return await handleScheduledEvent(event, env, ctx);
+        },
+
+        async fetch(request, env, ctx) {
+          const url = new URL(request.url);
+
+          if (url.pathname === '/unsub' && request.method === 'GET') {
+            return await handleUnsubscribe(request, env);
+          }
+
+          return new Response('Not Found', { status: 404 });
+        }
+      }
+    </step>
+    <step order="4">Add error boundary: catch unhandled errors, log, return 500</step>
+    <step order="5">Verify TypeScript compiles: npm run typecheck</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run typecheck succeeds</check>
+    <check type="manual">src/index.ts exports both scheduled and fetch handlers</check>
+    <check type="manual">GET /unsub route is handled</check>
+    <check type="manual">Other routes return 404</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-7" reason="KV module" />
+    <depends-on task-id="phase-1-task-8" reason="Resend API client" />
+    <depends-on task-id="phase-1-task-9" reason="Email templates" />
+    <depends-on task-id="phase-1-task-10" reason="Unsubscribe endpoint" />
+    <depends-on task-id="phase-1-task-11" reason="Scheduler handler" />
+  </dependencies>
+
+  <commit-message>feat(worker): integrate all modules into main Worker handler
+
+Assemble src/index.ts with complete request/schedule handling:
+- Export scheduled() handler for daily cron (0 0 * * *)
+- Export fetch() handler with route: GET /unsub?token=
+- Import and wire: scheduler, kv, resend, emails, unsubscribe modules
+
+Worker ready for deployment in Wave 3.
+  </commit-message>
+</task-plan>
+
+---
+
+### Wave 2 Summary
+
+**Wave 2 Status:** 9 tasks implementing all core Homeport functionality
+
+**Parallel execution:** Tasks 7-15 can run simultaneously
+- All tasks depend on Wave 1 completion
+- Internal dependencies exist (e.g., scheduler depends on kv, resend, emails)
+- Parallel path exists: 7→11 (KV→Scheduler) and 8 (Resend) and 9→12-13 (Templates→Tests) can overlap
+
+**Outcome by end of Wave 2:**
+- ✅ KV operations module complete (get, set, unsub, dedup)
+- ✅ Resend API client wrapper complete
+- ✅ 5 email template functions implemented and tested
+- ✅ Unsubscribe endpoint implemented
+- ✅ Scheduler logic implemented and tested
+- ✅ CSV-to-KV import script ready
+- ✅ All modules integrated into Worker
+- ✅ All unit tests passing (email rendering, scheduler logic)
+- ✅ Ready for Wave 3 integration testing and deployment
+
+---
+
+## Wave 3 (Sequential after Wave 2 — Integration & Launch)
+
+These tasks perform end-to-end testing, validation, and production deployment. They must run sequentially because each depends on the output of the previous.
+
+---
+
+<task-plan id="phase-1-task-16" wave="3">
+  <title>Deploy Worker to Cloudflare Production</title>
+  <requirement>R9 (Worker Scaffold), All core modules</requirement>
+  <description>
+    Deploy the complete Worker to Cloudflare production environment. This creates the live endpoint at aftercare.shipyard.ai and activates the scheduled cron job.
+
+    Deployment is a one-time action that pushes the built code to Cloudflare's global edge network.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/workers/contact-form/README.md" reason="Reference deployment instructions if available" />
+    <file path="/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md" reason="Section 7 (Dependencies - wrangler setup)" />
+  </context>
+
+  <steps>
+    <step order="1">Ensure all code is committed to git (clean working directory)</step>
+    <step order="2">Set RESEND_API_KEY secret in production environment:
+      cd /home/agent/shipyard-ai/workers/aftercare
+      wrangler secret put RESEND_API_KEY --env production
+      (Paste the API key from task-4)
+    </step>
+    <step order="3">Build Worker: npm run build (or wrangler build)</step>
+    <step order="4">Deploy to production: npm run deploy --env production</step>
+    <step order="5">Verify deployment: wrangler deployments list (shows the new deployment)</step>
+    <step order="6">Test live endpoint: curl https://aftercare.shipyard.ai/unsub?token=... (should return confirmation)</step>
+    <step order="7">Check Cloudflare dashboard: confirm cron trigger is active (0 0 * * *)</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Deployment completes without errors</check>
+    <check type="manual">Cloudflare dashboard shows aftercare Worker deployed</check>
+    <check type="manual">GET /unsub endpoint returns 200 with confirmation message</check>
+    <check type="manual">Cron trigger is active in dashboard</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-15" reason="All modules must be integrated into Worker before deploying" />
+    <depends-on task-id="phase-1-task-4" reason="Resend API key from domain setup" />
+  </dependencies>
+
+  <commit-message>chore(deploy): deploy Homeport Worker to Cloudflare production
+
+Deploy final Worker build to production environment:
+- Set RESEND_API_KEY secret
+- Run wrangler deploy --env production
+- Verify endpoint is live at aftercare.shipyard.ai
+- Confirm cron trigger is active
+
+Live Worker ready for data population and testing.
+  </commit-message>
+</task-plan>
+
+---
+
+<task-plan id="phase-1-task-17" wave="3">
+  <title>Populate KV Store with Project Data (CSV Upload)</title>
+  <requirement>R6 (CSV-to-KV Script), R3 (KV Operations)</requirement>
+  <description>
+    Run the CSV-to-KV import script (from task-12) to upload the shipped projects CSV (from task-1) into the live KV store. This initializes the database with real project data for testing and launch.
+
+    After this step, the Worker has data to work with.
+  </description>
+
+  <context>
+    <file path="[Task 1 output: projects CSV]" reason="Source data for KV upload" />
+    <file path="[Task 12 output: csv-to-kv script]" reason="Upload script" />
+  </context>
+
+  <steps>
+    <step order="1">Ensure CSV file exists: /tmp/shipyard-projects.csv (from task-1)</step>
+    <step order="2">Run import script: cd /home/agent/shipyard-ai/workers/aftercare && npm run csv-to-kv /tmp/shipyard-projects.csv</step>
+    <step order="3">Verify output: script should log "Uploaded X projects to KV"</step>
+    <step order="4">Spot-check KV data: wrangler kv:key get --namespace-id AFTERCARE_KV project:proj_001 (should show JSON data)</step>
+    <step order="5">Log into Cloudflare Workers KV dashboard and verify records appear</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Script runs without errors</check>
+    <check type="manual">All rows from CSV are uploaded</check>
+    <check type="manual">KV records appear in dashboard (project:{id} keys)</check>
+    <check type="manual">Sample KV record contains all fields: email, name, project_url, ship_date</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-16" reason="Worker must be deployed (KV namespace is initialized)" />
+    <depends-on task-id="phase-1-task-12" reason="CSV-to-KV script must exist" />
+    <depends-on task-id="phase-1-task-1" reason="Project CSV data from audit" />
+  </dependencies>
+
+  <commit-message>chore(data): populate KV store with shipped projects data
+
+Run CSV-to-KV import script to initialize production KV:
+- Upload all projects from projects.csv
+- Verify X projects successfully written to KV
+- Spot-check KV records in Cloudflare dashboard
+
+KV database ready for live email sending.
+  </commit-message>
+</task-plan>
+
+---
+
+<task-plan id="phase-1-task-18" wave="3">
+  <title>Manual Testing: Send Test Emails to Internal Team</title>
+  <requirement>All modules, R4 (Resend), R1 (Email Templates)</requirement>
+  <description>
+    Manually trigger the scheduler to send test emails to internal team (Phil, Steve, Elon) to verify end-to-end delivery: email composition, Resend API success, inbox placement.
+
+    This validates the entire pipeline before production launch.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/CODEBASE_SCOUT_REPORT_HOMEPORT.md" reason="Section 4.2 (Testing Strategy - test mode flag)" />
+  </context>
+
+  <steps>
+    <step order="1">Modify one test project in KV to have ship_date exactly 7 days ago:
+      wrangler kv:key put project:test_001 "{...ship_date: [7 days ago]...}"
+    </step>
+    <step order="2">Manually trigger cron handler (simulate scheduler):
+      - Call Worker endpoint: POST /trigger (if implemented)
+      - Or use wrangler local testing: wrangler dev and make request
+      - Or manually execute scheduled handler in isolation (Node.js)
+    </step>
+    <step order="3">Monitor Resend dashboard: watch for email sending, check status</step>
+    <step order="4">Check inbox: Phil, Steve, Elon should receive Day 7 test email</step>
+    <step order="5">Verify email content:
+      - Subject line is correct
+      - Body includes {name} and {project_url} personalization
+      - Unsubscribe link is clickable
+      - Plain text formatting (no HTML corruption)
+    </step>
+    <step order="6">Test unsubscribe link: click on it, verify KV flag is set, verify no more emails sent to that address</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Test email arrives in inbox (not spam)</check>
+    <check type="manual">Email subject line is visible</check>
+    <check type="manual">Email body shows personalization ({name} and {project_url} replaced)</check>
+    <check type="manual">Unsubscribe link is clickable</check>
+    <check type="manual">Email is plain text (no HTML artifacts)</check>
+    <check type="manual">Resend dashboard shows email as delivered</check>
+    <check type="manual">Unsubscribe link sets KV flag and shows confirmation</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-17" reason="KV must be populated with test data" />
+    <depends-on task-id="phase-1-task-16" reason="Worker must be deployed" />
+  </dependencies>
+
+  <commit-message>test(manual): send test emails to internal team for end-to-end validation
+
+Manually trigger scheduler to send Day 7 test emails:
+- Create test project with ship_date = 7 days ago
+- Trigger scheduler (manual invocation)
+- Verify email delivery via Resend dashboard
+- Verify email content (subject, personalization, unsubscribe link)
+- Test unsubscribe flow end-to-end
+
+All delivery checks pass. Ready for production data and live go-live.
+  </commit-message>
+</task-plan>
+
+---
+
+<task-plan id="phase-1-task-19" wave="3">
+  <title>Email Deliverability Validation (Mail-Tester, spam check)</title>
+  <requirement>R10 (Resend Config), R4 (Resend), All email modules</requirement>
+  <description>
+    Validate that production emails pass spam filters and achieve high deliverability scores. This is a critical check before production launch.
+
+    Forward a test email to mail@mail-tester.com, check score, and validate no spam triggers.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/decisions.md" reason="Section 5.1 Risk (Email Deliverability Issues)" />
+  </context>
+
+  <steps>
+    <step order="1">Send another test email from the scheduler (or directly via Resend)</step>
+    <step order="2">Forward test email to mail@mail-tester.com</step>
+    <step order="3">Wait for Mail-Tester report (usually instant)</step>
+    <step order="4">Check score: should be >9.0 / 10.0 (excellent deliverability)</step>
+    <step order="5">Review details: check for any red flags:
+      - SPF: PASS
+      - DKIM: PASS
+      - DMARC: PASS
+      - Spam score: LOW
+      - Blacklist status: CLEAN
+    </step>
+    <step order="6">If any red flags: debug and fix immediately (e.g., check DNS records, increase domain warmup time)</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Mail-Tester score is >9.0 / 10.0</check>
+    <check type="manual">SPF, DKIM, DMARC all PASS</check>
+    <check type="manual">Spam score is LOW</check>
+    <check type="manual">No blacklist warnings</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-18" reason="Test email from internal testing" />
+  </dependencies>
+
+  <commit-message>test(deliverability): validate email spam score with Mail-Tester
+
+Check email deliverability for production readiness:
+- Forward test email to mail@mail-tester.com
+- Verify score >9.0/10.0 (excellent)
+- Verify SPF, DKIM, DMARC all PASS
+- Verify spam score is LOW
+- Verify no blacklist issues
+
+Production-ready email delivery confirmed.
+  </commit-message>
+</task-plan>
+
+---
+
+<task-plan id="phase-1-task-20" wave="3">
+  <title>Final Voice Review and Go-Live Approval</title>
+  <requirement>All modules, R1 (Email Templates)</requirement>
+  <description>
+    Steve conducts final voice review of live email sends. Check that automation "smell test" passes: does the email feel human or robotic?
+
+    Phil and Elon give final approval to activate production cron and begin live sending to customers.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/decisions.md" reason="Section 11 (Voice Lock - Steve's final word)" />
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/essence.md" reason="Voice principles" />
+  </context>
+
+  <steps>
+    <step order="1">Steve reviews test email from task-18:
+      - Read it aloud: does it sound human?
+      - Would I send this to a friend?
+      - Any corporate jargon or fake casual?
+      - Any automation smell?
+    </step>
+    <step order="2">If Steve approves: move to step 4</step>
+    <step order="3">If Steve finds issues: return to task-9 or task-5/6 to fix templates, re-test, re-send</step>
+    <step order="4">Elon checks technical readiness:
+      - Worker deployed and running
+      - KV populated with real project data
+      - Cron scheduled (0 0 * * * UTC)
+      - Resend API key configured
+      - All tests passing
+    </step>
+    <step order="5">Phil checks operational readiness:
+      - Reply inbox assigned and monitored
+      - SLA for response confirmed
+      - Unsubscribe mechanism working
+      - Data audit complete
+    </step>
+    <step order="6">Unanimous approval: go-live approved</step>
+    <step order="7">Activate cron job (if not already active from deployment)</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Steve's voice review: APPROVED</check>
+    <check type="manual">Elon's technical checklist: APPROVED</check>
+    <check type="manual">Phil's operational checklist: APPROVED</check>
+    <check type="manual">Cron trigger is active in Cloudflare dashboard</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-19" reason="All testing must be complete" />
+    <depends-on task-id="phase-1-task-18" reason="Live email samples reviewed" />
+  </dependencies>
+
+  <commit-message>chore(approval): final voice review and go-live approval from Steve, Elon, Phil
+
+Complete final sign-off before production launch:
+- Steve: voice review APPROVED (passes automation smell test)
+- Elon: technical readiness APPROVED (all systems operational)
+- Phil: operational readiness APPROVED (reply inbox, SLA confirmed)
+
+Cron job activated. Homeport is live.
+
+Ready to monitor first customer emails and collect metrics for 90-day measurement period.
+  </commit-message>
+</task-plan>
+
+---
+
+<task-plan id="phase-1-task-21" wave="3">
+  <title>Go-Live: Activate Production Cron and Begin Customer Sends</title>
+  <requirement>All Wave 2 + Wave 3 preparation</requirement>
+  <description>
+    Final activation: the cron job is already configured to run daily at UTC midnight (set in task-3). This task confirms it's active and monitoring begins.
+
+    After this, the system runs autonomously for 90 days without touching code (feature freeze from decisions.md Section 1.12).
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/rounds/shipyard-post-ship-lifecycle/decisions.md" reason="Section 1.12 (Feature Freeze)" />
+  </context>
+
+  <steps>
+    <step order="1">Confirm cron is active: check Cloudflare Workers dashboard for aftercare Worker</step>
+    <step order="2">View upcoming cron execution: dashboard should show "Next execution: [tomorrow at UTC midnight]"</step>
+    <step order="3">Set up monitoring:
+      - Cloudflare Worker logs: monitor for errors
+      - Resend dashboard: watch open/click rates daily
+      - Internal team: check internal email for unsubscribe/reply activity
+    </step>
+    <step order="4">Document go-live:
+      - Record launch date/time
+      - Record first batch of projects in KV
+      - Record success metrics baseline (0 replies, 0 opens initially)
+    </step>
+    <step order="5">Lock code: no changes for 90 days (feature freeze in effect)</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Cloudflare dashboard confirms cron is active</check>
+    <check type="manual">Next execution time is visible</check>
+    <check type="manual">Monitoring dashboards are accessible</check>
+    <check type="manual">Go-live timestamp documented</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-20" reason="Go-live approval must be granted first" />
+  </dependencies>
+
+  <commit-message>chore(go-live): activate production cron and begin customer lifecycle emails
+
+Homeport is now live:
+- Cron scheduled to run daily at UTC midnight (0 0 * * *)
+- KV store populated with X shipped projects
+- Resend API configured and verified
+- Monitoring dashboards active
+
+First lifecycle emails will send on next cron execution.
+
+90-day feature freeze begins. Code is locked until post-launch analysis.
+Metric collection begins: reply rate, open rate, unsubscribe rate.
+
+Decision meeting scheduled for Day 91 to evaluate success.
+  </commit-message>
+</task-plan>
+
+---
+
+### Wave 3 Summary
+
+**Wave 3 Status:** 6 tasks for integration, validation, and live launch
+
+**Sequential execution:** Tasks must run in order (each depends on output of previous)
+- Task 16: Deploy Worker
+- Task 17: Populate data
+- Task 18: Manual testing
+- Task 19: Deliverability validation
+- Task 20: Voice/approval review
+- Task 21: Go-live activation
+
+**Outcome at end of Wave 3:**
+- ✅ Worker deployed to production
+- ✅ KV store populated with real customer data
+- ✅ End-to-end testing complete (email delivery, personalization, unsubscribe)
+- ✅ Deliverability validated (Mail-Tester score >9/10)
+- ✅ All stakeholders approved (Steve, Elon, Phil)
+- ✅ Cron job active and monitoring begins
+- ✅ **Homeport is LIVE**
+
+---
+
+## Project Timeline
+
+### Day 0 (Pre-Build)
+**Duration:** 4-8 hours (parallel work)
+
+**Blockers to resolve:**
+- Task 1: Audit project data ✅
+- Task 2: Decide From address and reply inbox ✅
+- Task 4: Configure Resend account ✅
+- Tasks 5-6: Write email templates (Steve) ✅
+
+**Outcome:** All blockers cleared, ready for Wave 1
+
+---
+
+### Day 1 (Build)
+**Duration:** 24 hours (parallel tasks)
+
+**Wave 1 (Foundation):** Tasks 1-6 (completed Day 0)
+**Wave 2 (Implementation):** Tasks 7-15 in parallel
+
+**Parallel paths:**
+- Path A (KV + Scheduler): 7→11→15
+- Path B (Resend): 8→15
+- Path C (Templates): 9→12-13→15
+
+**Outcome:** All code written, tested, and integrated
+
+---
+
+### Day 2 (Ship)
+**Duration:** 24 hours (sequential validation)
+
+**Wave 3 (Integration & Launch):** Tasks 16-21 in sequence
+
+**Outcome:** **Homeport is LIVE**
+
+---
+
+## Risk Mitigation Summary
+
+| Risk | Mitigation Task |
+|------|-----------------|
+| No project data | Task 1 (Day 0 blocker audit) |
+| Email deliverability | Task 4 (Resend setup), Task 19 (Mail-Tester validation) |
+| Bugs in email templates | Task 13 (Unit tests) |
+| Bugs in scheduler | Task 14 (Unit tests) |
+| Configuration errors | Task 3 (Scaffold + validate) |
+| Unsubscribe broken | Task 10 (Implementation) + Task 18 (Manual testing) |
+| Voice drift | Task 20 (Steve's final review) |
+| Deployment failure | Task 16 (Deploy to production) |
+| 48-hour timeline miss | Task 2, 3, 4 (Day 0 blockers), Wave 2 parallelization, 72-hour deadline buffer |
+
+---
+
+## Success Criteria (Complete Definition)
+
+### Launch Day Checklist ✅
+- [ ] Task 1: Project data validated (10+ projects)
+- [ ] Task 2: Critical decisions locked (From email, reply owner)
+- [ ] Task 3: Worker scaffolded and compiling
+- [ ] Task 4: Resend configured and verified
+- [ ] Tasks 5-6: Email templates approved by Steve
+- [ ] Tasks 7-15: All code written, tested, integrated
+- [ ] Task 16: Worker deployed to production
+- [ ] Task 17: KV populated with real data
+- [ ] Task 18: Test emails sent and verified
+- [ ] Task 19: Deliverability score >9/10
+- [ ] Task 20: Steve/Elon/Phil approval
+- [ ] Task 21: Cron active, monitoring live
+
+### 90-Day Measurement Metrics
+- **Primary:** Reply rate ≥ 10% (success) or <5% (kill)
+- **Secondary:** Revision request rate
+- **Secondary:** Unsubscribe rate (kill if >15% in week 1)
+- **Secondary:** Open rate
+
+### Post-Launch Constraints
+- 90-day feature freeze (no code changes)
+- Monitor metrics weekly
+- Respond to customer replies within SLA
+- Document qualitative feedback
+
+---
+
+**Plan Generated:** 2026-04-16
+**Status:** READY FOR EXECUTION
+**Total Work Items:** 21 tasks across 3 waves
+**Estimated Timeline:** 48 hours (2 days) from Day 0 blockers through Day 2 go-live
+
+*"Simple. Reliable. Unforgettable."* — Steve Jobs
+*"Ship now, iterate later."* — Elon Musk
+*"One triangle offense. Execute."* — Phil Jackson
+
+---
+
+## Appendix: File Structure After Execution
+
+```
+/home/agent/shipyard-ai/workers/aftercare/
+├── wrangler.toml                    # ✅ Configured (task-3)
+├── package.json                     # ✅ Created (task-3)
+├── tsconfig.json                    # ✅ Created (task-3)
+│
+├── src/
+│   ├── index.ts                     # ✅ Main Worker entry + routes (task-15)
+│   ├── scheduler.ts                 # ✅ Cron logic (task-11)
+│   ├── emails.ts                    # ✅ Template functions (task-9)
+│   ├── resend.ts                    # ✅ API client (task-8)
+│   ├── kv.ts                        # ✅ Store operations (task-7)
+│   └── unsubscribe.ts               # ✅ Unsub endpoint (task-10)
+│
+├── scripts/
+│   └── csv-to-kv.ts                 # ✅ CSV import (task-12)
+│
+├── tests/
+│   ├── emails.test.ts               # ✅ Template tests (task-13)
+│   └── scheduler.test.ts            # ✅ Scheduler tests (task-14)
+│
+├── .wrangler/                       # Build output (auto-generated)
+└── README.md                        # Documentation (deployment guide, voice)
+
+KV Store (Populated by task-17):
+├── project:proj_001 → {email, name, project_url, ship_date, ...}
+├── project:proj_002 → {...}
+├── ...
+└── unsubscribed:customer@example.com → "true" (if opted out)
+```
+
+---
+
+End of Phase 1 Plan.
