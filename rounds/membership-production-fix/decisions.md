@@ -5,6 +5,33 @@
 
 ---
 
+## 📊 DEBATE OUTCOMES
+
+### Round 1: Initial Positions
+**Elon's stance:** 5-minute hardcoded fix, cut everything else as scope creep
+**Steve's stance:** Fix the systemic issue (convention over configuration), make errors actionable
+**Outcome:** Both partially correct—need BOTH fixes, not either/or
+
+### Round 2: Refinement & Lock-In
+**Elon's concessions:**
+- Error messages DO matter (5 minutes investment)
+- Local-production parity is non-negotiable
+- Plugin system IS the product (if extensibility is value prop)
+- Respecting developer time means making system obvious
+
+**Steve's concessions:**
+- PRD was over-engineered (124 lines for "make it load")
+- "Read all docs" is process theater
+- Should take <30 minutes if system is obvious
+- Ship fast, validate with 100 users before adding abstraction
+
+### Final Synthesis
+**What ships:** Both the hardcoded fix AND the convention system (40 minutes total)
+**Why both:** Hardcoded fix = immediate relief. Convention system = prevents 5,000 hours of future debugging
+**How to execute:** Sequential—fix first (10 min), then prevent recurrence (30 min), ship same session
+
+---
+
 ## 🔒 LOCKED DECISIONS
 
 ### Decision 1: Immediate Fix Strategy
@@ -18,6 +45,10 @@
 - Time budget: 10 minutes for immediate fix
 
 **Rationale:** Speed compounds when you're at zero users. The yoga studio site is live and broken. Every day of debate is a day they can't onboard members.
+
+**Elon's core argument (Round 2):** *"The entrypoint path is wrong. That's it. Don't engineer emotional narratives when you should be fixing the path."*
+
+**Steve's concession (Round 2):** *"You're right to push back on over-engineering. This should take <30 minutes—not because we cut corners, but because the system should be obvious."*
 
 ---
 
@@ -47,6 +78,10 @@ plugins: [{
 
 **Rationale:** Configuration is tech debt disguised as flexibility. Convention over configuration prevents 100 future developers from wasting 5 hours each debugging paths.
 
+**Steve's core argument (Round 2):** *"Your 'fix' creates a precedent: when plugins break, developers debug npm aliases, compare file paths, and trace build configs. That's not 5 minutes—it's 5 hours × 100 developers × 10 plugins = 5,000 hours of wasted time. You're treating the symptom. I'm treating the disease."*
+
+**Elon's concession (Round 2):** *"Parity between local and production is non-negotiable. Steve's right: 'works on my machine' destroys trust. The fix should make behavior identical everywhere. That's not brand work—that's engineering rigor."*
+
 ---
 
 ### Decision 3: Self-Verifying Build System
@@ -60,7 +95,25 @@ plugins: [{
 - No manual verification (curl commands to check manifest)
 - Build-time validation catches broken plugins before deploy
 
+**Error message specification:**
+```json
+// ❌ BAD (generic):
+{"error": "INTERNAL_ERROR", "message": "Plugin route error"}
+
+// ✅ GOOD (actionable):
+{
+  "error": "PLUGIN_ENTRYPOINT_NOT_RESOLVED",
+  "message": "Could not find '@shipyard/membership/sandbox'. Use a file path like './sandbox-entry.js'",
+  "tried": "@shipyard/membership/sandbox",
+  "suggestion": "./plugins/membership/dist/sandbox-entry.js"
+}
+```
+
 **Rationale:** If it builds, it ships. If it ships, it runs. Make wrong things impossible.
+
+**Steve's principle (Round 1):** *"Error messages are documentation at the moment of crisis. The difference between generic errors and actionable ones is 30 minutes of debugging vs. 30 seconds. That's not polish—that's reducing time-to-success by 60x."*
+
+**Elon's concession (Round 2):** *"Error messages DO matter—but only once. If we ship better error messages that prevent the next developer from hitting this bug, fine. Invest 5 minutes in a clear error."*
 
 ---
 
@@ -124,16 +177,30 @@ plugins: [{
 
 ## 📁 FILE STRUCTURE
 
-### Immediate Fix Files:
+### Phase 1: Immediate Fix (10 minutes)
+**Single file change:**
 ```
-plugins/membership/
-├── descriptor.json          # Change entrypoint to real path
-│   └── "entrypoint": "./plugins/membership/dist/sandbox-entry.js"
-└── dist/
-    └── sandbox-entry.js     # Actual bundled file
+plugins/membership/descriptor.json
+```
+**Change:**
+```json
+// BEFORE (broken npm alias):
+{
+  "type": "standard",
+  "entrypoint": "@shipyard/membership/sandbox",
+  "workerLoader": "esm"
+}
+
+// AFTER (real file path):
+{
+  "type": "standard",
+  "entrypoint": "./plugins/membership/dist/sandbox-entry.js",
+  "workerLoader": "esm"
+}
 ```
 
-### Convention System Files:
+### Phase 2: Convention System (30 minutes)
+**New files to create:**
 ```
 shipyard-core/
 ├── plugin-resolver.ts       # NEW: Convention-based path resolution
@@ -146,11 +213,28 @@ shipyard-core/
     └── loadPlugins(["membership"]) → auto-resolve & bundle
 ```
 
-### Test Files:
+**Test files:**
 ```
 tests/
 ├── plugin-resolver.test.ts  # Verify convention resolution
 └── build-validator.test.ts  # Verify loud failures
+```
+
+**Target developer experience:**
+```typescript
+// emdash.config.ts - BEFORE (manual configuration):
+export default {
+  plugins: [{
+    type: "standard",
+    entrypoint: "./plugins/membership/dist/sandbox-entry.js",  // manual path
+    workerLoader: "esm"
+  }]
+}
+
+// emdash.config.ts - AFTER (convention):
+export default {
+  plugins: ["membership"]  // auto-resolves everything
+}
 ```
 
 ---
@@ -266,20 +350,25 @@ If no impact on key metrics → cut the plugin entirely.
 
 ## 🎯 SUCCESS CRITERIA
 
-### Build Phase Success:
+### Build Phase Success (Required for "Done"):
 - ✅ Plugin loads in production (manifest verification)
 - ✅ `plugins: ["membership"]` convention works
 - ✅ Build fails loudly on broken plugins
 - ✅ Total implementation time: ≤40 minutes
 - ✅ Zero manual configuration required
+- ✅ Curl `https://[site].emdash.ai/api/plugins/manifest` returns `["membership"]`
+- ✅ Local dev and production behave identically (no divergence)
 
-### Product Validation Success (post-build):
+### Product Validation Success (post-build, within 2 weeks):
 - 📊 10+ real members using plugin
 - 📊 >10% signup completion rate
 - 📊 <1% error rate in production
 - 📊 Zero developer support tickets on plugin loading
+- 📊 Plugin enables measurable revenue or retention improvement
 
 **If validation fails → cut the plugin per Elon's recommendation**
+
+**Elon's metric (Round 1):** *"If the plugin doesn't drive revenue or retention, fixing this gets you from 0 to 0 users. Distribution comes from product-market fit, not from fixing build configs."*
 
 ---
 
@@ -291,14 +380,32 @@ If no impact on key metrics → cut the plugin entirely.
 
 **The resolution:** 40 minutes. Hardcode fix (10 min) + convention system (30 min) = ship today + never touch again.
 
-**Core insight:**
-- Documentation is apology for bad design *(Steve)*
-- Configuration is tech debt disguised as flexibility *(Steve)*
-- Speed is a feature, shipping is the only validation *(Elon)*
-- The best infrastructure is invisible *(Steve)*
+**Core insights from the debates:**
+- *"Documentation is an apology for bad design"* — Steve (Round 2), Elon conceded
+- *"Configuration is tech debt disguised as flexibility"* — Steve (Round 2)
+- *"Speed is a feature, shipping is the only validation"* — Elon (Round 1, Round 2)
+- *"The best infrastructure is invisible"* — Steve (Round 1)
+- *"Every abstraction adds failure modes. Strip them away."* — Elon (Round 2)
+- *"First impressions are permanent. Plugin Zero sets the tone for every plugin that follows."* — Steve (Round 2)
+
+**The essence (from project brief):**
+> "Relief. The platform doesn't fight you. Local and production never diverge. Boring simplicity. Magical results."
 
 **The play:**
 Fix fast. Design forever. Ship both. Move on.
+
+**Execution directive:**
+This is not a debate. This is a build. The agent has 40 minutes:
+1. **Minutes 0-10:** Change descriptor.json entrypoint to real file path, deploy, verify manifest
+2. **Minutes 10-40:** Build convention system (resolver + validator), update config API, write tests
+3. **Minute 40:** Ship. Done. Never touch again.
+
+If the agent asks questions about approach, point them to this blueprint. If they want to read docs, point them to the 3 lines about entrypoint resolution. If they want to add features, cut them ruthlessly.
+
+**The triangle offense:**
+- Elon guards the timeline (40 minutes, no exceptions)
+- Steve guards the quality bar (no silent failures, actionable errors)
+- Phil guards the execution (ship both fixes, not just one)
 
 ---
 

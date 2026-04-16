@@ -1,29 +1,21 @@
 # Essence
 
-**What this is really about:**
-Making plugin registration impossible to break.
+**What it's about:**
+Making plugins work everywhere they claim to work.
 
-**Feeling it should evoke:**
-Power. Trust. Time respected.
+**The feeling:**
+Relief. The platform doesn't fight you.
 
-**The one thing that must be perfect:**
-Zero-config plugin loading — `plugins: ["membership"]` just works.
+**The one thing:**
+Local and production never diverge.
 
 **Creative direction:**
-Ship fast, design forever.
+Boring simplicity. Magical results.
 
 ---
 
-**The tension:**
-Elon wants speed (fix entrypoint path in 5 minutes, ship today).
-Steve wants systems (convention-based resolution, never debug again).
-
-**The truth:**
-Both right. Wrong timing for architecture — zero users, binary failure.
-Right time for principle — bad abstraction creates infinite future pain.
+**Tension:**
+Speed compounds at zero users. Bad abstractions compound forever.
 
 **Resolution:**
-Fix entrypoint NOW (hardcode path). Design convention system in 30 minutes. Total: 40 minutes. Ship + never touch again.
-
-**Core insight:**
-Documentation is apology for bad design. Configuration is tech debt disguised as flexibility. The best infrastructure is invisible.
+40 minutes. Hardcode fix + convention system. Ship both. Never touch again.
