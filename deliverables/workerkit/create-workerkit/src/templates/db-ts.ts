@@ -114,7 +114,7 @@ export async function query<T = any>(
     // Bind parameters safely (prevents SQL injection)
     // Each ? in your SQL is replaced with the corresponding parameter in order
     // Example: query(db, 'SELECT * FROM users WHERE email = ? AND active = ?', ['user@example.com', true])
-    // The ? placeholders ensure values are properly escaped and prevent SQL injection attacks
+    // The ? parameters ensure values are properly escaped and prevent SQL injection attacks
     const bound = statement.bind(...params);
 
     // Execute the prepared statement and return all results
