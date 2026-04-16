@@ -5,5 +5,6 @@
   "d1_databases": [{"binding": "DB", "database_name": "sunrise-yoga", "database_id": "acbadfb7-90c8-4d26-8249-ed07c9da0998"}],
   "r2_buckets": [{"binding": "MEDIA", "bucket_name": "sunrise-yoga-media"}],
   "kv_namespaces": [{"binding": "KV", "id": "test-kv-namespace"}],
+  "worker_loaders": [{"binding": "LOADER"}],
   "observability": {"enabled": true}
 }
