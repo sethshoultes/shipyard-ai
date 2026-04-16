@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import type { PluginDescriptor } from "emdash";
 
 /**
@@ -19,11 +21,17 @@ import type { PluginDescriptor } from "emdash";
  * - Analytics: `analytics:revenue:{date}` -> { total, orderCount }
  */
 export function commercekitPlugin(): PluginDescriptor {
+  // NOTE: Use real file path instead of npm alias (@shipyard/commercekit/sandbox)
+  // The alias works in local dev via node_modules but fails in Cloudflare Workers
+  // which only has access to bundled code. Bundler resolves absolute paths correctly.
+  const currentDir = dirname(fileURLToPath(import.meta.url));
+  const entrypointPath = join(currentDir, "sandbox-entry.ts");
+
   return {
     id: "commercekit",
     version: "1.0.0",
     format: "standard",
-    entrypoint: "@shipyard/commercekit/sandbox",
+    entrypoint: entrypointPath,
     capabilities: ["email:send"],
     options: {},
     adminPages: [

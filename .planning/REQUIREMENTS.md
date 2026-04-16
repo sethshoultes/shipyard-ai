@@ -1,124 +1,114 @@
-# Requirements: Membership Plugin Hotfix
+# Requirements Document: Fix Plugin Entrypoints
 
-**Project:** membership-hotfix
-**Priority:** p0 (Production Hotfix)
-**Site:** yoga.shipyard.company
-**Generated:** 2026-04-16
+**Project Slug**: fix-plugin-entrypoints
+**PRD**: /home/agent/shipyard-ai/prds/fix-plugin-entrypoints.md
+**Generated**: 2026-04-16
+**Priority**: p0 (hotfix)
 
 ## Problem Statement
 
-The Membership plugin on Sunrise Yoga has two runtime bugs blocking customers:
-
-1. **Settings page is blank** — `/_emdash/admin/plugins/membership` shows nothing on page_load
-2. **Members page crashes** — `/_emdash/admin/plugins/membership/members` throws `Cannot read properties of undefined (reading 'map')`
-
-Both are Block Kit rendering issues in the admin route handler.
-
-## Root Cause Analysis
-
-### Bug 1: Blank Settings Page
-The admin `page_load` handler only responds to specific pages (`/members`, `/plans`) but NOT the default root admin page. When no page is specified (or page is undefined), the handler returns `{ blocks: [] }`, causing a blank screen.
-
-**Code Location:** `/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts`, Line 2511
-
-### Bug 2: Members Page `.map()` Crash
-According to the PRD, the members list handler calls `.map()` on a value that's undefined when no members exist. However, code analysis reveals the current implementation uses `parseJSON()` with fallback defaults, suggesting this might be intermittent or related to specific KV states.
-
-**Code Location:** `/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts`, Lines 2212-2213
+6 of 8 Emdash plugins are not registered in Sunrise Yoga and 4 have broken npm-alias entrypoints that won't resolve on Cloudflare Workers.
 
 ## Atomic Requirements
 
-| ID | Requirement | File(s) | Verification |
-|---|---|---|---|
-| **REQ-1** | Fix blank settings page - Add page_load handler for root admin page that returns valid Block Kit blocks | `sandbox-entry.ts` | Navigate to `/_emdash/admin/plugins/membership` and confirm blocks render (not blank) |
-| **REQ-2** | Implement dashboard page_load handler with header, stats, and action buttons | `sandbox-entry.ts` | Dashboard shows: (1) Header "MemberShip — Membership Management", (2) Stats for member/plan counts, (3) Action buttons for Members/Plans/Settings |
-| **REQ-3** | Add null guard to members list KV fetch with `?? []` fallback | `sandbox-entry.ts` | Access members page with 0 members - shows empty table, no crash |
-| **REQ-4** | Add null guard to view_members action handler | `sandbox-entry.ts` | Verify `.map()` calls have preceding null checks |
-| **REQ-5** | Add null guard to view_plans action handler | `sandbox-entry.ts` | Access plans page with empty KV - shows default plans, no crash |
-| **REQ-6** | Verify all array operations (`.map()`, `.filter()`, etc.) on KV results have null guards | `sandbox-entry.ts` | Code review + grep for array methods |
-| **REQ-7** | Verify zero banned patterns (`throw new Response`, `rc.user`, `rc.pathParams`) | `sandbox-entry.ts` | Run: `grep -c "throw new Response\|rc\.user\|rc\.pathParams" plugins/membership/src/sandbox-entry.ts` → Must be 0 |
-| **REQ-8** | Commit and push all changes with descriptive commit message | Git | `git status` confirms clean working tree, commit exists, branch pushed |
+### Plugin Entrypoint Fixes
+
+**REQ-1**: Fix entrypoint in commercekit plugin
+- Replace npm alias `entrypoint: "@shipyard/commercekit/sandbox"` with file path resolution
+- File: `/home/agent/shipyard-ai/plugins/commercekit/src/index.ts`
+
+**REQ-2**: Fix entrypoint in formforge plugin
+- Replace npm alias `entrypoint: "@shipyard/formforge/sandbox"` with file path resolution
+- File: `/home/agent/shipyard-ai/plugins/formforge/src/index.ts`
+
+**REQ-3**: Fix entrypoint in reviewpulse plugin
+- Replace npm alias `entrypoint: "@shipyard/reviewpulse/sandbox"` with file path resolution
+- File: `/home/agent/shipyard-ai/plugins/reviewpulse/src/index.ts`
+
+**REQ-4**: Fix entrypoint in seodash plugin
+- Replace npm alias `entrypoint: "@shipyard/seodash/sandbox"` with file path resolution
+- File: `/home/agent/shipyard-ai/plugins/seodash/src/index.ts`
+
+### Plugin Registration
+
+**REQ-5**: Register all 6 available plugins in Sunrise Yoga astro.config.mjs
+- Import: membershipPlugin, eventdashPlugin, commercekitPlugin, formforgePlugin, reviewpulsePlugin, seodashPlugin
+- Add all to plugins array
+- File: `/home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs`
+
+### Verification
+
+**REQ-6**: Verify build succeeds
+- Command: `cd examples/sunrise-yoga && npm run build`
+- Must complete without errors
+- If plugin fails, remove from config and document failure
 
 ## Success Criteria
 
-- [x] Requirements extracted and documented (this file)
-- [ ] Admin page_load returns valid blocks (not blank)
-- [ ] view_members works with 0 members (empty list, no crash)
-- [ ] view_plans works with 0 plans (empty list, no crash)
-- [ ] view_settings returns a settings form
-- [ ] Zero banned pattern violations
-- [ ] Committed and pushed to git
-
-## Technical Constraints
-
-### Block Kit Response Format
-All admin handlers must return:
-```typescript
-{
-  blocks: [ /* array of Block Kit blocks */ ],
-  toast?: { message: string, type: "success" | "error" },
-}
-```
-
-**Valid Block Types:** header, section, stats, table, form, actions, context, divider, fields
-
-**Reference:** `/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md`, Lines 1015-1047
-
-### Sandbox Environment Rules
-- Plugin runs in sandboxed Worker isolate
-- No access to `rc.user`, `rc.pathParams`, `throw new Response`
-- All KV operations are async and may return `null`
-- Must use `ctx.kv.get<T>()` with type hints
-
-### Known Working Pattern (from EventDash)
-```typescript
-if (interaction.type === "page_load" && interaction.page === "/events") {
-  const events = await getAllEventsWithDates(ctx);
-  const eventRows = [];
-
-  for (const event of events) {
-    eventRows.push({ /* ... */ });
-  }
-
-  return {
-    blocks: [
-      { type: "header", text: "Events" },
-      { type: "stats", stats: [ /* ... */ ] },
-      { type: "table", columns: [ /* ... */ ], rows: eventRows },
-    ],
-  };
-}
-```
+- [ ] All plugin entrypoints use file path, not npm alias (REQ-1, REQ-2, REQ-3, REQ-4)
+- [ ] All 6 available plugins registered in astro.config.mjs (REQ-5)
+- [ ] `npm run build` succeeds (REQ-6)
+- [ ] Changes committed and pushed
 
 ## Files to Modify
 
-- **Primary:** `/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts`
-  - Lines 2202-2525: Admin handler section
-  - Line 2511: Default return statement (empty blocks)
-  - Lines 2211-2321: Members page handler
-  - Lines 2385-2428: Plans page handler
+1. `/home/agent/shipyard-ai/plugins/commercekit/src/index.ts` - REQ-1
+2. `/home/agent/shipyard-ai/plugins/formforge/src/index.ts` - REQ-2
+3. `/home/agent/shipyard-ai/plugins/reviewpulse/src/index.ts` - REQ-3
+4. `/home/agent/shipyard-ai/plugins/seodash/src/index.ts` - REQ-4
+5. `/home/agent/shipyard-ai/examples/sunrise-yoga/astro.config.mjs` - REQ-5
 
-## Related Documentation
+## Reference Implementation
 
-- **PRD:** `/home/agent/shipyard-ai/prds/membership-hotfix.md`
-- **Emdash Guide (Block Kit):** `/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md` (Section 6: Plugin System, Lines 1015-1047)
-- **Project Rules:** `/home/agent/shipyard-ai/CLAUDE.md` (Lines 158-177: Emdash CMS Reference)
-- **Working Example:** `/home/agent/shipyard-ai/plugins/eventdash/src/sandbox-entry.ts` (Lines 2862-2939)
+Working pattern from `/home/agent/shipyard-ai/plugins/membership/src/index.ts`:
 
-## Risk Assessment
+```typescript
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+import type { PluginDescriptor } from "emdash";
 
-| Risk | Severity | Mitigation |
-|---|---|---|
-| Breaking existing members/plans pages | MEDIUM | Test all existing admin pages after changes |
-| KV null states causing new crashes | MEDIUM | Add comprehensive null guards with fallbacks |
-| Incorrect Block Kit format | LOW | Follow EMDASH-GUIDE.md examples exactly |
-| Regression in production | HIGH | This is a hotfix for live site - test thoroughly |
+export function membershipPlugin(): PluginDescriptor {
+	const currentDir = dirname(fileURLToPath(import.meta.url));
+	const entrypointPath = join(currentDir, "sandbox-entry.ts");
 
-## Token Budget
+	return {
+		id: "membership",
+		version: "1.0.0",
+		format: "standard",
+		entrypoint: entrypointPath, // ✓ File path (works on Cloudflare)
+		// ... rest of config
+	};
+}
+```
 
-**Hotfix Tier:** 100K tokens
-**Current Usage:** ~54K tokens (research phase)
-**Remaining:** ~46K tokens (implementation + review + deploy)
+## Excluded Plugins
+
+- **adminpulse**: No TypeScript implementation (PHP plugin)
+- **forge**: No plugin descriptor exists (incomplete implementation)
+
+## Verification Steps
+
+1. Check imports added: `fileURLToPath`, `dirname`, `join`
+2. Check entrypoint path resolution logic present
+3. Check all 6 plugins imported in astro.config.mjs
+4. Check all 6 plugins in plugins array
+5. Run build: `cd examples/sunrise-yoga && npm run build`
+6. Verify build completes without errors
+7. Commit changes
+
+## Dependencies
+
+- Emdash plugin system (via EMDASH-GUIDE.md Section 6)
+- Cloudflare Workers bundler behavior
+- Astro build pipeline
+
+## Research Findings
+
+Per Codebase Scout Report:
+- All 4 broken plugins have sandbox-entry.ts files present ✓
+- Working pattern proven in membership and eventdash plugins ✓
+- Plugin export function names verified ✓
+- No critical blockers identified ✓
 
 ---
 

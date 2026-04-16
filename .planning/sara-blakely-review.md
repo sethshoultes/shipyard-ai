@@ -1,21 +1,31 @@
-# Sara Blakely Gut Check — Phase 1 Plan
+# Sara Blakely Review — Phase 1 Plan
 
 ## Would a customer pay for this?
-No. This is fixing broken shit they already paid for.
+
+No. This is plumbing. Zero customer-facing value. Internal tech debt fix.
 
 ## What's confusing? What makes someone bounce?
-Nothing confusing. It's a hotfix. Either it fixes the crashes or it doesn't.
+
+- **Too much process porn**: 400 lines for 5 file edits. Commit messages longer than code changes.
+- **Wave 1/Wave 2 theater**: All tasks are copy-paste identical. No real dependencies. Just do them.
+- **Risk section overkill**: "HIGH RISK: Untested Plugin Integration" for... adding 4 import lines? Come on.
 
 ## 30-second elevator pitch
-"Your membership plugin is broken. Can't see settings, crashes on member list. Two bugs, two null guards, one dashboard handler. Ships in 30 minutes."
+
+"We're fixing a bug so our plugins work on Cloudflare Workers instead of crashing. It's a find-replace across 4 files. Takes 10 minutes."
 
 ## What would you test first with $0 budget?
-Click the admin page. Does it load? Click members. Does it crash? That's it. No users, no funnel.
+
+Nothing to test. This isn't a product. It's a hotfix. Run the build, ship it, move on.
 
 ## What's the retention hook?
-Wrong question. This isn't a product. It's emergency surgery on a broken plugin blocking revenue on yoga.shipyard.company.
 
-## Honest feedback
-Plan is fine. Over-engineered for a 2-line fix. Don't need 4 tasks and waves for adding null guards and a page handler. Just fix it, commit once, test once, ship.
+Wrong question. This is infrastructure. Users don't see it.
 
-Stop treating production hotfixes like product launches.
+**The real question**: Why did this break? Why does the same pattern exist in 4 plugins? Sounds like copy-paste architecture. Fix the root cause or you'll be back here in 2 months.
+
+## Bottom line
+
+Plan is technically correct but drowning in ceremony. You don't need a 400-line battle plan for a 4-file find-replace.
+
+Cut 80% of the words. Ship it today. Spend saved time figuring out why this pattern exists 4 times instead of once.
