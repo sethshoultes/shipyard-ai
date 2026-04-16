@@ -21,6 +21,7 @@
 		"@astrojs/react": "^5.0.0",
 		"@emdash-cms/cloudflare": "^0.1.0",
 		"@shipyard/membership": "file:../../plugins/membership",
+		"@shipyard/eventdash": "file:../../plugins/eventdash",
 		"astro": "^6.1.2",
 		"better-sqlite3": "^11.10.0",
 		"emdash": "^0.1.0",
