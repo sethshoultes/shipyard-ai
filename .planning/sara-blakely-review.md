@@ -1,29 +1,43 @@
-# Sara Blakely Review: EventDash Fix Plan
+# Sara Blakely Gut Check — Phase 1 Plan
 
-**Would a customer pay?** No. This isn't a product — it's technical debt cleanup. No customer wakes up wanting "fewer banned patterns."
+## Would a real customer pay for this?
 
-**What's confusing?**
-- 95 violations → 133 lines. Where'd the code go? Did you delete features or just fluff?
-- "Already fixed" but making a 6-task plan to verify? Just run the damn tests.
-- Wave 1, 2, 3 for what? Grep, compile, write docs? This is 30 minutes of work stretched into a process.
+**Maybe. But not yet.**
 
-**30-second pitch:**
-"We broke our own rules 95 times. We're fixing the code so it follows platform patterns. Zero new features. Zero customer impact. Just compliance."
+You're solving a real problem: restaurant owners drowning in metrics, not acting on them. But you're adding 18 features before proving ONE works. Weekly journal? Badges? SMS? You're building Duolingo for restaurants before showing me the notification drives opens.
 
-**$0 marketing test:**
-Can't test compliance. Either it works or it doesn't. Run the build, load the plugin, create an event. If it doesn't crash, ship it.
+## What's confusing? What would make someone bounce?
 
-**Retention hook:**
-None. Customers don't know or care about "throw new Response" vs return objects. If the plugin works exactly the same, this is invisible.
+- **Too many notifications.** Daily emails, weekly digests, "all quiet" messages, badge unlocks, journal prompts, cliffhangers. That's 6+ message types. I'd unsubscribe.
+- **Badge thresholds aren't set yet** (Open Question #2). You can't ship badges without knowing if 500 visits is too easy or impossible.
+- **Who asked for a journal?** This feels like feature creep. You're collecting proprietary data, not solving a customer pain.
+- **SMS opt-in friction.** Asking for phone number = trust barrier. You need email proof first.
 
-**Gut check:**
-You're treating routine maintenance like it's a product launch. The work is done — file went from 3,442 lines to 133. Just verify it compiles and works. This plan has more documentation tasks than code changes.
+## 30-second elevator pitch (rewrite yours)
 
-**What I'd do:**
-1. Run TypeScript build
-2. Load plugin in staging
-3. Create/list/view one event
-4. Ship if it works
-5. Write one commit message
+"LocalGenius sends restaurant owners one email each week: what's working, what's not, what to do next. No dashboard login. No noise. Just clarity."
 
-Six tasks, three waves, requirements matrix for internal refactoring? The codebase needed a surgeon. This plan brought a committee.
+*That's it. Kill the badges, journal, SMS, cliffhangers. Ship the notification first. Prove open rate >40%. Then add.*
+
+## What would you test first with $0 marketing budget?
+
+- Send 100 existing users ONE email next Monday: "Your Google listing got 340 visits this week (up 22%). Your top review mentions 'ambiance.' Want to double down?"
+- Measure: open rate, click rate, reply rate.
+- If <30% open it, the problem isn't real.
+- If >50% open it, *then* build Wave 2.
+
+## What's the retention hook?
+
+**Week-over-week trends.** That's your moat. "Up 22% from last week" → dopamine → return user.
+
+But badges? Journal prompts? Those are engagement theater. Nobody shares "I got 500 visits." They share revenue.
+
+---
+
+## Bottom line:
+
+You're building Phase 1 like it's Phase 3. Strip it to notification + trends. Ship in 5 days. Prove opens. Then earn the right to build badges.
+
+Your 10-14 day timeline is a lie. You have 4 decision blockers unresolved. SMS isn't configured. Badge thresholds aren't calibrated. This ships in 3-4 weeks minimum, not 2.
+
+**Cut scope or miss deadline. Your choice.**

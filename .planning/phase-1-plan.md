@@ -1,688 +1,991 @@
-# Phase 1 Plan — Fix EventDash 95 Banned Pattern Violations
+# Phase 1 Plan — LocalGenius Engagement System (Pulse)
 
-**Generated**: 2026-04-16
-**Requirements**: `/home/agent/shipyard-ai/prds/fix-eventdash-violations.md`
-**Decisions**: `/home/agent/shipyard-ai/rounds/eventdash-fix/decisions.md`
-**Project**: fix-eventdash-violations
-**Total Tasks**: 6
-**Waves**: 3
-
-## Executive Summary
-
-**Current Status**: EventDash plugin violations appear to have been fixed. Research shows the file has been reduced from 3,442 lines to 133 lines with grep verification showing 0 violations.
-
-**Mission**: Verify all fixes are complete, ensure TypeScript compilation succeeds, validate against reference implementation (membership plugin with 0 violations), document changes, and prepare for deployment.
-
-**Scope**: Single file (`plugins/eventdash/src/sandbox-entry.ts`) with mechanical pattern replacements. **CRITICAL: Do NOT rewrite business logic** - these are mechanical find-and-replace fixes only.
-
-**Reference**: Emdash Guide Section 6 (Plugin System, lines 899-1158) and membership plugin at `plugins/membership/src/sandbox-entry.ts` (3,640 lines, 0 violations)
+**Generated:** 2026-04-18  
+**Requirements:** /home/agent/shipyard-ai/.planning/REQUIREMENTS.md  
+**Total Tasks:** 18  
+**Waves:** 3  
+**Estimated Duration:** 10-14 days
 
 ---
 
 ## Requirements Traceability
 
-| Requirement | Task(s) | Wave | Status |
-|-------------|---------|------|--------|
-| REQ-001: Eliminate `throw new Response` (121→0) | phase-1-task-1 | 1 | ✓ COMPLETE |
-| REQ-002: Remove `JSON.stringify` from KV.set (153→0) | phase-1-task-1 | 1 | ✓ COMPLETE |
-| REQ-003: Remove `JSON.parse` from KV.get (153→0) | phase-1-task-1 | 1 | ✓ COMPLETE |
-| REQ-004: Remove `rc.user` auth checks (16→0) | phase-1-task-1 | 1 | ✓ COMPLETE |
-| REQ-005: Replace `rc.pathParams` with `rc.input` (5→0) | phase-1-task-1 | 1 | ✓ COMPLETE |
-| Verify TypeScript compilation | phase-1-task-2 | 2 | PENDING |
-| Compare with membership reference | phase-1-task-3 | 2 | PENDING |
-| Run functional validation | phase-1-task-4 | 2 | PENDING |
-| Document changes | phase-1-task-5 | 3 | PENDING |
-| Create commit (if needed) | phase-1-task-6 | 3 | PENDING |
+| Requirement | Task(s) | Wave | Files Changed |
+|-------------|---------|------|---------------|
+| **Daily Notifications** | | | |
+| REQ-001: Email infrastructure | phase-1-task-001 | 1 | +notifications/sender.js, +api/notifications.js |
+| REQ-002: SMS via Twilio | phase-1-task-002 | 1 | +notifications/sms-sender.js, +api/sms.js |
+| REQ-003: Midnight batch generator | phase-1-task-003 | 1 | +notifications/generator.js, +jobs/notification-batch.js |
+| REQ-004: Scheduled delivery | phase-1-task-004 | 2 | +jobs/scheduled-delivery.js |
+| REQ-005: "All Quiet" notifications | phase-1-task-005 | 2 | ~notifications/templates/quiet.js |
+| REQ-006: Preferences UI | phase-1-task-006 | 2 | +components/NotificationPreferences.jsx, +api/preferences.js |
+| **Milestone Badges** | | | |
+| REQ-007: Badge detection | phase-1-task-007 | 1 | +badges/checker.js, +jobs/badge-checker.js |
+| REQ-008: Badge definitions | phase-1-task-008 | 1 | +migrations/006_badge_definitions.sql |
+| REQ-009: Badge image generation | phase-1-task-009 | 2 | +badges/image-generator.js, +jobs/badge-image-gen.js |
+| REQ-010: Social share | phase-1-task-010 | 2 | +components/BadgeUnlockModal.jsx |
+| REQ-011: Confetti animation | phase-1-task-011 | 2 | ~components/BadgeUnlockModal.jsx (CSS) |
+| REQ-012: Badge gallery | phase-1-task-012 | 3 | +components/BadgeGallery.jsx, +api/achievements.js |
+| **Journal & Trends** | | | |
+| REQ-013: Journal prompt | phase-1-task-013 | 1 | +journal/prompt.js, ~digest/templates.js |
+| REQ-014: Journal storage | phase-1-task-014 | 1 | +journal/storage.js, +api/journal.js |
+| REQ-016: Trend narratives | phase-1-task-015 | 1 | +trends/calculator.js, ~digest/generator.js |
+| REQ-020: Cliffhanger | phase-1-task-016 | 1 | +notifications/templates/cliffhanger.js |
+| **Infrastructure** | | | |
+| Database migrations | phase-1-task-017 | 1 | +migrations/*.sql |
+| Analytics & tracking | phase-1-task-018 | 2 | +analytics/tracker.js |
 
 ---
 
 ## Wave Execution Order
 
-### Wave 1 (Parallel) — Pattern Verification
+### Wave 1: Foundation (Independent, Parallel Execution)
+**Tasks:** 10  
+**Duration:** 5-7 days  
+**Parallelizable:** Yes
 
-<task-plan id="phase-1-task-1" wave="1">
-  <title>Verify All Banned Patterns Eliminated</title>
-  <requirement>REQ-001 through REQ-005: All 95 violations must be eliminated from sandbox-entry.ts</requirement>
-  <description>
-    Run comprehensive grep verification to confirm zero occurrences of all 5 banned patterns.
-    According to the PRD, the file originally had 95 violations. Research indicates the file has been
-    reduced from 3,442 lines to 133 lines. This task verifies the fixes are complete and no violations remain.
-  </description>
+Tasks: phase-1-task-001, 002, 003, 007, 008, 013, 014, 015, 016, 017
 
-  <context>
-    <file path="/home/agent/shipyard-ai/plugins/eventdash/src/sandbox-entry.ts" reason="Main file that was fixed - verify all patterns eliminated" />
-    <file path="/home/agent/shipyard-ai/prds/fix-eventdash-violations.md" reason="Lists all 5 banned patterns and verification commands (lines 14-92)" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6 Plugin System - defines correct patterns for sandboxed plugins (lines 899-1158)" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Reference implementation with 0 violations (3,640 lines)" />
-  </context>
+### Wave 2: Integration (Depends on Wave 1)
+**Tasks:** 6  
+**Duration:** 4-5 days  
+**Parallelizable:** Yes
 
-  <steps>
-    <step order="1">Run grep verification for all 5 patterns using the compound command from PRD line 89:
-    ```bash
-    grep -c "throw new Response\|rc\.user\|rc\.pathParams\|JSON\.stringify.*kv\|kv\.set.*JSON\.stringify" plugins/eventdash/src/sandbox-entry.ts
-    ```
-    Expected result: 0
-    </step>
+Tasks: phase-1-task-004, 005, 006, 009, 010, 011, 018
 
-    <step order="2">Verify individual patterns with detailed output to ensure no false negatives:
-    ```bash
-    grep -n "throw new Response" plugins/eventdash/src/sandbox-entry.ts
-    grep -n "rc\.user" plugins/eventdash/src/sandbox-entry.ts
-    grep -n "rc\.pathParams" plugins/eventdash/src/sandbox-entry.ts
-    grep -n "JSON\.stringify.*kv" plugins/eventdash/src/sandbox-entry.ts
-    grep -n "kv\.set.*JSON\.stringify" plugins/eventdash/src/sandbox-entry.ts
-    ```
-    All commands must return empty (no matches)
-    </step>
+### Wave 3: Polish (Depends on Wave 2)
+**Tasks:** 2  
+**Duration:** 1-2 days  
+**Parallelizable:** Yes
 
-    <step order="3">Check for acceptable JSON.parse usage (legacy data handling):
-    ```bash
-    grep -n "JSON\.parse" plugins/eventdash/src/sandbox-entry.ts
-    ```
-    May show 1 match in parseEvent() helper for legacy data compatibility (this is intentional)
-    </step>
-
-    <step order="4">Verify correct patterns are in place by spot-checking:
-    - Error handling: `return { error: "...", status: 404 }` instead of throw Response
-    - KV storage: `ctx.kv.set(key, object)` without JSON.stringify wrapper
-    - KV retrieval: `ctx.kv.get&lt;Type&gt;(key)` without JSON.parse wrapper
-    - Input access: Uses `routeCtx.input` not `rc.pathParams`
-    - No auth checks: Framework handles auth before handler execution
-    </step>
-
-    <step order="5">Document verification results:
-    - Total violations found (should be 0)
-    - File size change (3,442 lines → current size)
-    - Any edge cases identified (e.g., parseEvent helper)
-    - Confirmation that patterns match Emdash guide requirements
-    </step>
-  </steps>
-
-  <verification>
-    <check type="command">grep -c "throw new Response\|rc\.user\|rc\.pathParams\|JSON\.stringify.*kv\|kv\.set.*JSON\.stringify" plugins/eventdash/src/sandbox-entry.ts | grep -q "^0$" && echo "PASS: Zero violations" || echo "FAIL: Violations remain"</check>
-    <check type="manual">Review grep output to confirm no false positives/negatives</check>
-    <check type="manual">Verify any JSON.parse found is in parseEvent() helper for legacy data (acceptable)</check>
-  </verification>
-
-  <dependencies>
-    <!-- Independent - Wave 1 -->
-  </dependencies>
-
-  <commit-message>
-    N/A - verification only, no code changes
-  </commit-message>
-</task-plan>
+Tasks: phase-1-task-012
 
 ---
 
-### Wave 2 (Parallel, after Wave 1) — Build & Validation
+## XML Task Plans
 
-<task-plan id="phase-1-task-2" wave="2">
-  <title>Verify TypeScript Compilation</title>
-  <requirement>Success Criteria from PRD line 107: TypeScript compiles without errors</requirement>
+
+### Wave 1 (Parallel)
+
+<task-plan id="phase-1-task-001" wave="1">
+  <title>Email Notification Infrastructure Setup</title>
+  <requirement>REQ-001: Establish email notification delivery system integrating with Resend</requirement>
   <description>
-    Run TypeScript compiler to ensure all pattern fixes maintain type safety and the plugin builds successfully.
-    The simplified file should compile cleanly with proper types for all handlers and data structures.
-    Per Emdash Guide § 6, sandboxed plugins must use correct definePlugin() signature and handler types.
+    Set up email notification sender that integrates with LocalGenius's existing Resend provider.
+    Create notification sending infrastructure with error handling, delivery tracking, and retry logic.
+    Supports inline templates for insight, badge, journal, and cliffhanger notifications.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/eventdash/src/sandbox-entry.ts" reason="Source file to compile" />
-    <file path="/home/agent/shipyard-ai/plugins/eventdash/package.json" reason="Build scripts and TypeScript configuration" />
-    <file path="/home/agent/shipyard-ai/plugins/eventdash/tsconfig.json" reason="TypeScript compiler settings (if exists)" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Plugin type signatures reference (lines 1080-1158)" />
+    <file path="/home/agent/localgenius/src/services/email.ts" reason="Existing Resend integration pattern to follow" />
+    <file path="/home/agent/localgenius/src/db/schema.ts" reason="notifications table schema (lines 186-196 in decisions.md)" />
+    <file path="/home/agent/localgenius/package.json" reason="Verify resend dependency exists" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.1 - notification requirements" />
   </context>
 
   <steps>
-    <step order="1">Navigate to eventdash plugin directory:
-    ```bash
-    cd /home/agent/shipyard-ai/plugins/eventdash
-    ```
-    </step>
-
-    <step order="2">Check if dependencies are installed:
-    ```bash
-    test -d node_modules && echo "Dependencies installed" || echo "Need npm install"
-    ```
-    </step>
-
-    <step order="3">Install dependencies if needed:
-    ```bash
-    npm install
-    ```
-    </step>
-
-    <step order="4">Run TypeScript compilation check (no emit, just type checking):
-    ```bash
-    npx tsc --noEmit src/sandbox-entry.ts 2>&1 | tee ts-check.log
-    ```
-    </step>
-
-    <step order="5">Check compilation result:
-    ```bash
-    tail -20 ts-check.log
-    ```
-    Should show no errors, or only warnings if any
-    </step>
-
-    <step order="6">If build script exists, run it:
-    ```bash
-    npm run build 2>&1 | tee build.log
-    ```
-    </step>
-
-    <step order="7">Document compilation results:
-    - TypeScript version used
-    - Any errors found
-    - Any warnings found
-    - Build output (if build script ran)
-    - Pass/fail status
-    </step>
+    <step order="1">Create /src/services/notifications/email-sender.ts with sendNotificationEmail() function</step>
+    <step order="2">Implement template rendering for 4 notification types (insight, badge, journal_prompt, cliffhanger)</step>
+    <step order="3">Add error handling with exponential backoff retry (max 3 attempts)</step>
+    <step order="4">Add delivery tracking: update notifications.sent_at timestamp on success</step>
+    <step order="5">Create email templates in /src/services/notifications/templates/email/ directory</step>
+    <step order="6">Add click tracking: append ?notification_id={id} to all email links</step>
   </steps>
 
   <verification>
-    <check type="build">npx tsc --noEmit src/sandbox-entry.ts MUST exit 0</check>
-    <check type="manual">Review ts-check.log for any type errors</check>
-    <check type="manual">If build script exists, verify dist/output created</check>
+    <check type="build">npm run typecheck</check>
+    <check type="test">npm run test -- --grep "email.*notification"</check>
+    <check type="manual">Send test notification to real email address, verify receipt within 60 seconds</check>
+    <check type="manual">Verify click tracking updates notifications.clicked field</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Must verify patterns before testing compilation" />
+    <!-- No dependencies - Wave 1 foundation -->
   </dependencies>
 
-  <commit-message>
-    N/A - verification only, no code changes
-  </commit-message>
+  <commit-message>feat(notifications): add email notification infrastructure
+
+- Implement Resend-based email sender for Pulse notifications
+- Add 4 notification templates (insight, badge, journal, cliffhanger)
+- Include retry logic and delivery tracking
+- Add click tracking for engagement metrics
+
+Addresses REQ-001 from localgenius-engagement-system PRD
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
----
-
-<task-plan id="phase-1-task-3" wave="2">
-  <title>Compare with Membership Reference Implementation</title>
-  <requirement>Reference from PRD line 96: Membership plugin (0 violations) as correct pattern example</requirement>
+<task-plan id="phase-1-task-002" wave="1">
+  <title>SMS Notification via Twilio Setup</title>
+  <requirement>REQ-002: Establish SMS notification delivery system via Twilio with TCPA compliance</requirement>
   <description>
-    Compare eventdash sandbox-entry.ts patterns with membership plugin to ensure consistency.
-    Membership plugin has 3,640 lines with 0 violations and demonstrates all correct patterns.
-    Per PRD: "Use it as a reference for correct patterns."
+    Integrate Twilio SMS provider for sending SMS notifications. Include explicit opt-in tracking,
+    carrier deliverability monitoring, and cost tracking. Ensures TCPA compliance per Section II.5 decisions.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/eventdash/src/sandbox-entry.ts" reason="File to validate against reference" />
-    <file path="/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts" reason="Reference implementation with correct patterns (lines 1-100 for patterns)" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Section 6: Plugin System - official pattern documentation (lines 1020-1047 for Block Kit)" />
-    <file path="/home/agent/shipyard-ai/prds/fix-eventdash-violations.md" reason="PRD examples of correct patterns (lines 24-84)" />
+    <file path="/home/agent/localgenius/package.json" reason="Verify twilio dependency exists (line 46)" />
+    <file path="/home/agent/localgenius/.env.example" reason="Check for Twilio credential placeholders" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.5 - SMS locked as must-have, Section V Risk 1" />
+    <file path="/home/agent/localgenius/src/db/schema.ts" reason="Add sms_opt_in field to users table" />
   </context>
 
   <steps>
-    <step order="1">Extract and compare error handling patterns:
-    ```bash
-    echo "=== EventDash Error Handling ==="
-    grep -A2 "error:" plugins/eventdash/src/sandbox-entry.ts | head -20
-
-    echo "=== Membership Error Handling (reference) ==="
-    grep -A2 "error:" plugins/membership/src/sandbox-entry.ts | head -20
-    ```
-    Both should use plain object returns, not Response throws
-    </step>
-
-    <step order="2">Compare KV.set patterns:
-    ```bash
-    echo "=== EventDash KV.set ==="
-    grep "kv\.set" plugins/eventdash/src/sandbox-entry.ts
-
-    echo "=== Membership KV.set (reference) ==="
-    grep "kv\.set" plugins/membership/src/sandbox-entry.ts | head -10
-    ```
-    Verify neither uses JSON.stringify wrapper
-    </step>
-
-    <step order="3">Compare KV.get patterns:
-    ```bash
-    echo "=== EventDash KV.get ==="
-    grep "kv\.get" plugins/eventdash/src/sandbox-entry.ts
-
-    echo "=== Membership KV.get (reference) ==="
-    grep "kv\.get" plugins/membership/src/sandbox-entry.ts | head -10
-    ```
-    Verify both use typed retrieval without JSON.parse
-    </step>
-
-    <step order="4">Compare input parameter access:
-    ```bash
-    echo "=== EventDash Input Access ==="
-    grep "routeCtx\.input\|rc\.input" plugins/eventdash/src/sandbox-entry.ts | head -10
-
-    echo "=== Membership Input Access (reference) ==="
-    grep "routeCtx\.input\|rc\.input" plugins/membership/src/sandbox-entry.ts | head -10
-    ```
-    Verify both use routeCtx.input or rc.input, not rc.pathParams
-    </step>
-
-    <step order="5">Check for auth patterns (should be absent):
-    ```bash
-    echo "=== EventDash Auth Checks (should be 0) ==="
-    grep -c "rc\.user\|user\s*=.*rc\." plugins/eventdash/src/sandbox-entry.ts
-
-    echo "=== Membership Auth Checks (should be 0) ==="
-    grep -c "rc\.user\|user\s*=.*rc\." plugins/membership/src/sandbox-entry.ts
-    ```
-    Both should return 0 (framework handles auth)
-    </step>
-
-    <step order="6">Compare handler signatures:
-    ```bash
-    echo "=== EventDash Handler Signatures ==="
-    grep "handler.*async" plugins/eventdash/src/sandbox-entry.ts | head -5
-
-    echo "=== Membership Handler Signatures (reference) ==="
-    grep "handler.*async" plugins/membership/src/sandbox-entry.ts | head -5
-    ```
-    Both should use: `handler: async (routeCtx, ctx) =&gt; {...}`
-    </step>
-
-    <step order="7">Document comparison results:
-    - Pattern consistency assessment
-    - Any differences found and why they exist
-    - Confirmation both comply with Emdash Guide § 6
-    - Notes on any legitimate differences (different plugin functionality)
-    </step>
+    <step order="1">Create /src/services/notifications/sms-sender.ts with sendNotificationSMS() function</step>
+    <step order="2">Add database migration for users.sms_opt_in boolean field (default false)</step>
+    <step order="3">Implement Twilio client initialization with credentials from environment variables</step>
+    <step order="4">Add opt-in check: only send SMS if user.sms_opt_in === true</step>
+    <step order="5">Implement SMS template rendering (max 160 chars per message)</step>
+    <step order="6">Add cost tracking: log each SMS sent with estimated cost ($0.03/message)</step>
+    <step order="7">Create /src/api/settings/sms-opt-in route for user preference management</step>
   </steps>
 
   <verification>
-    <check type="manual">Review comparison output to confirm pattern consistency</check>
-    <check type="manual">Verify any differences are due to plugin functionality, not pattern violations</check>
-    <check type="manual">Confirm eventdash matches Emdash guide requirements from Section 6</check>
+    <check type="build">npm run typecheck</check>
+    <check type="test">npm run test -- --grep "sms.*notification"</check>
+    <check type="manual">Send test SMS to real phone number with opt-in=true, verify receipt</check>
+    <check type="manual">Verify SMS NOT sent when opt-in=false</check>
+    <check type="manual">Check Twilio dashboard shows successful delivery and cost</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Must verify patterns before comparing with reference" />
+    <!-- No dependencies - Wave 1 foundation -->
   </dependencies>
 
-  <commit-message>
-    N/A - verification only, no code changes
-  </commit-message>
+  <commit-message>feat(notifications): add SMS notification via Twilio
+
+- Implement Twilio SMS sender with TCPA-compliant opt-in
+- Add sms_opt_in field to users table
+- Include cost tracking and delivery monitoring
+- Create SMS template renderer (160 char limit)
+
+Addresses REQ-002, Section II.5 decision (Steve wins - SMS in v1)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
----
-
-<task-plan id="phase-1-task-4" wave="2">
-  <title>Run Functional Validation Tests</title>
-  <requirement>Verify admin page loads and event CRUD operations work correctly</requirement>
+<task-plan id="phase-1-task-003" wave="1">
+  <title>Midnight UTC Batch Notification Generator</title>
+  <requirement>REQ-003: Pre-compute daily notifications at midnight UTC to prevent 9am traffic spike</requirement>
   <description>
-    Test the eventdash plugin functionality to ensure pattern fixes didn't break business logic.
-    Per PRD line 20: "Fix the patterns. Keep all business logic exactly as-is."
-    Validate: route signatures correct, data flows logical, Block Kit responses well-formed.
+    Create midnight batch job that generates all notifications for the next day, stores them with
+    scheduled_for timestamp, and queues for delivery at user's preferred time. Implements Elon's
+    architecture decision from Section II.3 - prevents 9am bottleneck by pre-computing asynchronously.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/eventdash/src/sandbox-entry.ts" reason="Plugin routes to test" />
-    <file path="/home/agent/shipyard-ai/prds/fix-eventdash-violations.md" reason="CRITICAL: Do NOT rewrite - fixes must preserve business logic (line 18-20)" />
-    <file path="/home/agent/shipyard-ai/rounds/eventdash-fix/decisions.md" reason="Decision log emphasizes mechanical fixes only (lines 73-78)" />
-    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Block Kit admin UI spec (lines 1015-1047)" />
+    <file path="/home/agent/localgenius/src/db/schema.ts" reason="notifications table schema with scheduled_for field" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.3 - locked technical decision on batch approach" />
+    <file path="/home/agent/shipyard-ai/deliverables/localgenius-benchmark-engine/jobs/daily-sync.ts" reason="Existing cron job pattern to follow" />
+    <file path="/home/agent/localgenius/src/services/analytics/metrics.ts" reason="Data source for notification content generation" />
   </context>
 
   <steps>
-    <step order="1">Review the routes defined in sandbox-entry.ts:
-    ```bash
-    grep -A3 "routes:" plugins/eventdash/src/sandbox-entry.ts
-    ```
-    Should show: events (public), createEvent, admin
-    </step>
-
-    <step order="2">Verify route handler signatures match Emdash plugin API:
-    ```bash
-    grep "handler.*async.*routeCtx.*ctx" plugins/eventdash/src/sandbox-entry.ts
-    ```
-    All routes should follow: `handler: async (routeCtx: any, ctx: any) =&gt; { ... }`
-    </step>
-
-    <step order="3">Trace data flow for event creation (createEvent route):
-    - Read handler implementation
-    - Verify input validation: title and date required
-    - Verify UUID generation: crypto.randomUUID()
-    - Verify event object: {id, title, date, description, createdAt}
-    - Verify KV storage: ctx.kv.set(`event:${id}`, event) - NO JSON.stringify
-    - Verify response: { ok: true, event }
-    </step>
-
-    <step order="4">Trace data flow for event listing (events route):
-    - Read handler implementation
-    - Verify loadEvents(ctx.kv) helper called
-    - Verify parseEvent() handles legacy double-serialized data
-    - Verify sorting by date: localeCompare
-    - Verify response: { events: Event[] }
-    </step>
-
-    <step order="5">Trace admin UI Block Kit response (admin route):
-    - Verify handles page_load and block_actions interaction types
-    - Verify supports /events and /create pages
-    - Verify form submission via action handlers
-    - Verify toast notifications structure
-    - Verify navigation between pages
-    - Confirm Block Kit JSON structure per Emdash Guide § 6
-    </step>
-
-    <step order="6">Check parseEvent() helper for legacy data:
-    ```bash
-    grep -A10 "function parseEvent" plugins/eventdash/src/sandbox-entry.ts
-    ```
-    Should handle both string (old double-serialized) and object (new) formats
-    </step>
-
-    <step order="7">Document functional validation results:
-    - All routes callable without errors
-    - Data flow logical and complete
-    - Business logic preserved from original
-    - No functionality lost in pattern fixes
-    - Block Kit responses well-formed
-    </step>
+    <step order="1">Create /src/jobs/notification-generator.ts with generateDailyNotifications() function</step>
+    <step order="2">Query all active users with last_active_at within 90 days</step>
+    <step order="3">For each user, fetch analytics data and determine if meaningful insight exists</step>
+    <step order="4">Generate notification content: insight (if data exists) or "all quiet" (if no data)</step>
+    <step order="5">Insert notification into notifications table with scheduled_for = user's preferred time (default 9am local)</step>
+    <step order="6">Implement deduplication: check existing notifications for today before inserting</step>
+    <step order="7">Add dead man's switch: log completion timestamp, alert if job doesn't finish by 1am UTC</step>
+    <step order="8">Create Vercel cron config in vercel.json for daily midnight UTC execution</step>
   </steps>
 
   <verification>
-    <check type="manual">Review handler signatures match Emdash plugin API</check>
-    <check type="manual">Trace input validation logic is intact</check>
-    <check type="manual">Verify KV operations use correct patterns (direct object storage)</check>
-    <check type="manual">Confirm Block Kit admin responses match guide format</check>
-    <check type="manual">Check parseEvent() helper correctly handles legacy data</check>
+    <check type="build">npm run typecheck</check>
+    <check type="test">npm run test -- --grep "notification.*generator"</check>
+    <check type="manual">Run generator manually for 100 test users, verify <2 minute completion time</check>
+    <check type="manual">Check notifications table: exactly 1 notification per user, no duplicates</check>
+    <check type="manual">Verify scheduled_for timestamps match user timezone preferences</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Must verify patterns before testing functionality" />
+    <!-- No dependencies - Wave 1 foundation -->
   </dependencies>
 
-  <commit-message>
-    N/A - verification only, no code changes
-  </commit-message>
+  <commit-message>feat(notifications): add midnight UTC batch generator
+
+- Implement pre-computed notification generation (Elon's architecture)
+- Generate notifications at midnight UTC for next-day delivery
+- Include deduplication logic to prevent duplicate notifications
+- Add dead man's switch alert for job failure detection
+- Configure Vercel cron for daily execution
+
+Addresses REQ-003, Section II.3 locked decision
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
----
-
-### Wave 3 (After Wave 2) — Documentation & Commit
-
-<task-plan id="phase-1-task-5" wave="3">
-  <title>Document Pattern Fixes and Verification</title>
-  <requirement>Document all changes, verification results, and deployment readiness</requirement>
+<task-plan id="phase-1-task-007" wave="1">
+  <title>Badge Detection & Unlock Logic</title>
+  <requirement>REQ-007: Implement milestone badge achievement detection system</requirement>
   <description>
-    Create comprehensive documentation of the pattern fixes, verification results, and deployment notes.
-    This ensures future maintainers understand what was changed, why, and how to verify compliance.
-    Per Decision Log: "The codebase doesn't need a therapist. It needs a surgeon." - document the surgery.
+    Create system that detects when users hit badge milestones (e.g., "500 visits" = Local Favorite badge).
+    Runs daily as part of digest generation. Checks current metrics against badge thresholds and unlocks
+    new achievements.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/.planning/phase-1-plan.md" reason="This plan - source for documentation" />
-    <file path="/home/agent/shipyard-ai/plugins/eventdash/src/sandbox-entry.ts" reason="File that was fixed" />
-    <file path="/home/agent/shipyard-ai/docs/REQUIREMENTS-TRACEABILITY-MATRIX.md" reason="Requirements documentation from research agent" />
-    <file path="/home/agent/shipyard-ai/prds/fix-eventdash-violations.md" reason="Original PRD" />
-    <file path="/home/agent/shipyard-ai/rounds/eventdash-fix/decisions.md" reason="Decision log" />
+    <file path="/home/agent/localgenius/src/db/schema.ts" reason="achievements table schema (lines 209-216 in decisions.md)" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.2 - badge requirements, Open Question #2 for thresholds" />
+    <file path="/home/agent/localgenius/src/services/analytics/metrics.ts" reason="Data source for milestone metrics" />
   </context>
 
   <steps>
-    <step order="1">Create verification summary document at `.planning/eventdash-fix-verification.md`:
-    - Pattern verification results (all 5 patterns with grep counts)
-    - TypeScript compilation status
-    - Reference comparison summary
-    - Functional validation findings
-    - File size change (before → after)
-    - Violation count change (95 → 0)
-    - Timestamp of verification
-    </step>
-
-    <step order="2">Document correct patterns for future reference:
-    ```markdown
-    ## Correct Patterns for Emdash Sandboxed Plugins
-
-    ### 1. Error Handling
-    ❌ WRONG: throw new Response(JSON.stringify({error: "..."}), {status: 404})
-    ✅ CORRECT: return { error: "...", status: 404 }
-
-    ### 2. KV Storage
-    ❌ WRONG: await ctx.kv.set(key, JSON.stringify(value))
-    ✅ CORRECT: await ctx.kv.set(key, value)
-
-    ### 3. KV Retrieval
-    ❌ WRONG: const data = JSON.parse(await ctx.kv.get(key))
-    ✅ CORRECT: const data = await ctx.kv.get&lt;Type&gt;(key)
-
-    ### 4. Authentication
-    ❌ WRONG: if (!rc.user) throw new Response(...)
-    ✅ CORRECT: Delete - framework handles auth before handler
-
-    ### 5. Route Parameters
-    ❌ WRONG: const id = rc.pathParams?.id
-    ✅ CORRECT: const input = routeCtx.input; const id = input.id
-    ```
-    </step>
-
-    <step order="3">Create deployment checklist:
-    ```markdown
-    ## Deployment Readiness Checklist
-
-    - [x] All 5 banned patterns eliminated (verified via grep)
-    - [x] TypeScript compilation succeeds
-    - [x] Patterns match membership reference
-    - [x] Business logic preserved
-    - [ ] Backup file preserved (if applicable)
-    - [ ] Staging deployment tested
-    - [ ] Production deployment approved
-    ```
-    </step>
-
-    <step order="4">Add code comment to parseEvent() if not already present:
-    ```typescript
-    /**
-     * Safely parse an event value that may be double-serialized (old data) or an object (new data).
-     * NOTE: The JSON.parse here is intentional for legacy data compatibility.
-     * This is NOT a violation - it handles backward compatibility with old KV data
-     * that was stored with JSON.stringify before the platform handled serialization.
-     */
-    function parseEvent(value: unknown): Event | null {
-      // ... existing implementation ...
-    }
-    ```
-    </step>
-
-    <step order="5">Document scope boundaries for future work:
-    ```markdown
-    ## Scope: What Was Changed
-    - ✅ Transport layer patterns (throw Response → return object)
-    - ✅ Serialization patterns (remove JSON.stringify/parse wrappers)
-    - ✅ Auth patterns (remove redundant checks)
-    - ✅ Input access patterns (rc.pathParams → routeCtx.input)
-
-    ## Scope: What Was Preserved
-    - ✅ All business logic (event CRUD operations)
-    - ✅ Data model (Event interface, KV key schema)
-    - ✅ UI structure (Block Kit admin responses)
-    - ✅ Functionality (create, list, view events)
-
-    ## Out of Scope (Deferred to v2)
-    - ❌ Product rename to "Gather"
-    - ❌ Sunrise Yoga integration (separate PR per decisions.md)
-    - ❌ KV architecture refactor (index by ID, pagination)
-    - ❌ Performance optimizations
-    ```
-    </step>
-
-    <step order="6">Create rollback plan if backup exists:
-    ```bash
-    # Check for backup file
-    ls -la plugins/eventdash/src/sandbox-entry.ts.backup* 2&gt;/dev/null
-
-    # If backup exists, document rollback procedure
-    # If no backup, document that fixes can be reverted via git
-    ```
-    </step>
-
-    <step order="7">Write verification summary to file:
-    ```bash
-    cat &gt; .planning/eventdash-fix-verification.md &lt;&lt;'EOF'
-    # EventDash Pattern Fix Verification
-    [Generated content from steps 1-6]
-    EOF
-    ```
-    </step>
+    <step order="1">Create /src/services/badges/checker.ts with checkBadgeMilestones() function</step>
+    <step order="2">Query user's current metrics: website_visits, reviews_managed, streak_weeks</step>
+    <step order="3">Compare metrics against badge_definitions thresholds (from REQ-008)</step>
+    <step order="4">For each unmet milestone that is now met, insert into achievements table</step>
+    <step order="5">Prevent duplicate unlocks: check existing achievements before inserting</step>
+    <step order="6">Return list of newly unlocked badges for notification generation</step>
+    <step order="7">Create /src/jobs/badge-checker.ts cron job wrapper (runs daily after metrics update)</step>
   </steps>
 
   <verification>
-    <check type="manual">Verification summary document is complete and accurate</check>
-    <check type="manual">Deployment checklist covers all requirements from PRD</check>
-    <check type="manual">Code comment added to parseEvent() explaining intentional JSON.parse</check>
-    <check type="manual">Rollback procedure documented if applicable</check>
+    <check type="build">npm run typecheck</check>
+    <check type="test">npm run test -- --grep "badge.*checker"</check>
+    <check type="manual">Manually trigger badge checker for test user with 500 visits, verify "Local Favorite" unlocks</check>
+    <check type="manual">Run checker again for same user, verify no duplicate badge</check>
+    <check type="manual">Check achievements table: badge unlocked within 24 hours of metric reached</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Must complete verification before documenting" />
-    <depends-on task-id="phase-1-task-2" reason="Must verify compilation before deployment checklist" />
-    <depends-on task-id="phase-1-task-3" reason="Must complete reference comparison before documenting" />
-    <depends-on task-id="phase-1-task-4" reason="Must complete functional validation before deployment" />
+    <!-- No dependencies - Wave 1 foundation -->
   </dependencies>
 
-  <commit-message>
-    docs(eventdash): add pattern fix verification and deployment docs
+  <commit-message>feat(badges): add milestone badge detection system
 
-    Created comprehensive documentation of EventDash pattern fixes:
-    - Verification summary with grep results
-    - Correct pattern reference guide
-    - Deployment readiness checklist
-    - Scope boundaries (what changed, what preserved)
-    - Rollback procedure
+- Implement badge unlock detection based on user metrics
+- Check milestones: website visits, reviews managed, streak weeks
+- Prevent duplicate badge unlocks with database check
+- Add daily cron job for automated badge checking
 
-    Documents compliance with Emdash sandboxed plugin requirements.
+Addresses REQ-007 from localgenius-engagement-system PRD
 
-    Co-Authored-By: Claude Sonnet 4.5 &lt;noreply@anthropic.com&gt;
-  </commit-message>
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
----
-
-<task-plan id="phase-1-task-6" wave="3">
-  <title>Create Commit for EventDash Fixes (If Needed)</title>
-  <requirement>Commit verified fixes if changes exist and haven't been committed</requirement>
+<task-plan id="phase-1-task-008" wave="1">
+  <title>Five Core Badge Definitions</title>
+  <requirement>REQ-008: Define 5 milestone badge types with thresholds and celebratory messaging</requirement>
   <description>
-    Check git status to determine if changes need to be committed. Based on current analysis,
-    the fixes appear to already be applied. This task creates a commit only if changes are
-    uncommitted. Per CLAUDE.md: use conventional commits with Co-Authored-By line.
+    Create badge definitions with unlock criteria, visual messaging, and celebratory copy. Badges: 
+    Getting Started, Review Responder, Local Favorite, Destination Dining, Consistent. Thresholds
+    calibrated per Open Question #2 (must be validated with data before implementation).
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/plugins/eventdash/src/sandbox-entry.ts" reason="Main file with fixes" />
-    <file path="/home/agent/shipyard-ai/.planning/eventdash-fix-verification.md" reason="Verification documentation" />
-    <file path="/home/agent/shipyard-ai/CLAUDE.md" reason="Git commit guidelines (lines 141-168)" />
-    <file path="/home/agent/shipyard-ai/prds/fix-eventdash-violations.md" reason="PRD to reference in commit" />
-    <file path="/home/agent/shipyard-ai/rounds/eventdash-fix/decisions.md" reason="Decisions to reference in commit" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.2 - badge requirements, Open Question #2 for threshold decisions" />
+    <file path="/home/agent/shipyard-ai/prds/localgenius-engagement-system.md" reason="Table at line 112-122 with badge definitions" />
   </context>
 
   <steps>
-    <step order="1">Navigate to repo root and check git status:
-    ```bash
-    cd /home/agent/shipyard-ai
-    git status plugins/eventdash/src/sandbox-entry.ts
-    ```
-    </step>
-
-    <step order="2">Check if file has uncommitted changes:
-    ```bash
-    git diff plugins/eventdash/src/sandbox-entry.ts | wc -l
-    ```
-    If 0, no commit needed. If &gt;0, proceed with commit.
-    </step>
-
-    <step order="3">If changes exist, review the diff:
-    ```bash
-    git diff plugins/eventdash/src/sandbox-entry.ts | head -100
-    ```
-    Verify changes are pattern fixes only, no business logic changes
-    </step>
-
-    <step order="4">If committing, stage the file:
-    ```bash
-    git add plugins/eventdash/src/sandbox-entry.ts
-    ```
-    </step>
-
-    <step order="5">If committing, also stage documentation:
-    ```bash
-    git add .planning/eventdash-fix-verification.md
-    ```
-    </step>
-
-    <step order="6">Create commit with conventional commit format using HEREDOC:
-    ```bash
-    git commit -m "$(cat &lt;&lt;'EOF'
-fix(eventdash): eliminate 95 banned pattern violations in sandbox-entry.ts
-
-Remove all banned patterns from Emdash sandboxed plugin:
-- throw new Response (121 instances) → return error objects
-- JSON.stringify in kv.set (153 instances) → direct object storage
-- JSON.parse from kv.get (153 instances) → typed retrieval
-- rc.user auth checks (16 instances) → framework handles auth
-- rc.pathParams usage (5 instances) → routeCtx.input access
-
-File reduced from 3,442 lines to 133 lines.
-All business logic preserved - mechanical pattern fixes only.
-
-Verified:
-✓ Zero violations via grep
-✓ TypeScript compilation succeeds
-✓ Patterns match membership reference implementation
-✓ Business logic intact (event CRUD functionality)
-
-Reference: /home/agent/shipyard-ai/prds/fix-eventdash-violations.md
-Decisions: /home/agent/shipyard-ai/rounds/eventdash-fix/decisions.md
-Emdash Guide § 6 (Plugin System)
-
-Co-Authored-By: Claude Sonnet 4.5 &lt;noreply@anthropic.com&gt;
-EOF
-)"
-    ```
-    </step>
-
-    <step order="7">If no changes to commit, document current status:
-    ```bash
-    echo "EventDash fixes already committed. Current state: 0 violations verified." | tee -a .planning/eventdash-fix-verification.md
-    ```
-    </step>
-
-    <step order="8">Verify commit if created:
-    ```bash
-    git log -1 --stat | head -30
-    ```
-    Review commit message and files changed
-    </step>
+    <step order="1">Create database migration /migrations/006_badge_definitions.sql</step>
+    <step order="2">Create badge_definitions table with fields: badge_type, threshold_metric, threshold_value, title, message, icon_url</step>
+    <step order="3">Insert 5 badge definitions (PENDING Open Question #2 resolution):</step>
+    <step order="4">  - "getting_started": First week completed, "Your first week! You're already ahead of most restaurants."</step>
+    <step order="5">  - "review_responder": 50 reviews managed, "50 reviews, 50 thoughtful responses. Your reputation is growing."</step>
+    <step order="6">  - "local_favorite": 500 website visitors, "500 visits! You're becoming a neighborhood go-to."</step>
+    <step order="7">  - "destination_dining": 1000 website visitors, "1000 visits. People are seeking you out."</step>
+    <step order="8">  - "consistent": 4-week streak, "4 weeks of engagement. Consistency builds trust."</step>
+    <step order="9">Copy must be reviewed by Steve for brand voice approval</step>
   </steps>
 
   <verification>
-    <check type="command">git status | grep -q "nothing to commit\|Changes to be committed" && echo "PASS" || echo "Unexpected git state"</check>
-    <check type="manual">If committed, verify git log shows conventional commit format with fix: prefix</check>
-    <check type="manual">If committed, verify Co-Authored-By line present</check>
-    <check type="manual">If no commit, verify verification doc notes fixes already committed</check>
+    <check type="build">npm run db:migrate</check>
+    <check type="manual">Query badge_definitions table, verify 5 badges inserted with correct thresholds</check>
+    <check type="manual">Verify Steve has approved all badge messaging copy</check>
+    <check type="manual">Check that thresholds are calibrated (not too easy, not impossible) based on existing user data</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-5" reason="Must complete documentation before committing" />
+    <!-- No dependencies - Wave 1 foundation -->
   </dependencies>
 
-  <commit-message>fix(eventdash): eliminate 95 banned pattern violations in sandbox-entry.ts
+  <commit-message>feat(badges): define 5 core milestone badges
 
-Remove all banned patterns from Emdash sandboxed plugin:
-- throw new Response (121 instances) → return error objects
-- JSON.stringify in kv.set (153 instances) → direct object storage
-- JSON.parse from kv.get (153 instances) → typed retrieval
-- rc.user auth checks (16 instances) → framework handles auth
-- rc.pathParams usage (5 instances) → routeCtx.input access
+- Create badge_definitions table and migration
+- Insert 5 badges: getting_started, review_responder, local_favorite, destination_dining, consistent
+- Include warm, celebratory messaging per Steve's brand voice
+- Thresholds calibrated based on user data analysis
 
-File reduced from 3,442 lines to 133 lines.
-All business logic preserved - mechanical pattern fixes only.
+Addresses REQ-008, resolves Open Question #2
 
-Verified:
-✓ Zero violations via grep
-✓ TypeScript compilation succeeds
-✓ Patterns match membership reference implementation
-✓ Business logic intact (event CRUD functionality)
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
 
-Reference: /home/agent/shipyard-ai/prds/fix-eventdash-violations.md
-Decisions: /home/agent/shipyard-ai/rounds/eventdash-fix/decisions.md
-Emdash Guide § 6 (Plugin System)
+<task-plan id="phase-1-task-013" wave="1">
+  <title>Weekly Journal Prompt Notification</title>
+  <requirement>REQ-013: Generate weekly journal prompt notification asking "What worked this week?"</requirement>
+  <description>
+    Send weekly prompt (Sunday evening or Monday morning per user timezone) asking "What worked this week?"
+    Inline in weekly digest email. Includes skip option but tracks completion for product iteration.
+    Creates proprietary training data per Jensen's moat argument.
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.3 - journal as must-have, Jensen endorsement in Section 10" />
+    <file path="/home/agent/shipyard-ai/prds/localgenius-engagement-system.md" reason="Section 4.2 - journal mechanics and UI" />
+    <file path="/home/agent/localgenius/src/services/digest/generator.ts" reason="Existing weekly digest generation to integrate with" />
+  </context>
+
+  <steps>
+    <step order="1">Create /src/services/journal/prompt.ts with generateJournalPrompt() function</step>
+    <step order="2">Add journal prompt to weekly digest template (inline, not separate email)</step>
+    <step order="3">Include simple text input field in digest email for one-tap response</step>
+    <step order="4">Add "Skip" button that logs skip event to analytics</step>
+    <step order="5">Create journal prompt notification type in notifications table</step>
+    <step order="6">Schedule journal prompt for Sunday evening or Monday morning per user timezone</step>
+    <step order="7">Track completion rate: log journal_prompt_shown and journal_entry_created events</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run typecheck</check>
+    <check type="test">npm run test -- --grep "journal.*prompt"</check>
+    <check type="manual">Trigger weekly digest for test user, verify journal prompt appears inline</check>
+    <check type="manual">Submit journal entry via digest email, verify entry saved to database</check>
+    <check type="manual">Check analytics: journal prompt completion rate >40%</check>
+  </verification>
+
+  <dependencies>
+    <!-- No dependencies - Wave 1 foundation -->
+  </dependencies>
+
+  <commit-message>feat(journal): add weekly journal prompt to digest
+
+- Implement weekly journal prompt inline in digest email
+- Add "What worked this week?" question with text input
+- Include skip tracking for product iteration
+- Schedule for Sunday evening/Monday morning per user timezone
+
+Addresses REQ-013, Jensen's moat strategy (Section 10)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-014" wave="1">
+  <title>Journal Entry Storage & CRUD</title>
+  <requirement>REQ-014: Implement journal entry persistence and retrieval system</requirement>
+  <description>
+    Create system to store user's journal entries, append-only. Support create, read (single entry + 
+    history view), update (add notes to existing entry), delete (soft delete). Provides foundation
+    for proprietary training data pipeline.
+  </description>
+
+  <context>
+    <file path="/home/agent/localgenius/src/db/schema.ts" reason="journal_entries table schema (lines 198-206 in decisions.md)" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.3 - journal requirements" />
+  </context>
+
+  <steps>
+    <step order="1">Create database migration for journal_entries table: business_id, week, tags[], note, created_at</step>
+    <step order="2">Add index on (business_id, week) for efficient queries</step>
+    <step order="3">Create /src/services/journal/storage.ts with CRUD functions</step>
+    <step order="4">Implement createJournalEntry(businessId, week, note) function</step>
+    <step order="5">Implement getJournalEntry(businessId, week) function</step>
+    <step order="6">Implement getJournalHistory(businessId, limit) function for historical entries</step>
+    <step order="7">Implement updateJournalEntry(id, note) function for adding notes</step>
+    <step order="8">Implement softDeleteJournalEntry(id) function (sets deleted_at timestamp)</step>
+    <step order="9">Create /src/api/journal routes for API access</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run typecheck && npm run db:migrate</check>
+    <check type="test">npm run test -- --grep "journal.*storage"</check>
+    <check type="manual">Create journal entry via API, verify stored in database</check>
+    <check type="manual">Retrieve journal history, verify returns all entries in chronological order</check>
+    <check type="manual">Query single entry, verify <100ms response time</check>
+  </verification>
+
+  <dependencies>
+    <!-- No dependencies - Wave 1 foundation -->
+  </dependencies>
+
+  <commit-message>feat(journal): add journal entry storage and CRUD
+
+- Create journal_entries table with migration
+- Implement CRUD operations: create, read, update, soft delete
+- Add API routes for journal entry management
+- Include efficient indexing for query performance
+
+Addresses REQ-014 from localgenius-engagement-system PRD
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-015" wave="1">
+  <title>Trend Narratives with Week-over-Week Comparisons</title>
+  <requirement>REQ-016: Add week-over-week percentage deltas to metrics in weekly digest</requirement>
+  <description>
+    Enhance weekly digest with % change for each metric vs. previous week. Example: "340 website visits 
+    (up 22% from last week)". Uses SQL window functions (LAG/LEAD) for calculation. Replaces snapshot
+    metrics with stories per Section II.7.
+  </description>
+
+  <context>
+    <file path="/home/agent/localgenius/src/services/digest/generator.ts" reason="Existing digest generation to enhance" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.4 - trend narrative requirements" />
+    <file path="/home/agent/shipyard-ai/prds/localgenius-engagement-system.md" reason="Section 4.4 - examples of trend narratives" />
+  </context>
+
+  <steps>
+    <step order="1">Create /src/services/trends/calculator.ts with calculateTrends() function</step>
+    <step order="2">Query metrics for current week and previous week using SQL window functions</step>
+    <step order="3">Calculate WoW percentage delta: ((current - previous) / previous) * 100</step>
+    <step order="4">Handle edge cases: zero baseline (show absolute value), missing data (skip comparison)</step>
+    <step order="5">Format trend narrative: "340 visits (up 22% from last week)" or "down 15%" or "unchanged"</step>
+    <step order="6">Add sparkline generation for visual trend representation (optional)</step>
+    <step order="7">Integrate trend calculator into weekly digest generation</step>
+    <step order="8">Ensure trend calculations complete in <500ms</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run typecheck</check>
+    <check type="test">npm run test -- --grep "trend.*calculator"</check>
+    <check type="manual">Generate digest for test user with known metrics, verify WoW % is correct</check>
+    <check type="manual">Test edge case: user with zero visits previous week, verify correct handling</check>
+    <check type="manual">Measure trend calculation time, verify <500ms for 10 metrics</check>
+  </verification>
+
+  <dependencies>
+    <!-- No dependencies - Wave 1 foundation -->
+  </dependencies>
+
+  <commit-message>feat(trends): add week-over-week trend narratives
+
+- Implement trend calculator with WoW percentage deltas
+- Use SQL window functions for efficient metric comparison
+- Handle edge cases: zero baseline, missing data
+- Integrate trend narratives into weekly digest
+- Performance optimized: <500ms calculation time
+
+Addresses REQ-016, Section II.4 (turn data into stories)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-016" wave="1">
+  <title>Weekly Cliffhanger Template & Copy</title>
+  <requirement>REQ-020: Create weekly cliffhanger content at end of digest email</requirement>
+  <description>
+    Add 1-2 sentence forward hook to end of weekly digest. Examples: "Next week, I'm trying a different 
+    post style. I'll let you know if it works." Tone: First person (AI speaking), curious, experimental, 
+    never promises. Per Shonda Rhimes endorsement: "turns a report into a story."
+  </description>
+
+  <context>
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.5 - cliffhanger requirements, Shonda's endorsement" />
+    <file path="/home/agent/shipyard-ai/prds/localgenius-engagement-system.md" reason="Section 4.5 - cliffhanger examples and tone" />
+    <file path="/home/agent/localgenius/src/services/digest/templates.ts" reason="Digest template to append cliffhanger to" />
+  </context>
+
+  <steps>
+    <step order="1">Create /src/services/notifications/templates/cliffhanger.ts with generateCliffhanger() function</step>
+    <step order="2">Create 5-10 cliffhanger templates with placeholders for context</step>
+    <step order="3">  Example: "Next week, I'm trying a different post style. I'll let you know if it works."</step>
+    <step order="4">  Example: "I noticed competitors are doing X. I'm going to test something."</step>
+    <step order="5">  Example: "Your best week was [date]. I'm studying what worked."</step>
+    <step order="6">Implement context-aware selection logic based on user's journal notes, achievements, trends</step>
+    <step order="7">Append cliffhanger to end of weekly digest template (after all metrics)</step>
+    <step order="8">Ensure tone is first-person, curious, never promises (uses "testing," "trying")</step>
+    <step order="9">Submit all cliffhanger copy to Steve for brand voice approval</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run typecheck</check>
+    <check type="test">npm run test -- --grep "cliffhanger"</check>
+    <check type="manual">Generate digest with cliffhanger, verify appears at end of email</check>
+    <check type="manual">Verify tone is warm, first-person, creates anticipation</check>
+    <check type="manual">Confirm Steve has approved all cliffhanger copy</check>
+    <check type="manual">A/B test: measure re-engagement rate with vs. without cliffhanger</check>
+  </verification>
+
+  <dependencies>
+    <!-- No dependencies - Wave 1 foundation -->
+  </dependencies>
+
+  <commit-message>feat(cliffhanger): add weekly cliffhanger to digest
+
+- Implement cliffhanger generator with context-aware templates
+- Add 5-10 cliffhanger templates in warm, first-person tone
+- Append cliffhanger to end of weekly digest email
+- Copy approved by Steve for brand voice consistency
+
+Addresses REQ-020, Shonda Rhimes endorsement (Section 10)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-017" wave="1">
+  <title>Database Migrations for Pulse Tables</title>
+  <requirement>Database schema changes for notifications, journal_entries, achievements tables</requirement>
+  <description>
+    Create all database migrations for Pulse 3-table architecture per Elon's locked decision (Section II.2).
+    Includes notifications table, journal_entries table, achievements table, and supporting indexes.
+  </description>
+
+  <context>
+    <file path="/home/agent/localgenius/src/db/schema.ts" reason="Existing schema to extend" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section III - complete table definitions (lines 186-217)" />
+    <file path="/home/agent/localgenius/drizzle.config.ts" reason="Migration configuration" />
+  </context>
+
+  <steps>
+    <step order="1">Create /migrations/001_create_notifications_table.sql</step>
+    <step order="2">  Add fields: id, user_id, type, content, scheduled_for, sent_at, clicked, created_at</step>
+    <step order="3">  Add index on (user_id, scheduled_for) for efficient queue queries</step>
+    <step order="4">Create /migrations/002_create_journal_entries_table.sql</step>
+    <step order="5">  Add fields: id, business_id, week, tags[], note, created_at</step>
+    <step order="6">  Add index on (business_id, week) for efficient queries</step>
+    <step order="7">Create /migrations/003_create_achievements_table.sql</step>
+    <step order="8">  Add fields: id, user_id, badge_type, unlocked_at, image_url, shared</step>
+    <step order="9">  Add index on (user_id, badge_type, unlocked_at)</step>
+    <step order="10">Create /migrations/004_add_user_preferences.sql</step>
+    <step order="11">  Add fields to users: sms_opt_in, notification_time, notification_frequency, preferred_channels</step>
+    <step order="12">Run all migrations via npm run db:migrate</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run db:migrate</check>
+    <check type="manual">Query database schema, verify all 3 tables exist with correct columns</check>
+    <check type="manual">Verify indexes created correctly via EXPLAIN queries</check>
+    <check type="manual">Check foreign key constraints are valid</check>
+  </verification>
+
+  <dependencies>
+    <!-- No dependencies - Wave 1 foundation -->
+  </dependencies>
+
+  <commit-message>feat(database): add Pulse 3-table schema migrations
+
+- Create notifications table with scheduled delivery support
+- Create journal_entries table for proprietary training data
+- Create achievements table for milestone badges
+- Add user preference fields for notification settings
+- Include efficient indexes for query performance
+
+Addresses Elon's locked architecture decision (Section II.2)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+### Wave 2 (Parallel, after Wave 1)
+
+<task-plan id="phase-1-task-004" wave="2">
+  <title>Scheduled Notification Delivery Queue</title>
+  <requirement>REQ-004: Flush pre-computed notifications to users at their preferred time</requirement>
+  <description>
+    Queue system that takes pre-computed notifications from notifications table and delivers them at 
+    user's preferred scheduled_for timestamp. Respects user timezone preferences. Runs every 10 minutes
+    to find notifications ready for delivery.
+  </description>
+
+  <context>
+    <file path="/home/agent/localgenius/src/services/notifications/email-sender.ts" reason="Email sender from task-001" />
+    <file path="/home/agent/localgenius/src/services/notifications/sms-sender.ts" reason="SMS sender from task-002" />
+    <file path="/home/agent/localgenius/src/db/schema.ts" reason="notifications table with scheduled_for field" />
+  </context>
+
+  <steps>
+    <step order="1">Create /src/jobs/scheduled-delivery.ts with flushNotificationQueue() function</step>
+    <step order="2">Query notifications table: WHERE scheduled_for <= NOW() AND sent_at IS NULL</step>
+    <step order="3">For each notification, determine delivery channel (email, SMS, or both)</step>
+    <step order="4">Call appropriate sender function (email-sender.ts or sms-sender.ts)</step>
+    <step order="5">Update sent_at timestamp on successful delivery</step>
+    <step order="6">Handle partial failure: if email succeeds but SMS fails, still mark email as sent</step>
+    <step order="7">Configure Vercel cron to run this job every 10 minutes</step>
+    <step order="8">Add monitoring: alert if queue grows >1000 pending notifications</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run typecheck</check>
+    <check type="test">npm run test -- --grep "scheduled.*delivery"</check>
+    <check type="manual">Insert test notification with scheduled_for = NOW(), wait 10 minutes, verify delivery</check>
+    <check type="manual">Verify delivery within 5 minutes of scheduled_for timestamp</check>
+    <check type="manual">Check user timezone conversion accuracy (off by <1 minute)</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-001" reason="Requires email sender" />
+    <depends-on task-id="phase-1-task-002" reason="Requires SMS sender" />
+    <depends-on task-id="phase-1-task-003" reason="Requires batch generator to populate queue" />
+  </dependencies>
+
+  <commit-message>feat(notifications): add scheduled delivery queue
+
+- Implement 10-minute cron job to flush notification queue
+- Deliver notifications at user's preferred scheduled_for time
+- Handle multi-channel delivery (email + SMS)
+- Add monitoring for queue backlog alerts
+
+Addresses REQ-004 from localgenius-engagement-system PRD
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-005" wave="2">
+  <title>"All Quiet" Reassurance Notification</title>
+  <requirement>REQ-005: Generate reassurance notifications when no meaningful insights exist</requirement>
+  <description>
+    When user's business has no new activities/metrics to report, send warm "All quiet today" notification
+    instead of silence. Communicates that system is still monitoring. Include frequency cap (max 2x/week)
+    per Open Question #3 recommendation.
+  </description>
+
+  <context>
+    <file path="/home/agent/localgenius/src/jobs/notification-generator.ts" reason="Batch generator from task-003 to integrate with" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.6 - Steve wins, 'all quiet' is reassurance" />
+  </context>
+
+  <steps>
+    <step order="1">Create /src/services/notifications/templates/quiet.ts with generateQuietNotification() function</step>
+    <step order="2">Add "all quiet" notification type to notifications table enum</step>
+    <step order="3">In notification generator, check if user has zero significant metrics for the day</step>
+    <step order="4">Check last_quiet_notification_sent timestamp: only send if >3 days ago (2x/week cap)</step>
+    <step order="5">Generate warm copy: "All quiet today — your business is steady. I'm still here."</step>
+    <step order="6">Update last_quiet_notification_sent timestamp in user preferences</step>
+    <step order="7">Track "all quiet" open rate separately from insight notifications</step>
+    <step order="8">Submit copy to Steve for brand voice approval</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run typecheck</check>
+    <check type="test">npm run test -- --grep "quiet.*notification"</check>
+    <check type="manual">Trigger generator for user with zero activity, verify "all quiet" notification generated</check>
+    <check type="manual">Run generator 5 days in a row for same user, verify max 2 "all quiet" notifications sent</check>
+    <check type="manual">Check analytics: >30% open rate on "all quiet" messages</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-003" reason="Integrates into batch generator logic" />
+  </dependencies>
+
+  <commit-message>feat(notifications): add "all quiet" reassurance notification
+
+- Implement reassurance notification for zero-activity days
+- Add frequency cap: max 2x/week per user
+- Include warm, non-spammy copy per Steve's brand voice
+- Track open rates separately from insight notifications
+
+Addresses REQ-005, Section II.6 (Steve wins - reassurance not spam)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-006" wave="2">
+  <title>Notification Preference Settings Screen</title>
+  <requirement>REQ-006: Create minimal notification preferences UI (3-5 toggles)</requirement>
+  <description>
+    Add settings screen allowing users to control notification delivery without creating decision fatigue.
+    Include: Time of day, Email vs SMS channel, Frequency (daily vs weekly digest only). Per Section II.8
+    compromise: sensible defaults, 3-5 toggles max, not a "preference center."
+  </description>
+
+  <context>
+    <file path="/home/agent/localgenius/src/components/settings" reason="Existing settings components pattern" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.8 - minimal settings locked decision" />
+  </context>
+
+  <steps>
+    <step order="1">Create /src/components/NotificationPreferences.jsx settings panel component</step>
+    <step order="2">Add time picker: notification_time (default 9am local), dropdown with hourly options</step>
+    <step order="3">Add frequency dropdown: notification_frequency (daily, weekly digest only)</step>
+    <step order="4">Add channel checkboxes: preferred_channels (email, SMS, both) with SMS opt-in disclaimer</step>
+    <step order="5">Create /src/api/settings/notification-preferences route (GET/POST)</step>
+    <step order="6">Persist preferences to users table (fields added in task-017 migration)</step>
+    <step order="7">Add unsubscribe link at bottom: "Pause all notifications" option</step>
+    <step order="8">Ensure UI is clean, minimal, no decision fatigue (3 settings total)</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run build && npm run typecheck</check>
+    <check type="test">npm run test -- --grep "notification.*preferences"</check>
+    <check type="manual">Open settings panel, change notification time to 7pm, verify saved to database</check>
+    <check type="manual">Toggle SMS off, verify no SMS sent in next notification</check>
+    <check type="manual">Check unsubscribe rate stays <5% after launching preferences UI</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-001" reason="Must work with email notification system" />
+    <depends-on task-id="phase-1-task-002" reason="Must work with SMS notification system" />
+    <depends-on task-id="phase-1-task-017" reason="Requires user preference fields in database" />
+  </dependencies>
+
+  <commit-message>feat(settings): add notification preference UI
+
+- Create minimal settings panel with 3-5 toggles (no decision fatigue)
+- Add time picker, frequency dropdown, channel checkboxes
+- Include SMS opt-in disclaimer for TCPA compliance
+- Add unsubscribe/pause option
+- User preferences persist and affect notification delivery
+
+Addresses REQ-006, Section II.8 (Steve + Elon compromise)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-009" wave="2">
+  <title>Async Badge Image Generation</title>
+  <requirement>REQ-009: Generate shareable OG images for badge unlocks asynchronously</requirement>
+  <description>
+    When badge is unlocked, asynchronously generate a branded social media shareable card (OG image) with 
+    badge graphic, user's stats, and LocalGenius branding. Store in S3/CDN. Per Section II.12 locked decision:
+    Elon wins on async generation for performance.
+  </description>
+
+  <context>
+    <file path="/home/agent/localgenius/src/services/badges/checker.ts" reason="Badge checker from task-007" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.12 - async generation locked" />
+    <file path="/home/agent/localgenius/package.json" reason="Check for image generation dependencies (canvas, sharp)" />
+  </context>
+
+  <steps>
+    <step order="1">Create /src/services/badges/image-generator.ts with generateBadgeImage() function</step>
+    <step order="2">Install image generation dependencies if needed: @vercel/og or canvas</step>
+    <step order="3">Design badge card template: 1200x630px OG image with badge icon, stats, branding</step>
+    <step order="4">Generate image asynchronously when achievement unlocked (triggered by badge checker)</step>
+    <step order="5">Upload generated image to S3 or Cloudflare R2</step>
+    <step order="6">Store image URL in achievements.image_url field</step>
+    <step order="7">Add fallback: if custom generation fails, serve generic badge image</step>
+    <step order="8">Cache generated images in CDN for fast serving</step>
+    <step order="9">Create /src/jobs/badge-image-gen.ts for async job queue</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run build && npm run typecheck</check>
+    <check type="test">npm run test -- --grep "badge.*image"</check>
+    <check type="manual">Unlock test badge, verify OG image generated within 5 minutes</check>
+    <check type="manual">Check image resolution suitable for Instagram/Facebook (1200x630px)</check>
+    <check type="manual">Verify fallback generic image served if custom generation fails</check>
+    <check type="manual">Test image generation latency <2 seconds per badge</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-007" reason="Requires badge checker to trigger image generation" />
+    <depends-on task-id="phase-1-task-008" reason="Requires badge definitions for image content" />
+  </dependencies>
+
+  <commit-message>feat(badges): add async badge image generation
+
+- Implement OG image generator for shareable badge cards
+- Generate 1200x630px images with badge icon, stats, branding
+- Upload to S3/R2 and cache in CDN
+- Add fallback generic image for generation failures
+- Async generation prevents unlock latency
+
+Addresses REQ-009, Section II.12 (Elon wins - async approach)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-010" wave="2">
+  <title>One-Tap Badge Share to Social</title>
+  <requirement>REQ-010: Implement one-tap sharing of badge achievements to Instagram/Facebook</requirement>
+  <description>
+    Add share button to badge unlock celebration modal that pre-fills social share text and opens native
+    share UI. Pre-filled copy is warm, celebratory, not overly salesy. Tracks share events for growth
+    metrics validation.
+  </description>
+
+  <context>
+    <file path="/home/agent/localgenius/src/components" reason="Existing React component patterns" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.4 - badges must-have for viral growth" />
+  </context>
+
+  <steps>
+    <step order="1">Create /src/components/BadgeUnlockModal.jsx celebration modal component</step>
+    <step order="2">Display badge icon, title, and celebratory message when badge unlocks</step>
+    <step order="3">Add share button that opens native share UI (Web Share API)</step>
+    <step order="4">Pre-fill share text: "Just hit 1000 website visitors with @LocalGenius 🚀"</step>
+    <step order="5">Include badge OG image URL from achievements.image_url (task-009)</step>
+    <step order="6">Make pre-filled text editable by user before sharing</step>
+    <step order="7">Track share events: POST to /api/achievements/{id}/share when user clicks share</step>
+    <step order="8">Update achievements.shared=true and achievements.shared_at timestamp</step>
+    <step order="9">Fallback for browsers without Web Share API: copy link to clipboard</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run build && npm run typecheck</check>
+    <check type="test">npm run test -- --grep "badge.*share"</check>
+    <check type="manual">Unlock test badge, verify celebration modal appears with share button</check>
+    <check type="manual">Click share button, verify native share UI opens with pre-filled text</check>
+    <check type="manual">Share to social platform, verify share event logged in database</check>
+    <check type="manual">Check analytics: >10% of badge unlocks result in social share</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-007" reason="Requires badge unlock detection" />
+    <depends-on task-id="phase-1-task-008" reason="Requires badge definitions for copy" />
+    <depends-on task-id="phase-1-task-009" reason="Requires badge OG images" />
+  </dependencies>
+
+  <commit-message>feat(badges): add one-tap social sharing
+
+- Create badge unlock celebration modal with share button
+- Pre-fill share text with warm, celebratory copy
+- Use Web Share API for native platform sharing
+- Track share events for growth metrics
+- User can edit pre-filled text before sharing
+
+Addresses REQ-010, Section II.4 (shareable badges must-have)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-011" wave="2">
+  <title>Confetti Animation on Badge Unlock</title>
+  <requirement>REQ-011: Add celebratory confetti animation to badge unlock experience</requirement>
+  <description>
+    When user unlocks a badge, display modal with confetti animation and warm messaging to create dopamine
+    hit and make achievement feel special. Per Section II.2: Steve's celebratory design for emotional peaks.
+  </description>
+
+  <context>
+    <file path="/home/agent/localgenius/src/components/BadgeUnlockModal.jsx" reason="Modal from task-010 to add animation to" />
+  </context>
+
+  <steps>
+    <step order="1">Add confetti animation library: canvas-confetti or react-confetti</step>
+    <step order="2">Trigger confetti animation when BadgeUnlockModal opens</step>
+    <step order="3">Configure animation: 2-3 second duration, colorful particles, celebratory feel</step>
+    <step order="4">Ensure animation doesn't block user interaction (non-blocking)</step>
+    <step order="5">Add dismiss button: user can close modal with one tap</step>
+    <step order="6">Optimize performance: animation maintains >60fps on mobile</step>
+    <step order="7">Add accessibility: motion-reduced media query disables animation for users with vestibular disorders</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run build</check>
+    <check type="manual">Unlock test badge, verify confetti animation plays smoothly</check>
+    <check type="manual">Check animation duration is 2-3 seconds (not too long)</check>
+    <check type="manual">Verify user can dismiss modal with one tap</check>
+    <check type="manual">Test on mobile device: animation maintains >60fps</check>
+    <check type="manual">Enable prefers-reduced-motion, verify animation disabled</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-010" reason="Requires BadgeUnlockModal component" />
+  </dependencies>
+
+  <commit-message>feat(badges): add confetti animation to unlock
+
+- Add celebratory confetti animation when badge unlocks
+- Configure 2-3 second duration with colorful particles
+- Ensure >60fps performance on mobile
+- Add accessibility: respect prefers-reduced-motion
+- Non-blocking: user can dismiss modal immediately
+
+Addresses REQ-011, Steve's emotional peak design (Section II.2)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-018" wave="2">
+  <title>Analytics & Tracking Infrastructure</title>
+  <requirement>REQ-029 through REQ-032: Notification, badge, journal, and upgrade prompt analytics</requirement>
+  <description>
+    Create comprehensive tracking and analytics for all Pulse features. Track notification metrics (send, 
+    open, click, unsubscribe), badge metrics (unlock, share), journal metrics (prompt, completion), and
+    upgrade prompt metrics (impression, click, conversion). Enables product iteration and risk monitoring.
+  </description>
+
+  <context>
+    <file path="/home/agent/localgenius/src/services/analytics" reason="Existing analytics patterns" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section VI - success metrics" />
+  </context>
+
+  <steps>
+    <step order="1">Create /src/services/analytics/pulse-tracker.ts with tracking functions</step>
+    <step order="2">Add notification tracking: opened_at, clicked_at, clicked_url fields to notifications table</step>
+    <step order="3">Track badge metrics: create badge_analytics table with unlock_rate, share_rate</step>
+    <step order="4">Track journal metrics: create journal_analytics table with prompt_shown, completed, skipped</step>
+    <step order="5">Track upgrade prompts: create upgrade_prompt_analytics table with shown_at, clicked_at, converted_at</step>
+    <step order="6">Create aggregation job: daily rollup of all Pulse metrics</step>
+    <step order="7">Create /src/api/analytics/pulse endpoint for dashboard queries</step>
+    <step order="8">Add real-time alerts: unsubscribe rate >10%, open rate <20%, share rate <5%</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run typecheck && npm run db:migrate</check>
+    <check type="test">npm run test -- --grep "analytics.*tracker"</check>
+    <check type="manual">Send test notification, click link, verify click tracked in database</check>
+    <check type="manual">Unlock badge, share to social, verify share tracked</check>
+    <check type="manual">Query analytics dashboard, verify real-time metrics available</check>
+    <check type="manual">Check alerts trigger correctly when thresholds exceeded</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-001" reason="Tracks email notifications" />
+    <depends-on task-id="phase-1-task-002" reason="Tracks SMS notifications" />
+    <depends-on task-id="phase-1-task-007" reason="Tracks badge unlocks" />
+    <depends-on task-id="phase-1-task-013" reason="Tracks journal prompts" />
+  </dependencies>
+
+  <commit-message>feat(analytics): add Pulse tracking infrastructure
+
+- Implement comprehensive tracking for all Pulse features
+- Track notification metrics: send, open, click, unsubscribe
+- Track badge metrics: unlock, share rate
+- Track journal metrics: prompt completion
+- Track upgrade prompt metrics: impression, conversion
+- Add daily aggregation job and real-time alerts
+
+Addresses REQ-029 through REQ-032 from PRD
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+### Wave 3 (Parallel, after Wave 2)
+
+<task-plan id="phase-1-task-012" wave="3">
+  <title>Badge Gallery in Account Settings</title>
+  <requirement>REQ-012: Create badge collection display in user settings</requirement>
+  <description>
+    Add section to account settings showing all unlocked badges (and locked/upcoming badges as greyed out).
+    Browsable, shareable collection of achievements. Each badge card shows unlock date and has share button.
+  </description>
+
+  <context>
+    <file path="/home/agent/localgenius/src/components/settings" reason="Existing settings components" />
+    <file path="/home/agent/localgenius/src/services/badges/checker.ts" reason="Badge data source" />
+  </context>
+
+  <steps>
+    <step order="1">Create /src/components/BadgeGallery.jsx gallery component</step>
+    <step order="2">Query all badges: both unlocked (from achievements) and locked (from badge_definitions)</step>
+    <step order="3">Display badges in grid layout with badge icon, title, unlock date (or "Locked")</step>
+    <step order="4">For locked badges, show progression: "350/500 visits — 70% to Local Favorite"</step>
+    <step order="5">Add share button to each unlocked badge card</step>
+    <step order="6">Create /src/api/achievements/gallery endpoint: returns locked + unlocked badges</step>
+    <step order="7">Optimize query performance: gallery loads in <1 second</step>
+    <step order="8">Add badge collection page route: /settings/badges</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run build && npm run typecheck</check>
+    <check type="test">npm run test -- --grep "badge.*gallery"</check>
+    <check type="manual">Open badge gallery, verify all badges displayed (locked + unlocked)</check>
+    <check type="manual">Check locked badges show progression toward unlock</check>
+    <check type="manual">Click share button on unlocked badge, verify share UI opens</check>
+    <check type="manual">Measure gallery load time, verify <1 second</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-007" reason="Requires badge unlock data" />
+    <depends-on task-id="phase-1-task-008" reason="Requires badge definitions" />
+    <depends-on task-id="phase-1-task-009" reason="Requires badge images" />
+    <depends-on task-id="phase-1-task-010" reason="Requires share functionality" />
+  </dependencies>
+
+  <commit-message>feat(badges): add badge gallery to settings
+
+- Create browsable badge collection in account settings
+- Display locked + unlocked badges in grid layout
+- Show progression toward locked badges (e.g., "350/500 visits")
+- Add share button to each unlocked badge
+- Optimize query performance: <1 second load time
+
+Addresses REQ-012 from localgenius-engagement-system PRD
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
@@ -691,185 +994,165 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 
 ## Risk Notes
 
-### Current Status Assessment
+### Infrastructure Dependencies (HIGH PRIORITY)
 
-**Evidence of Completion:**
-- Research agent reports 0 violations via grep verification
-- File reduced from 3,442 lines to 133 lines (96% reduction)
-- Backup file exists: `sandbox-entry.ts.backup-20260416-133535`
-- Patterns match membership reference (per research findings)
+**BLOCKER:** 4 decision blockers must be resolved before Wave 1 execution:
 
-**Primary Risk**: Tasks shift from "fix" to "verify and document" mode since fixes appear complete.
+1. **SMS Provider Choice** (Open Question #1)
+   - **Impact:** Blocks task-002 (SMS infrastructure)
+   - **Recommendation:** Twilio for delivery quality
+   - **Cost Model:** 10K users × 30 SMS/mo × $0.03 = $9K/month
+   - **Decision Needed:** Choose provider and approve budget
 
-### Identified Risks
+2. **Badge Milestone Thresholds** (Open Question #2)
+   - **Impact:** Blocks task-008 (badge definitions)
+   - **Recommendation:** Validate with existing user data before setting thresholds
+   - **Example:** 500 visits = Local Favorite (must confirm this is achievable but not too easy)
+   - **Decision Needed:** Data analysis to calibrate thresholds
 
-1. **Already Fixed Status** (CONFIRMED - LOW RISK)
-   - **Evidence**: Grep verification shows 0 violations
-   - **File reduction**: 3,442 lines → 133 lines (96% smaller)
-   - **Backup preserved**: Original 3,442-line version backed up
-   - **Impact**: Tasks are verification-focused, not implementation-focused
-   - **Action**: Verify compilation, document, prepare for deployment
+3. **"All Quiet" Frequency Cap** (Open Question #3)
+   - **Impact:** Blocks task-005 ("all quiet" notifications)
+   - **Recommendation:** Max 2x/week to prevent over-communication
+   - **Decision Needed:** Steve + Elon approval on frequency
 
-2. **Legacy Data Handling** (ACCEPTABLE - LOW RISK)
-   - **Pattern**: parseEvent() uses JSON.parse for backward compatibility
-   - **Why Needed**: Handles double-serialized old KV data
-   - **Evidence**: Per research, 1 JSON.parse found in helper function
-   - **Mitigation**: Add code comment explaining this is intentional
-   - **Risk Level**: Low - this is correct pattern for legacy data
+4. **Notification Timing** (Open Question #4)
+   - **Impact:** Blocks task-006 (preferences UI)
+   - **Recommendation:** Default 9am local, user override in settings
+   - **Decision Needed:** Product decision on default vs. customization balance
 
-3. **TypeScript Compilation** (MEDIUM RISK)
-   - **Concern**: 96% line reduction might indicate type issues
-   - **Evidence**: Dramatic simplification from original
-   - **Mitigation**: Wave 2 includes full compilation verification
-   - **Risk Level**: Medium until verified
-   - **Action**: Test build in task 2 before declaring success
+### Technical Risks
 
-4. **Business Logic Preservation** (MEDIUM RISK)
-   - **Concern**: Event CRUD functionality must work identically
-   - **Evidence**: Pattern fixes should be mechanical per PRD line 20
-   - **Mitigation**: Wave 2 functional validation task
-   - **Risk Level**: Medium until traced
-   - **Action**: Trace data flows, verify handlers intact
+1. **Midnight Batch Job Failure** (Section V Risk 4)
+   - **Mitigation:** Dead man's switch in task-003, redundancy at 2am UTC
+   - **Alert:** If job doesn't complete by 1am UTC
 
-5. **Deployment Readiness** (LOW RISK)
-   - **Concern**: Need staging test before production
-   - **Evidence**: Per decisions.md line 127, staging env needed
-   - **Mitigation**: Document deployment checklist in task 5
-   - **Risk Level**: Low - standard deployment practice
-   - **Action**: Include staging verification in deployment docs
+2. **SMS Compliance** (Section V Risk 1)
+   - **Mitigation:** Explicit opt-in in task-002, TCPA-compliant templates
+   - **Monitoring:** Track delivery rates, carrier filtering
 
-### Success Criteria Summary
+3. **Badge Image Generation Latency** (Section V Risk 3)
+   - **Mitigation:** Async generation in task-009, fallback generic image
+   - **Target:** <5min generation, <2sec per image
 
-**Phase 1 Complete When:**
-- ✓ All 5 banned patterns eliminated (verified via grep = 0)
-- ✓ TypeScript compilation succeeds with no errors
-- ✓ Patterns match membership reference implementation
-- ✓ Business logic preserved (event CRUD works)
-- ✓ Documentation complete (verification summary, deployment checklist)
-- ✓ Commit created if needed (with conventional message)
+4. **Notification Fatigue** (Section V Risk 2)
+   - **Mitigation:** Frequency caps in task-005, unsubscribe flow in task-006
+   - **Target:** <5% unsubscribe rate
 
-**Ready for Deployment When:**
-- All Wave 3 tasks complete
-- Verification summary reviewed and approved
-- Staging environment tested (per decisions.md)
-- Production deployment signed off
+### Codebase-Specific Risks (from Risk Scanner Report)
+
+**Critical Finding:** LocalGenius has 4 major infrastructure gaps:
+
+1. **SMS/Twilio Integration** — Zero code exists; needs 2-3 days (task-002)
+2. **Email Service (SendGrid)** — Not configured; needs 2 days (task-001)
+3. **Cron/Scheduler Infrastructure** — Needs external scheduler setup (Vercel cron recommended)
+4. **Badge Image Generation** — No generation code; needs 2 days (task-009)
+
+**Timeline Impact:** 2-week ship date is AT RISK unless infrastructure work (tasks 001, 002, 003, 009) happens in parallel during Wave 1.
 
 ---
 
-## Technical Notes
+## Execution Strategy
 
-### File Size Impact
-- **Before**: 3,442 lines (with 95 violations)
-- **After**: 133 lines (clean implementation)
-- **Reduction**: 96.1% smaller
-- **Implication**: Significant simplification achieved
+### Parallel Execution Plan
 
-### Pattern Compliance Per Emdash Guide § 6
+**Wave 1 (Days 1-7):**
+- Run tasks 001, 002, 003 in parallel (infrastructure foundation)
+- Run tasks 007, 008, 013, 014, 015, 016, 017 in parallel (feature foundations)
+- **Critical Path:** task-003 (batch generator) must complete before Wave 2
 
-According to `/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md` lines 899-1158:
+**Wave 2 (Days 8-12):**
+- Run tasks 004, 005, 006 in parallel (notification delivery)
+- Run tasks 009, 010, 011 in parallel (badge features)
+- Run task-018 (analytics) in parallel
+- **Critical Path:** task-009 (badge images) must complete before Wave 3
 
-**Sandboxed Plugin Requirements:**
-- ✓ Must not use `throw new Response` (use return objects)
-- ✓ Platform handles KV serialization (no manual JSON.stringify/parse)
-- ✓ Framework handles auth before handler execution (no rc.user checks)
-- ✓ Route context provides `routeCtx.input` for parameters (not rc.pathParams)
-- ✓ Block Kit admin UI for sandboxed plugin interfaces
+**Wave 3 (Days 13-14):**
+- Run task-012 (badge gallery) — polish and UI
+- QA, testing, launch preparation
 
-**Plugin Context API:**
-- `ctx.kv` - Key-value store (auto-serializes objects)
-- `ctx.storage` - Plugin document collections
-- `ctx.http` - HTTP client (capability-gated)
-- `ctx.log` - Structured logger
-- `ctx.plugin` - Plugin metadata
+### Resource Allocation
 
-### Reference Implementation
+**Backend Engineers (2):**
+- Engineer A: tasks 001, 002, 003, 004, 005 (notification pipeline)
+- Engineer B: tasks 007, 008, 009, 013, 014, 015, 016 (badges, journal, trends)
 
-Membership plugin (`/home/agent/shipyard-ai/plugins/membership/src/sandbox-entry.ts`):
-- 3,640 lines with 0 violations
-- Demonstrates all correct patterns
-- Uses same plugin context APIs
-- Model for EventDash compliance verification
+**Frontend Engineers (1):**
+- Engineer C: tasks 006, 010, 011, 012 (UI components)
 
----
+**Database Engineer (1):**
+- Engineer D: task-017 (migrations), supports all teams
 
-## Next Steps After Phase 1
-
-### Immediate (v1)
-1. **Deploy to Staging** (if available)
-   - Verify plugin loads without errors
-   - Test event CRUD operations
-   - Validate admin UI renders correctly
-
-2. **Deploy to Production**
-   - After staging verification passes
-   - Monitor for any runtime issues
-   - Track error rates in Cloudflare Workers logs
-
-### Future (v2 - Separate PRs)
-
-Per `/home/agent/shipyard-ai/rounds/eventdash-fix/decisions.md`:
-
-3. **Phase 2**: Sunrise Yoga Integration
-   - Tracked in separate planning document
-   - Different risk profile (integration work)
-   - Decision: "Separate PRs, separate risk profiles"
-
-4. **Version 2 Roadmap**:
-   - Product rename to "Gather" (deferred per decisions.md line 27)
-   - KV architecture refactor (index by ID, pagination per line 59)
-   - UI/UX enhancements
-   - Performance optimizations
-
-### Continuous Compliance
-
-5. **Prevention Measures**:
-   - Add pre-commit hooks to prevent pattern violations
-   - Document banned patterns in plugin README
-   - Reference this plan for future plugin development
-   - Add grep checks to CI/CD pipeline
+**DevOps (1):**
+- Engineer E: Cron setup, monitoring, alerting, S3/CDN configuration
 
 ---
 
-## Verification Commands Reference
+## Success Criteria Validation
 
-### Quick Verification
-```bash
-# Check all violations (must return 0)
-grep -c "throw new Response\|rc\.user\|rc\.pathParams\|JSON\.stringify.*kv\|kv\.set.*JSON\.stringify" \
-  plugins/eventdash/src/sandbox-entry.ts
+At launch, validate these North Star metrics:
 
-# TypeScript check
-cd plugins/eventdash && npx tsc --noEmit src/sandbox-entry.ts
+| Metric | Target | Validation Method |
+|--------|--------|-------------------|
+| **Notification Open Rate** | >40% (email), >70% (SMS) | task-018 analytics |
+| **First-Run Retention** | >60% open Pulse 3+ times in first week | task-018 analytics |
+| **Badge Share Rate** | >10% of unlocks result in social share | task-018 analytics |
+| **Pro Upgrade Rate** | >5% within 30 days | task-018 analytics |
+| **Unsubscribe Rate** | <5% | task-018 analytics |
 
-# Compare with reference
-diff -u \
-  <(grep "kv\.set\|kv\.get" plugins/membership/src/sandbox-entry.ts | head -10) \
-  <(grep "kv\.set\|kv\.get" plugins/eventdash/src/sandbox-entry.ts)
-```
-
-### Individual Pattern Checks
-```bash
-# Pattern 1: throw new Response (should be 0)
-grep -c "throw new Response" plugins/eventdash/src/sandbox-entry.ts
-
-# Pattern 2: JSON.stringify with kv (should be 0)
-grep -c "JSON\.stringify.*kv\|kv\.set.*JSON\.stringify" plugins/eventdash/src/sandbox-entry.ts
-
-# Pattern 3: JSON.parse from kv (should be 0 or 1 in parseEvent)
-grep -c "JSON\.parse" plugins/eventdash/src/sandbox-entry.ts
-
-# Pattern 4: rc.user (should be 0)
-grep -c "rc\.user" plugins/eventdash/src/sandbox-entry.ts
-
-# Pattern 5: rc.pathParams (should be 0)
-grep -c "rc\.pathParams" plugins/eventdash/src/sandbox-entry.ts
-```
+**Failure Conditions (Triggers for Pivot):**
+- <20% notification open rate (we're spam)
+- >10% unsubscribe rate (we're annoying)
+- <2% upgrade conversion (economics don't work)
+- <5% badge share rate (viral hypothesis failed)
 
 ---
 
-*Plan created following GSD (Get Shit Done) methodology with spec-driven planning, XML task format, and wave organization for parallel execution.*
+## Deployment Checklist
 
-*Generated by: agency-plan skill*
-*Requirements source: fix-eventdash-violations PRD*
-*Technical reference: Emdash Guide § 6 (Plugin System)*
-*Decisions source: eventdash-fix/decisions.md*
+Before launching Pulse to production:
+
+- [ ] All 4 decision blockers resolved
+- [ ] All Wave 1 tasks complete and tested
+- [ ] All Wave 2 tasks complete and tested
+- [ ] All Wave 3 tasks complete and tested
+- [ ] Database migrations run successfully
+- [ ] Cron jobs configured and tested
+- [ ] Email/SMS providers configured with production credentials
+- [ ] S3/CDN configured for badge images
+- [ ] Analytics dashboard operational
+- [ ] Monitoring and alerts configured
+- [ ] Steve has approved all copy (notifications, badges, cliffhanger, "all quiet")
+- [ ] Elon has approved architecture and performance benchmarks
+- [ ] Zero P0 bugs in first-run experience
+- [ ] Staging tested with 100 alpha users
+- [ ] Notification open rate >30% in alpha test
+- [ ] SMS delivery rate >95% in alpha test
+- [ ] Badge unlock latency <24 hours in alpha test
+
+---
+
+## Post-Launch Iteration Plan
+
+**Week 1 Post-Launch:**
+- Monitor North Star metrics daily
+- Track unsubscribe rate, alert if >5%
+- A/B test notification copy variants (REQ-034 feature flags)
+- Gather qualitative user feedback
+
+**Week 2-4 Post-Launch:**
+- Calibrate badge thresholds based on unlock rates
+- Adjust "all quiet" frequency if needed
+- Test cliffhanger variants for re-engagement
+- Optimize notification timing based on open rate data
+
+**Nice-to-Have Features (Post-v1):**
+- REQ-036: Multi-channel preference center
+- REQ-037: Additional badge tiers (beyond 5)
+- REQ-038: Advanced journal features (tagging, search, export)
+- REQ-039: Competitive benchmarks (requires cross-restaurant data)
+- REQ-040: Push notifications (requires mobile app)
+
+---
+
+*Phase 1 Plan complete. Ready for agent execution.*
+

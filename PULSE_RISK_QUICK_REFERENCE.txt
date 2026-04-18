@@ -1,0 +1,438 @@
+================================================================================
+PULSE RISK SCANNER: QUICK REFERENCE CARD
+================================================================================
+
+CRITICAL FINDINGS AT A GLANCE
+================================================================================
+
+STATUS: 4 INFRASTRUCTURE GAPS FOUND
+  1. SMS/Twilio Integration — NOT IN CODEBASE
+  2. Email Service — NOT IN CODEBASE  
+  3. Cron Scheduler — NOT CONFIGURED
+  4. Image Generation — SKELETON ONLY
+
+ARCHITECTURE ASSESSMENT: SOUND
+  - 3-table design is elegant (decisions locked)
+  - Pre-computed batch approach is correct
+  - Database schema planned but not implemented
+  - Cloudflare Workers pattern proven (chat.js, daily-sync.ts examples exist)
+
+TIMELINE IMPACT: 2-WEEK SHIP AT RISK
+  - Infrastructure gaps = 30% of implementation effort
+  - Solution: Run DevOps track in parallel (Week 1)
+  - If sequential: Ship date slips to Week 3.5
+
+================================================================================
+FILE REFERENCES
+================================================================================
+
+DECISIONS DOCUMENT (LOCKED - REQUIREMENTS SOURCE):
+  /home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md
+
+RISK ANALYSIS REPORTS CREATED:
+  /home/agent/shipyard-ai/PULSE_RISK_SCANNER_REPORT.md (50 pages, detailed)
+  /home/agent/shipyard-ai/PULSE_IMPLEMENTATION_TECHNICAL_DETAILS.md (40 pages, code examples)
+  /home/agent/shipyard-ai/PULSE_RISK_SUMMARY_EXECUTIVE.md (6 pages, decision-makers)
+  /home/agent/shipyard-ai/PULSE_RISK_QUICK_REFERENCE.txt (this file)
+
+EXISTING CODEBASE REFERENCES:
+  Backend Schema: /home/agent/shipyard-ai/deliverables/localgenius-frontend-launch/backend/db/schema.sql
+  Chat Endpoint: /home/agent/shipyard-ai/deliverables/localgenius-frontend-launch/backend/workers/chat.js
+  FAQ Cache: /home/agent/shipyard-ai/deliverables/localgenius-frontend-launch/backend/workers/faq-cache.js
+  Daily Sync: /home/agent/shipyard-ai/deliverables/localgenius-benchmark-engine/jobs/daily-sync.ts (REFERENCE for batch job pattern)
+  Config: /home/agent/shipyard-ai/deliverables/localgenius-frontend-launch/backend/wrangler.toml
+
+================================================================================
+RISK MATRIX
+================================================================================
+
+RISK 1: SMS Compliance & Deliverability
+  Severity: HIGH | Probability: MEDIUM
+  Status: INFRASTRUCTURE GAP
+  Fix Time: 2-3 days
+  Owner: Elon
+  Blocker: SMS is locked decision — required for v1
+
+RISK 2: Notification Fatigue  
+  Severity: MEDIUM | Probability: MEDIUM
+  Status: DESIGN + IMPLEMENTATION RISK
+  Fix Time: 3-4 days (decision-dependent)
+  Owner: Steve + Elon
+  Blocker: Open decision on "All quiet" frequency cap
+
+RISK 3: Badge Image Generation Latency
+  Severity: LOW | Probability: LOW
+  Status: INFRASTRUCTURE GAP (PARTIAL)
+  Fix Time: 1-2 days
+  Owner: Elon
+  Note: Fallback exists if generation fails
+
+RISK 4: Midnight Batch Job Failure
+  Severity: HIGH | Probability: LOW
+  Status: ARCHITECTURE RISK
+  Fix Time: 2-3 days
+  Owner: Elon
+  Critical: If job fails, 10K users get 0 notifications that day
+
+================================================================================
+INFRASTRUCTURE GAPS (4 CRITICAL)
+================================================================================
+
+GAP 1: Twilio SMS Integration
+  Current: Zero code / configuration
+  Needed: Twilio SDK + phone validator + TCPA audit trail
+  Effort: 2-3 days
+  Cost: $300-500/month for 10K users
+  Decision: SMS provider choice (Twilio vs AWS SNS vs Vonage)
+  Blocker: OPEN DECISION from decisions.md IV.1
+
+GAP 2: Email Service (SendGrid/Postmark)
+  Current: Zero code / configuration
+  Needed: Email provider + 4 templates (insight, badge, quiet, cliffhanger)
+  Effort: 2 days
+  Cost: ~$50/month for 10K users
+  Decision: Which email provider?
+  Blocker: NONE (can use SendGrid, proven service)
+
+GAP 3: Cron/Scheduler Infrastructure
+  Current: Not configured (Cloudflare Workers don't support cron natively)
+  Needed: External scheduler (Vercel Cron / Upstash / AWS EventBridge)
+  Effort: 4-6 hours (mostly configuration)
+  Cost: Included in existing Cloudflare/Vercel bill or ~$20/month
+  Decision: Which scheduler service?
+  Blocker: CRITICAL — without this, notifications never send
+
+GAP 4: Image Generation + CDN
+  Current: R2 binding exists, no generation code
+  Needed: Badge image generator (SVG) + R2 upload + CDN URL generation
+  Effort: 2 days
+  Cost: Included in R2 (S3-compatible storage)
+  Decision: SVG generation or pre-designed templates?
+  Blocker: MEDIUM — badges can't be shared without images
+
+================================================================================
+OPEN DECISIONS (MUST RESOLVE BEFORE BUILD STARTS)
+================================================================================
+
+1. SMS Provider & Cost Model (decisions.md IV.1)
+   Question: Twilio vs AWS SNS vs Vonage?
+   Impact: Budget, compliance strategy, integration complexity
+   Recommendation: Twilio (best-in-class TCPA compliance)
+   Owner: Elon
+   Timeline: DECIDE THIS WEEK
+
+2. "All Quiet" Frequency Cap (decisions.md IV.3)
+   Question: If business quiet for 5 days, send 1 or cap at 2x/week?
+   Impact: Prevents notification fatigue
+   Recommendation: Cap at 2x/week maximum
+   Owner: Steve (brand trust) + Elon (anti-spam)
+   Timeline: DECIDE THIS WEEK
+
+3. Notification Timing (decisions.md IV.4)
+   Question: Default 9am UTC or allow user override? Local or UTC?
+   Impact: How scheduled_for timestamp calculated
+   Recommendation: Default 9am user's local time, allow override
+   Owner: Steve + Elon
+   Timeline: DECIDE THIS WEEK
+
+4. Badge Milestone Thresholds (decisions.md IV.2)
+   Question: What are 5 badge unlock criteria?
+   Current: 500 visits, 1000 visits, 50 reviews, 100 5-star reviews, 50% growth
+   Impact: Badge checker implementation
+   Owner: Steve (emotional resonance) + Elon (data validation)
+   Timeline: DECIDE THIS WEEK
+
+================================================================================
+FILES REQUIRING MODIFICATION
+================================================================================
+
+MUST MODIFY:
+  ✗ /home/agent/shipyard-ai/deliverables/localgenius-frontend-launch/backend/wrangler.toml
+    → Add Twilio environment binding
+    → Verify R2 binding configuration
+    → Add scheduler configuration
+
+  ✗ /home/agent/shipyard-ai/deliverables/localgenius-frontend-launch/backend/db/schema.sql
+    → Create 5 new tables (notifications, journal_entries, achievements, preferences, compliance)
+    → Add indexes for performance
+    → Add audit tables
+
+  ✗ /home/agent/shipyard-ai/.env
+    → Add TWILIO_ACCOUNT_SID
+    → Add TWILIO_AUTH_TOKEN
+    → Add SENDGRID_API_KEY
+    → Add CRON_SECRET
+    → Add R2 credentials
+
+REFERENCE (DON'T COPY BLINDLY):
+  ✓ /home/agent/shipyard-ai/deliverables/localgenius-benchmark-engine/jobs/daily-sync.ts
+    → Use as reference for batch job pattern (exponential backoff, error handling)
+    
+  ✓ /home/agent/shipyard-ai/deliverables/localgenius-frontend-launch/backend/workers/chat.js
+    → Use as reference for request handling (CORS, validation, error responses)
+
+  ✓ /home/agent/shipyard-ai/deliverables/localgenius-frontend-launch/backend/workers/faq-cache.js
+    → Use as reference for database CRUD operations
+
+================================================================================
+NEW FILES TO CREATE
+================================================================================
+
+PHASE 1: Infrastructure (Week 1)
+  /pulse/notifications/
+    - generator.js (200 lines) ★ CRITICAL
+    - sender.js (100 lines)
+    - email-sender.js (100 lines)
+    - sms-sender.js (150 lines)
+    - sms-delivery-webhook.js (50 lines)
+    - unsubscribe.js (50 lines)
+  /pulse/badges/
+    - checker.js (150 lines) ★ CRITICAL
+    - image-generator.js (100 lines)
+    - cdn-uploader.js (50 lines)
+  /pulse/cron/
+    - notification-scheduler.js (100 lines) ★ CRITICAL
+  /pulse/compliance/
+    - phone-validator.js (50 lines)
+    - tcpa-audit.js (100 lines)
+
+PHASE 2: Templates & Supporting (Week 2)
+  /pulse/notifications/templates/
+    - insight.js (50 lines)
+    - badge.js (50 lines)
+    - quiet.js (50 lines)
+    - cliffhanger.js (50 lines)
+    - [same 4 as .html files]
+  /pulse/journal/
+    - prompt.js (50 lines)
+    - storage.js (50 lines)
+  /pulse/ui-enhancements/
+    - trends.js (150 lines)
+    - upgrade-prompts.js (100 lines)
+  /pulse/settings/
+    - preferences.js (50 lines)
+
+ESTIMATED TOTAL: ~1,850 lines (slightly exceeds Elon's 900-line estimate)
+→ Offset by: existing patterns in codebase, reusable utilities, template simplicity
+
+================================================================================
+TESTING STRATEGY
+================================================================================
+
+CRITICAL PATH TESTING (Must pass before launch):
+  [ ] Notification table can be created + accept 10K inserts
+  [ ] Cron job completes in <5 minutes (processing 10K users)
+  [ ] Email delivery rate >95%
+  [ ] SMS delivery rate >95%
+  [ ] Database query latency <100ms (p95)
+  [ ] TCPA audit trail complete + verified
+  [ ] Notification open rate >30% (alpha test with 100 users)
+
+LOAD TESTING:
+  [ ] 10K notifications generated + queued in <5 minutes
+  [ ] 10K emails sent in <2 minutes (SendGrid rate limit: 100/sec)
+  [ ] 10K SMS sent in <30 seconds (rate limit: 100/sec to avoid spam filter)
+  [ ] 5K concurrent badge image generations, <2 seconds each
+  [ ] Database lock contention minimal during 10K concurrent INSERTs
+
+COMPLIANCE TESTING:
+  [ ] Opt-in/opt-out workflows tested with 10 sandbox numbers
+  [ ] TCPA audit trail shows complete consent record
+  [ ] Unsubscribe link works + user is removed from future sends
+  [ ] Copy review passes spam trigger word check
+  [ ] Delivery receipt webhooks properly track failures
+
+================================================================================
+SUCCESS METRICS (First 30 Days Post-Launch)
+================================================================================
+
+North Star Metrics:
+  Target: Email open rate >40%
+  Target: SMS open rate >70%
+  Target: Badge share rate >10% of unlocks
+  Target: Pro upgrade rate >5% within 30 days
+  Target: Unsubscribe rate <5% (failure: >10%)
+
+Implementation Quality:
+  Target: Cron job success rate 100% (run daily for 30 days, 0 failures)
+  Target: SMS delivery rate >95%
+  Target: Email delivery rate >95%
+  Target: Image generation latency <2 seconds (p95)
+
+================================================================================
+IMMEDIATE ACTION ITEMS (Next 24-48 Hours)
+================================================================================
+
+DECISIONS (BLOCKING):
+  [ ] Elon: Choose SMS provider (Twilio recommended)
+  [ ] Steve: Decide notification frequency cap
+  [ ] Elon: Decide badge thresholds (data-driven validation)
+  [ ] Elon: Choose cron scheduler service
+
+INFRASTRUCTURE SETUP:
+  [ ] Tech: Create Twilio account + get API credentials
+  [ ] Tech: Create SendGrid account + verify domain
+  [ ] Tech: Choose + configure cron scheduler (Vercel/Upstash/AWS)
+  [ ] Tech: Run database migration (non-blocking, can be reverted)
+  [ ] Tech: Set up monitoring + alerting for cron jobs
+
+RESOURCE ALLOCATION:
+  [ ] Assign DevOps resource for infrastructure (Week 1 full-time)
+  [ ] Assign backend resource for notification engine (Week 1-2)
+  [ ] Assign QA resource for load testing (Week 2-3)
+  [ ] Assign legal for TCPA compliance review (start Week 1, end Week 2)
+
+================================================================================
+COST SUMMARY (Monthly, at 10K Users)
+================================================================================
+
+SMS (Twilio):          $9,000   (10K users × 30 SMS/month × $0.03)
+Email (SendGrid):         $50   (included in plan)
+Cron (Vercel/Upstash):   $0-30  (low-usage tier)
+R2 Storage (images):    $10-50  (100-500 GB images, rarely exceeded)
+D1 Database:            $25-50  (included in Cloudflare bundle)
+
+TOTAL: ~$9,085-9,130 monthly
+
+Note: SMS cost can be reduced if:
+  - Gate SMS behind Pro tier ($49/month) instead of free
+  - Cap SMS at 5/month for free users (reduces to $1,500/month)
+  - US-only launch without international expansion
+
+================================================================================
+ROLLBACK PROCEDURES
+================================================================================
+
+If Cron Job Breaks:
+  1. Stop calling POST /api/pulse/cron/generate-notifications
+  2. Revert to previous git commit
+  3. Use manual trigger endpoint: POST /api/pulse/admin/generate [requires API key]
+
+If Database Migration Fails:
+  1. Drop new tables: notifications, journal_entries, achievements, etc.
+  2. Restore from backup (pre-migration snapshot)
+  3. Re-run migration with fixes
+
+If SMS Delivery Fails:
+  1. Check Twilio account status + API credentials
+  2. Review error logs for spam trigger words
+  3. Whitelist sender number if carrier filtering blocking
+
+If Email Delivery Fails:
+  1. Check SendGrid API key + domain verification
+  2. Review bounce logs for invalid emails
+  3. Check spam folder (may be legitimate delivery issue)
+
+================================================================================
+ARCHITECTURE DIAGRAM
+================================================================================
+
+Scheduled Job Layer (External):
+  Vercel Cron / Upstash / AWS EventBridge
+    ↓
+    POST /api/pulse/cron/generate-notifications
+    
+Cloudflare Workers (Edge Compute):
+  ├─ NotificationGenerator.generateAll()
+  │  ├─ BadgeChecker.checkMilestones()
+  │  ├─ InsightGenerator.generate()
+  │  └─ QuietTemplate.generate()
+  │
+  ├─ EmailSender.send() → SendGrid API
+  └─ SMSSender.send() → Twilio API
+
+Cloudflare D1 (Database - SQLite):
+  ├─ notifications (queue table)
+  ├─ journal_entries
+  ├─ achievements (badges)
+  ├─ user_notification_preferences
+  └─ notification_compliance (audit trail)
+
+Cloudflare R2 (Object Storage):
+  └─ Badge images (SVG/PNG, served via CDN)
+
+External APIs:
+  ├─ Twilio SMS API
+  ├─ SendGrid Email API
+  └─ External Cron Service
+
+================================================================================
+TIMELINE PROJECTION (REALISTIC)
+================================================================================
+
+WEEK 1 (Infrastructure + Decisions):
+  Mon-Wed: Resolve 4 decisions + infrastructure setup
+  Thu-Fri: Run database migration + implement core engines
+  Status: All infrastructure ready, no blocker for Week 2
+
+WEEK 2 (Feature Development + Testing):
+  Mon-Wed: Complete badge, email, SMS integrations + templates
+  Thu-Fri: Load testing (10K users) + compliance validation
+  Status: All features complete, QA testing in progress
+
+WEEK 3 (Polish + Launch):
+  Mon: Final fixes from load testing
+  Tue-Wed: Performance optimization + monitoring setup
+  Thu: Staging final test + decision-maker sign-off
+  Fri: Go-live (0800 UTC recommended, avoids 9am spike)
+
+RISK FACTORS:
+  - If decisions delayed: Ship date slips to Week 4
+  - If infrastructure late: Ship date slips to Week 3.5
+  - If load testing reveals issues: Ship date slips to Week 3.5
+  - If all parallelized: Ship date hits target (end of Week 2 / start of Week 3)
+
+================================================================================
+KEY CONTACTS & OWNERS
+================================================================================
+
+Elon (Technical Lead):
+  - SMS provider selection
+  - Badge thresholds decision
+  - Cron scheduler choice
+  - Performance optimization (target: 200ms per user)
+  - Batch job reliability (dead man's switch, recovery)
+
+Steve (Product/Brand):
+  - Notification frequency cap decision
+  - Timing preference decision
+  - Brand voice review (all templates)
+  - Copy approval for all notifications
+  - Upgrade prompt respectfulness check
+
+Phil (Zen Master):
+  - Conflict resolution on decisions
+  - Timeline management
+  - Priority arbitration
+  - Risk escalation
+
+Tech Team:
+  - Infrastructure setup (Twilio, SendGrid, cron, R2)
+  - Database migration
+  - Notification engine implementation
+  - Load testing + QA
+
+Legal:
+  - TCPA compliance review
+  - Consent tracking validation
+  - Unsubscribe mechanism audit
+
+================================================================================
+SUMMARY
+================================================================================
+
+STATUS: Ready to build, but 4 critical gaps must be filled in Week 1
+
+BLOCKERS: 4 open decisions (SMS provider, frequency cap, timing, thresholds)
+
+TIMELINE: 2-week ship achievable IF infrastructure work happens in parallel
+
+EFFORT: ~1,850 lines of code + ~10 days engineering (distributed across team)
+
+CONFIDENCE: HIGH (all gaps identified, solutions proven, reference code available)
+
+NEXT STEP: Schedule decision fast-track meeting (TODAY) to resolve blockers
+
+================================================================================
+END QUICK REFERENCE
+================================================================================
