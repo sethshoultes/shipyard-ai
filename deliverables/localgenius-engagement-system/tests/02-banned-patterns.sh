@@ -23,20 +23,20 @@ for word in "${BANNED_WORDS[@]}"; do
   fi
 done
 
-# Pattern: Check for "TODO" or "FIXME" comments
+# Pattern: Check for unfinished work markers in production code
 echo ""
-echo "Checking for TODO/FIXME comments in production code..."
-TODOS=$(grep -r "TODO\|FIXME" "$LOCALGENIUS_DIR/src/services/notifications/" \
+echo "Checking for unfinished work markers in production code..."
+UNFINISHED_WORK=$(grep -r "TODO\|FIXME" "$LOCALGENIUS_DIR/src/services/notifications/" \
                                "$LOCALGENIUS_DIR/src/services/badges/" \
                                "$LOCALGENIUS_DIR/src/services/journal/" \
                                "$LOCALGENIUS_DIR/src/services/trends/" \
                                "$LOCALGENIUS_DIR/src/jobs/" 2>/dev/null || true)
-if [ ! -z "$TODOS" ]; then
-  echo "✗ Found TODO/FIXME comments (should be resolved before ship):"
-  echo "$TODOS"
+if [ ! -z "$UNFINISHED_WORK" ]; then
+  echo "✗ Found unfinished work markers (should be resolved before ship):"
+  echo "$UNFINISHED_WORK"
   FAILED=1
 else
-  echo "✓ No TODO/FIXME comments found"
+  echo "✓ No unfinished work markers found"
 fi
 
 # Pattern: Check for console.log in production code (should use proper logging)

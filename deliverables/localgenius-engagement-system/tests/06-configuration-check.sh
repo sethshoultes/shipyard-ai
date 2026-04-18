@@ -43,7 +43,7 @@ else
   FAILED=1
 fi
 
-# Check .env.example has Twilio placeholders
+# Check .env.example has Twilio environment variables
 echo ""
 echo "Checking .env.example for required environment variables..."
 if [ -f "$LOCALGENIUS_DIR/.env.example" ]; then
@@ -52,7 +52,7 @@ if [ -f "$LOCALGENIUS_DIR/.env.example" ]; then
   REQUIRED_VARS=("TWILIO_ACCOUNT_SID" "TWILIO_AUTH_TOKEN" "TWILIO_PHONE_NUMBER")
   for var in "${REQUIRED_VARS[@]}"; do
     if echo "$ENV_EXAMPLE" | grep -qi "$var"; then
-      echo "✓ $var placeholder present"
+      echo "✓ $var environment variable present"
     else
       echo "✗ MISSING: $var in .env.example"
       FAILED=1
@@ -61,7 +61,7 @@ if [ -f "$LOCALGENIUS_DIR/.env.example" ]; then
 
   # Check for Resend API key (existing or new)
   if echo "$ENV_EXAMPLE" | grep -qi "RESEND\|EMAIL_API_KEY"; then
-    echo "✓ Email API key placeholder present"
+    echo "✓ Email API key environment variable present"
   else
     echo "⚠ Email API key not found in .env.example"
   fi

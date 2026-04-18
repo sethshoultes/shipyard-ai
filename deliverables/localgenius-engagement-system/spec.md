@@ -277,7 +277,7 @@ Simple systems compound. Complex ones collapse. Core system uses 3 database tabl
 
 ### Configuration
 - `~` `/vercel.json` — Add cron jobs for midnight batch, scheduled delivery, badge checker
-- `~` `/.env.example` — Add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER placeholders
+- `+` `/.env.example` — Environment variables for Twilio SMS, Resend email, S3/R2 storage, monitoring
 - `~` `/package.json` — Add twilio, canvas-confetti, @vercel/og (or canvas) dependencies
 
 ### Existing File Modifications

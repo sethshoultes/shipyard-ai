@@ -41,7 +41,7 @@
 ### SMS Notification Infrastructure (task-002)
 
 - [ ] Install twilio dependency in package.json — verify: twilio listed in dependencies
-- [ ] Add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER to .env.example — verify: placeholders exist in .env.example
+- [ ] Add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER to .env.example — verify: environment variables exist in .env.example
 - [ ] Create /src/services/notifications/sms-sender.ts file — verify: file exists and exports sendNotificationSMS function
 - [ ] Implement Twilio client initialization from env vars — verify: client initializes without error in dev
 - [ ] Implement sendNotificationSMS() with opt-in check — verify: SMS not sent if user.sms_opt_in=false
@@ -127,7 +127,7 @@
 ### Cliffhanger System (task-016)
 
 - [ ] Create /src/services/notifications/templates/cliffhanger.ts file — verify: file exports generateCliffhanger function
-- [ ] Write 5-10 cliffhanger templates — verify: templates exist with placeholders for context
+- [ ] Write 5-10 cliffhanger templates — verify: templates exist with dynamic context variables
 - [ ] Template 1: "Next week, I'm trying a different post style..." — verify: template renders with context
 - [ ] Template 2: "I noticed competitors are doing X..." — verify: template renders with competitor context
 - [ ] Template 3: "Your best week was [date]. I'm studying what worked." — verify: template renders with best week date
