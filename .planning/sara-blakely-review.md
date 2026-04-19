@@ -1,43 +1,26 @@
-# Sara Blakely Gut Check — Phase 1 Plan
+# Sara Blakely Gut Check — SPARK
 
-## Would a real customer pay for this?
+## Would a customer pay for this?
+**Not in V1.** Free only = no skin in the game. You're training people to expect free. Small biz owners pay for tools that work — Shopify plugins, email capture, live chat all charge. Zero monetization path = hobby project.
 
-**Maybe. But not yet.**
+## What's confusing?
+- "LocalGenius Lite" vs "SPARK" — two names, which is it?
+- Site owner has NO dashboard. How do they know it's working? Do they just... pray?
+- No way to customize responses. What if widget gives wrong answer? Owner is helpless.
+- "Client-side UUID" — what? Where? Who generates it? When?
 
-You're solving a real problem: restaurant owners drowning in metrics, not acting on them. But you're adding 18 features before proving ONE works. Weekly journal? Badges? SMS? You're building Duolingo for restaurants before showing me the notification drives opens.
+## What would make someone bounce?
+Landing page has ZERO proof. "Your website, instantly brilliant" — says who? Show me one real example. One real site using it. One testimonial. One metric. Give me a reason to believe this works.
 
-## What's confusing? What would make someone bounce?
+## 30-second elevator pitch
+"One line of code makes your website answer customer questions instantly. Your visitors ask, AI answers from your page content. No setup, no training. Works in 60 seconds."
 
-- **Too many notifications.** Daily emails, weekly digests, "all quiet" messages, badge unlocks, journal prompts, cliffhangers. That's 6+ message types. I'd unsubscribe.
-- **Badge thresholds aren't set yet** (Open Question #2). You can't ship badges without knowing if 500 visits is too easy or impossible.
-- **Who asked for a journal?** This feels like feature creep. You're collecting proprietary data, not solving a customer pain.
-- **SMS opt-in friction.** Asking for phone number = trust barrier. You need email proof first.
+## What would you test with $0 budget?
+Put it on MY OWN site first. Force myself to use it. Then: find 3 small biz owners on Twitter/LinkedIn, DM them: "I'll install this free chat widget on your site today. Tell me what breaks." Real feedback > theory. Record screen sessions of strangers trying to use it.
 
-## 30-second elevator pitch (rewrite yours)
-
-"LocalGenius sends restaurant owners one email each week: what's working, what's not, what to do next. No dashboard login. No noise. Just clarity."
-
-*That's it. Kill the badges, journal, SMS, cliffhangers. Ship the notification first. Prove open rate >40%. Then add.*
-
-## What would you test first with $0 marketing budget?
-
-- Send 100 existing users ONE email next Monday: "Your Google listing got 340 visits this week (up 22%). Your top review mentions 'ambiance.' Want to double down?"
-- Measure: open rate, click rate, reply rate.
-- If <30% open it, the problem isn't real.
-- If >50% open it, *then* build Wave 2.
-
-## What's the retention hook?
-
-**Week-over-week trends.** That's your moat. "Up 22% from last week" → dopamine → return user.
-
-But badges? Journal prompts? Those are engagement theater. Nobody shares "I got 500 visits." They share revenue.
+## Retention hook?
+**There isn't one.** Visitor uses widget once, gets answer, leaves forever. Site owner installs once, forgets it exists. No dashboard = no usage stats = no dopamine = no reason to come back. Where's the loop?
 
 ---
 
-## Bottom line:
-
-You're building Phase 1 like it's Phase 3. Strip it to notification + trends. Ship in 5 days. Prove opens. Then earn the right to build badges.
-
-Your 10-14 day timeline is a lie. You have 4 decision blockers unresolved. SMS isn't configured. Badge thresholds aren't calibrated. This ships in 3-4 weeks minimum, not 2.
-
-**Cut scope or miss deadline. Your choice.**
+**Bottom line:** Solid tech plan. Zero business model. Zero proof. Zero retention. Ships fast but dies fast. What happens after launch day?

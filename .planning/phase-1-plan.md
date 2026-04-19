@@ -1,1158 +1,918 @@
-# Phase 1 Plan — LocalGenius Engagement System (Pulse)
+# Phase 1 Plan — SPARK (LocalGenius Lite)
 
-**Generated:** 2026-04-18  
-**Requirements:** /home/agent/shipyard-ai/.planning/REQUIREMENTS.md  
-**Total Tasks:** 18  
-**Waves:** 3  
-**Estimated Duration:** 10-14 days
+**Generated:** 2026-04-19
+**Requirements:** `/home/agent/shipyard-ai/.planning/REQUIREMENTS.md`
+**Total Tasks:** 15 XML task plans
+**Waves:** 3 waves (parallel execution within waves)
+**Estimated Duration:** 4-6 hours (per locked decisions)
+
+---
+
+## Executive Summary
+
+SPARK is an AI-powered chat widget that makes any website instantly helpful. One script tag, zero configuration.
+
+**Architecture (Locked):**
+- Client-side UUID generation (no auth, no dashboard in V1)
+- Shadow DOM widget (vanilla JS, <10KB gzipped)
+- Cloudflare Worker + Claude 3.5 Haiku
+- Streaming responses via SSE
+- Rate limiting: 10 req/min per site_id, 100 req/hour per IP
+
+**Critical Path:**
+- Wave 1: Widget UI + Content Scraping + Worker Foundation
+- Wave 2: Claude Integration + Rate Limiting + Error Handling
+- Wave 3: Landing Page + Deployment
 
 ---
 
 ## Requirements Traceability
 
-| Requirement | Task(s) | Wave | Files Changed |
-|-------------|---------|------|---------------|
-| **Daily Notifications** | | | |
-| REQ-001: Email infrastructure | phase-1-task-001 | 1 | +notifications/sender.js, +api/notifications.js |
-| REQ-002: SMS via Twilio | phase-1-task-002 | 1 | +notifications/sms-sender.js, +api/sms.js |
-| REQ-003: Midnight batch generator | phase-1-task-003 | 1 | +notifications/generator.js, +jobs/notification-batch.js |
-| REQ-004: Scheduled delivery | phase-1-task-004 | 2 | +jobs/scheduled-delivery.js |
-| REQ-005: "All Quiet" notifications | phase-1-task-005 | 2 | ~notifications/templates/quiet.js |
-| REQ-006: Preferences UI | phase-1-task-006 | 2 | +components/NotificationPreferences.jsx, +api/preferences.js |
-| **Milestone Badges** | | | |
-| REQ-007: Badge detection | phase-1-task-007 | 1 | +badges/checker.js, +jobs/badge-checker.js |
-| REQ-008: Badge definitions | phase-1-task-008 | 1 | +migrations/006_badge_definitions.sql |
-| REQ-009: Badge image generation | phase-1-task-009 | 2 | +badges/image-generator.js, +jobs/badge-image-gen.js |
-| REQ-010: Social share | phase-1-task-010 | 2 | +components/BadgeUnlockModal.jsx |
-| REQ-011: Confetti animation | phase-1-task-011 | 2 | ~components/BadgeUnlockModal.jsx (CSS) |
-| REQ-012: Badge gallery | phase-1-task-012 | 3 | +components/BadgeGallery.jsx, +api/achievements.js |
-| **Journal & Trends** | | | |
-| REQ-013: Journal prompt | phase-1-task-013 | 1 | +journal/prompt.js, ~digest/templates.js |
-| REQ-014: Journal storage | phase-1-task-014 | 1 | +journal/storage.js, +api/journal.js |
-| REQ-016: Trend narratives | phase-1-task-015 | 1 | +trends/calculator.js, ~digest/generator.js |
-| REQ-020: Cliffhanger | phase-1-task-016 | 1 | +notifications/templates/cliffhanger.js |
-| **Infrastructure** | | | |
-| Database migrations | phase-1-task-017 | 1 | +migrations/*.sql |
-| Analytics & tracking | phase-1-task-018 | 2 | +analytics/tracker.js |
+| Requirement Category | Task(s) | Wave | Coverage |
+|---------------------|---------|------|----------|
+| **Widget UI** | tasks 1-3 | 1 | REQ-001 through REQ-014, REQ-040-042, REQ-066-075 |
+| **Content Scraping** | task 4 | 1 | REQ-015 through REQ-021, REQ-064-065 |
+| **Worker Foundation** | task 5 | 1 | REQ-022-026, REQ-045, REQ-059-063 |
+| **Claude Integration** | tasks 6-7 | 2 | REQ-027-039 |
+| **Rate Limiting** | task 8 | 2 | REQ-031-033 |
+| **Streaming** | task 9 | 2 | REQ-028-030 |
+| **Error Handling** | task 10 | 2 | REQ-043-044, REQ-080 |
+| **Logging** | task 11 | 2 | REQ-078 |
+| **Landing Page** | tasks 12-13 | 3 | REQ-046-052 |
+| **Deployment** | tasks 14-15 | 3 | REQ-053, REQ-069-070 |
 
 ---
 
 ## Wave Execution Order
 
-### Wave 1: Foundation (Independent, Parallel Execution)
-**Tasks:** 10  
-**Duration:** 5-7 days  
-**Parallelizable:** Yes
+### Wave 1: Foundation (Parallel Execution)
+**Duration:** 1.5-2 hours
+**Tasks:** 5 independent tasks
+**Focus:** Widget UI, content extraction, worker skeleton
 
-Tasks: phase-1-task-001, 002, 003, 007, 008, 013, 014, 015, 016, 017
+**Tasks:**
+- `phase-1-task-001`: Widget UI component (button + panel)
+- `phase-1-task-002`: Chat panel interactions
+- `phase-1-task-003`: Shadow DOM setup + CSS isolation
+- `phase-1-task-004`: Page content scraper (SPA-aware)
+- `phase-1-task-005`: Cloudflare Worker foundation
 
-### Wave 2: Integration (Depends on Wave 1)
-**Tasks:** 6  
-**Duration:** 4-5 days  
-**Parallelizable:** Yes
+### Wave 2: Integration (Parallel, after Wave 1)
+**Duration:** 2-2.5 hours
+**Tasks:** 6 tasks depending on Wave 1
+**Focus:** Claude API, streaming, rate limiting
 
-Tasks: phase-1-task-004, 005, 006, 009, 010, 011, 018
+**Tasks:**
+- `phase-1-task-006`: Claude API integration
+- `phase-1-task-007`: System prompt engineering
+- `phase-1-task-008`: Rate limiting (multi-layer)
+- `phase-1-task-009`: Streaming response handler
+- `phase-1-task-010`: Error handling + timeouts
+- `phase-1-task-011`: Usage logging (Cloudflare Analytics)
 
-### Wave 3: Polish (Depends on Wave 2)
-**Tasks:** 2  
-**Duration:** 1-2 days  
-**Parallelizable:** Yes
+### Wave 3: Launch (Parallel, after Wave 2)
+**Duration:** 1-1.5 hours
+**Tasks:** 4 tasks for deployment
+**Focus:** Landing page, CDN deployment
 
-Tasks: phase-1-task-012
+**Tasks:**
+- `phase-1-task-012`: Landing page (Steve's vision)
+- `phase-1-task-013`: Live demo embed
+- `phase-1-task-014`: CDN deployment (widget script)
+- `phase-1-task-015`: Cloudflare Worker deployment
 
 ---
 
 ## XML Task Plans
 
-
-### Wave 1 (Parallel)
+### Wave 1 (Parallel — No Dependencies)
 
 <task-plan id="phase-1-task-001" wave="1">
-  <title>Email Notification Infrastructure Setup</title>
-  <requirement>REQ-001: Establish email notification delivery system integrating with Resend</requirement>
+  <title>Widget UI: Floating Button + Chat Panel</title>
+  <requirement>REQ-001 through REQ-014: Create widget UI structure</requirement>
   <description>
-    Set up email notification sender that integrates with LocalGenius's existing Resend provider.
-    Create notification sending infrastructure with error handling, delivery tracking, and retry logic.
-    Supports inline templates for insight, badge, journal, and cliffhanger notifications.
+    Build core widget UI: 56px floating button (bottom-right), 380×520px chat panel with smooth
+    slide-up animation, purple gradient theme, "Powered by SPARK" footer. Vanilla JS, no frameworks.
   </description>
 
   <context>
-    <file path="/home/agent/localgenius/src/services/email.ts" reason="Existing Resend integration pattern to follow" />
-    <file path="/home/agent/localgenius/src/db/schema.ts" reason="notifications table schema (lines 186-196 in decisions.md)" />
-    <file path="/home/agent/localgenius/package.json" reason="Verify resend dependency exists" />
-    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.1 - notification requirements" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Shadow DOM patterns (Section 6, Plugin System)" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-lite/decisions.md" reason="Section 1.5 - polish requirements" />
+    <file path="/home/agent/shipyard-ai/prds/localgenius-lite.md" reason="UI/UX Specifications section" />
   </context>
 
   <steps>
-    <step order="1">Create /src/services/notifications/email-sender.ts with sendNotificationEmail() function</step>
-    <step order="2">Implement template rendering for 4 notification types (insight, badge, journal_prompt, cliffhanger)</step>
-    <step order="3">Add error handling with exponential backoff retry (max 3 attempts)</step>
-    <step order="4">Add delivery tracking: update notifications.sent_at timestamp on success</step>
-    <step order="5">Create email templates in /src/services/notifications/templates/email/ directory</step>
-    <step order="6">Add click tracking: append ?notification_id={id} to all email links</step>
+    <step order="1">Create `/spark/widget/spark.js` entry point with self-initializing IIFE</step>
+    <step order="2">Implement `createButton()`: 56px circle, bottom-right position (calc(100vw - 80px))</step>
+    <step order="3">Add CSS: purple gradient background, subtle pulse animation (opacity 0.7→1.0, 2s infinite)</step>
+    <step order="4">Implement `createPanel()`: 380×520px div, initially hidden</step>
+    <step order="5">Add panel elements: close button (X), message container, input field, send button</step>
+    <step order="6">Implement button click handler: toggle panel with CSS transition (transform: translateY, 300ms ease)</step>
+    <step order="7">Add input placeholder: "What can I help you find?"</step>
+    <step order="8">Create footer: `<a href="https://usespark.com" target="_blank">Powered by SPARK</a>`</step>
+    <step order="9">Style message bubbles: user messages right-aligned, AI messages left-aligned</step>
   </steps>
 
   <verification>
-    <check type="build">npm run typecheck</check>
-    <check type="test">npm run test -- --grep "email.*notification"</check>
-    <check type="manual">Send test notification to real email address, verify receipt within 60 seconds</check>
-    <check type="manual">Verify click tracking updates notifications.clicked field</check>
+    <check type="build">Test widget loads without errors in browser console</check>
+    <check type="manual">Click button → panel opens in <300ms with smooth animation</check>
+    <check type="manual">Verify button is 56px diameter circle positioned bottom-right</check>
+    <check type="manual">Verify panel is 380×520px when open</check>
+    <check type="manual">Check close button (X) works correctly</check>
+    <check type="manual">Verify purple gradient theme applied</check>
+    <check type="manual">Verify "Powered by SPARK" footer links to https://usespark.com</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundation -->
   </dependencies>
 
-  <commit-message>feat(notifications): add email notification infrastructure
+  <commit-message>feat(widget): add floating button and chat panel UI
 
-- Implement Resend-based email sender for Pulse notifications
-- Add 4 notification templates (insight, badge, journal, cliffhanger)
-- Include retry logic and delivery tracking
-- Add click tracking for engagement metrics
+- Implement 56px floating button with purple gradient
+- Add 380×520px chat panel with smooth slide-up animation
+- Include close button, message container, input, send button
+- Add "Powered by SPARK" footer with link
+- Vanilla JS, no framework dependencies
 
-Addresses REQ-001 from localgenius-engagement-system PRD
+Implements REQ-001 through REQ-014 (decisions.md §1.4, §1.5)
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 <task-plan id="phase-1-task-002" wave="1">
-  <title>SMS Notification via Twilio Setup</title>
-  <requirement>REQ-002: Establish SMS notification delivery system via Twilio with TCPA compliance</requirement>
+  <title>Chat Panel Interactions: Send, Clear, State</title>
+  <requirement>REQ-066-075: Implement chat interactions and keyboard support</requirement>
   <description>
-    Integrate Twilio SMS provider for sending SMS notifications. Include explicit opt-in tracking,
-    carrier deliverability monitoring, and cost tracking. Ensures TCPA compliance per Section II.5 decisions.
+    Add chat interaction logic: send button click, Enter key submit, input clearing, optimistic UI
+    (user message appears before API call), loading state during API wait.
   </description>
 
   <context>
-    <file path="/home/agent/localgenius/package.json" reason="Verify twilio dependency exists (line 46)" />
-    <file path="/home/agent/localgenius/.env.example" reason="Check for Twilio credential placeholders" />
-    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.5 - SMS locked as must-have, Section V Risk 1" />
-    <file path="/home/agent/localgenius/src/db/schema.ts" reason="Add sms_opt_in field to users table" />
+    <file path="/spark/widget/spark.js" reason="Widget UI from task-001" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-lite/decisions.md" reason="Chat Interface requirements" />
   </context>
 
   <steps>
-    <step order="1">Create /src/services/notifications/sms-sender.ts with sendNotificationSMS() function</step>
-    <step order="2">Add database migration for users.sms_opt_in boolean field (default false)</step>
-    <step order="3">Implement Twilio client initialization with credentials from environment variables</step>
-    <step order="4">Add opt-in check: only send SMS if user.sms_opt_in === true</step>
-    <step order="5">Implement SMS template rendering (max 160 chars per message)</step>
-    <step order="6">Add cost tracking: log each SMS sent with estimated cost ($0.03/message)</step>
-    <step order="7">Create /src/api/settings/sms-opt-in route for user preference management</step>
+    <step order="1">Implement `sendMessage()` function: validates input not empty (trim)</step>
+    <step order="2">Add Enter key listener to input field: calls sendMessage() on keypress</step>
+    <step order="3">Implement optimistic UI: append user message to chat immediately (before API call)</step>
+    <step order="4">Clear input field after message send: input.value = ""</step>
+    <step order="5">Add loading state: show typing indicator dots while awaiting response</step>
+    <step order="6">Disable send button during API call to prevent duplicate sends</step>
+    <step order="7">Persist widget state in memory: isOpen boolean for panel visibility</step>
   </steps>
 
   <verification>
-    <check type="build">npm run typecheck</check>
-    <check type="test">npm run test -- --grep "sms.*notification"</check>
-    <check type="manual">Send test SMS to real phone number with opt-in=true, verify receipt</check>
-    <check type="manual">Verify SMS NOT sent when opt-in=false</check>
-    <check type="manual">Check Twilio dashboard shows successful delivery and cost</check>
+    <check type="manual">Type message, click send → message appears immediately in chat</check>
+    <check type="manual">Type message, press Enter → message sends</check>
+    <check type="manual">Verify input clears after message send</check>
+    <check type="manual">Try sending empty message → verify rejected</check>
+    <check type="manual">Verify typing indicator shows during API call</check>
+    <check type="manual">Verify send button disabled during API wait</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies - Wave 1 foundation -->
+    <depends-on task-id="phase-1-task-001" reason="Requires widget UI components" />
   </dependencies>
 
-  <commit-message>feat(notifications): add SMS notification via Twilio
+  <commit-message>feat(widget): add chat interaction logic
 
-- Implement Twilio SMS sender with TCPA-compliant opt-in
-- Add sms_opt_in field to users table
-- Include cost tracking and delivery monitoring
-- Create SMS template renderer (160 char limit)
+- Implement send button click and Enter key submit
+- Add optimistic UI: user message appears immediately
+- Clear input after send, disable button during API call
+- Add typing indicator for loading state
+- Validate empty messages
 
-Addresses REQ-002, Section II.5 decision (Steve wins - SMS in v1)
+Implements REQ-066 through REQ-075 (PRD §Chat Interface)
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 <task-plan id="phase-1-task-003" wave="1">
-  <title>Midnight UTC Batch Notification Generator</title>
-  <requirement>REQ-003: Pre-compute daily notifications at midnight UTC to prevent 9am traffic spike</requirement>
+  <title>Shadow DOM Setup + CSS Isolation</title>
+  <requirement>REQ-059, REQ-063: Use Shadow DOM for CSS isolation from host site</requirement>
   <description>
-    Create midnight batch job that generates all notifications for the next day, stores them with
-    scheduled_for timestamp, and queues for delivery at user's preferred time. Implements Elon's
-    architecture decision from Section II.3 - prevents 9am bottleneck by pre-computing asynchronously.
+    Wrap widget UI in Shadow DOM to prevent CSS conflicts with host site styles. Add CSS reset
+    (all: initial), defensive styling, test on WordPress/Shopify/Wix for compatibility.
   </description>
 
   <context>
-    <file path="/home/agent/localgenius/src/db/schema.ts" reason="notifications table schema with scheduled_for field" />
-    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.3 - locked technical decision on batch approach" />
-    <file path="/home/agent/shipyard-ai/deliverables/localgenius-benchmark-engine/jobs/daily-sync.ts" reason="Existing cron job pattern to follow" />
-    <file path="/home/agent/localgenius/src/services/analytics/metrics.ts" reason="Data source for notification content generation" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Shadow DOM isolation patterns (Section 6.6)" />
+    <file path="/spark/widget/spark.js" reason="Widget UI to wrap in Shadow DOM" />
   </context>
 
   <steps>
-    <step order="1">Create /src/jobs/notification-generator.ts with generateDailyNotifications() function</step>
-    <step order="2">Query all active users with last_active_at within 90 days</step>
-    <step order="3">For each user, fetch analytics data and determine if meaningful insight exists</step>
-    <step order="4">Generate notification content: insight (if data exists) or "all quiet" (if no data)</step>
-    <step order="5">Insert notification into notifications table with scheduled_for = user's preferred time (default 9am local)</step>
-    <step order="6">Implement deduplication: check existing notifications for today before inserting</step>
-    <step order="7">Add dead man's switch: log completion timestamp, alert if job doesn't finish by 1am UTC</step>
-    <step order="8">Create Vercel cron config in vercel.json for daily midnight UTC execution</step>
+    <step order="1">Create shadow host element: const host = document.createElement('div')</step>
+    <step order="2">Attach Shadow DOM: const shadow = host.attachShadow({ mode: 'open' })</step>
+    <step order="3">Move all widget UI elements into shadow root</step>
+    <step order="4">Add CSS reset to shadow root: `:host { all: initial; }`</step>
+    <step order="5">Inject widget styles inside shadow DOM (not global styles)</step>
+    <step order="6">Test on WordPress site with aggressive global CSS (e.g., Divi theme)</step>
+    <step order="7">Test on Shopify site (Dawn theme)</step>
+    <step order="8">Add mobile responsiveness: full-width panel on <480px viewport</step>
   </steps>
 
   <verification>
-    <check type="build">npm run typecheck</check>
-    <check type="test">npm run test -- --grep "notification.*generator"</check>
-    <check type="manual">Run generator manually for 100 test users, verify <2 minute completion time</check>
-    <check type="manual">Check notifications table: exactly 1 notification per user, no duplicates</check>
-    <check type="manual">Verify scheduled_for timestamps match user timezone preferences</check>
+    <check type="manual">Load widget on WordPress site → verify no style conflicts</check>
+    <check type="manual">Load widget on Shopify site → verify no style conflicts</check>
+    <check type="manual">Inspect Shadow DOM in DevTools → verify styles scoped</check>
+    <check type="manual">Test on mobile (375px viewport) → panel full-width</check>
+    <check type="manual">Verify touch targets ≥44px on mobile</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-001" reason="Requires widget UI structure" />
+  </dependencies>
+
+  <commit-message>feat(widget): add Shadow DOM isolation
+
+- Wrap widget in Shadow DOM for CSS isolation
+- Add CSS reset (all: initial) to prevent conflicts
+- Test on WordPress, Shopify, Wix for compatibility
+- Add mobile responsiveness: full-width <480px
+- Ensure touch targets ≥44px on mobile
+
+Implements REQ-059, REQ-063 (decisions.md §1.6, §5.1)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-004" wave="1">
+  <title>Page Content Scraper (SPA-Aware)</title>
+  <requirement>REQ-015 through REQ-021, REQ-064-065: Extract page content intelligently</requirement>
+  <description>
+    Scrape page content on widget load: extract document.title, meta[description], body text from
+    <main>, <article>, or <body>. Handle SPAs with 1-second delay + MutationObserver. Truncate to ~10KB.
+    Cache in widget memory.
+  </description>
+
+  <context>
+    <file path="/spark/widget/spark.js" reason="Widget initialization" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-lite/decisions.md" reason="Section 2.1 - scraping requirements, §5.1 SPA handling" />
+  </context>
+
+  <steps>
+    <step order="1">Create `/spark/widget/utils/scraper.js` with `scrapePageContent()` function</step>
+    <step order="2">Extract document.title and store in context object</step>
+    <step order="3">Extract meta[description] content and store</step>
+    <step order="4">Try extracting from <main>, fallback to <article>, fallback to <body></step>
+    <step order="5">Use innerText (not innerHTML) to get visible text only</step>
+    <step order="6">Truncate to 10KB: context.slice(0, 10240)</step>
+    <step order="7">Add 1-second delay before scraping: setTimeout(scrape, 1000) for SPAs</step>
+    <step order="8">Implement MutationObserver to detect DOM changes and re-scrape if needed</step>
+    <step order="9">Cache scraped content in widget state: don't re-scrape per question</step>
+  </steps>
+
+  <verification>
+    <check type="build">Import scraper in spark.js, verify no errors</check>
+    <check type="manual">Load widget on static site → verify content extracted</check>
+    <check type="manual">Load widget on React SPA → wait 1s → verify content extracted</check>
+    <check type="manual">Test on large page (>50KB text) → verify truncated to 10KB</check>
+    <check type="manual">Ask 3 questions → verify content not re-scraped (cached)</check>
+    <check type="manual">Log scraped content → verify includes title, meta, body text</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundation -->
   </dependencies>
 
-  <commit-message>feat(notifications): add midnight UTC batch generator
+  <commit-message>feat(widget): add SPA-aware page content scraper
 
-- Implement pre-computed notification generation (Elon's architecture)
-- Generate notifications at midnight UTC for next-day delivery
-- Include deduplication logic to prevent duplicate notifications
-- Add dead man's switch alert for job failure detection
-- Configure Vercel cron for daily execution
+- Extract document.title, meta[description], body text
+- Prioritize <main> > <article> > <body> for content
+- Handle SPAs: 1-second delay + MutationObserver
+- Truncate to 10KB, cache in widget memory
+- Don't re-scrape per question (performance)
 
-Addresses REQ-003, Section II.3 locked decision
+Implements REQ-015 through REQ-021, REQ-064-065 (decisions.md §2.1, §5.1)
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
-<task-plan id="phase-1-task-007" wave="1">
-  <title>Badge Detection & Unlock Logic</title>
-  <requirement>REQ-007: Implement milestone badge achievement detection system</requirement>
+<task-plan id="phase-1-task-005" wave="1">
+  <title>Cloudflare Worker Foundation</title>
+  <requirement>REQ-022-026, REQ-045, REQ-060: Create Worker API endpoint with CORS</requirement>
   <description>
-    Create system that detects when users hit badge milestones (e.g., "500 visits" = Local Favorite badge).
-    Runs daily as part of digest generation. Checks current metrics against badge thresholds and unlocks
-    new achievements.
+    Create Cloudflare Worker with POST /api/chat endpoint. Accept site_id, context, question in JSON.
+    Validate UUID format. Return streaming response. Configure CORS for any origin.
   </description>
 
   <context>
-    <file path="/home/agent/localgenius/src/db/schema.ts" reason="achievements table schema (lines 209-216 in decisions.md)" />
-    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.2 - badge requirements, Open Question #2 for thresholds" />
-    <file path="/home/agent/localgenius/src/services/analytics/metrics.ts" reason="Data source for milestone metrics" />
+    <file path="/home/agent/shipyard-ai/examples/bellas-bistro/wrangler.jsonc" reason="Wrangler config pattern" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Cloudflare Worker deployment (Section 5)" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-lite/decisions.md" reason="Section 1.6 - tech stack, §4.2 CORS" />
   </context>
 
   <steps>
-    <step order="1">Create /src/services/badges/checker.ts with checkBadgeMilestones() function</step>
-    <step order="2">Query user's current metrics: website_visits, reviews_managed, streak_weeks</step>
-    <step order="3">Compare metrics against badge_definitions thresholds (from REQ-008)</step>
-    <step order="4">For each unmet milestone that is now met, insert into achievements table</step>
-    <step order="5">Prevent duplicate unlocks: check existing achievements before inserting</step>
-    <step order="6">Return list of newly unlocked badges for notification generation</step>
-    <step order="7">Create /src/jobs/badge-checker.ts cron job wrapper (runs daily after metrics update)</step>
+    <step order="1">Create `/spark/worker/index.js` Worker entry point</step>
+    <step order="2">Implement POST /api/chat route handler</step>
+    <step order="3">Parse request JSON: { site_id, context, question }</step>
+    <step order="4">Validate site_id is valid UUID v4 format: regex /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i</step>
+    <step order="5">Add CORS headers: Access-Control-Allow-Origin: *, Allow-Methods: POST, OPTIONS</step>
+    <step order="6">Handle OPTIONS preflight requests</step>
+    <step order="7">Return 400 Bad Request if site_id, context, or question missing</step>
+    <step order="8">Create wrangler.jsonc config with nodejs_compat flag</step>
   </steps>
 
   <verification>
-    <check type="build">npm run typecheck</check>
-    <check type="test">npm run test -- --grep "badge.*checker"</check>
-    <check type="manual">Manually trigger badge checker for test user with 500 visits, verify "Local Favorite" unlocks</check>
-    <check type="manual">Run checker again for same user, verify no duplicate badge</check>
-    <check type="manual">Check achievements table: badge unlocked within 24 hours of metric reached</check>
+    <check type="build">wrangler dev → Worker starts locally</check>
+    <check type="manual">POST to localhost:8787/api/chat with valid JSON → 200 response</check>
+    <check type="manual">POST with missing site_id → 400 error</check>
+    <check type="manual">POST with invalid UUID → 400 error</check>
+    <check type="manual">OPTIONS request → verify CORS headers present</check>
+    <check type="manual">POST from different origin → verify CORS allows request</check>
   </verification>
 
   <dependencies>
     <!-- No dependencies - Wave 1 foundation -->
   </dependencies>
 
-  <commit-message>feat(badges): add milestone badge detection system
+  <commit-message>feat(worker): add Cloudflare Worker foundation
 
-- Implement badge unlock detection based on user metrics
-- Check milestones: website visits, reviews managed, streak weeks
-- Prevent duplicate badge unlocks with database check
-- Add daily cron job for automated badge checking
+- Create POST /api/chat endpoint
+- Accept site_id, context, question in JSON
+- Validate UUID v4 format for site_id
+- Configure CORS for any origin (Access-Control-Allow-Origin: *)
+- Handle OPTIONS preflight requests
 
-Addresses REQ-007 from localgenius-engagement-system PRD
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-
-<task-plan id="phase-1-task-008" wave="1">
-  <title>Five Core Badge Definitions</title>
-  <requirement>REQ-008: Define 5 milestone badge types with thresholds and celebratory messaging</requirement>
-  <description>
-    Create badge definitions with unlock criteria, visual messaging, and celebratory copy. Badges: 
-    Getting Started, Review Responder, Local Favorite, Destination Dining, Consistent. Thresholds
-    calibrated per Open Question #2 (must be validated with data before implementation).
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.2 - badge requirements, Open Question #2 for threshold decisions" />
-    <file path="/home/agent/shipyard-ai/prds/localgenius-engagement-system.md" reason="Table at line 112-122 with badge definitions" />
-  </context>
-
-  <steps>
-    <step order="1">Create database migration /migrations/006_badge_definitions.sql</step>
-    <step order="2">Create badge_definitions table with fields: badge_type, threshold_metric, threshold_value, title, message, icon_url</step>
-    <step order="3">Insert 5 badge definitions (PENDING Open Question #2 resolution):</step>
-    <step order="4">  - "getting_started": First week completed, "Your first week! You're already ahead of most restaurants."</step>
-    <step order="5">  - "review_responder": 50 reviews managed, "50 reviews, 50 thoughtful responses. Your reputation is growing."</step>
-    <step order="6">  - "local_favorite": 500 website visitors, "500 visits! You're becoming a neighborhood go-to."</step>
-    <step order="7">  - "destination_dining": 1000 website visitors, "1000 visits. People are seeking you out."</step>
-    <step order="8">  - "consistent": 4-week streak, "4 weeks of engagement. Consistency builds trust."</step>
-    <step order="9">Copy must be reviewed by Steve for brand voice approval</step>
-  </steps>
-
-  <verification>
-    <check type="build">npm run db:migrate</check>
-    <check type="manual">Query badge_definitions table, verify 5 badges inserted with correct thresholds</check>
-    <check type="manual">Verify Steve has approved all badge messaging copy</check>
-    <check type="manual">Check that thresholds are calibrated (not too easy, not impossible) based on existing user data</check>
-  </verification>
-
-  <dependencies>
-    <!-- No dependencies - Wave 1 foundation -->
-  </dependencies>
-
-  <commit-message>feat(badges): define 5 core milestone badges
-
-- Create badge_definitions table and migration
-- Insert 5 badges: getting_started, review_responder, local_favorite, destination_dining, consistent
-- Include warm, celebratory messaging per Steve's brand voice
-- Thresholds calibrated based on user data analysis
-
-Addresses REQ-008, resolves Open Question #2
+Implements REQ-022 through REQ-026, REQ-045 (decisions.md §1.6, §4.2)
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
-<task-plan id="phase-1-task-013" wave="1">
-  <title>Weekly Journal Prompt Notification</title>
-  <requirement>REQ-013: Generate weekly journal prompt notification asking "What worked this week?"</requirement>
-  <description>
-    Send weekly prompt (Sunday evening or Monday morning per user timezone) asking "What worked this week?"
-    Inline in weekly digest email. Includes skip option but tracks completion for product iteration.
-    Creates proprietary training data per Jensen's moat argument.
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.3 - journal as must-have, Jensen endorsement in Section 10" />
-    <file path="/home/agent/shipyard-ai/prds/localgenius-engagement-system.md" reason="Section 4.2 - journal mechanics and UI" />
-    <file path="/home/agent/localgenius/src/services/digest/generator.ts" reason="Existing weekly digest generation to integrate with" />
-  </context>
-
-  <steps>
-    <step order="1">Create /src/services/journal/prompt.ts with generateJournalPrompt() function</step>
-    <step order="2">Add journal prompt to weekly digest template (inline, not separate email)</step>
-    <step order="3">Include simple text input field in digest email for one-tap response</step>
-    <step order="4">Add "Skip" button that logs skip event to analytics</step>
-    <step order="5">Create journal prompt notification type in notifications table</step>
-    <step order="6">Schedule journal prompt for Sunday evening or Monday morning per user timezone</step>
-    <step order="7">Track completion rate: log journal_prompt_shown and journal_entry_created events</step>
-  </steps>
-
-  <verification>
-    <check type="build">npm run typecheck</check>
-    <check type="test">npm run test -- --grep "journal.*prompt"</check>
-    <check type="manual">Trigger weekly digest for test user, verify journal prompt appears inline</check>
-    <check type="manual">Submit journal entry via digest email, verify entry saved to database</check>
-    <check type="manual">Check analytics: journal prompt completion rate >40%</check>
-  </verification>
-
-  <dependencies>
-    <!-- No dependencies - Wave 1 foundation -->
-  </dependencies>
-
-  <commit-message>feat(journal): add weekly journal prompt to digest
-
-- Implement weekly journal prompt inline in digest email
-- Add "What worked this week?" question with text input
-- Include skip tracking for product iteration
-- Schedule for Sunday evening/Monday morning per user timezone
-
-Addresses REQ-013, Jensen's moat strategy (Section 10)
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-
-<task-plan id="phase-1-task-014" wave="1">
-  <title>Journal Entry Storage & CRUD</title>
-  <requirement>REQ-014: Implement journal entry persistence and retrieval system</requirement>
-  <description>
-    Create system to store user's journal entries, append-only. Support create, read (single entry + 
-    history view), update (add notes to existing entry), delete (soft delete). Provides foundation
-    for proprietary training data pipeline.
-  </description>
-
-  <context>
-    <file path="/home/agent/localgenius/src/db/schema.ts" reason="journal_entries table schema (lines 198-206 in decisions.md)" />
-    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.3 - journal requirements" />
-  </context>
-
-  <steps>
-    <step order="1">Create database migration for journal_entries table: business_id, week, tags[], note, created_at</step>
-    <step order="2">Add index on (business_id, week) for efficient queries</step>
-    <step order="3">Create /src/services/journal/storage.ts with CRUD functions</step>
-    <step order="4">Implement createJournalEntry(businessId, week, note) function</step>
-    <step order="5">Implement getJournalEntry(businessId, week) function</step>
-    <step order="6">Implement getJournalHistory(businessId, limit) function for historical entries</step>
-    <step order="7">Implement updateJournalEntry(id, note) function for adding notes</step>
-    <step order="8">Implement softDeleteJournalEntry(id) function (sets deleted_at timestamp)</step>
-    <step order="9">Create /src/api/journal routes for API access</step>
-  </steps>
-
-  <verification>
-    <check type="build">npm run typecheck && npm run db:migrate</check>
-    <check type="test">npm run test -- --grep "journal.*storage"</check>
-    <check type="manual">Create journal entry via API, verify stored in database</check>
-    <check type="manual">Retrieve journal history, verify returns all entries in chronological order</check>
-    <check type="manual">Query single entry, verify <100ms response time</check>
-  </verification>
-
-  <dependencies>
-    <!-- No dependencies - Wave 1 foundation -->
-  </dependencies>
-
-  <commit-message>feat(journal): add journal entry storage and CRUD
-
-- Create journal_entries table with migration
-- Implement CRUD operations: create, read, update, soft delete
-- Add API routes for journal entry management
-- Include efficient indexing for query performance
-
-Addresses REQ-014 from localgenius-engagement-system PRD
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-
-<task-plan id="phase-1-task-015" wave="1">
-  <title>Trend Narratives with Week-over-Week Comparisons</title>
-  <requirement>REQ-016: Add week-over-week percentage deltas to metrics in weekly digest</requirement>
-  <description>
-    Enhance weekly digest with % change for each metric vs. previous week. Example: "340 website visits 
-    (up 22% from last week)". Uses SQL window functions (LAG/LEAD) for calculation. Replaces snapshot
-    metrics with stories per Section II.7.
-  </description>
-
-  <context>
-    <file path="/home/agent/localgenius/src/services/digest/generator.ts" reason="Existing digest generation to enhance" />
-    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.4 - trend narrative requirements" />
-    <file path="/home/agent/shipyard-ai/prds/localgenius-engagement-system.md" reason="Section 4.4 - examples of trend narratives" />
-  </context>
-
-  <steps>
-    <step order="1">Create /src/services/trends/calculator.ts with calculateTrends() function</step>
-    <step order="2">Query metrics for current week and previous week using SQL window functions</step>
-    <step order="3">Calculate WoW percentage delta: ((current - previous) / previous) * 100</step>
-    <step order="4">Handle edge cases: zero baseline (show absolute value), missing data (skip comparison)</step>
-    <step order="5">Format trend narrative: "340 visits (up 22% from last week)" or "down 15%" or "unchanged"</step>
-    <step order="6">Add sparkline generation for visual trend representation (optional)</step>
-    <step order="7">Integrate trend calculator into weekly digest generation</step>
-    <step order="8">Ensure trend calculations complete in <500ms</step>
-  </steps>
-
-  <verification>
-    <check type="build">npm run typecheck</check>
-    <check type="test">npm run test -- --grep "trend.*calculator"</check>
-    <check type="manual">Generate digest for test user with known metrics, verify WoW % is correct</check>
-    <check type="manual">Test edge case: user with zero visits previous week, verify correct handling</check>
-    <check type="manual">Measure trend calculation time, verify <500ms for 10 metrics</check>
-  </verification>
-
-  <dependencies>
-    <!-- No dependencies - Wave 1 foundation -->
-  </dependencies>
-
-  <commit-message>feat(trends): add week-over-week trend narratives
-
-- Implement trend calculator with WoW percentage deltas
-- Use SQL window functions for efficient metric comparison
-- Handle edge cases: zero baseline, missing data
-- Integrate trend narratives into weekly digest
-- Performance optimized: <500ms calculation time
-
-Addresses REQ-016, Section II.4 (turn data into stories)
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-
-<task-plan id="phase-1-task-016" wave="1">
-  <title>Weekly Cliffhanger Template & Copy</title>
-  <requirement>REQ-020: Create weekly cliffhanger content at end of digest email</requirement>
-  <description>
-    Add 1-2 sentence forward hook to end of weekly digest. Examples: "Next week, I'm trying a different 
-    post style. I'll let you know if it works." Tone: First person (AI speaking), curious, experimental, 
-    never promises. Per Shonda Rhimes endorsement: "turns a report into a story."
-  </description>
-
-  <context>
-    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.5 - cliffhanger requirements, Shonda's endorsement" />
-    <file path="/home/agent/shipyard-ai/prds/localgenius-engagement-system.md" reason="Section 4.5 - cliffhanger examples and tone" />
-    <file path="/home/agent/localgenius/src/services/digest/templates.ts" reason="Digest template to append cliffhanger to" />
-  </context>
-
-  <steps>
-    <step order="1">Create /src/services/notifications/templates/cliffhanger.ts with generateCliffhanger() function</step>
-    <step order="2">Create 5-10 cliffhanger templates with placeholders for context</step>
-    <step order="3">  Example: "Next week, I'm trying a different post style. I'll let you know if it works."</step>
-    <step order="4">  Example: "I noticed competitors are doing X. I'm going to test something."</step>
-    <step order="5">  Example: "Your best week was [date]. I'm studying what worked."</step>
-    <step order="6">Implement context-aware selection logic based on user's journal notes, achievements, trends</step>
-    <step order="7">Append cliffhanger to end of weekly digest template (after all metrics)</step>
-    <step order="8">Ensure tone is first-person, curious, never promises (uses "testing," "trying")</step>
-    <step order="9">Submit all cliffhanger copy to Steve for brand voice approval</step>
-  </steps>
-
-  <verification>
-    <check type="build">npm run typecheck</check>
-    <check type="test">npm run test -- --grep "cliffhanger"</check>
-    <check type="manual">Generate digest with cliffhanger, verify appears at end of email</check>
-    <check type="manual">Verify tone is warm, first-person, creates anticipation</check>
-    <check type="manual">Confirm Steve has approved all cliffhanger copy</check>
-    <check type="manual">A/B test: measure re-engagement rate with vs. without cliffhanger</check>
-  </verification>
-
-  <dependencies>
-    <!-- No dependencies - Wave 1 foundation -->
-  </dependencies>
-
-  <commit-message>feat(cliffhanger): add weekly cliffhanger to digest
-
-- Implement cliffhanger generator with context-aware templates
-- Add 5-10 cliffhanger templates in warm, first-person tone
-- Append cliffhanger to end of weekly digest email
-- Copy approved by Steve for brand voice consistency
-
-Addresses REQ-020, Shonda Rhimes endorsement (Section 10)
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-
-<task-plan id="phase-1-task-017" wave="1">
-  <title>Database Migrations for Pulse Tables</title>
-  <requirement>Database schema changes for notifications, journal_entries, achievements tables</requirement>
-  <description>
-    Create all database migrations for Pulse 3-table architecture per Elon's locked decision (Section II.2).
-    Includes notifications table, journal_entries table, achievements table, and supporting indexes.
-  </description>
-
-  <context>
-    <file path="/home/agent/localgenius/src/db/schema.ts" reason="Existing schema to extend" />
-    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section III - complete table definitions (lines 186-217)" />
-    <file path="/home/agent/localgenius/drizzle.config.ts" reason="Migration configuration" />
-  </context>
-
-  <steps>
-    <step order="1">Create /migrations/001_create_notifications_table.sql</step>
-    <step order="2">  Add fields: id, user_id, type, content, scheduled_for, sent_at, clicked, created_at</step>
-    <step order="3">  Add index on (user_id, scheduled_for) for efficient queue queries</step>
-    <step order="4">Create /migrations/002_create_journal_entries_table.sql</step>
-    <step order="5">  Add fields: id, business_id, week, tags[], note, created_at</step>
-    <step order="6">  Add index on (business_id, week) for efficient queries</step>
-    <step order="7">Create /migrations/003_create_achievements_table.sql</step>
-    <step order="8">  Add fields: id, user_id, badge_type, unlocked_at, image_url, shared</step>
-    <step order="9">  Add index on (user_id, badge_type, unlocked_at)</step>
-    <step order="10">Create /migrations/004_add_user_preferences.sql</step>
-    <step order="11">  Add fields to users: sms_opt_in, notification_time, notification_frequency, preferred_channels</step>
-    <step order="12">Run all migrations via npm run db:migrate</step>
-  </steps>
-
-  <verification>
-    <check type="build">npm run db:migrate</check>
-    <check type="manual">Query database schema, verify all 3 tables exist with correct columns</check>
-    <check type="manual">Verify indexes created correctly via EXPLAIN queries</check>
-    <check type="manual">Check foreign key constraints are valid</check>
-  </verification>
-
-  <dependencies>
-    <!-- No dependencies - Wave 1 foundation -->
-  </dependencies>
-
-  <commit-message>feat(database): add Pulse 3-table schema migrations
-
-- Create notifications table with scheduled delivery support
-- Create journal_entries table for proprietary training data
-- Create achievements table for milestone badges
-- Add user preference fields for notification settings
-- Include efficient indexes for query performance
-
-Addresses Elon's locked architecture decision (Section II.2)
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-
-### Wave 2 (Parallel, after Wave 1)
-
-<task-plan id="phase-1-task-004" wave="2">
-  <title>Scheduled Notification Delivery Queue</title>
-  <requirement>REQ-004: Flush pre-computed notifications to users at their preferred time</requirement>
-  <description>
-    Queue system that takes pre-computed notifications from notifications table and delivers them at 
-    user's preferred scheduled_for timestamp. Respects user timezone preferences. Runs every 10 minutes
-    to find notifications ready for delivery.
-  </description>
-
-  <context>
-    <file path="/home/agent/localgenius/src/services/notifications/email-sender.ts" reason="Email sender from task-001" />
-    <file path="/home/agent/localgenius/src/services/notifications/sms-sender.ts" reason="SMS sender from task-002" />
-    <file path="/home/agent/localgenius/src/db/schema.ts" reason="notifications table with scheduled_for field" />
-  </context>
-
-  <steps>
-    <step order="1">Create /src/jobs/scheduled-delivery.ts with flushNotificationQueue() function</step>
-    <step order="2">Query notifications table: WHERE scheduled_for <= NOW() AND sent_at IS NULL</step>
-    <step order="3">For each notification, determine delivery channel (email, SMS, or both)</step>
-    <step order="4">Call appropriate sender function (email-sender.ts or sms-sender.ts)</step>
-    <step order="5">Update sent_at timestamp on successful delivery</step>
-    <step order="6">Handle partial failure: if email succeeds but SMS fails, still mark email as sent</step>
-    <step order="7">Configure Vercel cron to run this job every 10 minutes</step>
-    <step order="8">Add monitoring: alert if queue grows >1000 pending notifications</step>
-  </steps>
-
-  <verification>
-    <check type="build">npm run typecheck</check>
-    <check type="test">npm run test -- --grep "scheduled.*delivery"</check>
-    <check type="manual">Insert test notification with scheduled_for = NOW(), wait 10 minutes, verify delivery</check>
-    <check type="manual">Verify delivery within 5 minutes of scheduled_for timestamp</check>
-    <check type="manual">Check user timezone conversion accuracy (off by <1 minute)</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-001" reason="Requires email sender" />
-    <depends-on task-id="phase-1-task-002" reason="Requires SMS sender" />
-    <depends-on task-id="phase-1-task-003" reason="Requires batch generator to populate queue" />
-  </dependencies>
-
-  <commit-message>feat(notifications): add scheduled delivery queue
-
-- Implement 10-minute cron job to flush notification queue
-- Deliver notifications at user's preferred scheduled_for time
-- Handle multi-channel delivery (email + SMS)
-- Add monitoring for queue backlog alerts
-
-Addresses REQ-004 from localgenius-engagement-system PRD
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-
-<task-plan id="phase-1-task-005" wave="2">
-  <title>"All Quiet" Reassurance Notification</title>
-  <requirement>REQ-005: Generate reassurance notifications when no meaningful insights exist</requirement>
-  <description>
-    When user's business has no new activities/metrics to report, send warm "All quiet today" notification
-    instead of silence. Communicates that system is still monitoring. Include frequency cap (max 2x/week)
-    per Open Question #3 recommendation.
-  </description>
-
-  <context>
-    <file path="/home/agent/localgenius/src/jobs/notification-generator.ts" reason="Batch generator from task-003 to integrate with" />
-    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.6 - Steve wins, 'all quiet' is reassurance" />
-  </context>
-
-  <steps>
-    <step order="1">Create /src/services/notifications/templates/quiet.ts with generateQuietNotification() function</step>
-    <step order="2">Add "all quiet" notification type to notifications table enum</step>
-    <step order="3">In notification generator, check if user has zero significant metrics for the day</step>
-    <step order="4">Check last_quiet_notification_sent timestamp: only send if >3 days ago (2x/week cap)</step>
-    <step order="5">Generate warm copy: "All quiet today — your business is steady. I'm still here."</step>
-    <step order="6">Update last_quiet_notification_sent timestamp in user preferences</step>
-    <step order="7">Track "all quiet" open rate separately from insight notifications</step>
-    <step order="8">Submit copy to Steve for brand voice approval</step>
-  </steps>
-
-  <verification>
-    <check type="build">npm run typecheck</check>
-    <check type="test">npm run test -- --grep "quiet.*notification"</check>
-    <check type="manual">Trigger generator for user with zero activity, verify "all quiet" notification generated</check>
-    <check type="manual">Run generator 5 days in a row for same user, verify max 2 "all quiet" notifications sent</check>
-    <check type="manual">Check analytics: >30% open rate on "all quiet" messages</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-003" reason="Integrates into batch generator logic" />
-  </dependencies>
-
-  <commit-message>feat(notifications): add "all quiet" reassurance notification
-
-- Implement reassurance notification for zero-activity days
-- Add frequency cap: max 2x/week per user
-- Include warm, non-spammy copy per Steve's brand voice
-- Track open rates separately from insight notifications
-
-Addresses REQ-005, Section II.6 (Steve wins - reassurance not spam)
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
+### Wave 2 (Parallel — Depends on Wave 1)
 
 <task-plan id="phase-1-task-006" wave="2">
-  <title>Notification Preference Settings Screen</title>
-  <requirement>REQ-006: Create minimal notification preferences UI (3-5 toggles)</requirement>
+  <title>Claude API Integration</title>
+  <requirement>REQ-027: Integrate Claude 3.5 Haiku via Anthropic API</requirement>
   <description>
-    Add settings screen allowing users to control notification delivery without creating decision fatigue.
-    Include: Time of day, Email vs SMS channel, Frequency (daily vs weekly digest only). Per Section II.8
-    compromise: sensible defaults, 3-5 toggles max, not a "preference center."
+    Call Claude API from Worker. Use model: claude-3-5-haiku-20241022. Include ANTHROPIC_API_KEY from
+    environment. Stream response back to widget.
   </description>
 
   <context>
-    <file path="/home/agent/localgenius/src/components/settings" reason="Existing settings components pattern" />
-    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.8 - minimal settings locked decision" />
+    <file path="/spark/worker/index.js" reason="Worker foundation from task-005" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-lite/decisions.md" reason="Section 1.6 - Claude Haiku decision" />
   </context>
 
   <steps>
-    <step order="1">Create /src/components/NotificationPreferences.jsx settings panel component</step>
-    <step order="2">Add time picker: notification_time (default 9am local), dropdown with hourly options</step>
-    <step order="3">Add frequency dropdown: notification_frequency (daily, weekly digest only)</step>
-    <step order="4">Add channel checkboxes: preferred_channels (email, SMS, both) with SMS opt-in disclaimer</step>
-    <step order="5">Create /src/api/settings/notification-preferences route (GET/POST)</step>
-    <step order="6">Persist preferences to users table (fields added in task-017 migration)</step>
-    <step order="7">Add unsubscribe link at bottom: "Pause all notifications" option</step>
-    <step order="8">Ensure UI is clean, minimal, no decision fatigue (3 settings total)</step>
+    <step order="1">Create `/spark/worker/claude.js` with `callClaude()` function</step>
+    <step order="2">Install @anthropic-ai/sdk dependency</step>
+    <step order="3">Initialize Anthropic client with API key from env.ANTHROPIC_API_KEY</step>
+    <step order="4">Call messages API with model: "claude-3-5-haiku-20241022"</step>
+    <step order="5">Set stream: true for streaming responses</step>
+    <step order="6">Add error handling: catch API errors, return 500 with user-friendly message</step>
+    <step order="7">Add timeout: 30-second max wait, return 408 Timeout if exceeded</step>
   </steps>
 
   <verification>
-    <check type="build">npm run build && npm run typecheck</check>
-    <check type="test">npm run test -- --grep "notification.*preferences"</check>
-    <check type="manual">Open settings panel, change notification time to 7pm, verify saved to database</check>
-    <check type="manual">Toggle SMS off, verify no SMS sent in next notification</check>
-    <check type="manual">Check unsubscribe rate stays <5% after launching preferences UI</check>
+    <check type="build">npm install @anthropic-ai/sdk</check>
+    <check type="manual">Call Claude API with test prompt → verify response received</check>
+    <check type="manual">Verify model is claude-3-5-haiku-20241022</check>
+    <check type="manual">Test with missing API key → verify error handled gracefully</check>
+    <check type="manual">Test with 35-second wait → verify timeout at 30s</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-001" reason="Must work with email notification system" />
-    <depends-on task-id="phase-1-task-002" reason="Must work with SMS notification system" />
-    <depends-on task-id="phase-1-task-017" reason="Requires user preference fields in database" />
+    <depends-on task-id="phase-1-task-005" reason="Requires Worker foundation" />
   </dependencies>
 
-  <commit-message>feat(settings): add notification preference UI
+  <commit-message>feat(worker): add Claude API integration
 
-- Create minimal settings panel with 3-5 toggles (no decision fatigue)
-- Add time picker, frequency dropdown, channel checkboxes
-- Include SMS opt-in disclaimer for TCPA compliance
-- Add unsubscribe/pause option
-- User preferences persist and affect notification delivery
+- Integrate Anthropic SDK for Claude 3.5 Haiku
+- Configure streaming responses
+- Add error handling for API failures
+- Add 30-second timeout protection
+- Read API key from environment variable
 
-Addresses REQ-006, Section II.8 (Steve + Elon compromise)
+Implements REQ-027 (decisions.md §1.6)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-007" wave="2">
+  <title>System Prompt Engineering</title>
+  <requirement>REQ-034 through REQ-039: Create system prompt that prevents hallucination</requirement>
+  <description>
+    Design system prompt that instructs Claude to answer ONLY from page context. Include strict
+    instructions: never make up info, never discuss unrelated topics, say "I don't see that information"
+    when unknown. Test on 20+ sites for accuracy.
+  </description>
+
+  <context>
+    <file path="/spark/worker/claude.js" reason="Claude integration from task-006" />
+    <file path="/home/agent/shipyard-ai/prds/localgenius-lite.md" reason="System Prompt section" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-lite/decisions.md" reason="Section 2.1 - accuracy requirements" />
+  </context>
+
+  <steps>
+    <step order="1">Create system prompt template in `/spark/worker/prompt.js`</step>
+    <step order="2">Include instruction: "You are a helpful assistant for this website. Answer questions based ONLY on the page content provided."</step>
+    <step order="3">Add fallback instruction: "If you don't know the answer from the provided content, say: 'I don't see that information on this page. You might want to contact the site owner directly.'"</step>
+    <step order="4">Add constraint: "Never make up information. Never discuss topics unrelated to the page content."</step>
+    <step order="5">Format: System prompt, then PAGE CONTENT: {scraped_content}, then User: {question}</step>
+    <step order="6">Test on 20 different websites with known content + out-of-scope questions</step>
+    <step order="7">Measure hallucination rate: should be <5%</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Test: "What are your hours?" on page with hours → correct answer</check>
+    <check type="manual">Test: "What are your hours?" on page without hours → "I don't see that information"</check>
+    <check type="manual">Test: "Who won the 2024 election?" (unrelated) → refuses to answer</check>
+    <check type="manual">Run 100 test questions → hallucination rate <5%</check>
+    <check type="manual">Verify responses cite page content, not external knowledge</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-006" reason="Requires Claude API integration" />
+  </dependencies>
+
+  <commit-message>feat(worker): add system prompt engineering
+
+- Create strict system prompt for accuracy
+- Instruct Claude to answer ONLY from page context
+- Add "I don't see that information" fallback
+- Prevent hallucination and off-topic responses
+- Test on 20+ sites, <5% hallucination rate
+
+Implements REQ-034 through REQ-039 (PRD §System Prompt)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-008" wave="2">
+  <title>Multi-Layer Rate Limiting</title>
+  <requirement>REQ-031-033: Implement 10 req/min per site_id + 100 req/hour per IP</requirement>
+  <description>
+    Add dual-layer rate limiting: (1) per site_id limit using in-memory map, (2) per IP limit using
+    Cloudflare native rate limiting. Return 429 Too Many Requests when exceeded.
+  </description>
+
+  <context>
+    <file path="/spark/worker/index.js" reason="Worker entry point from task-005" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-lite/decisions.md" reason="Section 1.4, §2.1 - rate limit requirements" />
+  </context>
+
+  <steps>
+    <step order="1">Create `/spark/worker/ratelimit.js` with rate limit logic</step>
+    <step order="2">Implement in-memory map: { site_id: { count, resetAt } }</step>
+    <step order="3">Check site_id limit: if count >= 10 in current minute, return 429</step>
+    <step order="4">Reset count every minute using timestamp comparison</step>
+    <step order="5">Extract client IP from request headers: request.headers.get('CF-Connecting-IP')</step>
+    <step order="6">Add Cloudflare rate limiting: use wrangler.jsonc rate_limiting config for 100 req/hour per IP</step>
+    <step order="7">Return 429 status with Retry-After header: seconds until reset</step>
+    <step order="8">Test: send 11 requests from same site_id → 11th returns 429</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Send 10 requests with same site_id → all succeed</check>
+    <check type="manual">Send 11th request → 429 Too Many Requests</check>
+    <check type="manual">Wait 61 seconds → verify rate limit resets</check>
+    <check type="manual">Send 101 requests from same IP → verify Cloudflare blocks</check>
+    <check type="manual">Verify Retry-After header present in 429 response</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-005" reason="Requires Worker foundation" />
+  </dependencies>
+
+  <commit-message>feat(worker): add multi-layer rate limiting
+
+- Implement 10 req/min per site_id limit (in-memory)
+- Add 100 req/hour per IP limit (Cloudflare native)
+- Return 429 Too Many Requests with Retry-After header
+- Reset limits every minute for site_id
+- Extract client IP from CF-Connecting-IP header
+
+Implements REQ-031 through REQ-033 (decisions.md §1.4, §2.1)
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 <task-plan id="phase-1-task-009" wave="2">
-  <title>Async Badge Image Generation</title>
-  <requirement>REQ-009: Generate shareable OG images for badge unlocks asynchronously</requirement>
+  <title>Streaming Response Handler</title>
+  <requirement>REQ-028-030: Stream Claude responses via SSE to widget</requirement>
   <description>
-    When badge is unlocked, asynchronously generate a branded social media shareable card (OG image) with 
-    badge graphic, user's stats, and LocalGenius branding. Store in S3/CDN. Per Section II.12 locked decision:
-    Elon wins on async generation for performance.
+    Stream Claude API response chunks to widget via Server-Sent Events. Format: data: {"chunk": "text"}.
+    Send done flag on completion: data: {"done": true}.
   </description>
 
   <context>
-    <file path="/home/agent/localgenius/src/services/badges/checker.ts" reason="Badge checker from task-007" />
-    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.12 - async generation locked" />
-    <file path="/home/agent/localgenius/package.json" reason="Check for image generation dependencies (canvas, sharp)" />
+    <file path="/spark/worker/claude.js" reason="Claude API from task-006" />
+    <file path="/spark/widget/spark.js" reason="Widget needs to receive and render chunks" />
+    <file path="/home/agent/shipyard-ai/prds/localgenius-lite.md" reason="API Design - streaming format" />
   </context>
 
   <steps>
-    <step order="1">Create /src/services/badges/image-generator.ts with generateBadgeImage() function</step>
-    <step order="2">Install image generation dependencies if needed: @vercel/og or canvas</step>
-    <step order="3">Design badge card template: 1200x630px OG image with badge icon, stats, branding</step>
-    <step order="4">Generate image asynchronously when achievement unlocked (triggered by badge checker)</step>
-    <step order="5">Upload generated image to S3 or Cloudflare R2</step>
-    <step order="6">Store image URL in achievements.image_url field</step>
-    <step order="7">Add fallback: if custom generation fails, serve generic badge image</step>
-    <step order="8">Cache generated images in CDN for fast serving</step>
-    <step order="9">Create /src/jobs/badge-image-gen.ts for async job queue</step>
+    <step order="1">Configure Claude API for streaming: stream: true</step>
+    <step order="2">Create ReadableStream in Worker to pipe Claude chunks</step>
+    <step order="3">Format each chunk as SSE: `data: ${JSON.stringify({ chunk: text })}\n\n`</step>
+    <step order="4">Send done event when stream completes: `data: ${JSON.stringify({ done: true })}\n\n`</step>
+    <step order="5">Set Worker response headers: Content-Type: text/event-stream, Cache-Control: no-cache</step>
+    <step order="6">In widget, create EventSource or fetch with reader to consume stream</step>
+    <step order="7">Append each chunk to AI message bubble as it arrives</step>
+    <step order="8">Hide typing indicator when done: true received</step>
   </steps>
 
   <verification>
-    <check type="build">npm run build && npm run typecheck</check>
-    <check type="test">npm run test -- --grep "badge.*image"</check>
-    <check type="manual">Unlock test badge, verify OG image generated within 5 minutes</check>
-    <check type="manual">Check image resolution suitable for Instagram/Facebook (1200x630px)</check>
-    <check type="manual">Verify fallback generic image served if custom generation fails</check>
-    <check type="manual">Test image generation latency <2 seconds per badge</check>
+    <check type="manual">Ask question → verify response streams chunk by chunk</check>
+    <check type="manual">Verify first chunk appears in <2 seconds</check>
+    <check type="manual">Verify typing indicator shows until done: true</check>
+    <check type="manual">Check browser DevTools Network → verify SSE format correct</check>
+    <check type="manual">Test on slow network → verify streaming still works</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-007" reason="Requires badge checker to trigger image generation" />
-    <depends-on task-id="phase-1-task-008" reason="Requires badge definitions for image content" />
+    <depends-on task-id="phase-1-task-006" reason="Requires Claude API integration" />
+    <depends-on task-id="phase-1-task-002" reason="Requires widget chat interactions" />
   </dependencies>
 
-  <commit-message>feat(badges): add async badge image generation
+  <commit-message>feat(worker): add streaming response handler
 
-- Implement OG image generator for shareable badge cards
-- Generate 1200x630px images with badge icon, stats, branding
-- Upload to S3/R2 and cache in CDN
-- Add fallback generic image for generation failures
-- Async generation prevents unlock latency
+- Stream Claude API responses via Server-Sent Events
+- Format chunks as: data: {"chunk": "text"}
+- Send done flag on completion: data: {"done": true}
+- Configure Worker for SSE: Content-Type, Cache-Control
+- Widget consumes stream and renders chunks in real-time
 
-Addresses REQ-009, Section II.12 (Elon wins - async approach)
+Implements REQ-028 through REQ-030 (PRD §API Design)
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 <task-plan id="phase-1-task-010" wave="2">
-  <title>One-Tap Badge Share to Social</title>
-  <requirement>REQ-010: Implement one-tap sharing of badge achievements to Instagram/Facebook</requirement>
+  <title>Error Handling + Timeouts</title>
+  <requirement>REQ-043-044, REQ-080: Handle API errors, timeouts gracefully</requirement>
   <description>
-    Add share button to badge unlock celebration modal that pre-fills social share text and opens native
-    share UI. Pre-filled copy is warm, celebratory, not overly salesy. Tracks share events for growth
-    metrics validation.
+    Add comprehensive error handling: Claude API failures, network timeouts, rate limit errors.
+    Show user-friendly messages (not stack traces). Add retry button for recoverable errors.
   </description>
 
   <context>
-    <file path="/home/agent/localgenius/src/components" reason="Existing React component patterns" />
-    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section II.4 - badges must-have for viral growth" />
+    <file path="/spark/worker/index.js" reason="Worker error handling" />
+    <file path="/spark/widget/spark.js" reason="Widget error display" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-lite/decisions.md" reason="Section 4.3 - error UX" />
   </context>
 
   <steps>
-    <step order="1">Create /src/components/BadgeUnlockModal.jsx celebration modal component</step>
-    <step order="2">Display badge icon, title, and celebratory message when badge unlocks</step>
-    <step order="3">Add share button that opens native share UI (Web Share API)</step>
-    <step order="4">Pre-fill share text: "Just hit 1000 website visitors with @LocalGenius 🚀"</step>
-    <step order="5">Include badge OG image URL from achievements.image_url (task-009)</step>
-    <step order="6">Make pre-filled text editable by user before sharing</step>
-    <step order="7">Track share events: POST to /api/achievements/{id}/share when user clicks share</step>
-    <step order="8">Update achievements.shared=true and achievements.shared_at timestamp</step>
-    <step order="9">Fallback for browsers without Web Share API: copy link to clipboard</step>
+    <step order="1">Create `/spark/worker/errors.js` with error handling utilities</step>
+    <step order="2">Add try-catch around Claude API calls</step>
+    <step order="3">Map errors to user-friendly messages: "Sorry, I couldn't answer that. Try again?"</step>
+    <step order="4">Handle specific errors: 429 → "I'm getting too many questions right now", 500 → "Something went wrong"</step>
+    <step order="5">Add 30-second timeout: if Claude doesn't respond, return timeout error</step>
+    <step order="6">In widget, display error message in chat (not console)</step>
+    <step order="7">Add retry button to error messages</step>
+    <step order="8">Log errors to console.error for debugging (not shown to user)</step>
   </steps>
 
   <verification>
-    <check type="build">npm run build && npm run typecheck</check>
-    <check type="test">npm run test -- --grep "badge.*share"</check>
-    <check type="manual">Unlock test badge, verify celebration modal appears with share button</check>
-    <check type="manual">Click share button, verify native share UI opens with pre-filled text</check>
-    <check type="manual">Share to social platform, verify share event logged in database</check>
-    <check type="manual">Check analytics: >10% of badge unlocks result in social share</check>
+    <check type="manual">Simulate Claude API error → verify user-friendly message shown</check>
+    <check type="manual">Simulate 30-second timeout → verify "Try again" message</check>
+    <check type="manual">Trigger 429 rate limit → verify correct error message</check>
+    <check type="manual">Verify no stack traces shown to user</check>
+    <check type="manual">Click retry button → verify message re-sends</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-007" reason="Requires badge unlock detection" />
-    <depends-on task-id="phase-1-task-008" reason="Requires badge definitions for copy" />
-    <depends-on task-id="phase-1-task-009" reason="Requires badge OG images" />
+    <depends-on task-id="phase-1-task-006" reason="Requires Claude API integration" />
+    <depends-on task-id="phase-1-task-008" reason="Handles rate limit errors" />
   </dependencies>
 
-  <commit-message>feat(badges): add one-tap social sharing
+  <commit-message">feat(worker): add error handling and timeouts
 
-- Create badge unlock celebration modal with share button
-- Pre-fill share text with warm, celebratory copy
-- Use Web Share API for native platform sharing
-- Track share events for growth metrics
-- User can edit pre-filled text before sharing
+- Add user-friendly error messages (no stack traces)
+- Handle Claude API failures gracefully
+- Add 30-second timeout with retry button
+- Map 429, 500 errors to helpful messages
+- Log errors to console for debugging
 
-Addresses REQ-010, Section II.4 (shareable badges must-have)
+Implements REQ-043-044, REQ-080 (decisions.md §4.3)
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 <task-plan id="phase-1-task-011" wave="2">
-  <title>Confetti Animation on Badge Unlock</title>
-  <requirement>REQ-011: Add celebratory confetti animation to badge unlock experience</requirement>
+  <title>Usage Logging (Cloudflare Analytics)</title>
+  <requirement>REQ-078: Log usage metrics to Cloudflare Analytics</requirement>
   <description>
-    When user unlocks a badge, display modal with confetti animation and warm messaging to create dopamine
-    hit and make achievement feel special. Per Section II.2: Steve's celebratory design for emotional peaks.
+    Track metrics: total questions, error rates, unique site_ids, response latency. Use Cloudflare
+    Analytics (free tier) for monitoring. Enables post-launch iteration.
   </description>
 
   <context>
-    <file path="/home/agent/localgenius/src/components/BadgeUnlockModal.jsx" reason="Modal from task-010 to add animation to" />
+    <file path="/spark/worker/index.js" reason="Worker request handler" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-lite/decisions.md" reason="Section 4.1 Q4 - logging requirements" />
   </context>
 
   <steps>
-    <step order="1">Add confetti animation library: canvas-confetti or react-confetti</step>
-    <step order="2">Trigger confetti animation when BadgeUnlockModal opens</step>
-    <step order="3">Configure animation: 2-3 second duration, colorful particles, celebratory feel</step>
-    <step order="4">Ensure animation doesn't block user interaction (non-blocking)</step>
-    <step order="5">Add dismiss button: user can close modal with one tap</step>
-    <step order="6">Optimize performance: animation maintains >60fps on mobile</step>
-    <step order="7">Add accessibility: motion-reduced media query disables animation for users with vestibular disorders</step>
+    <step order="1">Create `/spark/worker/analytics.js` with logging functions</step>
+    <step order="2">Log each request: site_id, question length, response time, error status</step>
+    <step order="3">Use console.log for structured JSON logging (Cloudflare captures this)</step>
+    <step order="4">Track metrics: { event: "question", site_id, latency_ms, error: null }</step>
+    <step order="5">Track errors: { event: "error", site_id, error_type, error_message }</step>
+    <step order="6">Track rate limits: { event: "rate_limited", site_id, limit_type }</step>
+    <step order="7">Add latency tracking: Date.now() before/after Claude call</step>
+    <step order="8">Verify logs appear in Cloudflare dashboard</step>
   </steps>
 
   <verification>
-    <check type="build">npm run build</check>
-    <check type="manual">Unlock test badge, verify confetti animation plays smoothly</check>
-    <check type="manual">Check animation duration is 2-3 seconds (not too long)</check>
-    <check type="manual">Verify user can dismiss modal with one tap</check>
-    <check type="manual">Test on mobile device: animation maintains >60fps</check>
-    <check type="manual">Enable prefers-reduced-motion, verify animation disabled</check>
+    <check type="manual">Send test question → verify logged in Cloudflare dashboard</check>
+    <check type="manual">Check log includes: site_id, latency, error status</check>
+    <check type="manual">Trigger error → verify error logged with type</check>
+    <check type="manual">Trigger rate limit → verify rate_limited event logged</check>
+    <check type="manual">Verify unique site_ids count in dashboard</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-010" reason="Requires BadgeUnlockModal component" />
+    <depends-on task-id="phase-1-task-005" reason="Requires Worker foundation" />
   </dependencies>
 
-  <commit-message>feat(badges): add confetti animation to unlock
+  <commit-message>feat(worker): add usage logging to Cloudflare Analytics
 
-- Add celebratory confetti animation when badge unlocks
-- Configure 2-3 second duration with colorful particles
-- Ensure >60fps performance on mobile
-- Add accessibility: respect prefers-reduced-motion
-- Non-blocking: user can dismiss modal immediately
+- Log all requests with site_id, latency, error status
+- Track errors with type and message
+- Track rate limit events
+- Use structured JSON logging for Cloudflare capture
+- Enable post-launch metrics analysis
 
-Addresses REQ-011, Steve's emotional peak design (Section II.2)
+Implements REQ-078 (decisions.md §4.1 Q4)
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
-<task-plan id="phase-1-task-018" wave="2">
-  <title>Analytics & Tracking Infrastructure</title>
-  <requirement>REQ-029 through REQ-032: Notification, badge, journal, and upgrade prompt analytics</requirement>
-  <description>
-    Create comprehensive tracking and analytics for all Pulse features. Track notification metrics (send, 
-    open, click, unsubscribe), badge metrics (unlock, share), journal metrics (prompt, completion), and
-    upgrade prompt metrics (impression, click, conversion). Enables product iteration and risk monitoring.
-  </description>
-
-  <context>
-    <file path="/home/agent/localgenius/src/services/analytics" reason="Existing analytics patterns" />
-    <file path="/home/agent/shipyard-ai/rounds/localgenius-engagement-system/decisions.md" reason="Section VI - success metrics" />
-  </context>
-
-  <steps>
-    <step order="1">Create /src/services/analytics/pulse-tracker.ts with tracking functions</step>
-    <step order="2">Add notification tracking: opened_at, clicked_at, clicked_url fields to notifications table</step>
-    <step order="3">Track badge metrics: create badge_analytics table with unlock_rate, share_rate</step>
-    <step order="4">Track journal metrics: create journal_analytics table with prompt_shown, completed, skipped</step>
-    <step order="5">Track upgrade prompts: create upgrade_prompt_analytics table with shown_at, clicked_at, converted_at</step>
-    <step order="6">Create aggregation job: daily rollup of all Pulse metrics</step>
-    <step order="7">Create /src/api/analytics/pulse endpoint for dashboard queries</step>
-    <step order="8">Add real-time alerts: unsubscribe rate >10%, open rate <20%, share rate <5%</step>
-  </steps>
-
-  <verification>
-    <check type="build">npm run typecheck && npm run db:migrate</check>
-    <check type="test">npm run test -- --grep "analytics.*tracker"</check>
-    <check type="manual">Send test notification, click link, verify click tracked in database</check>
-    <check type="manual">Unlock badge, share to social, verify share tracked</check>
-    <check type="manual">Query analytics dashboard, verify real-time metrics available</check>
-    <check type="manual">Check alerts trigger correctly when thresholds exceeded</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-001" reason="Tracks email notifications" />
-    <depends-on task-id="phase-1-task-002" reason="Tracks SMS notifications" />
-    <depends-on task-id="phase-1-task-007" reason="Tracks badge unlocks" />
-    <depends-on task-id="phase-1-task-013" reason="Tracks journal prompts" />
-  </dependencies>
-
-  <commit-message>feat(analytics): add Pulse tracking infrastructure
-
-- Implement comprehensive tracking for all Pulse features
-- Track notification metrics: send, open, click, unsubscribe
-- Track badge metrics: unlock, share rate
-- Track journal metrics: prompt completion
-- Track upgrade prompt metrics: impression, conversion
-- Add daily aggregation job and real-time alerts
-
-Addresses REQ-029 through REQ-032 from PRD
-
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
-</task-plan>
-
-### Wave 3 (Parallel, after Wave 2)
+### Wave 3 (Parallel — Depends on Wave 2)
 
 <task-plan id="phase-1-task-012" wave="3">
-  <title>Badge Gallery in Account Settings</title>
-  <requirement>REQ-012: Create badge collection display in user settings</requirement>
+  <title>Landing Page (Steve's Vision)</title>
+  <requirement>REQ-046-052: Create Apple-level simple landing page</requirement>
   <description>
-    Add section to account settings showing all unlocked badges (and locked/upcoming badges as greyed out).
-    Browsable, shareable collection of achievements. Each badge card shows unlock date and has share button.
+    Build landing page with Steve's design: "Your website, instantly brilliant." Hero text, one script
+    tag in code block, one demo, one CTA button ("Try It Now"). No feature lists. Minimal, beautiful.
   </description>
 
   <context>
-    <file path="/home/agent/localgenius/src/components/settings" reason="Existing settings components" />
-    <file path="/home/agent/localgenius/src/services/badges/checker.ts" reason="Badge data source" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-lite/decisions.md" reason="Section 1.7 - landing page requirements (Steve's vision)" />
   </context>
 
   <steps>
-    <step order="1">Create /src/components/BadgeGallery.jsx gallery component</step>
-    <step order="2">Query all badges: both unlocked (from achievements) and locked (from badge_definitions)</step>
-    <step order="3">Display badges in grid layout with badge icon, title, unlock date (or "Locked")</step>
-    <step order="4">For locked badges, show progression: "350/500 visits — 70% to Local Favorite"</step>
-    <step order="5">Add share button to each unlocked badge card</step>
-    <step order="6">Create /src/api/achievements/gallery endpoint: returns locked + unlocked badges</step>
-    <step order="7">Optimize query performance: gallery loads in <1 second</step>
-    <step order="8">Add badge collection page route: /settings/badges</step>
+    <step order="1">Create `/spark/landing/index.html` landing page</step>
+    <step order="2">Add hero section: <h1>Your website, instantly brilliant.</h1></step>
+    <step order="3">Add subheading: "One script tag. Zero configuration."</step>
+    <step order="4">Add code block with copy-paste ready script tag: <script src="https://cdn.usespark.com/spark.js"></script></step>
+    <step order="5">Add live demo section: working widget embedded on same page</step>
+    <step order="6">Add single CTA button: "Try It Now" → scrolls to code block</step>
+    <step order="7">Add footer with "Powered by SPARK" attribution</step>
+    <step order="8">Style: Clean, Apple-inspired, purple gradient accents, generous whitespace</step>
+    <step order="9">No feature lists, no pricing grids, no detailed docs (keep simple)</step>
   </steps>
 
   <verification>
-    <check type="build">npm run build && npm run typecheck</check>
-    <check type="test">npm run test -- --grep "badge.*gallery"</check>
-    <check type="manual">Open badge gallery, verify all badges displayed (locked + unlocked)</check>
-    <check type="manual">Check locked badges show progression toward unlock</check>
-    <check type="manual">Click share button on unlocked badge, verify share UI opens</check>
-    <check type="manual">Measure gallery load time, verify <1 second</check>
+    <check type="manual">Open landing page → verify hero text "Your website, instantly brilliant."</check>
+    <check type="manual">Verify code block has copy-paste ready script tag</check>
+    <check type="manual">Verify live demo works (widget opens, responds)</check>
+    <check type="manual">Click "Try It Now" → scrolls to code block</check>
+    <check type="manual">Verify design is clean, minimal, Apple-inspired</check>
+    <check type="manual">Verify no feature lists or complexity</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-007" reason="Requires badge unlock data" />
-    <depends-on task-id="phase-1-task-008" reason="Requires badge definitions" />
-    <depends-on task-id="phase-1-task-009" reason="Requires badge images" />
-    <depends-on task-id="phase-1-task-010" reason="Requires share functionality" />
+    <depends-on task-id="phase-1-task-001" reason="Requires widget for live demo" />
+    <depends-on task-id="phase-1-task-009" reason="Widget must work for demo" />
   </dependencies>
 
-  <commit-message>feat(badges): add badge gallery to settings
+  <commit-message>feat(landing): create Apple-inspired landing page
 
-- Create browsable badge collection in account settings
-- Display locked + unlocked badges in grid layout
-- Show progression toward locked badges (e.g., "350/500 visits")
-- Add share button to each unlocked badge
-- Optimize query performance: <1 second load time
+- Add hero: "Your website, instantly brilliant."
+- Include copy-paste script tag in code block
+- Add working live demo of widget
+- Single CTA: "Try It Now"
+- Clean, minimal design with purple gradient
+- No feature lists or complexity (Steve's vision)
 
-Addresses REQ-012 from localgenius-engagement-system PRD
+Implements REQ-046 through REQ-052 (decisions.md §1.7)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-013" wave="3">
+  <title>Live Demo Embed on Landing</title>
+  <requirement>REQ-049: Embed working widget on landing page for demo</requirement>
+  <description>
+    Embed SPARK widget on landing page itself to serve as interactive demo. Pre-load with sample
+    page content (landing page content) so visitors can test immediately.
+  </description>
+
+  <context>
+    <file path="/spark/landing/index.html" reason="Landing page from task-012" />
+    <file path="/spark/widget/spark.js" reason="Widget to embed" />
+  </context>
+
+  <steps>
+    <step order="1">Add widget script tag to landing page: <script src="../widget/spark.js"></script></step>
+    <step order="2">Widget scrapes landing page content automatically</step>
+    <step order="3">Test question: "What is SPARK?" → should answer from landing page content</step>
+    <step order="4">Add note above demo: "Try asking: 'What is SPARK?' or 'How does it work?'"</step>
+    <step order="5">Verify widget appears and works on landing page</step>
+  </steps>
+
+  <verification>
+    <check type="manual">Open landing page → widget button appears</check>
+    <check type="manual">Click widget → panel opens</check>
+    <check type="manual">Ask "What is SPARK?" → correct answer from landing content</check>
+    <check type="manual">Verify demo works smoothly (no errors)</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-012" reason="Requires landing page" />
+    <depends-on task-id="phase-1-task-009" reason="Requires working streaming" />
+  </dependencies>
+
+  <commit-message>feat(landing): add live demo embed
+
+- Embed SPARK widget on landing page
+- Widget scrapes landing page content for demo
+- Add suggested questions for testing
+- Interactive demo shows widget in action
+
+Implements REQ-049 (decisions.md §1.7)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-014" wave="3">
+  <title>CDN Deployment (Widget Script)</title>
+  <requirement>REQ-053: Deploy widget script to CDN at https://cdn.usespark.com/spark.js</requirement>
+  <description>
+    Bundle widget JavaScript, minify, gzip. Deploy to Cloudflare CDN (or similar). Configure caching,
+    versioning. Ensure <10KB gzipped size. Provide stable URL for embedding.
+  </description>
+
+  <context>
+    <file path="/spark/widget/spark.js" reason="Widget to deploy" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-lite/decisions.md" reason="Section 4.2 Q8 - CDN URL" />
+  </context>
+
+  <steps>
+    <step order="1">Install bundler: esbuild or rollup for minification</step>
+    <step order="2">Bundle spark.js + dependencies into single file</step>
+    <step order="3">Minify JavaScript: remove whitespace, shorten variable names</step>
+    <step order="4">Gzip bundle: verify ≤10KB compressed</step>
+    <step order="5">Deploy to Cloudflare R2 or Pages with public URL</step>
+    <step order="6">Configure CDN caching: Cache-Control: public, max-age=3600 (1 hour)</step>
+    <step order="7">Set up versioning: /v1/spark.js for future updates</step>
+    <step order="8">Test: curl https://cdn.usespark.com/spark.js → returns bundled script</step>
+  </steps>
+
+  <verification>
+    <check type="build">npm run build → creates bundled spark.js</check>
+    <check type="manual">Check bundle size: ls -lh spark.min.js.gz → verify ≤10KB</check>
+    <check type="manual">curl https://cdn.usespark.com/spark.js → returns script</check>
+    <check type="manual">Embed script in test page → widget loads and works</check>
+    <check type="manual">Check CDN caching headers in browser DevTools</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-001" reason="Requires complete widget code" />
+    <depends-on task-id="phase-1-task-004" reason="Includes scraper in bundle" />
+  </dependencies>
+
+  <commit-message>feat(deploy): deploy widget to CDN
+
+- Bundle, minify, gzip widget JavaScript
+- Deploy to Cloudflare CDN at cdn.usespark.com/spark.js
+- Configure caching and versioning
+- Verify ≤10KB gzipped size
+- Provide stable public URL for embedding
+
+Implements REQ-053, REQ-057 (decisions.md §4.2)
+
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
+</task-plan>
+
+<task-plan id="phase-1-task-015" wave="3">
+  <title>Cloudflare Worker Deployment</title>
+  <requirement>REQ-069-070: Deploy Worker with wrangler, configure Claude API key</requirement>
+  <description>
+    Deploy Cloudflare Worker to production. Configure environment variables (ANTHROPIC_API_KEY).
+    Set up wrangler.jsonc with correct settings. Test production deployment.
+  </description>
+
+  <context>
+    <file path="/spark/worker/wrangler.jsonc" reason="Worker config" />
+    <file path="/home/agent/shipyard-ai/examples/bellas-bistro/wrangler.jsonc" reason="Config pattern reference" />
+    <file path="/home/agent/shipyard-ai/rounds/localgenius-lite/decisions.md" reason="Section 3 - deployment" />
+  </context>
+
+  <steps>
+    <step order="1">Create wrangler.jsonc with name: "spark-api"</step>
+    <step order="2">Set compatibility_date: "2026-04-19"</step>
+    <step order="3">Add compatibility_flags: ["nodejs_compat"]</step>
+    <step order="4">Configure secrets: wrangler secret put ANTHROPIC_API_KEY</step>
+    <step order="5">Test locally: wrangler dev → verify Worker starts</step>
+    <step order="6">Deploy to production: wrangler deploy</step>
+    <step order="7">Verify production URL: https://spark-api.<subdomain>.workers.dev/api/chat</step>
+    <step order="8">Test production: POST to Worker URL with valid request → verify response</step>
+  </steps>
+
+  <verification>
+    <check type="build">wrangler deploy → successful deployment</check>
+    <check type="manual">POST to production Worker URL → 200 response with Claude answer</check>
+    <check type="manual">Verify ANTHROPIC_API_KEY secret configured</check>
+    <check type="manual">Check Cloudflare dashboard → Worker deployed and running</check>
+    <check type="manual">Test from widget → end-to-end flow works</check>
+  </verification>
+
+  <dependencies>
+    <depends-on task-id="phase-1-task-005" reason="Requires Worker code" />
+    <depends-on task-id="phase-1-task-006" reason="Requires Claude integration" />
+    <depends-on task-id="phase-1-task-008" reason="Includes rate limiting" />
+  </dependencies>
+
+  <commit-message>feat(deploy): deploy Cloudflare Worker to production
+
+- Configure wrangler.jsonc with nodejs_compat
+- Set up ANTHROPIC_API_KEY secret
+- Deploy to Cloudflare Workers
+- Test production endpoint
+- End-to-end flow operational
+
+Implements REQ-069-070 (decisions.md §3)
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com></commit-message>
 </task-plan>
 
 ---
 
-## Risk Notes
+## Risk Mitigation Plan
 
-### Infrastructure Dependencies (HIGH PRIORITY)
+### High-Priority Risks (from Risk Scanner Report)
 
-**BLOCKER:** 4 decision blockers must be resolved before Wave 1 execution:
+**TR-001: Shadow DOM CSS Conflicts**
+- **Mitigation Tasks:** task-003 (Shadow DOM setup + testing)
+- **Testing:** WordPress (Astra, Divi), Shopify (Dawn), Wix
+- **Fallback:** Use `all: initial` + `!important` selectively
 
-1. **SMS Provider Choice** (Open Question #1)
-   - **Impact:** Blocks task-002 (SMS infrastructure)
-   - **Recommendation:** Twilio for delivery quality
-   - **Cost Model:** 10K users × 30 SMS/mo × $0.03 = $9K/month
-   - **Decision Needed:** Choose provider and approve budget
+**TR-002: SPA Content Scraping Failures**
+- **Mitigation Tasks:** task-004 (1-second delay + MutationObserver)
+- **Testing:** React, Vue, Angular SPAs (20+ sites)
+- **Impact:** 30-40% of target market
 
-2. **Badge Milestone Thresholds** (Open Question #2)
-   - **Impact:** Blocks task-008 (badge definitions)
-   - **Recommendation:** Validate with existing user data before setting thresholds
-   - **Example:** 500 visits = Local Favorite (must confirm this is achievable but not too easy)
-   - **Decision Needed:** Data analysis to calibrate thresholds
+**TR-003: Claude API Hallucination**
+- **Mitigation Tasks:** task-007 (strict system prompt)
+- **Testing:** 100+ test questions, <5% hallucination rate
+- **Monitoring:** Post-launch accuracy tracking
 
-3. **"All Quiet" Frequency Cap** (Open Question #3)
-   - **Impact:** Blocks task-005 ("all quiet" notifications)
-   - **Recommendation:** Max 2x/week to prevent over-communication
-   - **Decision Needed:** Steve + Elon approval on frequency
+**TR-007: CORS Misconfiguration**
+- **Mitigation Tasks:** task-005 (CORS headers)
+- **Testing:** 3+ different domains, browser DevTools check
+- **Impact:** Complete blocker if misconfigured
 
-4. **Notification Timing** (Open Question #4)
-   - **Impact:** Blocks task-006 (preferences UI)
-   - **Recommendation:** Default 9am local, user override in settings
-   - **Decision Needed:** Product decision on default vs. customization balance
-
-### Technical Risks
-
-1. **Midnight Batch Job Failure** (Section V Risk 4)
-   - **Mitigation:** Dead man's switch in task-003, redundancy at 2am UTC
-   - **Alert:** If job doesn't complete by 1am UTC
-
-2. **SMS Compliance** (Section V Risk 1)
-   - **Mitigation:** Explicit opt-in in task-002, TCPA-compliant templates
-   - **Monitoring:** Track delivery rates, carrier filtering
-
-3. **Badge Image Generation Latency** (Section V Risk 3)
-   - **Mitigation:** Async generation in task-009, fallback generic image
-   - **Target:** <5min generation, <2sec per image
-
-4. **Notification Fatigue** (Section V Risk 2)
-   - **Mitigation:** Frequency caps in task-005, unsubscribe flow in task-006
-   - **Target:** <5% unsubscribe rate
-
-### Codebase-Specific Risks (from Risk Scanner Report)
-
-**Critical Finding:** LocalGenius has 4 major infrastructure gaps:
-
-1. **SMS/Twilio Integration** — Zero code exists; needs 2-3 days (task-002)
-2. **Email Service (SendGrid)** — Not configured; needs 2 days (task-001)
-3. **Cron/Scheduler Infrastructure** — Needs external scheduler setup (Vercel cron recommended)
-4. **Badge Image Generation** — No generation code; needs 2 days (task-009)
-
-**Timeline Impact:** 2-week ship date is AT RISK unless infrastructure work (tasks 001, 002, 003, 009) happens in parallel during Wave 1.
+**TR-008: Rate Limiting Bypass**
+- **Mitigation Tasks:** task-008 (multi-layer rate limiting)
+- **Testing:** Attack simulation (UUID spoofing)
+- **Monitoring:** Cost alerts in Claude API dashboard
 
 ---
 
-## Execution Strategy
+## Success Metrics Validation
 
-### Parallel Execution Plan
-
-**Wave 1 (Days 1-7):**
-- Run tasks 001, 002, 003 in parallel (infrastructure foundation)
-- Run tasks 007, 008, 013, 014, 015, 016, 017 in parallel (feature foundations)
-- **Critical Path:** task-003 (batch generator) must complete before Wave 2
-
-**Wave 2 (Days 8-12):**
-- Run tasks 004, 005, 006 in parallel (notification delivery)
-- Run tasks 009, 010, 011 in parallel (badge features)
-- Run task-018 (analytics) in parallel
-- **Critical Path:** task-009 (badge images) must complete before Wave 3
-
-**Wave 3 (Days 13-14):**
-- Run task-012 (badge gallery) — polish and UI
-- QA, testing, launch preparation
-
-### Resource Allocation
-
-**Backend Engineers (2):**
-- Engineer A: tasks 001, 002, 003, 004, 005 (notification pipeline)
-- Engineer B: tasks 007, 008, 009, 013, 014, 015, 016 (badges, journal, trends)
-
-**Frontend Engineers (1):**
-- Engineer C: tasks 006, 010, 011, 012 (UI components)
-
-**Database Engineer (1):**
-- Engineer D: task-017 (migrations), supports all teams
-
-**DevOps (1):**
-- Engineer E: Cron setup, monitoring, alerting, S3/CDN configuration
-
----
-
-## Success Criteria Validation
-
-At launch, validate these North Star metrics:
+At launch, validate:
 
 | Metric | Target | Validation Method |
 |--------|--------|-------------------|
-| **Notification Open Rate** | >40% (email), >70% (SMS) | task-018 analytics |
-| **First-Run Retention** | >60% open Pulse 3+ times in first week | task-018 analytics |
-| **Badge Share Rate** | >10% of unlocks result in social share | task-018 analytics |
-| **Pro Upgrade Rate** | >5% within 30 days | task-018 analytics |
-| **Unsubscribe Rate** | <5% | task-018 analytics |
-
-**Failure Conditions (Triggers for Pivot):**
-- <20% notification open rate (we're spam)
-- >10% unsubscribe rate (we're annoying)
-- <2% upgrade conversion (economics don't work)
-- <5% badge share rate (viral hypothesis failed)
+| **First Token Latency** | <2 seconds (p95) | task-011 logging |
+| **Widget Size** | <10KB gzipped | task-014 bundle check |
+| **Cost per Question** | <$0.001 | Claude API pricing validation |
+| **Uptime** | 99%+ | Cloudflare SLA |
+| **Error Rate** | <2% | task-011 analytics |
+| **Launch Week: Sites Embedded** | 10+ | Manual tracking |
+| **Launch Week: Questions Answered** | 100+ | task-011 analytics |
 
 ---
 
-## Deployment Checklist
+## Pre-Launch Checklist
 
-Before launching Pulse to production:
-
-- [ ] All 4 decision blockers resolved
-- [ ] All Wave 1 tasks complete and tested
-- [ ] All Wave 2 tasks complete and tested
-- [ ] All Wave 3 tasks complete and tested
-- [ ] Database migrations run successfully
-- [ ] Cron jobs configured and tested
-- [ ] Email/SMS providers configured with production credentials
-- [ ] S3/CDN configured for badge images
-- [ ] Analytics dashboard operational
-- [ ] Monitoring and alerts configured
-- [ ] Steve has approved all copy (notifications, badges, cliffhanger, "all quiet")
-- [ ] Elon has approved architecture and performance benchmarks
-- [ ] Zero P0 bugs in first-run experience
-- [ ] Staging tested with 100 alpha users
-- [ ] Notification open rate >30% in alpha test
-- [ ] SMS delivery rate >95% in alpha test
-- [ ] Badge unlock latency <24 hours in alpha test
-
----
-
-## Post-Launch Iteration Plan
-
-**Week 1 Post-Launch:**
-- Monitor North Star metrics daily
-- Track unsubscribe rate, alert if >5%
-- A/B test notification copy variants (REQ-034 feature flags)
-- Gather qualitative user feedback
-
-**Week 2-4 Post-Launch:**
-- Calibrate badge thresholds based on unlock rates
-- Adjust "all quiet" frequency if needed
-- Test cliffhanger variants for re-engagement
-- Optimize notification timing based on open rate data
-
-**Nice-to-Have Features (Post-v1):**
-- REQ-036: Multi-channel preference center
-- REQ-037: Additional badge tiers (beyond 5)
-- REQ-038: Advanced journal features (tagging, search, export)
-- REQ-039: Competitive benchmarks (requires cross-restaurant data)
-- REQ-040: Push notifications (requires mobile app)
+- [ ] All Wave 1 tasks complete (widget UI, scraper, worker foundation)
+- [ ] All Wave 2 tasks complete (Claude, rate limiting, streaming, errors)
+- [ ] All Wave 3 tasks complete (landing page, deployments)
+- [ ] Widget tested on 5+ CMS platforms (WordPress, Shopify, Wix, Squarespace, Webflow)
+- [ ] SPA testing complete (10+ React/Vue/Angular sites)
+- [ ] Cross-browser testing (Chrome, Firefox, Safari, Edge)
+- [ ] Mobile testing (iOS Safari, Android Chrome)
+- [ ] CORS verified from 3+ different domains
+- [ ] Rate limiting tested (site_id + IP limits)
+- [ ] System prompt accuracy tested (100+ questions)
+- [ ] Error handling tested (timeouts, API failures, rate limits)
+- [ ] Widget bundle ≤10KB gzipped
+- [ ] First token latency <2s (p95)
+- [ ] Cloudflare Analytics operational
+- [ ] Landing page live and demo working
+- [ ] CDN deployed and serving widget
+- [ ] Worker deployed with API key configured
+- [ ] Steve approves landing page copy and design
+- [ ] Elon approves technical architecture and performance
 
 ---
 
-*Phase 1 Plan complete. Ready for agent execution.*
-
+*Phase 1 Plan complete. Ready for parallel wave execution. Estimated 4-6 hours to ship V1.*
