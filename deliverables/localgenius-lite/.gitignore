@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+package-lock.json
+.npm
+
+# Build output
+dist/
+*.min.js
+*.min.js.gz
+
+# Cloudflare
+.wrangler/
+wrangler.toml
+
+# Environment
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Temp
+tmp/
+temp/

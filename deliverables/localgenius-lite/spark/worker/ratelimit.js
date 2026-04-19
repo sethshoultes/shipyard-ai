@@ -3,8 +3,6 @@
  * Multi-layer rate limiting: per site_id and per IP
  */
 
-import { RateLimitError } from './errors.js';
-
 // In-memory rate limit tracking
 const rateLimits = new Map();
 
@@ -12,6 +10,10 @@ const LIMITS = {
   SITE_ID: {
     max: 10,
     window: 60000 // 60 seconds
+  },
+  IP: {
+    max: 100,
+    window: 3600000 // 1 hour
   }
 };
 
@@ -32,11 +34,33 @@ export function checkSiteIdLimit(siteId) {
 
   // Check if exceeded
   if (limiter.count >= LIMITS.SITE_ID.max) {
-    const retryAfter = Math.ceil((limiter.resetAt - now) / 1000);
-    throw new RateLimitError(
-      `Rate limit exceeded: ${LIMITS.SITE_ID.max} requests per minute`,
-      retryAfter
-    );
+    return false;
+  }
+
+  // Increment counter
+  limiter.count++;
+
+  return true;
+}
+
+export function checkIPLimit(ip) {
+  const now = Date.now();
+  const key = `ip:${ip}`;
+
+  let limiter = rateLimits.get(key);
+
+  if (!limiter || now > limiter.resetAt) {
+    // Create new or reset limiter
+    limiter = {
+      count: 0,
+      resetAt: now + LIMITS.IP.window
+    };
+    rateLimits.set(key, limiter);
+  }
+
+  // Check if exceeded
+  if (limiter.count >= LIMITS.IP.max) {
+    return false;
   }
 
   // Increment counter
@@ -49,7 +73,8 @@ export function checkSiteIdLimit(siteId) {
 setInterval(() => {
   const now = Date.now();
   for (const [key, limiter] of rateLimits.entries()) {
-    if (now > limiter.resetAt + LIMITS.SITE_ID.window) {
+    const maxWindow = Math.max(LIMITS.SITE_ID.window, LIMITS.IP.window);
+    if (now > limiter.resetAt + maxWindow) {
       rateLimits.delete(key);
     }
   }

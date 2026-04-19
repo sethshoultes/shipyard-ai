@@ -1,0 +1,29 @@
+{
+  "name": "spark",
+  "version": "1.0.0",
+  "description": "Add AI chat to any website in 30 seconds",
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "dev:worker": "cd spark/worker && wrangler dev",
+    "deploy:worker": "cd spark/worker && wrangler deploy",
+    "dev:landing": "python3 -m http.server 8000 --directory spark/landing"
+  },
+  "keywords": [
+    "ai",
+    "chat",
+    "widget",
+    "claude",
+    "chatbot",
+    "customer-support"
+  ],
+  "author": "SPARK Team",
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.23.0",
+    "wrangler": "^3.0.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0"
+  }
+}

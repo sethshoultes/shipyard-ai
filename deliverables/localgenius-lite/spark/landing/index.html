@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SPARK makes any website instantly helpful with AI-powered chat. One script tag, zero configuration, Claude-powered answers from your page content.">
+  <title>SPARK — Your website, instantly brilliant.</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <h1>Your website, instantly brilliant.</h1>
+      <p class="subheading">One script tag. Zero configuration.</p>
+
+      <div class="cta-container">
+        <button class="cta-button" onclick="document.getElementById('embed-code').scrollIntoView({ behavior: 'smooth' })">
+          Try It Now
+        </button>
+      </div>
+    </section>
+
+    <section class="embed-section" id="embed-code">
+      <h2>Get Started in 30 Seconds</h2>
+      <p>Paste this script tag anywhere in your HTML:</p>
+
+      <div class="code-block">
+        <code>&lt;script src="https://cdn.usespark.com/spark.js"&gt;&lt;/script&gt;</code>
+        <button class="copy-button" onclick="copyToClipboard()">Copy</button>
+      </div>
+
+      <p class="note">That's it. Your site now has an AI assistant that answers questions from your page content.</p>
+    </section>
+
+    <section class="demo-section">
+      <h2>See It In Action</h2>
+      <p class="demo-instructions">
+        Try asking: <strong>"What is SPARK?"</strong> or <strong>"How does it work?"</strong>
+      </p>
+      <p class="demo-hint">👇 Look for the purple button in the bottom-right corner</p>
+    </section>
+
+    <section class="features">
+      <h2>Why SPARK?</h2>
+      <div class="feature-grid">
+        <div class="feature">
+          <h3>⚡ Instant Setup</h3>
+          <p>One line of code. Works on WordPress, Shopify, static sites, anywhere.</p>
+        </div>
+        <div class="feature">
+          <h3>🧠 Smart Answers</h3>
+          <p>Powered by Claude 3.5 Haiku. Answers questions from your actual page content.</p>
+        </div>
+        <div class="feature">
+          <h3>🎨 Beautiful UI</h3>
+          <p>Clean design that adapts to any website. Shadow DOM prevents style conflicts.</p>
+        </div>
+        <div class="feature">
+          <h3>🚀 Blazing Fast</h3>
+          <p>First response in under 2 seconds. Streaming for real-time answers.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-it-works">
+      <h2>How It Works</h2>
+      <ol class="steps">
+        <li>
+          <strong>Paste the script tag</strong> — SPARK automatically initializes when your page loads
+        </li>
+        <li>
+          <strong>AI reads your page</strong> — Extracts content from your HTML (title, main text, meta tags)
+        </li>
+        <li>
+          <strong>Visitors ask questions</strong> — Click the widget, type anything about your page
+        </li>
+        <li>
+          <strong>Get instant answers</strong> — Claude responds in 1-2 seconds with accurate info
+        </li>
+      </ol>
+    </section>
+
+    <section class="technical">
+      <h2>Built for Developers</h2>
+      <ul class="tech-features">
+        <li>✅ <strong>Zero dependencies</strong> — Vanilla JavaScript, under 10KB gzipped</li>
+        <li>✅ <strong>Shadow DOM isolation</strong> — Won't break your CSS or scripts</li>
+        <li>✅ <strong>Rate limited</strong> — 10 requests/min per site, 100/hour per IP</li>
+        <li>✅ <strong>Privacy-first</strong> — No tracking, no cookies, no user data storage</li>
+        <li>✅ <strong>Cloudflare Workers</strong> — Serverless backend, scales automatically</li>
+        <li>✅ <strong>Open source</strong> — MIT licensed, modify as you wish</li>
+      </ul>
+    </section>
+
+    <section class="cta-final">
+      <h2>Ready to make your site brilliant?</h2>
+      <button class="cta-button" onclick="document.getElementById('embed-code').scrollIntoView({ behavior: 'smooth' })">
+        Get Started Now
+      </button>
+    </section>
+  </main>
+
+  <footer>
+    <p>Powered by <strong>SPARK</strong></p>
+    <p class="footer-links">
+      <a href="https://github.com/yourusername/spark" target="_blank" rel="noopener">GitHub</a>
+      <span>•</span>
+      <a href="mailto:hello@usespark.com">Contact</a>
+    </p>
+  </footer>
+
+  <script>
+    function copyToClipboard() {
+      const code = '<script src="https://cdn.usespark.com/spark.js"><\/script>';
+      navigator.clipboard.writeText(code).then(() => {
+        const button = document.querySelector('.copy-button');
+        const originalText = button.textContent;
+        button.textContent = 'Copied!';
+        button.style.background = '#10b981';
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.style.background = '';
+        }, 2000);
+      });
+    }
+  </script>
+
+  <!-- SPARK Widget Demo -->
+  <script src="../widget/spark.js"></script>
+</body>
+</html>
