@@ -34,7 +34,7 @@ export function createPanel(onClose, onSend) {
   const input = document.createElement('input');
   input.type = 'text';
   input.className = 'spark-input';
-  input.placeholder = 'What can I help you find?';
+  input.placeholder = 'Ask me anything about this page...';
   input.setAttribute('aria-label', 'Type your message');
 
   const sendBtn = document.createElement('button');

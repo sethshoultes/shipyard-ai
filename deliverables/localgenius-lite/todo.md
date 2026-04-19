@@ -16,7 +16,7 @@
 - [ ] Implement `createPanel()` function: 380×520px div, initially hidden — verify: panel has correct dimensions in DevTools
 - [ ] Add panel structure: header with close button, message container, input field, send button — verify: all elements present in DOM
 - [ ] Style close button (X) top-right — verify: clicking X closes panel
-- [ ] Add input placeholder: "What can I help you find?" — verify: text appears in input field
+- [ ] Add input placeholder: "Ask me anything about this page..." — verify: text appears in input field
 - [ ] Create footer with link: `<a href="https://usespark.com" target="_blank">Powered by SPARK</a>` — verify: link opens in new tab
 - [ ] Style message bubbles: user right-aligned, AI left-aligned — verify: `.user-message { text-align: right }`, `.ai-message { text-align: left }`
 

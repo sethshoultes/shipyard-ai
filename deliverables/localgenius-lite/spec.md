@@ -116,7 +116,7 @@ PAGE CONTENT:
 - [ ] Click button → panel slides up in <300ms with smooth CSS transition
 - [ ] Panel is 380×520px when open
 - [ ] Close button (X) works correctly
-- [ ] Input has placeholder: "What can I help you find?"
+- [ ] Input has placeholder: "Ask me anything about this page..."
 - [ ] Footer shows "Powered by SPARK" linking to https://usespark.com
 - [ ] Message bubbles: user right-aligned, AI left-aligned
 
