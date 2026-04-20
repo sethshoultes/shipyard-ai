@@ -56,3 +56,43 @@ export {
   createMetric,
   getAverageMetrics,
 } from './queries/metrics';
+
+// Re-export Shipyard Care subscribers schema and types
+export {
+  subscribersTable,
+  subscribers,
+  tierEnum,
+  statusEnum,
+  type Subscriber,
+  type NewSubscriber,
+  type Tier,
+  type Status,
+} from './schema/subscribers';
+
+// Re-export Shipyard Care token usage schema and types
+export {
+  tokenUsageTable,
+  tokenUsage,
+  type TokenUsage,
+  type NewTokenUsage,
+} from './schema/token-usage';
+
+// Re-export Shipyard Care referrals schema and types
+export {
+  referralsTable,
+  referrals,
+  type Referral,
+  type NewReferral,
+} from './schema/referrals';
+
+// Re-export Shipyard Care pricing configuration
+export {
+  PRICING_TIERS,
+  getTierConfig,
+  calculateOverageCost,
+  REFERRAL_CONFIG,
+  TOKEN_WARNING_THRESHOLD,
+  ESTIMATED_TOKENS_PER_PRD,
+  type CareTier,
+  type PricingTier,
+} from './config/pricing';

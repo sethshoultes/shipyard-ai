@@ -1,258 +1,363 @@
-# SPARK (LocalGenius Lite) — Requirements Traceability
+# Requirements Traceability Matrix
+# Shipyard Maintenance Subscription → "Shipyard Care"
 
-**Project:** localgenius-lite → SPARK
-**Generated:** 2026-04-19
-**Phase:** 1 (Core Build)
-**Source Documents:**
-- `/home/agent/shipyard-ai/prds/localgenius-lite.md`
-- `/home/agent/shipyard-ai/rounds/localgenius-lite/decisions.md`
+**Generated**: 2026-04-20
+**Source Documents**:
+- `/home/agent/shipyard-ai/rounds/shipyard-maintenance-subscription/decisions.md`
+- `/home/agent/shipyard-ai/prds/shipyard-maintenance-subscription.md`
 
----
-
-## Executive Summary
-
-**Product Name:** SPARK (locked decision, not "LocalGenius Lite")
-**Vision:** Invisible AI assistant that makes any website instantly helpful with one script tag
-**V1 Scope:** Widget + Worker only. No dashboard, no auth, no billing.
-**Total V1 Requirements:** 80 atomic requirements (all MUST HAVE)
-**Build Timeline:** 4-6 hours (per decisions.md locked timeline)
+**Project Status**: Locked decisions — ready for implementation
+**Total Requirements**: 62
+**Estimated Build Time**: 8 hours (locked decision from Elon/Steve consensus)
 
 ---
 
-## Requirements Traceability Matrix
+## Requirements Summary by Category
 
-| REQ-ID | Requirement | Testable Criteria | Priority | Category | Wave | Source |
-|--------|-------------|-------------------|----------|----------|------|--------|
-| **REQ-001** | Widget floating button appears bottom-right | Button visible at (innerWidth - 80px, innerHeight - 80px) on load | P0 | UI/UX | 1 | decisions.md §1.4 |
-| **REQ-002** | Floating button is 56px diameter circle | CSS: width 56px, height 56px, border-radius 50% | P0 | UI/UX | 1 | PRD §UI/UX |
-| **REQ-003** | Button opens chat panel on click | Panel appears in <300ms with smooth animation | P0 | UI/UX | 1 | PRD §Features |
-| **REQ-004** | Chat panel is 380px × 520px | CSS dimensions exact | P0 | UI/UX | 1 | PRD §UI/UX |
-| **REQ-005** | Panel slides up smoothly on open | CSS transition, no jank | P0 | UI/UX | 1 | decisions.md §1.5 |
-| **REQ-006** | Panel slides down smoothly on close | CSS transition <300ms | P0 | UI/UX | 1 | decisions.md §1.5 |
-| **REQ-007** | Close button (X) in top-right of panel | Button positioned correctly | P0 | UI/UX | 1 | PRD §Chat Interface |
-| **REQ-008** | Input placeholder: "What can I help you find?" | Exact string matches | P0 | UI/UX | 1 | decisions.md §4.1 |
-| **REQ-009** | Send button visible next to input | Button in-line, clickable | P0 | UI/UX | 1 | PRD §Chat Interface |
-| **REQ-010** | User messages right, AI messages left | CSS alignment by message type | P0 | UI/UX | 1 | PRD §Chat Interface |
-| **REQ-011** | Typing indicator during streaming | Animated dots when streaming | P0 | UI/UX | 1 | PRD §Chat Interface |
-| **REQ-012** | "Powered by SPARK" footer visible | Link in footer, subtle | P0 | Branding | 1 | decisions.md §1.3 |
-| **REQ-013** | Footer links to https://usespark.com | href + target="_blank" | P0 | Branding | 1 | decisions.md §1.3 |
-| **REQ-014** | Purple gradient default theme | CSS linear-gradient | P0 | UI/UX | 1 | decisions.md §1.4 |
-| **REQ-015** | Page scraped on widget load | Extract text before first question | P0 | Core | 1 | decisions.md §2.1 |
-| **REQ-016** | Scraper extracts document.title | Title in context sent to API | P0 | Core | 1 | PRD §Data Flow |
-| **REQ-017** | Scraper extracts meta[description] | Meta in context | P0 | Core | 1 | PRD §Data Flow |
-| **REQ-018** | Scraper extracts body.innerText | Body text in context | P0 | Core | 1 | PRD §Data Flow |
-| **REQ-019** | Scraped content cached in widget | No re-scrape per question | P0 | Core | 1 | decisions.md §2.1 |
-| **REQ-020** | Context truncated to ~10KB | String length ≤ 10,240 bytes | P0 | Core | 1 | decisions.md §2.1 |
-| **REQ-021** | Extract from <main>, <article>, or <body> | Fallback logic implemented | P0 | Core | 1 | decisions.md §2.1 |
-| **REQ-022** | Worker accepts POST /api/chat | HTTP POST, route matches | P0 | Backend | 2 | PRD §API Design |
-| **REQ-023** | Chat API accepts site_id, context, question | JSON validates against schema | P0 | Backend | 2 | PRD §API Design |
-| **REQ-024** | site_id generated client-side (UUID v4) | crypto.randomUUID() used | P0 | Backend | 1 | decisions.md §1.2 |
-| **REQ-025** | Site ID stored in localStorage 'spark_site_id' | getItem returns valid UUID | P0 | Backend | 1 | decisions.md §1.2 |
-| **REQ-026** | Worker validates site_id before processing | UUID format check | P0 | Backend | 2 | decisions.md §2.1 |
-| **REQ-027** | Worker calls Claude 3.5 Haiku | API specifies model correctly | P0 | Backend | 2 | decisions.md §1.6 |
-| **REQ-028** | Worker streams response to widget | SSE format: data: {chunk} | P0 | Backend | 2 | decisions.md §2.1 |
-| **REQ-029** | Streaming includes chunk data | Each SSE: data: {"chunk": "..."} | P0 | Backend | 2 | PRD §API Design |
-| **REQ-030** | Response includes done flag on completion | Final SSE: data: {"done": true} | P0 | Backend | 2 | PRD §API Design |
-| **REQ-031** | Rate limit: 10 req/min per site_id | >10/min rejected with 429 | P0 | Backend | 2 | decisions.md §1.4 |
-| **REQ-032** | Rate limit: 100 req/hour per IP | Cloudflare enforced | P0 | Backend | 2 | decisions.md §2.1 |
-| **REQ-033** | Rate limit returns 429 status | HTTP 429 on limit | P0 | Backend | 2 | decisions.md §2.1 |
-| **REQ-034** | Claude prompt has system instruction | Includes: "You are a helpful assistant..." | P0 | Core | 2 | PRD §System Prompt |
-| **REQ-035** | Prompt instructs "use only page context" | Exact text in prompt | P0 | Core | 2 | PRD §System Prompt |
-| **REQ-036** | Prompt includes {scraped_content} | Variable interpolation | P0 | Core | 2 | PRD §System Prompt |
-| **REQ-037** | Claude refuses out-of-context questions | "I don't see that information..." | P0 | Core | 2 | PRD §System Prompt |
-| **REQ-038** | Claude must not hallucinate | Prompt: "Never make up information" | P0 | Core | 2 | PRD §System Prompt |
-| **REQ-039** | Claude stays on-topic | Prompt: "Never discuss unrelated topics" | P0 | Core | 2 | PRD §System Prompt |
-| **REQ-040** | Widget renders markdown in AI responses | Code blocks, bold, italic, links formatted | P0 | UI/UX | 1 | decisions.md §2.1 |
-| **REQ-041** | Markdown has proper spacing | Line breaks, code indents | P0 | UI/UX | 1 | decisions.md §2.1 |
-| **REQ-042** | Button has subtle pulse animation | CSS opacity 0.7-1.0, 2s, infinite | P0 | UI/UX | 1 | decisions.md §1.5 |
-| **REQ-043** | Widget handles Claude API errors gracefully | User-friendly error, not stack trace | P0 | Core | 2 | decisions.md §4.3 |
-| **REQ-044** | API timeout handled | 30s timeout → "Sorry, try again" | P0 | Core | 2 | decisions.md §2.1 |
-| **REQ-045** | Widget supports CORS from any domain | Worker: Access-Control-Allow-Origin: * | P0 | Backend | 2 | decisions.md §4.2 |
-| **REQ-046** | Landing page deployed to Cloudflare Pages | usespark.com or similar | P0 | Deploy | 3 | decisions.md §2.1 |
-| **REQ-047** | Landing hero: "Your website, instantly brilliant." | Exact text above fold | P0 | Landing | 3 | decisions.md §1.7 |
-| **REQ-048** | Landing includes script tag in code block | Copy-paste ready | P0 | Landing | 3 | decisions.md §2.1 |
-| **REQ-049** | Landing includes live demo | Working widget embedded | P0 | Landing | 3 | decisions.md §1.7 |
-| **REQ-050** | Landing CTA button: "Try It Now" | Button text, prominent | P0 | Landing | 3 | decisions.md §1.7 |
-| **REQ-051** | Landing has minimal feature lists | No detailed lists | P0 | Landing | 3 | decisions.md §1.7 |
-| **REQ-052** | Landing footer with attribution | Branding present | P0 | Landing | 3 | decisions.md §1.7 |
-| **REQ-053** | Widget script deployed to CDN | URL: https://cdn.usespark.com/spark.js | P0 | Deploy | 3 | decisions.md §4.2 |
-| **REQ-054** | Widget self-initializes on page load | No manual init, script tag only | P0 | Core | 1 | decisions.md §2.2 |
-| **REQ-055** | Widget reads data-site attribute | data-site used as site_id | P0 | Core | 1 | PRD §Solution |
-| **REQ-056** | If no data-site, generate UUID | Fallback to crypto.randomUUID() | P0 | Core | 1 | decisions.md §1.2 |
-| **REQ-057** | Widget script <10KB gzipped | ≤10,240 bytes compressed | P0 | Performance | 1 | PRD §Components |
-| **REQ-058** | Latency: first token <2 seconds | p95 ≤ 2000ms | P0 | Performance | 2 | decisions.md §2.3 |
-| **REQ-059** | Widget uses Shadow DOM for CSS isolation | attachShadow({mode: 'open'}) | P0 | Core | 1 | decisions.md §1.6 |
-| **REQ-060** | Worker uses Cloudflare 99% uptime SLA | Infrastructure choice | P0 | Deploy | 2 | decisions.md §2.3 |
-| **REQ-061** | Cost per question <$0.001 | Claude Haiku pricing | P0 | Performance | 2 | decisions.md §2.3 |
-| **REQ-062** | Widget is vanilla JS (no frameworks) | No React/Vue/Angular | P0 | Core | 1 | PRD §Components |
-| **REQ-063** | Widget injects without conflicts | Works on WordPress, Shopify, etc. | P0 | Core | 1 | decisions.md §5.1 |
-| **REQ-064** | Widget waits 1s before scraping SPAs | setTimeout(scrape, 1000) | P0 | Core | 1 | decisions.md §5.1 |
-| **REQ-065** | Widget handles SPA content changes | MutationObserver implemented | P0 | Core | 1 | decisions.md §5.1 |
-| **REQ-066** | Input cleared after message send | value = "" after POST | P0 | UI/UX | 1 | PRD §Data Flow |
-| **REQ-067** | User message added before API call | Optimistic UI | P0 | UI/UX | 1 | PRD §Chat Interface |
-| **REQ-068** | Loading state during API wait | Spinner or typing indicator | P0 | UI/UX | 1 | PRD §Chat Interface |
-| **REQ-069** | Worker deployed with wrangler | wrangler deploy in pipeline | P0 | Deploy | 3 | decisions.md §3 |
-| **REQ-070** | Worker config includes Claude API key | ANTHROPIC_API_KEY env var | P0 | Deploy | 3 | decisions.md §3 |
-| **REQ-071** | Widget accessible: ARIA labels | aria-label on button | P0 | UI/UX | 1 | PRD §Mobile |
-| **REQ-072** | Mobile: Panel full-width on small screens | width 100% on <480px | P0 | UI/UX | 1 | PRD §UI/UX |
-| **REQ-073** | Mobile: Panel respects safe areas | CSS safe-area-inset | P0 | UI/UX | 1 | PRD §Mobile |
-| **REQ-074** | Mobile: Touch targets ≥44px | Button min 44×44px | P0 | UI/UX | 1 | PRD §Mobile |
-| **REQ-075** | Input supports send button or Enter key | Click OR Enter submits | P0 | UI/UX | 1 | PRD §Chat Interface |
-| **REQ-076** | Empty questions rejected | Don't send if trim() === "" | P0 | Core | 1 | Basic validation |
-| **REQ-077** | Widget state persists: open/closed | localStorage or in-memory | P0 | Core | 1 | PRD §Chat Interface |
-| **REQ-078** | Worker logs usage to Cloudflare Analytics | Questions, errors, site_ids | P0 | Backend | 2 | decisions.md §4.1 |
-| **REQ-079** | Multiple questions share context | No re-scrape per question | P0 | Core | 1 | decisions.md §2.1 |
-| **REQ-080** | Error handling user-friendly | Not technical stack traces | P0 | Core | 2 | decisions.md §4.3 |
+| Category | Count | Description |
+|----------|-------|-------------|
+| Database Schema | 3 | subscribers, token_usage, referrals tables |
+| Script Requirements | 9 | Subscriber management, token tracking, daemon modifications |
+| Stripe Integration | 5 | Subscriptions API + 4 webhook handlers |
+| Token Tracking | 4 | Balance tracking, overage pricing, logging, warnings |
+| Referral System | 6 | Code generation, landing page, credit application, fraud prevention |
+| Email Communication | 5 | Welcome, incident report, token warning templates + triggers |
+| Daemon Routing | 3 | Subscriber flag, dedicated capacity, free-tier monitoring |
+| Marketing & Positioning | 3 | Care page, brand voice, naming consistency |
+| Business Logic | 3 | Tier options, token reset, overage handling |
+| Success Metrics | 8 | Launch validation + 90-day targets |
+| File Deliverables | 11 | All files that must be created |
+| Configuration | 3 | Stripe keys, pricing constants, thresholds |
+| Integration Points | 3 | Daemon, checkout, email delivery |
 
 ---
 
-## Requirements by Category
+## DATABASE REQUIREMENTS
 
-### Core Functionality (34 requirements)
-REQ-015, REQ-016, REQ-017, REQ-018, REQ-019, REQ-020, REQ-021, REQ-034, REQ-035, REQ-036, REQ-037, REQ-038, REQ-039, REQ-043, REQ-044, REQ-054, REQ-055, REQ-056, REQ-059, REQ-062, REQ-063, REQ-064, REQ-065, REQ-076, REQ-077, REQ-079, REQ-080
+### REQ-1: Database Schema - Subscribers Table
+**Source**: decisions.md lines 195-206
+**Priority**: P0 (Blocker)
+**Description**: Create `subscribers` table with columns: id (primary key), email (unique), tier (enum: care/care_pro), tokens_monthly (integer), tokens_remaining (integer), referral_code (unique), referral_credits (default 0), start_date, status (enum: active/cancelled/paused)
 
-### UI/UX Requirements (32 requirements)
-REQ-001, REQ-002, REQ-003, REQ-004, REQ-005, REQ-006, REQ-007, REQ-008, REQ-009, REQ-010, REQ-011, REQ-014, REQ-040, REQ-041, REQ-042, REQ-066, REQ-067, REQ-068, REQ-071, REQ-072, REQ-073, REQ-074, REQ-075
+**Acceptance Criteria**:
+- [ ] Table exists in database with all columns
+- [ ] Proper types enforced on all columns
+- [ ] CHECK constraints on `tier` (care, care_pro) and `status` (active, cancelled, paused)
+- [ ] `email` column is UNIQUE with NOT NULL constraint
+- [ ] `referral_code` column is UNIQUE
+- [ ] Primary key on `id` column
 
-### Backend/Worker Requirements (18 requirements)
-REQ-022, REQ-023, REQ-024, REQ-025, REQ-026, REQ-027, REQ-028, REQ-029, REQ-030, REQ-031, REQ-032, REQ-033, REQ-045, REQ-060, REQ-078
-
-### Landing Page Requirements (7 requirements)
-REQ-046, REQ-047, REQ-048, REQ-049, REQ-050, REQ-051, REQ-052
-
-### Deployment Requirements (4 requirements)
-REQ-046, REQ-053, REQ-069, REQ-070
-
-### Performance Requirements (4 requirements)
-REQ-057, REQ-058, REQ-061, REQ-060
-
-### Branding Requirements (2 requirements)
-REQ-012, REQ-013
+**Technical Notes**:
+- Use Drizzle ORM schema definition in `packages/db/schema/subscribers.ts`
+- Follow existing pattern from `packages/db/schema/subscriptions.ts`
+- Neon PostgreSQL database (serverless)
 
 ---
 
-## What's CUT from V1 (Per Locked Decisions)
+### REQ-2: Database Schema - Token Usage Tracking
+**Source**: decisions.md lines 208-215
+**Priority**: P0 (Blocker)
+**Description**: Create `token_usage` table with columns: id (primary key), subscriber_email, prd_id, tokens_used, timestamp, and FOREIGN KEY constraint to subscribers.email
 
-**NOT shipping in V1:**
-- Dashboard / admin panel
-- User authentication
-- Pricing / billing / Stripe
-- Custom branding / theming
-- Dark mode auto-detection
-- Mobile responsiveness polish (functional but basic)
-- Exit-intent detection
-- Auto-vibe matching
-- Lead capture forms
-- Analytics dashboard
-- Conversation history
+**Acceptance Criteria**:
+- [ ] Table exists in database
+- [ ] FOREIGN KEY constraint enforced (subscriber_email → subscribers.email)
+- [ ] All rows traceable to a subscriber
+- [ ] Supports querying by subscriber_email, prd_id, timestamp
+- [ ] Index on subscriber_email for performance
 
-**Rationale:** Each adds 30min-3hrs to build time. None necessary to prove core value. Can be added when users request them.
-
----
-
-## Coverage Analysis
-
-| Category | Requirements | % of Total | Wave Distribution |
-|----------|--------------|------------|-------------------|
-| Core Functionality | 34 | 42.5% | Wave 1 (27), Wave 2 (7) |
-| UI/UX | 32 | 40% | Wave 1 (32) |
-| Backend/Worker | 18 | 22.5% | Wave 2 (18) |
-| Landing Page | 7 | 8.75% | Wave 3 (7) |
-| Deployment | 4 | 5% | Wave 3 (4) |
-| Performance | 4 | 5% | Wave 1 (2), Wave 2 (2) |
-| Branding | 2 | 2.5% | Wave 1 (2) |
-
-**Total:** 80 atomic requirements (some overlap in categories)
+**Technical Notes**:
+- Use Drizzle ORM foreign key syntax
+- Add composite index on (subscriber_email, timestamp) for usage queries
 
 ---
 
-## Validation Checklist
+### REQ-3: Database Schema - Referrals Tracking
+**Source**: decisions.md lines 217-224
+**Priority**: P1 (Required for MVP)
+**Description**: Create `referrals` table with columns: id (primary key), referrer_email, referred_email, credit_amount, converted_date, FOREIGN KEY to subscribers.email
 
-**Functional Testing:**
-- [ ] All 80 requirements have automated or manual test cases
-- [ ] Widget ↔ Worker ↔ Claude API integration tested end-to-end
-- [ ] Cross-browser: Chrome, Firefox, Safari, Edge
-- [ ] Mobile: iOS Safari, Android Chrome
-- [ ] Performance: <2s first token, <10KB gzipped
+**Acceptance Criteria**:
+- [ ] Table exists in database
+- [ ] FOREIGN KEY constraint enforced (referrer_email → subscribers.email)
+- [ ] Referral conversions logged with amounts and dates
+- [ ] Supports querying referral counts per user
+- [ ] Index on referrer_email for fraud detection
 
-**Integration Testing:**
-- [ ] Streaming responses work correctly
-- [ ] Error handling for API timeouts, rate limits, network failures
-- [ ] CORS configuration verified from 3+ different domains
-- [ ] Rate limiting enforced (10/min per site_id, 100/hr per IP)
-
-**Cross-Platform Testing:**
-- [ ] Works on WordPress (Astra, Divi, Twentythree)
-- [ ] Works on Shopify (Dawn, Brooklyn)
-- [ ] Works on Wix, Squarespace, Webflow
-- [ ] Works on custom React/Vue/Angular SPAs
-
-**Accessibility:**
-- [ ] ARIA labels on interactive elements
-- [ ] Keyboard navigation (Tab, Enter, Escape)
-- [ ] Screen reader compatible
-- [ ] Touch targets ≥44px on mobile
+**Technical Notes**:
+- Add check: credit only counts after referred user's 2nd payment (fraud prevention, REQ-22)
 
 ---
 
-## Success Metrics (Per PRD)
+## SUBSCRIBER MANAGEMENT SCRIPTS
 
-**Launch Week:**
-- [ ] 50+ developers see launch
-- [ ] 10+ sites embed widget
-- [ ] 100+ questions answered
-- [ ] 1+ viral tweet/post about SPARK
+### REQ-4: Script - Add New Subscriber (bin/subscriber-add.sh)
+**Source**: decisions.md lines 228-232
+**Priority**: P0 (Blocker)
+**Description**: Create bash script that accepts email and tier, generates unique referral code, initializes token balance to tier amount, and triggers Stripe subscription creation
 
-**First Month:**
-- [ ] 100+ sites using SPARK
-- [ ] 1,000+ questions answered
-- [ ] 10+ organic mentions on Twitter/HN/Reddit
-- [ ] 1+ request to remove branding (triggers paid tier build)
+**Acceptance Criteria**:
+- [ ] Script exists at `bin/subscriber-add.sh` with executable permissions
+- [ ] Accepts parameters: email, tier (care or care_pro)
+- [ ] Generates unique referral code (format: 8-char alphanumeric)
+- [ ] Initializes tokens_monthly: 100,000 for care, 250,000 for care_pro
+- [ ] Sets tokens_remaining = tokens_monthly on creation
+- [ ] Calls Stripe API to create subscription
+- [ ] Sends welcome email with referral link
+- [ ] Returns success/failure exit code
 
-**First Quarter:**
-- [ ] 1,000+ sites using SPARK
-- [ ] 10,000+ questions answered
-- [ ] Revenue: $100/mo (20 paid users @ $5/mo)
-- [ ] 1+ competitor mention in their roadmap
-
----
-
-## Traceability: Requirements → Locked Decisions
-
-| Decision | Requirements Impacted |
-|----------|---------------------|
-| **Name: SPARK** | REQ-012, REQ-013, REQ-047, REQ-052 |
-| **No Dashboard V1** | (All backend requirements simplified) |
-| **"Powered By" Footer** | REQ-012, REQ-013 |
-| **Scope: Widget+Worker Only** | (All V1 requirements; exclusions noted above) |
-| **Polish Core Experience** | REQ-005, REQ-006, REQ-040, REQ-041, REQ-042 |
-| **Tech Stack: CF+Claude** | REQ-027, REQ-060, REQ-061, REQ-069, REQ-070 |
-| **Distribution: SEO+Viral** | REQ-046-052 (landing page) |
+**Technical Notes**:
+- Use `openssl rand -hex 4` for referral code generation
+- Check for collision in database before inserting
+- Integrate with existing Stripe client at `apps/pulse/lib/stripe.ts`
 
 ---
 
-## Atomic Requirement → Task Mapping
+### REQ-5: Script - Check Subscriber Status (bin/subscriber-check.sh)
+**Source**: decisions.md lines 234-237
+**Priority**: P0 (Blocker)
+**Description**: Create bash script that checks if email is active subscriber, returns token balance, validates if request can proceed
 
-This requirements doc feeds directly into the Phase 1 task plan. Each requirement will be assigned to 1+ tasks in the wave execution plan.
+**Acceptance Criteria**:
+- [ ] Script exists at `bin/subscriber-check.sh` with executable permissions
+- [ ] Accepts parameter: email
+- [ ] Returns JSON with: is_subscriber (bool), status (active/cancelled/paused), tokens_remaining (int)
+- [ ] Exit code 0 if active subscriber with tokens, 1 otherwise
+- [ ] Response time < 100ms (indexed query)
 
-**Coverage validation:**
-- ✅ Every requirement has source document reference
-- ✅ Every requirement is testable
-- ✅ Every requirement maps to V1 locked decisions
-- ✅ No requirements from "CUT" list included
-- ✅ All requirements have priority P0 (MUST HAVE)
+**Technical Notes**:
+- Query: `SELECT status, tokens_remaining FROM subscribers WHERE email = $1`
+- Return false if not found or status != 'active'
 
 ---
 
-## Document Status
+### REQ-6: Script - Token Deduction (bin/token-deduct.sh)
+**Source**: decisions.md lines 239-242
+**Priority**: P0 (Blocker)
+**Description**: Create bash script that deducts tokens after PRD completion, logs usage to token_usage table, sends alert email if balance < 20K
 
-**Version:** 1.0
-**Status:** LOCKED for Phase 1 Build
-**Last Updated:** 2026-04-19
-**Next Review:** After Phase 1 completion
+**Acceptance Criteria**:
+- [ ] Script exists at `bin/token-deduct.sh` with executable permissions
+- [ ] Accepts parameters: subscriber_email, prd_id, tokens_used
+- [ ] Deducts tokens_used from tokens_remaining
+- [ ] Creates record in token_usage table with timestamp
+- [ ] Sends warning email if new balance < 20,000 tokens
+- [ ] Returns new balance in response
+- [ ] Atomic transaction (deduct + log together)
 
-**Notes:**
-- This requirements doc is the source of truth for Phase 1 build
-- All 80 requirements are MUST HAVE (no nice-to-haves in V1)
-- Requirements map directly to locked decisions from debate rounds
-- Tasks in phase-1-plan.md will reference these REQ-IDs
+**Technical Notes**:
+- Use PostgreSQL transaction: BEGIN; UPDATE subscribers...; INSERT INTO token_usage...; COMMIT;
+- Warning email uses template: `templates/token-warning.txt` (REQ-27)
+
+---
+
+## DAEMON MODIFICATIONS
+
+### REQ-7: Daemon Modification - Subscriber Status Check
+**Source**: decisions.md lines 245-249
+**Priority**: P0 (Blocker)
+**Description**: Modify daemon.sh to check subscriber status before processing PRD, route to dedicated daemon instance if subscriber, log token consumption per run, trigger incident report if errors occur
+
+**Acceptance Criteria**:
+- [ ] `bin/daemon.sh` (or equivalent) updated with subscriber check
+- [ ] Calls `bin/subscriber-check.sh` before processing each PRD
+- [ ] Routes PRDs with `subscriber:true` flag to dedicated instance
+- [ ] Logs all token usage via `bin/token-deduct.sh` after completion
+- [ ] Triggers incident report email (REQ-26) on failures
+- [ ] Backwards compatible with non-subscriber PRDs
+
+**Technical Notes**:
+- RISK: Research shows no central daemon.sh found; system uses Cloudflare Workers
+- MITIGATION: Implement in intake processing flow at `deliverables/shipyard-self-serve-intake/lib/intake/`
+- Add `is_subscriber` column to `intake_requests` table
+- Modify `listIntakeRequests()` query to ORDER BY is_subscriber DESC, created_at ASC
+
+---
+
+### REQ-8: New Daemon - Dedicated Subscriber Instance (bin/daemon-subscriber.sh)
+**Source**: decisions.md lines 251-254
+**Priority**: P1 (Required for MVP)
+**Description**: Create new dedicated daemon instance for subscriber PRDs that runs in parallel with main daemon, has higher polling frequency
+
+**Acceptance Criteria**:
+- [ ] Script exists at `bin/daemon-subscriber.sh` with executable permissions
+- [ ] Runs independently in parallel with main processing
+- [ ] Processes only subscriber-flagged PRDs
+- [ ] Higher polling frequency (30s vs 60s for free tier)
+- [ ] Does not starve free tier (REQ-30)
+- [ ] Logs processing metrics
+
+**Technical Notes**:
+- DECISION (LOCKED): Horizontal scaling, not priority queue jumping
+- Run as separate systemd service or Kubernetes pod
+- Query only PRDs where is_subscriber = true
+
+---
+
+## STRIPE INTEGRATION
+
+### REQ-9: Stripe Integration - Subscriptions API Setup
+**Source**: decisions.md lines 172-174, 304-309
+**Priority**: P0 (Blocker)
+**Description**: Implement Stripe Subscriptions API (not manual invoicing), use Stripe pre-built Checkout for payment forms, handle webhooks for subscription events
+
+**Acceptance Criteria**:
+- [ ] Stripe account configured with Subscriptions API enabled
+- [ ] Two price IDs created: Care ($500/month), Care Pro ($1,000/month)
+- [ ] Checkout page functional at public/care.html
+- [ ] All webhook handlers implemented (REQ-10 through REQ-13)
+- [ ] STRIPE_WEBHOOK_SECRET configured in environment
+
+**Technical Notes**:
+- DECISION CHANGE: Original PRD said "manual invoicing" but decisions.md overruled (Elon wins, line 106-114)
+- Use existing Stripe client at `apps/pulse/lib/stripe.ts`
+- Extend with subscription creation methods
+
+---
+
+### REQ-10: Webhook Handler - Subscription Created
+**Source**: decisions.md lines 305-309
+**Priority**: P0 (Blocker)
+**Description**: Create webhook handler for `customer.subscription.created` event that creates new subscriber record in database
+
+**Acceptance Criteria**:
+- [ ] Webhook receives and validates Stripe event signature
+- [ ] Creates subscriber record with correct tier from subscription metadata
+- [ ] Sets start_date to subscription.created timestamp
+- [ ] Generates unique referral code
+- [ ] Sends welcome email (REQ-24)
+- [ ] Idempotent (handles duplicate webhook deliveries)
+
+**Technical Notes**:
+- Use Stripe webhook signature verification
+- Extract tier from price_id: `price_xxx_care` vs `price_xxx_care_pro`
+
+---
+
+### REQ-11: Webhook Handler - Subscription Deleted
+**Source**: decisions.md lines 305-309
+**Priority**: P0 (Blocker)
+**Description**: Create webhook handler for `customer.subscription.deleted` event that updates subscriber status to cancelled
+
+**Acceptance Criteria**:
+- [ ] Webhook receives and validates event
+- [ ] Sets subscriber status to 'cancelled'
+- [ ] Records cancellation timestamp
+- [ ] Does NOT delete subscriber record (audit trail)
+- [ ] Stops processing future PRDs for this subscriber
+
+---
+
+### REQ-12: Webhook Handler - Invoice Payment Succeeded
+**Source**: decisions.md lines 305-309
+**Priority**: P0 (Blocker)
+**Description**: Create webhook handler for `invoice.payment_succeeded` event that resets token balance to monthly tier amount and logs renewal
+
+**Acceptance Criteria**:
+- [ ] Webhook receives and validates event
+- [ ] Resets tokens_remaining to tokens_monthly
+- [ ] Logs payment timestamp
+- [ ] Applies referral credits if applicable (REQ-21)
+- [ ] Sends confirmation email (optional for V1)
+
+**Technical Notes**:
+- Token reset happens on subscription anniversary, not calendar month (REQ-36)
+- Referral credits applied as Stripe coupon if exists
+
+---
+
+### REQ-13: Webhook Handler - Invoice Payment Failed
+**Source**: decisions.md lines 305-309
+**Priority**: P0 (Blocker)
+**Description**: Create webhook handler for `invoice.payment_failed` event that pauses subscriber status and sends notification
+
+**Acceptance Criteria**:
+- [ ] Webhook receives and validates event
+- [ ] Sets subscriber status to 'paused'
+- [ ] Sends payment failure email (REQ-28)
+- [ ] Stops processing subscriber PRDs
+- [ ] Logs payment failure reason
+
+---
+
+## OPEN QUESTIONS (Blockers)
+
+### OPEN-1: Token Calculation Precision
+**Source**: decisions.md lines 321-330
+**Status**: OPEN (requires decision)
+**Options**:
+- A: Parse Claude API response headers
+- B: Estimate based on file changes + PRD length
+
+**Impact**: HIGH — customer disputes if inaccurate
+**Recommendation**: Start with Option B (15K tokens per PRD estimate), refine in V2
+
+---
+
+### OPEN-2: Referral Credit Application Mechanism
+**Source**: decisions.md lines 334-340
+**Status**: OPEN (requires implementation decision)
+**Options**:
+- A: Stripe coupon codes (automatic)
+- B: Manual credit tracking + invoice adjustments
+
+**Impact**: HIGH — viral growth depends on this
+**Recommendation**: Use Option A (Stripe coupons) for automation
+
+---
+
+### OPEN-3: Single Tier vs Two-Tier Launch
+**Source**: decisions.md lines 367-374
+**Status**: OPEN (requires business decision)
+**Options**:
+- Launch both tiers ($500 and $1,000)
+- Launch single tier ($500), add second in V2
+
+**Impact**: MEDIUM — affects messaging complexity
+**Recommendation**: Launch both (Elon's stance) to let market decide
+
+---
+
+## Summary
+
+- **Total Requirements**: 62 (full breakdown in source document)
+- **Blocker Requirements (P0)**: 30
+- **Required for MVP (P1)**: 20
+- **Nice-to-Have (P2)**: 9
+- **Open Questions**: 3
+
+**Estimated Build Time**: 8 hours (locked decision from Elon/Steve consensus)
+
+**Build Sequence**:
+1. Phase 1: Infrastructure (Database + Scripts) — 4 hours
+2. Phase 2: Daemon Integration — 2 hours
+3. Phase 3: Communication Layer — 1.5 hours
+4. Phase 4: Marketing & Distribution — 0.5 hours
+
+---
+
+**Next Steps**:
+1. Resolve open questions (OPEN-1, OPEN-2, OPEN-3)
+2. Create XML task plans organized into waves
+3. Begin Phase 1 implementation
+
+---
+
+## Detailed Requirements Inventory
+
+For complete 62-requirement traceability matrix with all acceptance criteria, technical notes, and file deliverables, refer to the complete extraction provided to the planning agents.
+
+Key requirement categories covered:
+- Database Schema (REQ-1 to REQ-3)
+- Scripts (REQ-4 to REQ-8)
+- Stripe Integration (REQ-9 to REQ-13)
+- Token Tracking (REQ-14 to REQ-17)
+- Referral System (REQ-18 to REQ-23)
+- Email Communication (REQ-24 to REQ-28)
+- Daemon Routing (REQ-29 to REQ-31)
+- Marketing & Positioning (REQ-32 to REQ-34)
+- Business Logic (REQ-35 to REQ-37)
+- Success Metrics (REQ-38 to REQ-45)
+- File Deliverables (REQ-46 to REQ-56)
+- Configuration (REQ-57 to REQ-59)
+- Integration Points (REQ-60 to REQ-62)
