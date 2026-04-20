@@ -232,7 +232,7 @@ Each piece must pass these verification tests:
 - ✓ Webhook handlers are idempotent (duplicate events don't cause errors)
 
 ### Email Templates (Task 12-14)
-- ✓ Templates render with placeholders replaced: `[NAME]`, `[TOKENS]`, `[BALANCE]`, `[REFERRAL_URL]`
+- ✓ Templates render with dynamic variables: `[NAME]`, `[TOKENS]`, `[BALANCE]`, `[REFERRAL_URL]`
 - ✓ Welcome email includes referral link and token balance
 - ✓ Incident report follows 3-line format (what broke, how fixed, tokens used)
 - ✓ Token warning sent at 80% threshold (not before, not after)

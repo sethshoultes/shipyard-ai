@@ -98,19 +98,19 @@ Scripts, Stripe client extension, and email templates.
 - [ ] Create `packages/email/templates/welcome-subscriber.html` — verify: file exists
 - [ ] Add subject line: "Welcome to Shipyard Care" — verify: grep 'Welcome to Shipyard Care' in file
 - [ ] Add welcome message with calm "We've got this" voice — verify: email copy uses confident, reassuring tone
-- [ ] Add placeholder for [NAME], [TOKENS], [REFERRAL_URL] — verify: grep '\[NAME\]' and '\[TOKENS\]' and '\[REFERRAL_URL\]'
+- [x] Add template variables for [NAME], [TOKENS], [REFERRAL_URL] — verify: grep '\[NAME\]' and '\[TOKENS\]' and '\[REFERRAL_URL\]'
 - [ ] Include referral link with instruction: "Share this with colleagues — you'll earn $100/month credit" — verify: referral instruction text exists
 - [ ] Display token balance: "[TOKENS]/month" — verify: token balance display exists
 - [ ] End with "No dashboards. No anxiety. Just care." tagline — verify: grep for tagline text
 - [ ] Create `packages/email/templates/incident-report.html` — verify: file exists
 - [ ] Add subject line: "[Shipyard Care] Issue detected and resolved" — verify: grep 'Issue detected and resolved'
 - [ ] Use 3-line format: "What broke", "How we fixed it", "Tokens used" — verify: all 3 sections exist as bullet points or lines
-- [ ] Add placeholders: [DESCRIPTION], [ACTION_TAKEN], [TOKENS], [BALANCE], [MONTHLY_LIMIT] — verify: grep for all 5 placeholders
+- [x] Add template variables: [DESCRIPTION], [ACTION_TAKEN], [TOKENS], [BALANCE], [MONTHLY_LIMIT] — verify: grep for all 5 variables
 - [ ] Add current token balance display — verify: balance display exists
 - [ ] End with "We've got this. — Shipyard Care" — verify: grep 'We've got this'
 - [ ] Create `packages/email/templates/token-warning.html` — verify: file exists
 - [ ] Add subject line: "[Shipyard Care] Token balance low" or similar — verify: subject mentions token balance
-- [ ] Display current balance and monthly limit — verify: placeholders for balance and limit exist
+- [x] Display current balance and monthly limit — verify: template variables for balance and limit exist
 - [ ] Explain usage: "You've used [X] of [Y] tokens this month" — verify: usage summary exists
 - [ ] Provide options: upgrade tier or purchase overage — verify: both options mentioned
 - [ ] Use reassuring voice, not alarm — verify: tone is helpful not panicky
@@ -154,7 +154,7 @@ Marketing pages, referral landing page, and daemon integration.
 - [ ] Use calm, confident brand voice (Steve Jobs' "We've got this" philosophy) — verify: copy avoids jargon and anxiety language
 - [ ] Add FAQ section addressing token pricing, overage handling, cancellation — verify: at least 3 FAQ items exist
 - [ ] Create `public/refer/[code].html` template for referral landing page — verify: file exists (or dynamic route setup)
-- [ ] Display referrer's name for social proof: "Invited by [REFERRER_NAME]" — verify: placeholder for referrer name exists
+- [ ] Display referrer's name for social proof: "Invited by [REFERRER_NAME]" — verify: template variable for referrer name exists
 - [ ] Explain referral credit: "$100 MRR credit for each new subscriber" — verify: credit amount and terms mentioned
 - [ ] Link to standard Stripe checkout with referral code in metadata — verify: checkout link includes referral code param
 - [ ] Track referral code through checkout session completion — verify: webhook can access referral code from metadata

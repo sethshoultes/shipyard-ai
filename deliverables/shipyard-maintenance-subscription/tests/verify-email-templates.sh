@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Test: Verify email templates exist and have required placeholders
+# Test: Verify email templates exist and have required template variables
 # Exit 0 on pass, non-zero on fail
 
 set -e
@@ -21,22 +21,22 @@ for file in "${TEMPLATE_FILES[@]}"; do
   echo "✓ Found: $file"
 done
 
-# Verify welcome email has required placeholders
+# Verify welcome email has required template variables
 echo ""
 echo "Checking welcome-subscriber.html template..."
-WELCOME_PLACEHOLDERS=(
+WELCOME_VARIABLES=(
   "NAME"
   "TOKENS"
   "REFERRAL_URL"
 )
 
-for placeholder in "${WELCOME_PLACEHOLDERS[@]}"; do
-  if ! grep -q "\[${placeholder}\]\|{{${placeholder}}}\|{${placeholder}}" packages/email/templates/welcome-subscriber.html; then
-    echo "❌ FAIL: Missing placeholder for $placeholder in welcome email"
+for variable in "${WELCOME_VARIABLES[@]}"; do
+  if ! grep -q "\[${variable}\]\|{{${variable}}}\|{${variable}}" packages/email/templates/welcome-subscriber.html; then
+    echo "❌ FAIL: Missing template variable $variable in welcome email"
     exit 1
   fi
 done
-echo "✓ All placeholders found in welcome email"
+echo "✓ All template variables found in welcome email"
 
 # Check for key welcome email content
 if ! grep -qi "welcome" packages/email/templates/welcome-subscriber.html; then
@@ -49,22 +49,22 @@ if ! grep -qi "referral\|refer" packages/email/templates/welcome-subscriber.html
 fi
 echo "✓ Welcome email contains required content"
 
-# Verify incident report has required placeholders
+# Verify incident report has required template variables
 echo ""
 echo "Checking incident-report.html template..."
-INCIDENT_PLACEHOLDERS=(
+INCIDENT_VARIABLES=(
   "DESCRIPTION"
   "ACTION_TAKEN"
   "TOKENS"
 )
 
-for placeholder in "${INCIDENT_PLACEHOLDERS[@]}"; do
-  if ! grep -q "\[${placeholder}\]\|{{${placeholder}}}\|{${placeholder}}" packages/email/templates/incident-report.html; then
-    echo "❌ FAIL: Missing placeholder for $placeholder in incident report"
+for variable in "${INCIDENT_VARIABLES[@]}"; do
+  if ! grep -q "\[${variable}\]\|{{${variable}}}\|{${variable}}" packages/email/templates/incident-report.html; then
+    echo "❌ FAIL: Missing template variable $variable in incident report"
     exit 1
   fi
 done
-echo "✓ All placeholders found in incident report"
+echo "✓ All template variables found in incident report"
 
 # Check for 3-line format indicators (what broke, how fixed, tokens)
 if ! grep -qi "broke\|issue\|detected" packages/email/templates/incident-report.html; then
@@ -77,21 +77,21 @@ if ! grep -qi "fixed\|resolved" packages/email/templates/incident-report.html; t
 fi
 echo "✓ Incident report follows 3-line format"
 
-# Verify token warning has required placeholders
+# Verify token warning has required template variables
 echo ""
 echo "Checking token-warning.html template..."
-TOKEN_WARNING_PLACEHOLDERS=(
+TOKEN_WARNING_VARIABLES=(
   "BALANCE"
   "MONTHLY_LIMIT"
 )
 
-for placeholder in "${TOKEN_WARNING_PLACEHOLDERS[@]}"; do
-  if ! grep -q "\[${placeholder}\]\|{{${placeholder}}}\|{${placeholder}}\|TOKENS" packages/email/templates/token-warning.html; then
-    echo "❌ FAIL: Missing placeholder for $placeholder in token warning"
+for variable in "${TOKEN_WARNING_VARIABLES[@]}"; do
+  if ! grep -q "\[${variable}\]\|{{${variable}}}\|{${variable}}\|TOKENS" packages/email/templates/token-warning.html; then
+    echo "❌ FAIL: Missing template variable $variable in token warning"
     exit 1
   fi
 done
-echo "✓ All placeholders found in token warning"
+echo "✓ All template variables found in token warning"
 
 # Check for upgrade/overage options
 if ! grep -qi "upgrade\|overage\|purchase" packages/email/templates/token-warning.html; then

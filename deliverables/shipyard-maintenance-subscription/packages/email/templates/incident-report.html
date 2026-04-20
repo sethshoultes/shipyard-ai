@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[Shipyard Care] Issue detected and resolved</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a1a1a;
+            font-size: 24px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+        .status-badge {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .incident-summary {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0066cc;
+            padding: 20px;
+            margin: 24px 0;
+            border-radius: 4px;
+        }
+        .incident-line {
+            margin-bottom: 16px;
+            padding-left: 24px;
+            position: relative;
+        }
+        .incident-line:before {
+            content: "•";
+            position: absolute;
+            left: 8px;
+            color: #0066cc;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .incident-line strong {
+            color: #1a1a1a;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .incident-line p {
+            margin: 0;
+            color: #4a4a4a;
+        }
+        .token-usage {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 16px;
+            margin: 24px 0;
+            border-radius: 4px;
+        }
+        .token-usage p {
+            margin: 4px 0;
+        }
+        .balance-display {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0066cc;
+        }
+        .footer {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #eee;
+            color: #666;
+        }
+        .signature {
+            margin-top: 16px;
+            font-style: italic;
+            color: #0066cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <span class="status-badge">✓ RESOLVED</span>
+
+        <h1>[Shipyard Care] Issue detected and resolved</h1>
+
+        <p>We detected an issue with your site and resolved it automatically. Here's what happened:</p>
+
+        <div class="incident-summary">
+            <div class="incident-line">
+                <strong>What broke</strong>
+                <p>[DESCRIPTION]</p>
+            </div>
+
+            <div class="incident-line">
+                <strong>How we fixed it</strong>
+                <p>[ACTION_TAKEN]</p>
+            </div>
+
+            <div class="incident-line">
+                <strong>Tokens used</strong>
+                <p>[TOKENS] tokens</p>
+            </div>
+        </div>
+
+        <div class="token-usage">
+            <p><strong>Current token balance:</strong> <span class="balance-display">[BALANCE]</span> / [MONTHLY_LIMIT] tokens remaining</p>
+        </div>
+
+        <p>Your site is back to normal. No action needed on your end.</p>
+
+        <p>If you notice anything unusual or have questions about this fix, just reply to this email.</p>
+
+        <div class="footer">
+            <p class="signature">We've got this. — Shipyard Care</p>
+        </div>
+    </div>
+</body>
+</html>
