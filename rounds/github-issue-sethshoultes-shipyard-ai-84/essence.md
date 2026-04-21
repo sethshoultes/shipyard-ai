@@ -1,11 +1,13 @@
-GitHub repos turned into gallery-worthy posters via one sacred URL.
+GitHub repos become gallery-worthy shareable posters via single URL.
 
-- Feeling: the gasp when your spaghetti code looks like MoMA
-- Must be perfect: the render. One inevitable layout. Zero customization
-- Creative direction: seductive inevitability
+- Product: paste link, receive inevitable art. No options. No regret.
+- Feeling: gasp when spaghetti code looks like MoMA
+- Perfection: render. One layout. Zero customization.
+- Direction: seductive inevitability
 
-- No templates. One layout. No choice, no regret
-- No AI taglines in v1. Cache everything. Ship the feeling, not the utility
-- Paste URL. Hold breath. Gasp. Share. That's the product
-- Output is the ad. Every README is a billboard
-- PNG only. Crisp text. No artifacts, no apologies
+No templates. No AI taglines. No databases. No auth.
+Cache-first. Stateless. One Worker.
+PNG only. Crisp. Honest. Perfect.
+Paste. Hold breath. Gasp. Share.
+READMEs are billboards. Output is ad.
+Respect is most addictive drug.

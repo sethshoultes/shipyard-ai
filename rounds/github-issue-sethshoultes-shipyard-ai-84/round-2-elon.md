@@ -1,33 +1,49 @@
-# Round 2: Elon — Poster Child
+## Round 2: Elon
 
-## Where Steve Is Wrong
+Steve, "one week of craft" is a beautiful suicide note.
 
-**"Poster" is unsearchable.** Try Googling "Poster GitHub." You get GitHub's own poster projects. A name must be memorable *and* discoverable. "Poster Child" is distinctive. "Poster" is a commodity word. One-word naming is fashion, not physics.
+You don't have a week. You have one agent session. That "inevitable layout" you want to perfect is a trap — perfection is just procrastination with better branding.
 
-**"One inevitable layout" is perfectionism with better branding.** You can't know what's inevitable until 1,000 repos have rendered through it. Steve wants to spend a week on white space before a single user sees the product. That's how you ship nothing. One template for v1 is correct — but call it what it is: a shipping constraint, not divine taste.
+Color extraction from repo DNA? Elegant, but adds a dependency chain that pushes launch from Tuesday to next quarter. The "gasp" you want in thirty seconds is worthless if nobody sees it for thirty days because you're still kerning the subtitle.
 
-**"PNG only, because JPG is for amateurs" is user-hostile snobbery.** If a platform compresses PNGs poorly, we lose. The output is a utility. Form follows function.
+Beauty that delays shipping isn't courage. It's cowardice dressed in Helvetica.
 
-**Color extraction from repo DNA:** Fragile, expensive, and often ugly. What if the dominant color is `#CCCCCC`? Now every Rails repo looks like a hospital wall. A curated palette with 12 presets beats an algorithm that guesses.
+You want no templates, no customization — I agree, but for the opposite reason.
 
-## Where Simplicity Wins
+Templates aren't evil because they let users "hang themselves." They're evil because someone has to build a template picker, a preview mode, and a state machine. One layout is correct, but it must be the *first* layout that works, not the *perfect* layout.
 
-Statelessness compounds. Every database you add is a team member you didn't hire who wakes you up at 3am. A read-only, cache-first Worker with R2 is a machine that sleeps while you sleep.
+Ship the one that looks good enough, then iterate. "Could not have been any other way" is a luxury of companies with ten engineers, not one. Constraints create taste; abundance creates bloat.
 
-Cutting Claude isn't anti-AI — it's pro-physics. Three seconds of latency kills sharing. `repo.description` exists. Use it. If the description is bad, the poster reflects reality. We don't need to hallucinate a better tagline.
+Your "Poster" rename is clever, but one-word names don't win on semantics — they win on memorability.
 
-The output-as-distribution strategy scales without ad spend. Shields.io didn't grow because of Product Hunt. It grew because every README became a billboard. That's gravitational pull, not marketing spend.
+"Poster Child" has alliteration, rhythm, and irony. It sticks in the brain. "Poster" is a commodity word you can't own. Don't let minimalism erase the marketing hook. If you can't trademark it in your head after hearing it once, you failed at naming.
 
-## Where Steve Is Right
+Where you're right: the output *must* look credible.
 
-The template we ship must be *excellent.* Not good. Excellent. Typography, spacing, hierarchy — these are the 30-second moment. One perfect render beats five mediocre ones. I'm conceding taste, not process.
+A jagged PNG with Comic Sans won't embed anywhere. The landing page needs confidence. The brand voice matters because distrust kills faster than latency.
 
-And the emotional hook is real. Developers do judge books by covers. The poster must feel like respect. But respect requires the image to *load instantly* and *render reliably.* A beautiful 6-second failure is still a failure.
+Taste is the tax you pay for attention — but it's a tax on the *surface*, not the *engine*. Spend your taste budget on the generated image and the landing page hero, nowhere else. The README embed is your real storefront; make it sharp, make it load fast, make it link back.
 
-## Non-Negotiables
+Where you're also right: saying no.
 
-1. **No Claude in v1.** Use `repo.description`. Ship in days, not weeks.
-2. **No database. No auth. No state.** Cache-first, R2-backed, sleep-at-night architecture.
-3. **One template at launch.** Not because it's "inevitable" — because two templates means a choice, a build step, and a maintenance tax we pay before we have users.
+Analytics dashboards, social scheduling, brand kits — all poison. But the reason to say no isn't mystical purity. It's that every "yes" is a support burden, a dependency, and a page of code that can break at 3am.
 
-Ship the tool. Let the users tell us what's beautiful.
+"That would make it better at being worse" is exactly right, though I'd phrase it as: features are bugs with good PR.
+
+My non-negotiables:
+
+1. **Single Cloudflare Worker.**
+
+No database, no queue, no auth. If it doesn't fit in one file, it doesn't ship. Complexity is a one-way valve — you can add, but you can never subtract under pressure. One file means one mental model. One mental model means one person can hold the entire system in working memory.
+
+2. **Immutable cache by commit SHA.**
+
+The architecture *is* the cache. Without it, you're burning API credits and serving 3-second responses. With it, you're a utility that happens to be beautiful. Cache isn't an optimization; it's the product. A slow beautiful tool is a dead tool.
+
+3. **Direct path only: URL → PNG.**
+
+No dashboard, no marketplace, no "enhance with Claude" toggle. Every feature that isn't that arrow is a trap disguised as progress. If a user can't describe it in six words, it doesn't exist. The viral loop is the embed. If the image doesn't link back to your domain, you failed at distribution.
+
+Ship the engine.
+
+Let beauty be a byproduct of clarity, not a goal that strangles it. The world is full of gorgeous products that never launched. I'd rather have an ugly PNG in production than a masterpiece in Figma.

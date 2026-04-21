@@ -1,10 +1,20 @@
-- Verdict: Zero revenue. Internal checkbox, not a product.
-- No customer pays for `echo` into a text file. Value = panic reduction, not profit.
-- Confusing: 197 lines to describe one shell command. Overdressed.
-- Bounce factor: "Seth trusts the system again." Who is Seth? Did he leave? Why?
-- Bounce factor: "Cultural rot" and "style-guide creep" risks for a 5-second script. Relax.
-- Two waves, six steps, four risks to write twelve words to disk. Bloated.
-- 30-sec pitch: "One command proves our AI pipeline hasn't died."
-- $0 test: Run it once. Break it intentionally. If nobody notices for 48 hours, kill the project.
-- Retention hook: None currently. Add Slack alert on failure. Pain of silence > value of green check.
-- Real talk: Ship the script. Delete the plan. Move on.
+No customer would pay for this. Internal smoke test, not a product.
+
+Confusing:
+- Fake stakeholder names (Elon, Steve, Seth) in a 15-minute script plan
+- "Cultural rot" risk for a one-line echo command
+- Architecture manifesto for a text file
+
+Bounce triggers:
+- Jargon wall ("waves", "traceability matrix", "risk register")
+- 197 lines to describe `echo "Kimi drove this." > pulse.txt`
+- Pretending a shell script needs a "locked decision" framework
+
+Elevator pitch:
+"One-line CI heartbeat that writes 'Kimi drove this.' to prove the pipeline still breathes."
+
+$0 test:
+Run `./run.sh`. Check `cat pulse.txt`. Done. No GitHub Actions needed to validate a string.
+
+Retention hook:
+None. No user, no retention. Engineers will forget this exists until it breaks.
