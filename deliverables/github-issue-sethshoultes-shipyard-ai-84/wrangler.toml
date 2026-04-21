@@ -1,0 +1,10 @@
+name = "poster"
+main = "src/index.ts"
+compatibility_date = "2024-04-05"
+
+[[r2_buckets]]
+binding = "CACHE"
+bucket_name = "poster-cache"
+
+[vars]
+GITHUB_TOKEN_POOL = ""

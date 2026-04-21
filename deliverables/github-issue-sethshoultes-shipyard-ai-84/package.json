@@ -1,0 +1,26 @@
+{
+  "name": "poster",
+  "version": "1.0.0",
+  "description": "One-click GitHub repository social preview image generator",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "warm-cache": "tsx scripts/warm-cache.ts"
+  },
+  "dependencies": {
+    "@resvg/resvg-wasm": "2.6.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240405.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0",
+    "wrangler": "^3.50.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}
