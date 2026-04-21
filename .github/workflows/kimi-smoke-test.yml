@@ -1,0 +1,27 @@
+name: Kimi Smoke Test
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  pulse:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run heartbeat
+        run: |
+          cd rounds/kimi-smoke-test
+          ./run.sh
+
+      - name: Verify pulse.txt
+        run: |
+          cd rounds/kimi-smoke-test
+          test -f pulse.txt
+          echo "pulse.txt contents:"
+          cat pulse.txt
+          grep -Fxq 'Kimi drove this.' pulse.txt

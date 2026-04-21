@@ -1,14 +1,14 @@
 # Requirements Traceability Matrix
-# Shipyard Maintenance Subscription → "Shipyard Care"
+# Kimi Smoke Test → "Pulse"
 
-**Generated**: 2026-04-20
+**Generated**: 2026-04-21
 **Source Documents**:
-- `/home/agent/shipyard-ai/rounds/shipyard-maintenance-subscription/decisions.md`
-- `/home/agent/shipyard-ai/prds/shipyard-maintenance-subscription.md`
+- `/home/agent/shipyard-ai/rounds/kimi-smoke-test/decisions.md`
+- `/home/agent/shipyard-ai/prds/kimi-smoke-test.md`
 
 **Project Status**: Locked decisions — ready for implementation
-**Total Requirements**: 62
-**Estimated Build Time**: 8 hours (locked decision from Elon/Steve consensus)
+**Total Requirements**: 6
+**Estimated Build Time**: < 15 minutes (locked decision from Elon/Steve consensus)
 
 ---
 
@@ -16,348 +16,149 @@
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| Database Schema | 3 | subscribers, token_usage, referrals tables |
-| Script Requirements | 9 | Subscriber management, token tracking, daemon modifications |
-| Stripe Integration | 5 | Subscriptions API + 4 webhook handlers |
-| Token Tracking | 4 | Balance tracking, overage pricing, logging, warnings |
-| Referral System | 6 | Code generation, landing page, credit application, fraud prevention |
-| Email Communication | 5 | Welcome, incident report, token warning templates + triggers |
-| Daemon Routing | 3 | Subscriber flag, dedicated capacity, free-tier monitoring |
-| Marketing & Positioning | 3 | Care page, brand voice, naming consistency |
-| Business Logic | 3 | Tier options, token reset, overage handling |
-| Success Metrics | 8 | Launch validation + 90-day targets |
-| File Deliverables | 11 | All files that must be created |
-| Configuration | 3 | Stripe keys, pricing constants, thresholds |
-| Integration Points | 3 | Daemon, checkout, email delivery |
+| Core Artifact | 3 | Shell script, output file, sentence content |
+| Pipeline Integration | 2 | CI step invocation, exit code verification |
+| Performance | 1 | 5-second wall-clock constraint |
 
 ---
 
-## DATABASE REQUIREMENTS
+## CORE ARTIFACT REQUIREMENTS
 
-### REQ-1: Database Schema - Subscribers Table
-**Source**: decisions.md lines 195-206
+### REQ-1: Shell Command (run.sh)
+**Source**: decisions.md MVP Feature Set #1, #2; Architecture decision (Elon wins)
 **Priority**: P0 (Blocker)
-**Description**: Create `subscribers` table with columns: id (primary key), email (unique), tier (enum: care/care_pro), tokens_monthly (integer), tokens_remaining (integer), referral_code (unique), referral_credits (default 0), start_date, status (enum: active/cancelled/paused)
+**Description**: Create a single shell command at `/home/agent/shipyard-ai/rounds/kimi-smoke-test/run.sh` that writes the locked sentence to `pulse.txt` and exits.
 
 **Acceptance Criteria**:
-- [ ] Table exists in database with all columns
-- [ ] Proper types enforced on all columns
-- [ ] CHECK constraints on `tier` (care, care_pro) and `status` (active, cancelled, paused)
-- [ ] `email` column is UNIQUE with NOT NULL constraint
-- [ ] `referral_code` column is UNIQUE
-- [ ] Primary key on `id` column
+- [ ] File exists at `/home/agent/shipyard-ai/rounds/kimi-smoke-test/run.sh`
+- [ ] Has executable permissions (`chmod +x`)
+- [ ] Writes exact text `Kimi drove this.` to `pulse.txt`
+- [ ] Exits with code 0 on success
+- [ ] Exits with non-zero code on any failure (e.g., directory not writable)
+- [ ] Zero configuration required (no env vars, no flags, no config files)
 
 **Technical Notes**:
-- Use Drizzle ORM schema definition in `packages/db/schema/subscribers.ts`
-- Follow existing pattern from `packages/db/schema/subscriptions.ts`
-- Neon PostgreSQL database (serverless)
+- DECISION (LOCKED): Single shell command. Zero modules. Zero imports. Zero entry points.
+- The interface is the exit code. Green means go. Red means wake someone up.
+- Sentence is hardcoded; no runtime model invocation.
 
 ---
 
-### REQ-2: Database Schema - Token Usage Tracking
-**Source**: decisions.md lines 208-215
+### REQ-2: Output File (pulse.txt)
+**Source**: decisions.md MVP Feature Set #6, File Structure
 **Priority**: P0 (Blocker)
-**Description**: Create `token_usage` table with columns: id (primary key), subscriber_email, prd_id, tokens_used, timestamp, and FOREIGN KEY constraint to subscribers.email
+**Description**: Generate `/home/agent/shipyard-ai/rounds/kimi-smoke-test/pulse.txt` containing only the locked sentence.
 
 **Acceptance Criteria**:
-- [ ] Table exists in database
-- [ ] FOREIGN KEY constraint enforced (subscriber_email → subscribers.email)
-- [ ] All rows traceable to a subscriber
-- [ ] Supports querying by subscriber_email, prd_id, timestamp
-- [ ] Index on subscriber_email for performance
+- [ ] File created at `/home/agent/shipyard-ai/rounds/kimi-smoke-test/pulse.txt`
+- [ ] Contains exactly: `Kimi drove this.`
+- [ ] No metadata, no timestamps, no formatting
+- [ ] Overwritten on each run (no accumulation)
+- [ ] Human-readable filename (`pulse.txt` honors the product name)
 
 **Technical Notes**:
-- Use Drizzle ORM foreign key syntax
-- Add composite index on (subscriber_email, timestamp) for usage queries
+- DECISION (LOCKED): `pulse.txt` is the output artifact, generated, not committed.
+- Cleanup policy: overwrite in-place to prevent disk fill at scale.
 
 ---
 
-### REQ-3: Database Schema - Referrals Tracking
-**Source**: decisions.md lines 217-224
+### REQ-3: Locked Sentence Content
+**Source**: decisions.md Section 2 (The Output Sentence)
+**Priority**: P0 (Blocker)
+**Description**: The output file must contain the exact locked sentence: "Kimi drove this."
+
+**Acceptance Criteria**:
+- [ ] Exact match: `Kimi drove this.`
+- [ ] Ends with a period (full stop)
+- [ ] No extra whitespace, newlines, or prefixes
+- [ ] Plain text only
+
+**Technical Notes**:
+- DECISION (LOCKED): "Kimi drove this." Period. Full stop. Let the silence do the work.
+- Steve wins on craft; sentence must be evidence of taste — clean, inevitable, alive.
+- Not a log, not a tag, not robot speak.
+
+---
+
+## PIPELINE INTEGRATION REQUIREMENTS
+
+### REQ-4: CI Step Invocation
+**Source**: decisions.md MVP Feature Set #5; Open Questions #2
 **Priority**: P1 (Required for MVP)
-**Description**: Create `referrals` table with columns: id (primary key), referrer_email, referred_email, credit_amount, converted_date, FOREIGN KEY to subscribers.email
+**Description**: Add one CI step that invokes the shell command. The step should be part of the Shipyard pipeline verification.
 
 **Acceptance Criteria**:
-- [ ] Table exists in database
-- [ ] FOREIGN KEY constraint enforced (referrer_email → subscribers.email)
-- [ ] Referral conversions logged with amounts and dates
-- [ ] Supports querying referral counts per user
-- [ ] Index on referrer_email for fraud detection
+- [ ] CI workflow contains a step that runs `run.sh`
+- [ ] Step runs in under 5 seconds wall-clock time
+- [ ] Step is triggered appropriately (on push to main and manual dispatch)
+- [ ] No additional build artifacts produced by the CI step itself
 
 **Technical Notes**:
-- Add check: credit only counts after referred user's 2nd payment (fraud prevention, REQ-22)
+- OPEN QUESTION (RESOLVED): CI location — create `/home/agent/shipyard-ai/.github/workflows/kimi-smoke-test.yml` as a dedicated smoke-test workflow.
+- OPEN QUESTION (RESOLVED): Agent vs shell — shell hardcodes the sentence. The model is tested by its ability to plan and write the script, not by runtime generation.
 
 ---
 
-## SUBSCRIBER MANAGEMENT SCRIPTS
-
-### REQ-4: Script - Add New Subscriber (bin/subscriber-add.sh)
-**Source**: decisions.md lines 228-232
+### REQ-5: Exit Code Verification
+**Source**: decisions.md MVP Feature Set #2; Architecture decision
 **Priority**: P0 (Blocker)
-**Description**: Create bash script that accepts email and tier, generates unique referral code, initializes token balance to tier amount, and triggers Stripe subscription creation
+**Description**: The CI step must check the exit code of the shell command. 0 means success; non-zero means failure.
 
 **Acceptance Criteria**:
-- [ ] Script exists at `bin/subscriber-add.sh` with executable permissions
-- [ ] Accepts parameters: email, tier (care or care_pro)
-- [ ] Generates unique referral code (format: 8-char alphanumeric)
-- [ ] Initializes tokens_monthly: 100,000 for care, 250,000 for care_pro
-- [ ] Sets tokens_remaining = tokens_monthly on creation
-- [ ] Calls Stripe API to create subscription
-- [ ] Sends welcome email with referral link
-- [ ] Returns success/failure exit code
+- [ ] CI fails (red light) if `run.sh` exits non-zero
+- [ ] CI passes (green) if `run.sh` exits 0
+- [ ] No additional interface (no parsing of stdout, no artifact inspection beyond basic existence)
 
 **Technical Notes**:
-- Use `openssl rand -hex 4` for referral code generation
-- Check for collision in database before inserting
-- Integrate with existing Stripe client at `apps/pulse/lib/stripe.ts`
+- DECISION (LOCKED): The interface is the exit code. Green means go. Red means wake someone up.
+- Failure semantics: CI red light (pager stops if this fails; trust breaks).
 
 ---
 
-### REQ-5: Script - Check Subscriber Status (bin/subscriber-check.sh)
-**Source**: decisions.md lines 234-237
-**Priority**: P0 (Blocker)
-**Description**: Create bash script that checks if email is active subscriber, returns token balance, validates if request can proceed
+## PERFORMANCE REQUIREMENTS
 
-**Acceptance Criteria**:
-- [ ] Script exists at `bin/subscriber-check.sh` with executable permissions
-- [ ] Accepts parameter: email
-- [ ] Returns JSON with: is_subscriber (bool), status (active/cancelled/paused), tokens_remaining (int)
-- [ ] Exit code 0 if active subscriber with tokens, 1 otherwise
-- [ ] Response time < 100ms (indexed query)
-
-**Technical Notes**:
-- Query: `SELECT status, tokens_remaining FROM subscribers WHERE email = $1`
-- Return false if not found or status != 'active'
-
----
-
-### REQ-6: Script - Token Deduction (bin/token-deduct.sh)
-**Source**: decisions.md lines 239-242
-**Priority**: P0 (Blocker)
-**Description**: Create bash script that deducts tokens after PRD completion, logs usage to token_usage table, sends alert email if balance < 20K
-
-**Acceptance Criteria**:
-- [ ] Script exists at `bin/token-deduct.sh` with executable permissions
-- [ ] Accepts parameters: subscriber_email, prd_id, tokens_used
-- [ ] Deducts tokens_used from tokens_remaining
-- [ ] Creates record in token_usage table with timestamp
-- [ ] Sends warning email if new balance < 20,000 tokens
-- [ ] Returns new balance in response
-- [ ] Atomic transaction (deduct + log together)
-
-**Technical Notes**:
-- Use PostgreSQL transaction: BEGIN; UPDATE subscribers...; INSERT INTO token_usage...; COMMIT;
-- Warning email uses template: `templates/token-warning.txt` (REQ-27)
-
----
-
-## DAEMON MODIFICATIONS
-
-### REQ-7: Daemon Modification - Subscriber Status Check
-**Source**: decisions.md lines 245-249
-**Priority**: P0 (Blocker)
-**Description**: Modify daemon.sh to check subscriber status before processing PRD, route to dedicated daemon instance if subscriber, log token consumption per run, trigger incident report if errors occur
-
-**Acceptance Criteria**:
-- [ ] `bin/daemon.sh` (or equivalent) updated with subscriber check
-- [ ] Calls `bin/subscriber-check.sh` before processing each PRD
-- [ ] Routes PRDs with `subscriber:true` flag to dedicated instance
-- [ ] Logs all token usage via `bin/token-deduct.sh` after completion
-- [ ] Triggers incident report email (REQ-26) on failures
-- [ ] Backwards compatible with non-subscriber PRDs
-
-**Technical Notes**:
-- RISK: Research shows no central daemon.sh found; system uses Cloudflare Workers
-- MITIGATION: Implement in intake processing flow at `deliverables/shipyard-self-serve-intake/lib/intake/`
-- Add `is_subscriber` column to `intake_requests` table
-- Modify `listIntakeRequests()` query to ORDER BY is_subscriber DESC, created_at ASC
-
----
-
-### REQ-8: New Daemon - Dedicated Subscriber Instance (bin/daemon-subscriber.sh)
-**Source**: decisions.md lines 251-254
+### REQ-6: Wall-Clock Time Under 5 Seconds
+**Source**: decisions.md Section 7 (Performance & Success Metrics)
 **Priority**: P1 (Required for MVP)
-**Description**: Create new dedicated daemon instance for subscriber PRDs that runs in parallel with main daemon, has higher polling frequency
+**Description**: End-to-end execution from CI trigger to file appearance must complete in under 5 seconds.
 
 **Acceptance Criteria**:
-- [ ] Script exists at `bin/daemon-subscriber.sh` with executable permissions
-- [ ] Runs independently in parallel with main processing
-- [ ] Processes only subscriber-flagged PRDs
-- [ ] Higher polling frequency (30s vs 60s for free tier)
-- [ ] Does not starve free tier (REQ-30)
-- [ ] Logs processing metrics
+- [ ] `run.sh` execution completes in < 1 second
+- [ ] CI step allocation + execution completes in < 5 seconds total
+- [ ] Measured via GitHub Actions logs or local `time` command
 
 **Technical Notes**:
-- DECISION (LOCKED): Horizontal scaling, not priority queue jumping
-- Run as separate systemd service or Kubernetes pod
-- Query only PRDs where is_subscriber = true
+- DECISION (LOCKED): Elon is right that the real bottleneck is inference latency and pipeline orchestration, not disk I/O. Wall-clock time must be measured and must be under 5 seconds end-to-end.
+- Steve is right that the metric isn't everything — Seth must feel the exhale. The success criterion is binary: file appears + Seth trusts the system again.
 
 ---
 
-## STRIPE INTEGRATION
+## Open Questions Resolution
 
-### REQ-9: Stripe Integration - Subscriptions API Setup
-**Source**: decisions.md lines 172-174, 304-309
-**Priority**: P0 (Blocker)
-**Description**: Implement Stripe Subscriptions API (not manual invoicing), use Stripe pre-built Checkout for payment forms, handle webhooks for subscription events
-
-**Acceptance Criteria**:
-- [ ] Stripe account configured with Subscriptions API enabled
-- [ ] Two price IDs created: Care ($500/month), Care Pro ($1,000/month)
-- [ ] Checkout page functional at public/care.html
-- [ ] All webhook handlers implemented (REQ-10 through REQ-13)
-- [ ] STRIPE_WEBHOOK_SECRET configured in environment
-
-**Technical Notes**:
-- DECISION CHANGE: Original PRD said "manual invoicing" but decisions.md overruled (Elon wins, line 106-114)
-- Use existing Stripe client at `apps/pulse/lib/stripe.ts`
-- Extend with subscription creation methods
+| Question | Resolution | Rationale |
+|----------|------------|-----------|
+| Output filename location | `/rounds/kimi-smoke-test/pulse.txt` | Honors the name; lives alongside the blueprint |
+| CI location | `.github/workflows/kimi-smoke-test.yml` | Dedicated workflow keeps it visible and independent |
+| Failure semantics | CI red light | Elon says pager stops; Steve says trust breaks. CI red satisfies both. |
+| Agent vs shell | Hardcoded in shell | Model is validated by planning/execution, not runtime generation. Keeps zero-config constraint. |
+| Cleanup policy | Overwrite in-place | Prevents disk fill at scale; simplest implementation |
 
 ---
 
-### REQ-10: Webhook Handler - Subscription Created
-**Source**: decisions.md lines 305-309
-**Priority**: P0 (Blocker)
-**Description**: Create webhook handler for `customer.subscription.created` event that creates new subscriber record in database
+## Non-Negotiables
 
-**Acceptance Criteria**:
-- [ ] Webhook receives and validates Stripe event signature
-- [ ] Creates subscriber record with correct tier from subscription metadata
-- [ ] Sets start_date to subscription.created timestamp
-- [ ] Generates unique referral code
-- [ ] Sends welcome email (REQ-24)
-- [ ] Idempotent (handles duplicate webhook deliveries)
-
-**Technical Notes**:
-- Use Stripe webhook signature verification
-- Extract tier from price_id: `price_xxx_care` vs `price_xxx_care_pro`
+1. **One shell command.** No modules. No imports. No entry points.
+2. **Zero process overhead.** No meetings, no design reviews, no stakeholder syncs for this artifact.
+3. **One crafted sentence.** Not a log. Not a tag. Evidence of taste.
+4. **Zero configuration.** No `.yaml` inside the artifact, no env vars, no flags for `run.sh`.
+5. **This blueprint is the only document.** If you need another page, you have already lost the plot.
 
 ---
 
-### REQ-11: Webhook Handler - Subscription Deleted
-**Source**: decisions.md lines 305-309
-**Priority**: P0 (Blocker)
-**Description**: Create webhook handler for `customer.subscription.deleted` event that updates subscriber status to cancelled
+## Success Criteria (V1 Launch)
 
-**Acceptance Criteria**:
-- [ ] Webhook receives and validates event
-- [ ] Sets subscriber status to 'cancelled'
-- [ ] Records cancellation timestamp
-- [ ] Does NOT delete subscriber record (audit trail)
-- [ ] Stops processing future PRDs for this subscriber
-
----
-
-### REQ-12: Webhook Handler - Invoice Payment Succeeded
-**Source**: decisions.md lines 305-309
-**Priority**: P0 (Blocker)
-**Description**: Create webhook handler for `invoice.payment_succeeded` event that resets token balance to monthly tier amount and logs renewal
-
-**Acceptance Criteria**:
-- [ ] Webhook receives and validates event
-- [ ] Resets tokens_remaining to tokens_monthly
-- [ ] Logs payment timestamp
-- [ ] Applies referral credits if applicable (REQ-21)
-- [ ] Sends confirmation email (optional for V1)
-
-**Technical Notes**:
-- Token reset happens on subscription anniversary, not calendar month (REQ-36)
-- Referral credits applied as Stripe coupon if exists
-
----
-
-### REQ-13: Webhook Handler - Invoice Payment Failed
-**Source**: decisions.md lines 305-309
-**Priority**: P0 (Blocker)
-**Description**: Create webhook handler for `invoice.payment_failed` event that pauses subscriber status and sends notification
-
-**Acceptance Criteria**:
-- [ ] Webhook receives and validates event
-- [ ] Sets subscriber status to 'paused'
-- [ ] Sends payment failure email (REQ-28)
-- [ ] Stops processing subscriber PRDs
-- [ ] Logs payment failure reason
-
----
-
-## OPEN QUESTIONS (Blockers)
-
-### OPEN-1: Token Calculation Precision
-**Source**: decisions.md lines 321-330
-**Status**: OPEN (requires decision)
-**Options**:
-- A: Parse Claude API response headers
-- B: Estimate based on file changes + PRD length
-
-**Impact**: HIGH — customer disputes if inaccurate
-**Recommendation**: Start with Option B (15K tokens per PRD estimate), refine in V2
-
----
-
-### OPEN-2: Referral Credit Application Mechanism
-**Source**: decisions.md lines 334-340
-**Status**: OPEN (requires implementation decision)
-**Options**:
-- A: Stripe coupon codes (automatic)
-- B: Manual credit tracking + invoice adjustments
-
-**Impact**: HIGH — viral growth depends on this
-**Recommendation**: Use Option A (Stripe coupons) for automation
-
----
-
-### OPEN-3: Single Tier vs Two-Tier Launch
-**Source**: decisions.md lines 367-374
-**Status**: OPEN (requires business decision)
-**Options**:
-- Launch both tiers ($500 and $1,000)
-- Launch single tier ($500), add second in V2
-
-**Impact**: MEDIUM — affects messaging complexity
-**Recommendation**: Launch both (Elon's stance) to let market decide
-
----
-
-## Summary
-
-- **Total Requirements**: 62 (full breakdown in source document)
-- **Blocker Requirements (P0)**: 30
-- **Required for MVP (P1)**: 20
-- **Nice-to-Have (P2)**: 9
-- **Open Questions**: 3
-
-**Estimated Build Time**: 8 hours (locked decision from Elon/Steve consensus)
-
-**Build Sequence**:
-1. Phase 1: Infrastructure (Database + Scripts) — 4 hours
-2. Phase 2: Daemon Integration — 2 hours
-3. Phase 3: Communication Layer — 1.5 hours
-4. Phase 4: Marketing & Distribution — 0.5 hours
-
----
-
-**Next Steps**:
-1. Resolve open questions (OPEN-1, OPEN-2, OPEN-3)
-2. Create XML task plans organized into waves
-3. Begin Phase 1 implementation
-
----
-
-## Detailed Requirements Inventory
-
-For complete 62-requirement traceability matrix with all acceptance criteria, technical notes, and file deliverables, refer to the complete extraction provided to the planning agents.
-
-Key requirement categories covered:
-- Database Schema (REQ-1 to REQ-3)
-- Scripts (REQ-4 to REQ-8)
-- Stripe Integration (REQ-9 to REQ-13)
-- Token Tracking (REQ-14 to REQ-17)
-- Referral System (REQ-18 to REQ-23)
-- Email Communication (REQ-24 to REQ-28)
-- Daemon Routing (REQ-29 to REQ-31)
-- Marketing & Positioning (REQ-32 to REQ-34)
-- Business Logic (REQ-35 to REQ-37)
-- Success Metrics (REQ-38 to REQ-45)
-- File Deliverables (REQ-46 to REQ-56)
-- Configuration (REQ-57 to REQ-59)
-- Integration Points (REQ-60 to REQ-62)
+- [ ] `run.sh` exists, is executable, and exits 0
+- [ ] `pulse.txt` appears with exact text "Kimi drove this."
+- [ ] CI step invokes `run.sh` and passes on green
+- [ ] End-to-end execution completes in < 5 seconds
+- [ ] Seth trusts the system again
