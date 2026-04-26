@@ -1,0 +1,20 @@
+name = "sous-worker"
+main = "worker/index.js"
+compatibility_date = "2026-04-26"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "c4789babfd814833aaeef76df5b840ef"
+preview_id = "3ef6b7eab3564151ad4ab70a5fb98d55"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sous-db"
+database_id = "1539c0c6-8339-4e69-a577-443165990ce1"
+
+[triggers]
+crons = ["0 3 * * *"]
+
+[[routes]]
+pattern = "api.sous.ai/*"
+custom_domain = true
