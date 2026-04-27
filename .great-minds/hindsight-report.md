@@ -1,10 +1,13 @@
 # Hindsight Report
-**Generated:** 2026-04-27T21:51:00.339Z
+**Generated:** 2026-04-27T22:48:15.332Z
 
 ## Summary
 Risk: HIGH. 15 high-churn files, 20 bug-associated files, 7 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- 5b23acb daemon: auto-commit 2 files
+- 1dacc5a Ship clipcraft-backend: all deliverables + retrospective
+- 0c6b0e3 daemon: auto-commit after build phase for clipcraft-backend
 - ec32ead daemon: auto-commit 1 files
 - d012596 daemon: auto-commit 2 files
 - dbac072 Ship github-issue-sethshoultes-shipyard-ai-88: all deliverables + retrospective
@@ -12,13 +15,10 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 7 uncommitted changes.
 - dd92d02 plugin-discoverability: install all 9 constellation plugins on DO; fix cagan subagent_type to great-designers:marty-cagan-designer; queue-dispatcher now invokes subagents via Agent tool
 - 0fda518 daemon: auto-commit 2 files
 - a21e29e Ship membership-production-fix: all deliverables + retrospective
-- 5087b0f Fix placeholder content in form fields
-- 20d1558 daemon: auto-commit after build phase for membership-production-fix
-- 4c3098b daemon: auto-commit 2 files
 
 ## High-Churn Files
-- `.planning/sara-blakely-review.md` (60 changes)
-- `.daemon-queue.json` (54 changes)
+- `.planning/sara-blakely-review.md` (61 changes)
+- `.daemon-queue.json` (56 changes)
 - `.planning/phase-1-plan.md` (47 changes)
 - `.planning/REQUIREMENTS.md` (43 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
@@ -58,12 +58,12 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 7 uncommitted changes.
 ## Uncommitted State
 ```
 M .daemon-queue.json
+ M .github-intake-state.json
  M .great-minds/hindsight-report.md
  M .planning/sara-blakely-review.md
- M pipeline/auto/cagan-dispatch-history.json
-?? .wolf/
-?? prds/clipcraft-backend.md
-?? rounds/clipcraft-backend/
+?? prds/github-issue-sethshoultes-shipyard-ai-77.md
+?? prds/github-issue-sethshoultes-shipyard-ai-82.md
+?? rounds/github-issue-sethshoultes-shipyard-ai-77/
 ```
 
 ---
