@@ -1,30 +1,30 @@
-WP Intelligence Suite
-- 4 plugins to sell 1 product. Over-built. Customer wants a button, not architecture.
-- $99/year for static FAQ templates? Free plugins do this. No AI moat.
-- "Honor-system licensing" = charity. You'll collect $0.
+**Verdict: Ship Beam. Kill WP Intelligence Suite.**
 
-Beam
-- Two-file utility. Clean. Real agency pain.
-- No monetization model shown. How do you eat?
-- Keyboard collision + stale index = user blames you.
+WP Intelligence Suite is four plugins pretending to be a business. Thirteen tasks. Five waves. Architecture debates in the plan (Elon vs. Steve). Customers don't fund your therapy.
 
-Both
-- Plans read like engineering manifestos. Architecture disputes (R-6) mean you're building for yourselves, not customers.
-- Wave charts and dependency graphs don't sell. Customers sell.
+**Would someone pay?**
+- WPIS: No. Static FAQ widget + notes + agreements. Every page builder does this free. $99/year for hand-written templates? Insulting.
+- Beam: Maybe. Cmd+K saves real clicks. But no monetization shown. How do you eat?
 
-Confusing / bounce factors
-- WPIS: Three-plugin architecture in Wave 1. Bounce. Looks like enterprise bloat.
-- WPIS: Usage limits on static FAQ clicks. Absurd. Nobody shares a FAQ plugin with "50 responses/month."
-- Beam: "Index staleness accepted." User publishes post, can't find it, uninstalls.
+**Bounce triggers**
+- Two products in one file. Which is the company?
+- "Honor-system licensing." That's charity. You'll collect zero dollars.
+- "Invisible gating," "contextual nudges." MBA word salad. Customers smell overhead.
+- Usage limits on FAQ clicks. Absurd. Nobody shares a plugin with "50 responses/month."
+- "Index staleness accepted." User publishes post, can't find it, uninstalls. Blames you.
 
-30-second elevator pitch
-- WPIS: "A teammate inside WordPress. Answers visitors, tracks notes, saves agreements. Zero setup."
-- Beam: "Cmd+K for WordPress. Every page, user, post. One keystroke."
+**Elevator pitch (Beam)**
+> "Cmd+K for WordPress admin. Every post, page, user, setting. Two keystrokes. No config."
 
-$0 marketing test
-- WPIS: Install free for 10 local business owners. Count uninstalls at day 3. >50% = kill it.
-- Beam: Drop ZIP in 3 agency Slack channels. Count reshares. Zero = no buzz.
+WPIS has no pitch. It has a thesis.
 
-Retention hook
-- WPIS: Pre-seeded content is a good first impression. Then static templates become a manual maintenance treadmill. No AI = no lock-in.
-- Beam: No localStorage, no memory. User starts fresh every page load. No habit loop, no stickiness.
+**$0 test**
+1. Drop Beam ZIP in 3 agency Slack channels. Count reshares. Zero = no buzz, kill it.
+2. WPIS: Install free for 10 local business owners. Count uninstalls at day 3. >50% = dead.
+
+**Retention hook**
+- WPIS: Pre-seeded content looks good for 30 seconds. Then static templates become manual maintenance. No AI = no lock-in. No habit = no retention.
+- Beam: Muscle memory is sticky. Every admin page load reinforces Cmd+K. But no localStorage, no memory. User starts fresh every load. No habit loop.
+
+**Bottom line**
+Build Beam. Delete WPIS. One file. One pitch. One channel. Prove someone cares before you architect a cathedral.
