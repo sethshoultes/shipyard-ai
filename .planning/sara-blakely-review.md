@@ -1,39 +1,30 @@
-# Sara Blakely Gut-Check
+WP Intelligence Suite
+- 4 plugins to sell 1 product. Over-built. Customer wants a button, not architecture.
+- $99/year for static FAQ templates? Free plugins do this. No AI moat.
+- "Honor-system licensing" = charity. You'll collect $0.
 
-## Verdict: Two products crammed in one doc. Neither knows its customer.
+Beam
+- Two-file utility. Clean. Real agency pain.
+- No monetization model shown. How do you eat?
+- Keyboard collision + stale index = user blames you.
 
-### Would a real customer pay?
-- **WP Intelligence Suite**: No. Three disconnected tools (FAQ widget, team notes, agreements) for who? Restaurant owner? Freelancer? Agency? Pick ONE. Nobody wakes up wanting "intelligence suite." They wake up wanting "fewer support emails" or "my web guy to stop dropping balls."
-- **Beam**: Maybe. Cmd+K for WordPress admin is clear. But "index staleness" means search is broken by design. That's like selling Spanx with a hole.
+Both
+- Plans read like engineering manifestos. Architecture disputes (R-6) mean you're building for yourselves, not customers.
+- Wave charts and dependency graphs don't sell. Customers sell.
 
-### What's confusing?
-- Two completely different products in one plan file. Beam starts at line 818 like nobody would notice.
-- "Invisible gating." "Contextual nudges." You mean a paywall and an upsell banner. Call it what it is.
-- Honor-system licensing. Are you kidding? I sold footless pantyhose out of a Ziplock bag. Trust me: people don't pay on honor.
-- PHP 5.6 compatibility in 2026. Building technical debt for a customer who doesn't exist.
-- Architecture battles (Elon vs. Steve) in a Phase 1 plan. Customer doesn't care about your file structure.
+Confusing / bounce factors
+- WPIS: Three-plugin architecture in Wave 1. Bounce. Looks like enterprise bloat.
+- WPIS: Usage limits on static FAQ clicks. Absurd. Nobody shares a FAQ plugin with "50 responses/month."
+- Beam: "Index staleness accepted." User publishes post, can't find it, uninstalls.
 
-### 30-Second Elevator Pitch
+30-second elevator pitch
+- WPIS: "A teammate inside WordPress. Answers visitors, tracks notes, saves agreements. Zero setup."
+- Beam: "Cmd+K for WordPress. Every page, user, post. One keystroke."
 
-**Beam** (only clear thing here):
-> "Beam is Spotlight for your WordPress admin. Hit Cmd+K, type a page or user's name, jump there in milliseconds. No settings. Just speed."
+$0 marketing test
+- WPIS: Install free for 10 local business owners. Count uninstalls at day 3. >50% = kill it.
+- Beam: Drop ZIP in 3 agency Slack channels. Count reshares. Zero = no buzz.
 
-**WP Intelligence Suite** (rewrite needed):
-> "A teammate inside WordPress that answers visitor questions so you don't have to."
-*(Pick one module. Kill the other two.)*
-
-### $0 Marketing Test
-1. **Find 10 strangers**. Not your mom. Real small business owners with WordPress sites.
-2. **Install it for them manually**. Watch their screen. Don't explain.
-3. **Count how many say "oh wow" in the first 30 seconds.** If zero, kill it.
-4. **Beam**: Post demo GIF in WordPress Facebook groups. Free plugin + "reply below if you want it." See who bites.
-5. **Intelligence Suite**: Cold-email 5 local business owners. "I built something that cuts your website support emails in half. Can I show you?"
-
-### Retention Hook
-- **Beam**: Muscle memory. If they use Cmd+K three times, they can't go back. But index staleness breaks trust. Fix that or die.
-- **Intelligence Suite**: None visible. What's the daily reason to open it? Where's the "I got a customer because of this" moment?
-
-### Brutal Truth
-- You have one decent product (Beam) and one architecture science project (Intelligence Suite).
-- Kill two modules. Pick one customer. Solve their pain until they cry without it.
-- Don't build a cathedral. Sell one pair of pantyhose.
+Retention hook
+- WPIS: Pre-seeded content is a good first impression. Then static templates become a manual maintenance treadmill. No AI = no lock-in.
+- Beam: No localStorage, no memory. User starts fresh every page load. No habit loop, no stickiness.
