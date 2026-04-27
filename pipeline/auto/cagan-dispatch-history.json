@@ -1,0 +1,12 @@
+{
+  "projects/plugins-v1": [
+    {
+      "timestamp": "2026-04-27T16:38:37.732Z",
+      "level": "RED",
+      "reasons": [
+        "5 analysis docs (>= 5)",
+        "541h in phase (>= 72h)"
+      ]
+    }
+  ]
+}
