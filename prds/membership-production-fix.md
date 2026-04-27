@@ -1,3 +1,7 @@
+# fix: membership-production-fix (hotfix retry)
+
+hotfix: true
+
 # PRD: Fix MemberShip Plugin Registration — Not Loading in Production
 
 > Priority: p0

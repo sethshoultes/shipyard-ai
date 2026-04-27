@@ -1,3 +1,7 @@
+# fix: shipyard-showcase (hotfix retry)
+
+hotfix: true
+
 # PRD — Shipyard Website Showcase Update
 
 ## 1. Project Overview
