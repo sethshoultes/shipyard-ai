@@ -26,7 +26,7 @@
 - [ ] Add OpenGraph meta tags via `wp_head` hook in `template.php` — verify: grep finds `og:title`, `og:description`, `og:url`
 - [ ] Include `template.php` from `stage.php` — verify: `php -l stage/stage.php` exits 0
 - [ ] Create `stage/templates/showcase.php` with HTML5 document wrapper and hero section — verify: file exists and contains `.stage-hero`
-- [ ] Add plugin metadata display block (name, author, version, description) to showcase template — verify: grep finds metadata placeholders or PHP echo tags
+- [x] Add plugin metadata display block (name, author, version, description) to showcase template — verify: grep finds metadata fields or PHP echo tags
 - [ ] Add "Install on my site" deep link to `wordpress.org/plugins/{slug}` with `target="_blank"` — verify: grep finds `wordpress.org/plugins` and `target="_blank"`
 
 ## Wave 4 — Styling

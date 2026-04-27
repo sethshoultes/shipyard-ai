@@ -34,7 +34,7 @@ add_action('add_meta_boxes', 'stage_add_meta_box');
 function stage_render_meta_box($post) {
     wp_nonce_field('stage_save_meta', 'stage_meta_nonce');
     $slug = get_post_meta($post->ID, '_stage_plugin_slug', true);
-    echo '<input type="text" name="stage_plugin_slug" value="' . esc_attr($slug) . '" class="widefat" placeholder="hello-dolly">';
+    echo '<input type="text" name="stage_plugin_slug" value="' . esc_attr($slug) . '" class="widefat">';
     echo '<p class="description">Enter the WordPress.org plugin slug.</p>';
 }
 

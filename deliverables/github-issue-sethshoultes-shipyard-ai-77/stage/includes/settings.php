@@ -29,7 +29,7 @@ function stage_render_settings_page() {
                     <th><label for="stage_plugin_slug">Plugin Slug</label></th>
                     <td>
                         <input type="text" id="stage_plugin_slug" name="stage_plugin_slug" value="<?php echo esc_attr($slug); ?>" class="regular-text">
-                        <p class="description">Enter the WordPress.org plugin slug (e.g. "hello-dolly").</p>
+                        <p class="description">Enter the WordPress.org plugin slug (e.g. "akismet").</p>
                     </td>
                 </tr>
             </table>
