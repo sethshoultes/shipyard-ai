@@ -1,1 +1,43 @@
-[]
+{
+  "schema_version": 1,
+  "$comment": "Dispatch queue. stall-detector.mjs writes here; Phil's dispatch cron reads. See pipeline/auto/stall-detector.mjs and docs/PRODUCT-MANAGEMENT-GAP.md.",
+  "$schema": {
+    "schema_version": "integer",
+    "last_updated": "ISO timestamp",
+    "entries": [
+      {
+        "id": "string — unique, e.g. 'stall-projects-pulse-1714234567890'",
+        "created_at": "ISO timestamp",
+        "source": "string — 'stall-detector', 'phil-jackson', 'manual'",
+        "status": "string — 'queued' | 'dispatched' | 'escalated' | 'resolved'",
+        "project": { "slug": "string", "path": "string", "root": "string" },
+        "severity": "GREEN | YELLOW | RED | BLACK",
+        "reasons": ["string"],
+        "metrics": {
+          "analysis_doc_count": "integer",
+          "code_file_count": "integer",
+          "hours_since_last_commit": "number or '∞'",
+          "time_in_phase_hours": "number",
+          "recent_code_commits_24h": "integer",
+          "cagan_dispatches_recent": "integer"
+        },
+        "dispatch": {
+          "agent": "string — alias from agent-registry.json",
+          "mode": "string — 'light' | 'force-decision'",
+          "prompt": "string — brief for the agent",
+          "save_path": "string — where the agent's output lands"
+        },
+        "escalation": {
+          "target": "human",
+          "message": "string"
+        },
+        "archive_candidate": {
+          "reason": "string",
+          "suggested_path": "string"
+        }
+      }
+    ]
+  },
+  "last_updated": null,
+  "entries": []
+}
