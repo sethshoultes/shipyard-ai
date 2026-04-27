@@ -2227,7 +2227,6 @@ export default definePlugin({
 											type: "text_input",
 											action_id: "email",
 											label: "Member Email",
-											placeholder: "Enter member's email address",
 										},
 										{
 											type: "select",
@@ -3426,13 +3425,12 @@ export default definePlugin({
 						type: "text_input",
 						action_id: "requiredPlan",
 						label: "Required Plan ID (optional)",
-						placeholder: "pro, premium, or enterprise",
 					},
 					{
 						type: "text_input",
 						action_id: "fallbackMessage",
 						label: "Message for Non-Members",
-						placeholder: "Become a member to unlock this content",
+						value: "Become a member to unlock this content",
 					},
 				],
 			},
