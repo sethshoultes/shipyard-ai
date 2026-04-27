@@ -101,3 +101,27 @@ Final assembly, deploy to Emdash, client handoff.
 - Sub-agents (haiku) for: tests, docs, boilerplate, content, QA
 - Directors do high-judgment work themselves
 - If blocked 3 times on the same task → escalate to Phil → escalate to human
+
+## Additional Agents (registered 2026-04-27 via pipeline/auto/agent-registry.json)
+
+### Marcus Aurelius — Mediator
+- Role: Stoic moderator, conflict resolution, neutral facilitation
+- Subagent: great-minds:marcus-aurelius-mod, model haiku
+- Dispatched by: phil-jackson, stall-detector-cross-craft
+
+### Rick Rubin — Essence Distiller
+- Role: Strip ideas to essence, post-debate synthesis
+- Subagent: great-minds:rick-rubin-creative, model haiku
+- Dispatched by: phil-jackson, post-debate
+
+### Marty Cagan — Product Manager (cross-plugin)
+- Role: Build-or-kill decisions on stalled projects, the four risks framework
+- Subagent: great-operators:marty-cagan-operator, model sonnet
+- Dispatched by: stall-detector, phil-jackson
+- Rate-limited: max 2 dispatches per project per week, then escalate to human
+- Load-bearing for the stall-detector loop. See docs/PRODUCT-MANAGEMENT-GAP.md.
+
+### Warren Buffett — Capital Allocation Reviewer
+- Role: Board reviewer, moat analysis, investability checks
+- Subagent: great-minds:warren-buffett-persona, model sonnet
+- Dispatched by: phil-jackson
