@@ -1,43 +1,40 @@
 {
   "schema_version": 1,
-  "$comment": "Dispatch queue. stall-detector.mjs writes here; Phil's dispatch cron reads. See pipeline/auto/stall-detector.mjs and docs/PRODUCT-MANAGEMENT-GAP.md.",
-  "$schema": {
-    "schema_version": "integer",
-    "last_updated": "ISO timestamp",
-    "entries": [
-      {
-        "id": "string — unique, e.g. 'stall-projects-pulse-1714234567890'",
-        "created_at": "ISO timestamp",
-        "source": "string — 'stall-detector', 'phil-jackson', 'manual'",
-        "status": "string — 'queued' | 'dispatched' | 'escalated' | 'resolved'",
-        "project": { "slug": "string", "path": "string", "root": "string" },
-        "severity": "GREEN | YELLOW | RED | BLACK",
-        "reasons": ["string"],
-        "metrics": {
-          "analysis_doc_count": "integer",
-          "code_file_count": "integer",
-          "hours_since_last_commit": "number or '∞'",
-          "time_in_phase_hours": "number",
-          "recent_code_commits_24h": "integer",
-          "cagan_dispatches_recent": "integer"
-        },
-        "dispatch": {
-          "agent": "string — alias from agent-registry.json",
-          "mode": "string — 'light' | 'force-decision'",
-          "prompt": "string — brief for the agent",
-          "save_path": "string — where the agent's output lands"
-        },
-        "escalation": {
-          "target": "human",
-          "message": "string"
-        },
-        "archive_candidate": {
-          "reason": "string",
-          "suggested_path": "string"
-        }
+  "last_updated": "2026-04-27T16:38:37.732Z",
+  "entries": [
+    {
+      "id": "stall-projects-plugins-v1-1777307917731",
+      "created_at": "2026-04-27T16:38:37.731Z",
+      "source": "stall-detector",
+      "project": {
+        "slug": "plugins-v1",
+        "path": "/home/agent/shipyard-ai/projects/plugins-v1",
+        "root": "projects"
+      },
+      "severity": "RED",
+      "reasons": [
+        "5 analysis docs (>= 5)",
+        "541h in phase (>= 72h)"
+      ],
+      "metrics": {
+        "analysis_doc_count": 5,
+        "code_file_count": 8,
+        "hours_since_last_commit": "517.5",
+        "time_in_phase_hours": "540.6",
+        "recent_code_commits_24h": 0,
+        "cagan_dispatches_recent": 0
+      },
+      "status": "queued",
+      "dispatch": {
+        "agent": "cagan",
+        "mode": "force-decision",
+        "prompt": "Stall detected (RED) for project plugins-v1. Reasons: 5 analysis docs (>= 5); 541h in phase (>= 72h). Read the analysis docs and prior cagan-checks in /home/agent/shipyard-ai/projects/plugins-v1. Write a build-or-kill recommendation to /home/agent/shipyard-ai/projects/plugins-v1/cagan-decision.md. Recommend ONE of: BUILD (with smallest viable scope and the riskiest assumption to test first), PIVOT (with the new framing), or KILL (with the reason the four risks failed). Do NOT defer. Do NOT request more analysis.",
+        "save_path": "/home/agent/shipyard-ai/projects/plugins-v1/cagan-decision.md"
+      },
+      "archive_candidate": {
+        "reason": "No commits in 22 days",
+        "suggested_path": "archive/abandoned/plugins-v1/"
       }
-    ]
-  },
-  "last_updated": null,
-  "entries": []
+    }
+  ]
 }

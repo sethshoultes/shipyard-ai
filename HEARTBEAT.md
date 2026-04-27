@@ -23,3 +23,22 @@
 | Board Reviews | `/home/agent/shipyard-ai/rounds/board-review-NNN.md` |
 | Pipeline State | `/home/agent/shipyard-ai/STATUS.md` |
 | Task Board | `/home/agent/shipyard-ai/TASKS.md` |
+
+## Maintenance + Stall Crons (added 2026-04-27)
+
+| Job | Schedule | Description |
+|-----|----------|-------------|
+| stall-detector | 7 */4 * * * | Classify projects GREEN/YELLOW/RED/BLACK; queue Cagan dispatch in .daemon-queue.json |
+| state-sync | 13 * * * * | Re-render STATUS.md and TASKS.md from git reality; reconcile AGENTS.md vs agent-registry.json |
+| maintenance-crew | */15 * * * * | Standalone watchdog at /home/agent/maintenance-crew/ — checks daemon, ollama, disk, stuck pipelines, hollow ships, hang risk, unpushed commits, silent ship failures |
+
+Logs:
+- pipeline/auto/stall-detector.cron.log
+- pipeline/auto/state-sync.cron.log
+- /home/agent/maintenance-crew/log/maintenance.log
+
+Activation status:
+- stall-detector: ACTIVE (cron installed 2026-04-27)
+- state-sync: ACTIVE (cron installed 2026-04-27, will skip STATUS.md/TASKS.md until daemon-authored)
+- maintenance-crew: ACTIVE since 2026-04-21
+- **Phil dispatcher wiring to read .daemon-queue.json: PENDING** — Phil cron still reads only TASKS.md. Cagan dispatches in queue will not execute until Phil is updated. See pipeline/auto/STALL-DETECTOR.md Step 4.
