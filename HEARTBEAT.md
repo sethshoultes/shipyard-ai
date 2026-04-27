@@ -42,3 +42,11 @@ Activation status:
 - state-sync: ACTIVE (cron installed 2026-04-27, will skip STATUS.md/TASKS.md until daemon-authored)
 - maintenance-crew: ACTIVE since 2026-04-21
 - **Phil dispatcher wiring to read .daemon-queue.json: PENDING** — Phil cron still reads only TASKS.md. Cagan dispatches in queue will not execute until Phil is updated. See pipeline/auto/STALL-DETECTOR.md Step 4.
+
+
+---
+## Rate-limit Escalation — 2026-04-27T20:22:01.380Z
+
+cagan hit max-per-week (2) for project `plugins-v1` without resolution. Human review required.
+
+From queue entry: `stall-projects-plugins-v1-1777320422235`

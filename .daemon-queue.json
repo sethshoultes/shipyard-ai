@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-27T20:07:02.235Z",
+  "last_updated": "2026-04-27T20:22:01.380Z",
   "entries": [
     {
       "id": "stall-projects-plugins-v1-1777320422235",
@@ -24,13 +24,14 @@
         "recent_code_commits_24h": 1,
         "cagan_dispatches_recent": 1
       },
-      "status": "queued",
+      "status": "escalated-rate-limit",
       "dispatch": {
         "agent": "cagan",
         "mode": "force-decision",
         "prompt": "Stall detected (RED) for project plugins-v1. Reasons: 5 analysis docs (>= 5); 544h in phase (>= 72h). Read the analysis docs and prior cagan-checks in /home/agent/shipyard-ai/projects/plugins-v1. Write a build-or-kill recommendation to /home/agent/shipyard-ai/projects/plugins-v1/cagan-decision.md. Recommend ONE of: BUILD (with smallest viable scope and the riskiest assumption to test first), PIVOT (with the new framing), or KILL (with the reason the four risks failed). Do NOT defer. Do NOT request more analysis.",
         "save_path": "/home/agent/shipyard-ai/projects/plugins-v1/cagan-decision.md"
-      }
+      },
+      "escalated_at": "2026-04-27T20:22:01.380Z"
     }
   ]
 }
