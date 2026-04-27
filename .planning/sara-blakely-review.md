@@ -1,21 +1,7 @@
-No customer pays for this.
+Verdict: Two plans crammed in one file. Zero customer fingerprints.
 
-- Four plugins, three problems, one confused buyer. Bundling unrelated tools into "Intelligence Suite" = enterprise word salad.
-- Free tier gives 50 widget clicks. Pro is $99/year for static templates. Dozens of free FAQ plugins exist. No moat.
-- Dash = custom post type with @mentions. Pinned = CPT with checklists. WordPress already does this. Solving problems that don't exist.
-- Beam MVP tacked onto same plan = scope creep. Pick one hero product.
-
-Confusing / bounce triggers:
-- "Intelligence Suite" headline. Sounds expensive, not urgent.
-- Four new admin menus on activation. Overwhelming.
-- Stripe checkout → manual license key entry. Friction kills conversion.
-- No before/after. No revenue proof. No real-customer screenshot.
-
-30-second pitch:
-"We turn repetitive visitor questions into a chat-style FAQ that works instantly — no AI downtime, no dev needed."
-
-$0 test:
-Post in one Facebook group for local business owners: "I built a widget that answers 'What are your hours?' automatically. Need 3 beta testers. Comment if interested." Less than 3 replies = pivot.
-
-Retention hook:
-None. Data lives in native WordPress. Zero lock-in. Add lead capture inside widget to create data gravity.
+- Customer pay? No. Static FAQ widget in 2026. Customers expect AI chat. "No LLM in v1" = death sentence. Dash and Pinned are thin custom-post-type wrappers. Google Docs and Notion are free. $99/year for hand-written templates is fantasy.
+- Confusing: File opens with WP Intelligence Suite, ends with Beam MVP. Total identity crisis. Architecture porn everywhere: "three-plugin decoupled architecture," "PHP 5.6 compatibility," "invisible gating." Not one sentence about whose revenue this grows. Customer bounces in 3 seconds. Feels built to impress developers, not users.
+- Elevator pitch: "Your WordPress site gets a 24/7 receptionist, team notebook, and filing cabinet—no AI bills, no hallucinations, works on cheap hosting."
+- $0 test: Walk into 10 local businesses with WordPress sites. Offer free install today. If fewer than 3 say yes, kill it. No ads. No funnels. Boots-on-ground validation only.
+- Retention hook: None. Static FAQs = set-and-forget. Notes have zero export friction. Usage caps create churn, not loyalty. No monthly reason to stay. No data lock-in. No network effect.

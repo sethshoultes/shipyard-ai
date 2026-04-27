@@ -29,6 +29,12 @@
       "project_slug": "plugins-v1",
       "dispatched_at": "2026-04-27T17:12:59.834Z",
       "queue_id": "stall-projects-plugins-v1-1777307917731"
+    },
+    {
+      "agent": "cagan",
+      "project_slug": "cagan-loop-verify",
+      "dispatched_at": "2026-04-27T21:28:38.118Z",
+      "queue_id": "test-cagan-verify-1777325165"
     }
   ]
 }

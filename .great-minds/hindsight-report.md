@@ -1,24 +1,24 @@
 # Hindsight Report
-**Generated:** 2026-04-27T20:06:51.492Z
+**Generated:** 2026-04-27T21:51:00.339Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 9 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 7 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- ec32ead daemon: auto-commit 1 files
+- d012596 daemon: auto-commit 2 files
+- dbac072 Ship github-issue-sethshoultes-shipyard-ai-88: all deliverables + retrospective
+- 05e3af8 daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-88
 - dd92d02 plugin-discoverability: install all 9 constellation plugins on DO; fix cagan subagent_type to great-designers:marty-cagan-designer; queue-dispatcher now invokes subagents via Agent tool
 - 0fda518 daemon: auto-commit 2 files
 - a21e29e Ship membership-production-fix: all deliverables + retrospective
 - 5087b0f Fix placeholder content in form fields
 - 20d1558 daemon: auto-commit after build phase for membership-production-fix
 - 4c3098b daemon: auto-commit 2 files
-- f4bb76a Ship shipyard-showcase: all deliverables + retrospective
-- 673e6b7 daemon: auto-commit after build phase for shipyard-showcase
-- e2cc917 deploy ClipCraft (Reel) to https://reel-ebw.pages.dev — static landing
-- c5059fa cleanup: archive 4 orphan rounds, reorg failed PRDs, retry 3 (Whisper/showcase/membership-fix)
 
 ## High-Churn Files
-- `.planning/sara-blakely-review.md` (59 changes)
-- `.daemon-queue.json` (51 changes)
+- `.planning/sara-blakely-review.md` (60 changes)
+- `.daemon-queue.json` (54 changes)
 - `.planning/phase-1-plan.md` (47 changes)
 - `.planning/REQUIREMENTS.md` (43 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
@@ -60,12 +60,10 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 9 uncommitted changes.
 M .daemon-queue.json
  M .great-minds/hindsight-report.md
  M .planning/sara-blakely-review.md
- M rounds/github-issue-sethshoultes-shipyard-ai-88/decisions.md
- M rounds/github-issue-sethshoultes-shipyard-ai-88/essence.md
- M rounds/github-issue-sethshoultes-shipyard-ai-88/round-1-elon.md
- M rounds/github-issue-sethshoultes-shipyard-ai-88/round-1-steve.md
- M rounds/github-issue-sethshoultes-shipyard-ai-88/round-2-elon.md
- M rounds/github-issue-sethshoultes-shipyard-ai-88/round-2-steve.md
+ M pipeline/auto/cagan-dispatch-history.json
+?? .wolf/
+?? prds/clipcraft-backend.md
+?? rounds/clipcraft-backend/
 ```
 
 ---
