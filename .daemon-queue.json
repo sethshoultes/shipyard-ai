@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-27T16:59:25.890Z",
+  "last_updated": "2026-04-27T17:12:59.835Z",
   "entries": [
     {
       "id": "stall-projects-plugins-v1-1777307917731",
@@ -24,7 +24,7 @@
         "recent_code_commits_24h": 0,
         "cagan_dispatches_recent": 0
       },
-      "status": "queued",
+      "status": "dispatched",
       "dispatch": {
         "agent": "cagan",
         "mode": "force-decision",
@@ -34,7 +34,8 @@
       "archive_candidate": {
         "reason": "No commits in 22 days",
         "suggested_path": "archive/abandoned/plugins-v1/"
-      }
+      },
+      "dispatched_at": "2026-04-27T17:12:59.834Z"
     }
   ]
 }
