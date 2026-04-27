@@ -1,0 +1,300 @@
+{
+  "restaurant": [
+    {
+      "question": "What are your hours?",
+      "answer_template": "{business_name} is open {hours}. We look forward to seeing you."
+    },
+    {
+      "question": "Do you take reservations?",
+      "answer_template": "Yes, {business_name} takes reservations. Give us a call at {phone} or stop by {address}."
+    },
+    {
+      "question": "Is there a dress code?",
+      "answer_template": "{business_name} welcomes everyone. Come as you are and enjoy a warm meal."
+    },
+    {
+      "question": "Do you have vegetarian options?",
+      "answer_template": "We have a full selection of vegetarian dishes at {business_name}. Ask your server for recommendations."
+    },
+    {
+      "question": "Can I bring my dog?",
+      "answer_template": "{business_name} loves well-behaved pets on our patio. Just let us know when you arrive."
+    },
+    {
+      "question": "Do you offer catering?",
+      "answer_template": "Yes, {business_name} caters events of all sizes. Call {phone} to talk through the details."
+    },
+    {
+      "question": "What is your most popular dish?",
+      "answer_template": "Guests keep coming back for our house specialties at {business_name}. Ask your server what is flying out of the kitchen tonight."
+    },
+    {
+      "question": "Do you have gluten-free options?",
+      "answer_template": "{business_name} offers several gluten-free choices. Just mention your needs and we will take care of you."
+    },
+    {
+      "question": "Is there parking nearby?",
+      "answer_template": "There is parking available near {business_name} at {address}. We also validate for the lot next door."
+    },
+    {
+      "question": "Can I order online?",
+      "answer_template": "You can order directly through our website or call {phone}. Your AI assistant can also help place an order."
+    },
+    {
+      "question": "Do you have a happy hour?",
+      "answer_template": "{business_name} runs happy hour on weekdays. Stop by during {hours} for specials."
+    },
+    {
+      "question": "Are you kid-friendly?",
+      "answer_template": "Families are always welcome at {business_name}. We have a kids menu and high chairs available."
+    },
+    {
+      "question": "Do you host private events?",
+      "answer_template": "{business_name} hosts private dinners and celebrations. Reach out at {phone} to reserve our back room."
+    },
+    {
+      "question": "What safety measures do you follow?",
+      "answer_template": "{business_name} keeps things clean and comfortable. If you have specific concerns, call us at {phone}."
+    },
+    {
+      "question": "How do I leave a review?",
+      "answer_template": "We love hearing from you. Leave a review online and know that your feedback helps us grow. There is always room to climb."
+    }
+  ],
+  "dental": [
+    {
+      "question": "What are your office hours?",
+      "answer_template": "{business_name} is open {hours}. We do our best to see you on time."
+    },
+    {
+      "question": "Do you accept new patients?",
+      "answer_template": "Yes, {business_name} is accepting new patients. Call {phone} to schedule your first visit."
+    },
+    {
+      "question": "What insurance plans do you take?",
+      "answer_template": "We work with most major insurance providers. Call {phone} and our team will verify your coverage."
+    },
+    {
+      "question": "Do you offer emergency appointments?",
+      "answer_template": "{business_name} reserves slots for urgent care. If you are in pain, call {phone} right away."
+    },
+    {
+      "question": "Is teeth whitening available?",
+      "answer_template": "We offer professional whitening at {business_name}. Ask about it during your next cleaning."
+    },
+    {
+      "question": "How often should I get a cleaning?",
+      "answer_template": "Most patients do well with two cleanings a year. Your AI assistant can remind you when it is time."
+    },
+    {
+      "question": "Do you treat children?",
+      "answer_template": "{business_name} sees patients of all ages. We make kids feel safe and comfortable."
+    },
+    {
+      "question": "What should I expect at my first visit?",
+      "answer_template": "Your first visit includes a thorough exam and a conversation about your goals. We are located at {address}."
+    },
+    {
+      "question": "Do you offer payment plans?",
+      "answer_template": "{business_name} offers flexible payment options. Call {phone} to learn what works for your budget."
+    },
+    {
+      "question": "Is sedation available?",
+      "answer_template": "We offer options to help anxious patients relax. Just let us know your concerns when you book."
+    },
+    {
+      "question": "How do I prepare for my appointment?",
+      "answer_template": "Brush and floss as usual, and bring your insurance card. We will take care of the rest at {business_name}."
+    },
+    {
+      "question": "Do you do Invisalign?",
+      "answer_template": "Yes, {business_name} provides clear aligner consultations. Schedule a visit to see if they are right for you."
+    },
+    {
+      "question": "What COVID precautions do you follow?",
+      "answer_template": "We follow strict sanitation protocols to keep every patient safe at {business_name}."
+    },
+    {
+      "question": "Can I reschedule online?",
+      "answer_template": "Call {phone} and we will find a time that works. Your AI assistant can also help with scheduling."
+    },
+    {
+      "question": "Do you offer second opinions?",
+      "answer_template": "Absolutely. {business_name} believes in transparency. Bring your records and we will review them together."
+    }
+  ],
+  "retail": [
+    {
+      "question": "What are your store hours?",
+      "answer_template": "{business_name} is open {hours}. Stop by whenever it is convenient for you."
+    },
+    {
+      "question": "Do you offer curbside pickup?",
+      "answer_template": "Yes, order online and pick up at {address}. Call {phone} when you arrive."
+    },
+    {
+      "question": "What is your return policy?",
+      "answer_template": "{business_name} accepts returns within 30 days with a receipt. We want you to love what you buy."
+    },
+    {
+      "question": "Do you have gift cards?",
+      "answer_template": "Gift cards are available in any amount. They make a thoughtful present and never expire."
+    },
+    {
+      "question": "Can I check stock before visiting?",
+      "answer_template": "Call {phone} and we will hold an item for you. We hate it when you make a trip for nothing."
+    },
+    {
+      "question": "Do you price match?",
+      "answer_template": "{business_name} matches verified competitor prices. Show us the deal and we will honor it."
+    },
+    {
+      "question": "Is there parking?",
+      "answer_template": "There is parking near {business_name} at {address}. We also validate at the garage next door."
+    },
+    {
+      "question": "Do you ship online orders?",
+      "answer_template": "We ship nationwide. Your AI assistant can help track your package once it is on the way."
+    },
+    {
+      "question": "Do you have a loyalty program?",
+      "answer_template": "Yes, sign up in-store or online to earn points on every purchase at {business_name}."
+    },
+    {
+      "question": "Can I order custom items?",
+      "answer_template": "Custom orders are our specialty. Visit us at {address} or call {phone} to start a conversation."
+    },
+    {
+      "question": "What brands do you carry?",
+      "answer_template": "{business_name} carries a curated mix of trusted brands. Stop by to see what is new this season."
+    },
+    {
+      "question": "Do you offer personal shopping?",
+      "answer_template": "Our team loves helping you find the perfect fit. Book a session by calling {phone}."
+    },
+    {
+      "question": "Are you wheelchair accessible?",
+      "answer_template": "{business_name} is fully accessible. If you need assistance, call ahead and we will be ready."
+    },
+    {
+      "question": "Do you have sales events?",
+      "answer_template": "We run seasonal sales throughout the year. Sign up for our newsletter to hear about them first."
+    },
+    {
+      "question": "How can I contact customer service?",
+      "answer_template": "Reach us at {phone} or visit {address}. Your AI assistant is here for quick questions too."
+    }
+  ],
+  "services": [
+    {
+      "question": "What are your business hours?",
+      "answer_template": "{business_name} operates {hours}. We are ready when you need us."
+    },
+    {
+      "question": "How do I book an appointment?",
+      "answer_template": "Call {phone} or visit {address} to schedule a time that works for you."
+    },
+    {
+      "question": "Do you offer free estimates?",
+      "answer_template": "{business_name} provides free estimates. Tell us what you need and we will give you an honest quote."
+    },
+    {
+      "question": "What areas do you serve?",
+      "answer_template": "We serve the greater metro area from our base at {address}. Ask us about your specific location."
+    },
+    {
+      "question": "Are you licensed and insured?",
+      "answer_template": "{business_name} is fully licensed and insured. We protect your property like it is our own."
+    },
+    {
+      "question": "How long will the job take?",
+      "answer_template": "Every project is different. After a quick consultation, we will give you a realistic timeline."
+    },
+    {
+      "question": "Do you offer warranties?",
+      "answer_template": "{business_name} stands behind our work. Ask about our warranty when we discuss your project."
+    },
+    {
+      "question": "What forms of payment do you accept?",
+      "answer_template": "We accept cash, check, and all major cards. Financing is available for larger projects."
+    },
+    {
+      "question": "Can I see reviews or references?",
+      "answer_template": "We are proud of our reputation. Check online reviews or ask us for local references."
+    },
+    {
+      "question": "Do you offer emergency service?",
+      "answer_template": "{business_name} has an emergency line. Call {phone} and we will dispatch someone quickly."
+    },
+    {
+      "question": "Will you clean up after the job?",
+      "answer_template": "We leave every site cleaner than we found it. That is just how we work at {business_name}."
+    },
+    {
+      "question": "Do you work weekends?",
+      "answer_template": "We offer weekend appointments by request. Call {phone} to check availability."
+    },
+    {
+      "question": "How do I prepare for your visit?",
+      "answer_template": "Clear the work area of valuables and pets. We will handle the rest when we arrive at {address}."
+    },
+    {
+      "question": "Do you use eco-friendly products?",
+      "answer_template": "{business_name} offers green options upon request. Ask during your estimate and we will tailor the plan."
+    },
+    {
+      "question": "What happens if something goes wrong?",
+      "answer_template": "We fix it fast, no excuses. {business_name} believes in doing right by our neighbors."
+    }
+  ],
+  "generic": [
+    {
+      "question": "What are your hours?",
+      "answer_template": "{business_name} is open {hours}. We would love to hear from you."
+    },
+    {
+      "question": "How can I reach you?",
+      "answer_template": "Call us at {phone} or visit us at {address}. Your AI assistant can also answer quick questions."
+    },
+    {
+      "question": "Where are you located?",
+      "answer_template": "Find us at {address}. We are easy to spot and happy to help with directions if you call {phone}."
+    },
+    {
+      "question": "Do you offer appointments?",
+      "answer_template": "Yes, call {phone} or stop by {address} to set up a time that works for your schedule."
+    },
+    {
+      "question": "What services do you provide?",
+      "answer_template": "{business_name} offers a range of services tailored to your needs. Ask us anything specific."
+    },
+    {
+      "question": "Do you have parking?",
+      "answer_template": "There is parking available at or near {address}. Call {phone} if you need details."
+    },
+    {
+      "question": "Are you wheelchair accessible?",
+      "answer_template": "{business_name} is accessible to everyone. Let us know if you need any special assistance."
+    },
+    {
+      "question": "Do you accept credit cards?",
+      "answer_template": "We accept all major credit cards, as well as cash and check."
+    },
+    {
+      "question": "Can I get a quote?",
+      "answer_template": "Absolutely. Call {phone} or visit {address} and we will give you an honest, no-pressure quote."
+    },
+    {
+      "question": "How do I stay updated?",
+      "answer_template": "Follow us online or give us a call. First weekly digest arrives Monday for new activations. We are always here to help."
+    },
+    {
+      "question": "Do you have a referral program?",
+      "answer_template": "We love referrals at {business_name}. Ask about our neighbor discount when you visit {address}."
+    },
+    {
+      "question": "What makes you different?",
+      "answer_template": "We care about people first. At {business_name}, every guest is treated like family."
+    }
+  ]
+}

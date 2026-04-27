@@ -78,6 +78,19 @@
 3. QA pass by Margaret
 4. Deploy + open-source the reusable workflow
 
+## Active Project: commandbar-prd (Beam)
+
+| Field | Value |
+|-------|-------|
+| Stage | PLAN (debate complete) |
+| Token budget | 500K (Plugin tier) |
+| Product name | Beam — Keyboard-driven command palette for WordPress admin |
+| Stack | PHP 7.4+, Vanilla JS, WordPress plugin |
+| Deploy target | WordPress.org plugin directory |
+| Locked decisions | rounds/commandbar-prd/decisions.md |
+| Plan | .planning/phase-1-plan.md |
+| Requirements | .planning/REQUIREMENTS.md |
+
 ---
 
 ## Ship Summary (monetization-mvp — 2026-04-16)

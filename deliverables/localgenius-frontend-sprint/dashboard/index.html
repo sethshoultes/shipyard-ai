@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sous Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+  <style>
+    :root {
+      --pico-primary: #334155;
+      --pico-primary-background: #334155;
+      --pico-primary-hover: #1e293b;
+    }
+    body { padding: 2rem; }
+    .dashboard-card {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 2rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 1rem;
+      background: #fff;
+    }
+    .metric-value {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #334155;
+      line-height: 1;
+    }
+    .metric-label {
+      font-size: 0.875rem;
+      color: #64748b;
+      margin-top: 0.25rem;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .toggle-label {
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .btn-primary {
+      width: 100%;
+    }
+    .onboarding-step {
+      display: none;
+    }
+    .onboarding-step.active {
+      display: block;
+    }
+    .faq-list {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+    }
+    .faq-list li {
+      padding: 0.5rem 0.75rem;
+      background: #f8fafc;
+      border-radius: 0.5rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      color: #334155;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

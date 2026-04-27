@@ -1,0 +1,18 @@
+{
+  "name": "reel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Turn any blog post into a polished short-form video in a few minutes.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "dev": "npm run dev --workspace=apps/web",
+    "test": "npm run test --workspaces"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
