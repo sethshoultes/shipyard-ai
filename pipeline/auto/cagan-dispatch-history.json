@@ -8,5 +8,13 @@
         "541h in phase (>= 72h)"
       ]
     }
+  ],
+  "dispatches": [
+    {
+      "agent": "cagan",
+      "project_slug": "plugins-v1",
+      "dispatched_at": "2026-04-27T16:59:25.889Z",
+      "queue_id": "stall-projects-plugins-v1-1777307917731"
+    }
   ]
 }

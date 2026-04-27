@@ -103,9 +103,18 @@ for (const entry of queue.entries || []) {
 
   const result = spawnSync(
     "claude",
-    ["--model", model === "haiku" ? "qwen3.5:cloud" : "kimi-k2.6:cloud", "-p", prompt],
-    { cwd: REPO, encoding: "utf8", timeout: 30 * 60 * 1000, env: process.env }
+    [
+      "--model", model === "haiku" ? "qwen3.5:cloud" : "kimi-k2.6:cloud",
+      "--dangerously-skip-permissions",
+      "-p", prompt,
+    ],
+    { cwd: REPO, encoding: "utf8", timeout: 30 * 60 * 1000, env: process.env, maxBuffer: 50 * 1024 * 1024 }
   );
+
+  // Log first 500 chars of claude's output for debugging
+  if (result.stdout) {
+    log(`OUTPUT[${entry.id}]: ${result.stdout.replace(/\n/g, " ").slice(0, 500)}`);
+  }
 
   if (result.error || result.status !== 0) {
     log(`FAILED ${entry.id} — ${result.error?.message || `exit ${result.status}`}`);
