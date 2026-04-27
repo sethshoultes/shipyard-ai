@@ -101,12 +101,21 @@ for (const entry of queue.entries || []) {
   const prompt = dispatch.prompt;
   log(`DISPATCH ${entry.id} → ${dispatch.agent} (${subagent}, model=${model})`);
 
+  // Wrap prompt so Claude dispatches the subagent via Agent tool
+  const wrappedPrompt = `Use the Agent tool to invoke the subagent type \`${subagent}\` with this exact prompt:
+
+---
+${prompt}
+---
+
+Do not paraphrase. Pass the prompt verbatim. After the subagent finishes, report only the location of any file it wrote.`;
+
   const result = spawnSync(
     "claude",
     [
       "--model", model === "haiku" ? "qwen3.5:cloud" : "kimi-k2.6:cloud",
       "--dangerously-skip-permissions",
-      "-p", prompt,
+      "-p", wrappedPrompt,
     ],
     { cwd: REPO, encoding: "utf8", timeout: 30 * 60 * 1000, env: process.env, maxBuffer: 50 * 1024 * 1024 }
   );

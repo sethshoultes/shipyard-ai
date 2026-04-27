@@ -1,13 +1,20 @@
 {
   "$schema_version": 1,
-  "$comment": "Source of truth for agents Shipyard can dispatch — local agents (great-minds) and cross-plugin agents (great-operators, great-counsels, etc.). state-sync.mjs reconciles AGENTS.md against this file. stall-detector.mjs uses this file to know which agents to dispatch. See docs/PRODUCT-MANAGEMENT-GAP.md.",
+  "$comment": "Source of truth for agents Shipyard can dispatch \u2014 local agents (great-minds) and cross-plugin agents (great-operators, great-counsels, etc.). state-sync.mjs reconciles AGENTS.md against this file. stall-detector.mjs uses this file to know which agents to dispatch. See docs/PRODUCT-MANAGEMENT-GAP.md.",
   "phil-jackson": {
     "source": "great-minds",
     "subagent_type": "great-minds:phil-jackson-orchestrator",
     "model": "sonnet",
     "role": "orchestrator",
-    "trigger_phrases": ["dispatch", "orchestrate", "who is idle"],
-    "dispatched_by": ["cron", "human"],
+    "trigger_phrases": [
+      "dispatch",
+      "orchestrate",
+      "who is idle"
+    ],
+    "dispatched_by": [
+      "cron",
+      "human"
+    ],
     "schedule": "*/29 * * * *"
   },
   "steve-jobs": {
@@ -15,32 +22,60 @@
     "subagent_type": "great-minds:steve-jobs-visionary",
     "model": "sonnet",
     "role": "creative-director",
-    "trigger_phrases": ["design", "brand", "user experience", "is this insanely great"],
-    "dispatched_by": ["phil-jackson"]
+    "trigger_phrases": [
+      "design",
+      "brand",
+      "user experience",
+      "is this insanely great"
+    ],
+    "dispatched_by": [
+      "phil-jackson"
+    ]
   },
   "elon-musk": {
     "source": "great-minds",
     "subagent_type": "great-minds:elon-musk-persona",
     "model": "sonnet",
     "role": "engineering-director",
-    "trigger_phrases": ["first principles", "ship fast", "physics"],
-    "dispatched_by": ["phil-jackson"]
+    "trigger_phrases": [
+      "first principles",
+      "ship fast",
+      "physics"
+    ],
+    "dispatched_by": [
+      "phil-jackson"
+    ]
   },
   "margaret-hamilton": {
     "source": "great-minds",
     "subagent_type": "great-minds:margaret-hamilton-qa",
     "model": "sonnet",
     "role": "qa-director",
-    "trigger_phrases": ["QA", "ship gate", "P0", "production incident"],
-    "dispatched_by": ["phil-jackson", "elon-musk", "post-build"]
+    "trigger_phrases": [
+      "QA",
+      "ship gate",
+      "P0",
+      "production incident"
+    ],
+    "dispatched_by": [
+      "phil-jackson",
+      "elon-musk",
+      "post-build"
+    ]
   },
   "jensen-huang": {
     "source": "great-minds",
     "subagent_type": "great-minds:jensen-huang-board",
     "model": "haiku",
     "role": "board-reviewer",
-    "trigger_phrases": ["board review", "moat", "compounding"],
-    "dispatched_by": ["cron"],
+    "trigger_phrases": [
+      "board review",
+      "moat",
+      "compounding"
+    ],
+    "dispatched_by": [
+      "cron"
+    ],
     "schedule": "17 * * * *"
   },
   "marcus-aurelius": {
@@ -48,48 +83,89 @@
     "subagent_type": "great-minds:marcus-aurelius-mod",
     "model": "haiku",
     "role": "mediator",
-    "trigger_phrases": ["mediate", "stoic", "calm under pressure"],
-    "dispatched_by": ["phil-jackson", "stall-detector-cross-craft"]
+    "trigger_phrases": [
+      "mediate",
+      "stoic",
+      "calm under pressure"
+    ],
+    "dispatched_by": [
+      "phil-jackson",
+      "stall-detector-cross-craft"
+    ]
   },
   "rick-rubin": {
     "source": "great-minds",
     "subagent_type": "great-minds:rick-rubin-creative",
     "model": "haiku",
     "role": "essence-distiller",
-    "trigger_phrases": ["essence", "what matters", "strip it down"],
-    "dispatched_by": ["phil-jackson", "post-debate"]
+    "trigger_phrases": [
+      "essence",
+      "what matters",
+      "strip it down"
+    ],
+    "dispatched_by": [
+      "phil-jackson",
+      "post-debate"
+    ]
   },
   "jony-ive": {
     "source": "great-minds",
     "subagent_type": "great-minds:jony-ive-designer",
     "model": "haiku",
     "role": "visual-design-strategic",
-    "trigger_phrases": ["less but better", "every pixel", "is this product worth building"],
-    "dispatched_by": ["steve-jobs", "phil-jackson"]
+    "trigger_phrases": [
+      "less but better",
+      "every pixel",
+      "is this product worth building"
+    ],
+    "dispatched_by": [
+      "steve-jobs",
+      "phil-jackson"
+    ]
   },
   "maya-angelou": {
     "source": "great-minds",
     "subagent_type": "great-minds:maya-angelou-writer",
     "model": "haiku",
     "role": "copywriter",
-    "trigger_phrases": ["copy", "emotional clarity", "voice"],
-    "dispatched_by": ["steve-jobs"]
+    "trigger_phrases": [
+      "copy",
+      "emotional clarity",
+      "voice"
+    ],
+    "dispatched_by": [
+      "steve-jobs"
+    ]
   },
   "sara-blakely": {
     "source": "great-minds",
     "subagent_type": "great-minds:sara-blakely-growth",
     "model": "haiku",
     "role": "growth-strategist",
-    "trigger_phrases": ["go-to-market", "scrappy", "blind spot"],
-    "dispatched_by": ["elon-musk"]
+    "trigger_phrases": [
+      "go-to-market",
+      "scrappy",
+      "blind spot"
+    ],
+    "dispatched_by": [
+      "elon-musk"
+    ]
   },
   "cagan": {
-    "source": "great-operators",
-    "subagent_type": "great-operators:marty-cagan-operator",
+    "source": "great-designers",
+    "subagent_type": "great-designers:marty-cagan-designer",
     "model": "sonnet",
     "role": "product-manager",
-    "trigger_phrases": ["product discovery", "the four risks", "is this worth building", "build or kill"],
-    "dispatched_by": ["stall-detector", "phil-jackson"],
+    "trigger_phrases": [
+      "product discovery",
+      "the four risks",
+      "is this worth building",
+      "build or kill"
+    ],
+    "dispatched_by": [
+      "stall-detector",
+      "phil-jackson"
+    ],
     "max_per_project_per_week": 2,
     "after_max": "escalate-to-human",
     "$comment": "Load-bearing for the stall-detector loop. See docs/PRODUCT-MANAGEMENT-GAP.md."
@@ -99,7 +175,13 @@
     "subagent_type": "great-minds:warren-buffett-persona",
     "model": "sonnet",
     "role": "board-reviewer",
-    "trigger_phrases": ["capital allocation", "is this investable", "moat"],
-    "dispatched_by": ["phil-jackson"]
+    "trigger_phrases": [
+      "capital allocation",
+      "is this investable",
+      "moat"
+    ],
+    "dispatched_by": [
+      "phil-jackson"
+    ]
   }
 }
