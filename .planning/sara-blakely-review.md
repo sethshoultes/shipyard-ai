@@ -1,19 +1,21 @@
-Verdict: Overbuilt. Two products, one doc, zero validated pain.
+No customer pays for this.
 
-WP Intelligence Suite
-- Customer won't pay. Four plugins for "invisible intelligence." No urgent pain.
-- Confusing: 3-plugin architecture, honor-system billing, invisible gating. Bounce city.
-- Your pitch: "A teammate inside WordPress." Vague. Teammate doing what?
-- Better pitch: "Auto-answering FAQ widget for your WP site. Install, activate, done."
-- $0 test: Post in 3 WordPress FB groups. "Free FAQ widget." Zero DMs = kill it.
-- Retention: Usage caps punish users. They uninstall, not upgrade.
+- Four plugins, three problems, one confused buyer. Bundling unrelated tools into "Intelligence Suite" = enterprise word salad.
+- Free tier gives 50 widget clicks. Pro is $99/year for static templates. Dozens of free FAQ plugins exist. No moat.
+- Dash = custom post type with @mentions. Pinned = CPT with checklists. WordPress already does this. Solving problems that don't exist.
+- Beam MVP tacked onto same plan = scope creep. Pick one hero product.
 
-Beam
-- Free utility. Nice-to-have. No clear monetization path.
-- Pitch: "Command palette for WordPress." Appeals to devs, not owners.
-- $0 test: Reddit r/WordPress. 100 upvotes? Keep. Crickets? Shelve.
+Confusing / bounce triggers:
+- "Intelligence Suite" headline. Sounds expensive, not urgent.
+- Four new admin menus on activation. Overwhelming.
+- Stripe checkout → manual license key entry. Friction kills conversion.
+- No before/after. No revenue proof. No real-customer screenshot.
 
-Fix:
-- Pick Beam. Ship in 48 hours. Free lead magnet for paid product.
-- Or kill both. Call 10 WP site owners. Ask #1 daily annoyance.
-- Build that. Charge $49 one-time. No hidden annual billing.
+30-second pitch:
+"We turn repetitive visitor questions into a chat-style FAQ that works instantly — no AI downtime, no dev needed."
+
+$0 test:
+Post in one Facebook group for local business owners: "I built a widget that answers 'What are your hours?' automatically. Need 3 beta testers. Comment if interested." Less than 3 replies = pivot.
+
+Retention hook:
+None. Data lives in native WordPress. Zero lock-in. Add lead capture inside widget to create data gravity.

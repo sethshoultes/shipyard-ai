@@ -1,55 +1,51 @@
-# Steve's Take: Round 1
+# Round 1 — Chief Design & Brand Officer
 
 ## Product Naming
 
-**Whisper Blocks** is two words. Two words is one too many.
+**Whisper Blocks** is a hardware store name. We don't sell two-by-fours.
 
-Call it **Whisper**. One word. A noun and a verb. People will say, *"I Whispered my podcast."* That's when you know you own the category.
+The product is one thing: it turns disappearing sound into permanent text.
 
-"Blocks" is a WordPress implementation detail. Your customer doesn't care about blocks. They care about their words.
+Rename it **Scribe**. One word. A three-syllable promise that spans five thousand years of human history — from monks in candlelight to AI in the cloud. Memorable in a podcast ad. Dignified on a toolbar. **Scribe.**
 
 ## Design Philosophy
 
-This isn't a transcription tool. This is a **time machine for audio**.
+This is not a "transcription tool." Transcription tools are utilitarian. Gray. They treat language like a spreadsheet.
 
-The technology must be invisible. When someone drags a file in, they shouldn't see a progress bar with an AI badge — they should see their spoken words materialize on the page like ink drying on fine paper. The magic isn't Whisper. The magic is making Whisper disappear.
+Scribe is about the **sanctity of spoken words**. A podcast episode is ephemeral — it evaporates the second it stops playing. We are giving creators the printed page. Think *The New Yorker* layout, not a GitHub README. Generous line-height. Pull quotes. The pause between sentences should breathe.
 
-Typography is the interface. If the transcript doesn't read like a beautifully typeset magazine, we've failed.
+We are at the intersection of liberal arts and speech-to-text technology. If it doesn't feel like reading something crafted by human hands, we failed.
 
-## The First 30 Seconds
+## User Experience: The First 30 Seconds
 
-Drop. Breathe. Transcript.
+Drag. Drop. The file lands.
 
-No setup wizard. No API key. No "choose your model." The user drags an MP3 into WordPress and — before they've finished exhaling — there's a clean, readable transcript sitting in their editor. Click a word, audio jumps there. It feels like telepathy.
+For three seconds, nothing — then words appear as if being written in real time, not dumped like a database query. The user clicks a sentence. The audio *teleports*. No scrubbing. No hunting. It feels like having a conversation with a perfect memory.
 
-If it takes longer than three seconds to go from silence to text, we haven't solved the problem. We've automated a chore.
+If the first 30 seconds feels like "configuring a plugin," we have already lost.
 
 ## Brand Voice
 
-Whisper speaks like a brilliant editor who stayed up all night to polish your work before breakfast.
+We speak like a craftsman, not a cloud service.
 
-Warm. Confident. Human. Never says "AI-powered" — nobody falls in love with a power source. Say "your words, captured perfectly."
+We don't "leverage Whisper models." We **capture voices**. We don't "process batch uploads." We **turn sound into permanence**. Every sentence in our copy should make a podcaster lean forward and think, *finally, someone gets it.*
 
-We don't explain. We demonstrate.
+Precision without coldness. Warmth without fluff.
 
 ## What to Say NO To
 
-NO to speaker detection in v1. If adding it means one more click or one more setting, it waits.
+NO to settings panels with twenty toggles. Pick the right defaults and have the courage to defend them.
+NO to "speaker detection" if it means ugly colored labels cluttering beautiful text.
+NO to exporting SRT, VTT, JSON, XML, and twelve other formats that 3% of users need. Ship HTML and plain text. Listen for demand.
+NO to WordPress admin chrome bleeding into the canvas. The block should feel native to the editor, not grafted onto it.
+NO to latency. If the transcript isn't appearing as fast as the user expects magic, it's broken.
 
-NO to export format menus. SRT, VTT, HTML — that's not a product, that's a committee. Pick one beautiful output. Add others later.
-
-NO to dark mode until light mode is perfect. Doing both means doing neither well.
-
-NO to "advanced settings" panels. If you need a panel of toggles, your default experience is broken.
-
-NO to AI badges, logos, or "powered by" footnotes. The user asked for their words, not our resume.
+Simplicity is the ultimate sophistication — and that means removing, not adding.
 
 ## The Emotional Hook
 
-Audio evaporates. Text endures.
+A podcaster spends forty hours crafting an hour of audio. Then it vanishes into an RSS feed, unsearchable, unquotable, lost to time.
 
-People will love Whisper because it rescues their ideas from the air and gives them permanence. A podcaster's best episode becomes searchable. A journalist's interview becomes quotable. A course creator's lesson becomes scannable.
+Scribe makes them feel **immortal**. Their voice becomes searchable. Their best quotes become tweets. Their interviews become reference material. We don't just transcribe — we **archive their soul**.
 
-This isn't about saving time. It's about making audio **matter**. When someone searches their own website and finds a sentence they spoke six months ago, that's the moment we win.
-
-Make the invisible visible. That's the job.
+That is why people will love this. Not because it saves time. Because it makes their work matter forever.

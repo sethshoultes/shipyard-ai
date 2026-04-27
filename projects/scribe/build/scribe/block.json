@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "scribe/transcript",
+  "title": "Scribe Transcript",
+  "category": "media",
+  "icon": "media-text",
+  "description": "Drag-and-drop audio transcription with AI-powered Whisper API.",
+  "textdomain": "scribe",
+  "editorScript": "file:./build/block.js",
+  "editorStyle": "file:./build/block.css",
+  "style": "file:./assets/css/frontend.css",
+  "script": "file:./build/frontend.js",
+  "supports": {
+    "html": false,
+    "align": ["wide", "full"]
+  },
+  "attributes": {
+    "audioUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "jobId": {
+      "type": "string",
+      "default": ""
+    },
+    "transcript": {
+      "type": "array",
+      "default": []
+    }
+  }
+}
