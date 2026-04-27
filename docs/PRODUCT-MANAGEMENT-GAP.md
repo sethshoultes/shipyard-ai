@@ -126,8 +126,8 @@ Cagan lives in `great-operators` already. Shipyard's agent registry needs an ent
 // pipeline/auto/agent-registry.json (new)
 {
   "cagan": {
-    "source": "great-operators",
-    "subagent_type": "great-operators:marty-cagan-operator",
+    "source": "great-designers",
+    "subagent_type": "great-designers:marty-cagan-designer",
     "model": "sonnet",
     "trigger_phrases": ["product discovery", "the four risks", "is this worth building"],
     "dispatched_by": ["stall-detector", "phil-jackson"],
@@ -268,7 +268,7 @@ The constellation is now nine plugins deep. Use it. Do not ask agents inside Shi
 ## References
 
 - **Constellation roadmap:** brain vault `projects/caseproof-ai-company-constellation.md`
-- **Cagan persona file:** `great-operators-plugin/agents/marty-cagan-operator.md`
+- **Cagan persona file:** `great-designers-plugin/agents/marty-cagan-designer.md` (product discovery is a design-management craft, not an operations craft — corrected via great-operators-plugin issue #1)
 - **Phil Jackson persona file:** `great-minds-plugin/agents/phil-jackson-orchestrator.md` (or current path)
 - **Marcus Aurelius persona file:** `great-minds-plugin/agents/marcus-aurelius-mod.md`
 - **Stall-detector code:** `pipeline/auto/stall-detector.mjs` (this commit)

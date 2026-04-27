@@ -116,7 +116,7 @@ Final assembly, deploy to Emdash, client handoff.
 
 ### Marty Cagan — Product Manager (cross-plugin)
 - Role: Build-or-kill decisions on stalled projects, the four risks framework
-- Subagent: great-operators:marty-cagan-operator, model sonnet
+- Subagent: great-designers:marty-cagan-designer, model sonnet
 - Dispatched by: stall-detector, phil-jackson
 - Rate-limited: max 2 dispatches per project per week, then escalate to human
 - Load-bearing for the stall-detector loop. See docs/PRODUCT-MANAGEMENT-GAP.md.
