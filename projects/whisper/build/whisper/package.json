@@ -1,0 +1,16 @@
+{
+  "name": "whisper",
+  "version": "1.0.0",
+  "description": "Whisper WordPress block for synchronized transcripts.",
+  "main": "build/block.js",
+  "scripts": {
+    "build": "wp-scripts build",
+    "start": "wp-scripts start",
+    "lint:js": "wp-scripts lint-js",
+    "lint:css": "wp-scripts lint-style"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^27.0.0"
+  },
+  "dependencies": {}
+}

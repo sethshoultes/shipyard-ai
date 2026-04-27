@@ -1,0 +1,17 @@
+name = "shipyard-worker"
+main = "src/index.ts"
+compatibility_date = "2024-04-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "shipyard-db"
+database_id = "shipyard-db-id"
+
+[[triggers.cron]]
+cron = "0 */6 * * *"
+
+[[triggers.cron]]
+cron = "0 9 * * *"
+
+[vars]
+RESEND_FROM = "Shipyard <hello@shipyard.ai>"

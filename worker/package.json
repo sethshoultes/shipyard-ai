@@ -1,0 +1,17 @@
+{
+  "name": "shipyard-worker",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "dependencies": {
+    "stripe": "^15.0.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.50.0",
+    "typescript": "^5.4.0"
+  }
+}

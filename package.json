@@ -1,0 +1,17 @@
+{
+  "name": "shipyard-ai",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "worker"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=apps/web",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "deploy:worker": "npm run deploy --workspace=worker"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
