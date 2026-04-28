@@ -1,42 +1,25 @@
-# Sara Blakely Gut-Check
+# Sara Blakely Review — WP Intelligence Suite & Beam MVP
 
-**Verdict:** Scrap the suite. Ship Beam. The rest is architecture theater.
+**Would a real customer pay?**
+WPIS: Maybe. Honor-system licensing = everyone gets Pro free. $99/year for static templates when free alternatives exist. "LocalGenius" with zero AI is false advertising.
 
----
+Beam: Yes. Cmd+K is muscle memory. But stale index on 200+ item sites kills the promise.
 
-## Would a Customer Pay?
+**What makes someone bounce?**
+- Four plugins for basic CPTs. Plugin fatigue.
+- "Invisible gating" = broken features, no visible upgrade path.
+- No onboarding wizard. One tooltip isn't enough.
+- "LocalGenius" promises AI, delivers hand-written FAQs.
 
-- Beam: Yes. Saves clicks. Cmd+K is muscle memory in Slack, Notion, WP admins want it.
-- WP Intelligence Suite: No. Static FAQ widget + team notes + agreement checklist = free plugins already exist. "$99/year for 50 static responses" is insulting when cost is zero.
-- Name promises "intelligence." Delivers hand-written HTML. Customer feels scammed.
+**30-Second Elevator Pitch**
+> Beam: Cmd+K for WordPress admin. Find anything instantly. No setup. Two files. Free.
 
-## What Makes Me Bounce
+**$0 Marketing Test**
+WordPress.org + r/WordPress GIF. One agency pilot for testimonials. Track: time-to-value, conversion rate.
 
-- Two plans in one file. Total chaos. No focus.
-- "Invisible gating" = MBA speak. Customer sees broken features and a paywall.
-- Four plugins for basic CPTs? Over-engineered. Plugin fatigue is real.
-- Activation seeds 5 verticals but user runs one business. Cluttered.
-- "LocalGenius" with no AI or local data = false advertising.
-- Honor-system license key = you just gave away Pro for free. No revenue.
+**Retention Hook**
+WPIS: Pre-seeded data = alive at activation. 80% nudge creates urgency. Static content goes stale.
 
-## 30-Second Elevator Pitch (Beam)
+Beam: Keystroke habit. Remove Cmd+K, users feel friction.
 
-> "Beam is Cmd+K for your WordPress admin. Hit a hotkey, find any post, page, user, or settings screen in under a second. No setup. Two files. Free."
-
-## $0 Marketing Test
-
-- Beam: Post GIF in WP Facebook groups / Twitter. "Cmd+K in WordPress." Let power users feel the speed. Word-of-mouth from agency devs.
-- WPIS: No demo-able "wow" moment. Static FAQ widget doesn't spread.
-
-## Retention Hook
-
-- Beam: Habit formation. Cmd+K becomes reflex. Hard to uninstall a keystroke.
-- WPIS: None. Static templates get stale. No network effect. No data gravity.
-
-## What I'd Actually Build
-
-1. Beam only. Two files. Ship today.
-2. Monetize Beam with team/activity analytics later — not static widgets.
-3. If you must do WPIS: one plugin, not four. Rename it. "Intelligence" requires actual smarts.
-
-**Bottom line:** Customer obsession means killing your darlings. Kill everything except Beam.
+**Verdict:** Merge into one plugin. Four plugins is architecture theater. Kill static widgets or add real LLM. Honor-system licensing isn't a business model.

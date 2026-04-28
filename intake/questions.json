@@ -1,0 +1,59 @@
+{
+  "version": "1.0",
+  "title": "Shipyard Site Intake",
+  "questions": [
+    {
+      "id": "business",
+      "type": "textarea",
+      "label": "What does your business do?",
+      "required": true,
+      "next": "audience"
+    },
+    {
+      "id": "audience",
+      "type": "text",
+      "label": "Who is your ideal visitor?",
+      "required": true,
+      "next": "goal"
+    },
+    {
+      "id": "goal",
+      "type": "select",
+      "label": "What action should visitors take?",
+      "options": [
+        { "value": "contact", "label": "Contact you", "next": "references" },
+        { "value": "book", "label": "Book a call", "next": "references" },
+        { "value": "buy", "label": "Request a quote", "next": "references" },
+        { "value": "read", "label": "Read more", "next": "references" }
+      ],
+      "required": true
+    },
+    {
+      "id": "references",
+      "type": "text",
+      "label": "Any sites you admire?",
+      "required": false,
+      "next": "pages"
+    },
+    {
+      "id": "pages",
+      "type": "text",
+      "label": "Pages you need (max 5)",
+      "required": true,
+      "next": null,
+      "validation": {
+        "maxPages": 5,
+        "guardrail": "Scope is capped at 5 pages. Additional pages require a custom engagement."
+      }
+    }
+  ],
+  "branching": {
+    "goal": {
+      "default": "references"
+    }
+  },
+  "output": {
+    "mapper": "mapper.js",
+    "schema": "schema/template.md"
+  }
+}

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shipyard — Tell us about your site</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; background: #fafafa; color: #222; }
+    .question { display: none; margin-bottom: 32px; }
+    .question.active { display: block; }
+    h1 { font-size: 1.5rem; margin-bottom: 8px; }
+    p.lead { color: #666; margin-bottom: 24px; }
+    label { display: block; font-weight: 600; margin-bottom: 8px; }
+    input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
+    textarea { min-height: 100px; resize: vertical; }
+    .actions { margin-top: 16px; }
+    button { padding: 10px 18px; border: none; border-radius: 6px; background: #111; color: #fff; font-size: 1rem; cursor: pointer; }
+    button.secondary { background: #e0e0e0; color: #111; margin-right: 8px; }
+    .progress { font-size: 0.875rem; color: #888; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <h1>Let's build your site</h1>
+  <p class="lead">Five quick questions so we understand what you need.</p>
+  <div class="progress">Question <span id="current">1</span> of 5</div>
+
+  <form id="intake-form">
+    <div class="question active" data-step="1">
+      <label for="q1">What does your business do?</label>
+      <textarea id="q1" name="business" placeholder="We help..." required></textarea>
+      <div class="actions">
+        <button type="button" onclick="next()">Next</button>
+      </div>
+    </div>
+
+    <div class="question" data-step="2">
+      <label for="q2">Who is your ideal visitor?</label>
+      <input type="text" id="q2" name="audience" placeholder="Small business owners looking for..." required>
+      <div class="actions">
+        <button type="button" class="secondary" onclick="prev()">Back</button>
+        <button type="button" onclick="next()">Next</button>
+      </div>
+    </div>
+
+    <div class="question" data-step="3">
+      <label for="q3">What action should visitors take?</label>
+      <select id="q3" name="goal" required>
+        <option value="">Choose one</option>
+        <option value="contact">Contact you</option>
+        <option value="book">Book a call</option>
+        <option value="buy">Request a quote</option>
+        <option value="read">Read more</option>
+      </select>
+      <div class="actions">
+        <button type="button" class="secondary" onclick="prev()">Back</button>
+        <button type="button" onclick="next()">Next</button>
+      </div>
+    </div>
+
+    <div class="question" data-step="4">
+      <label for="q4">Any sites you admire?</label>
+      <input type="text" id="q4" name="references" placeholder="example.com, another.com">
+      <div class="actions">
+        <button type="button" class="secondary" onclick="prev()">Back</button>
+        <button type="button" onclick="next()">Next</button>
+      </div>
+    </div>
+
+    <div class="question" data-step="5">
+      <label for="q5">Pages you need (max 5)</label>
+      <input type="text" id="q5" name="pages" placeholder="Home, About, Pricing, Contact" required>
+      <div class="actions">
+        <button type="button" class="secondary" onclick="prev()">Back</button>
+        <button type="submit">Finish</button>
+      </div>
+    </div>
+  </form>
+
+  <script>
+    let step = 1;
+    const total = 5;
+    const form = document.getElementById('intake-form');
+    const currentEl = document.getElementById('current');
+
+    function show(s) {
+      document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
+      document.querySelector('.question[data-step="' + s + '"]').classList.add('active');
+      currentEl.textContent = s;
+      step = s;
+    }
+
+    function next() {
+      const active = document.querySelector('.question.active');
+      const field = active.querySelector('input, textarea, select');
+      if (field && field.required && !field.value.trim()) {
+        field.focus();
+        return;
+      }
+      if (step < total) show(step + 1);
+    }
+
+    function prev() {
+      if (step > 1) show(step - 1);
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const data = new FormData(form);
+      const payload = {};
+      for (const [k, v] of data.entries()) payload[k] = v;
+      fetch('/api/intake', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        .then(r => r.json())
+        .then(() => alert('Thanks. We will be in touch within 24 hours.'))
+        .catch(() => alert('Thanks. We will be in touch within 24 hours.'));
+    });
+  </script>
+</body>
+</html>
