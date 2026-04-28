@@ -3,15 +3,21 @@ import { NextRequest, NextResponse } from "next/server";
 /**
  * POST /api/intake
  *
- * Receives a paid-customer intake submission and persists it.
- * v0 implementation per DHH's flow design at website/intake/intake-flow.md.
+ * Receives a paid-customer intake submission and emails it to the operator
+ * via Resend. v0 implementation per DHH's flow design at
+ * website/intake/intake-flow.md.
  *
- * v0 storage: posts to a webhook (Resend / Slack / email) configured via
- * INTAKE_WEBHOOK_URL env. Failure mode: log to console and return 500;
- * the operator follows up via the customer's email address.
+ * Env vars (set in Cloudflare Pages):
+ *   RESEND_API_KEY       — required to send. If unset, the route logs and
+ *                          returns success so the form still works in dev.
+ *   INTAKE_FROM_EMAIL    — sender. Default: "Shipyard <onboarding@resend.dev>"
+ *                          (Resend's sandbox sender; only delivers to the
+ *                          account owner's verified email until you verify a
+ *                          domain like shipyard.company).
+ *   INTAKE_TO_EMAIL      — recipient. Default: seth@caseproof.com.
  *
- * NOT in v0: webhook signature, retry queue, customer dashboard, Stripe
- * integration. All deferred until first 5 customers tell us what's needed.
+ * NOT in v0: signed webhooks, retry queue, customer dashboard, Stripe.
+ * Deferred until the first 5 customers tell us what's needed.
  */
 
 export const runtime = "edge";
@@ -28,9 +34,18 @@ function slugify(input: string): string {
     .slice(0, 60) || "untitled";
 }
 
+function escapeHtml(input: string): string {
+  return input
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function summarizeForOperator(data: IntakePayload): string {
   const lines: string[] = [];
-  lines.push(`📥 New Shipyard intake — ${new Date().toISOString()}`);
+  lines.push(`New Shipyard intake — ${new Date().toISOString()}`);
   lines.push("");
   lines.push(`Name:     ${data.name || "(not provided)"}`);
   lines.push(`Email:    ${data.email || "(not provided)"}`);
@@ -57,15 +72,32 @@ function summarizeForOperator(data: IntakePayload): string {
   return lines.join("\n");
 }
 
+function buildEmailHtml(data: IntakePayload, summary: string): string {
+  const customerEmail = escapeHtml(String(data.email || ""));
+  const customerName = escapeHtml(String(data.name || "(no name)"));
+  const tier = escapeHtml(String(data.tier || "(no tier)"));
+  return `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; color: #111;">
+      <h2 style="margin: 0 0 8px;">New Shipyard intake</h2>
+      <p style="margin: 0 0 16px; color: #555;">
+        <strong>${customerName}</strong> &lt;${customerEmail}&gt; — ${tier}
+      </p>
+      <pre style="background: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word;">${escapeHtml(summary)}</pre>
+      <p style="margin: 16px 0 0; color: #888; font-size: 12px;">
+        Reply to this email to respond directly to the customer.
+      </p>
+    </div>
+  `;
+}
+
 export async function POST(req: NextRequest) {
   let data: IntakePayload;
   try {
     data = (await req.json()) as IntakePayload;
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  // Validate the load-bearing fields
   if (!data.email || !data.name || !data.tier) {
     return NextResponse.json(
       { error: "Missing required fields: name, email, tier" },
@@ -82,31 +114,38 @@ export async function POST(req: NextRequest) {
   const slug = `${slugify(String(data.name))}-${Date.now().toString(36)}`;
   const summary = summarizeForOperator(data);
 
-  // v0: ship the summary to whatever webhook is configured.
-  // INTAKE_WEBHOOK_URL might be Slack, Discord, a Resend email-via-webhook, etc.
-  // If unset, we log and return success (the operator will check the logs).
-  const webhookUrl = process.env.INTAKE_WEBHOOK_URL;
-  if (webhookUrl) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.INTAKE_FROM_EMAIL || "Shipyard <onboarding@resend.dev>";
+  const toEmail = process.env.INTAKE_TO_EMAIL || "seth@caseproof.com";
+
+  if (apiKey) {
     try {
-      await fetch(webhookUrl, {
+      const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          slug,
-          received_at: new Date().toISOString(),
-          summary,
-          raw: data,
+          from: fromEmail,
+          to: [toEmail],
+          reply_to: String(data.email),
+          subject: `Shipyard intake — ${data.name} (${data.tier})`,
+          text: summary,
+          html: buildEmailHtml(data, summary),
         }),
       });
+      if (!res.ok) {
+        const detail = await res.text();
+        console.error("[intake] resend non-2xx:", res.status, detail);
+        console.error("[intake] payload:", summary);
+      }
     } catch (err) {
-      // Don't fail the customer's submission if the webhook is down;
-      // log so the operator can backfill.
-      console.error("[intake] webhook failed:", err);
+      console.error("[intake] resend error:", err);
       console.error("[intake] payload:", summary);
     }
   } else {
-    // No webhook configured — log to console (Cloudflare Pages tail)
-    console.log("[intake] no webhook configured. Payload:");
+    console.log("[intake] RESEND_API_KEY not set — logging payload:");
     console.log(summary);
   }
 
