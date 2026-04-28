@@ -103,7 +103,11 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
-export const onRequestPost = async ({ request, env }: Context) => {
+export const onRequest = async ({ request, env }: Context) => {
+  if (request.method !== "POST") {
+    return json({ error: `Method ${request.method} not allowed` }, 405);
+  }
+
   let data: IntakePayload;
   try {
     data = (await request.json()) as IntakePayload;
@@ -157,8 +161,4 @@ export const onRequestPost = async ({ request, env }: Context) => {
   }
 
   return json({ ok: true, slug, received_at: new Date().toISOString() });
-};
-
-export const onRequest = async ({ request }: Context) => {
-  return json({ error: `Method ${request.method} not allowed` }, 405);
 };
