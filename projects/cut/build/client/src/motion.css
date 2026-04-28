@@ -1,0 +1,154 @@
+/*
+ * motion.css — Cut (Changelog Theatre)
+ *
+ * Restrained transitions: gentle slides, confident fades.
+ * No bounce. No wobble. Dignity in motion.
+ */
+
+:root {
+  --cut-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --cut-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --cut-duration-fast: 0.35s;
+  --cut-duration-base: 0.6s;
+  --cut-duration-slow: 1s;
+  --cut-stagger: 0.08s;
+}
+
+/* ---------- Keyframes ---------- */
+
+@keyframes cut-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cut-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cut-fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cut-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes cut-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes cut-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes cut-rule-grow {
+  from {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  to {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+/* ---------- Utility classes ---------- */
+
+.cut-animate-fade-in {
+  animation: cut-fade-in var(--cut-duration-base) var(--cut-ease-out) forwards;
+  opacity: 0;
+}
+
+.cut-animate-fade-up {
+  animation: cut-fade-up var(--cut-duration-base) var(--cut-ease-out) forwards;
+  opacity: 0;
+}
+
+.cut-animate-fade-down {
+  animation: cut-fade-down var(--cut-duration-fast) var(--cut-ease-out) forwards;
+  opacity: 0;
+}
+
+.cut-animate-slide-left {
+  animation: cut-slide-in-left var(--cut-duration-base) var(--cut-ease-out) forwards;
+  opacity: 0;
+}
+
+.cut-animate-slide-right {
+  animation: cut-slide-in-right var(--cut-duration-base) var(--cut-ease-out) forwards;
+  opacity: 0;
+}
+
+.cut-animate-scale-in {
+  animation: cut-scale-in var(--cut-duration-slow) var(--cut-ease-out) forwards;
+  opacity: 0;
+}
+
+.cut-animate-rule {
+  animation: cut-rule-grow var(--cut-duration-slow) var(--cut-ease-in-out) forwards;
+  transform: scaleX(0);
+}
+
+/* Stagger delays */
+.cut-delay-1 { animation-delay: calc(var(--cut-stagger) * 1); }
+.cut-delay-2 { animation-delay: calc(var(--cut-stagger) * 2); }
+.cut-delay-3 { animation-delay: calc(var(--cut-stagger) * 3); }
+.cut-delay-4 { animation-delay: calc(var(--cut-stagger) * 4); }
+.cut-delay-5 { animation-delay: calc(var(--cut-stagger) * 5); }
+.cut-delay-6 { animation-delay: calc(var(--cut-stagger) * 6); }
+.cut-delay-7 { animation-delay: calc(var(--cut-stagger) * 7); }
+.cut-delay-8 { animation-delay: calc(var(--cut-stagger) * 8); }
+
+/* Reduced motion respect */
+@media (prefers-reduced-motion: reduce) {
+  .cut-animate-fade-in,
+  .cut-animate-fade-up,
+  .cut-animate-fade-down,
+  .cut-animate-slide-left,
+  .cut-animate-slide-right,
+  .cut-animate-scale-in,
+  .cut-animate-rule {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

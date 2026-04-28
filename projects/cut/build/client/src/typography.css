@@ -1,0 +1,132 @@
+/*
+ * typography.css — Cut (Changelog Theatre)
+ *
+ * One typeface, one scale, editorial hierarchy.
+ * System font stack — zero external font dependencies.
+ */
+
+:root {
+  --cut-base-size: 16px;
+  --cut-line-height: 1.55;
+  --cut-line-height-tight: 1.2;
+
+  --cut-fw-regular: 400;
+  --cut-fw-medium: 500;
+  --cut-fw-semibold: 600;
+
+  --cut-color-ink: #0f0f11;
+  --cut-color-ink-soft: #4a4a52;
+  --cut-color-ink-muted: #8a8a92;
+  --cut-color-paper: #fafafa;
+  --cut-color-accent: #c23b22;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: var(--cut-base-size);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  font-weight: var(--cut-fw-regular);
+  line-height: var(--cut-line-height);
+  color: var(--cut-color-ink);
+  background-color: var(--cut-color-paper);
+}
+
+/* Editorial scale */
+.cut-h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: var(--cut-fw-semibold);
+  line-height: var(--cut-line-height-tight);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25em;
+}
+
+.cut-h2 {
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: var(--cut-fw-semibold);
+  line-height: var(--cut-line-height-tight);
+  letter-spacing: -0.015em;
+  margin-bottom: 0.3em;
+}
+
+.cut-h3 {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  font-weight: var(--cut-fw-medium);
+  line-height: var(--cut-line-height-tight);
+  letter-spacing: -0.01em;
+  margin-bottom: 0.35em;
+}
+
+.cut-h4 {
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  font-weight: var(--cut-fw-medium);
+  line-height: var(--cut-line-height-tight);
+  margin-bottom: 0.4em;
+}
+
+.cut-h5 {
+  font-size: 0.875rem;
+  font-weight: var(--cut-fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5em;
+  color: var(--cut-color-ink-muted);
+}
+
+.cut-h6 {
+  font-size: 0.75rem;
+  font-weight: var(--cut-fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.6em;
+  color: var(--cut-color-ink-muted);
+}
+
+.cut-body {
+  font-size: 1rem;
+  line-height: var(--cut-line-height);
+  color: var(--cut-color-ink-soft);
+}
+
+.cut-body-small {
+  font-size: 0.875rem;
+  line-height: var(--cut-line-height);
+  color: var(--cut-color-ink-muted);
+}
+
+.cut-mono {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.9375em;
+}
+
+/* Decorative accent rule */
+.cut-rule {
+  width: 3rem;
+  height: 2px;
+  background-color: var(--cut-color-accent);
+  margin: 1.5rem 0;
+  border: none;
+}

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cut — Changelog Theatre</title>
+  <link rel="stylesheet" href="src/typography.css">
+  <link rel="stylesheet" href="src/motion.css">
+  <style>
+    /* Layout and chrome */
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    #cut-stage {
+      width: 100%;
+      max-width: 640px;
+      min-height: 320px;
+      position: relative;
+    }
+
+    /* Version card styling */
+    .cut-version {
+      padding: 2.5rem 2rem;
+      border-radius: 2px;
+      background: transparent;
+    }
+
+    .cut-version-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .cut-date-meta {
+      margin-top: 0.25rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .cut-bullet-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .cut-bullet-item {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      line-height: 1.6;
+    }
+
+    .cut-bullet-marker {
+      flex-shrink: 0;
+      color: var(--cut-color-accent);
+      font-weight: 500;
+    }
+
+    .cut-bullet-text {
+      color: var(--cut-color-ink-soft);
+    }
+
+    /* Error state */
+    .cut-error {
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+
+    .cut-error-icon {
+      font-size: 2rem;
+      color: var(--cut-color-accent);
+      margin-bottom: 1rem;
+      line-height: 1;
+    }
+
+    .cut-example {
+      text-align: left;
+      background: #f0f0f2;
+      padding: 1.25rem;
+      border-radius: 2px;
+      margin-top: 1.5rem;
+      overflow-x: auto;
+      white-space: pre;
+      color: var(--cut-color-ink-soft);
+      font-size: 0.8125rem;
+      line-height: 1.7;
+    }
+
+    /* Exit animation for outgoing version */
+    .cut-exiting {
+      animation: cut-fade-out 0.35s var(--cut-ease-in-out) forwards;
+    }
+
+    @keyframes cut-fade-out {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(-12px); }
+    }
+
+    /* Controls */
+    .cut-controls {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      opacity: 0;
+      animation: cut-fade-in 0.6s var(--cut-ease-out) 2s forwards;
+    }
+
+    .cut-btn {
+      appearance: none;
+      border: 1px solid rgba(15, 15, 17, 0.12);
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(4px);
+      padding: 0.5rem 1rem;
+      font-family: inherit;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--cut-color-ink-soft);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .cut-btn:hover {
+      border-color: var(--cut-color-ink-muted);
+      color: var(--cut-color-ink);
+    }
+
+    .cut-btn:active {
+      transform: translateY(1px);
+    }
+
+    .cut-btn-primary {
+      border-color: var(--cut-color-ink-soft);
+      color: var(--cut-color-ink);
+    }
+
+    .cut-btn[aria-pressed="true"] {
+      background: var(--cut-color-ink);
+      color: #fff;
+      border-color: var(--cut-color-ink);
+    }
+
+    /* Responsive */
+    @media (max-width: 520px) {
+      body { padding: 1rem; }
+      .cut-version { padding: 1.5rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="cut-stage" role="region" aria-label="Changelog Theatre"></div>
+
+  <div class="cut-controls" id="cut-controls">
+    <button class="cut-btn" id="cut-btn-prev" aria-label="Previous version">← Prev</button>
+    <button class="cut-btn cut-btn-primary" id="cut-btn-play" aria-label="Play or pause">Play</button>
+    <button class="cut-btn" id="cut-btn-next" aria-label="Next version">Next →</button>
+    <button class="cut-btn" id="cut-btn-voice" aria-label="Toggle narration" aria-pressed="false">Voice</button>
+  </div>
+
+  <script src="src/parser.js"></script>
+  <script src="src/renderer.js"></script>
+  <script src="src/narrator.js"></script>
+  <script src="src/sequence.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      var stage = document.getElementById('cut-stage');
+      var btnPlay = document.getElementById('cut-btn-play');
+      var btnPrev = document.getElementById('cut-btn-prev');
+      var btnNext = document.getElementById('cut-btn-next');
+      var btnVoice = document.getElementById('cut-btn-voice');
+      var sequence = null;
+
+      // Default sample data for standalone demo
+      var sampleChangelog = [
+        '== Changelog ==',
+        '',
+        '= 3.2.0 (2024-06-15) =',
+        '* Added dark-mode support with system preference detection.',
+        '* Improved keyboard navigation across all admin screens.',
+        '* Fixed a race condition in batch export.',
+        '',
+        '= 3.1.0 (2024-04-02) =',
+        '* Redesigned the settings page with clearer hierarchy.',
+        '* Deprecated legacy API v1 endpoints.',
+        '* Updated bundled translations for 12 languages.',
+        '',
+        '= 3.0.0 (2024-01-10) =',
+        '* Complete rewrite of the rendering engine for 60 fps performance.',
+        '* Introduced block-based content model.',
+        '* Breaking change: dropped PHP 5.6 support.'
+      ].join('\n');
+
+      function mountChangelog(text) {
+        try {
+          var data = window.CutParser.parse(text);
+        } catch (err) {
+          window.CutRenderer.renderError(stage, err.message);
+          if (sequence) { sequence.stop(); sequence = null; }
+          return;
+        }
+
+        if (sequence) {
+          sequence.stop();
+        }
+
+        sequence = window.CutSequence.create(stage, data, {
+          versionDuration: 6000,
+          transitionDuration: 700,
+          autoAdvance: true,
+          onComplete: function () {
+            btnPlay.textContent = 'Replay';
+          },
+          onVersionStart: function () {
+            btnPlay.textContent = sequence && sequence.getIsPlaying() ? 'Pause' : 'Play';
+          }
+        });
+
+        sequence.play();
+        btnPlay.textContent = 'Pause';
+      }
+
+      function getChangelogFromQuery() {
+        var params = new URLSearchParams(window.location.search);
+        return params.get('changelog');
+      }
+
+      function getChangelogFromHash() {
+        var hash = window.location.hash;
+        if (hash.indexOf('#changelog=') === 0) {
+          try {
+            return decodeURIComponent(hash.substring(11));
+          } catch (e) {
+            return null;
+          }
+        }
+        return null;
+      }
+
+      // Listen for postMessage from parent (WordPress admin preview)
+      window.addEventListener('message', function (event) {
+        if (!event.data || typeof event.data !== 'object') return;
+        if (event.data.type === 'cut-changelog' && typeof event.data.text === 'string') {
+          mountChangelog(event.data.text);
+        }
+      });
+
+      // Controls
+      btnPlay.addEventListener('click', function () {
+        if (!sequence) return;
+        if (sequence.getIsPlaying()) {
+          sequence.pause();
+          btnPlay.textContent = 'Play';
+        } else {
+          sequence.play();
+          btnPlay.textContent = 'Pause';
+        }
+      });
+
+      btnPrev.addEventListener('click', function () {
+        if (!sequence) return;
+        sequence.prev();
+        btnPlay.textContent = sequence.getIsPlaying() ? 'Pause' : 'Play';
+      });
+
+      btnNext.addEventListener('click', function () {
+        if (!sequence) return;
+        sequence.next();
+        btnPlay.textContent = sequence.getIsPlaying() ? 'Pause' : 'Play';
+      });
+
+      btnVoice.addEventListener('click', function () {
+        var enabled = btnVoice.getAttribute('aria-pressed') === 'true';
+        var next = !enabled;
+        btnVoice.setAttribute('aria-pressed', next ? 'true' : 'false');
+        if (sequence) sequence.enableNarration(next);
+        window.CutNarrator.enable(next);
+      });
+
+      // Init
+      var incoming = getChangelogFromQuery() || getChangelogFromHash() || sampleChangelog;
+      mountChangelog(incoming);
+    })();
+  </script>
+</body>
+</html>

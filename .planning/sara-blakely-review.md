@@ -1,29 +1,42 @@
-- Two products, one file. Identity crisis. Pick one.
+# Sara Blakely Gut-Check
 
-**Verdict: Beam ships. Intelligence Suite sinks.**
+**Verdict:** Scrap the suite. Ship Beam. The rest is architecture theater.
 
-- **Beam** fixes a real moment of pain (hunting through WP admin menus). Free, fast, two files. Agencies talk.
-- **Intelligence Suite** is four plugins solving problems Google Docs, Notion, and Tidio already own. No one pays $99/year for static FAQ templates in 2026.
+---
 
-**Would a real customer pay?**
-- Beam: Indirectly, yes. Time = money for agencies.
-- Suite: No. Static widget with a 50-click cap is a countdown to uninstall. Honor-system licensing collects zero dollars. "No LLM in v1" kills the brand promise of "Intelligence."
+## Would a Customer Pay?
 
-**What's confusing / bounce-worthy:**
-- Four plugins on install. Shared-hosting users panic at one.
-- "Invisible gating." Translation: users can't see what they're missing. Conversion suicide.
-- Architecture porn everywhere. "PHP 5.6 compatibility," "three-plugin decoupled architecture." Built to impress devs, not buyers.
-- Zero mention of who the customer is. Restaurant owner? Freelancer? Agency? Different pains, different wallets.
+- Beam: Yes. Saves clicks. Cmd+K is muscle memory in Slack, Notion, WP admins want it.
+- WP Intelligence Suite: No. Static FAQ widget + team notes + agreement checklist = free plugins already exist. "$99/year for 50 static responses" is insulting when cost is zero.
+- Name promises "intelligence." Delivers hand-written HTML. Customer feels scammed.
 
-**30-second elevator pitch:**
-> "Beam is command-k for your WordPress admin. Hit a key, find any page, user, or setting in half a second. No setup."
+## What Makes Me Bounce
 
-**$0 marketing test:**
-- Post Beam in r/WordPress and agency Slack groups. "I built this because I was tired of 12 clicks to edit a user." Track downloads for 48 hours.
-- For the suite: call 10 local business owners. Ask what they do inside WordPress daily. If none say "I need an agreements tracker," kill it.
+- Two plans in one file. Total chaos. No focus.
+- "Invisible gating" = MBA speak. Customer sees broken features and a paywall.
+- Four plugins for basic CPTs? Over-engineered. Plugin fatigue is real.
+- Activation seeds 5 verticals but user runs one business. Cluttered.
+- "LocalGenius" with no AI or local data = false advertising.
+- Honor-system license key = you just gave away Pro for free. No revenue.
 
-**Retention hook:**
-- Beam: muscle memory. Use it twice, admin feels broken without it.
-- Suite: none. Static FAQs = set-and-forget. Notes export easily. Usage caps annoy, not addict.
+## 30-Second Elevator Pitch (Beam)
 
-**Bottom line:** Kill the suite. Ship Beam this weekend. Charge later only when people beg.
+> "Beam is Cmd+K for your WordPress admin. Hit a hotkey, find any post, page, user, or settings screen in under a second. No setup. Two files. Free."
+
+## $0 Marketing Test
+
+- Beam: Post GIF in WP Facebook groups / Twitter. "Cmd+K in WordPress." Let power users feel the speed. Word-of-mouth from agency devs.
+- WPIS: No demo-able "wow" moment. Static FAQ widget doesn't spread.
+
+## Retention Hook
+
+- Beam: Habit formation. Cmd+K becomes reflex. Hard to uninstall a keystroke.
+- WPIS: None. Static templates get stale. No network effect. No data gravity.
+
+## What I'd Actually Build
+
+1. Beam only. Two files. Ship today.
+2. Monetize Beam with team/activity analytics later — not static widgets.
+3. If you must do WPIS: one plugin, not four. Rename it. "Intelligence" requires actual smarts.
+
+**Bottom line:** Customer obsession means killing your darlings. Kill everything except Beam.
