@@ -1,10 +1,13 @@
 # Hindsight Report
-**Generated:** 2026-04-28T03:48:21.267Z
+**Generated:** 2026-04-28T04:07:40.367Z
 
 ## Summary
 Risk: HIGH. 15 high-churn files, 20 bug-associated files, 3 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- 984bb5f daemon: auto-commit 2 files
+- 13d9c48 Ship github-issue-sethshoultes-shipyard-ai-98: all deliverables + retrospective
+- ff7616a daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-98
 - e5950e2 daemon: auto-commit 2 files
 - 3f546ae Ship github-issue-sethshoultes-shipyard-ai-99: all deliverables + retrospective
 - fd73696 Add deploy-website.yml and complete todo checklist
@@ -12,13 +15,10 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 3 uncommitted changes.
 - be543c8 daemon: auto-commit 2 files
 - 5dbe58f Ship PAID-TEMPLATE: all deliverables + retrospective
 - 6dd1314 daemon: auto-commit after build phase for PAID-TEMPLATE
-- 9f597d8 website: wire up /pricing, /terms, /intake routes — corp-formation v0 marketing live
-- 5a9aea4 corp-formation v0: sales copy + ToS draft + paid-customer intake design
-- 4a6e06d daemon: auto-commit 1 files
 
 ## High-Churn Files
-- `.planning/sara-blakely-review.md` (65 changes)
-- `.daemon-queue.json` (62 changes)
+- `.planning/sara-blakely-review.md` (66 changes)
+- `.daemon-queue.json` (63 changes)
 - `.planning/phase-1-plan.md` (48 changes)
 - `.planning/REQUIREMENTS.md` (44 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
@@ -26,7 +26,7 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 3 uncommitted changes.
 - `website/src/app/layout.tsx` (11 changes)
 - `STATUS.md` (11 changes)
 - `website/src/app/work/page.tsx` (11 changes)
-- `.great-minds/hindsight-report.md` (9 changes)
+- `.great-minds/hindsight-report.md` (10 changes)
 - `plugins/membership/src/index.ts` (9 changes)
 - `rounds/finish-plugins/board-verdict.md` (9 changes)
 - `rounds/finish-plugins/decisions.md` (9 changes)
@@ -59,7 +59,7 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 3 uncommitted changes.
 ```
 M .daemon-queue.json
  M .great-minds/hindsight-report.md
- M .planning/sara-blakely-review.md
+ M pipeline/auto/cagan-dispatch-history.json
 ```
 
 ---
