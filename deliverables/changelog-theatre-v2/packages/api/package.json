@@ -1,0 +1,19 @@
+{
+  "name": "@changelog-theatre-v2/api",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "hono": "^4.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@cloudflare/workers-types": "^4.20240403.0",
+    "wrangler": "^3.50.0"
+  }
+}

@@ -1,0 +1,4 @@
+- Aria turns commit history into a short film. Developer is protagonist.
+- Recognition. Weight. "That was you. That mattered."
+- The voice. Emotional truth in narration. Without it, decoration.
+- Sacred minimalism. One button. Curtain drop.

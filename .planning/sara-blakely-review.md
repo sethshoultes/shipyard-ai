@@ -1,11 +1,17 @@
-Verdict: Necessary plumbing. Not a product. Customers won't pay for CI/CD, but they'll bounce if your site is stale.
+Verdict: Fix the plumbing. Not exciting, but silent gaps kill trust.
 
-- Customer pay? No. Backend infrastructure. Buyers don't see deploy pipelines. They see broken or stale websites. Fix it because it kills trust, not because it sells.
+- Customer pay? No. Customers buy outcomes, not CI pipelines. This is internal plumbing. Worth doing only because broken deploys silently erode team confidence.
 
-- Confusing? "Phase 1" implies revenue is coming. Where's the customer-facing win? Plan talks YAML and wrangler, not what the site does for humans. I'd bounce searching for the "so what."
+- Confusing / bounce points:
+  - "No hindsight report available" — jargon. Say "we don't know what broke last time."
+  - "N/A — infrastructure-only change" under verification. Wrong. Infrastructure is the product to the team. Test it.
+  - Four requirement IDs (DEPLOY-001 through 004) with no plain-English translation. Bounce.
 
-- Elevator pitch: "We were handcuffing our own updates. Every fix died on GitHub instead of reaching customers. Now one push to main puts changes live instantly."
+- 30-second elevator pitch:
+  Push to main, site goes live. No handoffs, no forgotten deploys. Website changes reach customers in minutes, not never.
 
-- $0 test: Push a tiny homepage copy change. Did it deploy? Does the live site reflect it? If yes, ship. If no, fix the secrets. No ads needed — just a commit.
+- $0 marketing test:
+  Change one character on the homepage. Push. Did it go live? That's the only metric.
 
-- Retention hook: None. This isn't sticky. It's a door hinge. It either works or it doesn't. Retention comes from what the website says and sells, not how it deploys.
+- Retention hook:
+  Invisibility. If the team stops thinking about deploys entirely, this wins.

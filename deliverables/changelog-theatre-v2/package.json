@@ -1,0 +1,19 @@
+{
+  "name": "changelog-theatre-v2",
+  "version": "1.0.0",
+  "description": "Aria — Turn commit history into cinema.",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "for f in tests/*.sh; do echo \"$f\"; \"$f\" || exit 1; done"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

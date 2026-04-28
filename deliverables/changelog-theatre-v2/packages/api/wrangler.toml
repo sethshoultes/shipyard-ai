@@ -1,0 +1,14 @@
+name = "changelog-theatre-api"
+main = "src/index.ts"
+compatibility_date = "2024-04-01"
+
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "aria-jobs"
+
+[[queues.producers]]
+binding = "JOB_QUEUE"
+queue = "aria-render-queue"
+
+[vars]
+API_BASE = "https://changelog-theatre-api.your-account.workers.dev"
