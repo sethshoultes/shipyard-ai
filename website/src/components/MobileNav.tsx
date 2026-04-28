@@ -4,11 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 
 const links = [
-  { href: "/services", label: "Services" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/work", label: "Work" },
   { href: "/about", label: "About" },
   { href: "/pipeline", label: "Pipeline" },
+  { href: "/blog", label: "Blog" },
   { href: "/chat", label: "Chat" },
-  { href: "/contact", label: "Start a Project" },
+  { href: "/intake", label: "Start a Project" },
 ];
 
 export function MobileNav() {
@@ -45,8 +47,8 @@ export function MobileNav() {
                 href={link.href}
                 onClick={() => setOpen(false)}
                 className={
-                  link.href === "/contact"
-                    ? "rounded-full bg-accent px-4 py-3 text-center text-sm font-semibold text-black transition hover:bg-accent-dim"
+                  link.href === "/intake"
+                    ? "rounded-full bg-accent px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-accent-dim"
                     : "text-sm font-medium text-muted transition hover:text-foreground"
                 }
               >
