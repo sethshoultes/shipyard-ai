@@ -43,8 +43,8 @@ function Header() {
           <img src="/logo.png" alt="Shipyard AI" className="h-12 w-12 rounded" width={48} height={48} /> Shipyard AI
         </Link>
         <div className="hidden items-center gap-8 text-sm font-medium text-muted sm:flex">
-          <Link href="/services" className="transition hover:text-foreground">
-            Services
+          <Link href="/pricing" className="transition hover:text-foreground">
+            Pricing
           </Link>
           <Link href="/work" className="transition hover:text-foreground">
             Work
@@ -59,7 +59,7 @@ function Header() {
             Chat
           </Link>
           <Link
-            href="/contact"
+            href="/intake"
             className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-dim"
           >
             Start a Project
@@ -78,9 +78,9 @@ function Footer() {
         <div className="text-sm text-muted">
           &copy; {new Date().getFullYear()} Shipyard AI. PRD in, production out.
         </div>
-        <div className="flex gap-6 text-sm text-muted">
-          <Link href="/services" className="transition hover:text-foreground">
-            Services
+        <div className="flex flex-wrap gap-6 text-sm text-muted">
+          <Link href="/pricing" className="transition hover:text-foreground">
+            Pricing
           </Link>
           <Link href="/work" className="transition hover:text-foreground">
             Work
@@ -94,8 +94,14 @@ function Footer() {
           <Link href="/chat" className="transition hover:text-foreground">
             Chat
           </Link>
+          <Link href="/intake" className="transition hover:text-foreground">
+            Start
+          </Link>
           <Link href="/contact" className="transition hover:text-foreground">
             Contact
+          </Link>
+          <Link href="/terms" className="transition hover:text-foreground">
+            Terms
           </Link>
         </div>
       </div>
