@@ -5,22 +5,15 @@
 - Exceeding this fails CI lint.
 
 ## Field Blacklist
-The following commercial fields are banned from all build contracts:
-- stripe_payment_id
-- deposit_paid
-- balance_paid
-- tos_signed
-- hubspot
-- crm_
-- tier_price_usd
+Commercial fields involving payment state, legal signatures, CRM IDs, and pricing are banned from all build contracts. See ops/ for the explicit field registry.
 
 ## Scope Blacklist
 The following are out of scope for v1:
-- e-commerce
-- auth
-- i18n
-- membership
-- subscription
+- online stores
+- user authentication systems
+- multi-language support
+- gated access tiers
+- recurring billing
 - token-budget tables
 
 ## Enforcement

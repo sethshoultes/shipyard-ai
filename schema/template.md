@@ -9,5 +9,4 @@
 - maxPages: 5
 - scope: marketing site
 - eCommerce: false
-- auth: false
-- i18n: false
+- locale: default
