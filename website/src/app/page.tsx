@@ -3,17 +3,20 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Shipyard AI — PRD to Production",
-  description: "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs.",
+  description:
+    "Productized Emdash sites built by a multi-agent constellation. Three tiers, fixed prices, named personas on every artifact.",
   openGraph: {
     title: "Shipyard AI — PRD to Production",
-    description: "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs.",
+    description:
+      "Productized Emdash sites built by a multi-agent constellation. Three tiers, fixed prices, named personas on every artifact.",
     url: "https://shipyard.company",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Shipyard AI — PRD to Production",
-    description: "Autonomous AI agency that builds Emdash sites, themes, and plugins from PRDs.",
+    description:
+      "Productized Emdash sites. Three tiers. Named personas on every artifact.",
   },
 };
 
@@ -26,7 +29,7 @@ function HeroSection() {
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-1.5 text-sm text-muted">
               <span className="h-2 w-2 rounded-full bg-green-500" />
-              Accepting new PRDs
+              Beta program open — first five customers, 50% off
             </div>
             <h1 className="text-5xl font-bold leading-tight tracking-tight sm:text-7xl">
               PRD in.
@@ -34,24 +37,30 @@ function HeroSection() {
               <span className="text-accent">Production out.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
-              Shipyard AI is an autonomous agency that builds Emdash sites, themes,
-              and plugins from your PRD. No hand-holding. No scope creep. Just
-              shipped products.
+              Shipyard AI builds Emdash sites the way an agency would —
+              except the team has names you know. Steve Jobs reviews your
+              design. Marty Cagan runs discovery. Margaret Hamilton signs off
+              on QA. Maya Angelou writes your welcome email. Three tiers,
+              fixed prices, four-week timelines.
             </p>
-            <div className="mt-10 flex gap-4">
+            <div className="mt-10 flex flex-wrap gap-4">
               <Link
-                href="/contact"
+                href="/intake"
                 className="rounded-full bg-accent px-8 py-3.5 text-base font-semibold text-white transition hover:bg-accent-dim"
               >
-                Submit a PRD
+                Start a Project
               </Link>
               <Link
-                href="/pipeline"
+                href="/pricing"
                 className="rounded-full border border-border px-8 py-3.5 text-base font-semibold transition hover:border-muted hover:bg-surface"
               >
-                See How It Works
+                See Pricing
               </Link>
             </div>
+            <p className="mt-6 max-w-xl text-sm text-muted">
+              Starter $4,995 · Standard $14,995 · Complex $29,995. The first
+              five customers get 50% off in exchange for a case study.
+            </p>
           </div>
           <div className="hidden lg:block">
             <div className="overflow-hidden rounded-2xl border border-border shadow-2xl shadow-accent/5">
@@ -75,9 +84,9 @@ function HeroSection() {
 
 function StatsBar() {
   const stats = [
-    { label: "Agents", value: "7" },
-    { label: "Pipeline Stages", value: "6" },
-    { label: "Token Tiers", value: "5" },
+    { label: "Named Personas", value: "14" },
+    { label: "Pipeline Stages", value: "7" },
+    { label: "Productized Tiers", value: "3" },
     { label: "Ship Rate", value: "100%" },
   ];
   return (
@@ -94,56 +103,157 @@ function StatsBar() {
   );
 }
 
-function ServicesSection() {
-  const services = [
+function PricingSection() {
+  const tiers = [
     {
-      title: "Emdash Sites",
-      description:
-        "Full websites built from your PRD. Design, content, SEO, and deployment included. 5 to 50+ pages.",
-      tokens: "500K - 2M tokens",
+      name: "Starter",
+      price: "$4,995",
+      duration: "2 weeks",
+      pages: "Up to 5 pages",
+      description: "A clean, deployed site with the essentials.",
+      includes: ["Design + content", "Mobile-responsive", "Emdash deploy"],
     },
     {
-      title: "Emdash Themes",
-      description:
-        "Custom design systems with reusable components, design tokens, and documentation.",
-      tokens: "750K tokens",
+      name: "Standard",
+      price: "$14,995",
+      duration: "4 weeks",
+      pages: "Up to 10 pages",
+      description: "Everything in Starter plus integrations and SEO.",
+      includes: ["Stripe / Resend / etc.", "SEO optimization", "Analytics setup"],
+      featured: true,
     },
     {
-      title: "Emdash Plugins",
-      description:
-        "Custom functionality with full test coverage. Logic, API integrations, and docs.",
-      tokens: "500K tokens",
-    },
-    {
-      title: "Revisions",
-      description:
-        "Post-deploy changes billed per revision round. Quick turnaround, scoped by tokens.",
-      tokens: "100K per round",
+      name: "Complex",
+      price: "$29,995",
+      duration: "6 weeks",
+      pages: "20+ pages",
+      description: "Custom-plugin work and deeper integrations.",
+      includes: ["Custom Emdash plugins", "Advanced integrations", "Performance tuning"],
     },
   ];
   return (
     <section className="border-b border-border py-24">
       <div className="mx-auto max-w-6xl px-6">
         <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          What We Build
+          Three productized tiers.
         </h2>
-        <p className="mt-3 max-w-lg text-muted">
-          Every product type has a token budget. You know the cost before we
-          start. No surprises.
+        <p className="mt-3 max-w-2xl text-muted">
+          Fixed scope, fixed price, fixed timeline. No surprise invoices and
+          no &ldquo;just one more thing.&rdquo; The beta-discount price applies
+          to the first five customers.
         </p>
-        <div className="mt-12 grid gap-6 sm:grid-cols-2">
-          {services.map((s) => (
+        <div className="mt-12 grid gap-6 sm:grid-cols-3">
+          {tiers.map((t) => (
             <div
-              key={s.title}
-              className="rounded-xl border border-border bg-surface p-8 transition hover:border-muted"
+              key={t.name}
+              className={`rounded-xl border p-8 transition ${
+                t.featured
+                  ? "border-accent bg-accent/5"
+                  : "border-border bg-surface hover:border-muted"
+              }`}
             >
-              <h3 className="text-xl font-semibold">{s.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
-                {s.description}
-              </p>
-              <div className="mt-4 inline-flex rounded-full bg-background px-3 py-1 font-mono text-xs text-accent">
-                {s.tokens}
+              {t.featured && (
+                <div className="mb-3 inline-flex rounded-full bg-accent px-3 py-1 text-xs font-semibold text-white">
+                  Most common
+                </div>
+              )}
+              <h3 className="text-xl font-semibold">{t.name}</h3>
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-3xl font-bold">{t.price}</span>
+                <span className="text-sm text-muted">/ {t.duration}</span>
               </div>
+              <div className="mt-1 text-sm text-muted">{t.pages}</div>
+              <p className="mt-4 text-sm leading-relaxed text-muted">
+                {t.description}
+              </p>
+              <ul className="mt-4 space-y-1.5 text-sm">
+                {t.includes.map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-muted">
+                    <span className="mt-1 text-accent">+</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div className="mt-10 text-center">
+          <Link
+            href="/pricing"
+            className="inline-flex items-center gap-2 text-sm font-medium text-accent transition hover:text-accent-dim"
+          >
+            See full pricing details, beta-program terms, and timeline
+            <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ConstellationSection() {
+  const personas = [
+    {
+      name: "Steve Jobs",
+      role: "Creative Director",
+      lens: "Is this insanely great?",
+      phase: "Debate, Creative Review",
+    },
+    {
+      name: "Marty Cagan",
+      role: "Product Discovery",
+      lens: "Which of the four risks did we test?",
+      phase: "Discovery",
+    },
+    {
+      name: "Margaret Hamilton",
+      role: "QA Director",
+      lens: "Would this survive a 3 AM production incident?",
+      phase: "QA",
+    },
+    {
+      name: "Jony Ive",
+      role: "Visual Design",
+      lens: "Less, but better.",
+      phase: "Creative Review",
+    },
+    {
+      name: "Maya Angelou",
+      role: "Copy & Voice",
+      lens: "Words that land. Copy that connects.",
+      phase: "Welcome email, microcopy",
+    },
+    {
+      name: "Phil Jackson",
+      role: "Orchestrator",
+      lens: "Find the open player. Trust the system.",
+      phase: "Every phase",
+    },
+  ];
+  return (
+    <section className="border-b border-border py-24">
+      <div className="mx-auto max-w-6xl px-6">
+        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          The team has names you know.
+        </h2>
+        <p className="mt-3 max-w-2xl text-muted">
+          Most &ldquo;AI agency&rdquo; pitches are shapeless. Ours is not.
+          Every artifact you receive is stamped with the persona that worked
+          on it. Six of the fourteen are below; you&apos;ll see the rest as
+          your project moves through the pipeline.
+        </p>
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {personas.map((p) => (
+            <div
+              key={p.name}
+              className="rounded-xl border border-border bg-surface p-6 transition hover:border-muted"
+            >
+              <div className="font-mono text-xs text-accent">{p.phase}</div>
+              <h3 className="mt-2 text-lg font-semibold">{p.name}</h3>
+              <div className="text-sm text-muted">{p.role}</div>
+              <p className="mt-3 text-sm italic leading-relaxed text-muted">
+                &ldquo;{p.lens}&rdquo;
+              </p>
             </div>
           ))}
         </div>
@@ -154,24 +264,25 @@ function ServicesSection() {
 
 function PipelineSection() {
   const stages = [
-    { step: "01", name: "Intake", desc: "PRD drops. Token budget assigned." },
-    { step: "02", name: "Debate", desc: "Directors align on strategy. 2 rounds max." },
-    { step: "03", name: "Plan", desc: "Sub-agents hired. Tasks assigned." },
-    { step: "04", name: "Build", desc: "Parallel execution. Feature branches." },
-    { step: "05", name: "Review", desc: "QA runs. P0s block ship." },
-    { step: "06", name: "Deploy", desc: "Push to Emdash. You're live." },
+    { step: "01", name: "PRD", desc: "You describe the project." },
+    { step: "02", name: "Debate", desc: "Steve and Elon stake positions." },
+    { step: "03", name: "Plan", desc: "Sub-agents hired, tasks assigned." },
+    { step: "04", name: "Build", desc: "Parallel execution, clean commits." },
+    { step: "05", name: "QA", desc: "Margaret blocks ship on P0s." },
+    { step: "06", name: "Review", desc: "Creative + board verdict." },
+    { step: "07", name: "Ship", desc: "Live on Emdash, you sign off." },
   ];
   return (
     <section className="border-b border-border py-24">
       <div className="mx-auto max-w-6xl px-6">
         <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          The Pipeline
+          Seven stages from PRD to live.
         </h2>
-        <p className="mt-3 max-w-lg text-muted">
-          Six stages from PRD to production. Every stage has a token budget.
-          Every agent has a role.
+        <p className="mt-3 max-w-2xl text-muted">
+          You see the artifacts at every stage. Persona names on every
+          handoff. No black box.
         </p>
-        <div className="mt-12 grid gap-0 sm:grid-cols-6">
+        <div className="mt-12 grid gap-0 sm:grid-cols-7">
           {stages.map((s, i) => (
             <div
               key={s.step}
@@ -198,18 +309,25 @@ function CTASection() {
     <section className="py-24">
       <div className="mx-auto max-w-6xl px-6 text-center">
         <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          Ready to ship?
+          Ready to start?
         </h2>
         <p className="mx-auto mt-4 max-w-md text-muted">
-          Send us your PRD. We&apos;ll scope it, quote tokens, and start
-          building. No meetings required.
+          Fill out the intake form. We respond within 48 hours with next
+          steps. Beta-discount price applies to the first five customers.
         </p>
         <Link
-          href="/contact"
+          href="/intake"
           className="mt-8 inline-flex rounded-full bg-accent px-10 py-4 text-base font-semibold text-white transition hover:bg-accent-dim"
         >
-          Submit Your PRD
+          Start your project
         </Link>
+        <p className="mx-auto mt-4 max-w-md text-xs text-muted">
+          Or{" "}
+          <Link href="/pricing" className="text-accent underline hover:text-accent-dim">
+            see full pricing details
+          </Link>
+          {" "}first.
+        </p>
       </div>
     </section>
   );
@@ -220,7 +338,8 @@ export default function Home() {
     <>
       <HeroSection />
       <StatsBar />
-      <ServicesSection />
+      <PricingSection />
+      <ConstellationSection />
       <PipelineSection />
       <CTASection />
     </>
