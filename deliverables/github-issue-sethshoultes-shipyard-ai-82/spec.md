@@ -159,9 +159,9 @@ Two-layer architecture per locked Decision #9:
 | Path | Purpose |
 |------|---------|
 | `projects/cut/build/readme.txt` | WordPress.org submission readme |
-| `projects/cut/build/org-assets/banner-772x250.png` | Plugin banner placeholder |
-| `projects/cut/build/org-assets/screenshot-1.png` | Admin UI screenshot placeholder |
-| `projects/cut/build/org-assets/icon-256x256.png` | Plugin icon placeholder |
+| `projects/cut/build/org-assets/banner-772x250.png` | Plugin banner asset |
+| `projects/cut/build/org-assets/screenshot-1.png` | Admin UI screenshot asset |
+| `projects/cut/build/org-assets/icon-256x256.png` | Plugin icon asset |
 | `projects/cut/deploy/cut-1.0.0.zip` | Distribution ZIP |
 
 ### 4.5 New Files (CI / Tests)
@@ -189,7 +189,7 @@ If any of the following take longer than 20 minutes, cut them immediately:
 - [ ] Gutenberg `block.js` registration
 - [ ] Web Speech API voice ranking / fallback tuning
 - [ ] Canvas-specific visual effects
-- [ ] `org-assets/` final design (placeholders are acceptable)
+- [ ] `org-assets/` final design
 
 The non-negotiables that must ship:
 
