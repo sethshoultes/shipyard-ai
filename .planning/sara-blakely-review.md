@@ -1,10 +1,11 @@
-Verdict: Real problem, bloated plan. Strip the process theater.
+Verdict: Necessary plumbing. Not a product. Customers won't pay for CI/CD, but they'll bounce if your site is stale.
 
-- No customer pays for deploy scripts. Necessary plumbing, not a product.
-- "Wave 1," "DEPLOY-001," "structural gap." Jargon hides a simple issue: pushes don't go live.
-- No mention of what the website does. Can't obsess over customers if you won't name them.
-- Elevator pitch: "Website changes aren't reaching users. This auto-deploys them." (10 words)
-- $0 test: Push a one-word homepage edit. Live in <3 minutes? Pass. Otherwise debug.
-- No retention hook. It's plumbing. Goal: zero-thought reliability.
-- "commit-dirty" with no rollback is reckless. Add a staging gate or accept you'll break production.
-- Scrap the 150-line plan. Deploy the YAML, test it, document the rollback. Done.
+- Customer pay? No. Backend infrastructure. Buyers don't see deploy pipelines. They see broken or stale websites. Fix it because it kills trust, not because it sells.
+
+- Confusing? "Phase 1" implies revenue is coming. Where's the customer-facing win? Plan talks YAML and wrangler, not what the site does for humans. I'd bounce searching for the "so what."
+
+- Elevator pitch: "We were handcuffing our own updates. Every fix died on GitHub instead of reaching customers. Now one push to main puts changes live instantly."
+
+- $0 test: Push a tiny homepage copy change. Did it deploy? Does the live site reflect it? If yes, ship. If no, fix the secrets. No ads needed — just a commit.
+
+- Retention hook: None. This isn't sticky. It's a door hinge. It either works or it doesn't. Retention comes from what the website says and sells, not how it deploys.
