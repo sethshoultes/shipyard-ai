@@ -1,10 +1,12 @@
 # Hindsight Report
-**Generated:** 2026-04-28T14:41:10.734Z
+**Generated:** 2026-04-28T15:08:54.102Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 4 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 3 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- 8b8d2fb daemon: auto-commit 2 files
+- eddee43 daemon: auto-commit after build phase for whisper-blocks-v2
 - 6653337 daemon: auto-commit 2 files
 - fc302ee Ship changelog-theatre-v2: all deliverables + retrospective
 - 74fe863 daemon: auto-commit after build phase for changelog-theatre-v2
@@ -13,18 +15,16 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 4 uncommitted changes.
 - ff7f3a9 daemon: auto-commit 3 files
 - dd1cd4d daemon: auto-commit 2 files
 - 529ace9 daemon: auto-commit 1 files
-- a93aaac daemon: auto-commit 1 files
-- 7591f7b daemon: auto-commit 1 files
 
 ## High-Churn Files
-- `.daemon-queue.json` (76 changes)
-- `.planning/sara-blakely-review.md` (67 changes)
+- `.daemon-queue.json` (77 changes)
+- `.planning/sara-blakely-review.md` (68 changes)
 - `.planning/phase-1-plan.md` (48 changes)
 - `.planning/REQUIREMENTS.md` (44 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (14 changes)
-- `.great-minds/hindsight-report.md` (12 changes)
+- `.great-minds/hindsight-report.md` (13 changes)
 - `website/src/app/layout.tsx` (11 changes)
 - `STATUS.md` (11 changes)
 - `website/src/app/work/page.tsx` (11 changes)
@@ -60,7 +60,6 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 4 uncommitted changes.
 M .daemon-queue.json
  M .great-minds/hindsight-report.md
  M .planning/sara-blakely-review.md
-?? rounds/whisper-blocks-v2/
 ```
 
 ---
