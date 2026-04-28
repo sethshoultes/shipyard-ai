@@ -1,37 +1,43 @@
-import { NextRequest, NextResponse } from "next/server";
-
 /**
  * POST /api/intake
  *
- * Receives a paid-customer intake submission and emails it to the operator
- * via Resend. v0 implementation per DHH's flow design at
- * website/intake/intake-flow.md.
+ * Cloudflare Pages Function. Receives a paid-customer intake submission
+ * and emails it to the operator via Resend. Sits beside the static Next.js
+ * export — Next can't host server routes when output: "export" is set.
  *
- * Env vars (set in Cloudflare Pages):
+ * Env vars (set in Cloudflare Pages → Settings → Environment variables):
  *   RESEND_API_KEY       — required to send. If unset, the route logs and
  *                          returns success so the form still works in dev.
  *   INTAKE_FROM_EMAIL    — sender. Default: "Shipyard <onboarding@resend.dev>"
- *                          (Resend's sandbox sender; only delivers to the
- *                          account owner's verified email until you verify a
- *                          domain like shipyard.company).
+ *                          (Resend's sandbox; only delivers to the account
+ *                          owner's verified email until you verify a domain
+ *                          like shipyard.company in Resend).
  *   INTAKE_TO_EMAIL      — recipient. Default: seth@caseproof.com.
- *
- * NOT in v0: signed webhooks, retry queue, customer dashboard, Stripe.
- * Deferred until the first 5 customers tell us what's needed.
  */
 
-export const runtime = "edge";
+interface Env {
+  RESEND_API_KEY?: string;
+  INTAKE_FROM_EMAIL?: string;
+  INTAKE_TO_EMAIL?: string;
+}
+
+interface Context {
+  request: Request;
+  env: Env;
+}
 
 interface IntakePayload {
   [key: string]: string | string[] | undefined;
 }
 
 function slugify(input: string): string {
-  return input
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60) || "untitled";
+  return (
+    input
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60) || "untitled"
+  );
 }
 
 function escapeHtml(input: string): string {
@@ -90,33 +96,34 @@ function buildEmailHtml(data: IntakePayload, summary: string): string {
   `;
 }
 
-export async function POST(req: NextRequest) {
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "content-type": "application/json" },
+  });
+}
+
+export const onRequestPost = async ({ request, env }: Context) => {
   let data: IntakePayload;
   try {
-    data = (await req.json()) as IntakePayload;
+    data = (await request.json()) as IntakePayload;
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return json({ error: "Invalid JSON body" }, 400);
   }
 
   if (!data.email || !data.name || !data.tier) {
-    return NextResponse.json(
-      { error: "Missing required fields: name, email, tier" },
-      { status: 400 }
-    );
+    return json({ error: "Missing required fields: name, email, tier" }, 400);
   }
   if (data.ack_deposit !== "yes" || data.ack_terms !== "yes") {
-    return NextResponse.json(
-      { error: "Both acknowledgements (deposit, terms) are required." },
-      { status: 400 }
-    );
+    return json({ error: "Both acknowledgements (deposit, terms) are required." }, 400);
   }
 
   const slug = `${slugify(String(data.name))}-${Date.now().toString(36)}`;
   const summary = summarizeForOperator(data);
 
-  const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.INTAKE_FROM_EMAIL || "Shipyard <onboarding@resend.dev>";
-  const toEmail = process.env.INTAKE_TO_EMAIL || "seth@caseproof.com";
+  const apiKey = env.RESEND_API_KEY;
+  const fromEmail = env.INTAKE_FROM_EMAIL || "Shipyard <onboarding@resend.dev>";
+  const toEmail = env.INTAKE_TO_EMAIL || "seth@caseproof.com";
 
   if (apiKey) {
     try {
@@ -149,5 +156,9 @@ export async function POST(req: NextRequest) {
     console.log(summary);
   }
 
-  return NextResponse.json({ ok: true, slug, received_at: new Date().toISOString() });
-}
+  return json({ ok: true, slug, received_at: new Date().toISOString() });
+};
+
+export const onRequest = async ({ request }: Context) => {
+  return json({ error: `Method ${request.method} not allowed` }, 405);
+};
