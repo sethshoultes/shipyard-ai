@@ -1,0 +1,31 @@
+name = "clipcraft-backend-v2"
+main = "src/index.ts"
+compatibility_date = "2024-04-19"
+
+[[r2_buckets]]
+binding = "RENDER_OUTPUT"
+bucket_name = "RENDER_OUTPUT"
+
+[[r2_buckets]]
+binding = "RENDER_CACHE"
+bucket_name = "RENDER_CACHE"
+
+[[queues.producers]]
+binding = "RENDER_QUEUE"
+queue = "RENDER_QUEUE"
+
+[[queues.consumers]]
+queue = "RENDER_QUEUE"
+max_batch_size = 10
+max_batch_timeout = 30
+
+[[d1_databases]]
+binding = "RENDER_DB"
+database_name = "RENDER_DB"
+database_id = "00000000-0000-0000-0000-000000000000"
+
+[vars]
+R2_PUBLIC_URL = ""
+
+# Secrets (set via wrangler secret put):
+# OPENAI_API_KEY
