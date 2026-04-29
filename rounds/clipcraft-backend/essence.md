@@ -1,5 +1,6 @@
-Dead text into living film. Paste a URL. Receive a movie.
+# Essence
 
-- **Feeling:** You performed magic. Not scheduled a job.
-- **Must be perfect:** Output makes them feel *creative*. Not productive.
-- **Direction:** Invisible machinery. Visible wonder.
+- Dead text into living breath.
+- Feeling: awe you don't explain.
+- The render. Everything else is noise.
+- Direction: strip to the miracle.

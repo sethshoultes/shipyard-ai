@@ -1,53 +1,56 @@
-# Steve's Verdict
+# Steve Jobs — Design & Brand Review
+## Round 1
 
-## Product Naming
-**ClipCraft is a scrapbooking store. Reel is Meta's. Both die today.**
-This product takes dead text and breathes life into it.
-It needs a ONE-SYLLABLE proper noun you can verb.
-Call it **FLINT**.
-Strike it, content ignites.
-If I hear one more camelCase compound glued together by a committee, I'll scream.
+### Product Naming
+"ClipCraft" is dead on arrival.
+It sounds like a pliers set from Home Depot — utilitarian, forgettable, two words Frankensteined together.
+The codename was **Reel**.
+One word. Four letters. One syllable.
+That's the name.
+We don't describe what we do; we own the category.
+Reel. It reels people in.
+That's poetry and function in perfect collision.
 
-## Design Philosophy
-Technology should be invisible—like a lens, not a camera.
-The user doesn't care about your Cloudflare Queue or your Remotion pipeline.
-They care that their blog post just *became* a movie.
-Make the machinery disappear.
-If there's a "render job" anywhere in the UX, you've already failed.
-Insanely great means the user feels like they performed magic, not IT.
+### Design Philosophy
+This is not a video tool. This is a magic trick.
+You drop in a URL — a blob of static text — and ninety seconds later you hold cinema in your hand.
+Insanely great means the user never, ever sees the plumbing.
+No queues, no render configs, no "output presets," no tabs.
+The interface is a field, a button, and destiny.
+If the machine is doing the work, the human should feel like it happened by telepathy.
 
-## First 30 Seconds
-Paste URL. Breathe. Watch. That's it.
-No dashboards.
-No "job status" pages with progress bars masquerading as value.
-We show a living preview that blooms in real-time,
-like a Polaroid developing in your palm.
-If the video isn't dancing in under three taps, burn it and start over.
+### The First 30 Seconds
+You paste a link. The button pulses with life.
+The moment you press it, the entire world narrows to a single breath — a progress indicator that feels organic, not bureaucratic.
+Then the reveal: your words, spoken with gravity, moving with intent, shareable with a tap.
+If the first thirty seconds feels like configuring a printer, we have failed.
+It must feel like the first time your finger touched an iPod scroll wheel and the list moved like water — instant, fluid, inevitable.
 
-## Brand Voice
-We don't "leverage AI stacks."
-We don't "optimize workflows."
-We speak like a confident friend who just handed you the keys to a sports car.
-Short sentences. No jargon. No exclamation-point desperation.
-When something works, we say "Boom."
-When it doesn't, we fix it before the user notices.
+### Brand Voice
+We speak with the certainty of someone who already knows the answer.
+No "leverage our platform." No "streamline your content workflow." No acronyms. No explaining.
+We say: *"Your blog is asleep. Reel wakes it up."*
+We are not a B2B SaaS utility.
+We are a creative superpower wearing a t-shirt, not a tie.
+Confidence is quiet. Mediocrity is loud. We choose quiet.
 
-## What to Say NO To
-NO to "vertical vs horizontal" toggles in the interface—
-pick the format for them based on the content and be right.
-NO to settings panels.
-NO to "retry" buttons.
-NO to exposing job IDs, queue depths, cache invalidation, or idempotency keys.
-Simplicity is the ultimate sophistication,
-and sophistication means murdering your darlings.
-If you need a documentation page to explain it, it's dead.
+### What to Say NO To
+NO to timelines and trim tools. If they want to edit, let them buy Final Cut Pro.
+NO to voice-selection menus — we choose the voice, they choose the idea.
+Great taste is our job, not theirs.
+NO to horizontal default; vertical is the native tongue of the human hand.
+NO to AWS. No Redis. No "fallback VPS."
+Pick Cloudflare, commit completely, and make it sing.
+NO to a public gallery v2 distraction until the core miracle makes people gasp.
+Cache is backstage, not front-of-house.
+Simplicity isn't lack of features — it's the discipline to remove the ones that don't serve the magic.
 
-## The Emotional Hook
-People will love this because it makes them feel *creative*.
-Not productive—creative.
-Anyone can paste a link,
-but watching your words dance with voice and motion?
-That's alchemy.
-That's the moment we sell.
-Not "content repurposing"—
-*giving your ideas a pulse.*
+### The Emotional Hook
+Every person who has ever written a blog post secretly wishes they were a filmmaker.
+Reel grants that wish in ninety seconds.
+Hearing your own words given voice, motion, and light — that's not productivity, that's **delight**.
+That's the thing you grab your spouse's arm to show.
+That's the screenshot that flies across Slack without explanation.
+We aren't building a render pipeline.
+We are manufacturing moments of wonder.
+And wonder is the only marketing that ever mattered.
