@@ -27,7 +27,12 @@ $general_email = ! empty( $options['relay_general_email'] ) ? $options['relay_ge
 					<label for="relay_api_key"><?php esc_html_e( 'Claude API Key', 'relay' ); ?></label>
 				</th>
 				<td>
-					<input type="password" id="relay_api_key" name="relay_options[relay_api_key]" value="" placeholder="<?php echo $api_key ? esc_attr__( 'Key saved (enter to change)', 'relay' ) : ''; ?>" class="regular-text" />
+					<input type="password" id="relay_api_key" name="relay_options[relay_api_key]" value="" class="regular-text" />
+					<?php if ( $api_key ) : ?>
+						<p class="description" style="color:#22c55e;">
+							<?php esc_html_e( 'Key saved. Enter a new key above to replace it.', 'relay' ); ?>
+						</p>
+					<?php endif; ?>
 					<p class="description">
 						<?php esc_html_e( 'Your API key is encrypted at rest. You can also define RELAY_API_KEY in wp-config.php.', 'relay' ); ?>
 					</p>

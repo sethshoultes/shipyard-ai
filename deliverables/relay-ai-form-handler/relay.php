@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: Relay
- * Plugin URI:  https://example.com/relay
+ * Plugin URI:  https://shipyard.ai/relay
  * Description: AI Form Handler & Lead Router
  * Version:     1.0.0
  * Author:      Shipyard AI
- * Author URI:  https://example.com
+ * Author URI:  https://shipyard.ai
  * Text Domain: relay
  * Domain Path: /languages
  * Requires PHP: 7.4
