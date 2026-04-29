@@ -1,25 +1,19 @@
-# Round 1 Review: Changelog Theatre
+# Elon — Round 1 Review: Changelog Theatre
 
 ## Architecture
-The PRD says "WordPress plugin" + "Remotion." This is nonsensical. Remotion is a Node.js/React rendering engine. WordPress is PHP. You cannot run Remotion inside a WordPress plugin without a separate Node service, which means every user needs their own video infrastructure—or you need a SaaS render farm. The simplest system that could work is **not video at all.** It is animated HTML/CSS changelog pages rendered client-side, optionally screenshotted. If video is mandatory, the architecture is a headless Node API that accepts text and returns an MP4. But that is a separate product, not a WordPress plugin.
+A WordPress plugin running Remotion is architecturally insane. Remotion needs Node.js, React, and FFmpeg. WordPress is PHP on shared hosts with 30-second timeouts and 128 MB memory limits. The simplest system that works: a SaaS web app. Paste changelog text → Remotion Lambda renders → returns an MP4. If WordPress integration is mandatory, make it a 20-line PHP iframe wrapper. Nothing more.
 
 ## Performance
-Bottleneck: video rendering. A 30-second Remotion render takes 30–90 seconds of CPU time. One user generating a changelog blocks a full CPU core. At 10 concurrent users, you need 10 cores. At 100x, you need a render farm or AWS Lambda costs explode. The 10x path is to **eliminate server-side rendering entirely.** Use browser-native animations + Web Speech API. If it must be shareable video, generate a lightweight WebM via Canvas capture in the browser—not on your server.
+The bottleneck is video rendering, not TTS. A 30-second Remotion render on Lambda costs $0.03–0.08 and takes 20–45 seconds. The 10x path is aggressive deduplication—identical changelog hashes skip re-rendering entirely—and pre-rendered motion backgrounds with lightweight text compositing overlaid on top.
 
 ## Distribution
-"WordPress.org plugin directory, Product Hunt, indie hacker communities." This is hope, not a strategy. Product Hunt gives you a one-day traffic spike and zero retention. WordPress plugin developers are famously price-sensitive; the free-to-paid conversion rate on wp.org is ~0.5%. To reach 10,000 users without paid ads, you need organic shareability: the output (the changelog) must be so visually compelling that *end users* share it, creating demand-pull on developers. A 30-second video about a bugfix does not go viral. Cut the ego. Solve distribution first.
+WordPress.org and Product Hunt are organic graveyards. "Indie hacker communities" is hand-waving. There are ~50,000 WordPress plugins; maybe 3,000 have actively releasing developers. To reach 10,000 users without paid ads, you need viral mechanics: watermark free videos with your branding, make them one-click shareable on X/Twitter. Target agencies managing 10+ plugins—one signup equals ten videos, not one.
 
 ## What to CUT
-- **Remotion.** Overkill. CSS animations are 100x cheaper and instant.
-- **TTS narration.** Nobody asked for a robot to read a changelog. It adds latency, cost, and cringe.
-- **Video generation.** This is a v2 feature masquerading as v1. A beautiful, animated, auto-generated HTML changelog page is the real MVP. Video is a power-user export.
-- **The WordPress plugin framing.** If the core value is visual changelogs, build a SaaS that works for any platform (npm, GitHub Releases, WordPress). Walled gardens limit TAM.
+Cut the WordPress plugin entirely for v1. Cut auto-parsing of readme.txt—there is no standard format, so you will burn 40% of your session on regex hell. Cut "animated release pages"—developers want MP4s for social media, not HTML embeds. Cut multi-language TTS and voice customization. v1: paste text, pick one voice, get a 30-second MP4.
 
 ## Technical Feasibility
-**No.** "One session buildable" is delusional. Building a WordPress plugin with admin UI, parser for readme.txt/changelog formats, a Remotion render pipeline, TTS integration, video storage, and delivery is at minimum 3–4 distinct engineering domains. A single agent session could build a polished animated HTML changelog page. That is it. Everything else is a weekend of infrastructure work.
+"One session buildable" is fantasy if you include a WordPress plugin. Remotion + TTS + web UI + deployment is already 6–8 hours of tight work. Adding PHP, WP admin pages, and readme parsing pushes it to 12–15 hours. One agent session? No. Strip the WordPress layer and it is borderline—one long session for a janky but working SaaS MVP.
 
 ## Scaling
-At 100x usage, server-side video rendering breaks economically before it breaks technically. Assume 1 minute of render time per changelog. 1,000 plugins generating monthly changelogs = 1,000 CPU-minutes/month. That is fine. But if usage scales to 10,000 daily renders, you are burning thousands of dollars in compute for a free/cheap plugin. The model is unsustainable unless you charge per render or move rendering to the client. **Client-side generation scales infinitely; server-side generation scales linearly with your AWS bill.**
-
-## Verdict
-The insight—making changelogs delightful—is correct. The execution—video, TTS, Remotion, WordPress plugin—is heavy, slow, and expensive. Build a lightweight SaaS that turns changelog text into beautiful, animated HTML pages. Add video export later, if ever.
+At 100x usage, the WordPress plugin architecture collapses immediately. Shared hosts lack Node, FFmpeg, and memory. Even serverless scales linearly: 1,000 users × 4 videos/month × $0.05 = $200/month compute, which is fine, but video storage on S3 balloons fast. The real breakage is architectural. Fix that first, or you have no scaling story.
