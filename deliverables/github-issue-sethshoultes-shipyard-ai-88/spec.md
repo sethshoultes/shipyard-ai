@@ -57,7 +57,7 @@
 6. Transcript renderer emits semantic HTML with `data-start` timestamps. Click handler seeks audio element.
 
 ### 2.5 Monetization & Metering
-- License key validation (architecture TBD: self-hosted, WooCommerce, or Freemius).
+- Self-hosted license key validation via `class-license.php`. Keys are generated as UUIDv4 strings by the plugin author, stored in a remote JSON endpoint, and validated over HTTPS on a weekly basis with a local 7-day grace period to handle offline sites. Free tier enforcement (60 min/month) is checked locally against site option `_scribe_usage_minutes` and reset on the first of each month.
 - Per-minute usage counter stored in site options.
 - Hard cap at 60 min/month for free tier. Paywall is usage-cap, not watermark/scar.
 

@@ -74,7 +74,7 @@ class Scribe_Library {
 			<p&gt;<?php echo esc_html( sprintf( __( '%1$d transcripts — %2$d total minutes processed', 'scribe' ), $count, $total_minutes ) ); ?&gt;</p&gt;
 			<form method="get"&gt;
 				<input type="hidden" name="page" value="scribe-library" /&gt;
-				<input type="text" name="s" value="<?php echo esc_attr( isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '' ); ?&gt;" placeholder="<?php esc_attr_e( 'Search...', 'scribe' ); ?&gt;" /&gt;
+				<input type="text" name="s" value="<?php echo esc_attr( isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '' ); ?&gt;" placeholder="<?php esc_attr_e( 'Search transcripts by post title...', 'scribe' ); ?&gt;" /&gt;
 				<?php wp_nonce_field( 'scribe_library_search', 'scribe_library_nonce' ); ?&gt;
 				<?php submit_button( __( 'Filter', 'scribe' ), 'secondary', '', false ); ?&gt;
 			</form&gt;
