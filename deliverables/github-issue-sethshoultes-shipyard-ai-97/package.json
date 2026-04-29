@@ -1,0 +1,12 @@
+{
+  "name": "verify-routes",
+  "version": "1.0.0",
+  "description": "Pre-build CI gate that stops phantom Edge routes in Next.js static export",
+  "scripts": {
+    "build:check": "tsx scripts/verify-routes.ts",
+    "test": "node --import tsx --test tests/**/*.test.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
+  }
+}

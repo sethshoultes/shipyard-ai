@@ -1,30 +1,30 @@
 # Hindsight Report
-**Generated:** 2026-04-29T19:21:39.165Z
+**Generated:** 2026-04-29T21:24:25.652Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 9 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 4 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- f6ed0de daemon: auto-commit 2 files
+- ecda65e Ship github-issue-sethshoultes-shipyard-ai-88: all deliverables + retrospective
+- c4b0bfb Fix placeholder content flagged in QA pass 2
+- 50e7fc4 daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-88
 - 2f131ba daemon: auto-commit 16 files
 - e26524c plugins-v1: KILL — archive per Cagan decision (2026-04-27); stops BLACK escalation loop
 - 7d74bf0 daemon: auto-commit 1 files
 - 6143d87 daemon: auto-commit 3 files
 - 5f73878 daemon: auto-commit 1 files
 - bf09c3f daemon: auto-commit 6 files
-- 1a2dbf9 website: wire check-static-export into prebuild script (closes #97)
-- 31c9227 daemon: auto-commit 2 files
-- 6a1eb9b daemon: auto-commit after build phase for clipcraft-backend
-- 9f97ef4 daemon: auto-commit 2 files
 
 ## High-Churn Files
-- `.daemon-queue.json` (108 changes)
-- `.planning/sara-blakely-review.md` (72 changes)
+- `.daemon-queue.json` (109 changes)
+- `.planning/sara-blakely-review.md` (73 changes)
 - `.planning/phase-1-plan.md` (49 changes)
 - `.planning/REQUIREMENTS.md` (46 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
-- `.great-minds/hindsight-report.md` (18 changes)
+- `.great-minds/hindsight-report.md` (19 changes)
 - `HEARTBEAT.md` (13 changes)
 - `website/src/app/layout.tsx` (11 changes)
 - `STATUS.md` (11 changes)
@@ -34,6 +34,8 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 9 uncommitted changes.
 - `rounds/finish-plugins/decisions.md` (9 changes)
 
 ## Bug-Associated Files
+- `deliverables/github-issue-sethshoultes-shipyard-ai-88/includes/class-library.php`
+- `deliverables/github-issue-sethshoultes-shipyard-ai-88/spec.md`
 - `prds/changelog-theatre-v2.md`
 - `prds/clipcraft-backend-v2.md`
 - `prds/whisper-blocks-v2.md`
@@ -52,20 +54,13 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 9 uncommitted changes.
 - `STATUS.md`
 - `TASKS.md`
 - `rounds/membership-production-fix/qa-pass-1.md`
-- `rounds/membership-production-fix/retrospective.md`
-- `deliverables/membership-production-fix/sandbox-entry.ts`
 
 ## Uncommitted State
 ```
 M .daemon-queue.json
  M .great-minds/hindsight-report.md
  M .planning/sara-blakely-review.md
- M rounds/github-issue-sethshoultes-shipyard-ai-88/decisions.md
- M rounds/github-issue-sethshoultes-shipyard-ai-88/essence.md
- M rounds/github-issue-sethshoultes-shipyard-ai-88/round-1-elon.md
- M rounds/github-issue-sethshoultes-shipyard-ai-88/round-1-steve.md
- M rounds/github-issue-sethshoultes-shipyard-ai-88/round-2-elon.md
- M rounds/github-issue-sethshoultes-shipyard-ai-88/round-2-steve.md
+?? rounds/github-issue-sethshoultes-shipyard-ai-97/
 ```
 
 ---
