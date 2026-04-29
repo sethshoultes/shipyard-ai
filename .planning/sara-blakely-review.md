@@ -1,26 +1,22 @@
-# Sara Blakely Gut-Check
-## Verdict
-Not ready. Building too much before proving pain is worth paying for.
-## Would a Real Customer Pay?
-- Maybe. CF7 already routes emails free.
-- Claude API = ongoing cost TO customer. Shared hosting crowd is cheap.
-- No pricing model. Freemium? SaaS? Bounce.
-## What's Confusing / Bounce-Worthy
-- Name "Relay" means nothing. Sounds like a server tool.
-- "Steve Jobs called 'reason to survive'" — cringe. Delete.
-- 4 waves, 9 tasks. Architecting, not selling.
-- CPT + taxonomies + cron cleanup for MVP? Overbuilt.
-- WP Cron on Bluehost dies. Plan admits it. Still ships it.
-## 30-Second Pitch
-> "Relay reads your contact form submissions with AI and sends hot sales leads to the right inbox before they go cold."
-## First $0 Test
-- Find 5 agency owners in Facebook groups with "inbox dread."
-- Install free. Did it catch a lead they'd have missed?
-- No "holy shit" in week 1 = kill it.
-## Retention Hook
-- Weekly "almost missed" digest. Money counter: "$X leads saved."
-- Right now? No hook. Just another admin screen.
-## Bottom Line
-- Cut Waves 2-4. Ship form capture + AI classify + email forward in 1 week.
-- If 10 people don't beg to keep it, pivot.
-- Stop decorating. Start validating.
+**Verdict:** Over-engineered. Building a feature, not fixing a scream.
+
+**Would they pay?**
+Agency owner drowning in contact-form spam might pay $9/mo. But this talks to architects, not owners. No pricing. No customer quote. No proof the pain costs money.
+
+**What's confusing / bounce-worthy:**
+- "Steve Jobs called it the reason to survive" — instant cringe. Delete.
+- "Async UX = Dead Lead Gap" buried in risks. If magic takes 5 min, it isn't magic.
+- CPT, wp_remote_post, WP Cron — 90% plumbing, 10% payoff.
+- "Phil Jackson tie-breaker" — who? Bounce.
+
+**30-second elevator pitch:**
+"Your website forms dump everything into one inbox. Hot leads rot next to spam. Relay reads each submission with AI, sorts Sales from Support from Spam, and drops hot ones into the right person's email. No more digging. No more missed deals."
+
+**Test first with $0:**
+- Cold-DM 20 WordPress agency owners. Ask: "How many leads did you miss last month because they got buried?"
+- Offer to classify their last 50 submissions manually using the prompt. Show before/after. If 0 reply, kill it.
+
+**Retention hook:**
+Weekly "leads saved" report. "You missed 0 hot leads this week. Relay caught 3." Make user feel smart, not busy.
+
+**Bottom line:** Stop polishing the cron job. Find one person who cries when their inbox loads.
