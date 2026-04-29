@@ -106,3 +106,11 @@ From queue entry: `stall-projects-plugins-v1-1777406822088`
 🚨 STALL ESCALATION: plugins-v1 has had 2 Cagan dispatches in the past week and is still stalled. Human decision required: ship the existing scope, kill the project, or unblock a specific risk Cagan flagged. See /home/agent/shipyard-ai/projects/plugins-v1/cagan-*.md for prior analyses.
 
 From queue entry: `stall-projects-plugins-v1-1777421222548`
+
+
+---
+## Escalation — 2026-04-29T04:22:01.977Z
+
+🚨 STALL ESCALATION: plugins-v1 has had 2 Cagan dispatches in the past week and is still stalled. Human decision required: ship the existing scope, kill the project, or unblock a specific risk Cagan flagged. See /home/agent/shipyard-ai/projects/plugins-v1/cagan-*.md for prior analyses.
+
+From queue entry: `stall-projects-plugins-v1-1777435621861`
