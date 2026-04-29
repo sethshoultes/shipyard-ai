@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-29T00:07:02.549Z",
+  "last_updated": "2026-04-29T00:22:01.147Z",
   "entries": [
     {
       "id": "stall-projects-plugins-v1-1777421222548",
@@ -25,12 +25,13 @@
         "recent_code_commits_24h": 0,
         "cagan_dispatches_recent": 2
       },
-      "status": "queued",
+      "status": "escalated",
       "dispatch": null,
       "escalation": {
         "target": "human",
         "message": "🚨 STALL ESCALATION: plugins-v1 has had 2 Cagan dispatches in the past week and is still stalled. Human decision required: ship the existing scope, kill the project, or unblock a specific risk Cagan flagged. See /home/agent/shipyard-ai/projects/plugins-v1/cagan-*.md for prior analyses."
-      }
+      },
+      "escalated_at": "2026-04-29T00:22:01.145Z"
     }
   ]
 }
