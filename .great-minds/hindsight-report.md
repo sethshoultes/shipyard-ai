@@ -1,31 +1,31 @@
 # Hindsight Report
-**Generated:** 2026-04-29T08:15:31.126Z
+**Generated:** 2026-04-29T12:32:21.159Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 11 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 13 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- 97305a4 daemon: auto-commit 2 files
+- 4dfa152 daemon: auto-commit 1 files
+- ae2e530 daemon: auto-commit 1 files
+- 5fa937e daemon: auto-commit 1 files
+- f07e06d daemon: auto-commit 2 files
+- 5b09ca0 Ship relay-ai-form-handler: all deliverables + retrospective
+- 6801151 Ship relay-ai-form-handler: all deliverables
+- 531e8ab daemon: auto-commit after build phase for relay-ai-form-handler
 - 0d89831 daemon: auto-commit 1 files
 - e0dab9e daemon: auto-commit 1 files
-- 1580ded daemon: auto-commit 3 files
-- d0f46dc daemon: auto-commit 2 files
-- 71cf956 daemon: auto-commit 1 files
-- f9ed2d3 daemon: auto-commit 1 files
-- 1300666 daemon: auto-commit 1 files
-- 4fd39d3 daemon: auto-commit 3 files
-- eb68bd5 daemon: auto-commit 2 files
-- f0e52f6 daemon: auto-commit 1 files
 
 ## High-Churn Files
-- `.daemon-queue.json` (97 changes)
-- `.planning/sara-blakely-review.md` (69 changes)
-- `.planning/phase-1-plan.md` (48 changes)
-- `.planning/REQUIREMENTS.md` (44 changes)
+- `.daemon-queue.json` (102 changes)
+- `.planning/sara-blakely-review.md` (70 changes)
+- `.planning/phase-1-plan.md` (49 changes)
+- `.planning/REQUIREMENTS.md` (45 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
-- `pipeline/auto/cagan-dispatch-history.json` (22 changes)
-- `.great-minds/hindsight-report.md` (14 changes)
-- `HEARTBEAT.md` (11 changes)
+- `pipeline/auto/cagan-dispatch-history.json` (23 changes)
+- `.great-minds/hindsight-report.md` (15 changes)
+- `HEARTBEAT.md` (12 changes)
 - `website/src/app/layout.tsx` (11 changes)
 - `STATUS.md` (11 changes)
 - `website/src/app/work/page.tsx` (11 changes)
@@ -59,15 +59,17 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 11 uncommitted changes
 ```
 M .daemon-queue.json
  M .great-minds/hindsight-report.md
- M .planning/REQUIREMENTS.md
- M .planning/phase-1-plan.md
  M .planning/sara-blakely-review.md
- M pipeline/auto/cagan-dispatch-history.json
-?? dreams/dream-2026-04-29T07-2-elon.md
-?? dreams/dream-2026-04-29T07-2-steve.md
-?? dreams/dream-2026-04-29T07-2-votes.md
-?? prds/relay-ai-form-handler.md
-?? rounds/relay-ai-form-handler/
+ D prds/completed/clipcraft-backend.md
+ D prds/completed/github-issue-sethshoultes-shipyard-ai-99.md
+?? prds/clipcraft-backend.md
+?? prds/github-issue-sethshoultes-shipyard-ai-99.md
+?? rounds/github-issue-sethshoultes-shipyard-ai-99/decisions.md
+?? rounds/github-issue-sethshoultes-shipyard-ai-99/essence.md
+?? rounds/github-issue-sethshoultes-shipyard-ai-99/round-1-elon.md
+?? rounds/github-issue-sethshoultes-shipyard-ai-99/round-1-steve.md
+?? rounds/github-issue-sethshoultes-shipyard-ai-99/round-2-elon.md
+?? rounds/github-issue-sethshoultes-shipyard-ai-99/round-2-steve.md
 ```
 
 ---

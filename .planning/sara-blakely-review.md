@@ -1,11 +1,22 @@
-**Verdict**: Engineering theater. Cut 70%.
+No price tag. No customer. Would not pay.
 
-- **Would a real customer pay?** Not as planned. Metered Claude API + shared-hosting user = toxic combo. Flat-fee SaaS with API buried? Maybe. Plugin that asks them to bring their own AI key? No. Bounce before checkout.
+- Pain is real: inbox drowning. Solution is more complex than the problem (API keys, cron jobs, wp-config constants).
+- "Async UX gap" = leads sit dead for minutes. First impression = broken.
+- 9 tasks, 4 waves, design tokens. Building a spaceship to cross the street.
+- CF7 only? Most WordPress sites run WPForms, Elementor, Gravity. Wrong horse.
+- Claude API key + hosting + time = customer pays to save $0. No pricing model anywhere.
 
-- **Confusing / bounce factors**: "Unclassified" for minutes after submit. You admitted this kills the 30-second magic. Fix it or die. Also: too many settings. API key, toggles, cache purge, cron warnings. Non-technical owner freezes.
+Confusing / Bounce factors:
+- Why this over Gmail filters?
+- "Relay" sounds like an email server, not a lead sorter.
+- Setup demands wp-config edits and cron checks. Shared hosting users will quit at hello.
+- "Steve Jobs called it the reason to survive" — desperate. Overpromises, underdelivers.
 
-- **30-second pitch**: "Relay is the junk-filter for your website forms. It finds the money in your inbox and puts it on top. So you never lose a hot lead to spam again."
+30-second elevator pitch:
+Relay reads every form submission on your WordPress site, uses AI to separate hot buyers from spam, and drops the real leads in the right inbox. No more digging through junk to find revenue.
 
-- **$0 test**: Cold-DM 20 small business owners who use WordPress. Ask one question: "How many leads did you lose last month to form spam or buried emails?" If nobody cries, don't build. If they do, pre-sell 3 before you touch another file.
+$0 marketing test:
+DM 10 WordPress agency owners. Ask: "How do you sort form leads today?" Build only the feature they beg for. Do not write a line of code until one says "shut up and take my money."
 
-- **Retention hook**: The "Money Alert" email. Subject: "Hot lead — [Name] needs [Thing]" in under 10 seconds. Not an inbox dashboard. A ping that prints money.
+Retention hook:
+None yet. Novelty dies fast. Real hook = visible money. Dashboard must show: "You caught $X in leads this month" or "Blocked 200 spam bots." No ROI display = churn in 30 days.
