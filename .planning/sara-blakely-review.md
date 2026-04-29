@@ -1,7 +1,11 @@
-- Would a real customer pay? No. Auto-deploy is table stakes, not a premium product. Customers pay for *outcomes* (site stays up, updates are instant), not YAML files. The plan solves a real pain — silent undeployed pushes — but that's fixing your own mess, not selling value.
-- Confusing / bounce factor: No rollback plan. No "what happens when this breaks?" No alerts if deploy fails. No preview deploys for PRs. An engineer will read this, nod, then ask "and when it fails at 2am?"
-- Missing: commit-dirty=true feels hacky. Caching npm in a subdir (website/) without verifying cache hits. No test that the built site actually loads post-deploy.
-- 30-second pitch: "Push code to main, it goes live in two minutes, zero clicks. Never wonder if your fix actually reached customers."
-- $0 test: Push an empty commit that touches website/**. Verify workflow triggers. Verify build passes. Verify CF Pages actually serves the new file. Check the live URL, not just green checkmarks.
-- Retention hook: Reliability. If this works 100x in a row, team forgets it exists — that's the hook. Break once, they'll rip it out and never trust automation again.
-- Verdict: Ship it, but add a dead-simple health check post-deploy. One curl. One URL. Green checkmark means nothing if the site 404s.
+**Verdict**: Engineering theater. Cut 70%.
+
+- **Would a real customer pay?** Not as planned. Metered Claude API + shared-hosting user = toxic combo. Flat-fee SaaS with API buried? Maybe. Plugin that asks them to bring their own AI key? No. Bounce before checkout.
+
+- **Confusing / bounce factors**: "Unclassified" for minutes after submit. You admitted this kills the 30-second magic. Fix it or die. Also: too many settings. API key, toggles, cache purge, cron warnings. Non-technical owner freezes.
+
+- **30-second pitch**: "Relay is the junk-filter for your website forms. It finds the money in your inbox and puts it on top. So you never lose a hot lead to spam again."
+
+- **$0 test**: Cold-DM 20 small business owners who use WordPress. Ask one question: "How many leads did you lose last month to form spam or buried emails?" If nobody cries, don't build. If they do, pre-sell 3 before you touch another file.
+
+- **Retention hook**: The "Money Alert" email. Subject: "Hot lead — [Name] needs [Thing]" in under 10 seconds. Not an inbox dashboard. A ping that prints money.

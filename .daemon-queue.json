@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "last_updated": "2026-04-29T06:22:01.610Z",
+  "last_updated": "2026-04-29T08:22:01.987Z",
   "entries": [
     {
-      "id": "stall-projects-plugins-v1-1777435621861",
-      "created_at": "2026-04-29T04:07:01.861Z",
+      "id": "stall-projects-plugins-v1-1777450022643",
+      "created_at": "2026-04-29T08:07:02.643Z",
       "source": "stall-detector",
       "project": {
         "slug": "plugins-v1",
@@ -14,14 +14,14 @@
       "severity": "BLACK",
       "reasons": [
         "5 analysis docs (>= 5)",
-        "576h in phase (>= 72h)",
+        "580h in phase (>= 72h)",
         "Cagan dispatched 2x in last 7d, project still stalled"
       ],
       "metrics": {
         "analysis_doc_count": 5,
         "code_file_count": 8,
-        "hours_since_last_commit": "34.9",
-        "time_in_phase_hours": "576.0",
+        "hours_since_last_commit": "38.9",
+        "time_in_phase_hours": "580.0",
         "recent_code_commits_24h": 0,
         "cagan_dispatches_recent": 2
       },
@@ -31,7 +31,7 @@
         "target": "human",
         "message": "🚨 STALL ESCALATION: plugins-v1 has had 2 Cagan dispatches in the past week and is still stalled. Human decision required: ship the existing scope, kill the project, or unblock a specific risk Cagan flagged. See /home/agent/shipyard-ai/projects/plugins-v1/cagan-*.md for prior analyses."
       },
-      "escalated_at": "2026-04-29T04:22:01.978Z"
+      "escalated_at": "2026-04-29T08:22:01.984Z"
     }
   ]
 }
