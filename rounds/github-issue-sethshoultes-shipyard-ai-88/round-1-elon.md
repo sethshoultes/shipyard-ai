@@ -1,53 +1,41 @@
-# Round 1 — Elon (CPO & Growth)
+# Round 1 — Elon Musk (Chief Product & Growth Officer)
 
 ## Architecture
 
-**Three parts. No more.** A Gutenberg block for file pick and transcript display. A PHP endpoint that proxies audio to Whisper. A JSON blob in post_meta. That is the entire system.
+The PRD proposes Cloudflare Workers AI + WordPress Gutenberg. That is two hard problems stapled together with duct tape. The simplest system that could work: a WordPress plugin that calls an external transcription API asynchronously and stores the result as post meta.
 
-Do not build a Cloudflare Worker. That is a fourth auth surface, a deploy pipeline, and a caching debate for zero user benefit. Call the OpenAI Whisper API directly from PHP. Store one API key in `wp_options`. Complexity is the enemy of velocity.
+But the PRD never specifies who pays for Whisper. If it is the user's Cloudflare account, onboarding is a funnel-killing nightmare — another API key, another dashboard, another billing surface. If it is ours, unit economics are murder at anything above hobby usage. Pick one: either the plugin brings its own backend and we charge subscriptions, or it is a BYOK enterprise tool. The PRD tries to be both and ends up being neither.
 
 ## Performance
 
-**Bottleneck #1:** Shared hosting PHP timeouts. Upload a 50MB podcast on Bluehost and you hit `max_execution_time` in 30 seconds. **Fix:** Async processing via WP Cron plus chunked upload, or client-side presigned URL flow.
+"Transcript in seconds" is hand-waving. Whisper on a 1-hour podcast takes ~30–60s on GPU, 5–10 minutes on CPU. Cloudflare Workers free tier gives you 50ms CPU — useless for inference. You need Workers Unbound or a proper queue. The real bottleneck is not React rendering or CSS animations; it is inference.
 
-**Bottleneck #2:** Synchronous API waits. User stares at a spinner for 60 seconds while Whisper chews on a 30-minute interview. **Fix:** Queue it. Return a job ID. Poll or webhook when done.
+A 2MB audio file is the happy-path demo. A 200MB, 3-hour podcast episode is production reality. The 10x performance path is not better JavaScript — it is skipping transcription entirely and letting users paste transcripts they already generated in Descript or Otter.
 
-**10x path:** WordPress admins will not wait. Make it async or this dies in one-star reviews.
+## Distribution
 
-## Distribution — 10K Users, Zero Ad Spend
+WordPress.org is a distribution graveyard. 60,000 plugins exist, and most have <100 active installs. "Podcaster communities" and "journalism tools lists" are not channels — they are prayers. To hit 10,000 users without paid ads you need a viral loop, an existing audience, or a platform mandate. This plugin has none of the three. It is a utility, not a growth engine.
 
-WordPress.org is a graveyard of plugins with zero installs. Posting it gets you nothing.
+If you want 10K users, build a free transcript-hosting site that ranks for "[podcast name] transcript" SEO, then upsell the WordPress embed. The plugin is the capture mechanism, not the acquisition channel.
 
-**Actual path:**
-- **Content arbitrage:** Publish 50 blog posts targeting "[podcast name] transcript" SEO. Transcribe popular episodes yourself, rank, capture podcaster emails.
-- **Integration hijack:** Partner with 3 podcast hosting tools. Be the one-click WordPress embed.
-- **Freemium leverage:** Free for files under 10 min. Watermark removed at $29/mo. Podcasters pay for tools that save time.
+## What to CUT
 
-10K is achievable if you nail podcaster Twitter/X and get 2-3 micro-influencers. WordPress plugin repo alone gets you 200.
+Kill speaker diarization for v1 — it is a separate, harder model than Whisper and often wrong. Kill SRT/VTT export — YouTube and Descript already do this free, and no podcaster is switching tools for format conversion. Kill "gorgeous typography" — inherit the theme's fonts and move on.
 
-## What to CUT (Scope Creep Surgery)
+The v1 is: upload audio, queue async transcription, store plain transcript with sentence-level timestamps, render clickable seek links. Nothing else. Every extra feature is a v2 feature masquerading as v1 scope creep.
 
-- **Speaker detection / diarization:** Whisper does not do this. You would need pyannote or AssemblyAI. That is a separate product. **Cut.**
-- **Cloudflare Worker:** Infrastructure theater. Adds deploy complexity, auth, caching debates. Call Whisper from PHP. **Cut.**
-- **Word-level click-to-play:** Requires `timestamp_granularities=word` and precise HTML5 MediaElement sync. Cool demo, brittle in the wild. Ship sentence-level first. **Defer.**
-- **VTT/SRT export:** Keep. It is 20 lines of string formatting once you have timestamps.
+## Technical Feasibility
 
-## Technical Feasibility (One Agent Session?)
+One agent session is borderline delusional. Gutenberg blocks require PHP scaffold, block.json manifest, React build pipeline with webpack/babel, and a backend API with async job handling. That is four distinct engineering domains in one context window.
 
-**Yes, but only if you cut the above.** One session can build:
-- Plugin scaffold plus block.json
-- Media upload to PHP proxy to Whisper API
-- Basic timestamped transcript render in Gutenberg
-- JSON save and load as post meta
+Possible only if we fork an existing block starter and hardcode the API endpoint. I rate it 50/50 to work end-to-end in one session if scoped ruthlessly. With the current PRD scope — speaker diarization, Cloudflare Workers, multiple export formats — the probability is 10/10 that it ships broken or incomplete.
 
-**Not in one session:** Async job queue, virtualized scrolling for 2-hour transcripts, speaker diarization, CDN upload resumability.
+## Scaling
 
-## Scaling — What Breaks at 100x
+At 100x usage: Cloudflare AI costs scale linearly at roughly $0.006 per minute of audio. 1,000 hours of transcription = $360 per month. That sounds manageable until you realize you are paying it and giving the plugin away free.
 
-- **Cost:** OpenAI Whisper is $0.006/minute. 100 users transcribing 10 hrs/week = $360/week in API spend. If free tier is unlimited, you are bankrupt. **Cap free tier at 60 min/month.**
-- **Storage:** 10K sites times 100 transcripts times 500KB JSON = 500GB of post_meta bloat. WordPress databases will cry. **Add cleanup/pruning logic.**
-- **Rate limits:** 100x concurrent uploads hits OpenAI RPM limits. You need a queue with backoff. **Plan for it or the plugin 500-errors at scale.**
+But hosting breaks first. Most WordPress shared hosts cap total storage at 2GB and per-file uploads at 128MB. A 10,000-word transcript rendered as individual DOM nodes inside a Gutenberg block will crush mobile browsers and blow up editor memory. You need external object storage, pagination, and probably server-side rendering. None of that is in the PRD.
 
 ## Verdict
 
-Build the minimal lovable version: drag audio, async transcribe, sentence-level timestamps, export SRT. Everything else is v2 or never. Ship in one session. Iterate or die.
+Build the absolute minimum: async transcription, sentence-level timestamps, clickable seek. Cut everything else. Ship it as a BYOK plugin or do not ship it at all. Anything more ambitious in one session is fantasy.

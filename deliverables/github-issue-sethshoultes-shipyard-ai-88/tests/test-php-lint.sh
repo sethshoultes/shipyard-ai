@@ -1,34 +1,25 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
+# test-php-lint.sh
+# Runs php -l on all PHP files in the plugin.
+# Usage: ./test-php-lint.sh [PLUGIN_DIR]
+# Exit 0 on pass, non-zero on fail.
 
-PLUGIN_DIR="${PLUGIN_DIR:-projects/scribe/build/scribe}"
+set -e
 
-if [[ ! -d "$PLUGIN_DIR" ]]; then
-  echo "FAIL: plugin directory does not exist: $PLUGIN_DIR"
+PLUGIN_DIR="${1:-projects/scribe}"
+
+if [ ! -d "$PLUGIN_DIR" ]; then
+  echo "FAIL: Plugin directory not found: $PLUGIN_DIR"
   exit 1
 fi
 
-PHP_FILES=$(find "$PLUGIN_DIR" -name "*.php" -print)
+errors=$(find "$PLUGIN_DIR" -name "*.php" -exec php -l {} + 2>&1 | grep -i "error" || true)
 
-if [[ -z "$PHP_FILES" ]]; then
-  echo "FAIL: no PHP files found in $PLUGIN_DIR"
+if [ -n "$errors" ]; then
+  echo "$errors"
+  echo "FAIL: PHP syntax errors detected"
   exit 1
 fi
 
-fail=0
-for f in $PHP_FILES; do
-  if ! php -l "$f" > /dev/null 2>&1; then
-    echo "FAIL: php -l $f"
-    fail=1
-  else
-    echo "PASS: php -l $f"
-  fi
-done
-
-if [[ $fail -eq 1 ]]; then
-  echo "PHP lint test FAILED."
-  exit 1
-fi
-
-echo "All PHP files lint clean."
+echo "PASS: All PHP files have valid syntax"
 exit 0

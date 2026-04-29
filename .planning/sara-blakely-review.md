@@ -1,29 +1,11 @@
-# Sara Blakely Gut-Check — Relay v1
+**Verdict: Real pain. Backwards plan.**
 
-## Verdict
-Buildable. Over-engineered. Needs a customer before Wave 4.
-
-## Would someone pay?
-Yes. Inbox dread is real. But not for this complexity. A small agency with 50+ weekly form submissions would pay $29–$49/month. Under that, they'd rather just check email.
-
-## Confusing / Bounce-worthy
-- "Unclassified" badge for minutes after form submit. Customer thinks it's broken.
-- 9 tasks, 4 waves, caching layer, cron jobs, encryption, taxonomies — for v1? No.
-- "Steve Jobs called it the reason to survive" — embarrassing. Delete.
-- Target is "cheapest shared hosting" yet requires Claude API key, cron, and REST endpoints. Friction city.
-- No pricing page, no free trial length, no "first 100 classifications free." How do they buy?
-
-## 30-Second Pitch
-"Relay reads your website forms and sorts hot leads from spam instantly, so you respond to money while it's still warm."
-
-## $0 Marketing Test
-1. Go to 10 local service businesses (roofers, lawyers, dentists).
-2. Offer to manually sort their last 100 form submissions into Sales/Support/Spam for free.
-3. Ask: "Would you pay $39/month to never do this again?"
-4. Get 3 yeses with credit cards. Then build.
-
-## Retention Hook
-Time-to-lead. If Relay shaves response time from hours to minutes, revenue goes up. Show that metric in a weekly email: "You responded to 12 hot leads 4x faster this week." Money talks. Inbox zero doesn't.
-
-## Brutal Honest Note
-You're building a racecar when customers need a bicycle. Cut v1 to: intercept form → send to Claude → display result. No cron. No cache. No AJAX polling. If it breaks under load, you have customers to fund v2.
+- **Who pays?** Agencies with 100+ monthly leads. Worth $29/mo to stop inbox dread. No pricing model = free plugin, not business.
+- **Bounce #1:** Claude API key setup. Non-technical user = lost in 30 seconds. Zero-setup is false promise.
+- **Bounce #2:** Form submits, sits "Unclassified" for minutes. Feels broken. Relief becomes confusion.
+- **Name miss:** "Relay" = meaningless. Name after pain: LeadSorter. SmartInbox.
+- **Elevator pitch:** AI reads website forms, tags Sales vs Support, drops hot leads in right inbox before they go cold.
+- **$0 test #1:** Print pitch. Ask 5 agency owners: "Would you pay $29?" 3 yeses = build. Otherwise, pivot.
+- **$0 test #2:** Manually run 50 real leads through Claude. Under 90% accuracy = don't build. Broken brain = dead product.
+- **Retention hook:** Revenue impact. "Relay routed $X this month." Without dollar proof, churn hits when API bill arrives.
+- **Lock-in gap:** No CRM history, no lead tracking. Easy uninstall. Make leaving painful by owning the data pipeline.

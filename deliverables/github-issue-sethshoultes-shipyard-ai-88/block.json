@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "scribe/transcript",
+  "title": "Scribe Transcript",
+  "category": "scribe",
+  "icon": "microphone",
+  "description": "AI-generated audio transcript with click-to-play sync.",
+  "textdomain": "scribe",
+  "supports": {
+    "html": false,
+    "align": false
+  },
+  "attributes": {
+    "audioUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "jobId": {
+      "type": "string",
+      "default": ""
+    },
+    "transcript": {
+      "type": "array",
+      "default": []
+    }
+  },
+  "editorScript": "file:./build/block.js",
+  "editorStyle": "file:./build/block.css",
+  "style": "file:./build/block.css",
+  "script": "file:./build/frontend.js"
+}
