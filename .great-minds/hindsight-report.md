@@ -1,30 +1,30 @@
 # Hindsight Report
-**Generated:** 2026-04-30T05:39:13.430Z
+**Generated:** 2026-04-30T11:42:05.369Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 4 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 5 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- eaeca82 clipcraft-backend v1: archive hollow deliverable; v2 is canonical
+- 276cf3a daemon: auto-commit 2 files
+- b8908ad Ship localgenius-frontend-and-benchmark-engine: all deliverables + retrospective
+- 4fc6b3f Replace placeholder business URL with live WordPress site URL
+- a17c848 daemon: auto-commit after build phase for localgenius-frontend-and-benchmark-engine
 - a7bc3bc daemon: auto-commit 2 files
 - 4b764c9 daemon: auto-commit after build phase for shipyard-auto-pipeline-and-care-subscription
 - 68501a6 daemon: auto-commit 2 files
 - d7b7c1a daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-98
 - 5b671ff daemon: auto-commit 2 files
-- 463775b daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-97
-- f6ed0de daemon: auto-commit 2 files
-- ecda65e Ship github-issue-sethshoultes-shipyard-ai-88: all deliverables + retrospective
-- c4b0bfb Fix placeholder content flagged in QA pass 2
-- 50e7fc4 daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-88
 
 ## High-Churn Files
-- `.daemon-queue.json` (112 changes)
-- `.planning/sara-blakely-review.md` (76 changes)
+- `.daemon-queue.json` (113 changes)
+- `.planning/sara-blakely-review.md` (77 changes)
 - `.planning/phase-1-plan.md` (49 changes)
 - `.planning/REQUIREMENTS.md` (46 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
-- `.great-minds/hindsight-report.md` (22 changes)
+- `.great-minds/hindsight-report.md` (23 changes)
 - `HEARTBEAT.md` (13 changes)
 - `website/src/app/layout.tsx` (11 changes)
 - `STATUS.md` (11 changes)
@@ -57,10 +57,11 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 4 uncommitted changes.
 
 ## Uncommitted State
 ```
-M .daemon-queue.json
+M .github-intake-state.json
  M .great-minds/hindsight-report.md
  M .planning/sara-blakely-review.md
-?? rounds/localgenius-frontend-and-benchmark-engine/
+?? prds/github-issue-sethshoultes-shipyard-ai-91.md
+?? rounds/github-issue-sethshoultes-shipyard-ai-91/
 ```
 
 ---

@@ -1,0 +1,16 @@
+- [ ] Create project directory and configuration files (package.json, tsconfig, next.config, tailwind.config, postcss.config, .gitignore, vercel.json)
+- [ ] Create domain types in types/promptfolio.ts
+- [ ] Create library utilities (validators.ts, claudeParser.ts, markdownRenderer.ts, ogImageTemplate.tsx)
+- [ ] Create React components (Template.tsx, PromptCard.tsx, ImportDropzone.tsx, ManualPaste.tsx, OGImagePreview.tsx)
+- [ ] Create app/layout.tsx with dark-mode-first global styles
+- [ ] Create app/page.tsx (landing/editor/import surface)
+- [ ] Create app/[slug]/page.tsx (public portfolio, static generation)
+- [ ] Create app/api/og/route.tsx (OG image generation via @vercel/og)
+- [ ] Create app/api/export/route.ts (WordPress ZIP export)
+- [ ] Add public assets (fonts, wordmark)
+- [ ] Create test scripts (test-file-structure.sh, test-banned-patterns.sh, test-build.sh)
+- [ ] Run npm install and verify project boots
+- [ ] Run TypeScript check (tsc --noEmit)
+- [ ] Run production build (npm run build)
+- [ ] Run all test scripts and fix failures
+- [ ] Commit on feature branch

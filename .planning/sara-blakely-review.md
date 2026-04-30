@@ -1,28 +1,25 @@
 # Sara Blakely Gut-Check — Relay
 
-**Verdict: Agency channel saves it. SMB channel dies.**
+**Verdict: Over-built. Under-sold. Customer would bounce.**
 
-- Agencies with 50+ sites pay $20-50/mo to stop losing leads.
-- Single-site plumber with 4 forms/month? No. Claude API costs alone scare them.
-- Pricing layer missing entirely. v1 builds goodwill, not revenue.
+**Would they pay?**
+- No. Single-site owner sees "Claude API key" and quits before activation.
+- Agency channel works. But plan targets SMBs with shared hosting. Wrong customer.
+- Pricing layer missing. v1 = free tech demo, not business.
 
-**What's confusing / bounce-worthy:**
+**Bounce triggers:**
+- "Zero setup" lie. Needs API key, cron check, wp-config edit.
+- WP Cron on Bluehost = dead leads for hours. Kills "first 30 seconds" magic.
+- Sales/Support/Spam/General = 4 buckets for site getting 3 forms/month. Overkill.
+- Risk doc leaks "$600/day at scale." Customer smells cost trap. Leaves.
 
-- "Zero setup" but requires Claude API key. That's not zero. That's a tax form.
-- WP Cron dependency on shared hosting = leads sit "unclassified" for hours. Kills the "first 30 seconds" magic.
-- "Calm command center" built on WP_List_Table. Table looks like 2012. Promise ≠ delivery.
-- No routing addresses in MVP. Sales → where? Support → where? v1 says "admin_email" for everything. Fails the core promise.
+**30-second pitch:**
+> Stop losing website leads to spam. Relay sorts your contact forms so real buyers hit your inbox first. Reply in minutes, not days.
 
-**30-second elevator pitch:**
+**$0 test:**
+- Call 5 local businesses. Ask: "How many contact forms did you miss this month?" No number = no pain = no sale.
+- Post in WordPress admin groups: "How do you handle form spam?" No code until 3 strangers say "I'd pay $9/month."
 
-> Relay catches every form submission before it hits inbox purgatory, reads it with AI, and tells you exactly which ones are hot sales leads vs. time-wasters. One dashboard. No more scrolling through spam.
-
-**$0 marketing test:**
-
-- Loom video: 45 seconds. Submit a fake "I want a quote" form. Show it auto-tag Sales + High Urgency. Post in r/WordPress and 3 agency Facebook groups. Count "how do I get this?" replies. Zero paid ads.
-
-**Retention hook: Weak.**
-
-- Plugin runs silently. Inbox only matters if lead volume is high.
-- Fix: Weekly "Lead Report" email. "You caught 12 leads this week. 3 were Sales. 1 went unanswered." Makes invisible value visible.
-- Without that, churn after month 2 when customer forgets it exists.
+**Retention hook:**
+- Weekly email: "You caught 12 leads. 3 were Sales. 1 went unanswered." Make invisible value visible.
+- Color badges don't retain. Money left on table retains.
