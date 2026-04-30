@@ -1,0 +1,7 @@
+name = "spark-demo-worker"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "SPARK_DEMO_CACHE"
+id = "spark_demo_cache_namespace"

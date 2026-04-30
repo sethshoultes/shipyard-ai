@@ -1,0 +1,11 @@
+name = "spark-benchmark-worker"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "spark_benchmark_db"
+database_id = "spark_benchmark_db_id"
+
+[triggers]
+crons = ["0 2 * * 0"]

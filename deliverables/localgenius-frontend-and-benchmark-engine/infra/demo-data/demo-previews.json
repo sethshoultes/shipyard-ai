@@ -1,0 +1,5102 @@
+[
+  {
+    "url": "https://tastypizza.example.com",
+    "business_name": "Tasty Pizza",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Chicago, IL",
+    "cuisine_or_type": "Pizza",
+    "faqs": [
+      {
+        "q": "Do you deliver?",
+        "a": "Yes, within a 5-mile radius."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Absolutely. We offer a gluten-free crust."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "We are open daily from 11am to 10pm."
+      },
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; call ahead for parties of 6+."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking is available nearby."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for catering packages."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website or by phone."
+      },
+      {
+        "q": "Do you have vegan cheese?",
+        "a": "Yes, we carry dairy-free mozzarella."
+      },
+      {
+        "q": "What is your busiest time?",
+        "a": "Friday and Saturday evenings."
+      },
+      {
+        "q": "Do you offer slices?",
+        "a": "Yes, lunch slices are available 11am-3pm."
+      }
+    ],
+    "brand_color": "#EF4444"
+  },
+  {
+    "url": "https://cozybistro.example.com",
+    "business_name": "Cozy Bistro",
+    "category": "restaurant",
+    "hours": "Tue-Sun 5pm-11pm",
+    "location": "Austin, TX",
+    "cuisine_or_type": "French",
+    "faqs": [
+      {
+        "q": "Do I need a reservation?",
+        "a": "Recommended for dinner; walk-ins for lunch."
+      },
+      {
+        "q": "Is there a dress code?",
+        "a": "Smart casual."
+      },
+      {
+        "q": "Do you have outdoor seating?",
+        "a": "Yes, our patio is open weather permitting."
+      },
+      {
+        "q": "Can you accommodate allergies?",
+        "a": "Please alert your server and the kitchen will adjust."
+      },
+      {
+        "q": "Do you have a wine list?",
+        "a": "Yes, we offer a curated selection of French wines."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Valet is available on weekends."
+      },
+      {
+        "q": "Do you host private events?",
+        "a": "Yes, our private room seats up to 20."
+      },
+      {
+        "q": "What is your corkage fee?",
+        "a": "$25 per bottle."
+      },
+      {
+        "q": "Are children welcome?",
+        "a": "Yes, we have a kids menu."
+      },
+      {
+        "q": "Do you do brunch?",
+        "a": "Saturday and Sunday 10am-2pm."
+      }
+    ],
+    "brand_color": "#7C3AED"
+  },
+  {
+    "url": "https://sushibar.example.com",
+    "business_name": "Sushi Bar Zen",
+    "category": "restaurant",
+    "hours": "Mon-Sat 12pm-10pm",
+    "location": "Denver, CO",
+    "cuisine_or_type": "Sushi",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Yes, via phone or our website."
+      },
+      {
+        "q": "Is the fish fresh?",
+        "a": "We receive deliveries daily."
+      },
+      {
+        "q": "Do you have vegetarian rolls?",
+        "a": "Yes, a full vegetarian menu is available."
+      },
+      {
+        "q": "Can I order takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Do you have a full bar?",
+        "a": "Sake, beer, and wine."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Free lot behind the building."
+      },
+      {
+        "q": "Do you offer omakase?",
+        "a": "Yes, chef's choice by reservation only."
+      },
+      {
+        "q": "Are you open on holidays?",
+        "a": "Closed Thanksgiving and Christmas."
+      },
+      {
+        "q": "Do you have gift cards?",
+        "a": "Available in-store and online."
+      },
+      {
+        "q": "Can I sit at the sushi bar?",
+        "a": "Yes, first-come first-served."
+      }
+    ],
+    "brand_color": "#0EA5E9"
+  },
+  {
+    "url": "https://burgershack.example.com",
+    "business_name": "Burger Shack",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-11pm",
+    "location": "Chicago, IL",
+    "cuisine_or_type": "Burgers",
+    "faqs": [
+      {
+        "q": "Are your burgers grass-fed?",
+        "a": "Yes, 100% grass-fed beef."
+      },
+      {
+        "q": "Do you have veggie burgers?",
+        "a": "Yes, a house-made black bean burger."
+      },
+      {
+        "q": "Can I build my own burger?",
+        "a": "Absolutely, pick your bun, patty, and toppings."
+      },
+      {
+        "q": "Do you have milkshakes?",
+        "a": "Yes, hand-spun daily."
+      },
+      {
+        "q": "Is there WiFi?",
+        "a": "Free WiFi for guests."
+      },
+      {
+        "q": "Do you deliver?",
+        "a": "Via DoorDash and UberEats."
+      },
+      {
+        "q": "Are dogs allowed on the patio?",
+        "a": "Yes, we are dog-friendly."
+      },
+      {
+        "q": "Do you have a loyalty program?",
+        "a": "Buy 9 burgers, get the 10th free."
+      },
+      {
+        "q": "What are your busiest hours?",
+        "a": "Lunch and dinner rushes."
+      },
+      {
+        "q": "Do you take large orders?",
+        "a": "Call ahead for orders of 10+."
+      }
+    ],
+    "brand_color": "#F59E0B"
+  },
+  {
+    "url": "https://tacotown.example.com",
+    "business_name": "Taco Town",
+    "category": "restaurant",
+    "hours": "Mon-Sun 10am-10pm",
+    "location": "Austin, TX",
+    "cuisine_or_type": "Mexican",
+    "faqs": [
+      {
+        "q": "Are your tortillas handmade?",
+        "a": "Yes, fresh-pressed daily."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, jackfruit and mushroom tacos."
+      },
+      {
+        "q": "Is your salsa spicy?",
+        "a": "We offer mild, medium, and hot."
+      },
+      {
+        "q": "Do you serve breakfast?",
+        "a": "Breakfast tacos served until 11am."
+      },
+      {
+        "q": "Can I order catering?",
+        "a": "Yes, contact us 48 hours ahead."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Yes, covered patio."
+      },
+      {
+        "q": "Do you have margaritas?",
+        "a": "Yes, on the rocks or frozen."
+      },
+      {
+        "q": "Are you kid-friendly?",
+        "a": "High chairs and a kids menu available."
+      },
+      {
+        "q": "Do you offer delivery?",
+        "a": "Via Grubhub and DoorDash."
+      },
+      {
+        "q": "What payment do you accept?",
+        "a": "Cards, cash, and Apple Pay."
+      }
+    ],
+    "brand_color": "#10B981"
+  },
+  {
+    "url": "https://pastaplace.example.com",
+    "business_name": "Pasta Place",
+    "category": "restaurant",
+    "hours": "Tue-Sun 11am-9pm",
+    "location": "Denver, CO",
+    "cuisine_or_type": "Italian",
+    "faqs": [
+      {
+        "q": "Is the pasta made in-house?",
+        "a": "Yes, fresh pasta daily."
+      },
+      {
+        "q": "Do you have gluten-free pasta?",
+        "a": "Yes, rice-based pasta available."
+      },
+      {
+        "q": "Can I bring my own wine?",
+        "a": "Corkage fee is $15."
+      },
+      {
+        "q": "Do you do private dining?",
+        "a": "Yes, our back room seats 16."
+      },
+      {
+        "q": "Is there a lunch special?",
+        "a": "Weekdays until 3pm."
+      },
+      {
+        "q": "Do you have vegan options?",
+        "a": "Yes, marinara and primavera."
+      },
+      {
+        "q": "Can I order half portions?",
+        "a": "Yes, just ask your server."
+      },
+      {
+        "q": "Do you have parking?",
+        "a": "Street parking and a small lot."
+      },
+      {
+        "q": "Are reservations needed?",
+        "a": "Recommended on weekends."
+      },
+      {
+        "q": "Do you sell sauces to-go?",
+        "a": "Yes, marinara and pesto jars."
+      }
+    ],
+    "brand_color": "#F97316"
+  },
+  {
+    "url": "https://bbqpit.example.com",
+    "business_name": "BBQ Pit",
+    "category": "restaurant",
+    "hours": "Wed-Sun 11am-9pm",
+    "location": "Chicago, IL",
+    "cuisine_or_type": "BBQ",
+    "faqs": [
+      {
+        "q": "What meats do you smoke?",
+        "a": "Brisket, ribs, pulled pork, and turkey."
+      },
+      {
+        "q": "How long do you smoke the brisket?",
+        "a": "12-14 hours over oak."
+      },
+      {
+        "q": "Do you have sides?",
+        "a": "Mac and cheese, coleslaw, baked beans, cornbread."
+      },
+      {
+        "q": "Can I order by the pound?",
+        "a": "Yes, sold by the pound at the counter."
+      },
+      {
+        "q": "Do you offer sauces?",
+        "a": "House sweet, spicy, and vinegar-based."
+      },
+      {
+        "q": "Is there indoor seating?",
+        "a": "Picnic-style tables inside and out."
+      },
+      {
+        "q": "Do you cater?",
+        "a": "Yes, full-service and pickup catering."
+      },
+      {
+        "q": "Are you wheelchair accessible?",
+        "a": "Yes, ramp at the front entrance."
+      },
+      {
+        "q": "Do you sell merchandise?",
+        "a": "T-shirts and sauce bottles in-store."
+      },
+      {
+        "q": "Can I call ahead?",
+        "a": "Yes, we accept call-ahead orders."
+      }
+    ],
+    "brand_color": "#DC2626"
+  },
+  {
+    "url": "https://cafecentral.example.com",
+    "business_name": "Cafe Central",
+    "category": "restaurant",
+    "hours": "Mon-Fri 7am-4pm",
+    "location": "Austin, TX",
+    "cuisine_or_type": "Coffee Shop",
+    "faqs": [
+      {
+        "q": "Do you roast your own beans?",
+        "a": "We partner with a local roaster."
+      },
+      {
+        "q": "Do you have non-dairy milk?",
+        "a": "Oat, almond, and soy available."
+      },
+      {
+        "q": "Is there WiFi?",
+        "a": "Free WiFi with purchase."
+      },
+      {
+        "q": "Do you have pastries?",
+        "a": "Fresh pastries delivered each morning."
+      },
+      {
+        "q": "Can I work from here?",
+        "a": "Laptops welcome; please share tables during peak."
+      },
+      {
+        "q": "Do you sell beans to-go?",
+        "a": "Yes, whole bean and ground."
+      },
+      {
+        "q": "Do you have a loyalty card?",
+        "a": "Buy 10 drinks, get 1 free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Sidewalk tables available."
+      },
+      {
+        "q": "Do you serve breakfast?",
+        "a": "Avocado toast, bagels, and granola."
+      },
+      {
+        "q": "Can I order ahead?",
+        "a": "Yes, through our mobile app."
+      }
+    ],
+    "brand_color": "#D97706"
+  },
+  {
+    "url": "https://thaihouse.example.com",
+    "business_name": "Thai House",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Denver, CO",
+    "cuisine_or_type": "Thai",
+    "faqs": [
+      {
+        "q": "How spicy is your food?",
+        "a": "Mild to Thai hot; scale of 1-5."
+      },
+      {
+        "q": "Do you have vegan curries?",
+        "a": "Yes, tofu and vegetable options."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Many dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Small lot and street parking."
+      },
+      {
+        "q": "Do you deliver?",
+        "a": "Within 3 miles via our drivers."
+      },
+      {
+        "q": "Do you have a lunch menu?",
+        "a": "Yes, Monday-Friday 11am-3pm."
+      },
+      {
+        "q": "Can I bring my own bottle?",
+        "a": "BYOB with $5 corkage."
+      },
+      {
+        "q": "Are you open on holidays?",
+        "a": "Closed New Year's Day."
+      },
+      {
+        "q": "Do you have a kids menu?",
+        "a": "Yes, mild pad thai and rice."
+      }
+    ],
+    "brand_color": "#BE185D"
+  },
+  {
+    "url": "https://indiaspice.example.com",
+    "business_name": "India Spice",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11:30am-10pm",
+    "location": "Chicago, IL",
+    "cuisine_or_type": "Indian",
+    "faqs": [
+      {
+        "q": "Is your food authentic?",
+        "a": "Yes, recipes from family kitchens."
+      },
+      {
+        "q": "Do you have a buffet?",
+        "a": "Lunch buffet Monday-Saturday."
+      },
+      {
+        "q": "Can you make it mild?",
+        "a": "Yes, specify mild when ordering."
+      },
+      {
+        "q": "Do you have vegan options?",
+        "a": "Many vegetable curries are vegan."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Validated parking in the garage."
+      },
+      {
+        "q": "Do you cater weddings?",
+        "a": "Yes, full-service Indian catering."
+      },
+      {
+        "q": "Can I order takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Do you have a bar?",
+        "a": "Beer and wine only."
+      },
+      {
+        "q": "Are you nut-free?",
+        "a": "We cannot guarantee a nut-free kitchen."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available at the register."
+      }
+    ],
+    "brand_color": "#9333EA"
+  },
+  {
+    "url": "https://demobiz010.example.com",
+    "business_name": "Pizza Spot 10",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Chicago, IL",
+    "cuisine_or_type": "Pizza",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F43F5E"
+  },
+  {
+    "url": "https://demobiz011.example.com",
+    "business_name": "Burgers Spot 11",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Austin, TX",
+    "cuisine_or_type": "Burgers",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#78716C"
+  },
+  {
+    "url": "https://demobiz012.example.com",
+    "business_name": "Sushi Spot 12",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Denver, CO",
+    "cuisine_or_type": "Sushi",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#EF4444"
+  },
+  {
+    "url": "https://demobiz013.example.com",
+    "business_name": "Italian Spot 13",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Seattle, WA",
+    "cuisine_or_type": "Italian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F97316"
+  },
+  {
+    "url": "https://demobiz014.example.com",
+    "business_name": "Mexican Spot 14",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Portland, OR",
+    "cuisine_or_type": "Mexican",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F59E0B"
+  },
+  {
+    "url": "https://demobiz015.example.com",
+    "business_name": "Thai Spot 15",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Nashville, TN",
+    "cuisine_or_type": "Thai",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#84CC16"
+  },
+  {
+    "url": "https://demobiz016.example.com",
+    "business_name": "Indian Spot 16",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Atlanta, GA",
+    "cuisine_or_type": "Indian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#10B981"
+  },
+  {
+    "url": "https://demobiz017.example.com",
+    "business_name": "BBQ Spot 17",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Miami, FL",
+    "cuisine_or_type": "BBQ",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#06B6D4"
+  },
+  {
+    "url": "https://demobiz018.example.com",
+    "business_name": "French Spot 18",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Phoenix, AZ",
+    "cuisine_or_type": "French",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#0EA5E9"
+  },
+  {
+    "url": "https://demobiz019.example.com",
+    "business_name": "Coffee Shop Spot 19",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Boston, MA",
+    "cuisine_or_type": "Coffee Shop",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#6366F1"
+  },
+  {
+    "url": "https://demobiz020.example.com",
+    "business_name": "Pizza Spot 20",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Chicago, IL",
+    "cuisine_or_type": "Pizza",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#8B5CF6"
+  },
+  {
+    "url": "https://demobiz021.example.com",
+    "business_name": "Burgers Spot 21",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Austin, TX",
+    "cuisine_or_type": "Burgers",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#D946EF"
+  },
+  {
+    "url": "https://demobiz022.example.com",
+    "business_name": "Sushi Spot 22",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Denver, CO",
+    "cuisine_or_type": "Sushi",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F43F5E"
+  },
+  {
+    "url": "https://demobiz023.example.com",
+    "business_name": "Italian Spot 23",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Seattle, WA",
+    "cuisine_or_type": "Italian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#78716C"
+  },
+  {
+    "url": "https://demobiz024.example.com",
+    "business_name": "Mexican Spot 24",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Portland, OR",
+    "cuisine_or_type": "Mexican",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#EF4444"
+  },
+  {
+    "url": "https://demobiz025.example.com",
+    "business_name": "Thai Spot 25",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Nashville, TN",
+    "cuisine_or_type": "Thai",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F97316"
+  },
+  {
+    "url": "https://demobiz026.example.com",
+    "business_name": "Indian Spot 26",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Atlanta, GA",
+    "cuisine_or_type": "Indian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F59E0B"
+  },
+  {
+    "url": "https://demobiz027.example.com",
+    "business_name": "BBQ Spot 27",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Miami, FL",
+    "cuisine_or_type": "BBQ",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#84CC16"
+  },
+  {
+    "url": "https://demobiz028.example.com",
+    "business_name": "French Spot 28",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Phoenix, AZ",
+    "cuisine_or_type": "French",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#10B981"
+  },
+  {
+    "url": "https://demobiz029.example.com",
+    "business_name": "Coffee Shop Spot 29",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Boston, MA",
+    "cuisine_or_type": "Coffee Shop",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#06B6D4"
+  },
+  {
+    "url": "https://demobiz030.example.com",
+    "business_name": "Pizza Spot 30",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Chicago, IL",
+    "cuisine_or_type": "Pizza",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#0EA5E9"
+  },
+  {
+    "url": "https://demobiz031.example.com",
+    "business_name": "Burgers Spot 31",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Austin, TX",
+    "cuisine_or_type": "Burgers",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#6366F1"
+  },
+  {
+    "url": "https://demobiz032.example.com",
+    "business_name": "Sushi Spot 32",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Denver, CO",
+    "cuisine_or_type": "Sushi",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#8B5CF6"
+  },
+  {
+    "url": "https://demobiz033.example.com",
+    "business_name": "Italian Spot 33",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Seattle, WA",
+    "cuisine_or_type": "Italian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#D946EF"
+  },
+  {
+    "url": "https://demobiz034.example.com",
+    "business_name": "Mexican Spot 34",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Portland, OR",
+    "cuisine_or_type": "Mexican",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F43F5E"
+  },
+  {
+    "url": "https://demobiz035.example.com",
+    "business_name": "Thai Spot 35",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Nashville, TN",
+    "cuisine_or_type": "Thai",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#78716C"
+  },
+  {
+    "url": "https://demobiz036.example.com",
+    "business_name": "Indian Spot 36",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Atlanta, GA",
+    "cuisine_or_type": "Indian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#EF4444"
+  },
+  {
+    "url": "https://demobiz037.example.com",
+    "business_name": "BBQ Spot 37",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Miami, FL",
+    "cuisine_or_type": "BBQ",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F97316"
+  },
+  {
+    "url": "https://demobiz038.example.com",
+    "business_name": "French Spot 38",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Phoenix, AZ",
+    "cuisine_or_type": "French",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F59E0B"
+  },
+  {
+    "url": "https://demobiz039.example.com",
+    "business_name": "Coffee Shop Spot 39",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Boston, MA",
+    "cuisine_or_type": "Coffee Shop",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#84CC16"
+  },
+  {
+    "url": "https://demobiz040.example.com",
+    "business_name": "Pizza Spot 40",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Chicago, IL",
+    "cuisine_or_type": "Pizza",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#10B981"
+  },
+  {
+    "url": "https://demobiz041.example.com",
+    "business_name": "Burgers Spot 41",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Austin, TX",
+    "cuisine_or_type": "Burgers",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#06B6D4"
+  },
+  {
+    "url": "https://demobiz042.example.com",
+    "business_name": "Sushi Spot 42",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Denver, CO",
+    "cuisine_or_type": "Sushi",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#0EA5E9"
+  },
+  {
+    "url": "https://demobiz043.example.com",
+    "business_name": "Italian Spot 43",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Seattle, WA",
+    "cuisine_or_type": "Italian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#6366F1"
+  },
+  {
+    "url": "https://demobiz044.example.com",
+    "business_name": "Mexican Spot 44",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Portland, OR",
+    "cuisine_or_type": "Mexican",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#8B5CF6"
+  },
+  {
+    "url": "https://demobiz045.example.com",
+    "business_name": "Thai Spot 45",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Nashville, TN",
+    "cuisine_or_type": "Thai",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#D946EF"
+  },
+  {
+    "url": "https://demobiz046.example.com",
+    "business_name": "Indian Spot 46",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Atlanta, GA",
+    "cuisine_or_type": "Indian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F43F5E"
+  },
+  {
+    "url": "https://demobiz047.example.com",
+    "business_name": "BBQ Spot 47",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Miami, FL",
+    "cuisine_or_type": "BBQ",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#78716C"
+  },
+  {
+    "url": "https://demobiz048.example.com",
+    "business_name": "French Spot 48",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Phoenix, AZ",
+    "cuisine_or_type": "French",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#EF4444"
+  },
+  {
+    "url": "https://demobiz049.example.com",
+    "business_name": "Coffee Shop Spot 49",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Boston, MA",
+    "cuisine_or_type": "Coffee Shop",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F97316"
+  },
+  {
+    "url": "https://demobiz050.example.com",
+    "business_name": "Pizza Spot 50",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Chicago, IL",
+    "cuisine_or_type": "Pizza",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F59E0B"
+  },
+  {
+    "url": "https://demobiz051.example.com",
+    "business_name": "Burgers Spot 51",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Austin, TX",
+    "cuisine_or_type": "Burgers",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#84CC16"
+  },
+  {
+    "url": "https://demobiz052.example.com",
+    "business_name": "Sushi Spot 52",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Denver, CO",
+    "cuisine_or_type": "Sushi",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#10B981"
+  },
+  {
+    "url": "https://demobiz053.example.com",
+    "business_name": "Italian Spot 53",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Seattle, WA",
+    "cuisine_or_type": "Italian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#06B6D4"
+  },
+  {
+    "url": "https://demobiz054.example.com",
+    "business_name": "Mexican Spot 54",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Portland, OR",
+    "cuisine_or_type": "Mexican",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#0EA5E9"
+  },
+  {
+    "url": "https://demobiz055.example.com",
+    "business_name": "Thai Spot 55",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Nashville, TN",
+    "cuisine_or_type": "Thai",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#6366F1"
+  },
+  {
+    "url": "https://demobiz056.example.com",
+    "business_name": "Indian Spot 56",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Atlanta, GA",
+    "cuisine_or_type": "Indian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#8B5CF6"
+  },
+  {
+    "url": "https://demobiz057.example.com",
+    "business_name": "BBQ Spot 57",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Miami, FL",
+    "cuisine_or_type": "BBQ",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#D946EF"
+  },
+  {
+    "url": "https://demobiz058.example.com",
+    "business_name": "French Spot 58",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Phoenix, AZ",
+    "cuisine_or_type": "French",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F43F5E"
+  },
+  {
+    "url": "https://demobiz059.example.com",
+    "business_name": "Coffee Shop Spot 59",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Boston, MA",
+    "cuisine_or_type": "Coffee Shop",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#78716C"
+  },
+  {
+    "url": "https://demobiz060.example.com",
+    "business_name": "Pizza Spot 60",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Chicago, IL",
+    "cuisine_or_type": "Pizza",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#EF4444"
+  },
+  {
+    "url": "https://demobiz061.example.com",
+    "business_name": "Burgers Spot 61",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Austin, TX",
+    "cuisine_or_type": "Burgers",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F97316"
+  },
+  {
+    "url": "https://demobiz062.example.com",
+    "business_name": "Sushi Spot 62",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Denver, CO",
+    "cuisine_or_type": "Sushi",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F59E0B"
+  },
+  {
+    "url": "https://demobiz063.example.com",
+    "business_name": "Italian Spot 63",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Seattle, WA",
+    "cuisine_or_type": "Italian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#84CC16"
+  },
+  {
+    "url": "https://demobiz064.example.com",
+    "business_name": "Mexican Spot 64",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Portland, OR",
+    "cuisine_or_type": "Mexican",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#10B981"
+  },
+  {
+    "url": "https://demobiz065.example.com",
+    "business_name": "Thai Spot 65",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Nashville, TN",
+    "cuisine_or_type": "Thai",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#06B6D4"
+  },
+  {
+    "url": "https://demobiz066.example.com",
+    "business_name": "Indian Spot 66",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Atlanta, GA",
+    "cuisine_or_type": "Indian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#0EA5E9"
+  },
+  {
+    "url": "https://demobiz067.example.com",
+    "business_name": "BBQ Spot 67",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Miami, FL",
+    "cuisine_or_type": "BBQ",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#6366F1"
+  },
+  {
+    "url": "https://demobiz068.example.com",
+    "business_name": "French Spot 68",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Phoenix, AZ",
+    "cuisine_or_type": "French",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#8B5CF6"
+  },
+  {
+    "url": "https://demobiz069.example.com",
+    "business_name": "Coffee Shop Spot 69",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Boston, MA",
+    "cuisine_or_type": "Coffee Shop",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#D946EF"
+  },
+  {
+    "url": "https://demobiz070.example.com",
+    "business_name": "Pizza Spot 70",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Chicago, IL",
+    "cuisine_or_type": "Pizza",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F43F5E"
+  },
+  {
+    "url": "https://demobiz071.example.com",
+    "business_name": "Burgers Spot 71",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Austin, TX",
+    "cuisine_or_type": "Burgers",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#78716C"
+  },
+  {
+    "url": "https://demobiz072.example.com",
+    "business_name": "Sushi Spot 72",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Denver, CO",
+    "cuisine_or_type": "Sushi",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#EF4444"
+  },
+  {
+    "url": "https://demobiz073.example.com",
+    "business_name": "Italian Spot 73",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Seattle, WA",
+    "cuisine_or_type": "Italian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F97316"
+  },
+  {
+    "url": "https://demobiz074.example.com",
+    "business_name": "Mexican Spot 74",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Portland, OR",
+    "cuisine_or_type": "Mexican",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F59E0B"
+  },
+  {
+    "url": "https://demobiz075.example.com",
+    "business_name": "Thai Spot 75",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Nashville, TN",
+    "cuisine_or_type": "Thai",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#84CC16"
+  },
+  {
+    "url": "https://demobiz076.example.com",
+    "business_name": "Indian Spot 76",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Atlanta, GA",
+    "cuisine_or_type": "Indian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#10B981"
+  },
+  {
+    "url": "https://demobiz077.example.com",
+    "business_name": "BBQ Spot 77",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Miami, FL",
+    "cuisine_or_type": "BBQ",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#06B6D4"
+  },
+  {
+    "url": "https://demobiz078.example.com",
+    "business_name": "French Spot 78",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Phoenix, AZ",
+    "cuisine_or_type": "French",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#0EA5E9"
+  },
+  {
+    "url": "https://demobiz079.example.com",
+    "business_name": "Coffee Shop Spot 79",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Boston, MA",
+    "cuisine_or_type": "Coffee Shop",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#6366F1"
+  },
+  {
+    "url": "https://demobiz080.example.com",
+    "business_name": "Pizza Spot 80",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Chicago, IL",
+    "cuisine_or_type": "Pizza",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#8B5CF6"
+  },
+  {
+    "url": "https://demobiz081.example.com",
+    "business_name": "Burgers Spot 81",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Austin, TX",
+    "cuisine_or_type": "Burgers",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#D946EF"
+  },
+  {
+    "url": "https://demobiz082.example.com",
+    "business_name": "Sushi Spot 82",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Denver, CO",
+    "cuisine_or_type": "Sushi",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F43F5E"
+  },
+  {
+    "url": "https://demobiz083.example.com",
+    "business_name": "Italian Spot 83",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Seattle, WA",
+    "cuisine_or_type": "Italian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#78716C"
+  },
+  {
+    "url": "https://demobiz084.example.com",
+    "business_name": "Mexican Spot 84",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Portland, OR",
+    "cuisine_or_type": "Mexican",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#EF4444"
+  },
+  {
+    "url": "https://demobiz085.example.com",
+    "business_name": "Thai Spot 85",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Nashville, TN",
+    "cuisine_or_type": "Thai",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F97316"
+  },
+  {
+    "url": "https://demobiz086.example.com",
+    "business_name": "Indian Spot 86",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Atlanta, GA",
+    "cuisine_or_type": "Indian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F59E0B"
+  },
+  {
+    "url": "https://demobiz087.example.com",
+    "business_name": "BBQ Spot 87",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Miami, FL",
+    "cuisine_or_type": "BBQ",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#84CC16"
+  },
+  {
+    "url": "https://demobiz088.example.com",
+    "business_name": "French Spot 88",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Phoenix, AZ",
+    "cuisine_or_type": "French",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#10B981"
+  },
+  {
+    "url": "https://demobiz089.example.com",
+    "business_name": "Coffee Shop Spot 89",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Boston, MA",
+    "cuisine_or_type": "Coffee Shop",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#06B6D4"
+  },
+  {
+    "url": "https://demobiz090.example.com",
+    "business_name": "Pizza Spot 90",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Chicago, IL",
+    "cuisine_or_type": "Pizza",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#0EA5E9"
+  },
+  {
+    "url": "https://demobiz091.example.com",
+    "business_name": "Burgers Spot 91",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Austin, TX",
+    "cuisine_or_type": "Burgers",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#6366F1"
+  },
+  {
+    "url": "https://demobiz092.example.com",
+    "business_name": "Sushi Spot 92",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Denver, CO",
+    "cuisine_or_type": "Sushi",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#8B5CF6"
+  },
+  {
+    "url": "https://demobiz093.example.com",
+    "business_name": "Italian Spot 93",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Seattle, WA",
+    "cuisine_or_type": "Italian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#D946EF"
+  },
+  {
+    "url": "https://demobiz094.example.com",
+    "business_name": "Mexican Spot 94",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Portland, OR",
+    "cuisine_or_type": "Mexican",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F43F5E"
+  },
+  {
+    "url": "https://demobiz095.example.com",
+    "business_name": "Thai Spot 95",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Nashville, TN",
+    "cuisine_or_type": "Thai",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#78716C"
+  },
+  {
+    "url": "https://demobiz096.example.com",
+    "business_name": "Indian Spot 96",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Atlanta, GA",
+    "cuisine_or_type": "Indian",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#EF4444"
+  },
+  {
+    "url": "https://demobiz097.example.com",
+    "business_name": "BBQ Spot 97",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Miami, FL",
+    "cuisine_or_type": "BBQ",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F97316"
+  },
+  {
+    "url": "https://demobiz098.example.com",
+    "business_name": "French Spot 98",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Phoenix, AZ",
+    "cuisine_or_type": "French",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#F59E0B"
+  },
+  {
+    "url": "https://demobiz099.example.com",
+    "business_name": "Coffee Shop Spot 99",
+    "category": "restaurant",
+    "hours": "Mon-Sun 11am-10pm",
+    "location": "Boston, MA",
+    "cuisine_or_type": "Coffee Shop",
+    "faqs": [
+      {
+        "q": "Do you take reservations?",
+        "a": "Walk-ins welcome; reservations for parties of 4+."
+      },
+      {
+        "q": "Do you offer takeout?",
+        "a": "Yes, call or order online."
+      },
+      {
+        "q": "Is there parking?",
+        "a": "Street parking available nearby."
+      },
+      {
+        "q": "Do you have vegetarian options?",
+        "a": "Yes, ask your server for the vegetarian menu."
+      },
+      {
+        "q": "What are your hours?",
+        "a": "Open daily 11am-10pm."
+      },
+      {
+        "q": "Do you cater events?",
+        "a": "Yes, contact us for details."
+      },
+      {
+        "q": "Can I order online?",
+        "a": "Yes, through our website."
+      },
+      {
+        "q": "Do you have gluten-free options?",
+        "a": "Several dishes can be made gluten-free."
+      },
+      {
+        "q": "Is there outdoor seating?",
+        "a": "Patio seating available seasonally."
+      },
+      {
+        "q": "Do you offer gift cards?",
+        "a": "Available in-store and online."
+      }
+    ],
+    "brand_color": "#84CC16"
+  }
+]

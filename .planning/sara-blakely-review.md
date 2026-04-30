@@ -1,23 +1,28 @@
-**Verdict: Overbuilt. Fix the async gap or no one pays.**
+# Sara Blakely Gut-Check — Relay
 
-- **Customer would pay?** Maybe. Inbox dread is real. But waiting minutes for AI classification kills relief. Customer sees "Pending" → assumes product is broken → uninstalls.
-- **Confusing:** 4 waves, 9 tasks, XML tags. Engineer theater. Customer does not care about hash-based deduplication or token budgets. Critical risk #1 should be "lead sits unclassified," not "token budget overrun."
-- **Missing:** Price. No pricing anywhere. No customer interview plan. No refund policy. No demo video requirement.
-- **Bounce triggers:** "Pulsing Processing badge" = broken feeling. Admin notice about disabled WP Cron = panic. Orange `#F97316` button looks like a warning, not save.
+**Verdict: Agency channel saves it. SMB channel dies.**
 
-**Elevator Pitch:**
-"Relay reads your website forms and instantly routes leads to right person — sales gets hot leads, support gets tickets, spam dies. No more shared inbox chaos."
+- Agencies with 50+ sites pay $20-50/mo to stop losing leads.
+- Single-site plumber with 4 forms/month? No. Claude API costs alone scare them.
+- Pricing layer missing entirely. v1 builds goodwill, not revenue.
 
-**$0 Test:**
-- Post in 3 WordPress agency Facebook groups: "Who still sorts contact form emails by hand?"
-- DM 10 agency owners. Offer free install. Count how many keep it after 7 days.
-- If zero ask to pay, kill it before Wave 1.
+**What's confusing / bounce-worthy:**
 
-**Retention Hook:**
-Daily "leads sorted, nothing missed" email summary. Makes invisible work visible to boss. Vanity metric = retention.
+- "Zero setup" but requires Claude API key. That's not zero. That's a tax form.
+- WP Cron dependency on shared hosting = leads sit "unclassified" for hours. Kills the "first 30 seconds" magic.
+- "Calm command center" built on WP_List_Table. Table looks like 2012. Promise ≠ delivery.
+- No routing addresses in MVP. Sales → where? Support → where? v1 says "admin_email" for everything. Fails the core promise.
 
-- **Cut:** REST endpoint v1. CF7 only. One route, one form plugin.
-- **Cut:** Classification cache v1. Deduplication is premature optimization for zero users.
-- **Fix:** Fire classification synchronously on form submit. 100ms vs 2 seconds does not matter if result is instant. Async is an excuse for sloppy UX.
+**30-second elevator pitch:**
 
-**Bottom line:** Build half this. Test with 5 real sites. Then decide if waves 3-4 deserve oxygen.
+> Relay catches every form submission before it hits inbox purgatory, reads it with AI, and tells you exactly which ones are hot sales leads vs. time-wasters. One dashboard. No more scrolling through spam.
+
+**$0 marketing test:**
+
+- Loom video: 45 seconds. Submit a fake "I want a quote" form. Show it auto-tag Sales + High Urgency. Post in r/WordPress and 3 agency Facebook groups. Count "how do I get this?" replies. Zero paid ads.
+
+**Retention hook: Weak.**
+
+- Plugin runs silently. Inbox only matters if lead volume is high.
+- Fix: Weekly "Lead Report" email. "You caught 12 leads this week. 3 were Sales. 1 went unanswered." Makes invisible value visible.
+- Without that, churn after month 2 when customer forgets it exists.
