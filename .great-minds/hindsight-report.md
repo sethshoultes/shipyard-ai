@@ -1,10 +1,12 @@
 # Hindsight Report
-**Generated:** 2026-04-29T22:05:31.068Z
+**Generated:** 2026-04-30T05:22:17.753Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 7 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 11 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- 68501a6 daemon: auto-commit 2 files
+- d7b7c1a daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-98
 - 5b671ff daemon: auto-commit 2 files
 - 463775b daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-97
 - f6ed0de daemon: auto-commit 2 files
@@ -13,18 +15,16 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 7 uncommitted changes.
 - 50e7fc4 daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-88
 - 2f131ba daemon: auto-commit 16 files
 - e26524c plugins-v1: KILL — archive per Cagan decision (2026-04-27); stops BLACK escalation loop
-- 7d74bf0 daemon: auto-commit 1 files
-- 6143d87 daemon: auto-commit 3 files
 
 ## High-Churn Files
-- `.daemon-queue.json` (110 changes)
-- `.planning/sara-blakely-review.md` (74 changes)
+- `.daemon-queue.json` (111 changes)
+- `.planning/sara-blakely-review.md` (75 changes)
 - `.planning/phase-1-plan.md` (49 changes)
 - `.planning/REQUIREMENTS.md` (46 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
-- `.great-minds/hindsight-report.md` (20 changes)
+- `.great-minds/hindsight-report.md` (21 changes)
 - `HEARTBEAT.md` (13 changes)
 - `website/src/app/layout.tsx` (11 changes)
 - `STATUS.md` (11 changes)
@@ -60,10 +60,14 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 7 uncommitted changes.
 M .daemon-queue.json
  M .great-minds/hindsight-report.md
  M .planning/sara-blakely-review.md
-?? rounds/github-issue-sethshoultes-shipyard-ai-98/essence.md
-?? rounds/github-issue-sethshoultes-shipyard-ai-98/round-1-elon.md
-?? rounds/github-issue-sethshoultes-shipyard-ai-98/round-1-steve.md
-?? rounds/github-issue-sethshoultes-shipyard-ai-98/round-2-steve.md
+?? dreams/improve-2026-04-30T04-5-buffett.md
+?? dreams/improve-2026-04-30T04-5-jensen.md
+?? dreams/improve-2026-04-30T04-5-oprah.md
+?? dreams/improve-2026-04-30T04-5-shonda.md
+?? dreams/improve-2026-04-30T04-5-summary.md
+?? prds/localgenius-frontend-and-benchmark-engine.md
+?? prds/shipyard-auto-pipeline-and-care-subscription.md
+?? rounds/shipyard-auto-pipeline-and-care-subscription/
 ```
 
 ---
