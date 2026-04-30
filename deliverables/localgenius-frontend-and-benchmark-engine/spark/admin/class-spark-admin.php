@@ -66,7 +66,7 @@ class SPARK_Admin {
 						id="spark_business_url"
 						name="spark_business_url"
 						value="<?php echo esc_url( $business_url ); ?&gt;"
-						placeholder="https://yourbusiness.com"
+						placeholder="<?php echo esc_attr( get_site_url() ); ?>"
 						class="regular-text"
 					/>
 					<button type="button" id="spark-fetch-preview" class="button"&gt;<?php esc_html_e( 'Preview', 'spark' ); ?&gt;</button>
