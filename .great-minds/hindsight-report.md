@@ -1,10 +1,12 @@
 # Hindsight Report
-**Generated:** 2026-04-30T11:42:05.369Z
+**Generated:** 2026-04-30T12:12:47.885Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 5 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 3 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- 66a926c daemon: auto-commit 2 files
+- 0358bcf daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-91
 - eaeca82 clipcraft-backend v1: archive hollow deliverable; v2 is canonical
 - 276cf3a daemon: auto-commit 2 files
 - b8908ad Ship localgenius-frontend-and-benchmark-engine: all deliverables + retrospective
@@ -13,25 +15,23 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 5 uncommitted changes.
 - a7bc3bc daemon: auto-commit 2 files
 - 4b764c9 daemon: auto-commit after build phase for shipyard-auto-pipeline-and-care-subscription
 - 68501a6 daemon: auto-commit 2 files
-- d7b7c1a daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-98
-- 5b671ff daemon: auto-commit 2 files
 
 ## High-Churn Files
 - `.daemon-queue.json` (113 changes)
-- `.planning/sara-blakely-review.md` (77 changes)
+- `.planning/sara-blakely-review.md` (78 changes)
 - `.planning/phase-1-plan.md` (49 changes)
 - `.planning/REQUIREMENTS.md` (46 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
+- `.great-minds/hindsight-report.md` (24 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
-- `.great-minds/hindsight-report.md` (23 changes)
 - `HEARTBEAT.md` (13 changes)
 - `website/src/app/layout.tsx` (11 changes)
 - `STATUS.md` (11 changes)
 - `website/src/app/work/page.tsx` (11 changes)
+- `.github-intake-state.json` (9 changes)
 - `plugins/membership/src/index.ts` (9 changes)
 - `rounds/finish-plugins/board-verdict.md` (9 changes)
-- `rounds/finish-plugins/decisions.md` (9 changes)
 
 ## Bug-Associated Files
 - `deliverables/github-issue-sethshoultes-shipyard-ai-88/includes/class-library.php`
@@ -58,10 +58,8 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 5 uncommitted changes.
 ## Uncommitted State
 ```
 M .github-intake-state.json
- M .great-minds/hindsight-report.md
- M .planning/sara-blakely-review.md
-?? prds/github-issue-sethshoultes-shipyard-ai-91.md
-?? rounds/github-issue-sethshoultes-shipyard-ai-91/
+?? prds/github-issue-sethshoultes-shipyard-ai-86.md
+?? rounds/github-issue-sethshoultes-shipyard-ai-86/
 ```
 
 ---

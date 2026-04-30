@@ -1,10 +1,10 @@
-# Phase 1 Plan — Relay: AI Form Handler & Lead Router (v1 MVP)
+# Phase 1 Plan — Anvil: Cloudflare Workers AI Template Generator (v1 MVP)
 
-**Generated**: 2026-04-29
-**Requirements**: `/home/agent/shipyard-ai/prds/relay-ai-form-handler.md` + `/home/agent/shipyard-ai/rounds/relay-ai-form-handler/decisions.md` (locked)
+**Generated**: 2026-04-30
+**Requirements**: `/home/agent/shipyard-ai/.planning/REQUIREMENTS.md`
 **Total Tasks**: 9
 **Waves**: 4
-**Project Slug**: `relay-ai-form-handler`
+**Project Slug**: `github-issue-sethshoultes-shipyard-ai-86`
 
 ---
 
@@ -12,22 +12,22 @@
 
 ### Verified Technical Context
 
-1. **Platform Lock**: WordPress plugin (pure PHP), NOT Emdash/Cloudflare. The locked decisions (#2) explicitly override the PRD's Cloudflare Worker architecture with direct PHP-to-Claude via `wp_remote_post`. No Node.js build step for the backend.
+1. **Platform Lock**: Node.js CLI tool distributed via npm, NOT Emdash/Cloudflare. The locked decisions explicitly define this as a standalone CLI product (`anvil`). No Astro, no WordPress, no Emdash plugin patterns apply.
 
-2. **Data Storage Lock**: Custom Post Type (`relay_lead`) per locked decisions (Open Question #2 resolution). Custom database table deferred to v2. Post meta stores: `_relay_email`, `_relay_message`, `_relay_category`, `_relay_urgency`, `_relay_classification_json`, `_relay_status`.
+2. **Architecture Lock**: Dynamic generation from live Cloudflare Workers AI OpenAPI spec (decisions.md §3). **Zero static templates.** If the generator fails, it fails loudly. No bundled fallbacks.
 
-3. **Admin UI Lock**: PHP-rendered inbox with heavily customized CSS and vanilla JS (Phil Jackson tie-breaker, Open Question #1). `WP_List_Table` subclass with custom CSS for color-coded badges. No React/Webpack build pipeline in v1. 30s AJAX polling for live updates.
+3. **Streaming-Only Contract**: Locked decision #2 — `stream: true` is the only code path. No batch mode, no multimodal flags, no image/audio logic in generated workers.
 
-4. **Design Tokens Verified** (PRD §4, confirmed in decisions):
-   - Urgency High: `#EF4444` | Medium: `#F59E0B` | Low: `#22C55E`
-   - Spam: `#64748B` | Accent (AI): `#38BDF8`
-   - Surface: `#F8FAFC` | Border: `#E2E8F0` | Text: `#0F172A`
+4. **Generated Artifact Design Rule**: `index.ts` and `wrangler.toml` only. If a third file is required, the generator is wrong (decisions.md §File Structure).
 
-5. **Classification Taxonomy Locked** (decisions.md MVP #4):
-   - Categories: `Sales`, `Support`, `Spam`, `General`
-   - Urgency: `High`, `Medium`, `Low`
+5. **Cloudflare Workers AI Streaming API** (verified via docs/EMDASH-GUIDE.md §5 and decisions.md):
+   - Binding: `env.AI.run(model, { messages, stream: true })`
+   - Returns a `ReadableStream` forwarded with `Content-Type: text/event-stream`
+   - Model is `@cf/` prefixed text-generation model selected at scaffold time
 
-6. **Emdash Reference**: This project is explicitly a **WordPress plugin**, not an Emdash plugin. `docs/EMDASH-GUIDE.md` was reviewed per CLAUDE.md mandate to confirm the architectural divergence is intentional and locked. No Emdash APIs are used.
+6. **Brand Voice Lock**: Plainspoken, human, zero corporate jargon. Error messages explain what to do next. No raw stack traces as UI. "If a sentence sounds like it could live on an IBM landing page, delete it."
+
+7. **Production Metric**: 100 concurrent streaming requests, stable. This is the agreed v1 ceiling test.
 
 ---
 
@@ -35,519 +35,516 @@
 
 | Requirement | Task(s) | Wave |
 |-------------|---------|------|
-| RELAY-001 | phase-1-task-1 | 1 |
-| RELAY-002 | phase-1-task-2 | 1 |
-| RELAY-003 | phase-1-task-2, phase-1-task-8 | 1, 3 |
-| RELAY-004 | phase-1-task-3 | 1 |
-| RELAY-005 | phase-1-task-4 | 2 |
-| RELAY-006 | phase-1-task-4 | 2 |
-| RELAY-007 | phase-1-task-5 | 2 |
-| RELAY-008 | phase-1-task-6 | 2 |
-| RELAY-009 | phase-1-task-7 | 3 |
-| RELAY-010 | phase-1-task-8 | 3 |
-| RELAY-011 | phase-1-task-8 | 3 |
-| RELAY-012 | phase-1-task-7 | 3 |
-| RELAY-013 | phase-1-task-1, phase-1-task-4, phase-1-task-9 | 1, 2, 4 |
-| RELAY-014 | phase-1-task-1, phase-1-task-5, phase-1-task-9 | 1, 2, 4 |
+| ANV-001 | phase-1-task-1, phase-1-task-6 | 1, 3 |
+| ANV-002 | phase-1-task-2 | 1 |
+| ANV-003 | phase-1-task-4 | 2 |
+| ANV-004 | phase-1-task-5 | 2 |
+| ANV-005 | phase-1-task-7 | 3 |
+| ANV-006 | phase-1-task-3 | 1 |
+| ANV-007 | phase-1-task-4, phase-1-task-6 | 2, 3 |
+| ANV-008 | phase-1-task-2 | 1 |
+| ANV-009 | phase-1-task-1, phase-1-task-7, phase-1-task-8 | 1, 3, 3 |
+| ANV-010 | phase-1-task-9 | 4 |
 
 ---
 
 ## Wave Execution Order
 
 ### Wave 1 (Parallel) — Foundation
-Tasks: 3 | Dependencies: None
-- **phase-1-task-1**: Plugin scaffold — `relay.php` headers, activation/deactivation, `class-relay.php` loader
-- **phase-1-task-2**: CPT + taxonomy — `class-storage.php` with `relay_lead` CPT and classification meta
-- **phase-1-task-3**: Settings page — `class-admin.php` menu registration, `settings.php` API key + toggles
+**Duration**: Day 1
+**Dependencies**: None — all tasks run in parallel.
 
-### Wave 2 (Parallel, after Wave 1) — Core Logic
-Tasks: 3 | Dependencies: Wave 1
-- **phase-1-task-4**: Form interception — `class-form-handler.php` CF7 hook + generic REST endpoint
-- **phase-1-task-5**: Claude API client — `class-claude-client.php` `wp_remote_post` wrapper + retry
-- **phase-1-task-6**: Classification cache — `class-cache.php` hash-based deduplication
+#### Task 1.1: Bootstrap CLI Project Structure
+**Output**: Working `bin/anvil` entry point, `package.json`, `tsconfig.json`
 
-### Wave 3 (Parallel, after Wave 2) — Integration
-Tasks: 2 | Dependencies: Wave 2
-- **phase-1-task-7**: Async processor + routing — `class-async-processor.php` WP Cron classification + `wp_mail` routing
-- **phase-1-task-8**: Admin inbox UI — `inbox.php`, `relay-admin.css`, `relay-admin.js`, 30s AJAX poll
+#### Task 1.2: Build Cloudflare Spec Fetcher + Default Model Selector
+**Output**: `src/generators/spec.ts` that fetches live spec and picks the best text-generation model
 
-### Wave 4 (Sequential, after Wave 3) — Polish & Hardening
-Tasks: 1 | Dependencies: Wave 3
-- **phase-1-task-9**: Security hardening — capability checks, nonces, escaping, i18n stubs, `readme.txt`
+#### Task 1.3: Scaffold Zero-Install GitHub Template
+**Output**: `github-template/` with Deploy button, placeholder worker, and minimal deps
+
+---
+
+### Wave 2 (Parallel) — Generators
+**Duration**: Day 1-2
+**Dependencies**: Wave 1 complete. Both generators depend on `spec.ts` interface from Task 1.2.
+
+#### Task 2.1: Build Streaming Worker Code Generator
+**Output**: `src/generators/worker.ts` — emits `index.ts` with streaming inference handler
+
+#### Task 2.2: Build Wrangler.toml Generator
+**Output**: `src/generators/worker.ts` (or adjacent function) — emits minimal `wrangler.toml`
+
+---
+
+### Wave 3 (Parallel) — Orchestration & Polish
+**Duration**: Day 2
+**Dependencies**: Wave 2 complete. Tasks 3.1 and 3.2 can run in parallel; both need generators ready.
+
+#### Task 3.1: Build CLI Create Command + Deploy Wrapper
+**Output**: `src/commands/create.ts` and `src/utils/deploy.ts`
+
+#### Task 3.2: Write Plainspoken README, Error Messages, and CLI Polish
+**Output**: `README.md` and human-voiced strings throughout the CLI
+
+---
+
+### Wave 4 — Integration Verification
+**Duration**: Day 2-3
+**Dependencies**: All prior waves complete.
+
+#### Task 4.1: End-to-End Integration Test
+**Output**: Verified 60-second path from `npx anvil create --llm` to streaming response
 
 ---
 
 ## XML Task Plans
 
-### Wave 1
+### Wave 1 (Parallel)
 
+```xml
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Plugin scaffold: relay.php and class-relay.php loader</title>
-  <requirement>RELAY-001, RELAY-013, RELAY-014</requirement>
+  <title>Bootstrap Anvil CLI project structure</title>
+  <requirement>ANV-001: Single-command LLM worker scaffolding; ANV-009: Plainspoken CLI voice</requirement>
   <description>
-    Create the main plugin file and core loader class. relay.php contains WordPress plugin headers,
-    activation hook (flushes rewrite rules, schedules cron), deactivation hook (cleans cron events),
-    and registers the autoloader for includes/class-*.php. class-relay.php instantiates all component
-    classes in the correct order and exposes a singleton accessor.
+    Create the foundational Node.js/TypeScript project for the Anvil CLI.
+    This includes package.json with correct bin entry, tsconfig.json for Node 22+,
+    the executable bin/anvil file, and the src/index.ts CLI entry point with
+    argument parsing and plainspoken --help text.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/relay-ai-form-handler/decisions.md" reason="File structure and architecture lock" />
-    <file path="/home/agent/shipyard-ai/prds/relay-ai-form-handler.md" reason="Plugin headers and WP.org standards reference" />
+    <file path="/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-86/decisions.md" reason="File structure spec and brand voice constraints" />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="ANV-001 and ANV-009 acceptance criteria" />
   </context>
 
   <steps>
-    <step order="1">Create `projects/relay-ai-form-handler/relay.php` with WordPress plugin headers: Plugin Name: Relay, Version: 1.0.0, Author: Shipyard AI, Text Domain: relay, Requires PHP: 7.4, Requires at least: 5.8.</step>
-    <step order="2">Add `register_activation_hook` that: (a) calls `Relay_Storage::activate()` to register CPT, (b) schedules the async classification cron event `relay_process_leads` if not already scheduled, (c) flushes rewrite rules.</step>
-    <step order="3">Add `register_deactivation_hook` that: (a) clears the `relay_process_leads` cron event, (b) flushes rewrite rules.</step>
-    <step order="4">Create `projects/relay-ai-form-handler/includes/class-relay.php` with a `Relay` singleton class. Constructor instantiates `Relay_Storage`, `Relay_Admin`, `Relay_Form_Handler`, `Relay_Claud_Client`, `Relay_Cache`, `Relay_Async_Processor` in dependency-safe order.</step>
-    <step order="5">Add `Relay::instance()` static method for global access. Hook `Relay::init()` into `plugins_loaded` at priority 10.</step>
-    <step order="6">Verify no syntax errors with `php -l relay.php && php -l includes/class-relay.php`.</step>
+    <step order="1">Create the project root at `projects/github-issue-sethshoultes-shipyard-ai-86/build/anvil/`</step>
+    <step order="2">Write `package.json` with: name="@shipyard/anvil", bin={anvil:"./dist/index.js"}, type="module", engines={node:">=22"}, dependencies include commander and chalk (for plainspoken colors)</step>
+    <step order="3">Write `tsconfig.json` targeting ES2022, module NodeNext, outDir "./dist", strict mode enabled</step>
+    <step order="4">Create `bin/anvil` executable shell script that runs `node ./dist/index.js "$@"`</step>
+    <step order="5">Write `src/index.ts` — CLI entry that imports `commands/create.ts`, sets up a friendly CLI banner (plainspoken, human), and delegates to the create command</step>
+    <step order="6">Ensure `--help` prints concise usage: "anvil create --llm [--name <project>] [--deploy]" with warm, plainspoken descriptions</step>
+    <step order="7">Run `npm install` in the project root</step>
+    <step order="8">Run `npm run build` (or `npx tsc`) and verify `dist/index.js` is created</step>
+    <step order="9">Execute `node bin/anvil --help` and confirm output matches plainspoken brand voice (no IBM sentences, no raw stack traces)</step>
   </steps>
 
   <verification>
-    <check type="build">`php -l relay.php && php -l includes/class-relay.php` returns no syntax errors</check>
-    <check type="test">Install plugin in a WordPress test environment; activation succeeds without fatal errors</check>
-    <check type="manual">Confirm plugin appears in wp-admin Plugins list with correct name and version</check>
+    <check type="build">npm run build succeeds with zero TypeScript errors</check>
+    <check type="test">node bin/anvil --help prints usage and exits 0</check>
+    <check type="manual">Read --help output; confirm it is warm, human, and plainspoken</check>
   </verification>
 
   <dependencies>
-    <!-- Empty — wave 1 independent task -->
+    <!-- None — wave 1 -->
   </dependencies>
 
-  <commit-message>feat: add plugin scaffold and main loader
-
-Creates relay.php with activation/deactivation hooks and
-includes/class-relay.php as the singleton controller.
-Registers CPT on activation and schedules classification cron.</commit-message>
+  <commit-message>feat(cli): bootstrap Anvil project with entry point and plainspoken help</commit-message>
 </task-plan>
 
 <task-plan id="phase-1-task-2" wave="1">
-  <title>CPT + taxonomy: class-storage.php with relay_lead and classification meta</title>
-  <requirement>RELAY-002, RELAY-003</requirement>
+  <title>Build Cloudflare Workers AI spec fetcher and default model selector</title>
+  <requirement>ANV-002: Dynamic spec fetching; ANV-008: One default LLM model</requirement>
   <description>
-    Register the Custom Post Type `relay_lead` with all required meta fields for storing submission
-    data and AI classification results. Also register the hierarchical taxonomy `relay_category`
-    (terms: Sales, Support, Spam, General) and the flat taxonomy `relay_urgency` (terms: High, Medium, Low).
-    On activation, auto-insert default taxonomy terms if they do not exist.
+    Build the generator module that fetches the live Cloudflare Workers AI OpenAPI spec,
+    parses available text-generation models, and selects the highest-version default model.
+    This module is the engine of Anvil — zero static templates, pure dynamic generation.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/relay-ai-form-handler/decisions.md" reason="CPT vs custom table decision and taxonomy schema" />
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Locked hex color codes and taxonomy labels" />
+    <file path="/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-86/decisions.md" reason="Dynamic generation requirement and default model selection logic" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Cloudflare Workers deployment context (§5)" />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="ANV-002 and ANV-008 acceptance criteria" />
   </context>
 
   <steps>
-    <step order="1">Create `includes/class-storage.php` with `Relay_Storage` class. Static `activate()` method registers the CPT and default taxonomy terms.</step>
-    <step order="2">Register `relay_lead` CPT with labels, `public => false`, `show_ui => true`, `show_in_menu => false` (custom menu added later by Relay_Admin), `supports => ['title']`, `capability_type => 'post'`.</step>
-    <step order="3">Register `relay_category` taxonomy (hierarchical) attached to `relay_lead` with labels. On activation, insert terms: Sales, Support, Spam, General.</step>
-    <step order="4">Register `relay_urgency` taxonomy (non-hierarchical) attached to `relay_lead` with labels. On activation, insert terms: High, Medium, Low.</step>
-    <step order="5">Register post meta keys with `register_post_meta('relay_lead', ...)` for: `_relay_email` (string), `_relay_message` (string), `_relay_source` (string), `_relay_raw_json` (string), `_relay_classification_json` (string), `_relay_status` (string, default 'pending'). Use `'show_in_rest' => false` and `'single' => true`.</step>
-    <step order="6">Add helper method `Relay_Storage::create_lead($data)` that inserts a new `relay_lead` post with title = sanitize_text_field($data['name'] . ' — ' . $data['subject']), and stores email/message/source/raw_json in post meta.</step>
-    <step order="7">Verify `php -l includes/class-storage.php` passes. Test activation in WordPress: confirm CPT and taxonomies exist under the Relay admin menu.</step>
+    <step order="1">Create `src/generators/spec.ts`</step>
+    <step order="2">Implement `fetchSpec(): Promise<CloudflareSpec>` that GETs the Cloudflare Workers AI OpenAPI spec endpoint (verify actual URL from Cloudflare docs: https://developers.cloudflare.com/api/ or Workers AI REST API docs)</step>
+    <step order="3">Parse the spec to extract an array of model objects: each must have `name`, `task`, and optional `version` fields</step>
+    <step order="4">Implement `selectDefaultModel(models: Model[]): string` that filters for `task === 'text-generation'` and picks the highest-version model. If versions are equal, prefer the model with the most recent name pattern (e.g., llama-3 over llama-2)</step>
+    <step order="5">If no text-generation models are found, throw a plainspoken error: "Couldn't find a text-generation model in the Cloudflare catalog. They might be updating things — try again in a minute?"</step>
+    <step order="6">If the network request fails, throw a plainspoken error with actionable next steps (check connection, try again)</step>
+    <step order="7">Export a TypeScript interface `CloudflareSpec` and `Model` so downstream generators are type-safe</step>
+    <step order="8">Write a unit test that mocks the spec response and asserts `selectDefaultModel` picks the right model</step>
+    <step order="9">Run build and tests; verify no static template fallbacks exist anywhere in the codebase</step>
   </steps>
 
   <verification>
-    <check type="build">`php -l includes/class-storage.php` passes</check>
-    <check type="test">Activation creates CPT and taxonomies; default terms (Sales, Support, Spam, General, High, Medium, Low) are present</check>
-    <check type="manual">`Relay Leads` appears as a hidden CPT with custom columns visible in the Relay Inbox</check>
+    <check type="build">npm run build passes</check>
+    <check type="test">Unit test: mocked spec with 3 models → selectDefaultModel returns the highest-version text-generation model</check>
+    <check type="test">Unit test: empty text-generation array → throws plainspoken error</check>
+    <check type="manual">Run a real fetch against Cloudflare's live spec and log the selected model name</check>
   </verification>
 
   <dependencies>
-    <!-- Empty — wave 1 independent task -->
+    <!-- None — wave 1. Interface must be stable before Wave 2 starts. -->
   </dependencies>
 
-  <commit-message>feat: register relay_lead CPT with classification taxonomies
-
-Adds Relay_Storage with relay_lead CPT, relay_category and relay_urgency
-taxonomies, and post meta for submission data. Default taxonomy terms
-auto-created on activation.</commit-message>
+  <commit-message>feat(generator): fetch live Cloudflare AI spec and select default text-generation model</commit-message>
 </task-plan>
 
 <task-plan id="phase-1-task-3" wave="1">
-  <title>Settings page: API key encryption and integration toggles</title>
-  <requirement>RELAY-004, RELAY-013</requirement>
+  <title>Scaffold zero-install GitHub template</title>
+  <requirement>ANV-006: Zero-install onboarding path</requirement>
   <description>
-    Build a single-screen settings page under the Relay admin menu. The page accepts a Claude API key,
-    encrypts it at rest using openssl, and provides toggles for Contact Form 7 interception and generic
-    form endpoint. Include a warning if the key is stored in the database (recommend wp-config.php define).
-    Use `current_user_can('manage_options')` and wp_nonce_field on all forms.
+    Create the `github-template/` directory — a minimal Cloudflare Worker project that
+    serves as both a GitHub template repository and a fallback zero-install path. It must
+    include a "Deploy to Workers" button, a placeholder worker, and minimal dependencies.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/relay-ai-form-handler/decisions.md" reason="Zero setup wizard philosophy and API key security risk #7" />
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Encryption-at-rest requirement" />
+    <file path="/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-86/decisions.md" reason="GitHub template file structure and zero-install requirements" />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="ANV-006 acceptance criteria" />
   </context>
 
   <steps>
-    <step order="1">Create `includes/class-admin.php` with `Relay_Admin` class. Hook `admin_menu` to register a top-level menu page `Relay` with icon URL `assets/relay-badge.svg` and capability `manage_options`.</step>
-    <step order="2">Add submenu page `Settings` slug `relay-settings` that renders `admin/views/settings.php`.</step>
-    <step order="3">Register settings with `register_setting('relay_options', 'relay_api_key', ['sanitize_callback' => 'relay_encrypt_api_key'])` and `register_setting('relay_options', 'relay_integrations', ['type' => 'array'])`.</step>
-    <step order="4">Implement `relay_encrypt_api_key($key)` using `openssl_encrypt` with a key derived from `AUTH_KEY` + `SECURE_AUTH_KEY` (fall back to `wp_salt()`). Store the IV alongside the ciphertext in the option value.</step>
-    <step order="5">Implement `relay_decrypt_api_key()` that reads the option, splits IV/ciphertext, and decrypts. If `RELAY_API_KEY` constant is defined in wp-config.php, return that instead and show a non-writable notice in the UI.</step>
-    <step order="6">Create `admin/views/settings.php` with a simple form: API key input (type=password, with reveal toggle via vanilla JS), checkboxes for "Enable Contact Form 7 interception" and "Enable generic form endpoint", and Save Changes button. Use `settings_fields('relay_options')` and `do_settings_sections('relay-settings')`.</step>
-    <step order="7">Add admin notice if API key is missing: "Relay needs a Claude API key to classify leads."</step>
-    <step order="8">Verify `php -l` on both files. Confirm settings save and retrieve correctly, encryption is reversible, and wp-config define takes precedence.</step>
+    <step order="1">Create `github-template/` directory inside the project root</step>
+    <step order="2">Write `github-template/src/index.ts` — a minimal placeholder worker that responds "Hello from Anvil! Run `npx anvil create --llm` to replace this with a streaming LLM worker." on GET /</step>
+    <step order="3">Write `github-template/wrangler.toml` with: name="anvil-template", compatibility_date=(today), ai={binding="AI"}</step>
+    <step order="4">Write `github-template/package.json` with minimal deps: `wrangler` (devDependency) and `@cloudflare/workers-types` (devDependency). No runtime dependencies.</step>
+    <step order="5">Write `github-template/README.md` with: a prominent "Deploy to Workers" button (SVG badge linking to Cloudflare's deploy flow), a 10-second description, and a link to the npm package</step>
+    <step order="6">Verify the template compiles: `cd github-template && npm install && npx wrangler deploy --dry-run`</step>
+    <step order="7">Confirm template has exactly 4 files: src/index.ts, wrangler.toml, package.json, README.md</step>
   </steps>
 
   <verification>
-    <check type="build">`php -l includes/class-admin.php && php -l admin/views/settings.php` passes</check>
-    <check type="test">Settings form submits without nonce errors; API key encrypts and decrypts correctly; `RELAY_API_KEY` constant bypasses DB storage</check>
-    <check type="manual">Visual confirmation: Relay menu appears in wp-admin sidebar; Settings page loads with one screen, password field, toggles, and orange `#F97316` accent on save button</check>
+    <check type="build">cd github-template && npm install && npx wrangler deploy --dry-run succeeds</check>
+    <check type="test">ls github-template/ contains exactly src/index.ts, wrangler.toml, package.json, README.md</check>
+    <check type="manual">README.md preview shows a clear "Deploy to Workers" button and 10-second onboarding path</check>
   </verification>
 
   <dependencies>
-    <!-- Empty — wave 1 independent task -->
+    <!-- None — wave 1 -->
   </dependencies>
 
-  <commit-message>feat: add settings page with encrypted API key storage
-
-Registers Relay top-level admin menu and Settings subpage.
-API key encrypted at rest with openssl. Supports wp-config.php
-constant override. Integration toggles for CF7 and generic endpoint.</commit-message>
+  <commit-message>feat(template): add zero-install GitHub template with Deploy to Workers button</commit-message>
 </task-plan>
+```
 
-### Wave 2
+### Wave 2 (Parallel) — After Wave 1
 
+```xml
 <task-plan id="phase-1-task-4" wave="2">
-  <title>Form interception engine: CF7 hook + generic REST endpoint</title>
-  <requirement>RELAY-005, RELAY-006, RELAY-013, RELAY-014</requirement>
+  <title>Build streaming worker code generator</title>
+  <requirement>ANV-003: Streaming inference handler; ANV-007: Streaming-only contract</requirement>
   <description>
-    Intercept form submissions before they hit the inbox abyss. Hook into Contact Form 7's
-    `wpcf7_before_send_mail` action to capture submissions. Also register a REST API endpoint
-    `/wp-json/relay/v1/submit` for generic HTML forms, with nonce validation or secret token
-    authentication. Sanitize all inputs, store via Relay_Storage::create_lead(), and return 200 OK
-    in under 100ms. Never block on Claude classification here.
+    Build the generator that emits `index.ts` — a production-ready Cloudflare Worker
+    with a streaming LLM inference handler. The generated file must use `env.AI.run(model, { messages, stream: true })`,
+    forward the ReadableStream as `text/event-stream`, and contain zero batch/multimodal code paths.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/relay-ai-form-handler/decisions.md" reason="Async model: store instantly, return 200 OK in &lt;100ms" />
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="CF7 + generic hook priority; sanitization requirements" />
-    <file path="projects/relay-ai-form-handler/includes/class-storage.php" reason="create_lead() helper to store submissions" />
+    <file path="/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-86/decisions.md" reason="Streaming-only contract and generated file constraints" />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="ANV-003 and ANV-007 acceptance criteria" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Cloudflare Workers deployment and AI binding context (§5)" />
   </context>
 
   <steps>
-    <step order="1">Create `includes/class-form-handler.php` with `Relay_Form_Handler` class. Constructor hooks `wpcf7_before_send_mail` and `rest_api_init`.</step>
-    <step order="2">Implement CF7 handler `capture_cf7($contact_form)` that extracts `posted_data`: name, email, subject, message. Sanitize each field with `sanitize_text_field` or `sanitize_email`. Build a `$submission` array.</step>
-    <step order="3">Call `Relay_Storage::create_lead($submission)` to persist the lead as `relay_lead` CPT with status `pending`.</step>
-    <step order="4">Implement `register_rest_route('relay/v1', '/submit', ['methods' => 'POST', 'callback' => [...], 'permission_callback' => [...]])`. Permission callback accepts either a valid WP nonce (`check_ajax_referer`) or a secret token from settings.</step>
-    <step order="5">REST handler sanitizes inputs identically to CF7 handler, calls `Relay_Storage::create_lead()`, and returns JSON `{'success': true, 'lead_id': $post_id}` with HTTP 200.</step>
-    <step order="6">Add integration toggle checks: only hook CF7 if `relay_integrations['cf7']` is enabled; only register REST route if `relay_integrations['generic']` is enabled.</step>
-    <step order="7">Verify `php -l`. Test CF7 submission creates a lead post. Test REST endpoint with curl returns 200 and creates a lead post.</step>
+    <step order="1">Read `src/generators/spec.ts` from Task 1.2 to understand the `Model` and selected model interface</step>
+    <step order="2">Create `src/generators/worker.ts` with `generateWorker(modelName: string): string`</step>
+    <step order="3">Implement `generateWorker` to return a TypeScript string containing: Env interface with `AI: Ai`, default fetch handler, GET / health check, POST / handler that parses `{ messages }` from JSON body</step>
+    <step order="4">Ensure the generated handler calls `env.AI.run(modelName, { messages, stream: true })` — verify the exact Cloudflare Workers AI streaming API from https://developers.cloudflare.com/workers-ai/models/ or official docs; do not guess</step>
+    <step order="5">Ensure the generated handler returns `new Response(stream, { headers: { 'Content-Type': 'text/event-stream' } })`</step>
+    <step order="6">Add a try/catch around the inference call that returns `{ error: "The model had a hiccup. Try again?" }` (or similar plainspoken message) as a JSON Response on failure</step>
+    <step order="7">Verify the generated string contains zero instances of: `batch`, `blocking`, `multimodal`, `image`, `audio`</step>
+    <step order="8">Write a unit test that calls `generateWorker('@cf/test/model')` and asserts the output string contains `stream: true` and no banned words</step>
+    <step order="9">Run build and tests; verify the generated TypeScript is syntactically valid (run it through a TS parser or write it to a temp file and `tsc --noEmit`)</step>
   </steps>
 
   <verification>
-    <check type="build">`php -l includes/class-form-handler.php` passes</check>
-    <check type="test">CF7 form submission creates a `relay_lead` post with correct meta; REST POST to `/wp-json/relay/v1/submit` returns 200 and creates a lead</check>
-    <check type="test">Missing nonce or invalid token returns 403 on REST endpoint</check>
-    <check type="manual">Submit a form; check wp-admin Relay Inbox — unclassified lead appears within seconds</check>
+    <check type="build">npm run build passes</check>
+    <check type="test">Unit test: generateWorker output contains `stream: true` and `text/event-stream`</check>
+    <check type="test">Unit test: generateWorker output contains zero banned words (batch, blocking, multimodal, image, audio)</check>
+    <check type="test">Write generated output to temp file and `npx tsc --noEmit --skipLibCheck` passes</check>
+    <check type="manual">Read generated `index.ts` string; confirm it would make a developer grin at its simplicity</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Plugin loader must be in place to instantiate Relay_Form_Handler" />
-    <depends-on task-id="phase-1-task-2" reason="Relay_Storage::create_lead() must exist to store submissions" />
+    <depends-on task-id="phase-1-task-1" reason="Project structure and build pipeline must exist" />
+    <depends-on task-id="phase-1-task-2" reason="Needs selected model name and CloudflareSpec types from spec generator" />
   </dependencies>
 
-  <commit-message>feat: intercept CF7 and generic form submissions
-
-Adds Relay_Form_Handler with wpcf7_before_send_mail hook and
-/wp-json/relay/v1/submit REST endpoint. All inputs sanitized.
-Stores leads instantly via Relay_Storage without blocking on AI.</commit-message>
+  <commit-message>feat(generator): emit streaming LLM worker index.ts with zero blocking paths</commit-message>
 </task-plan>
 
 <task-plan id="phase-1-task-5" wave="2">
-  <title>Claude API client: wp_remote_post wrapper with retry logic</title>
-  <requirement>RELAY-007, RELAY-013, RELAY-014</requirement>
+  <title>Build wrangler.toml generator</title>
+  <requirement>ANV-004: Wrangler config generator</requirement>
   <description>
-    Build a PHP client that sends submission content to the Claude API via `wp_remote_post`,
-    receives structured JSON classification, and implements retry logic with exponential backoff.
-    Construct a prompt that asks Claude to classify into category (Sales/Support/Spam/General)
-    and urgency (High/Medium/Low). Parse and validate the JSON response. Gracefully degrade:
-    on failure, return `null` so the caller can mark the lead for retry.
+    Build the generator that emits a minimal `wrangler.toml` with the AI binding
+    pre-configured. The file must be valid TOML, require zero hand-tuning, and
+    contain no extraneous boilerplate.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/relay-ai-form-handler/decisions.md" reason="Direct PHP-to-Claude architecture lock; retry and graceful failure requirements" />
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Classification taxonomy and prompt structure" />
-    <file path="projects/relay-ai-form-handler/includes/class-admin.php" reason="API key retrieval via relay_decrypt_api_key()" />
+    <file path="/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-86/decisions.md" reason="Generated wrangler.toml constraints" />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="ANV-004 acceptance criteria" />
+    <file path="/home/agent/shipyard-ai/docs/EMDASH-GUIDE.md" reason="Cloudflare wrangler.jsonc/wrangler.toml config examples (§5)" />
   </context>
 
   <steps>
-    <step order="1">Create `includes/class-claude-client.php` with `Relay_Claude_Client` class. Constructor reads API key via `relay_decrypt_api_key()`.</step>
-    <step order="2">Implement `classify($submission)` method that builds a JSON prompt for Claude Messages API. Prompt: "Classify this form submission into one category: Sales, Support, Spam, General. Also assign urgency: High, Medium, Low. Return ONLY JSON: {\"category\":\"...\",\"urgency\":\"...\",\"reason\":\"...\"}"</step>
-    <step order="3">Send request via `wp_remote_post('https://api.anthropic.com/v1/messages', [...])` with headers: `x-api-key`, `anthropic-version: 2023-06-01`, `Content-Type: application/json`. Body: `model: 'claude-3-5-sonnet-20241022'`, `max_tokens: 256`, `messages: [{role:'user', content:$prompt}]`.</step>
-    <step order="4">Implement retry loop: up to 3 attempts with exponential backoff (1s, 2s, 4s). On `WP_Error` or non-2xx HTTP status, retry. On final failure, return `null`.</step>
-    <step order="5">Parse response body with `json_decode`. Validate that `category` is in the allowed set and `urgency` is in the allowed set. If invalid, return `null`.</step>
-    <step order="6">Return structured array: `['category' => ..., 'urgency' => ..., 'reason' => ..., 'raw_json' => $response_body]`.</step>
-    <step order="7">Verify `php -l`. Test with a mock server or valid API key: confirm classification returns correct structure and retries on 500 errors.</step>
+    <step order="1">Read `src/generators/spec.ts` from Task 1.2 to understand model metadata that may affect bindings</step>
+    <step order="2">In `src/generators/worker.ts` (or `src/generators/config.ts`), implement `generateWrangler(projectName: string): string`</step>
+    <step order="3">Generate TOML with exactly these fields: `name = projectName`, `compatibility_date = (today's date)`, `compatibility_flags = ["nodejs_compat"]`, and `[[ai]]` binding table with `binding = "AI"`</step>
+    <step order="4">Verify the generated string is valid TOML by parsing it with `@iarna/toml` or `toml` npm package in a unit test</step>
+    <step order="5">Verify the generated TOML passes `npx wrangler deploy --dry-run` when written to a temp directory with a dummy `index.ts`</step>
+    <step order="6">Confirm no commented-out boilerplate, no extra bindings, no environment-specific overrides</step>
+    <step order="7">Run build and tests</step>
   </steps>
 
   <verification>
-    <check type="build">`php -l includes/class-claude-client.php` passes</check>
-    <check type="test">Mock wp_remote_post returning 500 twice then 200 — confirm 3 attempts and success on third</check>
-    <check type="test">Mock response with invalid category returns null; valid response returns structured array</check>
-    <check type="manual">With real API key, classify a sample submission and verify JSON output matches expected schema</check>
+    <check type="build">npm run build passes</check>
+    <check type="test">Unit test: generated TOML parses cleanly with a TOML parser</check>
+    <check type="test">Dry-run `wrangler deploy` on generated config + dummy worker succeeds</check>
+    <check type="manual">Inspect generated TOML; confirm it is minimal and requires zero edits</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Plugin loader must instantiate Relay_Claude_Client" />
-    <depends-on task-id="phase-1-task-3" reason="API key must be retrievable via relay_decrypt_api_key()" />
+    <depends-on task-id="phase-1-task-1" reason="Project structure and build pipeline must exist" />
+    <depends-on task-id="phase-1-task-2" reason="May need model metadata for binding configuration" />
   </dependencies>
 
-  <commit-message>feat: add Claude API client with retry and graceful degradation
-
-Relay_Claude_Client sends submissions to Claude Messages API via
-wp_remote_post. Exponential backoff retry (3 attempts). Returns
-structured classification or null on failure. Compatible with PHP 7.4+.</commit-message>
+  <commit-message>feat(generator): emit minimal wrangler.toml with AI binding</commit-message>
 </task-plan>
+```
 
-<task-plan id="phase-1-task-6" wave="2">
-  <title>Classification cache: hash-based deduplication</title>
-  <requirement>RELAY-008, RELAY-014</requirement>
+### Wave 3 (Parallel) — After Wave 2
+
+```xml
+<task-plan id="phase-1-task-6" wave="3">
+  <title>Build CLI create command orchestration</title>
+  <requirement>ANV-001: Single-command scaffolding; ANV-007: Streaming-only contract</requirement>
   <description>
-    Implement a hash-based classification cache to eliminate redundant Claude API calls for
-    identical submissions. Hash the normalized subject + body. Store the hash → classification
-    result mapping in the WordPress options table with a 24-hour TTL. Before sending a new
-    submission to Claude, check the cache. On cache hit, return the stored classification instantly.
-    On cache miss, classify via API and store the result. Include a cache purge option in settings.
+    Wire the CLI entry point to the generators. Implement `src/commands/create.ts`
+    that orchestrates: fetch spec → select model → generate index.ts → generate wrangler.toml
+    → write to new directory → optionally run deploy. This is the heart of the 60-second path.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/relay-ai-form-handler/decisions.md" reason="Scaling guardrail: classification caching from day one; hash-based deduplication required" />
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Cache TTL and invalidation strategy" />
+    <file path="/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-86/decisions.md" reason="MVP feature set and file structure" />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="ANV-001 and ANV-007 acceptance criteria" />
+    <file path="projects/github-issue-sethshoultes-shipyard-ai-86/build/anvil/src/generators/spec.ts" reason="Interface for spec fetching and model selection" />
+    <file path="projects/github-issue-sethshoultes-shipyard-ai-86/build/anvil/src/generators/worker.ts" reason="Interface for worker and wrangler generation" />
   </context>
 
   <steps>
-    <step order="1">Create `includes/class-cache.php` with `Relay_Cache` class. Option key: `relay_classification_cache`.</step>
-    <step order="2">Implement `get_cache_key($submission)` that normalizes email + message (lowercase, trim whitespace) and returns `md5($normalized)`.</step>
-    <step order="3">Implement `get($submission)` that looks up the hash in `get_option('relay_classification_cache', [])`. Return the cached classification array only if `['expires'] > time()`. Otherwise return `false`.</step>
-    <step order="4">Implement `set($submission, $classification)` that writes the hash → `['classification' => ..., 'expires' => time() + DAY_IN_SECONDS]` into the option array, then updates the option.</step>
-    <step order="5">Implement `purge()` that deletes the option entirely. Expose a "Purge Classification Cache" button on the Relay Settings page (add to class-admin.php/settings.php).</step>
-    <step order="6">Add a cron cleanup job that runs daily and removes expired entries without deleting the whole cache.</step>
-    <step order="7">Verify `php -l`. Test: identical submissions return cached result; submissions after TTL trigger new API call.</step>
+    <step order="1">Create `src/commands/create.ts` importing `generators/spec.ts` and `generators/worker.ts`</step>
+    <step order="2">Implement `create({ llm: boolean, name?: string, deploy?: boolean })`</step>
+    <step order="3">If `!llm`, print plainspoken error: "Right now Anvil only speaks LLM. Try `--llm`?" and exit 1</step>
+    <step order="4">Fetch the live Cloudflare spec using `fetchSpec()`</step>
+    <step order="5">Select default model using `selectDefaultModel()`</step>
+    <step order="6">Create the target directory (default `anvil-worker` or user-provided `--name`)</step>
+    <step order="7">Write `index.ts` via `generateWorker(modelName)` into the target directory</step>
+    <step order="8">Write `wrangler.toml` via `generateWrangler(projectName)` into the target directory</step>
+    <step order="9">Write a minimal `package.json` into the target directory with `wrangler` and `@cloudflare/workers-types` as dev deps</step>
+    <step order="10">Print plainspoken success: "Your worker is forged in ./{name}/. Two files. One purpose."</step>
+    <step order="11">If `--deploy` flag is passed, invoke `deploy.ts` wrapper (Task 3.2) after generation</step>
+    <step order="12">If `--deploy` is not passed, print a hint: "Run `cd {name} && npx wrangler deploy` when you're ready to ship it."</step>
+    <step order="13">Verify the command creates exactly 3 files in the output directory (design rule: index.ts + wrangler.toml + package.json only)</step>
+    <step order="14">Run `node bin/anvil create --llm --name test-worker` in a temp directory and verify output</step>
   </steps>
 
   <verification>
-    <check type="build">`php -l includes/class-cache.php` passes</check>
-    <check type="test">Two identical submissions: first triggers API, second returns cache hit with zero API call</check>
-    <check type="test">Cache entry expires after TTL; subsequent identical submission triggers fresh API call</check>
-    <check type="manual">Press "Purge Cache" button; confirm option is cleared and next submission triggers API</check>
+    <check type="build">npm run build passes</check>
+    <check type="test">`node bin/anvil create --llm --name test-worker` creates directory with 3 files and exits 0</check>
+    <check type="test">`node bin/anvil create` (without --llm) prints friendly error and exits 1</check>
+    <check type="test">`node bin/anvil create --llm --name test-worker --deploy` triggers deploy flow (or mocked deploy)</check>
+    <check type="manual">Read success message; confirm it is warm, human, and makes you grin</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Plugin loader must instantiate Relay_Cache" />
+    <depends-on task-id="phase-1-task-1" reason="CLI entry point and project structure must exist" />
+    <depends-on task-id="phase-1-task-2" reason="Needs spec fetcher and model selector" />
+    <depends-on task-id="phase-1-task-4" reason="Needs worker generator to emit index.ts" />
+    <depends-on task-id="phase-1-task-5" reason="Needs wrangler generator to emit wrangler.toml" />
   </dependencies>
 
-  <commit-message>feat: add hash-based classification cache with TTL
-
-Relay_Cache deduplicates identical submissions via md5 hash.
-24-hour TTL with daily expired-entry cleanup. Admin can purge
-cache from Settings page. Reduces API costs at agency scale.</commit-message>
+  <commit-message>feat(cli): wire create command to generators for 60-second scaffolding</commit-message>
 </task-plan>
-
-### Wave 3
 
 <task-plan id="phase-1-task-7" wave="3">
-  <title>Async processor + routing: WP Cron classification and wp_mail routing</title>
-  <requirement>RELAY-009, RELAY-012, RELAY-013, RELAY-014</requirement>
+  <title>Build wrangler deploy wrapper and auth edge-case handling</title>
+  <requirement>ANV-005: Wrangler deploy integration; ANV-009: Plainspoken CLI voice</requirement>
   <description>
-    Build the WP Cron job that processes unclassified leads in the background. On each cron run,
-    query for `relay_lead` posts with `_relay_status = 'pending'`, limited to 5 per batch to respect
-    shared hosting limits. For each lead: check the classification cache; on miss, call Claude API;
-    store the result; update taxonomy terms and post meta; set status to 'classified'. Then trigger
-    email routing: if category = Sales, send wp_mail to the configured sales address; if Support,
-    send to support address; if Spam, mark status 'quarantined' and skip email. Include a manual
-    "Process Now" button in the admin UI for hosts with disabled WP Cron.
+    Build `src/utils/deploy.ts` — a thin wrapper around `wrangler deploy` that detects
+    missing authentication, prints plainspoken guidance instead of raw Wrangler errors,
+    and celebrates successful deploys with the Worker URL.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/relay-ai-form-handler/decisions.md" reason="Async classification pipeline; WP Cron reliability risk #9; email routing" />
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Classification taxonomy and routing rules" />
-    <file path="projects/relay-ai-form-handler/includes/class-claude-client.php" reason="classify() method" />
-    <file path="projects/relay-ai-form-handler/includes/class-cache.php" reason="get() and set() methods" />
-    <file path="projects/relay-ai-form-handler/includes/class-storage.php" reason="Lead query and update helpers" />
+    <file path="/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-86/decisions.md" reason="Auth friction open question and deploy requirements" />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="ANV-005 and ANV-009 acceptance criteria" />
   </context>
 
   <steps>
-    <step order="1">Create `includes/class-async-processor.php` with `Relay_Async_Processor` class. Hook `relay_process_leads` cron event to `process_batch()`.</step>
-    <step order="2">Implement `process_batch()` that queries `get_posts(['post_type' => 'relay_lead', 'post_status' => 'any', 'meta_key' => '_relay_status', 'meta_value' => 'pending', 'posts_per_page' => 5])`.</step>
-    <step order="3">For each pending lead: (a) build submission array from post meta, (b) call `Relay_Cache::get()`, (c) if cache miss, call `Relay_Claude_Client::classify()`, (d) if classification is null, leave status as 'pending' and continue, (e) on success, call `Relay_Cache::set()`, update taxonomy terms (`wp_set_post_terms` for category and urgency), update `_relay_classification_json` and `_relay_status = 'classified'`.</step>
-    <step order="4">Implement `route_email($lead_id, $classification)` that reads routing rules from settings. Default rules: Sales → `get_option('admin_email')`, Support → `get_option('admin_email')`, General → `get_option('admin_email')`, Spam → skip. Allow override addresses in settings. Use `wp_mail` with subject "[Relay] New {$category} Lead — {$urgency} Urgency".</step>
-    <step order="5">Add admin dashboard widget showing "Pending classifications: N" with a "Process Now" button that manually triggers `do_action('relay_process_leads')` via AJAX.</step>
-    <step order="6">Add admin notice if WP Cron appears disabled (no cron runs in last 30 minutes): "Relay classifications may be delayed. Consider setting up a server-side cron."</step>
-    <step order="7">Verify `php -l`. Test with mock data: pending leads get classified and routed; Claude failure leaves lead pending; manual Process Now works.</step>
+    <step order="1">Create `src/utils/deploy.ts` with `deploy(projectPath: string): Promise<void>`</step>
+    <step order="2">Use `child_process.spawn` to run `npx wrangler deploy` in the project directory</step>
+    <step order="3">Stream Wrangler's stdout/stderr through a filter that replaces cryptic errors with plainspoken messages</step>
+    <step order="4">Detect "not authenticated" or "Unauthorized" in output and print: "Looks like Wrangler needs to know who you are. Run `npx wrangler login` and come back — we'll wait." Then exit 1</step>
+    <step order="5">Detect successful deploy and extract the deployed URL from Wrangler output (e.g., `https://<name>.<subdomain>.workers.dev`)</step>
+    <step order="6">On success, print: "It's live! {url} — your worker is answering requests from 200 cities right now."</step>
+    <step order="7">On generic failure, print: "Deploy hit a snag. Here's what Wrangler said: {cleanedError}" plus a suggestion to check the Cloudflare dashboard</step>
+    <step order="8">Write a unit test that mocks spawn stdout/stderr and verifies the plainspoken error paths</step>
+    <step order="9">Run build and tests</step>
   </steps>
 
   <verification>
-    <check type="build">`php -l includes/class-async-processor.php` passes</check>
-    <check type="test">Create 3 pending leads; run cron batch; confirm 3 get classified, taxonomy terms updated, emails sent</check>
-    <check type="test">Simulate Claude API failure; confirm leads remain pending and can be retried on next cron</check>
-    <check type="test">Spam lead gets status 'quarantined' and no email sent</check>
-    <check type="manual">Dashboard widget shows pending count; "Process Now" button classifies leads immediately</check>
+    <check type="build">npm run build passes</check>
+    <check type="test">Mocked spawn with "Unauthorized" → plainspoken auth guidance message</check>
+    <check type="test">Mocked spawn with success → URL extracted and celebrated</check>
+    <check type="manual">Read error messages; confirm zero IBM sentences and zero raw stack traces as primary UI</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Needs CPT and taxonomy to store classification results" />
-    <depends-on task-id="phase-1-task-5" reason="Needs Relay_Claude_Client::classify()" />
-    <depends-on task-id="phase-1-task-6" reason="Needs Relay_Cache for deduplication" />
+    <depends-on task-id="phase-1-task-1" reason="Project structure and build pipeline must exist" />
   </dependencies>
 
-  <commit-message>feat: add async classification processor with email routing
-
-WP Cron batch job classifies pending leads via Claude API (with cache
-lookup). Updates taxonomy terms and triggers wp_mail routing based on
-category. Manual "Process Now" button for unreliable cron hosts.</commit-message>
+  <commit-message>feat(deploy): wrap wrangler deploy with plainspoken auth handling and celebration</commit-message>
 </task-plan>
 
 <task-plan id="phase-1-task-8" wave="3">
-  <title>Admin inbox UI: PHP-rendered with color-coded badges and AJAX polling</title>
-  <requirement>RELAY-010, RELAY-011</requirement>
+  <title>Write plainspoken README, error messages, and CLI polish</title>
+  <requirement>ANV-009: Plainspoken CLI voice; ANV-010: 60-second grin path</requirement>
   <description>
-    Build the admin inbox view that Steve Jobs called "the reason to survive." Use a custom
-    WP_List_Table subclass or clean PHP render with the locked design tokens. Display leads with
-    color-coded badges for category and urgency. Provide sort/filter by category/urgency/date and
-    search by name/email. Include one-click Reply that opens `mailto:` with pre-filled To and Subject.
-    Add vanilla JS for 30-second AJAX polling to refresh the inbox as classifications complete.
-    The UI must feel alive — smooth state transitions, heartbeat polling, calm command center aesthetic.
+    Audit every user-facing string in the CLI. Write a README.md that sells the 60-second
+    promise. Ensure all error messages, progress messages, and help text are warm, human,
+    and plainspoken. No corporate jargon. No stack traces as UI.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/relay-ai-form-handler/decisions.md" reason="PHP-rendered inbox decision; Steve's emotional requirement" />
-    <file path="/home/agent/shipyard-ai/rounds/relay-ai-form-handler/essence.md" reason=""Feeling: Relief. End of inbox dread. Must be perfect: First 30 seconds."" />
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="Locked hex color codes for badges" />
-    <file path="projects/relay-ai-form-handler/includes/class-storage.php" reason="CPT query helpers" />
-    <file path="projects/relay-ai-form-handler/includes/class-admin.php" reason="Menu registration and asset enqueuing" />
+    <file path="/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-86/decisions.md" reason="Brand voice locked decisions (#4) and emotional payoff metric (#5)" />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="ANV-009 acceptance criteria" />
   </context>
 
   <steps>
-    <step order="1">Create `admin/views/inbox.php` with a custom table or clean div-based list. Query `get_posts(['post_type' => 'relay_lead', 'posts_per_page' => 20])` with pagination.</step>
-    <step order="2">Display columns: Name/Email (linked), Category badge, Urgency badge, Date, Actions (Reply, View). Badges use inline styles with locked hex codes: Sales `#F97316`, Support `#38BDF8`, Spam `#64748B`, General `#E2E8F0`. Urgency: High `#EF4444`, Medium `#F59E0B`, Low `#22C55E`.</step>
-    <step order="3">Add filter bar: dropdowns for Category and Urgency, date picker, text search. Implement server-side filtering by adjusting the WP_Query args based on `$_GET` parameters with nonces.</step>
-    <step order="4">Add sort toggles on column headers (Date, Category, Urgency). Use `$_GET['orderby']` and `$_GET['order']` with allowlisted values.</step>
-    <step order="5">Implement Reply action: link to `mailto:{$email}?subject=Re: {$subject}` with `esc_url` and `esc_attr`.</step>
-    <step order="6">Create `admin/css/relay-admin.css` with calm command center aesthetic: Inter-like system font stack, card backgrounds `#F8FAFC`, borders `#E2E8F0`, text `#0F172A`. Smooth hover transitions (0.2s). Badge styles with border-radius 9999px, padding 4px 12px, font-size 12px, font-weight 600.</step>
-    <step order="7">Create `admin/js/relay-admin.js` with: (a) 30-second `setInterval` that fetches `/wp-json/relay/v1/inbox-poll` (new REST endpoint) and updates badge counts + pending rows without full reload, (b) sort/filter form enhancement (prevent default, fetch via AJAX), (c) one-click reply confirmation for spam leads.</step>
-    <step order="8">Register `/wp-json/relay/v1/inbox-poll` endpoint in `class-admin.php` or `class-form-handler.php` that returns JSON with latest leads and counts. Capability check: `current_user_can('manage_options')`.</step>
-    <step order="9">Enqueue CSS and JS only on Relay admin pages using `admin_enqueue_scripts` with `$hook` check.</step>
-    <step order="10">Verify `php -l` on all new files. Visual QA: inbox loads, badges render correctly, AJAX polling updates counts, Reply opens email client.</step>
+    <step order="1">Audit all strings in `src/index.ts`, `src/commands/create.ts`, `src/utils/deploy.ts`, and `src/generators/*.ts`</step>
+    <step order="2">Replace any message that sounds like an IBM landing page, a server log, or a stack trace with warm, plainspoken copy</step>
+    <step order="3">Write `README.md` at project root with: hero sentence ("One command. One worker. One grin."), 60-second promise, install instructions (`npm install -g @shipyard/anvil`), usage example, zero-install button link, and a "What gets built" section</step>
+    <step order="4">Ensure README contains no jargon: no "leverage", "synergy", "scalable solution", "best-in-class"</step>
+    <step order="5">Add a `CHANGELOG.md` or release notes section with v1.0.0 entry</step>
+    <step order="6">Run `grep -ri "unauthorized\|bad request\|internal server error\|please contact\|stack trace\|at \S* (\S*:\d*:\d*)" src/` and confirm zero matches (except in comments documenting what NOT to do)</step>
+    <step order="7">Run `grep -ri "leverage\|synergy\|scalable\|best-in-class\|end-to-end solution" README.md src/` and confirm zero matches</step>
+    <step order="8">Run build and verify no string literals break TypeScript compilation</step>
   </steps>
 
   <verification>
-    <check type="build">`php -l admin/views/inbox.php` passes; CSS validates</check>
-    <check type="test">Inbox page loads within 2 seconds with 50 leads; filtering by category returns correct subset</check>
-    <check type="test">AJAX poll endpoint returns JSON and requires `manage_options` capability</check>
-    <check type="manual">Visual QA: badges are color-coded per design tokens; hover states smooth; Reply link opens mailto with correct recipient; polling updates pending count without flash</check>
+    <check type="build">npm run build passes</check>
+    <check type="test">Grep for corporate jargon in README + src/ returns 0 matches</check>
+    <check type="test">Grep for raw HTTP status strings as primary error UI returns 0 matches</check>
+    <check type="manual">Read README aloud; confirm it makes you want to run the command immediately</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Needs relay_lead CPT and taxonomy terms to display" />
-    <depends-on task-id="phase-1-task-3" reason="Needs Relay_Admin menu registration and asset enqueue hooks" />
+    <depends-on task-id="phase-1-task-1" reason="Project structure must exist" />
+    <depends-on task-id="phase-1-task-6" reason="Needs create command strings to audit" />
+    <depends-on task-id="phase-1-task-7" reason="Needs deploy strings to audit" />
   </dependencies>
 
-  <commit-message>feat: build admin inbox with color-coded badges and AJAX polling
-
-PHP-rendered inbox with custom CSS badges, sort/filter, search, and
-one-click Reply (mailto). Vanilla JS 30s AJAX polling for live updates.
-Calm command center aesthetic per design tokens.</commit-message>
+  <commit-message>docs: plainspoken README and CLI voice audit — zero IBM sentences</commit-message>
 </task-plan>
+```
 
-### Wave 4
+### Wave 4 — After Wave 3
 
+```xml
 <task-plan id="phase-1-task-9" wave="4">
-  <title>Security hardening, i18n, and WP.org readiness</title>
-  <requirement>RELAY-013, RELAY-014</requirement>
+  <title>End-to-end integration test and 60-second path verification</title>
+  <requirement>ANV-010: 60-second grin path</requirement>
   <description>
-    Final pass across all plugin files to ensure WordPress.org coding standards compliance.
-    Add capability checks on every admin action and REST endpoint. Verify all forms use wp_nonce_field
-    and check_admin_referer. Escape all output with esc_html, esc_attr, esc_url, wp_kses_post.
-    Sanitize all input with sanitize_text_field, sanitize_email, wp_kses. Use $wpdb->prepare for any
-    direct queries (though CPT API should be used). Add i18n wrappers (__(), _e(), esc_html__())
-    with text domain 'relay'. Create readme.txt with WP.org headers and agency install pitch.
-    Verify PHP 7.4+ syntax compatibility throughout.
+    Run the full Anvil pipeline end-to-end: scaffold a worker, typecheck the generated code,
+    run a dry-run deploy, and measure the time from command to "ready to deploy." Fix any
+    friction that pushes the experience over 60 seconds. This is the grin test.
   </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/relay-ai-form-handler/decisions.md" reason="WP.org standards must-have; shared hosting compatibility; API key exposure risk #7" />
-    <file path="/home/agent/shipyard-ai/prds/relay-ai-form-handler.md" reason="Must-have #6: WordPress.org coding standards" />
-    <file path="projects/relay-ai-form-handler/relay.php" reason="Main file headers and compatibility declaration" />
-    <file path="projects/relay-ai-form-handler/includes/class-admin.php" reason="Capability checks and nonce verification" />
-    <file path="projects/relay-ai-form-handler/includes/class-form-handler.php" reason="REST permission callbacks and input sanitization" />
+    <file path="/home/agent/shipyard-ai/rounds/github-issue-sethshoultes-shipyard-ai-86/decisions.md" reason="60-second target experience and 100-concurrent-stream production metric" />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="ANV-010 acceptance criteria" />
+    <file path="projects/github-issue-sethshoultes-shipyard-ai-86/build/anvil/src/commands/create.ts" reason="Create command to exercise end-to-end" />
+    <file path="projects/github-issue-sethshoultes-shipyard-ai-86/build/anvil/src/utils/deploy.ts" reason="Deploy wrapper to verify dry-run" />
   </context>
 
   <steps>
-    <step order="1">Audit every admin page callback: add `current_user_can('manage_options')` bail-out at the top.</step>
-    <step order="2">Audit every REST `permission_callback`: ensure it returns `current_user_can('manage_options')` or valid nonce/token.</step>
-    <step order="3">Audit every `echo` and print statement: replace with `esc_html()`, `esc_attr()`, `esc_url()`, or `wp_kses_post()` as appropriate.</step>
-    <step order="4">Audit every `$_GET`, `$_POST`, `$_REQUEST` access: wrap in `sanitize_text_field()`, `sanitize_email()`, `absint()`, or `wp_kses()`.</step>
-    <step order="5">Verify all forms use `wp_nonce_field('relay_action', 'relay_nonce')` and `check_admin_referer('relay_action', 'relay_nonce')`.</step>
-    <step order="6">Wrap all user-visible strings with `__()`, `_e()`, or `esc_html__()` using text domain `'relay'`.</step>
-    <step order="7">Create `languages/relay.pot` stub with `xgettext` or hand-rolled header. Add `load_plugin_textdomain('relay', false, dirname(plugin_basename(__FILE__)) . '/languages/')` to `relay.php`.</step>
-    <step order="8">Create `readme.txt` with WordPress.org standard headers: === Relay ===, Contributors, Tags, Requires at least, Tested up to, Requires PHP, Stable tag, License. Include short description, long description (agency pitch), installation steps, FAQ, and changelog.</step>
-    <step order="9">Verify PHP 7.4 compatibility: no union types, no named arguments, no match expressions, no str_contains(). Use `strpos()` instead.</step>
-    <step order="10">Run `php -l` recursively on all `.php` files. Perform a final static review for any missed escapes or sanitization gaps.</step>
+    <step order="1">In a clean temp directory, run `time node /path/to/bin/anvil create --llm --name e2e-test`</step>
+    <step order="2">Verify the output directory `e2e-test/` contains exactly 3 files: `index.ts`, `wrangler.toml`, `package.json`</step>
+    <step order="3">Run `cd e2e-test && npm install` and measure time</step>
+    <step order="4">Run `cd e2e-test && npx tsc --noEmit --skipLibCheck index.ts` and verify TypeScript compiles with zero errors</step>
+    <step order="5">Run `cd e2e-test && npx wrangler deploy --dry-run` and verify dry-run succeeds</step>
+    <step order="6">Sum the times from steps 1-5. If total > 60 seconds, identify the bottleneck and file a fix task (or fix inline if trivial)</step>
+    <step order="7">Inspect generated `index.ts` to confirm it contains `stream: true`, health check, and no banned patterns</step>
+    <step order="8">Inspect generated `wrangler.toml` to confirm it is minimal and valid</step>
+    <step order="9">Write a script `scripts/e2e-smoke.sh` that automates steps 1-5 for CI</step>
+    <step order="10">Add a GitHub Actions workflow `.github/workflows/ci.yml` that runs `npm run build`, `npm run test`, and `scripts/e2e-smoke.sh`</step>
+    <step order="11">Run the full CI pipeline locally and confirm green</step>
   </steps>
 
   <verification>
-    <check type="build">`find . -name '*.php' -exec php -l {} \;` returns no errors</check>
-    <check type="test">WP_DEBUG enabled; no PHP notices or warnings on any admin page or REST call</check>
-    <check type="test">Plugin Check (WP-CLI `wp plugin check relay`) passes with zero errors and zero warnings</check>
-    <check type="manual">readme.txt renders correctly on the WP.org plugin readme validator</check>
+    <check type="build">npm run build passes</check>
+    <check type="test">npm run test passes (all unit tests green)</check>
+    <check type="test">scripts/e2e-smoke.sh passes and completes in <60 seconds on a warm cache</check>
+    <check type="test">Generated worker TypeScript compiles with zero errors</check>
+    <check type="manual">Run the command yourself. Does it make you grin? If not, fix the friction.</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="Touches relay.php for textdomain and readme" />
-    <depends-on task-id="phase-1-task-2" reason="Touches class-storage.php for escaping and capabilities" />
-    <depends-on task-id="phase-1-task-3" reason="Touches class-admin.php and settings.php for nonces and escaping" />
-    <depends-on task-id="phase-1-task-4" reason="Touches class-form-handler.php for REST permissions and sanitization" />
-    <depends-on task-id="phase-1-task-5" reason="Touches class-claude-client.php for error handling robustness" />
-    <depends-on task-id="phase-1-task-7" reason="Touches class-async-processor.php for cron security" />
-    <depends-on task-id="phase-1-task-8" reason="Touches inbox.php, CSS, JS for escaping and capability checks" />
+    <depends-on task-id="phase-1-task-1" reason="Project must be fully built" />
+    <depends-on task-id="phase-1-task-2" reason="Spec fetcher must work live" />
+    <depends-on task-id="phase-1-task-3" reason="GitHub template must be valid" />
+    <depends-on task-id="phase-1-task-4" reason="Worker generator must emit valid code" />
+    <depends-on task-id="phase-1-task-5" reason="Wrangler generator must emit valid config" />
+    <depends-on task-id="phase-1-task-6" reason="Create command must orchestrate correctly" />
+    <depends-on task-id="phase-1-task-7" reason="Deploy wrapper must handle dry-run" />
+    <depends-on task-id="phase-1-task-8" reason="README and voice polish must be in place" />
   </dependencies>
 
-  <commit-message>chore: security hardening, i18n, and WP.org standards compliance
-
-Final pass: capability checks, nonces, input sanitization, output escaping,
-i18n wrappers, readme.txt, PHP 7.4 compatibility verification.
-Plugin Check passes with zero errors.</commit-message>
+  <commit-message>test(e2e): verify 60-second path and add CI smoke test</commit-message>
 </task-plan>
+```
 
 ---
 
 ## Risk Notes
 
-### Project-Specific Risks
+### High-Risk Items from Hindsight
 
-1. **Token Budget Overrun / Shipping Failure** (Critical)
-   - The original PRD budgeted 775K tokens including React UI (+150K) and Cloudflare Worker (+75K).
-   - Locked decisions cut both, reclaiming ~225K tokens for the PHP-only build.
-   - **Mitigation**: Hard ceiling of 40% of session tokens for the inbox layer (per risk register #1). If inbox CSS/JS debugging exceeds budget, auto-simplify to bare WP_List_Table with inline styles. Task 8 is the highest-risk task for token overrun.
+1. **Spec Drift / Generation Failure** (Likelihood: Medium, Impact: High)
+   - The live Cloudflare Workers AI OpenAPI spec may change model names, bindings, or response shapes.
+   - **Mitigation**: Task 1.2 (spec fetcher) includes version-aware parsing and loud failure. Task 4.1 (E2E test) runs a daily smoke test that fails CI if the generator output doesn't compile or dry-run cleanly. No static fallback templates are permitted.
 
-2. **Shared Hosting Incompatibility** (Critical)
-   - Target environment is cheapest shared hosting (Bluehost/HostGator).
-   - WP Cron may be disabled or throttled (risk register #9).
-   - **Mitigation**: Task 7 includes manual "Process Now" button and admin notice for disabled cron. Task 9 verifies PHP 7.4+ syntax and zero exotic extensions.
+2. **`npm install` / `wrangler auth` Drop-off** (Likelihood: High, Impact: High)
+   - First-time users hit `wrangler login` and lose the grin.
+   - **Mitigation**: Task 1.3 (GitHub template) provides a zero-install bypass. Task 3.2 (deploy wrapper) replaces raw Wrangler auth errors with plainspoken hand-holding.
 
-3. **Async UX = "Dead Lead" Gap** (High)
-   - User submits form, sees "Unclassified" for minutes until cron fires. Kills the 30-second magic promised in essence.md.
-   - **Mitigation**: Task 7 fires `spawn_cron()` immediately on form submission event (Task 4) to trigger classification ASAP. Admin inbox (Task 8) gracefully shows unclassified leads with a pulsing "Processing" badge so nothing feels broken.
+3. **Scope Creep into Framework Territory** (Likelihood: High, Impact: Medium)
+   - The original PRD mentions "rate limiting, caching, streaming, and monitoring built in." Decisions explicitly CUT these.
+   - **Mitigation**: Every task plan references the CUT list. Any feature request outside ANV-001 through ANV-010 must be rejected or deferred.
 
-4. **Claude API Cost at Scale** (Critical — future)
-   - 200K classifications/day ≈ $600/day without caching.
-   - **Mitigation**: Task 6 ships hash-based deduplication from day one. Task 7 uses cache before every API call. SaaS metering hooks are out of scope for v1 but the architecture leaves room for counters.
+4. **Demo-Quality Product** (Likelihood: Medium, Impact: High)
+   - Optimizing for HN upvotes instead of daily use kills retention.
+   - **Mitigation**: Task 4.1 is literally "the grin test." If the 60-second path doesn't produce delight, the plan is not complete.
 
-5. **Form Plugin Fragmentation** (Medium)
-   - Only CF7 + generic hook ship in v1. Gravity Forms is v1.1.
-   - **Mitigation**: Task 4's generic REST endpoint (`/wp-json/relay/v1/submit`) covers most custom form use cases without plugin-specific code.
+### Low-Risk Items
 
-### Hindsight-Informed Risks
+5. **Name/Brand Dilution** (Likelihood: Low, Impact: Medium)
+   - Already locked as "Anvil" in decisions.md §1. Task 1.1 and Task 3.3 enforce the name and voice.
 
-- **Greenfield advantage**: No high-churn or bug-associated files exist for this project. No merge conflicts expected.
-- **Planning file churn**: `.planning/phase-1-plan.md` and `.planning/REQUIREMENTS.md` are high-churn files in the broader repo (48 and 44 changes). Coordinate with other active projects (`agentpipe`, `whisper`) to avoid simultaneous edits.
-- **Uncommitted changes**: `prds/relay-ai-form-handler.md` and `rounds/relay-ai-form-handler/` are currently untracked. Safe to leave as-is during build.
+6. **Template Rot via Static Fallbacks** (Likelihood: Low, Impact: High)
+   - Locked decision #3 forbids static templates. Task 1.2 and Task 2.1 enforce dynamic-only generation.
 
-### Sequencing Notes
+### Hindsight-File Intersection
+- **None**. This is a greenfield build in a new workspace. The high-churn files (`.planning/phase-1-plan.md`, `.planning/REQUIREMENTS.md`) are expected to be overwritten for each active project.
+- Agents should **not** touch `plugins/membership/src/sandbox-entry.ts` or `plugins/eventdash/src/sandbox-entry.ts` — these are unrelated Emdash plugins with their own maintenance cycles.
 
-- **Wave 1 tasks are fully parallel** — no shared files between task-1, task-2, and task-3 except the conceptual loader registration, which each class handles independently.
-- **Wave 2 tasks are fully parallel** once Wave 1 completes — each core logic class is independent.
-- **Wave 3 tasks are parallel** once Wave 2 completes. Task 7 (async processor) and Task 8 (inbox) can run simultaneously; the inbox gracefully handles both classified and unclassified leads.
-- **Wave 4 must be sequential** after Wave 3 because it touches every file for final hardening.
+---
+
+## Execution Notes
+
+- **Build workspace**: `projects/github-issue-sethshoultes-shipyard-ai-86/build/anvil/`
+- **Token budget**: Per CLAUDE.md, this is a "Plugin"-sized build (500K tokens base). Debate + Plan should use ≤10% (50K). Build gets 60% (300K). Review + Deploy get 20% (100K). Reserve 10% (50K).
+- **Model for sub-agents**: Haiku (as per CLAUDE.md, all sub-agents run on haiku).
+- **Quality gate**: Margaret Hamilton (QA) must approve before merge to main. No exceptions.
+- **Branch**: `feature/anvil-v1` → PR → `main`.
+
+---
+
+*End of Phase 1 Plan*
