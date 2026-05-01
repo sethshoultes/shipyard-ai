@@ -1,10 +1,11 @@
 # Hindsight Report
-**Generated:** 2026-04-30T12:12:47.885Z
+**Generated:** 2026-05-01T09:13:20.066Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 3 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 7 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- c0b0280 daemon: auto-commit 6 files
 - 66a926c daemon: auto-commit 2 files
 - 0358bcf daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-91
 - eaeca82 clipcraft-backend v1: archive hollow deliverable; v2 is canonical
@@ -14,22 +15,21 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 3 uncommitted changes.
 - a17c848 daemon: auto-commit after build phase for localgenius-frontend-and-benchmark-engine
 - a7bc3bc daemon: auto-commit 2 files
 - 4b764c9 daemon: auto-commit after build phase for shipyard-auto-pipeline-and-care-subscription
-- 68501a6 daemon: auto-commit 2 files
 
 ## High-Churn Files
 - `.daemon-queue.json` (113 changes)
 - `.planning/sara-blakely-review.md` (78 changes)
-- `.planning/phase-1-plan.md` (49 changes)
-- `.planning/REQUIREMENTS.md` (46 changes)
+- `.planning/phase-1-plan.md` (50 changes)
+- `.planning/REQUIREMENTS.md` (47 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
-- `.great-minds/hindsight-report.md` (24 changes)
+- `.great-minds/hindsight-report.md` (25 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
 - `HEARTBEAT.md` (13 changes)
 - `website/src/app/layout.tsx` (11 changes)
 - `STATUS.md` (11 changes)
 - `website/src/app/work/page.tsx` (11 changes)
-- `.github-intake-state.json` (9 changes)
+- `.github-intake-state.json` (10 changes)
 - `plugins/membership/src/index.ts` (9 changes)
 - `rounds/finish-plugins/board-verdict.md` (9 changes)
 
@@ -57,9 +57,13 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 3 uncommitted changes.
 
 ## Uncommitted State
 ```
-M .github-intake-state.json
-?? prds/github-issue-sethshoultes-shipyard-ai-86.md
-?? rounds/github-issue-sethshoultes-shipyard-ai-86/
+M .great-minds/hindsight-report.md
+ M .planning/sara-blakely-review.md
+?? dreams/dream-2026-05-01T08-5-elon.md
+?? dreams/dream-2026-05-01T08-5-steve.md
+?? dreams/dream-2026-05-01T08-5-votes.md
+?? prds/prd-agentbridge-wordpress-mcp-server.md
+?? rounds/prd-agentbridge-wordpress-mcp-server/
 ```
 
 ---
