@@ -1,29 +1,39 @@
-# Round 2: Shipping Beats Storytelling
+# Round 2 — Elon
 
-Steve built a beautiful cathedral. The problem is, we need a door latch.
+## Where Steve's Beauty is Blocking the Ship
 
-**Where beauty blocks shipping**
+"Proof" is a fine name for v3. We just had 6 days of 404s because nobody got paged. Naming committees don't fix outages. Ship the function, trademark later.
 
-"PROOF" is a lovely name for a consumer app. This is a deploy hook. Naming it does not make it exist. The "Verified" screen in 30 seconds assumes a human staring at a terminal during CI/CD. No one does this. Engineers push code and look at Slack or the PR status check. Building a branded "moment of truth" is theater when the pipeline is what needs to pass or fail.
+The product didn't miss its landing because it lacked a poetic name. It missed because there was no line of code that checked the domain after the publish step finished.
 
-The "no Slack integration as primary experience" stance is actively harmful. If the deploy fails, the signal must surface where the team already lives. Forcing engineers to a separate red screen fragments workflow and slows response time.
+Steve's emotional architecture — "dread into confidence," "splash of cold water," Margaret Hamilton — is marketing theater. What actually stops 404s is a 30-line script hitting a URL and screaming into Slack when it isn't 200. Everything else is scope creep wearing a turtleneck.
 
-**Why first-principles simplicity wins**
+The "mom test" brand voice sounds humane until you have to localize it, A/B test it, and maintain a tone guide. Error messages in v1 should be raw failure: `GET / → 404 on example.com`. Poetry is v2.
 
-My inline `curl` check is not elegant. It is *accountable*. You can read it in five seconds, know exactly what it does, and replace it when the platform changes. A separate "verification stage" with product semantics accumulates owners, documentation, and eventually a Jira board.
+Steve says no to graphs and configuration wizards, then proposes an entire emotional product experience. That's the contradiction: you can't be "insanely focused" and also craft a branded "moment of truth." Focus means cutting the brand bible, not just the Grafana dashboard.
 
-Default-on in the deploy template is the only distribution strategy that survives contact with reality. Opt-in features protect zero customers.
+## Why My Engineering Simplicity Wins Long-Term
 
-Origin-validation — confirming the response comes from the Cloudflare Pages IP, not just HTTP 200 — is non-negotiable because DNS cache gives false positives. A beautiful green "Verified" that lies is worse than no check at all.
+Shelling out to `wrangler` and `grep` is fragile. CLI output formatting changes without semantic-versioning your parser. Direct API calls are deterministic. This isn't taste; it's physics.
 
-**Where Steve is right**
+Default-on in the deploy template isn't "distribution strategy" — it's the only path to non-zero adoption. Opt-in features die in every dataset I've ever seen. Zero friction or it doesn't exist.
 
-Error messages should be plain English. "Your domain is broken" is better than "an error was encountered." I concede that completely. And he is correct that this must not become a monitoring platform with dashboards and configurable thresholds. Scope discipline matters.
+Fail fast and alert beats "pretty failure" every time. A red Slack message at T+30 seconds is infinitely more valuable than a curated "verdict" at T+6 days. Retry loops and "insanely great" prose are just latency.
 
-**My three non-negotiables**
+The real 10x fix isn't a prettier verification stage — it's owning the DNS record update inside the same pipeline step that publishes. If deploy and DNS can't drift, you don't need a verification band-aid. Unified control is simpler than a beautiful safety net.
 
-1. **Inline pipeline check.** No separate microservice, no "post-deploy stage," no product wrapper.
-2. **Origin-validated health check.** Validate the CNAME/A record against expected Cloudflare Pages origin, not just HTTP status.
-3. **Default-on in deploy template.** Every customer deployment runs this automatically. Opt-in is the same as off.
+## Where Steve is Correct
 
-That is the fix. Everything else is a press release.
+He's right that the answer must fit in a push notification. I call that "send the HTTP status and domain," but we agree: binary, instant, no graphs.
+
+He's right that it must be wired into the pipeline without thought. That's why it's default-on, not a standalone microservice.
+
+These are engineering constraints, not a brand manifesto. I will grant that taste matters when the user is a consumer choosing between apps. When the user is a sleep-deprived engineer at 3 AM, they need a siren, not a sonnet.
+
+## Top 3 Non-Negotiable Decisions
+
+1. **No HTML body parsing or CLI grep.** API + `X-Build-Id` header only. Machine-readable, deterministic.
+2. **Default-on in the deploy template.** Not opt-in. Not a separate service. Adoption through zero friction.
+3. **Fail fast + alert.** No retry loops, no dashboards, no "verdict" prose in v1. 200 or page. That's it.
+
+The 404s happened because we built everything except the thing that wakes us up. Don't let beauty mute the alarm.

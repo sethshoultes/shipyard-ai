@@ -1,6 +1,6 @@
 # Essence
 
-- Product: Automated confirmation deploy is live, correct origin, right build.
-- Feeling: Lock clicking shut at 2 AM. No pit in stomach.
-- Must be perfect: Cannot lie. Origin validation beats green status code.
-- Direction: Invisible truth.
+- What it is: Proof your deployment actually reached your users.
+- Feeling: Lock clicking at 2 AM. Safe. Final. Done.
+- Must be perfect: Cannot lie. Origin validation or nothing ships.
+- Direction: Verdict, not courtroom.

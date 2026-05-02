@@ -1,32 +1,32 @@
 # Hindsight Report
-**Generated:** 2026-05-02T20:55:26.760Z
+**Generated:** 2026-05-02T21:21:13.431Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 1 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 15 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- a43a9de daemon: auto-commit 1 files
+- 33317eb micromanager: dirty auto-reconcile
+- 80e3648 daemon: auto-commit 4 files
+- da8083e daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-90
 - b37044d micromanager: dirty auto-reconcile
 - ce2b112 daemon: auto-commit 3 files
 - ed15812 daemon: auto-commit 3 files
 - 4a0b0e5 daemon: auto-commit after build phase for standalone-apps-portfolio-v2
 - 517dad7 micromanager: dirty auto-reconcile
 - 00491b2 daemon: auto-commit 2 files
-- d42e18a daemon: auto-commit 3 files
-- 9af9d58 micromanager: dirty auto-reconcile
-- 3111cbf daemon: auto-commit 3 files
-- 1b25ecb micromanager: dirty auto-reconcile
 
 ## High-Churn Files
-- `.daemon-queue.json` (136 changes)
-- `.planning/sara-blakely-review.md` (88 changes)
+- `.daemon-queue.json` (139 changes)
+- `.planning/sara-blakely-review.md` (89 changes)
 - `.planning/phase-1-plan.md` (51 changes)
 - `.planning/REQUIREMENTS.md` (48 changes)
-- `.great-minds/hindsight-report.md` (37 changes)
+- `.great-minds/hindsight-report.md` (38 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
+- `prds/github-issue-sethshoultes-shipyard-ai-90.md` (20 changes)
 - `prds/github-issue-sethshoultes-shipyard-ai-91.md` (20 changes)
-- `prds/github-issue-sethshoultes-shipyard-ai-90.md` (19 changes)
 - `prds/github-issue-sethshoultes-shipyard-ai-98.md` (17 changes)
 - `HEARTBEAT.md` (13 changes)
 - `.github-intake-state.json` (12 changes)
@@ -57,7 +57,21 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 1 uncommitted changes.
 
 ## Uncommitted State
 ```
-M .planning/sara-blakely-review.md
+M .daemon-queue.json
+ D prds/daemon-fix-watcher-skip-loop.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-98/decisions.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-98/essence.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-98/round-1-elon.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-98/round-1-steve.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-98/round-2-elon.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-98/round-2-steve.md
+?? .agent-logs/debate/elon-musk-r1-1777756379607.jsonl
+?? .agent-logs/debate/elon-musk-r2-1777756551325.jsonl
+?? .agent-logs/debate/phil-jackson-consolidation-1777756722661.jsonl
+?? .agent-logs/debate/rick-rubin-essence-1777756687776.jsonl
+?? .agent-logs/debate/steve-jobs-r1-1777756379601.jsonl
+?? .agent-logs/debate/steve-jobs-r2-1777756551316.jsonl
+?? prds/parked/daemon-fix-watcher-skip-loop.parked-superseded.md
 ```
 
 ---
