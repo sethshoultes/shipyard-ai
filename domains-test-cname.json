@@ -1,0 +1,7 @@
+[
+  {
+    "domain": "vercel.com",
+    "expected_origin": "pages.cloudflare.com",
+    "routes": ["/"]
+  }
+]

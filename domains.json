@@ -1,0 +1,7 @@
+[
+  {
+    "domain": "shipyard.company",
+    "expected_origin": "pages.cloudflare.com",
+    "routes": ["/"]
+  }
+]

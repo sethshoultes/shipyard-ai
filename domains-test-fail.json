@@ -1,0 +1,7 @@
+[
+  {
+    "domain": "this-is-not-a-real-domain-12345.test",
+    "expected_origin": "pages.cloudflare.com",
+    "routes": ["/"]
+  }
+]

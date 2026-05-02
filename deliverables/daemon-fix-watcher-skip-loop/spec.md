@@ -1,179 +1,215 @@
-# Spec — Daemon Fix: Watcher Skip-Loop on Retried Intake PRDs
+# Spec: Proof — Post-Deploy Domain Verification
 
-**Slug:** `daemon-fix-watcher-skip-loop`
-**Date:** 2026-05-02
-**Status:** Ready for Build
-
----
-
-## Goals
-
-From the PRD, this fix addresses a bug where:
-
-1. **The Problem:** When a PRD from GitHub intake fails, it lands in `prds/failed/`. Intake's next 5-min cycle recreates it in `prds/`, but the watcher silently rejects it because `isAlreadyProcessed()` returns true for any file in `failed/`. The PRD never re-enters the queue.
-
-2. **The Fix:** Align the watcher's `isAlreadyProcessed()` logic with intake's `isIssueAlreadyConverted()` logic. A PRD is **NOT** already processed if:
-   - A fresh copy exists in `prds/` with mtime **newer** than any copy in `failed/` or `parked/`
-   - (`completed/` always wins — never re-attempt a shipped PRD)
-
-3. **Logging Visibility:** When the watcher rejects a file, it must log the *reason* explicitly. No silent rejections.
-
-4. **Intake Visibility:** When intake recreates a PRD that has a copy in `failed/` or `parked/`, log it explicitly for debugging.
+**Project:** `daemon-fix-watcher-skip-loop`
+**Generated:** 2026-05-02
+**Source PRD:** `/home/agent/shipyard-ai/prds/github-issue-sethshoultes-shipyard-ai-98.md`
+**Source Plan:** `/home/agent/shipyard-ai/.planning/phase-1-plan.md`
+**Decisions:** `/home/agent/shipyard-ai/rounds/daemon-fix-watcher-skip-loop/decisions.md`
 
 ---
 
-## Implementation Approach
+## Goals (from PRD)
 
-From the plan and decisions:
+### Primary Goal
+Add post-deploy verification to catch DNS misconfigurations before they cause silent 404s. The pipeline must verify that production custom domains actually serve the deployed build.
 
-### 1. Patch `daemon/src/daemon.ts` — `isAlreadyProcessed()`
+### Problem Statement (from PRD #98)
+- `shipyard.company` DNS pointed at Vercel IPs (`216.150.1.65`) from a previous deployment
+- Vercel project no longer existed — every request returned `DEPLOYMENT_NOT_FOUND` 404
+- CF Pages project `shipyard-ai` had the domain attached and served correctly at `shipyard-ai.pages.dev`
+- Mismatch went unnoticed for **6+ days**
+- No verification that production custom domain actually serves the deployed build
 
-Replace the current implementation (lines 102–107) with mtime-aware logic:
+### Expected Behavior
+After every deploy, the pipeline should:
+1. For each custom domain attached to the CF Pages project, fetch `/` and verify status 200
+2. Verify DNS origin matches expected Cloudflare origin (CNAME or CF headers)
+3. Fail the deploy and alert the operator if mismatch
 
-```ts
-function isAlreadyProcessed(prdFile: string): boolean {
-  const completedPath = resolve(PRDS_DIR, "completed", prdFile);
-  if (existsSync(completedPath)) return true;
+### Non-Goals (Explicitly Cut)
+- No monitoring dashboards (v2 scope)
+- No retry loops (fail-fast per PRD)
+- No Slack webhooks (terminal-only output)
+- No HTML body parsing for build IDs (DNS + header validation is sufficient)
 
-  const livePath = resolve(PRDS_DIR, prdFile);
-  const failedPath = resolve(PRDS_DIR, "failed", prdFile);
-  const parkedPath = resolve(PRDS_DIR, "parked", prdFile);
+---
 
-  for (const archivePath of [failedPath, parkedPath]) {
-    if (!existsSync(archivePath)) continue;
-    if (!existsSync(livePath)) return true; // archived and not retried — skip
-    try {
-      const archiveMtime = statSync(archivePath).mtimeMs;
-      const liveMtime = statSync(livePath).mtimeMs;
-      if (liveMtime <= archiveMtime) return true; // not a fresh retry — skip
-    } catch {
-      return true; // safe default
+## Implementation Approach (from Plan)
+
+### Wave 1: Configuration + Verification Engine
+
+#### Task 1: Create `domains.json`
+- **Location:** `/home/agent/shipyard-ai/domains.json`
+- **Schema:** Array of objects:
+  ```json
+  [
+    {
+      "domain": "shipyard.company",
+      "expected_origin": "pages.cloudflare.com",
+      "routes": ["/"]
     }
-  }
-  return false;
-}
-```
+  ]
+  ```
+- **Purpose:** Version-controlled domain configuration for Proof verification
+- **Replaces:** Runtime `wrangler` CLI calls (Decision 1.2)
+- **Validation:** `node -e "JSON.parse(require('fs').readFileSync('domains.json'))"` exits 0
 
-### 2. Add `statSync` Import
+#### Task 2: Create `scripts/proof.js`
+- **Location:** `/home/agent/shipyard-ai/scripts/proof.js`
+- **Dependencies:** Node.js built-ins only (`https`, `dns`, `fs`, `path`, `url`)
+- **Checks per domain (in parallel):**
+  - **DNS CNAME check:** `dns.resolveCname(domain)` — pass if any record matches `expected_origin`
+  - **Fallback DNS:** If CNAME fails, `dns.resolve4(domain)` + HTTPS header check
+  - **HTTPS GET check:** `https.get` with `User-Agent: Shipyard-Proof/1.0` — accept only status 200
+  - **Cloudflare header validation:** Check for `CF-RAY` or `Server: cloudflare` headers
+- **Output:**
+  - Success: `Verified {domain} {ISO8601_timestamp}` per domain, exit 0
+  - Failure: One plain-English sentence ≤140 chars, exit 1, no stack traces
+- **Config:** Reads `./domains.json` by default; override via `PROOF_DOMAINS_PATH` env var
 
-Add `statSync` to the existing `fs` import in `daemon.ts`:
+### Wave 2: Workflow Integration
 
-```ts
-import { existsSync, readFileSync, statSync } from "fs";
-```
+#### Task 3: Modify `.github/workflows/deploy-website.yml`
+- Add Proof step immediately after "Deploy to Cloudflare Pages" step
+- Guard: `if: github.ref == 'refs/heads/main'` (matches deploy step guard)
+- Run: `node scripts/proof.js` from repo root
+- Env: `PROOF_DOMAINS_PATH: ./domains.json`
+- No additional secrets required
 
-### 3. Strengthen Watcher Skip Log
+### Wave 3: Local Verification
 
-Update the skip log message to include the reason:
-
-```ts
-if (isAlreadyProcessed(name)) {
-  log(`WATCHER: Skipping "${name}" — already processed (completed/failed/parked)`);
-  return;
-}
-```
-
-### 4. Add Intake Recreation Log
-
-In `daemon/src/health.ts` near the `INTAKE: Created PRD` log (line ~274), add warnings:
-
-```ts
-const failedPath = resolve(PRDS_DIR, "failed", filename);
-const parkedPath = resolve(PRDS_DIR, "parked", filename);
-if (existsSync(failedPath)) log(`INTAKE: Note — recreating "${filename}" which has a copy in failed/. Watcher will compare mtimes.`);
-if (existsSync(parkedPath)) log(`INTAKE: Note — recreating "${filename}" which has a copy in parked/. Watcher will compare mtimes.`);
-log(`INTAKE: Created PRD ${filename}`);
-```
-
-### 5. Add Vitest Test File
-
-Create `daemon/tests/watcher-skip.test.ts` with tests for:
-1. Live PRD newer than failed copy → `isAlreadyProcessed` returns `false`
-2. Live PRD older than failed copy → returns `true`
-3. Only failed copy exists, no live → returns `true`
-4. Only completed copy exists → returns `true` regardless
-5. Live PRD newer than parked copy → returns `false`
+#### Task 4: Dry-run Tests
+- Test success path with real domain
+- Test failure path with nonsense domain (e.g., `this-is-not-a-real-domain-12345.test`)
+- Test origin validation with wrong-CNAME domain (e.g., `vercel.com` expecting `pages.cloudflare.com`)
+- Verify elapsed time <10s (fail-fast guarantee)
 
 ---
 
 ## Verification Criteria
 
-### V1: Code Changes Applied
-
+### V1: `domains.json` exists and is valid
 | Check | Command | Expected |
 |-------|---------|----------|
-| `statSync` imported | `grep "statSync" daemon/src/daemon.ts` | Import line present |
-| `isAlreadyProcessed` updated | `grep -A 20 "function isAlreadyProcessed" daemon/src/daemon.ts` | Contains `statSync`, `mtimeMs`, `liveMtime <= archiveMtime` |
-| Skip log strengthened | `grep "already processed (completed/failed/parked)" daemon/src/daemon.ts` | Log message present |
-| Intake log added | `grep "recreating.*which has a copy in failed/" daemon/src/health.ts` | Log message present |
+| Valid JSON syntax | `node -e "JSON.parse(require('fs').readFileSync('domains.json'))"` | Exit 0 |
+| Valid JSON (pretty) | `python3 -m json.tool domains.json` | Pretty-prints without error |
+| Schema correct | Manual inspection | Array with objects containing `domain`, `expected_origin`, `routes` |
 
-### V2: Type Check Passes
-
-```bash
-cd daemon && npx tsc --noEmit
-# Exit code: 0
-```
-
-### V3: Vitest Tests Pass
-
-```bash
-cd daemon && npx vitest run tests/watcher-skip.test.ts
-# Exit code: 0, all tests pass
-```
-
-### V4: No New Dependencies
-
-```bash
-cd daemon && cat package.json | jq '.dependencies, .devDependencies'
-# No new entries added for this fix
-```
-
-### V5: Structural Scan
-
+### V2: `scripts/proof.js` runs without syntax errors
 | Check | Command | Expected |
 |-------|---------|----------|
-| No TODOs | `grep -riE 'TODO|FIXME|HACK|XXX' daemon/src/daemon.ts daemon/src/health.ts daemon/tests/watcher-skip.test.ts` | No matches |
-| No placeholders | `grep -riE 'placeholder|implement me|fix later' daemon/` | No matches |
+| No syntax errors | `node scripts/proof.js` | Executes (may fail verification legitimately) |
+| Module loads | `node -e "require('./scripts/proof.js')"` | No syntax error thrown |
+| No banned patterns | `grep -E 'child_process|wrangler|require\(".*"\)' scripts/proof.js` | No matches (only built-ins) |
+
+### V3: Failure output is correct
+| Check | Command | Expected |
+|-------|---------|----------|
+| Exit code 1 | `PROOF_DOMAINS_PATH=./domains-test-fail.json node scripts/proof.js; echo $?` | Exit code 1 |
+| One sentence | Output line count | Exactly 1 line |
+| ≤140 chars | `wc -c` on output | ≤140 characters |
+| No stack trace | Visual inspection | No `Error:` or `at ` lines |
+
+### V4: Success output is correct
+| Check | Command | Expected |
+|-------|---------|----------|
+| Exit code 0 | `node scripts/proof.js; echo $?` (with valid domain) | Exit code 0 |
+| Format correct | Output matches regex | `^Verified .+ \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}` |
+
+### V5: Workflow integration is correct
+| Check | Command | Expected |
+|-------|---------|----------|
+| Valid YAML | `python3 -c "import yaml; yaml.safe_load(open('.github/workflows/deploy-website.yml'))"` | No error |
+| Proof step position | Manual inspection | Appears AFTER deploy step |
+| Guard matches | `grep -A2 "Proof" .github/workflows/deploy-website.yml` | `if: github.ref == 'refs/heads/main'` |
+| Script call | `grep "node scripts/proof.js" .github/workflows/deploy-website.yml` | Present |
+
+### V6: Fail-fast timing
+| Check | Command | Expected |
+|-------|---------|----------|
+| Elapsed time | `time node scripts/proof.js` | <10 seconds |
 
 ---
 
 ## Files to Create or Modify
 
-### Modified Files
-
-| File | Change |
-|------|--------|
-| `daemon/src/daemon.ts` | Add `statSync` import; replace `isAlreadyProcessed()` body; strengthen skip log |
-| `daemon/src/health.ts` | Add intake recreation warning logs before `INTAKE: Created PRD` |
-
-### Created Files
-
+### New Files
 | File | Purpose |
 |------|---------|
-| `daemon/tests/watcher-skip.test.ts` | Vitest tests for `isAlreadyProcessed()` mtime logic |
-| `deliverables/daemon-fix-watcher-skip-loop/spec.md` | This spec document |
-| `deliverables/daemon-fix-watcher-skip-loop/todo.md` | Running task list |
-| `deliverables/daemon-fix-watcher-skip-loop/tests/*.sh` | Build verification scripts |
+| `/home/agent/shipyard-ai/domains.json` | Domain configuration for Proof verification |
+| `/home/agent/shipyard-ai/scripts/proof.js` | Node.js verification engine |
+| `/home/agent/shipyard-ai/deliverables/daemon-fix-watcher-skip-loop/spec.md` | This specification |
+| `/home/agent/shipyard-ai/deliverables/daemon-fix-watcher-skip-loop/todo.md` | Running task list |
+| `/home/agent/shipyard-ai/deliverables/daemon-fix-watcher-skip-loop/tests/*.sh` | Verification test scripts |
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `/home/agent/shipyard-ai/.github/workflows/deploy-website.yml` | Add Proof verification step after deploy |
+
+### Test Files (Temporary, for Task 4)
+| File | Purpose | Cleanup |
+|------|---------|---------|
+| `domains-test-fail.json` | Test failure output | Delete after test |
+| `domains-test-cname.json` | Test origin validation | Delete after test |
 
 ---
 
-## Out of Scope
+## Architecture Diagram
 
-- Changing intake's recreation logic
-- Renaming `failed/` or `parked/` directories
-- Cleanup of historical failed PRDs
-- The orthogonal Kimi build-phase issue
-- SQLite migration (v2 conversation)
-- Retro document creation
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    GitHub Actions Runner                        │
+│                                                                 │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────────────┐ │
+│  │  Deploy to  │    │    Proof    │    │   Mark Complete     │ │
+│  │  CF Pages   │───▶│ Verification│───▶│   (if all pass)     │ │
+│  └─────────────┘    └─────────────┘    └─────────────────────┘ │
+│                          │                                      │
+│                          ▼                                      │
+│                   ┌─────────────┐                               │
+│                   │ domains.json│                               │
+│                   └─────────────┘                               │
+│                          │                                      │
+│                          ▼                                      │
+│                   ┌─────────────┐                               │
+│                   │  proof.js   │                               │
+│                   └─────────────┘                               │
+│                          │                                      │
+│              ┌───────────┴───────────┐                          │
+│              ▼                       ▼                          │
+│       ┌─────────────┐         ┌─────────────┐                   │
+│       │ DNS CNAME   │         │ HTTPS GET   │                   │
+│       │ Check       │         │ Check       │                   │
+│       └─────────────┘         └─────────────┘                   │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## Acceptance Criteria (from PRD)
+## Risk Notes
 
-1. [ ] `daemon/src/daemon.ts` `isAlreadyProcessed` updated with mtime check. `statSync` imported.
-2. [ ] `daemon/src/health.ts` intake logs warn on recreation over archived copy.
-3. [ ] New vitest file passes: `cd daemon && npx vitest run tests/watcher-skip.test.ts`
-4. [ ] `npx tsc --noEmit` exits 0 from `daemon/`
-5. [ ] Manual smoke test (cut per decisions.md #6 — replaced by automated tests)
-6. [ ] Backwards compat: PRD with no live copy and only archive copy still logs `Skipping — already processed`
-7. [ ] No new dependencies in `daemon/package.json`
+1. **DNS CNAME for apex domains** — Apex domains may use A records rather than CNAME due to RFC constraints. The `proof.js` fallback to CF-RAY header detection handles this.
+2. **False positive from cached pages** — HTTP 200 alone could pass for parked/catch-all pages. Origin validation (CNAME + CF headers) prevents this per R-PROOF-003.
+3. **GitHub Actions network access** — Runner must reach public internet for DNS/HTTPS checks. Standard for `ubuntu-latest` runners.
+4. **Scope creep** — Any PR adding dashboards, retry loops, or webhooks must be rejected without explicit Open Question resolution.
+
+---
+
+## Commit Messages
+
+1. `feat(proof): add domains.json for post-deploy verification config`
+2. `feat(proof): add verification engine with origin validation`
+3. `ci(deploy): add Proof verification step inline after CF Pages deploy`
+4. `test(proof): local dry-run verification passed`
+
+---
+
+## Acceptance Criteria (from PRD #98)
+
+- [ ] Pipeline verifies production custom domain after deploy
+- [ ] DNS misconfiguration caught before marking deploy complete
+- [ ] Verification fails fast (no retry loops)
+- [ ] Output is terminal-only (no dashboards, no webhooks)
+- [ ] All tests pass
+- [ ] No new npm dependencies

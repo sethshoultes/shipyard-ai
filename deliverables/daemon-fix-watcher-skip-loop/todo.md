@@ -1,63 +1,40 @@
-# To-Do List — Daemon Fix: Watcher Skip-Loop
+# To-Do List — Proof: Post-Deploy Domain Verification
 
 **Slug:** `daemon-fix-watcher-skip-loop`
 **Created:** 2026-05-02
+**Spec:** `/home/agent/shipyard-ai/deliverables/daemon-fix-watcher-skip-loop/spec.md`
 
 ---
 
 ## Tasks
 
-### 1. Read Source Files
+### Wave 1: Configuration + Verification Engine
 
-- [ ] Read `daemon/src/daemon.ts` to understand current `isAlreadyProcessed()` implementation — verify: file contents displayed, current lines 102–107 identified
-- [ ] Read `daemon/src/health.ts` to locate intake PRD creation log — verify: line number of `INTAKE: Created PRD` log identified
-- [ ] Check existing `fs` imports in `daemon.ts` — verify: confirm whether `existsSync` is already imported, note import line number
+- [ ] Create `domains.json` at repo root with domain configuration schema
+- [ ] Create `scripts/proof.js` verification engine with DNS + HTTPS checks
+- [ ] Verify `domains.json` is valid JSON (node parse test)
+- [ ] Verify `proof.js` runs without syntax errors
 
-### 2. Modify `daemon/src/daemon.ts`
+### Wave 2: Workflow Integration
 
-- [ ] Add `statSync` to the `fs` import statement — verify: `grep "import.*statSync.*from.*fs" daemon/src/daemon.ts` returns match
-- [ ] Replace `isAlreadyProcessed()` function body with mtime-aware logic — verify: function contains `statSync`, `mtimeMs`, and `liveMtime <= archiveMtime` comparison
-- [ ] Update skip log message to include `(completed/failed/parked)` reason — verify: `grep "already processed (completed/failed/parked)" daemon/src/daemon.ts` returns match
-- [ ] Scan for TODOs/placeholders in modified file — verify: `grep -riE 'TODO|FIXME|HACK|XXX|placeholder' daemon/src/daemon.ts` returns no matches
+- [ ] Modify `.github/workflows/deploy-website.yml` to add Proof step after deploy
+- [ ] Verify Proof step has correct guard (`if: github.ref == 'refs/heads/main'`)
+- [ ] Verify workflow YAML is valid
 
-### 3. Modify `daemon/src/health.ts`
+### Wave 3: Local Verification
 
-- [ ] Locate the `INTAKE: Created PRD` log line — verify: line number confirmed
-- [ ] Add `failedPath` and `parkedPath` variable declarations before the log — verify: both `resolve(PRDS_DIR, "failed", filename)` and `resolve(PRDS_DIR, "parked", filename)` present
-- [ ] Add conditional log for failed copy recreation — verify: `grep "recreating.*copy in failed/" daemon/src/health.ts` returns match
-- [ ] Add conditional log for parked copy recreation — verify: `grep "recreating.*copy in parked/" daemon/src/health.ts` returns match
-- [ ] Scan for TODOs/placeholders in modified file — verify: `grep -riE 'TODO|FIXME|HACK|XXX|placeholder' daemon/src/health.ts` returns no matches
+- [ ] Test success path with real domain
+- [ ] Test failure path with nonsense domain
+- [ ] Test origin validation with wrong-CNAME domain
+- [ ] Verify elapsed time <10s (fail-fast guarantee)
+- [ ] Verify failure output is ≤140 chars, one line, no stack trace
 
-### 4. Create Test File
+### Final Steps
 
-- [ ] Create `daemon/tests/watcher-skip.test.ts` — verify: file exists at exact path
-- [ ] Write test: live PRD newer than failed copy → returns `false` — verify: test case present with descriptive name
-- [ ] Write test: live PRD older than failed copy → returns `true` — verify: test case present with descriptive name
-- [ ] Write test: only failed copy exists (no live) → returns `true` — verify: test case present with descriptive name
-- [ ] Write test: only completed copy exists → returns `true` — verify: test case present with descriptive name
-- [ ] Write test: live PRD newer than parked copy → returns `false` — verify: test case present with descriptive name
-- [ ] Verify test file uses temp directory pattern (no hardcoded paths) — verify: test uses `tmp` or temp dir, mocks `PRDS_DIR`
-- [ ] Scan test file for TODOs/skipped tests — verify: `grep -riE 'TODO|skip|todo\(' daemon/tests/watcher-skip.test.ts` returns no matches
-
-### 5. Run Type Check
-
-- [ ] Run `cd daemon && npx tsc --noEmit` — verify: exit code 0, no type errors
-- [ ] If type errors exist, fix them — verify: re-run passes with exit code 0
-
-### 6. Run Tests
-
-- [ ] Run `cd daemon && npx vitest run tests/watcher-skip.test.ts` — verify: exit code 0, all tests pass
-- [ ] If tests fail, debug and fix — verify: re-run passes with exit code 0
-
-### 7. Dependency Check
-
-- [ ] Verify no new dependencies added — verify: `cd daemon && cat package.json | jq '.dependencies'` shows no new entries compared to original
-- [ ] Verify no new devDependencies added — verify: `cat package.json | jq '.devDependencies'` unchanged
-
-### 8. Final Verification
-
-- [ ] Run all verification shell scripts in `deliverables/daemon-fix-watcher-skip-loop/tests/` — verify: each script exits 0
-- [ ] Confirm all acceptance criteria from spec.md are met — verify: checklist in spec.md fully checked
+- [ ] Run all verification shell scripts in `tests/`
+- [ ] Update todo.md with completion marks
+- [ ] Create execution report
+- [ ] Commit on feature branch
 
 ---
 
@@ -65,5 +42,5 @@
 
 | Status | Count |
 |--------|-------|
-| Total Tasks | 24 |
-| Estimated Time | ~60 minutes (all tasks <5 min each) |
+| Total Tasks | 14 |
+| Estimated Time | ~45 minutes |
