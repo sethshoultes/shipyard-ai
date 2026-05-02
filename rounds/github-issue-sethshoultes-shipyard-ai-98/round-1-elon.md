@@ -1,26 +1,34 @@
-# Round 1: Elon Musk — First-Principles Assessment
+# Round 1: Elon — Chief Product & Growth Officer
 
 ## Architecture
-This is a smoke test, not a satellite. The simplest system that works is a GitHub Action step that curls the production domain with retry logic. Not a new microservice. Not a "health check platform." A 20-line bash script with `curl --retry` and exponential backoff is sufficient.
+This is a smoke test, not a satellite. The simplest system that works: inject `BUILD_ID` into the HTML at build time, then run a 10-line bash script post-deploy that curls the custom domain and greps for that ID. One GitHub Action step. No microservice. No database. No dashboard. If it takes more than 20 lines, you're architecting for a problem you don't have.
+
+The PRD suggests `wrangler pages project list | grep custom-domains` — this is fragile shell parsing that breaks when CLI output formats change. Harder, better, faster, stronger: read domains from an environment variable or a `domains.json` checked into the repo. Deterministic. Testable. No external API dependencies at verify time.
 
 ## Performance
-The bottleneck is DNS propagation, not compute. CF Pages deploys in seconds; DNS can take 60–300 seconds to converge globally. An instant post-deploy check fails valid deploys and generates noise. The 10x path is making verification *non-blocking* — run it asynchronously after the deploy step completes, and alert on failure rather than blocking the pipeline.
+The bottleneck is DNS propagation and CDN cache invalidation, not compute. CF Pages deploys in ~15 seconds; DNS edge convergence can take 60–120 seconds globally. An immediate post-deploy check will flake and generate false failures, which teaches teams to ignore the check.
+
+The 10x path: run checks with exponential backoff (5s, 10s, 20s, 40s), cap total wait at 90s, and parallelize across domains with `xargs -P`. The actual CPU load is zero; we're I/O-bound on network round-trips. A single runner can verify 10 domains in under 2 minutes if parallelized. Sequential checks are the enemy.
 
 ## Distribution
-This is infrastructure, not a consumer app. "Distribution" here means preventing churn. One customer hitting a 404 at launch generates more negative word-of-mouth than ten happy customers generate positive word-of-mouth. Retention equals distribution. No paid ads required — bake this into the platform and let case studies do the work.
+This is pipeline infrastructure, not a consumer app. "10,000 users without paid ads" is the wrong frame. Distribution here means template adoption: package this as a reusable GitHub Action in a shared repo so every client project gets it by default. If teams have to copy-paste bash manually, adoption dies at three repos. Make it the default, not an option.
+
+One customer hitting a 404 at launch generates more negative word-of-mouth than ten happy customers generate positive word-of-mouth. Retention is distribution. Bake this into the platform template and let "zero failed launches" become the case study that sells the next client. No ads required — just operational excellence as a moat.
 
 ## What to CUT
-- **Generalization to every customer launch** — that is v2 masquerading as v1. Fix our own domain first.
-- **Body grep for BUILD_ID** — brittle. HTML changes; tests break. V1 should check status 200 plus absence of known error signatures (e.g., "DEPLOYMENT_NOT_FOUND").
-- **"Margaret Hamilton (QA)" human gate** — scope creep disguised as process. This must be fully automated. If a human is required, the system is already broken.
+- **Multi-region probing** — checking from 3 continents is v2 theater. One runner catches DNS mismatches just fine. You don't need geo-redundancy to detect a Vercel 404.
+- **Persistent audit logs / S3 storage** — GitHub Actions logs are the log. Compliance paranoia is scope creep. If you need compliance later, add it later.
+- **Automatic DNS remediation** — Suggesting or applying DNS fixes is v2. Fail the build, alert Slack, let a human fix it. Automation that touches DNS is automation that can take down production.
+- **"Every customer launch" generalization** — Abstracting to a universal platform before shipping it for `shipyard.company` is premature optimization. Ship it selfishly first. Prove it works on your own domain for 30 days before templating it.
+- **Human QA gate** — Assigning this to "Margaret Hamilton (QA)" is process theater. If a human must verify every deploy, the system is already broken. Automate it fully. Humans review alerts; they don't do the checking.
+- **Body diffing / complex matchers** — The PRD suggests matching "a unique string from the new release." Just grep the `BUILD_ID`. HTML structure changes; build IDs don't. Complex matchers break on refactors and waste debug time.
 
 ## Technical Feasibility
-Yes. One agent session can write a GitHub Action step. The PRD's suggested bash loop is 90% of the solution. The remaining 10% is retry logic and timeout tuning. Do not over-engineer.
+Yes. One agent session can build this. It is a single GitHub Action step, a build-time `sed` to inject the ID into a meta tag, and a curl loop. The PRD's suggested bash snippet is 90% of the solution. The remaining 10% is retry logic and timeout tuning. This is a 2-hour task, not a 2-day task. If an agent can't deliver this in one session, the agent is broken, not the scope.
 
 ## Scaling
-At 100x usage (1,000+ customer domains), sequential blocking checks in the deploy pipeline will timeout and kill good deploys. What breaks:
-1. **Pipeline timeouts** — 1,000 sequential curls × 30s retry = 8+ hours.
-2. **False positives** — geo-DNS means `shipyard.company` resolves differently in CI than in user regions.
-3. **Rate limits** — repeated curls against the same origin can trigger WAF rules.
+At 100x — say 500 domains across 50 projects — a sequential curl loop in one CI runner becomes the bottleneck. Pipeline time balloons, and you'll hit runner network limits and potentially WAF rate limits on your own origin. What breaks: the naive loop.
 
-The fix at scale is decoupling: deploy, then queue async health checks, and surface failures via Slack or webhook without blocking the pipeline.
+The fix is trivial parallelization and optionally decoupling: queue async health checks after deploy, alert on failure via Slack webhook without blocking the pipeline. Don't architect for 100x today, but write the script so swapping the loop for `xargs -P` is a one-line change. Keep the door open without building the hallway.
+
+**Bottom line:** Build the smoke test. Nothing else.

@@ -1,20 +1,25 @@
 # Steve Jobs — Chief Design & Brand Officer
-## Positions: Deploy Verification
 
-### Product Naming: PROOF
-One word. Five letters. A hard stop at the end. You don't "run post-deploy validation scripts" — you get Proof. When your code hits the internet, Proof is the receipt. Anything longer than one syllable is a focus group murdering a product. Proof is a promise, not a feature.
+## Product Naming
 
-### Design Philosophy: The Lock Click
-What makes this insanely great? Invisibility with teeth. When it works, you don't see it. When it fails, it's impossible to ignore. It's the click of a precision lock — silent assurance that you're secure. We are not building a monitoring dashboard. We are building a moment of absolute, binary truth. Green means your customers see it. Red means stop, fix it, now. No charts. No noise. Just certainty.
+**Shipyard is dead.** It sounds like a rusted dock where cargo sits in the rain. We ship experiences, not shipping containers. The name is **Orbit** — one word, weightless, inevitable. You launch something, and it stays up. Forever. Say it out loud. *Orbit.* That’s the sound of something that does not come down.
 
-### User Experience: Thirty Seconds to Bedrock
-You push. You wait. One word appears: "Verified." Below it, your domain and a timestamp. That is the entire success state. If it fails, the screen turns red and speaks human: "shipyard.company is serving a 404. Your DNS points to the wrong place." No stack traces. No log vomit. No 47-line JSON. The first 30 seconds should feel like closing a vault door — heavy, final, done.
+## Design Philosophy
 
-### Brand Voice: The Genius Who Cares
-Confident. Direct. Almost parental. Like the best Apple Genius looking you in the eye: "We checked. You're good." Or: "Wait — something's wrong. Here's exactly what." No passive voice. No "an error was encountered." We say "Your domain is broken" because euphemisms are cowardice. We speak like a human who gives a damn.
+This product should be **invisible.** The best technology is a pane of glass — you look through it, not at it. When a customer hits "publish," the world should see their work. Instantly. On their domain. Not on some `.pages.dev` consolation prize. If a user has to check DNS, we have already failed. Insanely great means the user never thinks about deployment. It just *arrives.*
 
-### What to Say NO To: The DevOps Bloat Trap
-NO to verification dashboards. NO to configurable alert thresholds. NO to retry knobs. NO to cron syntax. NO to Slack/Discord/PagerDuty integrations as the primary interface. If it fails, we tell YOU directly, immediately, in English. We are not building a monitoring platform — we are building a moment of truth. Say NO to every feature that lets a customer 404 in silence for six days. Simplicity is the ultimate sophistication, and that means removing, not adding.
+## First 30 Seconds
 
-### Emotional Hook: Dignity at Launch
-Nobody wants to be the person who shipped a 404 to their customer, their boss, their mother. Proof protects your dignity at the moment of maximum exposure — the launch. It's the friend who taps your shoulder and says "your fly is down" before you walk on stage. That's not a feature. That's love. People will love Proof because it lets them sleep. Because launching should feel like flying, not falling with no parachute.
+You click deploy. The button pulses once — a heartbeat. Then a single word appears: **"Live."** Not a dashboard. Not a log stream. Not six green checkboxes that could mean anything. One word, in your face, undeniable. Because behind that word, we did the work: we checked the domain, verified the build, confirmed the match. The user feels *power* — the power to publish and be heard, immediately.
+
+## Brand Voice
+
+We speak like someone who actually **built the thing.** Confident, direct, human. No "deployment pipeline verification framework." We say: *"It works. We checked. You're live."* No passive voice. No hedging. No "your mileage may vary." We take the risk so the user doesn’t have to.
+
+## What to Say NO To
+
+NO to dashboards that lie with green checkmarks while customers see 404s. NO to making the user verify what we should guarantee. NO to DNS panels, CNAME records, or any setting a human being should never see. NO to "deploy succeeded" messages when the production domain is a ghost town. Simplicity is not adding features until it works — it is removing failures until only trust remains.
+
+## Emotional Hook
+
+People will LOVE this because it removes **humiliation.** There is no worse feeling than sharing your work and having someone say, "It's broken." Orbit gives you the unshakable confidence that when you say "it's live," it is actually live — on your domain, in the world, right now. Like dropping a letter in a magical mailbox and watching it appear in the recipient's hand. No lost mail. No dead drops. Just arrival.
