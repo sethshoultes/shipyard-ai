@@ -7,37 +7,41 @@
 - **Repo:** sethshoultes/shipyard-ai
 - **Issue:** #91
 - **Author:** sethshoultes
-- **Labels:** dream-candidate, p1
-- **Created:** 2026-04-30T11:21:49Z
-- **Priority:** p1
+- **Labels:** p1, dream-candidate
+- **Created:** 2026-04-21T16:13:30Z
 
 ## Problem
-AI practitioners (prompt engineers, AI consultants, developers showcasing AI integrations) need a beautiful portfolio generator that can:
-1. One-click import Claude/ChatGPT conversation exports
-2. Automatically create visual hierarchy with prompts as hero cards
-3. Include a "Try this prompt" widget for visitor interaction
-4. Provide a genuinely good dark mode (not just inverted colors)
+## Dream Candidate: Promptfolio
 
-Current solutions require manual HTML/CSS work or generic portfolio templates that don't understand AI workflow presentation.
+**Proposed in 1 dream session(s):**
+- `dreams/dream-2026-04-21T00-1-steve.md`
+
+---
+
+### First mention (excerpt)
+
+**Promptfolio**
+*A beautiful portfolio generator for AI practitioners*
+
+**What:** A WordPress plugin that generates stunning, Apple-esque portfolio sites showcasing AI prompts, workflows, and case studies. Think "Dribbble meets prompt engineering."
+
+**Why it delights:**
+- One-click import from Claude/ChatGPT conversation exports
+- Automatic visual hierarchy — prompts become hero cards with elegant typography
+- Built-in "Try this prompt" widget that lets visitors experience your work
+- Dark mode that actually looks good (not just inverted colors)
+
+**User:** AI consultants, prompt engineers, developers showing off AI integrations
+**Distribution:** WordPress plugin directory, ProductHunt launch
+**Dogfoodable:** Yes — we'd use it to showcase Shipyard's work
+
+---
+
+---
+
+*Auto-created by dream-backfill. Promote to PRD in `prds/` to activate.*
+
 
 ## Success Criteria
-- WordPress plugin that installs via standard WP plugin directory
-- One-click import from Claude/ChatGPT conversation JSON exports
-- Automatic generation of hero cards from prompts with elegant typography
-- Built-in "Try this prompt" widget (iframe or API integration)
-- Dark mode that looks designed, not inverted
-- Mobile-responsive Apple-esque design
-- Demo site deployed and working
-
-## Technical Approach
-- WP plugin architecture: PHP backend + React frontend blocks
-- Import parser: Handle both Claude (.json) and ChatGPT (.json) export formats
-- Design system: Tailwind CSS with custom Apple-inspired component library
-- Widget: Embed sandboxed prompt runner (iframe to Shipyard AI or local inference)
-
-## Acceptance Criteria
-- [ ] Plugin installs cleanly on fresh WP 6.5+
-- [ ] Import produces at least 3 portfolio cases from sample export
-- [ ] Dark mode toggle works across all pages
-- [ ] Lighthouse score > 90 on mobile and desktop
-- [ ] Demo site live at promptfolio.pages.dev
+- Issue sethshoultes/shipyard-ai#91 requirements are met
+- All tests pass

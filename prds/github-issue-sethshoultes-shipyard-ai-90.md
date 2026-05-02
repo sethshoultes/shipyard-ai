@@ -7,32 +7,45 @@
 - **Repo:** sethshoultes/shipyard-ai
 - **Issue:** #90
 - **Author:** sethshoultes
-- **Labels:** dream-candidate, p2
-- **Created:** 2026-04-30T11:22:21Z
-- **Priority:** p2
+- **Labels:** p2, dream-candidate
+- **Created:** 2026-04-21T16:13:29Z
 
 ## Problem
-Operations teams and no-code builders need to design, test, and deploy multi-agent AI workflows without writing code. Current tools require programming (CrewAI, AutoGen) or Zapier-style linear automation, which doesn't support agent branching, conditional logic, or Claude-level reasoning workflows.
+## Dream Candidate: AgentForge
+
+**Proposed in 1 dream session(s):**
+- `dreams/dream-2026-04-21T00-1-elon.md`
+
+---
+
+### First mention (excerpt)
+
+**AgentForge**
+*Visual builder for multi-agent workflows*
+
+**What:** A web app (or WordPress plugin) that lets non-developers design, test, and deploy multi-agent AI workflows. Think Zapier, but for orchestrating Claude agents.
+
+**Why it scales:**
+- Agent orchestration is the next automation wave
+- First-mover advantage in visual agent building
+- Freemium model — free for 3 workflows, then pricing tiers
+- Each workflow is a potential case study/template
+
+**Technical feasibility:** HIGH
+- We've done multi-agent orchestration in the plugin
+- React + drag-drop UI is well-understood
+- Workers AI for edge execution keeps latency low
+
+**User:** Operations teams, no-code builders, consultants
+**Distribution:** ProductHunt, no-code communities, LinkedIn
+
+---
+
+---
+
+*Auto-created by dream-backfill. Promote to PRD in `prds/` to activate.*
+
 
 ## Success Criteria
-- Visual workflow builder with drag-and-drop nodes
-- Pre-built agent templates (researcher, writer, reviewer, etc.)
-- Claude agent integration with tool-calling support
-- One-click testing of each workflow step
-- Deploy as Cloudflare Worker or webhook
-- Free tier: 3 workflows; paid tiers for more
-- Exportable JSON workflow definitions
-
-## Technical Approach
-- Frontend: React + React Flow (xyflow) for the canvas
-- Backend: FastAPI or Hono on Workers with SQLite/D1 for persistence
-- Agent execution: Claude API via Server-Sent Events
-- Deployment: Compile workflow to CF Worker JS bundle
-- Auth: GitHub OAuth for user sessions
-
-## Acceptance Criteria
-- [ ] New workflow created via drag-drop
-- [ ] At least 3 agent node types in palette
-- [ ] Claude tool-calling works in test mode
-- [ ] Workflow deploys to CF Pages/Workers
-- [ ] Shared workflow URL works for visitors
+- Issue sethshoultes/shipyard-ai#90 requirements are met
+- All tests pass

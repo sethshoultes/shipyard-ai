@@ -7,34 +7,44 @@
 - **Repo:** sethshoultes/shipyard-ai
 - **Issue:** #86
 - **Author:** sethshoultes
-- **Labels:** dream-candidate, p2
-- **Created:** 2026-04-30T11:25:07Z
-- **Priority:** p2
+- **Labels:** p2, dream-candidate
+- **Created:** 2026-04-21T16:13:24Z
 
 ## Problem
-Developers building AI features on Cloudflare Workers need production-ready scaffolding but current templates are bare-bones. Setting up rate limiting, caching, streaming, and monitoring from scratch takes hours and is error-prone.
+## Dream Candidate: WorkerForge
+
+**Proposed in 1 dream session(s):**
+- `dreams/dream-2026-04-19T00-1-elon.md`
+
+---
+
+### First mention (excerpt)
+
+**WorkerForge** — Cloudflare Workers AI Template Generator
+
+**What:** A CLI that scaffolds production-ready Cloudflare Workers AI projects. Pick your model (LLM, image, audio), get a working deployment with rate limiting, caching, streaming, and monitoring built in.
+
+**Market Size:**
+- Cloudflare has 5M+ developers
+- AI inference at edge is exploding
+- Current templates are bare-bones
+
+**Technical Feasibility:**
+- We've built hybrid Claude + Workers AI systems
+- It's code generation → deployment pipeline
+- `npx workerforge create --llm --stream` → deployed in 60s
+
+**Target User:** Developers building AI features on Cloudflare
+
+**Distribution:** Cloudflare community, npm, dev Twitter, templates marketplace
+
+---
+
+---
+
+*Auto-created by dream-backfill. Promote to PRD in `prds/` to activate.*
+
 
 ## Success Criteria
-- CLI tool `npx workerforge create` scaffolds a working CF Workers AI project
-- Supports model types: LLM, image (Stable Diffusion), audio (Whisper)
-- Built-in rate limiting (Cloudflare KV or Durable Objects)
-- Built-in caching layer
-- Streaming responses for LLM
-- Monitoring dashboard (optional, defaults to simple logging)
-- Deployed in < 60 seconds from CLI
-
-## Technical Approach
-- CLI built with Node.js + Commander.js
-- Template engine: copies pre-built templates from GitHub repo
-- CF Workers AI bindings pre-configured
-- Optional Wrangler.toml auto-generation
-- TypeScript-first templates
-
-## Acceptance Criteria
-- [ ] `npx workerforge create --llm --stream` produces deployable project
-- [ ] `npx workerforge create --image` produces deployable project
-- [ ] `npx workerforge create --audio` produces deployable project
-- [ ] All templates include rate limiting
-- [ ] All templates include caching
-- [ ] LLM template supports streaming
-- [ ] README with deployment instructions
+- Issue sethshoultes/shipyard-ai#86 requirements are met
+- All tests pass
