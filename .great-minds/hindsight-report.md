@@ -1,10 +1,13 @@
 # Hindsight Report
-**Generated:** 2026-05-02T23:07:14.838Z
+**Generated:** 2026-05-02T23:28:18.380Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 2 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 6 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- cd9a2ab micromanager: dirty auto-reconcile
+- ca0402c daemon: auto-commit 2 files
+- 9746fb1 daemon: auto-commit after build phase for daemon-fix-watcher-skip-loop
 - 4d7486f micromanager: dirty auto-reconcile
 - ed6db31 daemon: auto-commit 6 files
 - 4c63349 micromanager: dirty auto-reconcile
@@ -12,16 +15,13 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 2 uncommitted changes.
 - 78b7506 micromanager: dirty auto-reconcile
 - 76660fa daemon: auto-commit 6 files
 - b899b32 micromanager: dirty auto-reconcile
-- b962c22 daemon: auto-commit 10 files
-- f0a513c micromanager: dirty auto-reconcile
-- a009e27 daemon: auto-commit 12 files
 
 ## High-Churn Files
-- `.daemon-queue.json` (151 changes)
-- `.planning/sara-blakely-review.md` (95 changes)
+- `.daemon-queue.json` (153 changes)
+- `.planning/sara-blakely-review.md` (96 changes)
 - `.planning/phase-1-plan.md` (52 changes)
+- `.great-minds/hindsight-report.md` (49 changes)
 - `.planning/REQUIREMENTS.md` (49 changes)
-- `.great-minds/hindsight-report.md` (48 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
@@ -34,31 +34,35 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 2 uncommitted changes.
 - `STATUS.md` (11 changes)
 
 ## Bug-Associated Files
-- `.daemon-queue.json`
+- `.agent-logs/build/build-reviewer-1777763565759.jsonl`
+- `.agent-logs/build/build-setup-1777763234839.jsonl`
+- `.agent-logs/build/build-setup-1777763272147.jsonl`
+- `.agent-logs/build/builder-1777763365854.jsonl`
+- `.agent-logs/plan/sara-blakely-gutcheck-1777763202887.jsonl`
+- `.github/workflows/deploy-website.yml`
 - `.great-minds/hindsight-report.md`
 - `.planning/sara-blakely-review.md`
 - `deliverables/daemon-fix-watcher-skip-loop/spec.md`
+- `deliverables/daemon-fix-watcher-skip-loop/todo.md`
+- `domains-test-cname.json`
+- `domains-test-fail.json`
+- `domains.json`
+- `scripts/proof.js`
+- `.daemon-queue.json`
 - `deliverables/daemon-fix-watcher-skip-loop/tests/check-code-changes.sh`
 - `deliverables/daemon-fix-watcher-skip-loop/tests/check-file-existence.sh`
 - `deliverables/daemon-fix-watcher-skip-loop/tests/check-no-new-deps.sh`
 - `deliverables/daemon-fix-watcher-skip-loop/tests/check-no-todos.sh`
 - `deliverables/daemon-fix-watcher-skip-loop/tests/check-tests-pass.sh`
-- `deliverables/daemon-fix-watcher-skip-loop/tests/check-type-check.sh`
-- `deliverables/daemon-fix-watcher-skip-loop/todo.md`
-- `prds/github-issue-sethshoultes-shipyard-ai-90.md`
-- `rounds/daemon-fix-watcher-skip-loop/decisions.md`
-- `rounds/daemon-fix-watcher-skip-loop/essence.md`
-- `rounds/daemon-fix-watcher-skip-loop/round-1-elon.md`
-- `rounds/daemon-fix-watcher-skip-loop/round-1-steve.md`
-- `rounds/daemon-fix-watcher-skip-loop/round-2-elon.md`
-- `rounds/daemon-fix-watcher-skip-loop/round-2-steve.md`
-- `deliverables/github-issue-sethshoultes-shipyard-ai-88/includes/class-library.php`
-- `deliverables/github-issue-sethshoultes-shipyard-ai-88/spec.md`
 
 ## Uncommitted State
 ```
-M .agent-logs/plan/sara-blakely-gutcheck-1777763202887.jsonl
+M .agent-logs/debate/phil-jackson-consolidation-1777764146816.jsonl
+ M .great-minds/hindsight-report.md
  M .planning/sara-blakely-review.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-91/decisions.md
+?? .agent-logs/plan/planner-1777764404394.jsonl
+?? .agent-logs/plan/sara-blakely-gutcheck-1777764460761.jsonl
 ```
 
 ---

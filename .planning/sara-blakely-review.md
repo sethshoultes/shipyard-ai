@@ -1,23 +1,36 @@
 # Sara Blakely Gut-Check — Phase 1 Plan
 
-- **Verdict**: Overdressed for a first date. Strip it down.
-- Customer is the developer at 2am asking "did my deploy stick?". They won't pay cash, but they'll pay attention if it saves a panic attack.
+## Verdict: Useful feature. Weak product.
 
-**Confusing / Bounce-worthy**
-- 3 waves, 4 tasks, traceability matrices. Smells like consulting, not shipping.
-- `domains.json` is another config file to rot. One more thing to lie to you.
-- DNS CNAME + CF-RAY header + HTTPS GET + parallel-ready. Too clever for v1. Pick one check that hurts if it breaks.
-- Testing against `vercel.com` as a negative case? That's not your product. Test your own broken state.
+- Real customer pays for pain relief, not scripts.
+- This is a band-aid, not Spanx. Solves one moment (deploy verification). Customers pay for *ongoing* confidence.
+- No pricing model. No recurring value. Hard to charge monthly for a JSON file + 50 lines of Node.
 
-**30-Second Pitch**
-> "Proof is the green light after deploy. One command tells you your domain actually points to Cloudflare, not your old host. No dashboards. No guessing."
+## What Makes Me Bounce
 
-**$0 Marketing Budget — Test First**
-- Break your own DNS on purpose. Point `shipyard.company` somewhere wrong. Run the script. Did it scream loud enough to wake you up? If not, fix the error message, not the architecture.
-- Ask one engineer who didn't write this to read the failure output. If they need a README, you failed.
+- "Proof" means nothing. Rename to "Deploy Verdict" or "Live Check."
+- Over-engineered XML task plans for a simple script. Screams "consultant billing by the hour."
+- 250 lines to say: check DNS + HTTP after deploy. Cut 80%.
+- "Wave 1, Wave 2, Wave 3" — unnecessary choreography. Just build it.
+- No mention of what happens when CF header names change. Fragile fallback.
 
-**Retention Hook**
-- Deploy anxiety. Developers will keep using it because "last time I didn't check, I looked like an idiot for 3 hours." The hook is fear, not delight. Own that.
+## 30-Second Elevator Pitch
 
-**One Hard Truth**
-- If the deploy step already passes, people assume it worked. Proof only wins if it catches the edge case where deploy passes but domain is wrong. Your plan spends 200 lines on process and 2 lines on that edge case. Flip the ratio.
+> After every deploy, we check your domain is actually live and pointing to the right place. One sentence. Pass or fail. No dashboards, no noise, no 3am surprises.
+
+## First Test — $0 Marketing
+
+- Use it on 5 real deploys. Screenshot green "Verified" line. Tweet gif of it catching a bad deploy.
+- Post gist to Hacker News / r/webdev. If nobody stars it in 48h, the pain isn't sharp enough.
+- Measure: stars, comments, "how do I install this?" — that is your demand signal.
+
+## Retention Hook
+
+- Catches the one failure that saves a launch.
+- Once it prevents a single 3am outage, customer never removes it.
+- But retention is thin without alerts (Slack, PagerDuty). Silent green checks get ignored.
+- Add webhook/Slack one-liner in v2 or this becomes wallpaper.
+
+## Bottom Line
+
+Build it in an afternoon. Ship it. But know: this is table stakes, not a moat.
