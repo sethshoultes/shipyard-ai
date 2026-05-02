@@ -1,7 +1,25 @@
-**Verdict: No customer, no sale. Kill it or pivot to real pain.**
+**Verdict:** Internal safety net. Zero revenue. Saves embarrassment. Not sellable.
 
-- Pays? No. Zero person needs "slugify library." Internal plumbing, not product. No market. No revenue model.
-- Confusing: 300-line plan for 50 lines of code. Jargon wall ("ESM import pattern," "barrel files," "zero-dependency contract"). No human problem stated. Bounce in 3 seconds.
-- Elevator pitch: "AI-generated string utilities to test if models hallucinate." Still worthless. No one pays for that.
-- $0 test: Cold-email 10 CTOs. Ask "Would you pay $50/mo for AI model validation micro-libraries?" If zero replies, dead.
-- Retention: None. One-and-done canary. No recurring value. No community. No reason to return.
+**Pitch:** "Proof auto-checks domain works post-deploy. Catches DNS screw-ups before customers do."
+
+**Pay?**
+- No. Infrastructure, not product.
+- Dev teams tolerate; don't budget.
+- Value = one saved outage. Invisible when working.
+
+**Confusing / bounce:**
+- 250-line plan for 20-line script.
+- Requirement IDs alienate humans.
+- Three "waves" for JSON + JS + YAML. One commit.
+- "Parallel-ready" for single domain. Pretentious.
+- XML bureaucracy with 12 steps per task.
+
+**$0 test:**
+- Run manually after next 5 deploys.
+- Don't touch CI until catches real failure.
+- Stays green for 20 deploys? Delete. Noise.
+
+**Retention hook:**
+- Catches one broken deploy = becomes religion.
+- "Proof pass?" replaces "hope it's fine."
+- Removing feels like driving without seatbelt.

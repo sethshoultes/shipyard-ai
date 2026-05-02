@@ -1,232 +1,177 @@
-# Spec: Deploy Verification — "Proof" (v1)
+# Specification — Proof: Deploy Verification v1
 
-> Issue: sethshoultes/shipyard-ai#98
-> PRD: Deploy verification: production custom domain not validated, 404s shipped silently
-> Status: Blueprint for Build Phase
+**Project:** github-issue-sethshoultes-shipyard-ai-98
+**PRD:** Deploy verification: production custom domain not validated, 404s shipped silently
+**Phase:** 1
+**Generated:** 2026-05-02
 
 ---
 
 ## 1. Goals (from PRD)
 
 ### Problem Statement
-After deploying to Cloudflare Pages, the production custom domain (`shipyard.company`) continued pointing at Vercel IPs (`216.150.1.65`) from a previous deployment. The Vercel project no longer existed — every request returned `DEPLOYMENT_NOT_FOUND` 404. The CF Pages project served correctly at `.pages.dev`, but this mismatch went unnoticed for **6+ days**. No verification step ensured the production custom domain actually served the deployed build.
+DNS misconfiguration caused `shipyard.company` to point at Vercel IPs (`216.150.1.65`) returning `DEPLOYMENT_NOT_FOUND` 404s for 6+ days. The CF Pages deploy succeeded and `.pages.dev` preview worked, but no one verified the production custom domain actually served the deployed build.
 
 ### Expected Behavior
 After every deploy, the pipeline must:
 1. Fetch `/` for each custom domain attached to the CF Pages project
-2. Verify status 200 AND that the response comes from the expected Cloudflare origin
-3. Fail the deploy and alert the operator if mismatch detected
+2. Verify status 200 AND that the response originates from Cloudflare Pages (not Vercel or any other host)
+3. Fail the deploy and alert the operator if mismatch
 
 ### Success Criteria
 - Issue sethshoultes/shipyard-ai#98 requirements are met
 - All tests pass
-- Verification runs automatically as part of the deploy pipeline (default-on)
-- No human gate required
+- Origin validation prevents false positives from cached/wrong servers
+- Fail-fast behavior: no retry loops, no dashboards, no knobs
 
 ---
 
 ## 2. Implementation Approach (from Plan + Decisions)
 
-### Architecture Decisions (Locked)
+### Locked Architecture Decisions
 
-| Decision | Rationale |
-|----------|-----------|
-| **Inline pipeline check** | Verification runs as a step inside the existing deploy pipeline, not as a separate microservice. Accountability in 5 seconds. |
-| **Origin-validated health check** | Validate response CNAME/A record against expected Cloudflare Pages origin, not merely HTTP 200. DNS caches old A records. |
-| **Parallelize + exponential backoff (60s max)** | Bottleneck is DNS propagation, not CPU. Serial curls timeout at 100 domains. |
-| **Cut `wrangler pages project list`** | Hardcode domains in `domains.json`. Runtime API calls are fragile, slow, and hit rate limits. |
-| **No human owner gate** | Automation owns verification. Human gates cause 6-day outages. |
-| **Name: "Proof"** | One word. One screen. One truth. |
-| **One word, one screen, one truth** | Success: `Verified` + domain + timestamp. Failure: one plain-English sentence. No stack traces. |
-| **No dashboards, knobs, or thresholds** | This is a moment of truth, not a monitoring platform. |
-| **Default-on in deploy template** | Every customer deployment runs this automatically. Opt-in = off. |
-| **Cut build-ID body grep** | Status 200 + origin validation is the v1 signal. |
-| **Cut "key routes" verification** | Ship `/` only in v1. Multi-route is v1.1. |
+| Decision | Source | Rationale |
+|----------|--------|-----------|
+| **Inline pipeline step** | Decision 1.1 | Verification runs as job step inside existing deploy workflow, not standalone microservice |
+| **No wrangler/grep dependencies** | Decision 1.2 | Use only Node.js built-ins (`https`, `dns`, `fs`); no `wrangler pages project list`, no HTML body grep |
+| **No retry loops in v1** | Decision 1.3 | Fail fast. The 404s lasted 6 days because nobody got paged, not because the check lacked patience |
+| **Root path `/` only** | Decision 1.4 | v1 scope: if `/` 404s, the launch is dead. Deep routes are v1.1 |
+| **Origin validation required** | Decision 1.5 | Validate response originates from expected Cloudflare Pages CNAME/A record, not merely HTTP 200 |
+| **Default-on** | Decision 3.1 | Zero opt-in. Every customer deployment runs this automatically |
+| **One breath, one answer** | Decision 2.2 | Success: single green signal + domain + timestamp. Failure: exactly one plain-English sentence |
+| **Name: "Proof"** | Decision 2.1 | One word. Five letters. Hard consonant. |
 
-### v1 MVP Scope
+### Wave 1: Foundation (Parallel)
 
-**Core Deliverables:**
-1. GitHub Actions workflow `.github/workflows/deploy-website.yml`
-2. Build step: `npm ci && npm run build` in `website/`
-3. Deploy step: `wrangler pages deploy website/out/` to CF Pages project `shipyard-ai`
-4. Proof verification step: inline post-deploy check
+1. **Create `domains.json`** — Version-controlled domain configuration
+   - Schema: `[{ domain: string, expected_origin: string, routes: string[] }]`
+   - Replaces runtime `wrangler` API dependency
+   - v1: single domain, root path only (`["/"]`)
 
-**Verification Behavior:**
-- Target: Root path `/` via HTTPS
-- Method: HTTP GET with origin validation (expected CF Pages IP/CNAME)
-- Retry: Exponential backoff up to 60 seconds
-- Parallel: Architecture supports parallel domain checks
-- Success output: `Verified` + domain + timestamp
-- Failure output: One plain-English sentence
+2. **Create `scripts/proof.js`** — Node.js verification engine
+   - Reads `domains.json` (or `PROOF_DOMAINS_PATH` env var)
+   - For each domain, performs in parallel:
+     - DNS CNAME check against `expected_origin`
+     - HTTPS GET to `https://{domain}/` with Cloudflare header validation (`CF-RAY` or `Server: cloudflare`)
+   - Fail fast: exit 1 on first failure
+   - Success output: `Verified {domain} {ISO8601_timestamp}`
+   - Failure output: One plain-English sentence ≤140 chars, no stack traces
 
-**Explicitly NOT in v1:**
-- Slack/Discord/PagerDuty integrations
-- Multi-route verification
-- Build-ID body grep
-- `wrangler pages project list` API calls
-- Human approval gate
-- Configurable retry policies or thresholds
+### Wave 2: Pipeline Integration (Parallel)
+
+3. **Modify `.github/workflows/deploy-website.yml`**
+   - Add Proof step immediately after "Deploy to Cloudflare Pages"
+   - Guard: `if: github.ref == 'refs/heads/main'`
+   - Run: `node scripts/proof.js`
+   - Env: `PROOF_DOMAINS_PATH: ./domains.json`
+
+### Wave 3: Verification (Sequential)
+
+4. **Local dry-run** — Validate success/failure output, origin validation, fail-fast timing
 
 ---
 
 ## 3. Verification Criteria
 
-### DEPLOY-001: Workflow Trigger
-- **Verify**: `.github/workflows/deploy-website.yml` contains `on.push.paths: ['website/**']`
-- **Check**: `grep -q "on:" deploy-website.yml && grep -q "push:" deploy-website.yml && grep -q "paths:" deploy-website.yml && grep -q "website/\*\*" deploy-website.yml`
-- **Exit 0**: Workflow triggers on push to `website/**`
+### R-DEPLOY-001 (Workflow Trigger)
+- **Verify:** `.github/workflows/deploy-website.yml` contains `on.push.branches: [main]` and `on.push.paths: ['website/**', '.github/workflows/deploy-website.yml']`
+- **Test:** `grep -A5 "^on:" .github/workflows/deploy-website.yml` shows correct triggers
 
-### DEPLOY-002: Build Step
-- **Verify**: Workflow contains `npm ci` and `npm run build` in `website/` directory
-- **Check**: `grep -q "npm ci" deploy-website.yml && grep -q "npm run build" deploy-website.yml`
-- **Exit 0**: Build step exists
+### R-DEPLOY-002 (Build Step)
+- **Verify:** Workflow contains `npm ci` and `npm run build` in `website/` directory
+- **Test:** `grep -A10 "npm ci" .github/workflows/deploy-website.yml` shows build commands
 
-### DEPLOY-003: Deploy Step
-- **Verify**: Workflow contains `wrangler pages deploy` with correct project name and secrets
-- **Check**: `grep -q "wrangler pages deploy" deploy-website.yml && grep -q "CLOUDFLARE_API_TOKEN" deploy-website.yml && grep -q "CLOUDFLARE_ACCOUNT_ID" deploy-website.yml`
-- **Exit 0**: Deploy step with CF credentials exists
+### R-DEPLOY-003 (Deploy Step)
+- **Verify:** Workflow contains `wrangler pages deploy out --project-name=shipyard-ai`
+- **Test:** `grep "wrangler pages deploy" .github/workflows/deploy-website.yml` returns non-empty
 
-### DEPLOY-004: Proof Verification Step
-- **Verify**: Workflow contains inline verification step post-deploy
-- **Check**: `grep -q "proof" deploy-website.yml` or `grep -q "verify" deploy-website.yml`
-- **Exit 0**: Verification step exists
+### R-DEPLOY-004 (Secrets References)
+- **Verify:** Workflow references `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets
+- **Test:** `grep "CLOUDFLARE_" .github/workflows/deploy-website.yml` shows both secrets
 
-### PROOF-001: Origin Validation
-- **Verify**: `scripts/proof.js` validates origin (CNAME/A record), not just HTTP 200
-- **Check**: `grep -q "origin" scripts/proof.js` or `grep -q "dns" scripts/proof.js` or `grep -q "resolve" scripts/proof.js`
-- **Exit 0**: Origin validation logic exists
+### R-PROOF-001 (Inline Default-On)
+- **Verify:** Proof step appears AFTER deploy step, no opt-in required
+- **Test:** Open workflow, confirm step ordering and no `if` condition that gates on user input
 
-### PROOF-002: Retry Logic
-- **Verify**: `scripts/proof.js` implements exponential backoff with 60s max
-- **Check**: `grep -q "retry" scripts/proof.js && grep -q "backoff" scripts/proof.js`
-- **Exit 0**: Retry logic exists
+### R-PROOF-002 (Root Path Only)
+- **Verify:** `scripts/proof.js` only checks `/` (root path)
+- **Test:** `grep "routes" scripts/proof.js` or review code for path iteration
 
-### PROOF-003: Output Format
-- **Verify**: Success outputs `Verified` + domain + timestamp; failure outputs plain English
-- **Check**: `grep -q "Verified" scripts/proof.js && grep -q "console.log" scripts/proof.js`
-- **Exit 0**: Output formatting exists
+### R-PROOF-003 (Origin Validation)
+- **Verify:** Script performs DNS CNAME check AND Cloudflare header validation
+- **Test:** Code review confirms `dns.resolveCname()` and `CF-RAY`/`Server: cloudflare` header checks
 
-### CONFIG-001: Domain Configuration
-- **Verify**: `domains.json` exists with domain + expected_origin schema
-- **Check**: `cat domains.json | jq '.[].domain'` and `cat domains.json | jq '.[].expected_origin'` return values
-- **Exit 0**: Valid domain configuration
+### R-PROOF-004 (Fail Fast, No Retry)
+- **Verify:** No `setTimeout`, no retry loops, no exponential backoff in code
+- **Test:** `grep -E "(retry|setTimeout|backoff)" scripts/proof.js` returns empty
 
-### STRUCT-001: File Existence
-- **Verify**: All required files exist
-- **Check**: Files exist at correct paths (see File List below)
-- **Exit 0**: All files present
+### R-PROOF-005 (Success Output)
+- **Verify:** Success prints `Verified {domain} {ISO8601_timestamp}` per domain
+- **Test:** Run with valid domain, confirm output format matches
 
-### STRUCT-002: No Banned Patterns
-- **Verify**: No TODO, FIXME, HACK, XXX, placeholder comments
-- **Check**: `grep -riE 'TODO|FIXME|HACK|XXX|placeholder' .` returns nothing
-- **Exit 0**: No placeholders
+### R-PROOF-006 (Failure Output)
+- **Verify:** Failure prints exactly one sentence ≤140 chars, no stack traces
+- **Test:** Run with invalid domain, confirm single-sentence output and exit code 1
 
----
+### R-PROOF-007 (No wrangler/grep)
+- **Verify:** No `child_process`, no `wrangler` calls, no HTML body grep
+- **Test:** `grep -E "(child_process|wrangler|grep)" scripts/proof.js` returns empty
 
-## 4. File List
+### R-PROOF-008 (Parallel-Ready)
+- **Verify:** Domain checks run via `Promise.all` for concurrency
+- **Test:** Code review confirms `Promise.all` usage
 
-### Files to Create
+### R-PROOF-009 (domains.json Schema)
+- **Verify:** File is valid JSON array with `domain`, `expected_origin`, `routes` keys
+- **Test:** `node -e "JSON.parse(require('fs').readFileSync('domains.json'))"` exits 0
 
-| Path | Purpose |
-|------|---------|
-| `.github/workflows/deploy-website.yml` | GitHub Actions workflow: build + deploy + Proof verification |
-| `scripts/proof.js` | Verification engine: origin check, retry, output formatting |
-| `domains.json` | Domain list + expected Cloudflare origins |
-
-### Files Modified
-
-| Path | Changes |
-|------|---------|
-| *(None)* | This is a new feature; no existing files are modified |
-
-### Directory Structure
-
-```
-github-issue-sethshoultes-shipyard-ai-98/
-├── .github/
-│   └── workflows/
-│       └── deploy-website.yml      # Build + deploy + Proof (verification step)
-├── scripts/
-│   └── proof.js                    # Verification engine: origin check, retry, output formatting
-├── domains.json                    # Domain list + expected Cloudflare origins
-└── decisions.md                    # Already exists (debate decisions)
-```
+### R-PROOF-010 (Script Separated)
+- **Verify:** `scripts/proof.js` exists as separate file, invoked via `node scripts/proof.js` in workflow
+- **Test:** File exists and workflow contains `node scripts/proof.js`
 
 ---
 
-## 5. Technical Details
+## 4. Files to Create or Modify
 
-### domains.json Schema
-
-```json
-[
-  {
-    "domain": "shipyard.company",
-    "expected_origin": "pages.cloudflare.com"
-  },
-  {
-    "domain": "www.shipyard.company",
-    "expected_origin": "pages.cloudflare.com"
-  }
-]
-```
-
-### Proof Script Behavior
-
-1. Read `domains.json` to get list of domains to verify
-2. For each domain (in parallel):
-   - Perform HTTPS GET to `https://{domain}/`
-   - Resolve DNS and validate CNAME/A record matches `expected_origin`
-   - Retry with exponential backoff (max 60s total)
-3. On success: print `Verified {domain} at {timestamp}`
-4. On failure: print plain-English error (e.g., "Your DNS points to the wrong place.")
-5. Exit 0 if all domains verified, exit 1 if any failed
-
-### Workflow Structure
-
-```yaml
-name: Deploy Website
-on:
-  push:
-    paths:
-      - 'website/**'
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: npm ci
-        working-directory: website
-
-      - name: Build
-        run: npm run build
-        working-directory: website
-
-      - name: Deploy to Cloudflare Pages
-        run: wrangler pages deploy website/out/ --project-name=shipyard-ai
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Verify deployment (Proof)
-        run: node scripts/proof.js
-```
+| File | Action | Purpose |
+|------|--------|---------|
+| `/home/agent/shipyard-ai/domains.json` | CREATE | Domain configuration with expected Cloudflare origin |
+| `/home/agent/shipyard-ai/scripts/proof.js` | CREATE | Verification engine (DNS + HTTPS + origin validation) |
+| `/home/agent/shipyard-ai/.github/workflows/deploy-website.yml` | MODIFY | Add Proof step after deploy |
+| `/home/agent/shipyard-ai/deliverables/github-issue-sethshoultes-shipyard-ai-98/tests/verify-domains-json.sh` | CREATE | Test: validate domains.json schema |
+| `/home/agent/shipyard-ai/deliverables/github-issue-sethshoultes-shipyard-ai-98/tests/verify-proof-script.sh` | CREATE | Test: verify proof.js structure and constraints |
+| `/home/agent/shipyard-ai/deliverables/github-issue-sethshoultes-shipyard-ai-98/tests/verify-workflow.sh` | CREATE | Test: verify workflow structure and Proof step |
 
 ---
 
-## 6. Quality Gates
+## 5. Out of Scope (v1)
 
-Before marking complete, verify:
-- [ ] All 3 files created at correct paths
-- [ ] Workflow triggers on `website/**` push
-- [ ] Workflow contains `npm ci`, `npm run build`, `wrangler pages deploy`
-- [ ] Workflow references `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
-- [ ] Proof script validates origin (not just status 200)
-- [ ] Proof script has retry logic with 60s max
-- [ ] Proof script outputs plain English (no stack traces)
-- [ ] `domains.json` has valid schema with `domain` and `expected_origin`
-- [ ] No TODO/FIXME/HACK/XXX/placeholder comments
-- [ ] No subdirectories beyond `.github/workflows/` and `scripts/`
+- Slack/Discord/PagerDuty notifications (v1.1)
+- Multi-route verification beyond `/` (v1.1)
+- Build-ID body grep or meta-tag injection (explicitly cut)
+- `wrangler pages project list` runtime API calls (explicitly cut)
+- Human approval gate
+- Configurable retry policies, alert thresholds, propagation windows
+- Cron syntax or scheduled checks
+- DNS ownership migration (v2)
+
+---
+
+## 6. Requirements Traceability
+
+| Requirement | Task(s) | Wave | Status |
+|-------------|---------|------|--------|
+| R-DEPLOY-001 (workflow trigger) | phase-1-task-3 | 2 | Pending |
+| R-DEPLOY-002 (build step) | phase-1-task-3 | 2 | Pending |
+| R-DEPLOY-003 (deploy step) | phase-1-task-3 | 2 | Pending |
+| R-DEPLOY-004 (secrets refs) | phase-1-task-3 | 2 | Pending |
+| R-PROOF-001 (inline default-on) | phase-1-task-3 | 2 | Pending |
+| R-PROOF-002 (root path only) | phase-1-task-1, phase-1-task-2 | 1 | Pending |
+| R-PROOF-003 (origin validation) | phase-1-task-2 | 1 | Pending |
+| R-PROOF-004 (fail fast, no retry) | phase-1-task-2 | 1 | Pending |
+| R-PROOF-005 (success output) | phase-1-task-2 | 1 | Pending |
+| R-PROOF-006 (failure output) | phase-1-task-2 | 1 | Pending |
+| R-PROOF-007 (no wrangler/grep) | phase-1-task-2 | 1 | Pending |
+| R-PROOF-008 (parallel-ready) | phase-1-task-1, phase-1-task-2 | 1 | Pending |
+| R-PROOF-009 (domains.json) | phase-1-task-1 | 1 | Pending |
+| R-PROOF-010 (script separated) | phase-1-task-2, phase-1-task-3 | 1, 2 | Pending |

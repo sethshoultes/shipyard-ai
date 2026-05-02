@@ -1,75 +1,87 @@
-# To-Do List: Deploy Verification — "Proof" (v1)
+# To-Do List — Proof: Deploy Verification v1
 
-> Issue: sethshoultes/shipyard-ai#98
-> Each task is atomic, verifiable, and completable in <5 minutes.
-
----
-
-## Phase 1: Configuration Files
-
-- [ ] Create `domains.json` with shipyard.company and www.shipyard.company — verify: `cat domains.json | jq '. | length'` returns 2
-- [ ] Add `expected_origin` field to each domain entry — verify: `cat domains.json | jq '.[].expected_origin'` returns non-null values
-- [ ] Validate `domains.json` is valid JSON — verify: `cat domains.json | jq .` exits 0
+**Project:** github-issue-sethshoultes-shipyard-ai-98
+**Phase:** 1
+**Total Tasks:** 33 (all <5 minutes each)
 
 ---
 
-## Phase 2: Proof Verification Script
+## Wave 1: Foundation
 
-- [ ] Create `scripts/proof.js` file — verify: `test -f scripts/proof.js` exits 0
-- [ ] Add Node.js shebang and strict mode — verify: `head -2 scripts/proof.js` contains `#!/usr/bin/env node` and `'use strict'`
-- [ ] Implement domain list loader from `domains.json` — verify: script contains `fs.readFileSync` and `JSON.parse`
-- [ ] Implement HTTPS GET function for domain verification — verify: script contains `https.get` or `fetch`
-- [ ] Implement DNS origin resolution — verify: script contains `dns.resolve` or `resolveCname` or `resolve4`
-- [ ] Implement origin validation (compare resolved vs expected) — verify: script compares resolved origin against `expected_origin`
-- [ ] Implement exponential backoff retry logic — verify: script contains `setTimeout` and retry counter with max 60s
-- [ ] Implement success output format (`Verified {domain} at {timestamp}`) — verify: `grep "Verified" scripts/proof.js` returns match
-- [ ] Implement failure output (plain English sentence) — verify: script contains error message without stack traces
-- [ ] Add parallel domain checking support — verify: script uses `Promise.all` or `Promise.allSettled`
-- [ ] Add main entry point that exits 0 on success, 1 on failure — verify: script contains `process.exit(0)` and `process.exit(1)`
-- [ ] Remove any TODO/FIXME/HACK/XXX comments — verify: `grep -iE 'TODO|FIXME|HACK|XXX' scripts/proof.js` returns nothing
+### domains.json Configuration
 
----
+- [ ] Create `/home/agent/shipyard-ai/domains.json` file — verify: `test -f domains.json` exits 0
+- [ ] Add JSON array structure with `_comment` field explaining purpose — verify: `grep "_comment" domains.json` returns non-empty
+- [ ] Add domain entry for `shipyard.company` — verify: `grep "shipyard.company" domains.json` returns non-empty
+- [ ] Add `expected_origin: "pages.cloudflare.com"` — verify: `grep "pages.cloudflare.com" domains.json` returns non-empty
+- [ ] Add `routes: ["/"]` array (v1 root path only) — verify: `grep 'routes.*"/"' domains.json` returns non-empty
+- [ ] Validate JSON syntax with Node.js — verify: `node -e "JSON.parse(require('fs').readFileSync('domains.json'))"` exits 0
+- [ ] Validate JSON syntax with python — verify: `python3 -m json.tool domains.json > /dev/null` exits 0
 
-## Phase 3: GitHub Actions Workflow
+### scripts/proof.js Verification Engine
 
-- [ ] Create `.github/workflows/` directory — verify: `test -d .github/workflows` exits 0
-- [ ] Create `deploy-website.yml` workflow file — verify: `test -f .github/workflows/deploy-website.yml` exits 0
-- [ ] Add workflow name and trigger on push to `website/**` — verify: `grep -q "on:" deploy-website.yml && grep -q "paths:" deploy-website.yml && grep -q "website/\*\*" deploy-website.yml`
-- [ ] Add checkout step — verify: workflow contains `uses: actions/checkout`
-- [ ] Add `npm ci` step in website directory — verify: `grep -q "npm ci" deploy-website.yml`
-- [ ] Add `npm run build` step in website directory — verify: `grep -q "npm run build" deploy-website.yml`
-- [ ] Add `wrangler pages deploy` step with project name — verify: `grep -q "wrangler pages deploy" deploy-website.yml && grep -q "shipyard-ai" deploy-website.yml`
-- [ ] Add Cloudflare secrets references — verify: `grep -q "CLOUDFLARE_API_TOKEN" deploy-website.yml && grep -q "CLOUDFLARE_ACCOUNT_ID" deploy-website.yml`
-- [ ] Add Proof verification step that runs `node scripts/proof.js` — verify: `grep -q "proof.js" deploy-website.yml`
-- [ ] Validate workflow YAML syntax — verify: `cat deploy-website.yml | yq .` exits 0 (or manual visual inspection)
-
----
-
-## Phase 4: Structural Validation
-
-- [ ] Verify no subdirectories beyond allowed paths — verify: `find . -mindepth 1 -type d | grep -v -E '\.github|scripts|tests'` returns nothing
-- [ ] Verify no spec.md or todo.md in deliverables root (test-as-spec pattern) — verify: `test ! -f spec.md` is false since we created it per instructions
-- [ ] Verify no README.md or CHANGELOG.md — verify: `test ! -f README.md && test ! -f CHANGELOG.md` exits 0
-- [ ] Verify no barrel files (index.js, index.ts) — verify: `test ! -f index.js && test ! -f index.ts` exits 0
-- [ ] Run full placeholder scan — verify: `grep -riE 'TODO|FIXME|HACK|XXX|placeholder|implement me|fix later' .` returns nothing
+- [ ] Create `/home/agent/shipyard-ai/scripts/` directory — verify: `test -d scripts` exits 0
+- [ ] Create `scripts/proof.js` with shebang `#!/usr/bin/env node` — verify: `head -1 scripts/proof.js` shows shebang
+- [ ] Import only Node.js built-ins: `https`, `dns`, `fs`, `path` — verify: `grep "require\|import" scripts/proof.js` shows only built-in modules
+- [ ] Add code to read `domains.json` from CWD or `PROOF_DOMAINS_PATH` env var — verify: `grep "PROOF_DOMAINS_PATH" scripts/proof.js` returns non-empty
+- [ ] Add JSON parse error handling with `process.exit(1)` — verify: code contains exit on parse failure
+- [ ] Implement DNS CNAME resolver using `dns.resolveCname(domain)` — verify: `grep "resolveCname" scripts/proof.js` returns non-empty
+- [ ] Compare CNAME result against `expected_origin` from config — verify: code contains string comparison
+- [ ] Add A record fallback using `dns.resolve4(domain)` for apex domains — verify: `grep "resolve4" scripts/proof.js` returns non-empty
+- [ ] Implement HTTPS GET using `https.get` with `User-Agent: Shipyard-Proof/1.0` — verify: `grep "User-Agent" scripts/proof.js` returns non-empty
+- [ ] Accept only HTTP 200 status code — verify: code contains `statusCode === 200` check
+- [ ] Check for Cloudflare headers (`CF-RAY` or `Server: cloudflare`) — verify: `grep -E "(CF-RAY|cloudflare)" scripts/proof.js` returns non-empty
+- [ ] Use `Promise.all` for parallel domain checks — verify: `grep "Promise.all" scripts/proof.js` returns non-empty
+- [ ] Print `Verified {domain} {ISO8601_timestamp}` on success — verify: `grep "Verified" scripts/proof.js` returns non-empty
+- [ ] Print one plain-English sentence ≤140 chars on failure — verify: code contains single error message before exit
+- [ ] Exit with code 1 on failure, code 0 on success — verify: `grep "process.exit" scripts/proof.js` shows both codes
+- [ ] Make script executable with `chmod +x` — verify: `ls -la scripts/proof.js` shows execute permission
 
 ---
 
-## Phase 5: Functional Testing
+## Wave 2: Pipeline Integration
 
-- [ ] Run proof.js syntax check — verify: `node --check scripts/proof.js` exits 0
-- [ ] Test proof.js with mock domains.json (dry run) — verify: script loads without errors
-- [ ] Run all test scripts in `tests/` directory — verify: each test script exits 0
+### Workflow Verification (Read Existing)
+
+- [ ] Open `.github/workflows/deploy-website.yml` and identify structure — verify: can locate trigger, build, deploy, secrets sections
+- [ ] Verify R-DEPLOY-001: `on.push.branches` includes `main` — verify: `grep -A5 "^on:" .github/workflows/deploy-website.yml` shows `main`
+- [ ] Verify R-DEPLOY-001: `on.push.paths` includes `website/**` — verify: `grep "website/\*\*" .github/workflows/deploy-website.yml` returns non-empty
+- [ ] Verify R-DEPLOY-002: `npm ci` exists — verify: `grep "npm ci" .github/workflows/deploy-website.yml` returns non-empty
+- [ ] Verify R-DEPLOY-002: `npm run build` exists — verify: `grep "npm run build" .github/workflows/deploy-website.yml` returns non-empty
+- [ ] Verify R-DEPLOY-003: `wrangler pages deploy` with `--project-name=shipyard-ai` — verify: `grep "wrangler pages deploy" .github/workflows/deploy-website.yml` returns non-empty
+- [ ] Verify R-DEPLOY-004: `CLOUDFLARE_API_TOKEN` referenced — verify: `grep "CLOUDFLARE_API_TOKEN" .github/workflows/deploy-website.yml` returns non-empty
+- [ ] Verify R-DEPLOY-004: `CLOUDFLARE_ACCOUNT_ID` referenced — verify: `grep "CLOUDFLARE_ACCOUNT_ID" .github/workflows/deploy-website.yml` returns non-empty
+
+### Workflow Modification (Add Proof Step)
+
+- [ ] Add Proof step named "Proof — verify production domain" after deploy step — verify: workflow contains step with "Proof" in name
+- [ ] Add `run: node scripts/proof.js` to Proof step — verify: `grep "node scripts/proof.js" .github/workflows/deploy-website.yml` returns non-empty
+- [ ] Add `if: github.ref == 'refs/heads/main'` guard to Proof step — verify: `grep "github.ref.*main" .github/workflows/deploy-website.yml` returns non-empty
+- [ ] Add `env: PROOF_DOMAINS_PATH: ./domains.json` to Proof step — verify: `grep "PROOF_DOMAINS_PATH" .github/workflows/deploy-website.yml` returns non-empty
+- [ ] Validate workflow YAML syntax — verify: `python3 -c "import yaml; yaml.safe_load(open('.github/workflows/deploy-website.yml'))"` exits 0
 
 ---
 
-## Summary Checklist
+## Wave 3: Verification Tests
 
-| Phase | Tasks | Status |
-|-------|-------|--------|
-| Configuration | 3 | [ ] |
-| Proof Script | 12 | [ ] |
-| Workflow | 10 | [ ] |
-| Structural | 5 | [ ] |
-| Functional | 3 | [ ] |
-| **Total** | **33** | |
+### Test Scripts
+
+- [ ] Create `/home/agent/shipyard-ai/deliverables/github-issue-sethshoultes-shipyard-ai-98/tests/` directory — verify: `test -d deliverables/github-issue-sethshoultes-shipyard-ai-98/tests` exits 0
+- [ ] Create `tests/verify-domains-json.sh` — verify: `test -f tests/verify-domains-json.sh` exits 0
+- [ ] Create `tests/verify-proof-script.sh` — verify: `test -f tests/verify-proof-script.sh` exits 0
+- [ ] Create `tests/verify-workflow.sh` — verify: `test -f tests/verify-workflow.sh` exits 0
+- [ ] Make all test scripts executable — verify: `ls -la tests/*.sh` shows execute permissions
+- [ ] Run `tests/verify-domains-json.sh` — verify: script exits 0
+- [ ] Run `tests/verify-proof-script.sh` — verify: script exits 0
+- [ ] Run `tests/verify-workflow.sh` — verify: script exits 0
+
+---
+
+## Summary
+
+| Wave | Tasks | Description |
+|------|-------|-------------|
+| Wave 1 | 7 + 16 = 23 | domains.json + proof.js |
+| Wave 2 | 8 + 5 = 13 | Workflow verification + modification |
+| Wave 3 | 8 | Test scripts + execution |
+| **Total** | **33** | All atomic, all <5 minutes |

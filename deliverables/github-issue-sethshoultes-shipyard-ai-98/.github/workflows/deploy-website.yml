@@ -2,8 +2,10 @@ name: Deploy Website
 
 on:
   push:
+    branches: [main]
     paths:
       - 'website/**'
+      - '.github/workflows/deploy-website.yml'
 
 jobs:
   deploy:
@@ -25,5 +27,8 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-      - name: Verify deployment (Proof)
+      - name: Proof — verify production domain
+        if: github.ref == 'refs/heads/main'
         run: node scripts/proof.js
+        env:
+          PROOF_DOMAINS_PATH: ./domains.json

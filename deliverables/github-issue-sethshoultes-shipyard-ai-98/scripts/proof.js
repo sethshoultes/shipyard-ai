@@ -6,17 +6,36 @@ const dns = require('dns').promises;
 const fs = require('fs');
 const path = require('path');
 
-const MAX_BACKOFF_MS = 60000; // 60 seconds max
-const INITIAL_DELAY_MS = 1000;
-const BACKOFF_MULTIPLIER = 2;
-
 /**
- * Load domains configuration from domains.json
+ * Load domains configuration from domains.json or PROOF_DOMAINS_PATH env var
  */
 function loadDomains() {
-  const domainsPath = path.join(__dirname, '..', 'domains.json');
-  const content = fs.readFileSync(domainsPath, 'utf8');
-  return JSON.parse(content);
+  const domainsPath = process.env.PROOF_DOMAINS_PATH
+    ? path.resolve(process.cwd(), process.env.PROOF_DOMAINS_PATH)
+    : path.join(__dirname, '..', 'domains.json');
+
+  if (!fs.existsSync(domainsPath)) {
+    console.log('Configuration file not found: ' + domainsPath);
+    process.exit(1);
+  }
+
+  let content;
+  try {
+    content = fs.readFileSync(domainsPath, 'utf8');
+  } catch (err) {
+    console.log('Failed to read configuration file: ' + err.message);
+    process.exit(1);
+  }
+
+  let domains;
+  try {
+    domains = JSON.parse(content);
+  } catch (err) {
+    console.log('Invalid JSON in configuration file: ' + err.message);
+    process.exit(1);
+  }
+
+  return domains;
 }
 
 /**
@@ -29,16 +48,16 @@ async function resolveOrigin(domain) {
     return cname;
   } catch (cnameErr) {
     try {
-      // Fall back to A record
+      // Fall back to A record for apex domains
       const addresses = await dns.resolve4(domain);
       if (addresses && addresses.length > 0) {
         return addresses[0];
       }
     } catch (aErr) {
-      throw new Error(`DNS resolution failed for ${domain}`);
+      throw new Error('DNS resolution failed');
     }
   }
-  throw new Error(`Could not resolve origin for ${domain}`);
+  throw new Error('Could not resolve origin');
 }
 
 /**
@@ -58,17 +77,31 @@ function validateOrigin(resolved, expected) {
  */
 function httpsGet(domain) {
   return new Promise((resolve, reject) => {
-    const req = https.get(`https://${domain}/`, {
+    const req = https.get('https://' + domain + '/', {
       timeout: 10000,
       headers: {
-        'User-Agent': 'shipyard-ai-proof/1.0'
+        'User-Agent': 'Shipyard-Proof/1.0'
       }
     }, (res) => {
-      if (res.statusCode === 200) {
-        resolve({ statusCode: res.statusCode, headers: res.headers });
-      } else {
-        reject(new Error(`HTTP ${res.statusCode}`));
+      // Collect headers for Cloudflare validation
+      const headers = res.headers;
+
+      if (res.statusCode !== 200) {
+        reject(new Error('HTTP ' + res.statusCode));
+        return;
       }
+
+      // Check for Cloudflare headers (CF-RAY or Server: cloudflare)
+      const hasCfRay = !!headers['cf-ray'];
+      const serverHeader = (headers['server'] || '').toLowerCase();
+      const hasCloudflareServer = serverHeader.includes('cloudflare');
+
+      if (!hasCfRay && !hasCloudflareServer) {
+        reject(new Error('Missing Cloudflare headers'));
+        return;
+      }
+
+      resolve({ statusCode: res.statusCode, headers: headers });
     });
 
     req.on('error', reject);
@@ -80,82 +113,65 @@ function httpsGet(domain) {
 }
 
 /**
- * Verify a single domain with exponential backoff retry logic
+ * Verify a single domain - fail fast, no retry
  */
-async function verifyDomainWithRetry(domainConfig, attempt = 1, delay = INITIAL_DELAY_MS) {
+async function verifyDomain(domainConfig) {
   const { domain, expected_origin } = domainConfig;
 
   try {
-    // Perform HTTPS request
-    const httpResult = await httpsGet(domain);
+    // Perform HTTPS request with Cloudflare header validation
+    await httpsGet(domain);
 
     // Resolve DNS and validate origin
     const resolvedOrigin = await resolveOrigin(domain);
 
     if (!validateOrigin(resolvedOrigin, expected_origin)) {
-      throw new Error(`Origin mismatch: got ${resolvedOrigin}, expected ${expected_origin}`);
+      throw new Error('Origin mismatch');
     }
 
-    // Success
+    // Success - print verification message with ISO8601 timestamp
     const timestamp = new Date().toISOString();
-    console.log(`Verified ${domain} at ${timestamp}`);
-    return { success: true, domain };
+    console.log('Verified ' + domain + ' ' + timestamp);
+    return { success: true, domain: domain };
   } catch (error) {
-    // Check if we should retry (within 60 second max backoff)
-    if (delay < MAX_BACKOFF_MS) {
-      const nextDelay = Math.min(delay * BACKOFF_MULTIPLIER, MAX_BACKOFF_MS);
-      console.log(`Attempt ${attempt} failed for ${domain}: ${error.message}. Retrying in ${delay}ms...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-      return verifyDomainWithRetry(domainConfig, attempt + 1, nextDelay);
-    }
-
-    // Max retries exceeded - output plain English failure message
-    console.log(`Failed to verify ${domain}: Your DNS points to the wrong place or the server is not responding.`);
-    return { success: false, domain, error: error.message };
+    // Fail fast - one plain-English sentence, no stack traces
+    console.log('Failed to verify ' + domain + ': ' + error.message + '.');
+    return { success: false, domain: domain, error: error.message };
   }
 }
 
 /**
- * Verify all domains in parallel
+ * Verify all domains in parallel using Promise.all
  */
 async function verifyAllDomains() {
   const domains = loadDomains();
 
-  if (domains.length === 0) {
+  if (!Array.isArray(domains) || domains.length === 0) {
     console.log('No domains to verify');
     process.exit(0);
   }
 
-  // Run all verifications in parallel
-  const results = await Promise.allSettled(
-    domains.map(config => verifyDomainWithRetry(config))
+  // Run all verifications in parallel with Promise.all
+  const results = await Promise.all(
+    domains.map(function(config) {
+      return verifyDomain(config);
+    })
   );
 
-  // Check results
-  let allSuccess = true;
-  for (const result of results) {
-    if (result.status === 'fulfilled') {
-      if (!result.value.success) {
-        allSuccess = false;
-      }
-    } else {
-      // Promise rejected
-      allSuccess = false;
-      console.log(`Verification failed: ${result.reason?.message || 'Unknown error'}`);
+  // Check results - fail fast on first failure
+  for (let i = 0; i < results.length; i++) {
+    if (!results[i].success) {
+      console.log('Deploy verification failed');
+      process.exit(1);
     }
   }
 
-  if (allSuccess) {
-    console.log('All domains verified successfully');
-    process.exit(0);
-  } else {
-    console.log('One or more domains failed verification');
-    process.exit(1);
-  }
+  console.log('All domains verified successfully');
+  process.exit(0);
 }
 
 // Main entry point
-verifyAllDomains().catch((error) => {
-  console.log('Verification failed: An unexpected error occurred');
+verifyAllDomains().catch(function(error) {
+  console.log('Verification failed: An unexpected error occurred.');
   process.exit(1);
 });

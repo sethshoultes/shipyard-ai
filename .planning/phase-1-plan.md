@@ -1,41 +1,10 @@
-# Phase 1 Plan — Slug: Model Canary TypeScript Utility Library (v1)
+# Phase 1 Plan — Deploy Verification ("Proof") v1
 
 **Generated**: 2026-05-02
 **Requirements**: `/home/agent/shipyard-ai/.planning/REQUIREMENTS.md`
-**Total Tasks**: 6
+**Total Tasks**: 4
 **Waves**: 3
-**Project Slug**: `build-model-canary`
-
----
-
-## Documentation Review
-
-### Verified Technical Context
-
-1. **Platform Lock**: Standalone TypeScript utility module, NOT Emdash/Cloudflare/Astro. No CMS integration, no plugin patterns, no wrangler. The `docs/EMDASH-GUIDE.md` is explicitly NOT applicable here (CLAUDE.md §Emdash CMS Reference); this is a plain Node.js ESM module.
-2. **Architecture Lock**: Flat file structure, zero subdirectories, zero barrel files (decisions.md §4). The model has already failed the canary if it invents `src/`, `lib/`, or `tests/`.
-3. **Zero-Dependency Contract**: Empty `dependencies` in `package.json`. No `devDependencies` in the emitted artifact. Node built-in test runner only (`node:test` + `node:assert`) per decisions.md §3, §7.
-4. **TypeScript Discipline**: Explicit parameter and return types. No `any`, no implicit returns. `tsc --noEmit` must pass (decisions.md §4, PRD §Acceptance #4).
-5. **Test-as-Spec Contract**: The test files ARE the specification. No separate `spec.md` or `todo.md` inside the build directory (decisions.md §6).
-6. **Slugify Rules** (locked from PRD test cases + decisions.md Open #3 resolution):
-   - Lowercase input via `toLowerCase()`.
-   - Replace any sequence of non-ASCII-alphanumeric characters with a single hyphen (`/[^a-z0-9]+/g → '-'`).
-   - Strip leading/trailing hyphens (`/^-+|-+$/g → ''`).
-   - Unicode non-alphanumerics are treated as noise and stripped.
-7. **Truncate Rules** (locked from PRD + decisions.md Open #2 resolution):
-   - If `text.length <= maxLength`, return `text` unchanged (no ellipsis).
-   - Find the last word boundary (space character) at an index `<= maxLength`.
-   - If boundary found, return `text.substring(0, boundary) + "…"`.
-   - If no boundary found (single word exceeds `maxLength`), hard-cut at `maxLength` and append `"…"`.
-   - `maxLength <= 0` returns `"…"`.
-   - Empty string returns `""`.
-8. **ESM Import Pattern**: Test files import source files with `.js` extensions (`./slugify.js`, `./truncate.js`). This is the TypeScript ESM standard: TS allows `.js` imports that resolve to `.ts` sources at compile time, and `tsx` resolves them at runtime. This supports both `tsc` compilation and direct `tsx` execution without modifying imports.
-
-### Hindsight Risk Flags
-
-- **`.planning/phase-1-plan.md`** and **`.planning/REQUIREMENTS.md`** are high-churn files (50+ and 47+ changes respectively per `/home/agent/shipyard-ai/.great-minds/hindsight-report.md`). Overwriting them for this canary destroys the active Anvil project plan currently staged in `.planning/`. **Mitigation**: This canary is a deliberate, time-boxed diagnostic with explicit overwrite instructions. The Anvil plan is preserved in git history (last commit 2026-04-30). If both projects need simultaneous active planning, migrate to slug-specific subdirectories (e.g., `.planning/build-model-canary/`) in the next pipeline iteration.
-- **Uncommitted changes**: `prds/build-model-canary.md` and `rounds/build-model-canary/` exist in the working tree. These are the correct, expected inputs for this plan. Safe to proceed.
-- **No bug-associated files** in the build-model-canary scope. The bug-associated files from hindsight (e.g., `plugins/membership/src/sandbox-entry.ts`, `STATUS.md`) are outside this project's surface area.
+**Project Slug**: `github-issue-sethshoultes-shipyard-ai-98`
 
 ---
 
@@ -43,14 +12,20 @@
 
 | Requirement | Task(s) | Wave |
 |-------------|---------|------|
-| R1 (Flat layout) | phase-1-task-1 | 1 |
-| R2 (Zero deps) | phase-1-task-1 | 1 |
-| R3 (slugify impl) | phase-1-task-2 | 1 |
-| R4 (truncate impl) | phase-1-task-3 | 1 |
-| R5 (Tests) | phase-1-task-4, phase-1-task-5 | 2 |
-| R6 (TS valid) | phase-1-task-6 | 3 |
-| R7 (Tests pass) | phase-1-task-6 | 3 |
-| R8 (No placeholders) | phase-1-task-1, phase-1-task-2, phase-1-task-3, phase-1-task-4, phase-1-task-5 | 1, 2 |
+| R-DEPLOY-001 (workflow trigger) | phase-1-task-3 | 2 |
+| R-DEPLOY-002 (build step) | phase-1-task-3 | 2 |
+| R-DEPLOY-003 (deploy step) | phase-1-task-3 | 2 |
+| R-DEPLOY-004 (secrets refs) | phase-1-task-3 | 2 |
+| R-PROOF-001 (inline default-on) | phase-1-task-3 | 2 |
+| R-PROOF-002 (root path only) | phase-1-task-1, phase-1-task-2 | 1 |
+| R-PROOF-003 (origin validation) | phase-1-task-2 | 1 |
+| R-PROOF-004 (fail fast, no retry) | phase-1-task-2 | 1 |
+| R-PROOF-005 (success output) | phase-1-task-2 | 1 |
+| R-PROOF-006 (failure output) | phase-1-task-2 | 1 |
+| R-PROOF-007 (no wrangler/grep) | phase-1-task-2 | 1 |
+| R-PROOF-008 (parallel-ready) | phase-1-task-1, phase-1-task-2 | 1 |
+| R-PROOF-009 (domains.json) | phase-1-task-1 | 1 |
+| R-PROOF-010 (script separated) | phase-1-task-2, phase-1-task-3 | 1, 2 |
 
 ---
 
@@ -58,265 +33,222 @@
 
 ### Wave 1 (Parallel)
 
-These three tasks are completely independent. They can be emitted in any order or simultaneously by parallel sub-agents.
-
 <task-plan id="phase-1-task-1" wave="1">
-  <title>Create minimal package.json and tsconfig.json</title>
-  <requirement>R1 (Flat file layout), R2 (Zero runtime dependencies), R6 (TS validity)</requirement>
-  <description>Establish the module manifest and TypeScript configuration with zero runtime dependencies, flat structure, and minimal tooling footprint.</description>
+  <title>Create domains.json — version-controlled domain configuration</title>
+  <requirement>R-PROOF-009 (domains.json replaces runtime wrangler API), R-PROOF-008 (parallel-ready schema), R-PROOF-002 (root path only)</requirement>
+  <description>
+    Create the human-readable, version-controlled domain configuration file that tells Proof which domains to verify and what their expected Cloudflare origin is. This eliminates the wrangler CLI dependency and makes the verification deterministic and auditable.
+  </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/rounds/build-model-canary/decisions.md" reason="Locks the zero-dependency constraint and flat-file rule" />
-    <file path="/home/agent/shipyard-ai/prds/build-model-canary.md" reason="PRD acceptance criteria requiring tsc --noEmit" />
+    <file path="/home/agent/shipyard-ai/decisions.md" reason="Defines the domains.json schema per Open Question 4.5: [{ domain, expected_origin }]. Also defines v1 scope: single domain, root path only." />
+    <file path="/home/agent/shipyard-ai/.github/workflows/deploy-website.yml" reason="Confirms project name is shipyard-ai and deploy target is Cloudflare Pages." />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="R-PROOF-009 acceptance criteria and schema definition." />
   </context>
 
   <steps>
-    <step order="1">Create directory `deliverables/build-model-canary/` if it does not exist.</step>
-    <step order="2">Write `deliverables/build-model-canary/package.json` with exactly these fields: `name` set to `"slug"`, `version` set to `"1.0.0"`, `type` set to `"module"`, and `dependencies` set to `{}`. Do NOT include `devDependencies`, `scripts`, `exports`, `main`, or `types` fields.</step>
-    <step order="3">Write `deliverables/build-model-canary/tsconfig.json` with minimal configuration required for ESM Node resolution and strict type checking. Required fields: `compilerOptions.module` = `"NodeNext"`, `compilerOptions.moduleResolution` = `"NodeNext"`, `compilerOptions.strict` = `true`, `compilerOptions.esModuleInterop` = `true`, `compilerOptions.skipLibCheck` = `true`, `compilerOptions.forceConsistentCasingInFileNames` = `true`, `include` = `["*.ts"]`.</step>
-    <step order="4">Verify that `package.json` parses as valid JSON and contains zero items in `dependencies`.</step>
-    <step order="5">Verify that `tsconfig.json` parses as valid JSON and does not include `outDir`, `rootDir`, `src/`, or `dist/` paths.</step>
+    <step order="1">Create `domains.json` at the repository root (`/home/agent/shipyard-ai/domains.json`).</step>
+    <step order="2">Populate with the v1 domain configuration. Schema MUST be an array of objects. Each object MUST have: `domain` (string, the production custom domain), `expected_origin` (string, the expected CNAME target, e.g., "pages.cloudflare.com"), and `routes` (array of strings, reserved for v1.1; v1 ships with `["/"]`).</step>
+    <step order="3">Use the exact domain(s) attached to the Cloudflare Pages project `shipyard-ai`. If unknown, default to `[{ "domain": "shipyard.company", "expected_origin": "pages.cloudflare.com", "routes": ["/"] }]` and add a comment block at the top of the JSON file (or a `_comment` field) noting that this should be verified against the CF Pages dashboard.</step>
+    <step order="4">Validate the file is well-formed JSON with `node -e "JSON.parse(require('fs').readFileSync('domains.json'))"`.</step>
+    <step order="5">Commit the file with a conventional commit message.</step>
   </steps>
 
   <verification>
-    <check type="build">`cat deliverables/build-model-canary/package.json | jq '.dependencies | length'` returns 0</check>
-    <check type="build">`cat deliverables/build-model-canary/tsconfig.json | jq '.compilerOptions.module'` returns "NodeNext"</check>
-    <check type="manual">Neither file references `src/`, `dist/`, `lib/`, or `tests/`</check>
+    <check type="build">`node -e "JSON.parse(require('fs').readFileSync('domains.json'))"` exits 0</check>
+    <check type="manual">Open `domains.json` and confirm it is a JSON array containing at least one object with `domain`, `expected_origin`, and `routes` keys.</check>
+    <check type="test">Run `cat domains.json | python3 -m json.tool` (or `npx jsonlint domains.json`) to pretty-print and validate JSON syntax.</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies — wave 1 root task -->
+    <!-- Empty: wave 1, independent -->
   </dependencies>
 
-  <commit-message>chore(canary): minimal package.json and tsconfig.json for slug utility</commit-message>
+  <commit-message>feat(proof): add domains.json for post-deploy verification config
+
+Version-controlled domain list + expected Cloudflare origin.
+Replaces wrangler CLI runtime dependency per locked decision 1.2.
+Schema supports parallel multi-domain checks in v1.1.
+
+Refs: github-issue-sethshoultes-shipyard-ai-98</commit-message>
 </task-plan>
 
 <task-plan id="phase-1-task-2" wave="1">
-  <title>Implement slugify.ts</title>
-  <requirement>R3 (slugify function), R8 (Zero placeholders)</requirement>
-  <description>Emit a pure, zero-dependency slugify function with exact regex rules locked from the PRD test cases.</description>
+  <title>Create scripts/proof.js — Node.js verification engine</title>
+  <requirement>R-PROOF-003 (origin validation), R-PROOF-004 (fail fast), R-PROOF-005 (success output), R-PROOF-006 (failure output), R-PROOF-007 (no wrangler/grep), R-PROOF-008 (parallel-ready), R-PROOF-010 (script separated from YAML)</requirement>
+  <description>
+    Build the standalone Node.js verification script that checks each configured domain via HTTPS GET and validates DNS origin. The script must fail fast, print one sentence on failure, and print one green signal on success. No retries. No stack traces. No external dependencies.
+  </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="R3 defines the exact slugify acceptance criteria and verified test cases" />
-    <file path="/home/agent/shipyard-ai/rounds/build-model-canary/decisions.md" reason="Locks pure-function discipline, zero side effects, explicit types" />
+    <file path="/home/agent/shipyard-ai/decisions.md" reason="Defines ALL locked UX and behavior constraints: one breath one answer, no retry, origin validation, human voice error messages." />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="R-PROOF-003 through R-PROOF-010 acceptance criteria." />
+    <file path="/home/agent/shipyard-ai/domains.json" reason="The script reads this file at runtime to discover domains and expected origins." />
+    <file path="/home/agent/shipyard-ai/.github/workflows/deploy-website.yml" reason="Understands the deploy context: project shipyard-ai, CF Pages, secrets available in workflow env." />
   </context>
 
   <steps>
-    <step order="1">Write `deliverables/build-model-canary/slugify.ts`.</step>
-    <step order="2">Export a single named function `slugify` with signature `(text: string): string`.</step>
-    <step order="3">Implementation must be a single pipeline of pure string operations:
-      1. `text.toLowerCase()`
-      2. `.replace(/[^a-z0-9]+/g, '-')`
-      3. `.replace(/^-+|-+$/g, '')`
-    </step>
-    <step order="4">Return the transformed string. No external imports, no side effects, no mutation of the input parameter.</step>
-    <step order="5">Post-write static scan: reject file if any line matches `/TODO/i` or if the function body is an empty block `{}`.</step>
+    <step order="1">Create `scripts/proof.js` at the repository root (`/home/agent/shipyard-ai/scripts/proof.js`). If the `scripts/` directory does not exist at repo root, create it first.</step>
+    <step order="2">Import ONLY Node.js built-in modules: `https`, `dns`, `fs`, `path`, `url`. No npm dependencies. No `child_process` calls to wrangler.</step>
+    <step order="3">Read `domains.json` from the current working directory (default `./domains.json`; allow override via `PROOF_DOMAINS_PATH` env var for testability). Parse with `JSON.parse`. Exit with plain-English failure if file is missing or invalid.</step>
+    <step order="4">For each domain object in the array, define an async verification function that performs two checks in parallel for speed: (a) DNS origin check, and (b) HTTPS GET to `https://{domain}/`.</step>
+    <step order="5">DNS origin check: Use `dns.resolveCname(domain)` to fetch CNAME records. If any record matches the `expected_origin` from `domains.json`, pass. If CNAME fails (e.g., ENODATA), fall back to `dns.resolve4(domain)` to get A records, then perform the HTTPS GET and check for Cloudflare-specific headers (`CF-RAY` or `Server: cloudflare`). Only pass if headers are present. If neither CNAME match nor Cloudflare headers are found, fail.</step>
+    <step order="6">HTTPS GET check: Use `https.get` with `headers: { 'User-Agent': 'Shipyard-Proof/1.0' }`. Accept only status code 200. Any other status (404, 500, 301 without follow, etc.) is a failure. Do NOT follow redirects (or if following, treat non-200 final status as failure).</step>
+    <step order="7">Collect all domain checks with `Promise.all` so they run concurrently (parallel-ready architecture). Wait for all to settle.</step>
+    <step order="8">If ANY domain fails, print exactly ONE plain-English sentence to stderr (or stdout) describing the first failure. Example: "Your domain shipyard.company isn't pointing here." Keep it under 140 characters. Exit with code `1`. No stack traces. No JSON.</step>
+    <step order="9">If ALL domains pass, print one line per domain: `Verified {domain} {ISO8601_timestamp}`. Use `new Date().toISOString()` for the timestamp. Exit with code `0`.</step>
+    <step order="10">Add a shebang line `#!/usr/bin/env node` at the top and make the file executable (`chmod +x scripts/proof.js`).</step>
+    <step order="11">Test locally with a known-good domain (e.g., `example.com` or `shipyard.company` if accessible) to verify the script executes without runtime errors. If the target domain is unreachable from the local environment, test with a mock by temporarily editing `domains.json` to point to `httpbin.org` or a local test server, then revert.</step>
+    <step order="12">Commit the file with a conventional commit message.</step>
   </steps>
 
   <verification>
-    <check type="test">`cd deliverables/build-model-canary && node -e "import('./slugify.ts').then(m => console.log(m.slugify('Hello World'))).catch(e => { console.error(e); process.exit(1) })"` outputs `hello-world` (requires tsx or ts-node in host env; if unavailable, verify via tsc compilation first)</check>
-    <check type="build">`tsc --noEmit slugify.ts` exits 0 when tsconfig.json is present</check>
-    <check type="manual">File contains no `TODO`, `console.log`, `debugger`, or placeholder comments</check>
+    <check type="build">`node scripts/proof.js` runs without throwing (may fail verification legitimately if DNS is wrong — that's expected behavior).</check>
+    <check type="test">`node -e "require('./scripts/proof.js')"` does not throw a syntax error.</check>
+    <check type="manual">Review the source code and confirm: no `child_process`, no `wrangler`, no HTML body parsing for build IDs, no retry loops, no `setTimeout` for backoff, and only built-in Node modules are imported.</check>
+    <check type="manual">Simulate a failure by temporarily creating a `domains.json` with a nonsense domain like `this-is-not-a-real-domain-12345.test`, run the script, and confirm it prints exactly one sentence and exits 1.</check>
   </verification>
 
   <dependencies>
-    <!-- No dependencies — wave 1 root task. tsconfig.json is nice-to-have for tsc verification but not a hard dependency. -->
+    <!-- Empty: wave 1, independent. The script reads domains.json but can be authored in parallel. -->
   </dependencies>
 
-  <commit-message>feat(canary): implement slugify pure function</commit-message>
-</task-plan>
+  <commit-message>feat(proof): add verification engine with origin validation
 
-<task-plan id="phase-1-task-3" wave="1">
-  <title>Implement truncate.ts</title>
-  <requirement>R4 (truncate function), R8 (Zero placeholders)</requirement>
-  <description>Emit a pure, zero-dependency truncate function with word-boundary semantics and ellipsis behavior locked from the PRD.</description>
+Node.js script that checks DNS CNAME + HTTPS GET for each domain
+in domains.json. Fails fast, no retries, one-sentence errors.
+Uses only built-in modules (https, dns, fs).
 
-  <context>
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="R4 defines the exact truncate acceptance criteria and verified test cases" />
-    <file path="/home/agent/shipyard-ai/rounds/build-model-canary/decisions.md" reason="Locks pure-function discipline, zero side effects, explicit types" />
-  </context>
-
-  <steps>
-    <step order="1">Write `deliverables/build-model-canary/truncate.ts`.</step>
-    <step order="2">Export a single named function `truncate` with signature `(text: string, maxLength: number): string`.</step>
-    <step order="3">Implementation logic (in order):
-      1. If `text.length <= maxLength`, return `text`.
-      2. If `maxLength <= 0`, return `"…"`.
-      3. Find the last space character at an index `<= maxLength` using `text.lastIndexOf(' ', maxLength)`.
-      4. If a space is found (`boundary > 0` or `boundary === 0` if `maxLength >= 0`), return `text.substring(0, boundary) + "…"`.
-      5. If no space is found, return `text.substring(0, maxLength) + "…"`.
-    </step>
-    <step order="4">No external imports, no side effects, no mutation of input parameters.</step>
-    <step order="5">Post-write static scan: reject file if any line matches `/TODO/i` or if the function body is an empty block `{}`.</step>
-  </steps>
-
-  <verification>
-    <check type="test">`cd deliverables/build-model-canary && node -e "import('./truncate.ts').then(m => console.log(m.truncate('hello world', 5))).catch(e => { console.error(e); process.exit(1) })"` outputs `hello…` (requires tsx or ts-node in host env; if unavailable, verify via tsc compilation first)</check>
-    <check type="build">`tsc --noEmit truncate.ts` exits 0 when tsconfig.json is present</check>
-    <check type="manual">File contains no `TODO`, `console.log`, `debugger`, or placeholder comments</check>
-  </verification>
-
-  <dependencies>
-    <!-- No dependencies — wave 1 root task. -->
-  </dependencies>
-
-  <commit-message>feat(canary): implement truncate pure function</commit-message>
+Refs: github-issue-sethshoultes-shipyard-ai-98</commit-message>
 </task-plan>
 
 ---
 
 ### Wave 2 (Parallel, after Wave 1)
 
-These two tasks depend on their respective source files existing so that imports can resolve during verification. They are independent of each other.
-
-<task-plan id="phase-1-task-4" wave="2">
-  <title>Create slugify.test.ts</title>
-  <requirement>R5 (Test coverage), R8 (Zero placeholders)</requirement>
-  <description>Emit the slugify test file using Node.js built-in test runner. The test file IS the spec; it documents expected behavior through test names and assertions.</description>
+<task-plan id="phase-1-task-3" wave="2">
+  <title>Modify deploy-website.yml — inline Proof step after deploy</title>
+  <requirement>R-DEPLOY-001 through R-DEPLOY-004 (verify existing workflow), R-PROOF-001 (inline default-on), R-PROOF-010 (script separated but wired into pipeline)</requirement>
+  <description>
+    Update the existing GitHub Actions workflow to add the Proof verification step inline, immediately after the Cloudflare Pages deploy step. Verify that all existing deploy requirements (trigger, build, deploy, secrets) are already satisfied before adding the new step.
+  </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/build-model-canary/slugify.ts" reason="Source function under test" />
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="R3 and R5 define the test cases and runner constraints" />
-    <file path="/home/agent/shipyard-ai/rounds/build-model-canary/decisions.md" reason="Locks flat structure (no tests/ subdir) and zero-dependency test runner" />
+    <file path="/home/agent/shipyard-ai/.github/workflows/deploy-website.yml" reason="The existing workflow that must be modified. MUST verify it already contains trigger, build, deploy, and secrets before editing." />
+    <file path="/home/agent/shipyard-ai/scripts/proof.js" reason="The script that the workflow will invoke. Must exist and be executable before this task runs." />
+    <file path="/home/agent/shipyard-ai/domains.json" reason="The config file the script reads. Must exist before this task runs." />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="R-DEPLOY-001 through R-DEPLOY-004 and R-PROOF-001 acceptance criteria." />
+    <file path="/home/agent/shipyard-ai/decisions.md" reason="Locked decisions on inline architecture (1.1), default-on (3.1), and no standalone microservice." />
   </context>
 
   <steps>
-    <step order="1">Write `deliverables/build-model-canary/slugify.test.ts` in the root directory (NOT in a `tests/` subdirectory).</step>
-    <step order="2">Import `describe` and `it` from `node:test` and `strictEqual` from `node:assert`.</step>
-    <step order="3">Import `slugify` from `./slugify.js` (ESM `.js` extension pattern for TypeScript).</step>
-    <step order="4">Write tests covering:
-      - `slugify("Hello World")` → `"hello-world"`
-      - `slugify("Foo  Bar!!!")` → `"foo-bar"`
-      - `slugify("  trim me  ")` → `"trim-me"`
-      - `slugify("")` → `""`
-      - `slugify("UPPER")` → `"upper"`
-      - `slugify("unicode-ñ-test")` → `"unicode-test"`
-    </step>
-    <step order="5">Each test must have a descriptive name explaining the scenario. No `todo()` or skipped tests.</step>
-    <step order="6">Post-write static scan: reject file if any line matches `/TODO/i` or `/skip/i`.</step>
+    <step order="1">Open `.github/workflows/deploy-website.yml` and verify the existing structure satisfies R-DEPLOY-001 through R-DEPLOY-004: (a) `on.push.branches` includes `main`, (b) `on.push.paths` includes `website/**` and `.github/workflows/deploy-website.yml`, (c) `npm ci` and `npm run build` run in `website/`, (d) `wrangler pages deploy out --project-name=shipyard-ai` runs on `github.ref == 'refs/heads/main'`, (e) `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets are referenced. If any are missing, add them before proceeding.</step>
+    <step order="2">Add a new step immediately after the "Deploy to Cloudflare Pages" step. Name it "Proof — verify production domain" or similar.</step>
+    <step order="3">The new step MUST use `run: node scripts/proof.js` and execute from the repo root (the default working directory in `actions/checkout` is the repo root, which is correct).</step>
+    <step order="4">The new step MUST have `if: github.ref == 'refs/heads/main'` to match the deploy step guard, ensuring Proof only runs on actual production deploys.</step>
+    <step order="5">The new step MUST NOT require any additional secrets, input parameters, or opt-in environment variables for basic operation. It reads `domains.json` from disk by default.</step>
+    <step order="6">Add `PROOF_DOMAINS_PATH: ./domains.json` to the step's `env:` block for explicit configuration and future testability.</step>
+    <step order="7">Run the workflow YAML through a linter (e.g., `npx actionlint .github/workflows/deploy-website.yml` if available, or visually verify indentation and syntax). Ensure no broken YAML indentation.</step>
+    <step order="8">Commit the modified workflow with a conventional commit message.</step>
   </steps>
 
   <verification>
-    <check type="build">`tsc --noEmit slugify.test.ts` exits 0 (import resolves to slugify.ts via tsconfig)</check>
-    <check type="test">`node --test slugify.test.js` exits 0 after `tsc` compilation (or via tsx if available)</check>
-    <check type="manual">File contains no `TODO`, no skipped tests, no placeholder assertions</check>
+    <check type="build">`npx actionlint .github/workflows/deploy-website.yml` passes (if actionlint is unavailable, use an online YAML validator or `python3 -c "import yaml; yaml.safe_load(open('.github/workflows/deploy-website.yml'))"` after `pip install pyyaml`).</check>
+    <check type="manual">Open the workflow file and visually confirm: Proof step appears AFTER deploy step, has matching `if:` guard, calls `node scripts/proof.js`, and references `PROOF_DOMAINS_PATH`.</check>
+    <check type="manual">Confirm the workflow still contains the original trigger, build, install, deploy, and secrets configuration unchanged.</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-2" reason="Test file imports and asserts against slugify.ts; source must exist before test verification" />
+    <depends-on task-id="phase-1-task-1" reason="The workflow references domains.json indirectly via proof.js. The config must exist in the repo before the workflow step is meaningful." />
+    <depends-on task-id="phase-1-task-2" reason="The workflow step invokes scripts/proof.js. The script must exist and be committed before the workflow modification." />
   </dependencies>
 
-  <commit-message>test(canary): slugify acceptance tests with node:test</commit-message>
-</task-plan>
+  <commit-message>ci(deploy): add Proof verification step inline after CF Pages deploy
 
-<task-plan id="phase-1-task-5" wave="2">
-  <title>Create truncate.test.ts</title>
-  <requirement>R5 (Test coverage), R8 (Zero placeholders)</requirement>
-  <description>Emit the truncate test file using Node.js built-in test runner. The test file IS the spec; it documents expected behavior through test names and assertions.</description>
+Runs scripts/proof.js automatically on every main-branch deploy.
+Default-on, zero opt-in, terminal-only output per locked decisions.
+Verifies production custom domain origin before marking deploy done.
 
-  <context>
-    <file path="/home/agent/shipyard-ai/deliverables/build-model-canary/truncate.ts" reason="Source function under test" />
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="R4 and R5 define the test cases and runner constraints" />
-    <file path="/home/agent/shipyard-ai/rounds/build-model-canary/decisions.md" reason="Locks flat structure (no tests/ subdir) and zero-dependency test runner" />
-  </context>
-
-  <steps>
-    <step order="1">Write `deliverables/build-model-canary/truncate.test.ts` in the root directory (NOT in a `tests/` subdirectory).</step>
-    <step order="2">Import `describe` and `it` from `node:test` and `strictEqual` from `node:assert`.</step>
-    <step order="3">Import `truncate` from `./truncate.js` (ESM `.js` extension pattern for TypeScript).</step>
-    <step order="4">Write tests covering:
-      - `truncate("hello world", 5)` → `"hello…"` (boundary at index 5)
-      - `truncate("hello world", 4)` → `"hell…"` (boundary before index 4)
-      - `truncate("short", 10)` → `"short"` (no truncation needed)
-      - `truncate("", 5)` → `""`
-      - `truncate("supercalifragilisticexpialidocious", 5)` → `"super…"` (hard-cut, no boundary ≤ 5)
-      - `truncate("hello world", 0)` → `"…"`
-      - `truncate("hello world", -1)` → `"…"`
-    </step>
-    <step order="5">Each test must have a descriptive name explaining the scenario. No `todo()` or skipped tests.</step>
-    <step order="6">Post-write static scan: reject file if any line matches `/TODO/i` or `/skip/i`.</step>
-  </steps>
-
-  <verification>
-    <check type="build">`tsc --noEmit truncate.test.ts` exits 0 (import resolves to truncate.ts via tsconfig)</check>
-    <check type="test">`node --test truncate.test.js` exits 0 after `tsc` compilation (or via tsx if available)</check>
-    <check type="manual">File contains no `TODO`, no skipped tests, no placeholder assertions</check>
-  </verification>
-
-  <dependencies>
-    <depends-on task-id="phase-1-task-3" reason="Test file imports and asserts against truncate.ts; source must exist before test verification" />
-  </dependencies>
-
-  <commit-message>test(canary): truncate acceptance tests with node:test</commit-message>
+Refs: github-issue-sethshoultes-shipyard-ai-98</commit-message>
 </task-plan>
 
 ---
 
 ### Wave 3 (Sequential, after Wave 2)
 
-This task validates the entire artifact. It must run after all source and test files are emitted.
-
-<task-plan id="phase-1-task-6" wave="3">
-  <title>Validate type check and test suite</title>
-  <requirement>R6 (TypeScript validity), R7 (Test execution), R1 (Flat layout guard)</requirement>
-  <description>Run the full quality gate: type-check all TypeScript files, execute the test suite, and scan for structural violations (subdirectories, process artifacts, placeholders).</description>
+<task-plan id="phase-1-task-4" wave="3">
+  <title>Local dry-run verification — validate the full pipeline locally</title>
+  <requirement>R-PROOF-010 (testability), R-PROOF-005 (success output verification), R-PROOF-006 (failure output verification), R-PROOF-003 (origin validation verification)</requirement>
+  <description>
+    Perform a local end-to-end sanity check of the Proof script against real and simulated domains. Confirm success formatting, failure formatting, and origin validation logic work as intended without relying on the GitHub Actions runner.
+  </description>
 
   <context>
-    <file path="/home/agent/shipyard-ai/deliverables/build-model-canary/package.json" reason="Dependency gate check" />
-    <file path="/home/agent/shipyard-ai/deliverables/build-model-canary/tsconfig.json" reason="Type check configuration" />
-    <file path="/home/agent/shipyard-ai/deliverables/build-model-canary/slugify.ts" reason="Source file to type-check" />
-    <file path="/home/agent/shipyard-ai/deliverables/build-model-canary/truncate.ts" reason="Source file to type-check" />
-    <file path="/home/agent/shipyard-ai/deliverables/build-model-canary/slugify.test.ts" reason="Test file to type-check and run" />
-    <file path="/home/agent/shipyard-ai/deliverables/build-model-canary/truncate.test.ts" reason="Test file to type-check and run" />
-    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="R6 and R7 define the validation acceptance criteria" />
-    <file path="/home/agent/shipyard-ai/rounds/build-model-canary/decisions.md" reason="Locks flat structure, zero deps, and placeholder-free code" />
+    <file path="/home/agent/shipyard-ai/scripts/proof.js" reason="The script under test." />
+    <file path="/home/agent/shipyard-ai/domains.json" reason="The configuration under test." />
+    <file path="/home/agent/shipyard-ai/.github/workflows/deploy-website.yml" reason="The pipeline definition. Used only to confirm the step wiring is correct." />
+    <file path="/home/agent/shipyard-ai/.planning/REQUIREMENTS.md" reason="All R-PROOF-* acceptance criteria that must be verified." />
   </context>
 
   <steps>
-    <step order="1">Run `cd deliverables/build-model-canary && tsc --noEmit`. Verify exit code 0 and zero type errors.</step>
-    <step order="2">Run structural scan: `find deliverables/build-model-canary -mindepth 1 -type d`. If any directory is found, reject the build (flat-file lock violated).</step>
-    <step order="3">Run structural scan: verify `deliverables/build-model-canary/spec.md`, `todo.md`, `README.md`, `CHANGELOG.md`, `index.ts` do NOT exist. If any found, reject the build.</step>
-    <step order="4">Run dependency scan: `cat deliverables/build-model-canary/package.json | jq '.dependencies | length'`. Verify result is 0 and no `devDependencies` key exists.</step>
-    <step order="5">Run placeholder scan: `grep -riE 'TODO|FIXME|HACK|XXX|placeholder|implement me|fix later' deliverables/build-model-canary/`. If any match found, reject the build.</step>
-    <step order="6">Execute tests. Prefer Path A (zero dependency): `cd deliverables/build-model-canary && npx tsc` to compile, then `node --test *.test.js`. If `tsx` is available, Path B is acceptable: `node --test --import tsx *.test.ts`. Verify exit code 0.</step>
-    <step order="7">If any step 1–6 fails, mark build as rejected and report the first failure. Do not proceed to deploy.</step>
+    <step order="1">Run `node scripts/proof.js` with the committed `domains.json`. If the configured domain is live and correctly pointed at Cloudflare Pages, expect: exit code 0 and output matching `Verified {domain} {ISO8601_timestamp}`.</step>
+    <step order="2">Create a temporary test config file `domains-test-fail.json` with a deliberately bad domain (e.g., `{ "domain": "shipyard.company.notreal", "expected_origin": "pages.cloudflare.com", "routes": ["/"] }`). Run `PROOF_DOMAINS_PATH=./domains-test-fail.json node scripts/proof.js`. Expect: exit code 1 and exactly one plain-English sentence. No stack trace. Clean up the temp file after.</step>
+    <step order="3">Create a temporary test config file `domains-test-cname.json` with a domain known to NOT CNAME to Cloudflare (e.g., `{ "domain": "vercel.com", "expected_origin": "pages.cloudflare.com", "routes": ["/"] }`). Run `PROOF_DOMAINS_PATH=./domains-test-cname.json node scripts/proof.js`. Expect: exit code 1 because DNS CNAME does not match expected_origin and CF headers won't be present. Clean up the temp file after.</step>
+    <step order="4">Verify that `node scripts/proof.js` completes in under 10 seconds total (fail-fast guarantee — no retry-induced delay).</step>
+    <step order="5">Review the workflow file one final time to ensure the Proof step is correctly sequenced after deploy and before any post-deploy notifications (there are none in v1, but confirm nothing was accidentally added).</step>
+    <step order="6">Document any findings in a brief note. If all checks pass, mark the task complete. If failures are found, file a bug against the relevant earlier task and do NOT mark this complete until resolved.</step>
   </steps>
 
   <verification>
-    <check type="build">`cd deliverables/build-model-canary && tsc --noEmit` exits 0 with no stderr</check>
-    <check type="test">`node --test` on compiled tests exits 0 with no failures</check>
-    <check type="manual">Exactly 6 files exist in `deliverables/build-model-canary/`: `package.json`, `tsconfig.json`, `slugify.ts`, `truncate.ts`, `slugify.test.ts`, `truncate.test.ts`</check>
-    <check type="manual">No subdirectories, no process artifacts, no barrel file, no TODOs anywhere</check>
+    <check type="test">`node scripts/proof.js` with real `domains.json` exits 0 and prints one `Verified ...` line.</check>
+    <check type="test">`PROOF_DOMAINS_PATH=./domains-test-fail.json node scripts/proof.js` exits 1 and prints exactly one sentence ≤ 140 characters.</check>
+    <check type="manual">`time node scripts/proof.js` shows elapsed &lt; 10s.</check>
+    <check type="manual">No temp test files remain in the working tree after cleanup.</check>
   </verification>
 
   <dependencies>
-    <depends-on task-id="phase-1-task-1" reason="package.json and tsconfig.json must exist for tsc and dependency scans" />
-    <depends-on task-id="phase-1-task-2" reason="slugify.ts must exist for type check and test execution" />
-    <depends-on task-id="phase-1-task-3" reason="truncate.ts must exist for type check and test execution" />
-    <depends-on task-id="phase-1-task-4" reason="slugify.test.ts must exist for test execution" />
-    <depends-on task-id="phase-1-task-5" reason="truncate.test.ts must exist for test execution" />
+    <depends-on task-id="phase-1-task-1" reason="domains.json must be committed and stable for the real-domain test." />
+    <depends-on task-id="phase-1-task-2" reason="proof.js must be committed and stable for all script behavior tests." />
+    <depends-on task-id="phase-1-task-3" reason="The workflow modification must be committed so the dry-run validates the final pipeline wiring, even though the local test does not execute the workflow itself." />
   </dependencies>
 
-  <commit-message>ci(canary): validate type check, tests, and structural constraints</commit-message>
+  <commit-message>test(proof): local dry-run verification passed
+
+Validated success output, failure output, origin validation,
+and fail-fast behavior against real and simulated domains.
+No changes to source — verification-only commit.
+
+Refs: github-issue-sethshoultes-shipyard-ai-98</commit-message>
 </task-plan>
 
 ---
 
 ## Risk Notes
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| **Hallucination drift** — Model injects TODO, empty body, or placeholder on emission | High | Critical | Deterministic prompts with explicit NO-TODO constraint. Post-generation static scan for `/TODO/i` and empty `{}` bodies (phase-1-task-6, step 5). Reject and retry on hit. |
-| **Agent invents folder structure** — Emits `src/`, `lib/`, or `tests/` despite flat-file lock | Medium | High | Explicit one-directory constraint in every task plan. Structural scan in phase-1-task-6 (step 2) parses file paths; rejects any emission containing path separators beyond root. |
-| **TypeScript tooling introduces hidden dependency** — `tsc`, `tsx`, or `ts-node` added to `dependencies`/`devDependencies` | Low | Medium | Dependency scan in phase-1-task-6 (step 4). `dependencies` must be empty. `devDependencies` must not exist in the emitted artifact. |
-| **Undefined edge-case behavior** — `slugify` or `truncate` behaves differently across emissions because spec was vague | Medium | High | Exact regex rules and truncation logic locked in task plans (phase-1-task-2 and phase-1-task-3). Acceptance tests (phase-1-task-4, phase-1-task-5) assert identical output for identical input. |
-| **Test file fails to define spec** — Tests are too shallow to catch regression | Medium | High | Tests cover empty strings, unicode, maximum length, special characters, negative bounds, and word-boundary vs hard-cut paths. The test file IS the contract. |
-| **Overwrite of active Anvil plan** — `.planning/` files currently contain the Anvil project plan | High (process) | Medium | Anvil plan is backed up in git history. This canary is time-boxed. Future iterations should use project-specific `.planning/{slug}/` subdirectories to avoid collision. |
+### From Hindsight Report
+- **`.github/workflows/deploy-website.yml`** is relatively new (created 2026-04-29) with low churn. Modification risk is LOW.
+- **`website/src/app/layout.tsx`** and **`website/src/app/page.tsx`** are moderate-churn but **NOT touched** by this plan. The Proof feature is pure CI/infrastructure.
+- **No uncommitted changes** in the build surface area. All uncommitted files are debate transcripts in `rounds/github-issue-sethshoultes-shipyard-ai-98/` and do not affect deliverables.
+- **No bug-associated files** in this scope. Previous bug-associated files (plugin sandbox entries, daemon deliverables) are unrelated.
+
+### Technical Risks
+1. **DNS CNAME resolution for apex domains**: Apex domains (naked domains like `shipyard.company`) often use A records rather than CNAME due to RFC constraints. The proof.js fallback to CF-RAY header detection handles this, but if Cloudflare changes header names, the fallback breaks. **Mitigation**: Document the fallback logic in code comments and test against actual domain configuration before shipping.
+2. **False positive from cached 200 pages**: If Vercel (or another old host) returns a 200 status for a parked/catch-all page, the HTTP check alone would pass. The origin validation (CNAME + CF headers) is specifically designed to prevent this. **Mitigation**: Ensure both DNS and header checks are implemented and tested per R-PROOF-003.
+3. **GitHub Actions runner network access**: The runner must be able to reach the public internet to perform DNS and HTTPS checks. This is standard for `ubuntu-latest` runners. **Risk accepted** — no mitigation needed.
+4. **Scope creep into monitoring platform**: Any PR adding dashboards, retry loops, Slack webhooks, or cron syntax must be rejected unless it cites an explicit Open Question resolution from decisions.md §4. **Cultural guardrail**: "Proof is the verdict, not the courtroom."
+5. **Slug mismatch repeat**: Decisions.md Open Question 4.3 flags a prior slug mismatch. The PRD file is `github-issue-sethshoultes-shipyard-ai-98.md` and the round directory is `github-issue-sethshoultes-shipyard-ai-98`. **Confirmed canonical**: we use `-98` everywhere.
+
+### Customer Gut-Check Trigger
+After this plan is approved, spawn a haiku sub-agent as Sara Blakely to read this plan and the original PRD, then write `.planning/sara-blakely-review.md` with a customer-value gut-check per SKILL.md §7.
 
 ---
 
-## Agent Assignments
+## Documentation Review Summary
 
-- **Elon Musk**: Validates zero-dependency lock (empty `dependencies`, no `devDependencies`), flat-file discipline, and structural scan results.
-- **Steve Jobs**: Validates function naming (`slugify`, `truncate`), type precision (no `any`), test quality, and the absence of theater (no README novels, no spec.md).
-- **Margaret Hamilton**: Runs the full validation gate (phase-1-task-6): `tsc --noEmit`, `node --test`, placeholder scan, subdirectory scan. Rejects the build on any failure.
+### Verified Technical Context
+1. **Platform Lock**: Next.js static-export site (`output: "export"` in `next.config.ts`). Build produces `website/out/`.
+2. **Deploy Target**: Cloudflare Pages via `wrangler pages deploy` (static site hosting, NOT Cloudflare Workers + D1 + R2). The `docs/EMDASH-GUIDE.md` §5 Deployment describes Workers deployment; that pattern does NOT apply here.
+3. **Runtime**: GitHub Actions `ubuntu-latest` with Node.js 22. Runner has `node` by default.
+4. **Secrets**: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are already present in the existing workflow.
+5. **Project Name**: `shipyard-ai` (confirmed in existing `.github/workflows/deploy-website.yml`).
+6. **No External API Dependencies**: Per locked decision 1.2, the verification script uses only Node.js built-ins (`https`, `dns`, `fs`) plus `domains.json`. No `wrangler` CLI calls, no HTML body grep.

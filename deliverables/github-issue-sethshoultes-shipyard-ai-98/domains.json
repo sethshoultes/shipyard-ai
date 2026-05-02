@@ -1,10 +1,14 @@
 [
   {
+    "_comment": "Production domains to verify after each Cloudflare Pages deploy. Each domain must return HTTP 200 with Cloudflare headers and DNS pointing to pages.cloudflare.com",
     "domain": "shipyard.company",
-    "expected_origin": "pages.cloudflare.com"
+    "expected_origin": "pages.cloudflare.com",
+    "routes": ["/"]
   },
   {
+    "_comment": "Production domains to verify after each Cloudflare Pages deploy. Each domain must return HTTP 200 with Cloudflare headers and DNS pointing to pages.cloudflare.com",
     "domain": "www.shipyard.company",
-    "expected_origin": "pages.cloudflare.com"
+    "expected_origin": "pages.cloudflare.com",
+    "routes": ["/"]
   }
 ]
