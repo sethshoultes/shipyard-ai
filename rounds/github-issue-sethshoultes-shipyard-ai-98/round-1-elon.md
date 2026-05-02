@@ -1,22 +1,22 @@
 ## Architecture
 
-Simplest system: after `pages publish`, query Cloudflare's API for the project's custom domains. Don't shell out to `wrangler` and `grep` — that's begging for breakage when CLI output formatting changes. Hit each domain with `curl -I`, assert `200 OK`. Done.
+Simplest system that works: after `pages publish`, query the Cloudflare API for the project's custom domains. Don't shell out to `wrangler` and pipe through `grep` — CLI output formats change and that breaks. Hit each domain with `curl -I`, assert `200 OK`. Done.
 
-You don't need to grep the HTML body for a build ID. That's unnecessary complexity. If you must verify the revision, inject an `X-Build-Id` header. Parsing HTML with `grep` is amateur hour.
+Verifying the build revision? Don't grep the HTML body. That's fragile. Inject an `X-Build-Id` response header in the build and assert that. Parsing HTML with `grep` is amateur hour.
 
 ## Performance
 
-Bottleneck is human latency, not compute. The 404s lasted **6 days** because nobody got paged. The 10x path is instant alerting (Slack/PagerDuty), not a dashboard.
+The bottleneck isn't the check — it's human latency. The 404s lasted **6 days** because nobody got paged. The 10x path is instant alerting (Slack/PagerDuty), not a dashboard you check when you feel like it.
 
-Real 10x? Stop treating DNS as separate from deploy. The root cause is DNS pointing at a dead Vercel project. If the pipeline owned the DNS record update alongside the publish step, they could never drift. Verification is a band-aid; unified control is the cure.
+Real 10x? Stop treating DNS as separate from deploy. The root cause is DNS still pointing at a dead Vercel project. If the pipeline owned the DNS record update alongside the publish step, they could never drift. Verification is a band-aid; unified control is the cure.
 
 ## Distribution
 
-This isn't a consumer feature. "Distribution" means baking it into the default deploy template. If it's an opt-in setting, adoption is <5%. Make it default-on for every customer project. Zero friction is the only way to reach 10,000 users without paid ads — they get the protection before they know they need it.
+This isn't a consumer feature. "Distribution" means making it the default in every deploy template. If it's an opt-in checkbox, adoption is <5%. Make it default-on for every customer project. Zero friction is the only way to reach 10,000 users without paid ads — they get the protection before they know they need it.
 
 ## What to CUT
 
-- **HTML body build-id grep.** v2 masquerading as v1. Cut it.
+- **HTML body build-id grep.** v2 masquerading as v1. Cut it. Use headers.
 - **"Verify a few key routes."** Check `/` first. Deep-route smoke tests are v2.
 - **Retry loops with exponential backoff and dashboards.** Fail fast and alert. Pretty UIs don't fix 404s.
 - **Standalone microservice.** This is a 30-line addition to the existing CI job, not a new service.

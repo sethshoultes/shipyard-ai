@@ -1,41 +1,41 @@
-# Round 1 — Steve
+# Steve's Positions — Deploy Verification
 
-## Product Naming: Proof
+## Product Naming
 
-Name it **Proof**. One word. Unforgettable. It does exactly what it says on the tin: it proves your ship made it to shore.
+**Proof.** One word. Final. When you ask "is my site actually live?" the answer isn't a dashboard checkbox — it's Proof. Dashboards lie. DNS lies. Green checkmarks lie. Proof doesn't.
 
-"Deploy verification" is a committee word invented by people who love acronyms and fear humanity. "Proof" is a human word. It's short enough to become a verb. "Did you Proof it?" That's how you know you own the mind. When the name is right, the marketing writes itself.
+A name with two words is a committee. A name with three words is a startup that will pivot in six months. Proof is what you present when someone doubts you. It is the evidence that your work actually reached the world.
 
-## Design Philosophy: The Verdict, Not the Dashboard
+Other tools "verify." Proof *proves*. That distinction is the difference between a bureaucrat stamping a form and a witness swearing on the stand.
 
-This isn't a dashboard. It's a verdict. The best interface is the one you never see — until something is wrong. Then it should hit you like a splash of cold water: red, clear, impossible to ignore.
+## Design Philosophy
 
-We don't chart trends. We don't aggregate percentiles. We answer a single, existential question: Did my deployment actually reach my users? Everything else is noise. If the answer doesn't fit in a push notification, it doesn't belong in the product. Insanely great means insanely focused.
+This is a smoke detector, not a fire extinguisher. It doesn't fix the fire — it screams before you smell smoke. The interface should feel like a single red thread pulled tight between your deploy and your customer's browser. Any slack in that thread, any gap, and the thread turns red. Instantly.
 
-## User Experience: The First 30 Seconds
+No graphs. No toggles. No "health scores." Just: alive or dead. We are not building a hospital monitor with 40 waveforms. We are building the one alarm that drags you out of bed before the house burns down.
 
-You don't "open" Proof. It finds you. The moment your deploy finishes, it whispers the answer into your terminal, your Slack, your bones.
+## User Experience (First 30 Seconds)
 
-Green? You feel that satisfying click of a door shutting — safe, final, done. The kind of calm that lets you close the laptop and go to dinner.
+You open Proof after a deploy. The screen is black. A single line pulses: `shipyard.company — breathing`. That's it. No sidebar. No "last checked 3 minutes ago" fine print. Just a pulse.
 
-Red? You know exactly what's broken before your customer does. No hunting through DNS records. No ssh-ing into a box. No tabs open in three browsers. One breath. One answer. Certainty.
+If it stops breathing, the screen turns blood-red and a bell rings — not an email, not a Slack ping, a **bell**. The first 30 seconds should feel like you've plugged a stethoscope directly into the internet and heard a heartbeat. You should feel relief, then forget it exists, then feel terror when it breaks the silence.
 
-## Brand Voice: The Smart Friend, Not the Sysadmin
+## Brand Voice
 
-We speak with empathy and precision. We don't say "DEPLOYMENT_NOT_FOUND." We say, "Your domain isn't pointing here. Here's exactly how to fix it."
+Proof speaks like a Coast Guard radio operator. No "Oops! Something went wrong." No emojis. No "We're sorry for the inconvenience." It says: **"DEPLOYMENT NOT_FOUND. Customer sees 404. You shipped nothing."**
 
-Every sentence must pass the mom test: would my mother understand this in three seconds? No jargon. No passive voice. No "utilize." Just a human being who cares enough to be clear. When you respect people's time, they trust you with their business.
+Then it goes silent until it matters again. It does not apologize for waking you at 3 AM. The building is on fire. You should be awake.
 
 ## What to Say NO To
 
-Say NO to graphs. NO to configuration wizards. NO to "monitoring suites" that require a manual and a certification. NO to log dumps that bury the truth in haystacks. NO to cron syntax. NO to making the user remember to check a separate tool.
+NO dashboards with 47 metrics. NO "trend analysis." NO "anomaly detection" that learns your failure patterns. NO configurability. You don't get to decide which routes matter — we check the ones customers actually hit.
 
-If Proof isn't wired into the pipeline so it runs without a thought, it doesn't exist. Simplicity is not the art of adding features; it's the art of removing the need to worry. The only thing worse than a bug is a tool that adds more work.
+NO "optional" toggle. Proof is not a feature you enable. It's the floor the product stands on. Remove everything that isn't the truth. If it doesn't answer "did my deploy actually reach my customer?" it doesn't belong in the product.
 
-## Emotional Hook: Turning Dread into Confidence
+Simplicity is not the absence of clutter. It is the presence of exactly what matters, and nothing else. If a designer shows you a mock with a "settings" gear icon, fire them.
 
-Launching is terrifying. The seconds after you push are the loneliest seconds in software. You're naked on a stage, hoping the curtain rises.
+## The Emotional Hook
 
-Proof transforms that vulnerability into power. It is Margaret Hamilton standing at the gate, looking you in the eye, and saying, "It's good. Ship it."
+People will love Proof because it protects their dignity. The worst feeling in software isn't a bug — it's standing in front of someone, sharing a link you *know* you deployed, and watching it 404 in their hands. That humiliation is what Proof prevents.
 
-People won't just use Proof. They'll love it because it gives them back the one thing technology stole: the confidence to sleep through the night. And that is the only metric that ever mattered.
+Proof is the friend who grabs your shoulder before you walk on stage and says: "Your fly is down." Nobody wants a smoke detector until the night they almost die in their sleep. Then they worship it. We are selling peace of mind disguised as a heartbeat monitor. Once someone feels that pulse, they will never ship without it again.
