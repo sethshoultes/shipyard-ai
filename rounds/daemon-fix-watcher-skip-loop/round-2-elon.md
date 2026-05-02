@@ -1,37 +1,38 @@
 # Round 2 — Elon
 
-Steve's Round 1 was gorgeous. It was also a roadmap to v3 masquerading as a bug fix. I admire the vision, but we are bailing water right now. Here is why beauty must wait its turn.
+## Where Beauty Becomes a Bug
 
-## Challenge: where beauty blocks shipping
+Steve wants to call it **Pulse**. Cute. But renaming a background job while its state machine is still grep'ing a directory tree is like polishing a piston ring while the engine is on fire. The user — one engineer, zero paying customers — does not fall in love with a name. They fall in love with a system that does not lose their PRD at 2 a.m. Branding a tourniquet does not turn it into surgery.
 
-Steve wants to rename the daemon to "Pulse" mid-outage. That's not craft, it's bikeshedding. Every name change breaks runbooks, scripts, and muscle memory for zero user-facing value. You don't rebrand a leaking hull while you're bailing water. Ship the fix; debate the poetry in v2.
+The "covenant" and "whisper back" language is beautiful and dangerous. A daemon with no external users does not whisper. It writes structured logs, exposes metrics, and gets out of the way. If you need poetry to trust your infrastructure, your observability is broken. When the pager fires, you want `ERROR: watcher skipped prd/x.md because mtime <= completed/x.md` — not a craftsperson rolling up their sleeves.
 
-The "no seams, no friction" philosophy sounds beautiful but offers zero implementation path. You cannot compile vibes. The mtime check *is* a hack — calling it a "covenant in code" doesn't make it atomic, idempotent, or race-safe. Love is not a concurrency model. Covenants are for people; databases are for state.
+The "baby monitor" metaphor is misplaced. A baby monitor lets you sleep because it tells you the truth — crying means wake up, silence means check the device. A silent skip is a flatline disguised as uptime. You fix that with a better sensor, not a better lullaby.
 
-Steve's brand-voice directive to "speak in verbs" is actively dangerous if it means we paper over failure states. Sometimes "failed" *is* a final destination: a corrupt PRD should not retry forever in the name of optimism. Optimism without boundaries is just denial with better typography.
+Hiding `failed/` and `parked/` as "scars" makes debugging harder. When the watcher silently drops a retry because of a 1-second ext4 timestamp collision, that engineer needs to `ls` those directories, not hunt through a branded abstraction. Exposed plumbing is not shameful; it is honest. If you cannot debug it at 2 a.m. with `grep` and `ls`, it is not production-ready, no matter how pretty the README.
 
-Most dangerously, Steve says "NO to blaming the filesystem." The filesystem *is* the problem. Pretending otherwise because it hurts the brand narrative is how you end up with silent data loss in production. Great products are built on honest physics, not denial. When Steve says "NO to dashboards that celebrate monitoring over movement," I actually agree — but the cure is working code, not brand guidelines.
+Steve says "NO to configuration knobs for retry logic." I disagree here. Retry without boundaries is just denial with better typography. A corrupt PRD should not retry forever in the name of optimism. Boundaries are what separate working systems from cults.
 
-## Defense: why simplicity wins at 2 a.m.
+## Defending First Principles
 
-A SQLite state table isn't over-engineering; it's *deletion*. It removes the dual-source-of-truth problem permanently. Every refactor-for-beauty adds state you have to hold in working memory during an outage. The band-aid that ships today becomes the ossified architecture that breaks in three months. Technical simplicity wins because it stays debuggable when nothing else does.
+**SQLite is not over-engineering.** It is the simplest system that eliminates an entire class of races. A filesystem queue is a distributed consensus protocol you implemented in 30 lines without realizing it. That is not simplicity; it is debt.
 
-Simplicity also wins on velocity. The SQLite patch is forty lines and one schema. The "invisible machinery" Steve imagines requires re-architecting intake, health checks, and the watcher into a seamless abstraction nobody can trace. That is v3 scope masquerading as v1 taste. Ship the table now; invisible comes later.
+**statSync will stall the event loop.** Physics does not negotiate with brand voice. At 100× volume, synchronous syscalls inside Chokidar handlers are a guaranteed outage. The fix is not "prettier logs around the stall."
 
-The long-run winner is always the system the next engineer can understand in ten minutes. Complexity is a mortgage with compounding interest. You don't feel it until you're underwater. I have seen entire teams ground to a halt by "beautiful" abstractions nobody dared touch. That is not velocity. That is paralysis with good typography.
+**Manual smoke tests and retro files are operational toil.** Every minute a human spends "eyeballing the log" or writing `memory/daemon-fix-retrospective.md` is a minute not spent replacing the filesystem queue. Toil compounds; it does not ship product.
 
-Steve wants to make the daemon feel like magic. I want to make it legible. Legible systems ship faster, fail softer, and evolve cheaper. Magic is just obfuscation with applause. If you can't explain the failure path to a new hire in one sentence, the architecture is too clever. Clever is the enemy of done.
+Complexity is a mortgage with compounding interest. You don't feel it until you're underwater. I have seen teams ground to a halt by "beautiful" abstractions nobody dared touch. That is paralysis with good typography. Legible systems ship faster, fail softer, and evolve cheaper. Magic is just obfuscation with applause.
 
-## Concession: where Steve is right
+## Where Steve Is Right
 
-Silent rejection is a sin. If the watcher skips a file, it must scream. That observability is non-negotiable. And Steve is right that the first thirty seconds of onboarding decide whether engineers actually run the daemon. Fix the friction there — but with shell scripts and clear logs, not brand voice guidelines.
+- **Silent failures are death.** I agree completely. The mtime patch must log loudly when it skips, or it is just a quieter bug.
+- **"NO treating mtime comparisons as product features."** Correct. The PRD is a tourniquet. Ship it, tag it, replace it.
+- **The first 30 seconds of onboarding matter.** We align: one shell script, zero wiki pages. Frictionless install is engineering hygiene, not marketing.
+- **Taste at the interface layer.** Clean CLI output, grep-friendly logs, and a non-junk-drawer directory layout are good. But that is polish on top of a working machine, not a substitute for one. You don't sculpt a hood ornament before the engine runs.
 
-Steve is also right that "failed" should not be a graveyard without review. Every failure deserves a path back to intake once the root cause is fixed. That is not love; it is simply correct state-machine hygiene. A system that cannot recover from its own errors is brittle, no matter how elegant it looks.
+## Top 3 Non-Negotiables
 
-And I concede this: taste matters at the interface layer. The CLI output should be clean, the log format should be grep-friendly, and the directory layout should not look like a junk drawer. But that is polish on top of a working machine, not a substitute for one. You don't sculpt a hood ornament before the engine runs.
+1. **No rename, no brand voice pass, no "Pulse" until the filesystem queue is replaced with a real state store.** You do not get to name the patient while it is still bleeding.
+2. **No manual smoke tests in the acceptance criteria.** Automate the validation or delete the AC. Humans reading logs is not a test.
+3. **The mtime fix ships with a hard expiration.** A `TODO` comment is not enough. File a P1 ticket: "Replace fs queue with SQLite" before this PRD merges. If the ticket does not exist, the PRD does not ship.
 
-## Non-negotiables
-
-1. **No rename in this fix.** Ship under the existing identity. Brand is a v2 conversation, not a P0 patch. Renaming during a bug fix is pure operational drag.
-2. **Acknowledge the band-aid.** The mtime check ships as a tactical patch, never as covenant. The strategic fix is a single state table, and we document that debt on merge so the next engineer knows the real target.
-3. **Explicit failure boundaries.** Every dropped or failed PRD lands in a dead-letter path with a timestamped reason. No silent drops, no infinite retries, and no euphemisms. Talk, fix, ship — then move on.
+Ship the band-aid. Then schedule the surgery. No poetry until the patient is stable. The best brand is a system that never pages you at midnight.

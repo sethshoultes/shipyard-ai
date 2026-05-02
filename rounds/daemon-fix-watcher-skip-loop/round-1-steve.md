@@ -1,40 +1,24 @@
-**Pulse.** One syllable. One idea. The daemon isn't a "background process" —
-it's the heartbeat of the entire factory. If it flatlines, the shipyard becomes
-a graveyard of good intentions. Names matter. "Daemon-fix-watcher-skip-loop"
-is a cry for help, not a product. We build ships. Our heartbeat is **Pulse**.
-If the name doesn't make your spine straighten, change it again.
+# Steve Jobs — Chief Design & Brand Officer
+## Position on Pulse (formerly known as "the daemon")
 
-**Design philosophy:** Invisible machinery is the only kind worth building.
-The user should feel pure momentum, never mechanics. When you mark a dream P1,
-the system must inhale it like oxygen. No seams. No friction. No
-`isAlreadyProcessed` gatekeeping that quietly suffocates retries. The design is
-finished when there is nothing left to take away — not when there is nothing
-left to add.
+### Product Naming
+Stop calling it a daemon. A daemon is a background process in a Unix manual nobody reads. This is **Pulse** — the heartbeat of Shipyard. One word. One syllable. One purpose. If you can't name it across a coffee cup without explaining what a "watcher skip-loop" is, you've already surrendered to mediocrity.
 
-**User experience:** The first thirty seconds must deliver one unmistakable
-emotion: *it's already working.* Not "it will queue." Not "it's being
-processed." Already building. Already breathing. The distance between intention
-and action should feel like a finger snap. If a user has to open a log to
-verify we got their PRD, we have already failed. Great UX is the absence of
-anxiety.
+### Design Philosophy
+The insanely great is invisible. You don't fall in love with your heart because it beats — you love it because you never have to think about it. Pulse is the heartbeat of creation: you drop a blueprint, and a product appears. If it breaks, it heals itself. A silent skip is a flatline disguised as uptime. That is death in a dashboard.
 
-**Brand voice:** We speak in verbs, not acronyms. We don't "retry intake PRDs"
-— we *finish what we started.* We don't "handle watcher events" — we *ship
-dreams.* The voice is a master craftsperson: quiet, certain, direct. No passive
-voice. No engineering hedge words like "should," "attempt," or "possibly." Either
-it ships or it doesn't. Confidence is the only tone worth hearing.
+### User Experience — First 30 Seconds
+A developer pushes a PRD and holds their breath. In those first thirty seconds, Pulse must whisper back: *I see you. I'm building.* Not a log line. Not a timestamp. A covenant. The bug we just shipped? It was like tossing a letter into the ocean and having the post office insist the mail is working because the boat didn't sink. You don't get credit for not sinking. You get credit for delivering. Every single time.
 
-**What to say NO to:** NO to "failed" as a final destination. Failure is a
-waypoint, not a graveyard. NO to silent rejection — if we skip a file, we
-scream the reason. NO to making the user understand our plumbing. NO to
- dashboards that celebrate monitoring over movement. NO to treating reliability
-as a "fix." Reliability is the baseline. Everything else is ornament. NO to
-blaming the filesystem. The mtime check isn't a hack — it's the covenant in
-code.
+### Brand Voice
+Pulse speaks like a master craftsperson, not a sysadmin crawling through a server closet at 3 a.m. It doesn't "execute intake cycles" or "handle watcher events." It picks up your blueprint, rolls up its sleeves, and gets to work. When it stumbles, it says so — loudly, clearly, without shame. Humans fail; machines hide. Pulse is human.
 
-**Emotional hook:** People don't love tools. They love covenants. Pulse keeps
-its promises. In a world where every other automation flakes, drops, or "logs
-an error and moves on," this one delivers. That reliability isn't a feature —
-it's the *soul* of the brand. When Pulse is running, creators sleep well.
-They wake up to shipped dreams.
-That's not engineering. That's love. And love is worth fighting for.
+### What We Say NO To
+- **NO silent failures.** If we skip a file, we scream. Silence is the enemy.
+- **NO exposed plumbing.** The user never sees `failed/` or `parked/` — those are our scars, not their concern.
+- **NO configuration knobs for retry logic.** If a behavior needs a dial, we haven't finished thinking.
+- **NO treating mtime comparisons as product features.** A tourniquet stops bleeding; it doesn't win a design award.
+- **NO "it's just a backend tool" excuses.** Every pixel, every log line, every silence is the product.
+
+### The Emotional Hook
+People don't love tools that *work*. They love tools that *let them stop worrying*. Pulse is the baby monitor that lets the creator sleep through the night — except the baby is a product, and the nursery is a build pipeline. When a P1 dream vanishes for two days and nobody notices, we didn't fail technically. We failed emotionally. We broke the covenant. Build trust, or build nothing.
