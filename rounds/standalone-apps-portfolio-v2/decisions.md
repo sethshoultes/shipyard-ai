@@ -7,7 +7,7 @@
 
 ## How We Reached Here
 
-Two rounds between Elon Musk (first-principles / velocity) and Steve Jobs (taste / curation). Points of deep agreement: kill meta-work, static export, zero theater, portfolio as credibility infrastructure not growth engine. Points of conflict: whether SCAFFOLD earns public real estate, whether restraint is feature or cope, whether data is gardened or generated. Below are the binding resolutions.
+Two rounds between **Elon Musk** (first-principles / velocity) and **Steve Jobs** (taste / curation). Points of deep agreement: kill meta-work, static export, zero theater, portfolio as credibility infrastructure not growth engine. Points of conflict: whether SCAFFOLD earns public real estate, whether restraint is feature or cope, whether data is gardened or generated. Below are the binding resolutions.
 
 ---
 
@@ -15,51 +15,63 @@ Two rounds between Elon Musk (first-principles / velocity) and Steve Jobs (taste
 
 ### 1. Zero SCAFFOLD entries on `/work`
 - **Proposed by:** Elon (Round 1, reinforced Round 2)
-- **Opposed by:** Steve (Round 1 defended SCAFFOLD as radical honesty; Round 2 revised to "gallery wall is for shipped work only")
-- **Winner:** Elon, with Steve's framing adopted.
-- **Why:** Steve ultimately conceded that SCAFFOLD is a fact, not a fantasy, but the *gallery wall* is reserved for shipped/demo-able work only. The locked rule: only apps with live demos earn a card on `/work`. SCAFFOLD status may exist in repo metadata — it does not appear on the public page. Weak entries dilute credibility faster than strong ones build it. That is math, and Steve accepted the math when it was framed as quality of impression rather than quantity of output.
+- **Opposed by:** Steve (Round 1 defended SCAFFOLD as radical honesty; Round 2 doubled down — "moral center of the product")
+- **Winner:** Elon. The Zen Master rules: the gallery wall is sacred space.
+- **Why:** Steve's instinct toward radical transparency is honorable, but the public page is proof, not confession. SCAFFOLD status may persist in repo metadata; it does not appear on the public page. Weak entries dilute credibility faster than strong ones build it. That is math. The compromise: honesty lives in the repo; curation lives on the wall.
 
 ### 2. Restraint is the feature — zero gradients, zero pulses, invisible frame
 - **Proposed by:** Steve (Round 1)
-- **Opposed by:** Elon (initially dismissed as "coping mechanism" / aesthetic theater)
-- **Winner:** Steve. Elon conceded in Round 2: "white space is cheaper to ship than gradients, and clean typography requires zero dependencies. Taste here is just the absence of bad decisions."
-- **Why:** The rendered output must feel like a gallery wall. No decoration. No "AI-powered" copy. The work speaks. The frame is invisible. This is non-negotiable brand voice.
+- **Opposed by:** Elon (Round 1 dismissed as "coping mechanism" / aesthetic theater)
+- **Winner:** Steve. Elon conceded in Round 2.
+- **Why:** Elon: "White space is cheaper to ship than gradients, and clean typography requires zero dependencies. Taste here is just the absence of bad decisions." The output must feel like a gallery wall. No decoration. No "AI-powered" copy. The work speaks. The frame is invisible. This is non-negotiable brand voice.
 
 ### 3. No search. No filters. For v1, forever if we stay curated.
 - **Proposed by:** Steve (Round 1, reinforced Round 2)
-- **Opposed by:** Elon (argued search is broken at thirty apps)
+- **Opposed by:** Elon (Round 1 argued search is broken at thirty apps)
 - **Winner:** Steve for v1. Elon's scaling concern is noted and architecturally hedged (see File Structure).
 - **Why:** At three apps, search is absurd and signals a junk drawer. If we ever have thirty apps and no curation, we have failed as an agency. The page is proof, not a catalog. However, the component architecture must not bake in search assumptions that are hard to remove.
 
 ### 4. Kill the meta-work — three deliverable files, no `spec.md`, `todo.md`, `MIGRATION.md`
 - **Proposed by:** Elon (Round 1)
 - **Opposed by:** None. Steve fully agreed in Round 2.
-- **Winner:** unanimous.
+- **Winner:** Unanimous.
 - **Why:** Every meta-file is a human handoff queue disguised as diligence. If the agent can generate code but can't merge it into `website/src/`, we haven't automated anything — we've emailed ourselves typesetting jobs. Fix the pipeline, delete the meta-work.
 
-### 5. Portfolio data: hand-curated `portfolio.ts` for v1, schema must be machine-readable for future generation
+### 5. Kill the build theater — no live-URL curl gates, no retrospective requirement, no tautological `node --test` validation
+- **Proposed by:** Elon (Round 1 on URL checks and retrospectives). Steve agreed Round 2.
+- **Opposed by:** None.
+- **Winner:** Unanimous.
+- **Why:** A build gate that fails because GitHub hiccuped is insanity. Documentation is not shipping. TypeScript already proves data structure; `node --test` of static data the agent just wrote is cargo-cult validation. Validate by existence, not bureaucracy.
+
+### 6. Portfolio data: hand-curated `portfolio.ts` for v1, schema must be machine-readable for future generation
 - **Proposed by:** Elon (Round 2: "data generated, not gardened")
 - **Opposed by:** Steve (implicitly; Steve never argued for generation but cares more about rendered truth than data pipeline)
 - **Winner:** Compromise — v1 ships hand-curated, schema is Elon-compliant.
 - **Why:** For three apps, a scraper script is premature optimization and burns build complexity budget. However, Elon is right that hand-curated arrays become stale weed patches. The `portfolio.ts` schema must be structured so that a future build-time script can walk the monorepo, read `package.json` + `README.md`, and generate the array without a rewrite. Humans ship v1; machines scale v2.
 
-### 6. The portfolio page is credibility infrastructure, not a growth engine
+### 7. The portfolio page is credibility infrastructure, not a growth engine
 - **Proposed by:** Elon (Round 1)
 - **Opposed by:** None. Steve agreed in Round 2: "He brings them to the door; we close the sale."
-- **Winner:** unanimous.
+- **Winner:** Unanimous.
 - **Why:** Nobody shares "my agency's work page." Distribution comes from the apps themselves or from Seth's content flywheel. `/work` converts visitors who already arrived. We do not pretend otherwise in copy or in metric targets.
 
-### 7. Demo-able is the shipping standard — perfect is a trap
+### 8. Demo-able is the shipping standard — perfect is a trap
 - **Proposed by:** Elon (Round 2)
 - **Opposed by:** Steve (Round 1 said "only perfect earns a frame"; Round 2 softened to "perfection gets the spotlight")
 - **Winner:** Elon, with Steve's taste guardrails.
 - **Why:** Polish is asymptotic; shipping is binary. An app that runs with honest description ships. Steve keeps veto power over whether the rendered card meets gallery standards, but "it isn't perfect yet" is not a blocker. You can push a prettier commit tomorrow; you cannot iterate on something that never lands.
 
-### 8. Naming: one word if possible, two if necessary, three is a committee
+### 9. Naming: one word if possible, two if necessary, three is a committee
 - **Proposed by:** Steve (Round 1)
 - **Opposed by:** Elon (Round 2: "ship the tool, fix the name in a follow-up commit")
-- **Winner:** Steve on standard, Elon on pragmatism.
+- **Winner:** Steve on standard, Elon on v1 pragmatism.
 - **Why:** The standard is Steve's. Names are destiny. But a bad name on a shipped app beats a beautiful name on a repo that never deploys. For v1, existing names stand. Future apps get Steve's review before they enter the repo.
+
+### 10. Brand voice: craftsmen at the bench, not SaaS marketers at a webinar
+- **Proposed by:** Steve (Round 1)
+- **Opposed by:** None. Elon dismissed the prose manifesto as process bloat, but did not oppose the voice itself.
+- **Winner:** Steve.
+- **Why:** Short sentences. No "leveraging AI to drive synergy." No "unlock your potential." No Kickstarter prose. We say what it does and stop. The product is the prose. Automated lint rule: ban words ["revolutionary", "AI-powered", "cutting-edge", "next-gen", "unlock"].
 
 ---
 
@@ -79,7 +91,7 @@ Two rounds between Elon Musk (first-principles / velocity) and Steve Jobs (taste
 
 3. **Data layer**
    - Single file: `portfolio.ts`.
-   - Typed schema with fields for: slug, name, tagline, status, description bullets, tech stack, GitHub URL, live demo URL.
+   - Typed schema with fields for: slug, name, tagline, status, description bullets, tech stack, GitHub URL, live demo URL, lastVerified date.
    - Schema structured for future machine generation.
 
 4. **Components**
@@ -117,12 +129,13 @@ website/src/
 - `MIGRATION.md`
 - Any search/filter UI or logic
 - Any "coming soon" or SCAFFOLD card rendering
+- Any screenshot generation pipeline (v1 is typographic)
 
 ---
 
 ## Open Questions (What Still Needs Resolution)
 
-1. **The four other apps.** They are not demo-able today. Do they remain in the repo with SCAFFOLD metadata (Steve's preference for honesty), or do they get removed from the repo entirely until they ship (Elon's preference for zero inventory)? Decision needed before build starts.
+1. **The four other apps.** They are not demo-able today. Do they remain in the repo with SCAFFOLD metadata (Steve's preference for honesty in the repo), or do they get removed from the repo entirely until they ship (Elon's preference for zero inventory)? Decision needed before build starts.
 
 2. **How to ground feature bullets without burning agent context.** The PRD wants the agent to read 3 source files per app. With 3 apps × 3 files + analysis, this risks hallucination if context runs thin. Do we pre-extract key files into a scratchpad, or do we limit bullets to what the builder already knows?
 
@@ -133,6 +146,8 @@ website/src/
 5. **When the data generation script gets built.** Is it a v1.1 follow-up, or is it built as a stub now? Elon wants it architecturally ready; Steve doesn't care about the pipeline until it breaks. We need a trigger condition (e.g., "when app count exceeds 6, build the script").
 
 6. **Build pipeline fix.** We killed the meta-files, but the pipeline may still expect them. Does the orchestration layer need a one-time update to allow direct-merge mode, or does the agent self-coordinate without handoff artifacts?
+
+7. **Lighthouse target.** Elon says 90 is fine; Steve says the last five points are the difference between a page that loads and a page that breathes. Do we ship at 90 and iterate, or gate launch at 95?
 
 ---
 
@@ -146,8 +161,9 @@ website/src/
 | **Pipeline still demands meta-files** after we delete them | Medium | Medium | Orchestrator must update merge protocol before build session begins. If pipeline breaks, meta-file is single-line stub pointing to source, not full spec. |
 | **Perfect becomes enemy of shipped** — endless polish on card spacing, typography, copy | High | High | Demo-able is binary. Steve has 24-hour veto window on rendered aesthetics, then we ship. Post-launch commits are encouraged; launch blockers are not. |
 | **Build time at scale** (300 apps) with `generateStaticParams` | Low | Medium | Not a v1 risk. Schema is future-proofed. When app count crosses 12, implement build-time script. |
-| **Copy drifts into billboard mode** — "revolutionary," "AI-powered," superlatives | Medium | High | Automated lint rule: ban words ["revolutionary", "AI-powered", "cutting-edge", "next-gen"]. Steve spot-checks. |
+| **Copy drifts into billboard mode** — "revolutionary," "AI-powered," superlatives | Medium | High | Automated lint rule: ban words ["revolutionary", "AI-powered", "cutting-edge", "next-gen", "unlock", "leverage"]. Steve spot-checks. |
 | **One of the three apps is not actually demo-able** at build time | Medium | Critical | Pre-flight check: verify live URLs before agent begins. If <3 apps pass, page ships with however many pass. Two strong entries beat three with one broken link. |
+| **Lighthouse gate causes launch stall** arguing over 90 vs 95 | Medium | Medium | Ship at 90. Open a fast-follow issue for 95. The last five points are not launch blockers on static text. |
 
 ---
 
@@ -155,4 +171,4 @@ website/src/
 
 > "The strength of the team is each individual member. The strength of each member is the team."
 
-Elon gave us velocity and truth. Steve gave us taste and curation. The locked decisions are not compromises — they are the synthesis. We ship three apps on a white gallery wall. No search. No scars on the showroom floor. No meta-work. Demo-able is the standard. The frame is invisible. Move on.
+Elon gave us velocity and truth. Steve gave us taste and curation. The locked decisions are not compromises — they are the synthesis. We ship three apps on a white gallery wall. No search. No scars on the showroom floor. No meta-work. No build theater. Demo-able is the standard. The frame is invisible. Move on.
