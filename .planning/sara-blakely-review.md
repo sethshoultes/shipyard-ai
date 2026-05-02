@@ -1,10 +1,8 @@
-Verdict: internal tool, not product. Over-planned. Ship script, burn rest.
+Feature, not product. No customer pays to check a URL.
 
-- No customer pays for DNS checks. Saves dev embarrassment, not user pain. Unsellable standalone.
-- Confusing: XML task plans, traceability matrix, "waves." Reads like government contract. Dev wants README + script.
-- "Parallel-ready" for one domain. Hilarious. Remove v1.1 schema bloat.
-- Risk section longer than code. DNS fallback logic = one if-statement. Stop philosophizing.
-- 30-second pitch: "One script verifies deploys. Green line means live. One sentence means broken. No dashboards, no noise."
-- $0 test: Paste proof.js on X/HN. Ask: "How do you know deploy worked?" Count replies requesting repo.
-- Retention hook: Invisible CI step. Fires automatically. Catches DNS flip that costs customer.
-- Bottom line: Plan spans 250 lines. Script will be ~80. Stop polishing requirements, start typing node.
+- Pays? No. 60-second problem. Free tools exist. No budget line.
+- Confusing? Requirement IDs, XML plans, three waves. 250 lines hiding a 50-line script. Smells like committee.
+- Bounce? "254 lines to check my site?" Looks expensive. Customer leaves.
+- Elevator pitch: "Proof checks your site actually works after deploy, so customers don't find broken pages first."
+- $0 test: Ask 10 developers if they verify every deploy. Shrug = no pain. Fire = build.
+- Retention hook: None. Utility, not habit. Retention lives in platform. Alone, commodity.
