@@ -1,27 +1,42 @@
-# Round 1: Steve Jobs on WorkerForge
+# Steve's Take: Kill WorkerForge, Birth a Nova
 
-## The Name
+## Product Naming
 
-WorkerForge is dead on arrival. It sounds like a server-management panel from 2003 — the kind of tool that requires a certification exam. Two words? Industrial-age imagery? We’re not building railroads for coal barons.
+**WorkerForge is dead.** Two words, industrial-grade boring, smells like a SharePoint plugin from 2003. This product gets **ONE word.** One or two syllables max. I don't care if the .com is taken — buy it or fight for it. A name is destiny, not a specification sheet.
 
-**The name is Anvil.** One word. Two syllables. Hard consonant. It says: we strike the edge, and we strike once. You forge on an anvil. It’s the tool, not the factory. It implies precision, impact, and permanence. Memorable? Try forgetting it after you’ve typed it once.
+Call it **Nova.** When a developer types one command and a global AI service flares into existence across the edge network, that's not "forging" — that's a star being born. WorkerForge says "I make widgets." Nova says "I make magic."
 
 ## Design Philosophy
 
-Insanely great means the user never sees the plumbing. A CLI should be like a lightsaber — elegant weapon for a more civilized age, no buttons you don’t need, no manual thicker than a paperback. Convention over configuration isn’t a feature, it’s religion. If a developer needs a README to deploy a basic LLM worker, we’ve already failed. The defaults should be so good that customization feels optional, not mandatory.
+This isn't a CLI. It's a **magic wand disguised as a CLI.** Every flag, every prompt, every pixel of output should make the user feel like a sorcerer. If it takes more than ten seconds to go from "I have an idea" to "it's live on the internet," you've failed.
 
-## The First 30 Seconds
+Insanely great means the complexity doesn't vanish — it was **never there to begin with.** Like the iPod scroll wheel: there are no buttons because the user doesn't need buttons. Here, there is no config because the user doesn't need config. **We choose. They create.**
 
-`npx anvil create --llm` → deployed in 60 seconds. That first curl to your edge AI should feel like the first time you swiped to unlock an iPhone. Magic. Immediate. Intentional. You should grin. If the 30th second doesn’t end with a streaming response from a worker running in 200 cities worldwide, burn it down and start over. Zero to deployed is the only metric that matters.
+Great design is not how it looks. It's how it works — and more importantly, **how it makes you feel.**
+
+## User Experience: The First 30 Seconds
+
+**Second one:** they type the command.
+**Second five:** the terminal breathes — clean, warm, alive.
+**Second fifteen:** a URL appears, glowing like a lit fuse.
+**Second thirty:** they're hitting their own AI endpoint from their phone, and it already has rate limiting, caching, streaming, and monitoring. Their jaw drops.
+
+That's the product. Not the code — **the gasp.** If we don't engineer for that gasp, we shouldn't ship.
 
 ## Brand Voice
 
-We speak like the smartest engineer in the room who actually respects your time. Plainspoken. Confident. Human. No "leveraging synergies." No "AI-native paradigm-shifting platform solutions." If a sentence sounds like it could live on an IBM landing page, delete it and apologize to the user. Every word we write is either helping someone ship, or it’s noise.
+Nova doesn't apologize. It doesn't explain. It doesn't say "You might want to..." It says: **"Boom. It's alive."** The voice is confident to the edge of arrogance, because we've earned it. Every sentence is short. Every word costs money. We speak like someone who knows exactly what you need before you do.
 
-## What To Say NO To
+## What to Say NO To
 
-Say NO to configuration hell. NO to supporting AWS, GCP, and Azure because "enterprises asked." NO to 47 CLI flags. NO to dashboards with 400 widgets. NO to feature creep disguised as "flexibility." NO to onboarding that feels like filing taxes. Simplicity means removing, not adding. If a feature doesn’t absolutely deserve to exist — if it doesn’t make the user fist-pump — it doesn’t.
+**NO** to configuration files. **NO** to "pick your architecture" — we pick. **NO** to tutorials. **NO** to documentation longer than a napkin. **NO** to supporting every model under the sun — start with three and make them perfect. **NO** to "flexibility." Flexibility is a trap that turns products into committees.
+
+Simplicity means **removing**, not adding. If someone asks for a feature, the default answer is NO. Only say yes if it fits through the keyhole without turning the handle.
 
 ## The Emotional Hook
 
-People will love this because it gives them a superpower. Not the boring corporate kind — the Spider-Man kind. You’re not a DevOps engineer chained to a desk of Terraform configs and existential dread. You think of an AI feature, you cast it to the edge, and it’s alive. Worldwide. In a breath. Freedom from infrastructure is an emotion, not a feature. We’re selling that rush.
+People will love Nova because for the first time in their developer lives, they'll feel **powerful** instead of overwhelmed. Infrastructure is supposed to be hard — it's not. Deployment is supposed to take days — it takes seconds.
+
+That feeling, that giddy **"I can't believe that just worked"** sensation — that's the entire business. We're not selling templates. We're selling the feeling of being ten times smarter than you actually are.
+
+That's the product.

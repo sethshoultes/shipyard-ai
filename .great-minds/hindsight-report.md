@@ -1,35 +1,35 @@
 # Hindsight Report
-**Generated:** 2026-05-02T02:17:37.412Z
+**Generated:** 2026-05-02T15:10:40.380Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 6 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 13 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- f655c8e micromanager: dirty auto-reconcile
+- 6049280 daemon: auto-commit 3 files
+- d69ef28 micromanager: dirty auto-reconcile
+- 8314d56 daemon: auto-commit 2 files
+- c066331 micromanager: dirty auto-reconcile
+- 9d65331 daemon: auto-commit 2 files
+- a561c18 Ship build-model-canary: all deliverables + retrospective
+- e82b3fd daemon: auto-commit after build phase for build-model-canary
 - cb75952 daemon: auto-commit 2 files
 - 6ab781a daemon: auto-commit after build phase for standalone-apps-portfolio-v2
-- e8e9a20 daemon: auto-commit 2 files
-- 0f856e5 daemon: auto-commit after build phase for standalone-apps-portfolio
-- 2e88748 daemon: auto-commit 2 files
-- cc897a9 Ship prd-agentbridge-wordpress-mcp-server: all deliverables + retrospective
-- f622baf daemon: auto-commit after build phase for prd-agentbridge-wordpress-mcp-server
-- c0b0280 daemon: auto-commit 6 files
-- 66a926c daemon: auto-commit 2 files
-- 0358bcf daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-91
 
 ## High-Churn Files
 - `.daemon-queue.json` (113 changes)
-- `.planning/sara-blakely-review.md` (81 changes)
-- `.planning/phase-1-plan.md` (50 changes)
-- `.planning/REQUIREMENTS.md` (47 changes)
+- `.planning/sara-blakely-review.md` (82 changes)
+- `.planning/phase-1-plan.md` (51 changes)
+- `.planning/REQUIREMENTS.md` (48 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
-- `.great-minds/hindsight-report.md` (28 changes)
+- `.great-minds/hindsight-report.md` (29 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
 - `HEARTBEAT.md` (13 changes)
+- `.github-intake-state.json` (12 changes)
 - `website/src/app/layout.tsx` (11 changes)
 - `STATUS.md` (11 changes)
 - `website/src/app/work/page.tsx` (11 changes)
-- `.github-intake-state.json` (10 changes)
 - `plugins/membership/src/index.ts` (9 changes)
 - `rounds/finish-plugins/board-verdict.md` (9 changes)
 
@@ -57,12 +57,19 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 6 uncommitted changes.
 
 ## Uncommitted State
 ```
-M .great-minds/hindsight-report.md
- M .planning/REQUIREMENTS.md
- M .planning/phase-1-plan.md
+M .daemon-queue.json
+ M .great-minds/hindsight-report.md
  M .planning/sara-blakely-review.md
-?? prds/build-model-canary.md
-?? rounds/build-model-canary/
+ M rounds/github-issue-sethshoultes-shipyard-ai-86/decisions.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-86/essence.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-86/round-1-elon.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-86/round-1-steve.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-86/round-2-elon.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-86/round-2-steve.md
+?? prds/daemon-fix-watcher-skip-loop.md
+?? prds/github-issue-sethshoultes-shipyard-ai-86.md
+?? prds/github-issue-sethshoultes-shipyard-ai-90.md
+?? prds/github-issue-sethshoultes-shipyard-ai-91.md
 ```
 
 ---

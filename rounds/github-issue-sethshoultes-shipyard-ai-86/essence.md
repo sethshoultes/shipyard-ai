@@ -1,21 +1,15 @@
 # Essence
 
-- Edge AI deployment so fast it feels like thinking something into existence.
-- Superpower. Grin. Freedom from infrastructure.
-- That first streaming response hitting the terminal.
-- Strip it to the bone.
+One command. Live LLM worker. No config. No install. Sixty seconds.
 
-## What It Is
-A bridge. Idea to live LLM worker in under a minute. No config. No auth friction. No local install required.
+Feeling: superpower. That grin when the stream hits your phone from 200 cities.
 
-## What It Is Not
-A platform. A dashboard. A framework. Multi-cloud. Multimodal. Anything that requires a README.
+One thing perfect: first streaming response under a minute. Everything else is noise.
 
-## The One Rule
-If it doesn't make someone grin when their first request streams back from 200 cities, cut it.
+Creative direction: strip it to the bone.
 
 ## Non-Negotiables
-- One LLM template. Streaming only.
+- One LLM. Streaming only.
 - Dynamic generation from Cloudflare spec. No hand-written templates.
 - Zero-install deploy path.
 

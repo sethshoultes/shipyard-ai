@@ -1,0 +1,22 @@
+{
+  "name": "anvil",
+  "version": "1.0.0",
+  "description": "CLI for scaffolding production-ready Cloudflare Workers AI projects",
+  "type": "module",
+  "main": "src/index.ts",
+  "bin": {
+    "anvil": "./bin/anvil"
+  },
+  "dependencies": {},
+  "scripts": {
+    "build": "tsc",
+    "start": "node --loader ts-node/esm src/index.ts"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "ai",
+    "cli"
+  ],
+  "license": "MIT"
+}

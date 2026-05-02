@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+
+/**
+ * Anvil CLI Executable
+ * Entry point for npx anvil commands
+ */
+
+import("../src/index.js");
