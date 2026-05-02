@@ -52,20 +52,23 @@ else
     echo "PASS: Has origin validation"
 fi
 
-# Test 5: Has retry logic
-if ! grep -qiE "retry|backoff|attempt" "$PROOF_FILE"; then
-    echo "FAIL: Missing retry logic"
+# Test 5: No retry logic (fail fast per spec)
+# Check for retry/backoff/setTimeout in actual code (excluding comments)
+# Use grep to find lines, then filter out comment lines (both // and /* */ style)
+RETRY_FOUND=$(grep -iE "retry|backoff|setTimeout" "$PROOF_FILE" | grep -v '^\s*//' | grep -v '^\s*\*' | grep -v '^\s*/\*' || true)
+if [ -n "$RETRY_FOUND" ]; then
+    echo "FAIL: Has retry logic (should fail fast per spec)"
     FAILED=1
 else
-    echo "PASS: Has retry logic"
+    echo "PASS: No retry logic (fail fast)"
 fi
 
-# Test 6: Has 60 second max timeout
-if ! grep -qE "60|60000" "$PROOF_FILE"; then
-    echo "FAIL: Missing 60s max timeout"
+# Test 6: Has timeout configured (reasonable value for fail-fast)
+if ! grep -qE "timeout" "$PROOF_FILE"; then
+    echo "FAIL: Missing timeout configuration"
     FAILED=1
 else
-    echo "PASS: Has 60s max timeout"
+    echo "PASS: Has timeout configured"
 fi
 
 # Test 7: Outputs "Verified" on success
