@@ -1,30 +1,26 @@
-# Round 1: First Principles Assessment
+# Round 1: Elon Musk — First-Principles Assessment
 
-This is not a product feature. It is a fix for a broken deploy process. Treating it like a roadmap item is how you ship a "Verification Platform" in Q3 instead of fixing the bug today.
+## Architecture
+This is a smoke test, not a satellite. The simplest system that works is a GitHub Action step that curls the production domain with retry logic. Not a new microservice. Not a "health check platform." A 20-line bash script with `curl --retry` and exponential backoff is sufficient.
 
-**Architecture**
+## Performance
+The bottleneck is DNS propagation, not compute. CF Pages deploys in seconds; DNS can take 60–300 seconds to converge globally. An instant post-deploy check fails valid deploys and generates noise. The 10x path is making verification *non-blocking* — run it asynchronously after the deploy step completes, and alert on failure rather than blocking the pipeline.
 
-The simplest system that works: the deploy script exits non-zero if `curl -sf https://shipyard.company/` fails. Inline. Same process. No microservices, no "post-deploy verification stage," no human QA gate. If the pipeline lacks a hook, fix the pipeline. Do not build a second pipeline around the first.
+## Distribution
+This is infrastructure, not a consumer app. "Distribution" here means preventing churn. One customer hitting a 404 at launch generates more negative word-of-mouth than ten happy customers generate positive word-of-mouth. Retention equals distribution. No paid ads required — bake this into the platform and let case studies do the work.
 
-**Performance**
+## What to CUT
+- **Generalization to every customer launch** — that is v2 masquerading as v1. Fix our own domain first.
+- **Body grep for BUILD_ID** — brittle. HTML changes; tests break. V1 should check status 200 plus absence of known error signatures (e.g., "DEPLOYMENT_NOT_FOUND").
+- **"Margaret Hamilton (QA)" human gate** — scope creep disguised as process. This must be fully automated. If a human is required, the system is already broken.
 
-The bottleneck is DNS propagation and edge-cache poisoning, not CPU. A serial bash loop is 1970s thinking. Parallelize domain checks. Retry with exponential backoff for 60 seconds. The 10x path is querying Cloudflare's own custom-domain status API rather than blind-curling and hoping DNS has converged. Ask the source.
+## Technical Feasibility
+Yes. One agent session can write a GitHub Action step. The PRD's suggested bash loop is 90% of the solution. The remaining 10% is retry logic and timeout tuning. Do not over-engineer.
 
-**Distribution**
+## Scaling
+At 100x usage (1,000+ customer domains), sequential blocking checks in the deploy pipeline will timeout and kill good deploys. What breaks:
+1. **Pipeline timeouts** — 1,000 sequential curls × 30s retry = 8+ hours.
+2. **False positives** — geo-DNS means `shipyard.company` resolves differently in CI than in user regions.
+3. **Rate limits** — repeated curls against the same origin can trigger WAF rules.
 
-Category error. This is not user-facing software. "Distribution" means every customer deployment runs this check by default. That requires no marketing—it requires making the check the default in your deploy template. If it is opt-in, it does not exist.
-
-**What to CUT**
-
-- **Build-ID body grep:** Scope creep. Status 200 is the signal. Injecting build metadata into every page to feed a verification script is v2 theater.
-- **"Key routes" verification:** If `/` 404s, the launch is dead. Check `/`. Done.
-- **`wrangler pages project list` dependency:** Cut. Hardcode the domain or read from `domains.json`. Adding a runtime Cloudflare API call to discover what you already know is fragile, slow, and breaks at API rate limits.
-- **Human owner (Margaret Hamilton):** Cut. Automation owns verification. If a human is the gate, you will have 6-day outages.
-
-**Technical Feasibility**
-
-Yes. One agent session, 20–30 minutes. The code is trivial. The only hard part is choosing the exact hook point in the deploy pipeline.
-
-**Scaling**
-
-At 100x (100 domains, 100 projects), serial curls timeout the pipeline. Parallelize. The real breakage is false negatives: DNS caches the old A record and your check passes because the old server (Vercel) still returns 200. You must validate the response against the expected origin (CF Pages IP/CNAME), not merely HTTP status. Otherwise you verify that *something* is live, not that *your deploy* is live.
+The fix at scale is decoupling: deploy, then queue async health checks, and surface failures via Slack or webhook without blocking the pipeline.
