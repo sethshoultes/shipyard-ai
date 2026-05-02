@@ -1,46 +1,28 @@
-# Round 1 — Elon Musk
+# AgentForge — First Principles Assessment
 
 ## Architecture
 
-The PRD says "web app or WordPress plugin." That's not architecture — that's indecision.
-
-First principles: a multi-agent workflow is a DAG of API calls. The simplest system that could work is a **JSON workflow config + a lightweight executor**. A "visual builder" in v1 should be a schema-validating editor with a live preview, not a drag-and-drop Figma clone.
-
-If you already have an orchestration layer, reuse it. If you don't, building one plus a visual editor in one session is fantasy. A new runtime doesn't make you twice as fast; it makes you half as reliable. The only new code in v1 is the config schema and a thin runner. Anything more is ego, not engineering.
+Pick one: **web app** or WordPress plugin. "Both" means neither works. WordPress is a security and distribution tar pit. The simplest system is a JSON workflow config + execution engine + basic Next.js UI. The drag-and-drop builder is **v2 masquerading as v1** — if you can't define the workflow in YAML, you don't understand the problem well enough to build a GUI for it yet.
 
 ## Performance
 
-The bottleneck isn't "edge execution" or Workers AI latency. **It's LLM API cost and serial execution.**
-
-Each workflow node that calls Claude adds 1–3 seconds of blocking latency. Five agents in series = 10–15 seconds minimum. The 10x path is **parallelizing independent nodes** and **aggressive caching** — if an agent's input hasn't changed, don't call the API again. Cache hits should be instant; cache misses should be parallel where possible.
-
-Workers AI doesn't run Claude; this is hand-waving. A fast ugly workflow beats a slow beautiful one. If a workflow isn't under five seconds, nobody uses it twice.
+The bottleneck is not "edge execution." It's LLM inference latency. A 5-agent synchronous chain at 2s per call is 10s wall-clock. At 10 agents it's 20s+. Users will bounce. The 10x path is **parallel execution graphs** (DAG, not sequence), async queues, and aggressive output caching. "Workers AI for edge execution" is hand-waving — edge doesn't fix 10-second LLM calls.
 
 ## Distribution
 
-"ProductHunt, no-code communities, LinkedIn" is hope, not strategy.
-
-You don't get to 10,000 users without a distribution channel that already has users in it. The only credible path is embedding where your target users already work — either an existing plugin base, a marketplace, or viral templates that solve a specific, painful ops problem. Otherwise you're building a new category ("Zapier for Claude agents") that nobody is searching for. That's a $10M marketing problem, not a v1 feature.
-
-ProductHunt is a lottery ticket; an installed base is a funnel. No-code communities are graveyards of beautiful tools nobody adopted.
+ProductHunt and "no-code communities" are not a distribution strategy. They're a launch-day sugar high. Reaching 10,000 users without paid ads requires **viral loops** or **open-source gravity**. Open-source the execution engine, charge for the hosted orchestration. Become the standard so Stack Overflow answers mention you. Templates are content marketing, not distribution.
 
 ## What to CUT
 
-- **Freemium billing** — v2. Stripe integration, subscription state, dunning logic, and quota enforcement burn 30% of your tokens for zero core value. Ship value first. Worry about monetization when users are actually hitting limits and complaining.
-- **Drag-and-drop visual canvas** — v2. A JSON editor ships the same orchestration value in 1/10th the code. A DAG editor is a database schema, a rendering engine, an event system, an undo stack, and a layout solver. That's not a feature; that's a product team.
-- **WordPress plugin variant** — pick one platform. "Or" in a PRD means you build two products badly. If the web app works, wrap it later.
-- **"Workers AI for edge execution"** — agents call the Claude API. This is marketing fluff that confuses the stack and sets false latency expectations.
+1. **Visual builder** — v1 should be config-first (YAML/JSON). Drag-and-drop is 80% of the frontend work for 20% of the value.
+2. **WordPress plugin** — separate auth model, separate hosting, separate security surface. Kill it.
+3. **Freemium pricing tiers** — Pricing complexity before product-market fit is founder theater. Free until 1,000 MAU.
+4. **"Workers AI"** — You have zero users. Global edge infra is premature optimization.
 
 ## Technical Feasibility
 
-One agent session can build a **JSON workflow config + executor + simple UI**. It cannot build auth, billing, a visual DAG editor, and a plugin architecture in one session.
-
-The PRD claims "HIGH feasibility" because "React + drag-drop is well-understood" — that's like saying a car is easy because wheels are round. The hard parts are orchestration, error handling, retry logic, state management, and secret management. Scope to the config editor. Ship the core value in one session; iterate on the chrome later. If the orchestration engine doesn't exist yet, this is a multi-month project, not a session.
+Claimed "HIGH." Reality: **One agent session can build the execution engine and a basic CRUD UI.** It cannot build a real-time collaborative visual builder, versioned workflows, and a plugin ecosystem in one session. Scope to config-driven v1 and feasibility is high. Scope to the PRD's implied vision and it's medium-to-low.
 
 ## Scaling
 
-At 100x usage, **Anthropic's rate limits and your API bill break before Cloudflare does.**
-
-Run the numbers: 1,000 DAUs × 10 workflows × 5 agents × 10K tokens = **$3,000–15,000/day** depending on model. Your infrastructure will handle the load; your wallet won't. You need per-user token budgets, output caching, and request deduplication on day one, or you'll be subsidizing user workloads.
-
-API cost is the existential risk; UI polish is not. If the unit economics don't work at 100 users, they implode at 10,000. The infrastructure that matters isn't Cloudflare — it's your Anthropic rate limit tier and your credit card limit.
+What breaks at 100x? **COGS.** A multi-agent workflow costs $0.10–$2.00 per run in LLM tokens. 100 users × 10 workflows/day × $0.50 = $500/day = $15K/mo in API costs. Freemium dies here. You need usage-based pricing, token budgeting per workflow, and model-tier fallback (GPT-3.5 for drafts, Claude for final output) or the business model capsizes before the servers do.

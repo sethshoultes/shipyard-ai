@@ -1,10 +1,13 @@
 # Hindsight Report
-**Generated:** 2026-05-02T20:29:19.538Z
+**Generated:** 2026-05-02T20:53:36.204Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 3 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 9 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- ce2b112 daemon: auto-commit 3 files
+- ed15812 daemon: auto-commit 3 files
+- 4a0b0e5 daemon: auto-commit after build phase for standalone-apps-portfolio-v2
 - 517dad7 micromanager: dirty auto-reconcile
 - 00491b2 daemon: auto-commit 2 files
 - d42e18a daemon: auto-commit 3 files
@@ -12,16 +15,13 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 3 uncommitted changes.
 - 3111cbf daemon: auto-commit 3 files
 - 1b25ecb micromanager: dirty auto-reconcile
 - e9fd726 daemon: auto-commit 3 files
-- 4edd226 daemon: auto-commit 3 files
-- f6acb09 micromanager: dirty auto-reconcile
-- fab84ea daemon: auto-commit 3 files
 
 ## High-Churn Files
-- `.daemon-queue.json` (133 changes)
-- `.planning/sara-blakely-review.md` (87 changes)
+- `.daemon-queue.json` (135 changes)
+- `.planning/sara-blakely-review.md` (88 changes)
 - `.planning/phase-1-plan.md` (51 changes)
 - `.planning/REQUIREMENTS.md` (48 changes)
-- `.great-minds/hindsight-report.md` (35 changes)
+- `.great-minds/hindsight-report.md` (36 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
@@ -57,9 +57,15 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 3 uncommitted changes.
 
 ## Uncommitted State
 ```
-M .great-minds/hindsight-report.md
- M .planning/sara-blakely-review.md
- M rounds/standalone-apps-portfolio-v2/decisions.md
+M .daemon-queue.json
+ M rounds/github-issue-sethshoultes-shipyard-ai-90/decisions.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-90/essence.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-90/round-1-elon.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-90/round-1-steve.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-90/round-2-elon.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-90/round-2-steve.md
+?? deliverables/relay-case-studies.md
+?? monitor.sh
 ```
 
 ---

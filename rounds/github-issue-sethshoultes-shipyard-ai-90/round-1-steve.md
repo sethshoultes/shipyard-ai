@@ -1,55 +1,42 @@
-# Steve's Positions: AgentForge
+# Relay — Design & Brand Positions
 
 ## Product Naming
-"AgentForge" is a label, not a name. It sounds like a server rack in a basement. Nobody whispers server racks.
 
-The name is **Forge.**
+**AgentForge is dead.** It sounds like a server patch for a game nobody plays. It smells like infrastructure, and people don't fall in love with infrastructure.
 
-One syllable. One punch. It sounds like metal bending to your will. iPod. iPhone. Forge. The product finishes the sentence before you open your mouth.
-
-If it needs two words, you don't believe in it.
+The name is **Relay**. One word. Human. Athletic. It evokes the most elegant moment in sport — the seamless pass of a baton at full sprint. That's exactly what this product does: agents don't stop to shake hands, they hand off momentum. Relay is a verb and a noun. It's memorable because it's alive.
 
 ## Design Philosophy
-Great design is not how it looks. It is how it *forgets* to be there.
 
-The canvas must be white, infinite, and hungry for your ideas. Every node, every wire, every pixel must beg for its life. If an element doesn't make the user feel like a genius, we burn it in the courtyard.
+This is not plumbing. Stop comparing us to Zapier. Zapier is pipes under the sink — necessary, invisible, boring. Relay is **choreography**.
 
-This is a Steinway piano, not a synthesizer. You sit down, and music pours out.
+The design philosophy is simple: **the UI disappears, intent remains.** When a user drags two agents together, they shouldn't see a "configuration panel." They should see a spark. A handshake. A breath between dancers. Every pixel must answer one question: *does this feel like magic, or machinery?* If it's machinery, burn it.
 
 ## The First 30 Seconds
-They land. They drag one circle to another. Two invisible hands shake. An email writes itself. A spreadsheet fills. An idea becomes real.
 
-No tour. No wizard. No "Click here to learn!" If we need a manual, we built a broken machine.
+You don't land on a dashboard. You land on a **canvas**.
 
-Thirty seconds to wow, or we do not ship.
+Drop one agent — it pulses, awake. Drop a second — they drift together like magnets and a golden thread appears between them. Press the giant, unmissable play button. Something beautiful happens immediately: a poem, a report, a cleaned spreadsheet. No API keys. No "connect your account" prison. **Magic first, mechanics later.** The first 30 seconds should feel like conducting your first symphony, not filing your taxes.
 
 ## Brand Voice
-We speak like a friend who happens to be a genius.
 
-No "AI-powered workflow orchestration." No "synergistic multi-agent paradigms." No acronyms. No explaining.
+We speak like humans who believe in something. Short sentences. Active verbs. No "robust," no "leverage," no "synergy." We say: *"Your ideas just found a team."* We say: *"One mind, many hands."* We say: *"Press play."*
 
-We say: *"You just hired a hundred perfect employees. They never sleep, never complain, and they do exactly what you tell them. Let's put them to work."*
+Our voice is confident to the point of poetry. We don't explain — we **declare**. If a sentence could appear on a spec sheet from 2003, delete it.
 
-Confident. Human. Almost arrogant in our simplicity.
+## What We Say NO To
 
-## What to Say NO To
-NO to forty-seven node types in the sidebar.
-NO to "Advanced Settings" stuffed with sliders.
-NO to dark mode as a feature.
-NO to explaining what a Large Language Model is.
-NO to PowerPoint export in version one. NO to CSV templates on day one. NO to every feature that wins a committee vote and murders the soul.
+- **NO feature parity with Zapier.** We're not building a better mousetrap; we're eliminating the need for mice.
+- **NO "enterprise-grade" labels.** That's code for "we gave up on elegance."
+- **NO gray dashboards with 47 toggles.** Complexity is not power; it's laziness.
+- **NO templates that look like Excel spreadsheets.** If it has columns and rows, it dies.
+- **NO user manuals.** If it needs explaining, it's broken.
+- **NO calling people "admins" or "users."** They're conductors. Directors. Creators.
 
-Simplicity is not the lack of features. It is the *arrogance* to choose one perfect thing over ten good things.
+Simplicity isn't adding a simple mode — it's removing everything that isn't essential until only genius remains.
 
 ## The Emotional Hook
-People will love this because it makes them feel like a conductor before a silent orchestra.
 
-Not a sysadmin. Not a "no-code builder." A *maestro*.
+Loneliness is the enemy of the modern creator. One person with a big idea used to need a department, a budget, and six months. Now they need 30 seconds and a canvas.
 
-They raise a baton, and a symphony of tireless, brilliant minds plays exactly what they imagined, note for note, while they sleep, while they eat, while they live.
-
-That's not automation. That's *power*. That's art.
-
-Once they feel that, going back will feel like churning butter by hand.
-
-We are not selling software. We are selling the feeling of having an unfair advantage.
+The emotional hook is **companionship at scale.** Your Relay crew never sleeps, never complains, and actually *gets* you. At 3 AM, while you're dreaming, your agents are shipping. The joy isn't in building the workflow — it's in waking up to find the work done. That's not automation; that's **alchemy**. People won't just use this. They'll **love** it.
