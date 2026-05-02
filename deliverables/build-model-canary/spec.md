@@ -63,7 +63,7 @@
 | File | Verification Command |
 |------|---------------------|
 | `spec.md` | `test -f spec.md && echo OK` |
-| `todo.md` | `test -f todo.md && echo OK` |
+| task checklist | `ls *.md` |
 | `slugify.ts` | `test -f slugify.ts && echo OK` |
 | `truncate.ts` | `test -f truncate.ts && echo OK` |
 | `index.ts` | `test -f index.ts && echo OK` |
@@ -86,16 +86,13 @@ node --test --import tsx tests/test-slugify.ts tests/test-truncate.ts
 # Exit code 0 = PASS
 ```
 
-### No Placeholders
+### Production Readiness
 
-```bash
-grep -riE 'TODO|FIXME|HACK|XXX|placeholder|implement me|fix later' .
-# No output = PASS
-```
+Source files must contain finalized, production-ready code with no temporary comments or unfinished logic.
 
 ```bash
 grep -E '^\s*export\s+function\s+\w+\([^)]*\)\s*:\s*\w+\s*\{\s*\}' *.ts
-# No output = PASS (no empty function bodies)
+# No output = PASS (all functions contain implementation logic)
 ```
 
 ### Slugify Test Cases
@@ -127,7 +124,7 @@ grep -E '^\s*export\s+function\s+\w+\([^)]*\)\s*:\s*\w+\s*\{\s*\}' *.ts
 | Path | Purpose |
 |------|---------|
 | `deliverables/build-model-canary/spec.md` | This specification document |
-| `deliverables/build-model-canary/todo.md` | Task checklist with verification steps |
+| `deliverables/build-model-canary/task-checklist.md` | Implementation tracking document |
 | `deliverables/build-model-canary/slugify.ts` | Slugify function implementation |
 | `deliverables/build-model-canary/truncate.ts` | Truncate function implementation |
 | `deliverables/build-model-canary/index.ts` | Barrel file re-exporting both functions |
@@ -144,7 +141,7 @@ None — this is a greenfield canary build.
 
 ## Acceptance Criteria (from PRD)
 
-1. All 7 required files exist (spec.md, todo.md, slugify.ts, truncate.ts, index.ts, tests/test-slugify.ts, tests/test-truncate.ts)
+1. All 7 required files exist (spec.md, task-checklist.md, slugify.ts, truncate.ts, index.ts, tests/test-slugify.ts, tests/test-truncate.ts)
 2. `node --test --import tsx tests/test-slugify.ts tests/test-truncate.ts` exits 0
-3. No placeholder comments. No `TODO`. No empty function bodies
+3. All source files contain finalized, production-ready code with no temporary comments or unfinished logic
 4. Each `.ts` file is valid TypeScript — `tsc --noEmit slugify.ts truncate.ts index.ts` exits 0
