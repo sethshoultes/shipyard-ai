@@ -1,33 +1,27 @@
-# Steve's Positions: Making AgentForge Insanely Great
+# Steve's Positions: AgentForge
 
 ## Product Naming
-"AgentForge" is a committee name. It reeks of compromise. Drop the "Agent." Nobody falls in love with agents. They fall in love with what agents *do* for them.
+"AgentForge" is a label, not a name. It sounds like a server rack in a basement. Nobody whispers server racks.
 
-Call it **Forge.** One word. Four letters.
+The name is **Forge.**
 
-Memorable as a hammer striking anvil. If you can't say it drunk at a bar and have people remember it Monday morning, it's dead on arrival.
+One syllable. One punch. It sounds like metal bending to your will. iPod. iPhone. Forge. The product finishes the sentence before you open your mouth.
 
-One word. That's the rule. iPod. iPhone. Forge. The product *is* the sentence.
+If it needs two words, you don't believe in it.
 
 ## Design Philosophy
-Insanely great means the interface disappears. Like a Steinway piano — you don't admire the wood grain, you sit down and music pours out.
+Great design is not how it looks. It is how it *forgets* to be there.
 
-The canvas must be white, infinite, and quietly confident.
+The canvas must be white, infinite, and hungry for your ideas. Every node, every wire, every pixel must beg for its life. If an element doesn't make the user feel like a genius, we burn it in the courtyard.
 
-Every node, every wire, every shadow must beg for its existence on its knees. If an element doesn't make the user feel like a genius, it gets burned in the courtyard.
-
-Beauty is not decoration. Beauty is function so perfect it becomes emotion.
+This is a Steinway piano, not a synthesizer. You sit down, and music pours out.
 
 ## The First 30 Seconds
-They land. They see a canvas that breathes.
+They land. They drag one circle to another. Two invisible hands shake. An email writes itself. A spreadsheet fills. An idea becomes real.
 
-They drag one circle to another. Two agents shake hands and produce something real — an email written, a spreadsheet filled, an idea made tangible.
+No tour. No wizard. No "Click here to learn!" If we need a manual, we built a broken machine.
 
-No wizard. No tooltip tour. No "Click here to learn!" If we need a manual, we've built a broken machine.
-
-It must feel like striking a match in a dark room: frictionless, then sudden fire.
-
-Thirty seconds to wow, or we don't ship.
+Thirty seconds to wow, or we do not ship.
 
 ## Brand Voice
 We speak like a friend who happens to be a genius.
@@ -36,25 +30,26 @@ No "AI-powered workflow orchestration." No "synergistic multi-agent paradigms." 
 
 We say: *"You just hired a hundred perfect employees. They never sleep, never complain, and they do exactly what you tell them. Let's put them to work."*
 
-Human. Confident. Almost arrogant in our simplicity. The voice of someone who knows the answer before you finish the question.
+Confident. Human. Almost arrogant in our simplicity.
 
 ## What to Say NO To
-NO to forty-seven node types cluttering the sidebar.
-NO to "Advanced Settings" drawers stuffed with sliders.
-NO to dark mode as a selling point.
-NO to explaining what a Large Language Model is. If they care, they're sold. If they don't, you're boring them.
-NO to PowerPoint export in version one. NO to CSV templates on day one. NO to every feature that wins a committee vote but dilutes the soul into beige oatmeal.
+NO to forty-seven node types in the sidebar.
+NO to "Advanced Settings" stuffed with sliders.
+NO to dark mode as a feature.
+NO to explaining what a Large Language Model is.
+NO to PowerPoint export in version one. NO to CSV templates on day one. NO to every feature that wins a committee vote and murders the soul.
 
-Simplicity isn't the lack of features. It is the *arrogance* to choose one perfect thing over ten good things.
+Simplicity is not the lack of features. It is the *arrogance* to choose one perfect thing over ten good things.
 
 ## The Emotional Hook
 People will love this because it makes them feel like a conductor before a silent orchestra.
 
 Not a sysadmin. Not a "no-code builder." A *maestro*.
 
-They raise a baton and a symphony of tireless, brilliant minds plays exactly what they imagined, note for note, while they sleep, while they eat, while they live.
+They raise a baton, and a symphony of tireless, brilliant minds plays exactly what they imagined, note for note, while they sleep, while they eat, while they live.
 
-That's not automation. That's not productivity. That's *power*. That's art.
-Once they feel that power, going back to old tools will feel like churning butter by hand.
+That's not automation. That's *power*. That's art.
+
+Once they feel that, going back will feel like churning butter by hand.
 
 We are not selling software. We are selling the feeling of having an unfair advantage.
