@@ -7,7 +7,7 @@
 - **Repo:** sethshoultes/shipyard-ai
 - **Issue:** #90
 - **Author:** sethshoultes
-- **Labels:** p2, dream-candidate
+- **Labels:** p2
 - **Created:** 2026-04-21T16:13:29Z
 
 ## Problem
