@@ -1,30 +1,33 @@
 # Round 2 — Elon Musk
 
-## Where Beauty Becomes a Boat Anchor
+## Where Steve Goes Wrong
 
-Steve wants a "conductor's baton" that a child can use without tooltips. That's not a v1 — that's a $5M R&D lab with a twelve-person animation team. The "liquid" interface, the flocking birds, the agent that "turns to face you" — we are not building a Pixar film. We are building a tool. Every shader and physics simulation is a week not spent on the thing that actually matters: **the agent runtime doesn't drop messages when two nodes fire in parallel.** Beauty that delays shipping is just procrastination with better typography.
+Steve wants a "canvas that breathes" and a "Steinway piano." That's beautiful — and that's the trap.
 
-The "no JSON view" stance is delusional. Developers are our first users, full stop. If you force a visual canvas on someone debugging a race condition in a ten-agent workflow, they will abandon the product in thirty seconds — not because it isn't beautiful, but because they can't see the state tree. The visual layer is a **presentation layer**, not a prison.
+A DAG editor is not a feature; it's a product team. You need a rendering engine, an event system, an undo stack, collision detection, and accessibility compliance. The user gets to drag two circles together in thirty seconds. We get three months of debugging Safari canvas performance.
 
-A landing page that runs a live, real-time multi-agent workflow 24/7 is a donation to Anthropic's bottom line. Demo with a tight, pre-rendered video. Same emotional punch, zero API burn.
+The "thirty seconds to wow or we don't ship" rule sounds principled, but it guarantees we never ship. You cannot wow anyone with a workflow builder that doesn't actually run workflows because we spent the sprint on Bézier curves.
 
-## Why Simplicity Wins
+Beauty is not function so perfect it becomes emotion. Beauty is what you build *after* function works. A Steinway piano with no strings is just furniture.
 
-I said v1 is a JSON config + executor wrapper around the existing SDK. Here's why that isn't "settling" — it's **leverage**. The daemon already handles scheduling, retries, and secrets. A second runtime doesn't make us twice as fast; it makes us half as reliable. JSON is debuggable, diffable, and upgradeable without migration scripts. A visual DAG editor is a database schema, a rendering engine, an event system, and an undo stack. That's not a feature; that's a product.
+## Why Technical Simplicity Wins
 
-The 10x performance win isn't edge execution orWorkers AI — it's parallelizing independent nodes and caching deterministic outputs. A pretty UI can't hide a 15-second workflow. But a fast workflow *forgives* an ugly UI.
+A JSON schema editor ships the exact same orchestration value as a visual canvas in one-tenth the code. One agent session can build it. The existing daemon handles dispatch, retry, and secrets today — not in six weeks, today.
 
-Distribution isn't a feeling; it's a funnel. The Emdash plugin ecosystem is a funnel with users already in it. ProductHunt is a lottery ticket.
+The product feeling is speed. A workflow under three seconds feels like magic; a workflow at fifteen seconds feels broken, even if the nodes glow. Parallelize independent agents, cache every deterministic output, and the user forgives the absence of shadows and gradients. The opposite is never true.
 
 ## Where Steve Is Right
 
-- **AgentForge is a terrible name.** It sounds like a medieval supply-chain startup. One word, lowercase, alive — fine. Just don't spend $50K on a domain before we have a single paying user.
-- **The landing page should demonstrate value immediately.** No login walls, no empty states. A crisp video of a real workflow executing in under five seconds.
-- **Brand voice should be confident, not enterprise-boring.** Users buy from people who believe in the thing they built.
-- **One aesthetic, done well, beats three half-baked themes.** Dark mode is a v2 nice-to-have.
+He's right about the name. "AgentForge" is committee sludge; "Forge" is clean.
+
+He's right about voice. No acronyms, no "AI-powered orchestration," no explaining. If it needs a manual, it's broken.
+
+He's right that we should say no to forty-seven node types and PowerPoint export. That discipline matters.
+
+But you cannot sell the feeling of being a maestro when the orchestra won't play. Function first. Emotion second. Not because emotion is unimportant — because it is impossible without function.
 
 ## Top 3 Non-Negotiables
 
-1. **JSON config editor ships in v1; the visual canvas is v2.** The core value is orchestration, not illustration.
-2. **Zero new runtimes.** We wrap the existing SDK and daemon. If it doesn't run in the current pipeline, it doesn't ship.
-3. **Token budgets + request deduplication are day-one infrastructure.** We do not subsidize user workloads. API cost is the existential risk; UI polish is not.
+1. **Submit to the existing daemon.** Zero new runtime, zero new auth, zero new secret management. If it doesn't run in the current pipeline, it doesn't ship.
+2. **JSON config editor with live preview.** Zero drag-and-drop canvas in v1. A schema-validating code editor is the UI. Anything prettier waits.
+3. **Parallelize and cache.** Independent agent nodes run concurrently. Identical inputs hit cache instantly. Workers AI edge execution is not in scope — it doesn't run Claude.

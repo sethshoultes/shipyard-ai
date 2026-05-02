@@ -1,49 +1,60 @@
-# Steve Jobs — Round 1 Positions
+# Steve's Positions: Making AgentForge Insanely Great
 
 ## Product Naming
+"AgentForge" is a committee name. It reeks of compromise. Drop the "Agent." Nobody falls in love with agents. They fall in love with what agents *do* for them.
 
-**AgentForge is dead.**
+Call it **Forge.** One word. Four letters.
 
-Two words. Industrial. Blacksmith sweat. Our user is a non-developer in operations — they do not want to *forge* anything. They want to *conduct*.
+Memorable as a hammer striking anvil. If you can't say it drunk at a bar and have people remember it Monday morning, it's dead on arrival.
 
-The name will be **one word**, lowercase, alive. I don't care if the domain costs $50K. If you won't pay for the right name, you don't believe in the product. Buy it. Or call it **Relay** or **Pulse** or **Thread** — but it will breathe. It will not clang.
+One word. That's the rule. iPod. iPhone. Forge. The product *is* the sentence.
 
 ## Design Philosophy
+Insanely great means the interface disappears. Like a Steinway piano — you don't admire the wood grain, you sit down and music pours out.
 
-This is not a "visual builder." That's Microsoft thinking. This is a **conductor's baton**.
+The canvas must be white, infinite, and quietly confident.
 
-The interface must disappear. When you touch a node, it responds like liquid. When two agents connect, the line pulses with light. The user should feel like they're arranging living things, not wiring circuits. Insanely great means: a child can orchestrate a ten-agent workflow without reading a single tooltip.
+Every node, every wire, every shadow must beg for its existence on its knees. If an element doesn't make the user feel like a genius, it gets burned in the courtyard.
+
+Beauty is not decoration. Beauty is function so perfect it becomes emotion.
 
 ## The First 30 Seconds
+They land. They see a canvas that breathes.
 
-No login wall. No empty-state sad face. No "create your first workflow" button.
+They drag one circle to another. Two agents shake hands and produce something real — an email written, a spreadsheet filled, an idea made tangible.
 
-You land on a canvas where a workflow is **already running**. Agents are passing a real task in real-time. You touch one. It pauses, turns to face you, shows you what it knows. You drag it. The others adjust like birds in a flock.
+No wizard. No tooltip tour. No "Click here to learn!" If we need a manual, we've built a broken machine.
 
-In thirty seconds, you don't *learn* the product. You *feel* power.
+It must feel like striking a match in a dark room: frictionless, then sudden fire.
+
+Thirty seconds to wow, or we don't ship.
 
 ## Brand Voice
+We speak like a friend who happens to be a genius.
 
-We speak like we did at Macworld. Confident, human, almost cocky — because we earned it.
+No "AI-powered workflow orchestration." No "synergistic multi-agent paradigms." No acronyms. No explaining.
 
-We do not say "seamless multi-agent orchestration." We say: *Your team just got a brain. And it never sleeps.* We do not say "leverage our freemium tier." We say: *It's free. Because once you try it, you'll never go back.*
+We say: *"You just hired a hundred perfect employees. They never sleep, never complain, and they do exactly what you tell them. Let's put them to work."*
 
-No enterprise bullet points. No checklists against Zapier. We tell stories or we stay silent.
+Human. Confident. Almost arrogant in our simplicity. The voice of someone who knows the answer before you finish the question.
 
-## What We Say NO To
+## What to Say NO To
+NO to forty-seven node types cluttering the sidebar.
+NO to "Advanced Settings" drawers stuffed with sliders.
+NO to dark mode as a selling point.
+NO to explaining what a Large Language Model is. If they care, they're sold. If they don't, you're boring them.
+NO to PowerPoint export in version one. NO to CSV templates on day one. NO to every feature that wins a committee vote but dilutes the soul into beige oatmeal.
 
-- **NO dark-mode toggle.** We ship one beautiful aesthetic. Morning sunlight. Pick it and defend it.
-- **NO advanced mode.** If you need a JSON view, you failed. Make the visual layer powerful enough that developers forget they ever liked text.
-- **NO workspace folders, nested projects, or org hierarchies.** That's Salesforce. That's death by a thousand menus.
-- **NO feature-comparison chart on the homepage.** If we have to explain why we're better in a table, we've already lost.
-- **NO "powered by Claude" badge.** The magic is ours. The user doesn't care who forged the engine.
+Simplicity isn't the lack of features. It is the *arrogance* to choose one perfect thing over ten good things.
 
 ## The Emotional Hook
+People will love this because it makes them feel like a conductor before a silent orchestra.
 
-People won't love this because it saves them time. Time is a spreadsheet metric.
+Not a sysadmin. Not a "no-code builder." A *maestro*.
 
-They'll love it because for the first time in their life, they snap their fingers and a **team of brilliant minds assembles** — working, reasoning, handing off, finishing — while they go to dinner. It's Tony Stark in the suit. It's the bicycle for the AI mind.
+They raise a baton and a symphony of tireless, brilliant minds plays exactly what they imagined, note for note, while they sleep, while they eat, while they live.
 
-This isn't automation. Automation is a conveyor belt. This is **agency without employees**. And that feeling — that rush of pure, effortless power — is addictive.
+That's not automation. That's not productivity. That's *power*. That's art.
+Once they feel that power, going back to old tools will feel like churning butter by hand.
 
-Make them feel that in thirty seconds, or go home.
+We are not selling software. We are selling the feeling of having an unfair advantage.
