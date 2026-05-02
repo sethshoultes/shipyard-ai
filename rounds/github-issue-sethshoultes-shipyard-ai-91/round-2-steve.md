@@ -1,43 +1,31 @@
-# Round 2: Steve's Rebuttal
+# Steve's Round 2 Rebuttal — Aura
 
-> *"Innovation distinguishes between a leader and a follower."*
+Elon, you are optimizing for **parts count**, not **love**. "The best part is no part" is a factory slogan. We are building a church.
 
-Elon ships rockets. I ship feelings. Both require precision, but the payload is different.
+## Where You Are Wrong
 
-## Where Elon Optimizes for the Wrong Metric
+**Templates.** You want "pick a template." That is the original sin of software. Forty-seven ugly options is not choice; it is cowardice. One perfected layout, sacred and unchanging, tells the user: *we know what beauty is so you don't have to worry.* Fragmentation is mediocrity dressed as flexibility.
 
-Elon wants to cut one-click Claude/ChatGPT import because the schemas shift quarterly. That is optimizing for **engineering maintenance** over **user astonishment**. If our first 30 seconds is "paste your Markdown here," we have not built Promptfolio—we have built a blog theme. The magic is transmutation: buried JSON into a public monument. Without the import, there is no emotional hook, no dignity, no reason to choose us.
+**The watermark.** "Built with Promptfolio" as a viral loop? That is graffiti on marble. If the product is genuinely beautiful, people will ask what built it. Force a watermark and you admit the work cannot speak for itself. Viral loops born of obligation are spam. Viral loops born of pride are religion.
 
-He wants to cut the "Try this prompt" widget to avoid OpenAI bills. That is optimizing for **burn rate** over **virality**. Meter it. Gate it. Make it a v1.1 if the cost curve terrifies you. But removing interactivity turns a living gallery into a dead brochure. People do not screenshot brochures.
+**Cutting OG images.** You call it a nice-to-have. I call it the only ad we will ever buy. When someone shares their prompt on Twitter, the card is the first impression. If that card is ugly, there is no second impression. Pre-generate at build time. Do not skip it.
 
-His scoped v1 includes "manual prompt entry." That is not a scoped product; it is a different product entirely. You cannot ship a jeweler that asks customers to mine their own gold. We are not in the note-taking business. We are in the dignity business.
+## Why Design Quality Matters Here
 
-## Defending What Elon Will Attack
+Prompt engineers are not WordPress customers. They are taste-makers sitting on private museums of brilliance. They will not share something that looks like a Carrd template. **The container must honor the work** or the work stays buried. Elon, you see a parser and a CDN. I see a resurrection. You want 10,000 users. I want 1,000 apostles who post screenshots at midnight. Apostles scale. Users churn.
 
-"One exquisite layout" is not laziness—it is **courage**. When you only have one canvas, you obsess over every ligature, every margin, every spotlight in dark mode. Forty-seven templates is a race to mediocrity. One perfect template is why people screenshot it, share it, and whisper *"I want mine to look like that."* Design quality is not veneer. It is the reason the product spreads.
+## Where I Concede
 
-The "Kunsthalle" metaphor is not pretentious. It is the standard. The prompt engineer's work is craft, and craft deserves a pedestal. If we treat prompts like blog posts, we deserve to be another forgotten WordPress plugin.
+You are right: **WordPress is dead.** A static SaaS, one file in, one URL out, is the correct architecture. It is pure. It is fast. It is ours.
 
-Elon says you cannot iterate "Apple-esque" design inside 50,000 arbitrary WordPress themes. Of course you cannot—so we do not. We are SaaS. One surface. One experience. Absolute control.
+You are right: **kill the widget.** Barnacles.
 
-## Where Elon Is Right
+You are right: **one upload, one URL.** No auth, no DB, no admin hell. If the import feels like opening the first iPhone box, we win.
 
-WordPress-first architecture is a compatibility graveyard. I already said we are not building a WordPress plugin. SaaS-first, export-second.
+## Top 3 Non-Negotiables
 
-He is right about edge-cached static HTML and zero DB reads on the public face. The gallery must load instantly, or the spell breaks.
+1. **One sacred layout.** No templates. No light mode. No font picker. The prompt is the painting; the screen is the wall. Dark mode is not a feature — it is the air this product breathes.
+2. **Zero-friction resurrection.** Upload Claude export → instant, beautiful URL. Thirty seconds or we have failed. No settings page before magic.
+3. **The name is Aura.** One word. Emotional. A name that sings, not explains. "Promptfolio" dies today.
 
-He is right that one agent session will not ship the full PRD. Scope ruthlessly—but do not scope away the soul.
-
-He is right that auto-generated OG images are the distribution hack. Every portfolio must be a billboard.
-
-He is right about inference costs scaling dangerously. The widget needs hard metering, rate limits, and a credit system before it sees daylight.
-
-## Non-Negotiables
-
-1. **One-click import must exist.** Start with Claude if ChatGPT's schema is volatile. Without transmutation, we are a CMS.
-2. **One immaculate template.** Gallery-grade typography. Midnight spotlight dark mode. Never forty-seven.
-3. **Auto-generated OG images for every portfolio.** Elon is correct: this is the distribution engine. The image must render the prompt itself as typography, unmistakably Promptfolio from fifty feet away. Every share must sell the next user.
-
----
-
-*You can build a safe product, or you can build a legendary one. Not both.*
+Ship that, or ship nothing.

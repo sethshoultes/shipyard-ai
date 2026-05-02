@@ -1,10 +1,10 @@
-# Promptfolio v1 — Build Spec
+# Aura v1 — Build Spec
 
 **Issue:** sethshoultes/shipyard-ai#91
 **Source PRD:** `prds/github-issue-sethshoultes-shipyard-ai-91.md`
 **Locked Decisions:** `rounds/github-issue-sethshoultes-shipyard-ai-91/decisions.md`
-**Project Slug:** `promptfolio`
-**Build Path:** `projects/promptfolio/`
+**Product Name:** Aura (per locked decision #2)
+**Version:** 1.0 (MVP)
 
 ---
 
@@ -13,72 +13,83 @@
 From the PRD and locked debate decisions:
 
 1. **SaaS Portfolio Generator** — Build a React-based web app that lets AI practitioners create stunning, gallery-grade portfolio sites showcasing their prompts, workflows, and case studies.
-2. **One-Click Claude Import** — Drag-and-drop import from Claude conversation exports (scoped to current Anthropic export schema). ChatGPT import is explicitly out of scope for v1.
-3. **Manual Markdown/JSON Paste** — Universal fallback input method with live preview.
-4. **One Immaculate Template** — Single gallery template with hero prompt display, elegant code blocks, and obsessive typography control. No theming system in v1.
-5. **Midnight Spotlight Dark Mode** — Dark mode is the default identity, not an inverted afterthought. Light mode is explicitly out of scope for v1.
-6. **Auto-Generated OG Images** — Every portfolio generates a typographic shareable image rendering the prompt itself, unmistakably branded as Promptfolio.
-7. **Edge-Cached Static Public Pages** — Public portfolios are served as static HTML with zero database reads on the public face. Slug-based URLs (`/[slug]`).
-8. **Optional WordPress Export** — ZIP download or embeddable HTML snippet for syndication. Not a WordPress plugin — decoupled SaaS-first architecture.
-9. **"Try This Prompt" Widget** — Explicitly deferred to v1.1 (per locked decision #9). Must not ship in v1.
-10. **No Barnacles** — Cut SEO wizards, newsletter widgets, popup chatbots, and every other extraneous feature. Ruthless simplicity.
+2. **One-Click Claude Import** — Drag-and-drop import from Claude conversation exports ONLY. No ChatGPT, no manual paste in v1 (per locked decision #5).
+3. **One Sacred Template** — Single gallery template with hero prompt display, elegant code blocks, and obsessive typography control. No theming system, no font picker, no color picker.
+4. **Dark Mode Only** — Dark mode is the identity. No light mode toggle, no light-mode styles (per locked decision #4).
+5. **Auto-Generated OG Images** — Every portfolio generates a typographic shareable image at creation time (pre-generated, not edge-rendered) per locked decision #6.
+6. **Static CDN-Hosted Pages** — Public portfolios served as static HTML with zero database reads. Instant URL returned after upload.
+7. **30-Second Resurrection Standard** — Upload Claude export → instant beautiful URL in under 30 seconds (per locked decision #10).
+8. **No Forced Watermark** — No "Built with Aura" backlinks. Viral loop via organic pride, not obligation (per locked decision #7).
+9. **No "Try This Prompt" Widget** — Explicitly cut. API keys, rate limits, abuse vectors are all liability (per locked decision #8).
+10. **No Barnacles** — Cut SEO wizards, newsletter widgets, popup chatbots, and every other extraneous feature.
 
 ---
 
 ## Implementation Approach
 
 ### Architecture Lock (from decisions.md)
-- **SaaS-first, WordPress export optional** — Host the beautiful part yourself; syndicate to WordPress as embed or zip export.
-- **One React template, edge-cached static** — Single canvas means obsessive control over every ligature and margin.
-- **Performance: Zero DB reads on public face** — Static generation at build/save time. Database queries per portfolio load must be zero.
-- **OG Generation: SVG/edge-based via `@vercel/og`** — No serverless Chromium bills. Cache aggressively.
-- **Input Method: Manual paste + Claude JSON import** — Manual paste is the universal fallback; Claude JSON drag-and-drop is the magic moment.
+
+| Decision | Resolution |
+|----------|------------|
+| **Static SaaS** | One file in (Claude JSON), one URL out, CDN-hosted. No DB, no auth, no server-side rendering in v1. |
+| **Product Name** | Aura — rebrand from Promptfolio. |
+| **One Sacred Template** | No theme marketplace. No font picker. No color picker. Designer gets one shot. |
+| **Dark Mode Only** | Not a toggle. The air the gallery breathes. |
+| **Claude Import Only** | ChatGPT, OpenAI, Gemini exports are v2. |
+| **OG Images Pre-Generated** | Generate during static build pipeline, not edge-rendered per-request. |
+| **No Forced Watermark** | Beauty must compel sharing. Apostles, not hostages. |
+| **No Widget** | "Try this prompt" widget is barnacles. |
+| **No WordPress Plugin** | PHP rewrite, WordPress.org review queue, HostGator tickets — all death for v1. |
+| **Self-Evident Affordance** | No multi-step wizard. Single obvious upload action. One-line helper text max. |
 
 ### Tech Stack
-- **Framework:** Next.js 14+ (App Router)
+
+- **Framework:** Next.js 14+ (App Router) with static export
 - **Runtime:** React 18+, TypeScript (strict)
-- **Styling:** Tailwind CSS or CSS Modules (styling engine must support dark-mode-first token system)
+- **Styling:** Tailwind CSS (dark-mode-first, locked tokens)
 - **Validation:** Zod
-- **OG Images:** `@vercel/og` (edge runtime, Satori-based SVG→PNG)
-- **Data Persistence:** File-system blob or lightweight KV (e.g., Vercel KV, Upstash Redis) for portfolio JSON source of truth
-- **Deployment:** Vercel (edge caching, ISR/static generation)
+- **OG Images:** `@vercel/og` (Satori-based SVG→PNG, pre-generated at creation time)
+- **Data Persistence:** None in v1 — pure static generation from uploaded JSON
+- **Deployment:** Vercel or Cloudflare Pages (edge caching, static hosting)
 
 ### Data Flow
-1. User lands on `/` — editor surface with manual paste and import dropzone.
-2. User inputs prompt data via **ManualPaste** (markdown/JSON) or **ImportDropzone** (Claude JSON).
-3. Input is validated by `validators.ts` and parsed by `claudeParser.ts`.
-4. Live preview renders via **Template** → **PromptCard** → `markdownRenderer.ts`.
-5. On publish, portfolio JSON is persisted to storage (KV/blob).
-6. Static page is generated/revalidated at `/[slug]`.
-7. OG image is served on-demand from `/api/og?slug=[slug]` (edge-cached).
-8. WordPress export is generated on-demand from `/api/export` (ZIP with self-contained HTML + assets).
+
+1. User lands on `/` — single, obvious file upload drop-zone for Claude JSON export.
+2. User drrops Claude export JSON → parser validates and extracts prompts.
+3. Static generator renders HTML + CSS + OG image from template.
+4. Static bundle uploaded to CDN.
+5. Shareable URL returned to user instantly.
+6. Public portfolio page at `/{uuid}/index.html` with pre-generated `og-image.png`.
 
 ### Parser Resilience
-- `claudeParser.ts` must be wrapped in `try/catch` with graceful fallback to manual paste.
-- If Claude export schema drifts, parser returns `null` and UI prompts user to use manual paste.
-- Only one provider (Claude) in v1 to limit maintenance surface.
+
+- `claudeParser.ts` wrapped in `try/catch` with graceful error message.
+- If Claude export schema drifts, show helpful error: "This export format isn't recognized. Please check you exported from Claude's Settings → Data → Export."
+- Only Claude parser in v1.
 
 ---
 
 ## Verification Criteria
 
 | Requirement | How to Prove It Works |
-|---|---|
-| **Project boots** | `cd projects/promptfolio && npm install && npm run dev` starts without fatal errors on `localhost:3000` |
+|-------------|----------------------|
+| **Project boots** | `cd projects/aura && npm install && npm run dev` starts without fatal errors on `localhost:3000` |
 | **Type safety** | `npx tsc --noEmit` passes with zero errors across the entire project |
-| **Production build** | `npm run build` exits 0 and outputs `.next/` directory with static routes |
-| **Dark mode only** | `grep -riE "light-mode|bg-white|text-black|@media\s*\(prefers-color-scheme:\s*light\)" app/ components/ lib/` returns zero matches |
-| **Static slug pages** | `curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/demo-portfolio` returns `200` with rendered HTML containing prompt content |
-| **OG image generation** | `curl -s -o /dev/null -w "%{http_code}" "http://localhost:3000/api/og?title=Demo+Prompt&prompt=Hello+world"` returns `200` with `image/png` or `image/svg+xml` content-type |
-| **Claude JSON import** | Dropping a valid Claude export JSON into ImportDropzone renders parsed prompts in preview within 2 seconds |
-| **Manual paste live preview** | Typing markdown into ManualPaste updates the Template preview within 500ms |
-| **Input validation** | Submitting invalid JSON or malformed markdown shows a Zod-derived error message (not a blank screen or console error) |
-| **WordPress export** | POST to `/api/export` with `{ slug: "demo" }` returns `200` with `Content-Type: application/zip` and a ZIP containing `index.html` + asset folder |
+| **Production build** | `npm run build` exits 0 and outputs `.next/` or `out/` directory with static routes |
+| **Dark mode only** | `grep -riE "light-mode|light_mode|prefers-color-scheme:\s*light" app/ components/ lib/` returns zero matches |
+| **Static slug pages** | `curl -s http://localhost:3000/{uuid}/` returns `200` with rendered HTML containing prompt content |
+| **OG image generation** | `ls projects/aura/out/{uuid}/og-image.png` exists after build; file is valid PNG |
+| **Claude JSON import** | Dropping valid Claude export JSON into upload zone parses and generates portfolio within 5 seconds |
+| **30-second flow** | End-to-end timing: upload → parse → generate → deploy → URL returned in <30 seconds |
+| **Input validation** | Submitting invalid JSON shows user-friendly error (not blank screen or console crash) |
 | **Zero banned patterns** | `tests/test-banned-patterns.sh` exits 0 |
-| **Edge caching headers** | `curl -I http://localhost:3000/demo-portfolio` (or staging) shows `Cache-Control` with `s-maxage` or `stale-while-revalidate` |
-| **No "Try This Prompt" widget** | `grep -riE "try.this.prompt|tryprompt|promptwidget|openai.*api|anthropic.*api.*client" app/ components/ lib/` returns zero matches |
-| **No barnacles** | `grep -riE "seo.wizard|newsletter|popup|chatbot|cookie.banner|analytics" app/ components/ lib/` returns zero matches |
+| **No "Try This Prompt" widget** | `grep -riE "try.this.prompt|tryprompt|prompt.*widget|execute.*prompt" app/ components/ lib/` returns zero matches |
+| **No barnacles** | `grep -riE "newsletter|popup|chatbot|cookie.banner|seo.wizard" app/ components/ lib/` returns zero matches |
+| **No WordPress plugin** | `find projects/aura -name "*.php" -o -name "plugin.php"` returns nothing |
+| **No manual paste UI** | `grep -riE "manual.*paste|paste.*input|markdown.*input" app/ components/` returns zero matches (v1 is Claude-import-only) |
+| **No auth/database** | `grep -riE "prisma|drizzle|auth|login|register|session|user\." app/ lib/` returns zero matches |
 | **File structure compliance** | `tests/test-file-structure.sh` exits 0 (all required files exist) |
+| **Flat structure (no tests/ subdir in build)** | `find projects/aura -type d -name "tests"` returns nothing (tests live in deliverables/) |
 
 ---
 
@@ -87,67 +98,85 @@ From the PRD and locked debate decisions:
 ### Configuration & Tooling
 | File | Purpose |
 |------|---------|
-| `projects/promptfolio/package.json` | Dependencies: next, react, react-dom, typescript, zod, @vercel/og, tailwindcss (or chosen CSS solution) |
-| `projects/promptfolio/tsconfig.json` | Strict TypeScript, path aliases (`@/*` → `./*`) |
-| `projects/promptfolio/next.config.js` | Static export / ISR config, image remotePatterns, trailingSlash optional |
-| `projects/promptfolio/vercel.json` | Edge caching headers, build settings |
-| `projects/promptfolio/tailwind.config.ts` *(if Tailwind)* | Dark-mode class strategy, custom font families, color tokens (midnight palette) |
-| `projects/promptfolio/postcss.config.js` *(if Tailwind)* | PostCSS setup |
-| `projects/promptfolio/.gitignore` | Standard Node/Next.js ignores |
+| `projects/aura/package.json` | Dependencies: next, react, react-dom, typescript, zod, @vercel/og, tailwindcss |
+| `projects/aura/tsconfig.json` | Strict TypeScript, path aliases (`@/*` → `./*`) |
+| `projects/aura/next.config.js` | Static export config (`output: 'export'`) |
+| `projects/aura/tailwind.config.ts` | Locked design tokens: dark mode only, midnight palette, typography scale |
+| `projects/aura/postcss.config.js` | PostCSS setup for Tailwind |
+| `projects/aura/.gitignore` | Standard Node/Next.js ignores |
 
 ### App Router (Next.js 14 App Router)
 | File | Purpose |
 |------|---------|
-| `projects/promptfolio/app/layout.tsx` | Root layout: dark-mode-first global styles, font loading (gallery-grade typefaces), metadata base |
-| `projects/promptfolio/app/page.tsx` | Landing / editor / import surface — the single surface where users create portfolios |
-| `projects/promptfolio/app/[slug]/page.tsx` | Public portfolio page — static generation, edge-cached, zero DB reads at request time |
-| `projects/promptfolio/app/api/og/route.tsx` | Dynamic OG image generation — edge runtime, Satori layout, typographic prompt rendering |
-| `projects/promptfolio/app/api/export/route.ts` | WordPress export endpoint — generates self-contained ZIP (HTML + CSS + assets) |
+| `projects/aura/app/layout.tsx` | Root layout: dark-mode-first global styles, font loading, metadata base |
+| `projects/aura/app/page.tsx` | Landing page: single upload drop-zone, one-line helper text for Claude export location |
+| `projects/aura/app/[uuid]/page.tsx` | Public portfolio page: static generation, zero DB reads |
+| `projects/aura/app/api/generate/route.ts` | Generation endpoint: receives Claude JSON, returns static bundle + URL |
 
 ### Components
 | File | Purpose |
 |------|---------|
-| `projects/promptfolio/components/Template.tsx` | The one immaculate gallery template — layout shell, midnight spotlight aesthetic |
-| `projects/promptfolio/components/PromptCard.tsx` | Hero prompt display — large typography, code block styling, visual hierarchy |
-| `projects/promptfolio/components/ImportDropzone.tsx` | Claude JSON drag-and-drop with validation, progress state, error fallback to manual paste |
-| `projects/promptfolio/components/ManualPaste.tsx` | Markdown/JSON textarea with live preview toggle, syntax hinting |
-| `projects/promptfolio/components/OGImagePreview.tsx` | Shareable image preview before publish — shows user exactly what Twitter/LinkedIn will render |
+| `projects/aura/components/Template.tsx` | The one sacred template: dark mode, midnight spotlight aesthetic |
+| `projects/aura/components/PromptCard.tsx` | Hero prompt display: large typography, code block styling |
+| `projects/aura/components/UploadDropzone.tsx` | Claude JSON drag-and-drop with validation and progress state |
 
 ### Library / Utilities
 | File | Purpose |
 |------|---------|
-| `projects/promptfolio/lib/claudeParser.ts` | Scoped Claude JSON → Promptfolio domain schema parser. Wrapped in try/catch. Graceful degradation. |
-| `projects/promptfolio/lib/markdownRenderer.ts` | Gallery-grade prompt body renderer — syntax highlighting, spacing, typographic scale |
-| `projects/promptfolio/lib/ogImageTemplate.tsx` | Satori/React layout for OG image — prompt as typography, Promptfolio watermark/lockup |
-| `projects/promptfolio/lib/validators.ts` | Zod schemas for Portfolio, Prompt, ClaudeExport, manual input shapes |
+| `projects/aura/lib/claudeParser.ts` | Claude JSON → Portfolio domain schema parser. Try/catch with graceful error. |
+| `projects/aura/lib/markdownRenderer.ts` | Gallery-grade prompt body renderer: syntax highlighting, typographic scale |
+| `projects/aura/lib/ogImageTemplate.tsx` | Satori/React layout for OG image: prompt as typography, tasteful Aura branding |
+| `projects/aura/lib/staticGenerator.ts` | Orchestrates HTML + CSS + OG image write to disk |
+| `projects/aura/lib/validators.ts` | Zod schemas for Portfolio, Prompt, ClaudeExport |
 
 ### Types
 | File | Purpose |
 |------|---------|
-| `projects/promptfolio/types/promptfolio.ts` | Domain types: `Portfolio`, `Prompt`, `ClaudeExport`, `OGImageProps`, `ExportPayload` |
+| `projects/aura/types/aura.ts` | Domain types: `Portfolio`, `Prompt`, `ClaudeExport`, `OGImageProps` |
 
 ### Assets
 | File | Purpose |
 |------|---------|
-| `projects/promptfolio/public/fonts/` | Gallery-grade typeface files (e.g., Inter, Geist, or a premium serif for display headings) |
-| `projects/promptfolio/public/promptfolio-wordmark.svg` *(optional)* | Wordmark for OG image watermarking |
+| `projects/aura/public/fonts/` | Gallery-grade typeface files (e.g., Inter, Geist, or premium serif for headings) |
+| `projects/aura/public/aura-wordmark.svg` | Wordmark for OG image branding |
 
-### Tests (Deliverables)
+### Tests (in Deliverables)
 | File | Purpose |
 |------|---------|
 | `deliverables/github-issue-sethshoultes-shipyard-ai-91/tests/test-file-structure.sh` | Verify every file in the spec exists |
-| `deliverables/github-issue-sethshoultes-shipyard-ai-91/tests/test-banned-patterns.sh` | Verify no light-mode leaks, no widget code, no barnacles |
-| `deliverables/github-issue-sethshoultes-shipyard-ai-91/tests/test-build.sh` | Verify `npm run build` exits 0 and `.next/` contains expected routes |
+| `deliverables/github-issue-sethshoultes-shipyard-ai-91/tests/test-banned-patterns.sh` | Verify no light-mode, no widget, no barnacles |
+| `deliverables/github-issue-sethshoultes-shipyard-ai-91/tests/test-build.sh` | Verify `npm run build` exits 0 and output contains expected routes |
+| `deliverables/github-issue-sethshoultes-shipyard-ai-91/tests/test-claude-parser.sh` | Verify Claude parser handles valid/invalid input correctly |
 
 ---
 
 ## Out of Scope (Locked Decisions)
 
 The following must **not** appear in v1:
-- Light mode toggle or light-mode-specific styles
-- ChatGPT JSON import
-- "Try This Prompt" widget / interactive inference
-- WordPress plugin architecture
-- Multiple templates or theming system
-- SEO wizards, newsletter widgets, popup chatbots, cookie banners
-- Server-side DB queries on public portfolio pages
+
+| Excluded | Locked Decision |
+|----------|-----------------|
+| Light mode toggle or light-mode-specific styles | #4 |
+| ChatGPT/OpenAI/Gemini JSON import | #5 |
+| Manual markdown/JSON paste input | #5 (Claude import only) |
+| "Try This Prompt" widget / interactive inference | #8 |
+| WordPress plugin architecture | #9 |
+| Multiple templates or theming system | #3 |
+| Font picker / color picker / theme picker | #3 |
+| SEO wizards, newsletter widgets, popup chatbots, cookie banners | #10 |
+| Forced watermark or "Built with Aura" backlink | #7 |
+| User accounts / auth / database | #1 (static SaaS) |
+| Multi-step onboarding wizard | #11 |
+| Settings page before magic | #11 |
+
+---
+
+## Acceptance Criteria (from PRD)
+
+- [ ] Issue sethshoultes/shipyard-ai#91 requirements are met
+- [ ] All tests pass
+- [ ] 30-second upload-to-URL flow works end-to-end
+- [ ] Claude export import works with real export files
+- [ ] OG images display correctly when shared on Twitter/Slack
+- [ ] Dark mode renders correctly on mobile and desktop
+- [ ] No barnacles shipped

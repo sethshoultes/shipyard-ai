@@ -1,10 +1,12 @@
 # Hindsight Report
-**Generated:** 2026-05-02T16:10:49.216Z
+**Generated:** 2026-05-02T16:35:15.195Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 5 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 9 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- e96d31f daemon: auto-commit 2 files
+- 1d69029 daemon: auto-commit after build phase for daemon-fix-watcher-skip-loop
 - 438df8e daemon: auto-commit 2 files
 - bb69890 daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-90
 - 5ac87be daemon: auto-commit 2 files
@@ -13,16 +15,14 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 5 uncommitted changes.
 - f655c8e micromanager: dirty auto-reconcile
 - 6049280 daemon: auto-commit 3 files
 - d69ef28 micromanager: dirty auto-reconcile
-- 8314d56 daemon: auto-commit 2 files
-- c066331 micromanager: dirty auto-reconcile
 
 ## High-Churn Files
-- `.daemon-queue.json` (115 changes)
-- `.planning/sara-blakely-review.md` (84 changes)
+- `.daemon-queue.json` (116 changes)
+- `.planning/sara-blakely-review.md` (85 changes)
 - `.planning/phase-1-plan.md` (51 changes)
 - `.planning/REQUIREMENTS.md` (48 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
-- `.great-minds/hindsight-report.md` (31 changes)
+- `.great-minds/hindsight-report.md` (32 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
 - `HEARTBEAT.md` (13 changes)
@@ -34,34 +34,38 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 5 uncommitted changes.
 - `rounds/finish-plugins/board-verdict.md` (9 changes)
 
 ## Bug-Associated Files
+- `.daemon-queue.json`
+- `.great-minds/hindsight-report.md`
+- `.planning/sara-blakely-review.md`
+- `deliverables/daemon-fix-watcher-skip-loop/spec.md`
+- `deliverables/daemon-fix-watcher-skip-loop/tests/check-code-changes.sh`
+- `deliverables/daemon-fix-watcher-skip-loop/tests/check-file-existence.sh`
+- `deliverables/daemon-fix-watcher-skip-loop/tests/check-no-new-deps.sh`
+- `deliverables/daemon-fix-watcher-skip-loop/tests/check-no-todos.sh`
+- `deliverables/daemon-fix-watcher-skip-loop/tests/check-tests-pass.sh`
+- `deliverables/daemon-fix-watcher-skip-loop/tests/check-type-check.sh`
+- `deliverables/daemon-fix-watcher-skip-loop/todo.md`
+- `prds/github-issue-sethshoultes-shipyard-ai-90.md`
+- `rounds/daemon-fix-watcher-skip-loop/decisions.md`
+- `rounds/daemon-fix-watcher-skip-loop/essence.md`
+- `rounds/daemon-fix-watcher-skip-loop/round-1-elon.md`
+- `rounds/daemon-fix-watcher-skip-loop/round-1-steve.md`
+- `rounds/daemon-fix-watcher-skip-loop/round-2-elon.md`
+- `rounds/daemon-fix-watcher-skip-loop/round-2-steve.md`
 - `deliverables/github-issue-sethshoultes-shipyard-ai-88/includes/class-library.php`
 - `deliverables/github-issue-sethshoultes-shipyard-ai-88/spec.md`
-- `prds/changelog-theatre-v2.md`
-- `prds/clipcraft-backend-v2.md`
-- `prds/whisper-blocks-v2.md`
-- `website/scripts/check-static-export.sh`
-- `website/functions/api/intake.ts`
-- `website/src/components/MobileNav.tsx`
-- `website/src/app/page.tsx`
-- `deliverables/github-issue-sethshoultes-shipyard-ai-77/stage/includes/post-type.php`
-- `deliverables/github-issue-sethshoultes-shipyard-ai-77/stage/includes/settings.php`
-- `deliverables/github-issue-sethshoultes-shipyard-ai-77/todo.md`
-- `rounds/github-issue-sethshoultes-shipyard-ai-77/qa-pass-1.md`
-- `AGENTS.md`
-- `docs/PRODUCT-MANAGEMENT-GAP.md`
-- `pipeline/auto/agent-registry.json`
-- `pipeline/auto/queue-dispatcher.mjs`
-- `STATUS.md`
-- `TASKS.md`
-- `rounds/membership-production-fix/qa-pass-1.md`
 
 ## Uncommitted State
 ```
 M .daemon-queue.json
  M .great-minds/hindsight-report.md
  M .planning/sara-blakely-review.md
-?? prds/github-issue-sethshoultes-shipyard-ai-90.md
-?? rounds/daemon-fix-watcher-skip-loop/
+ M rounds/github-issue-sethshoultes-shipyard-ai-91/decisions.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-91/essence.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-91/round-1-elon.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-91/round-1-steve.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-91/round-2-elon.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-91/round-2-steve.md
 ```
 
 ---

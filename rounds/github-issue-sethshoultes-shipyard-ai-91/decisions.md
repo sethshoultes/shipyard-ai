@@ -1,134 +1,136 @@
-# Promptfolio — Build Blueprint
+# Locked Decisions — Build Phase Blueprint
 
-*Orchestrated by the Zen Master. Two egos, one triangle offense. Here's what survived the room.*
+*Synthesized by Phil Jackson, Zen Master*
+*Source debates: Round 1–2 (Elon Musk vs. Steve)*
 
 ---
 
-## Locked Decisions
+## Decision Ledger
 
-### 1. Product Name: Promptfolio
-- **Proposed by:** Steve
-- **Winner:** Steve
-- **Why:** One word. Category ownership. Already carries the emotional payload. Elon didn't contest the name; he contested the architecture beneath it. Locked.
-
-### 2. Architecture: SaaS-First, WordPress Export Optional
-- **Proposed by:** Elon
-- **Winner:** Elon
-- **Why:** Steve conceded in Round 2 — "We are SaaS. One surface. One experience. Absolute control." The public gallery cannot survive inside 50,000 arbitrary WordPress themes. Host the beautiful part yourself; syndicate to WordPress as an embed or zip export. Decouple or die.
-
-### 3. Template Strategy: One Immaculate Template Only
-- **Proposed by:** Steve
-- **Winner:** Steve
-- **Why:** Elon conceded in Round 2 — "One React template, edge-cached static." Forty-seven templates is a race to mediocrity. One canvas means obsessive control over every ligature and margin. Design quality is the distribution mechanism.
-
-### 4. Aesthetic Direction: Gallery-Grade Typography, Midnight Spotlight Dark Mode
-- **Proposed by:** Steve
-- **Winner:** Steve
-- **Why:** Elon conceded that "taste matters." Dark mode is not an inverted color scheme; it is the default identity — a midnight gallery with spotlights on the work. Light mode is not in scope for v1. Typography is a feature, not an afterthought.
-
-### 5. Distribution Engine: Auto-Generated OG Images for Every Portfolio
-- **Proposed by:** Elon
-- **Winner:** Elon
-- **Why:** Steve agreed and expanded — "The image must render the prompt itself as typography, unmistakably Promptfolio from fifty feet away." This is the viral loop. Every share is a billboard. Non-negotiable for v1.
-
-### 6. Brand Voice: "Show Your Work." Confident. Human. Ruthlessly Simple.
-- **Proposed by:** Steve
-- **Winner:** Steve
-- **Why:** Elon adopted the ethos in his rebuttal. No "AI-driven synergies." No barnacles. If a feature doesn't make the prompt feel legendary within three seconds, it dies.
-
-### 7. Input Method: Manual Markdown/JSON Paste + Scoped Claude JSON Import
-- **Proposed by:** Steve (import); Elon (manual paste as robust fallback)
-- **Winner:** Synthesis / Phil Jackson ruling
-- **Why:** Steve made one-click import non-negotiable but narrowed the scope to Claude-only after Elon's schema-drift warning. Elon conceded that a single-schema parser is manageable. Ruling: v1 ships both. Manual paste is the universal fallback; Claude JSON drag-and-drop is the magic moment. ChatGPT import is explicitly out of scope for v1 due to schema volatility.
-
-### 8. Performance: Edge-Cached Static HTML, Zero DB Reads on Public Face
-- **Proposed by:** Elon
-- **Winner:** Elon
-- **Why:** Steve agreed — "The gallery must load instantly, or the spell breaks." Database queries per portfolio load must be zero. Static generation at build/save time.
-
-### 9. "Try This Prompt" Widget: Deferred to v1.1
-- **Proposed by:** Elon (to cut)
-- **Winner:** Elon
-- **Why:** Steve defended interactivity but conceded it needs "hard metering, rate limits, and a credit system before it sees daylight." Without revenue infrastructure, the widget turns user growth into an OpenAI bill. v1 is a monument, not a playground.
-
-### 10. No Barnacles Policy
-- **Proposed by:** Steve
-- **Winner:** Steve
-- **Why:** Elon agreed. Cut SEO wizards, newsletter widgets, popup chatbots, and every other WordPress-plugin barnacle. Simplicity is the ultimate sophistication.
+| # | Decision | Proposed By | Winner | Rationale |
+|---|----------|-------------|--------|-----------|
+| 1 | **Static SaaS architecture** — one file in, one URL out, CDN-hosted | Elon (R1) | **Elon** | Steve conceded R2: *"WordPress is dead. A static SaaS... is the correct architecture."* No DB, no auth, no server-side rendering in v1. |
+| 2 | **Product name: Aura** | Steve (R1) | **Steve** | Elon objected on procedural grounds (repo churn), but Steve never conceded and the entire brand thesis hangs on a name that *sings, not explains.* Rebranding cost is 30 minutes; losing the emotional hook is fatal. Promptfolio dies today. |
+| 3 | **One sacred template, zero knobs** | Steve (R1) | **Steve** | Elon conceded R2: *"One exquisite template, perfected, beats forty-seven mediocre options."* No theme marketplace. No font picker. No color picker. No light mode. The designer gets one shot. |
+| 4 | **Dark mode only** | Steve (R1) | **Steve** | Elon dismissed it as CSS theatre in R1 but never mounted a defense. For this product, dark mode is not a toggle; it is the air the gallery breathes. |
+| 5 | **Claude import only for v1** | Elon (R1) | **Elon** | Steve mentioned ChatGPT import in R1 prose but did not defend it in R2. We ship the parser that exists. ChatGPT, OpenAI, Gemini exports are v2. |
+| 6 | **OG images: pre-generate at creation time** | Steve (R2) | **Steve** | Elon wanted to cut OG images for v1. Steve rebutted: *"When someone shares their prompt on Twitter, the card is the first impression."* Compromise: generate during the static build pipeline (not edge-rendered per-request). This satisfies both beauty and Elon’s no-server mandate. |
+| 7 | **No forced watermark / viral loop via organic pride** | Steve (R2) | **Steve** | Elon proposed a *"Built with Promptfolio"* backlink as compound interest. Steve: *"Viral loops born of obligation are spam."* Correct. The product must be so beautiful that users screenshot it unprompted. Apostles, not hostages. |
+| 8 | **Cut "Try this prompt" widget** | Elon (R1) | **Elon** | Steve conceded R2: *"kill the widget. Barnacles."* API keys, rate limits, abuse vectors — all liability, no love. |
+| 9 | **No WordPress plugin for v1** | Elon (R1) | **Elon** | Steve conceded R2. WordPress.org review queue, PHP rewrite, HostGator support tickets — all death for a v1 that needs to ship in hours, not weeks. |
+| 10 | **30-second resurrection standard** | Steve (R1) | **Steve** | Upload Claude export → instant, beautiful URL. *Thirty seconds or we have failed.* Elon’s static-export pipeline makes this technically possible; Steve made it the standard. |
+| 11 | **No explicit onboarding tutorial; self-evident affordance** | Steve (R1) | **Steve** (with Elon guardrail) | Steve: *"If you need a manual, the design is broken."* Elon’s valid concern: users must know where their Claude export lives. Resolution: the upload UI is a single, obvious action. No multi-step wizard. No settings before magic. |
 
 ---
 
 ## MVP Feature Set (What Ships in v1)
 
-1. **SaaS Web App** — React-based, single surface, absolute control over rendering.
-2. **One Gallery Template** — Hero prompt display, code blocks that sing, midnight spotlight dark mode, gallery-grade typography.
-3. **Manual Prompt Entry** — Markdown/JSON paste with live preview.
-4. **Claude JSON Import** — Drag-and-drop parser scoped to current Claude export schema. Single schema, single point of maintenance.
-5. **Automatic OG Image Generation** — Every portfolio generates a shareable image rendering the prompt as typography, watermarked unmistakably as Promptfolio.
-6. **Public Portfolio Pages** — Static HTML, edge-cached, zero database reads, served via slug-based URLs.
-7. **Optional WordPress Export** — Zip download or embeddable snippet for syndication. Not a plugin. Not native architecture.
-8. **Dark Mode Only** — No light-mode toggle in v1. Midnight gallery is the identity.
+**Core Flow:**
+1. Landing page with single, obvious upload drop-zone for Claude conversation export JSON.
+2. Parser: Claude export JSON → structured prompt objects (title, body, metadata).
+3. Static generator: one sacred template (dark mode only) → HTML + CSS + OG image.
+4. Deployment: static files pushed to CDN → shareable URL returned to user.
+5. Portfolio page: sacred whitespace, typography-forward, code blocks as sheet music, each prompt framed like art.
+
+**What Is IN:**
+- Single-file upload (Claude JSON only)
+- One unchangeable template (dark mode, locked typography/spacing/color)
+- Static HTML/CSS export
+- OG image generation at creation time (Twitter/OpenGraph cards)
+- CDN deployment with instant URL
+- Responsive layout
+
+**What Is OUT:**
+- User accounts / auth
+- Database
+- WordPress plugin
+- ChatGPT/OpenAI/Gemini parsers
+- Template marketplace / theme picker / font picker / color picker
+- Light mode
+- "Try this prompt" widget
+- Forced watermark or backlink
+- Onboarding tutorial / multi-step wizard
+- Settings page / admin panel
+- Edge-rendered OG images
+- Newsletter widgets / chatbots / SEO panels / page-builder compatibility
+- Manual markdown/JSON paste (out of scope; single import path only)
 
 ---
 
 ## File Structure (What Gets Built)
 
 ```
-promptfolio/
-├── app/
-│   ├── layout.tsx                 # Root layout, dark-mode-first global styles
-│   ├── page.tsx                   # Landing / editor / import surface
-│   └── [slug]/
-│       └── page.tsx               # Public portfolio — static, edge-cached
-│   └── api/
-│       ├── og/
-│       │   └── route.tsx            # Dynamic OG image generation (@vercel/og)
-│       └── export/
-│           └── route.ts             # WordPress zip export
-├── components/
-│   ├── Template.tsx               # The one immaculate gallery template
-│   ├── PromptCard.tsx             # Prompt hero display component
-│   ├── ImportDropzone.tsx         # Claude JSON drag-and-drop with validation
-│   ├── ManualPaste.tsx            # Markdown/JSON paste fallback
-│   └── OGImagePreview.tsx         # Shareable image preview before publish
-├── lib/
-│   ├── claudeParser.ts            # Scoped Claude JSON → Promptfolio schema
-│   ├── markdownRenderer.ts        # Gallery-grade prompt body renderer
-│   ├── ogImageTemplate.tsx        # OG image typography layout
-│   └── validators.ts              # Zod/input validation schemas
-├── public/
-│   └── fonts/                     # Gallery-grade typeface assets
-├── types/
-│   └── promptfolio.ts             # Domain types (Prompt, Portfolio, etc.)
-└── next.config.js / vercel.json   # Edge caching headers, ISR config
+/aura                          # Project root (renamed from Promptfolio)
+├── /src
+│   ├── /parser
+│   │   └── claude.ts         # Claude export JSON → structured Portfolio object
+│   ├── /template
+│   │   ├── layout.tsx        # Single sacred layout: dark mode, sacred whitespace
+│   │   ├── prompt-card.tsx   # Individual prompt component (the painting)
+│   │   └── styles.css        # Locked typography, spacing, color tokens
+│   ├── /generator
+│   │   ├── static-export.ts  # Orchestrates HTML + CSS write to disk
+│   │   └── og-image.ts       # Generates OG PNG at creation time
+│   └── /deploy
+│       └── cdn-push.ts       # Uploads static bundle to CDN (Cloudflare/Vercel)
+├── /app
+│   ├── page.tsx              # Landing page: single upload drop-zone
+│   └── layout.tsx            # Root layout (no settings, no navigation)
+├── /public
+│   └── assets                # Static assets (fonts, favicon)
+├── /lib
+│   └── utils.ts              # Shared utilities
+├── next.config.js            # Static export configuration
+├── tailwind.config.ts        # Locked design tokens (dark only)
+└── package.json
+```
+
+**Build Output (per portfolio):**
+```
+/{uuid}/
+  ├── index.html              # Portfolio page
+  ├── og-image.png            # Pre-generated social card
+  └── assets/
+      └── styles.css          # Minified, locked styles
 ```
 
 ---
 
 ## Open Questions (What Still Needs Resolution)
 
-1. **Claude JSON Schema Drift Mitigation** — How do we version the parser when Anthropic changes export structure? Graceful degradation vs. hard failure?
-2. **OG Image Watermarking Specifics** — Exact lockup, logo placement, and typography scale for the fifty-foot rule.
-3. **WordPress Export Format** — Is it a self-contained HTML embed, a ZIP with assets, or both? What is the exact spec?
-4. **Data Persistence Layer** — If public portfolios are edge-cached static HTML, where does the source of truth live? Vercel KV? Postgres? File-system blob?
-5. **Slug Collision Strategy** — Username-based (`/user/slug`) or hash-based (`/p/abc123`)? SEO vs. anonymity tradeoffs.
-6. **Light Mode for v1.1?** — Steve says midnight gallery is identity. Do we ever ship light mode, or is Promptfolio dark-mode-only forever?
-7. **Revenue Model / Metering** — Free tier limits? Paywall for custom domains? The widget deferral assumes future metering infrastructure.
+1. **Domain / hosting logistics.** If the name is Aura, does the repo rename happen now or post-v1? Elon is right that DNS, README, and deploy pipeline updates burn clock. Decision needed before first commit.
+2. **OG generation at creation time vs. true static.** Since user uploads happen post-deploy, "pre-generate at build time" is technically impossible unless we run a micro-build pipeline on upload. Is this a serverless function (violates pure static?) or a lightweight container step? The boundary between "build" and "creation" is fuzzy.
+3. **Claude export location affordance.** Users must find `claude-export.json` in their Downloads folder. If they don’t know how to export, the 30-second promise dies at second 0. Do we add a single-line helper text ("Export your Claude conversations → Settings → Data → Export") or is that a manual?
+4. **CDN cost and rate limits at scale.** Static files scale, but upload-processing bandwidth and storage aren’t free. Is there a ceiling where we need auth/quotas?
+5. **Edit / delete / update.** No auth means no ownership. If a user regenerates, they get a new URL. Is orphan cleanup acceptable? What if they need to remove a portfolio?
+6. **Monetization.** Never debated. Hosting costs money. Do we need a simple paywall or tipping mechanism, or is this loss-leader/giftware?
+7. **Parser fragility.** Claude export JSON schema is undocumented and can change. If Anthropic alters the format, the parser breaks. Do we version the parser defensively?
 
 ---
 
 ## Risk Register (What Could Go Wrong)
 
 | Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| **Claude export schema changes** | Medium | High | Parser wrapped in try/catch with fallback to manual paste. Schema diff alerts. Limit to one provider in v1. |
-| **OG image generation cost spikes** | Medium | High | SVG/edge-based generation via `@vercel/og` (no serverless Chromium bills). Cache aggressively. |
-| **Single-session scope overflow** | High | Critical | Ruthless template freeze. No design iteration spirals. If it's not in the MVP list above, it doesn't ship. |
-| **WordPress export fragility** | Medium | Medium | Ship as ZIP/embed, not a plugin. Support one export format only. Document "use at your own theme" disclaimer. |
-| **"Apple-esque" design taking too long** | Medium | High | One template means one obsession, but timebox typography refinement to 20% of session. Ship good, iterate to great. |
-| **Viral share without retention loop** | Medium | High | OG images are the hook, but v1 has no widget/interactivity to bring viewers back. Accept this as v1 tradeoff. |
-| **Inference cost exposure (post-v1 widget)** | Low (v1) / High (v1.1) | Critical | Already deferred. If resurrected, metering + credit system must ship before the widget. |
+|------|------------|--------|------------|
+| **Users can’t find their Claude export** | High | Critical | Single-line contextual helper on upload zone. No wizard. One sentence. |
+| **30-second promise broken by large exports** | Medium | High | Size limit enforced at upload (e.g., 50MB max). Async processing with progress indicator if edge case exceeds threshold. |
+| **Single template alienates users who want customization** | Medium | Medium | That is the thesis. Apostles, not users. If they want customization, they are not the customer. Accept the risk. |
+| **Claude JSON format changes** | Medium | High | Defensive parser with schema validation and graceful error message. Fallback to raw text display if structure unrecognized. |
+| **OG image generation adds latency** | Medium | Medium | Use lightweight canvas/SVG-to-PNG pipeline (not headless Chrome). Cap prompt count per portfolio. |
+| **Organic viral loop fails without watermarks** | Medium | High | Build-in share affordance (native Web Share API + copy-link) but no forced attribution. If beauty is insufficient, we lose. That is the bet. |
+| **No auth = no edit/delete = support burden** | Medium | Medium | Accept orphan URLs. If user needs removal, manual support channel. Do not build auth for v1. |
+| **Static generation pipeline complexity creeps** | High | Critical | Guardrail: every feature proposal must answer *"Does this require a connection string, a database, or an API key?"* If yes, it is v2. |
+| **CDN costs at 10,000+ portfolios** | Low | Medium | Monitor. If reached, introduce simple token-based upload or tipping. Not a v1 problem. |
+| **Rebranding to Aura delays ship date** | Low | Medium | Batch all rename operations in one 30-minute commit. Do not interleave with feature work. |
 
 ---
 
-*The debate is over. The blueprint is locked. Build the monument.*
+## The Zen Master's Final Word
+
+Elon brought the constraints. Steve brought the soul. The winner is the product that ships with both.
+
+Build the static SaaS. One upload. One URL. One sacred layout in dark mode. Call it Aura. Make it so beautiful they post screenshots at midnight. No barnacles. No parts that do not compound.
+
+*The best system is the one that lets the work breathe.*
+
+Move.

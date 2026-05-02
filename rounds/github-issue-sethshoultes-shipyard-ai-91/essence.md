@@ -1,7 +1,5 @@
-Promptfolio turns buried AI conversations into public monuments.
+Promptfolio resurrects dead prompt threads into living legacy.
 
-Feeling: Dignity. Your craft hung on a wall.
-
-One thing perfect: One template. Gallery-grade typography. Midnight spotlight dark mode.
-
-Creative direction: Show your work.
+- Feeling: Pride. Breath catching. Forgotten work, hung on wall.
+- Must be perfect: One template. Sacred whitespace. Typography cuts. No knobs.
+- Direction: Midnight gallery, sacred whitespace.
