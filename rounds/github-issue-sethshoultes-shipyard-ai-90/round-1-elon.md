@@ -1,28 +1,61 @@
-# AgentForge — First Principles Assessment
+# Elon Review — AgentForge PRD
 
 ## Architecture
 
-Pick one: **web app** or WordPress plugin. "Both" means neither works. WordPress is a security and distribution tar pit. The simplest system is a JSON workflow config + execution engine + basic Next.js UI. The drag-and-drop builder is **v2 masquerading as v1** — if you can't define the workflow in YAML, you don't understand the problem well enough to build a GUI for it yet.
+The PRD never defines what a "workflow" is. DAG? State machine? Linear pipe?
+You cannot build a visual editor for an undefined data structure.
+The simplest system that could work is a JSON/YAML executor with a table view—
+not a drag-and-drop React canvas.
+Layout engines, edge routing, undo/redo, and validation are 6+ months of frontend work alone.
+Canvas is a v2 feature masquerading as v1.
 
 ## Performance
 
-The bottleneck is not "edge execution." It's LLM inference latency. A 5-agent synchronous chain at 2s per call is 10s wall-clock. At 10 agents it's 20s+. Users will bounce. The 10x path is **parallel execution graphs** (DAG, not sequence), async queues, and aggressive output caching. "Workers AI for edge execution" is hand-waving — edge doesn't fix 10-second LLM calls.
+The bottleneck isn't "edge latency."
+A 5-agent workflow with tool calls is 15–30 seconds and $0.50–$2.00 per run.
+"Workers AI for edge execution" is hand-waving;
+edge functions are ephemeral and stateless,
+but multi-agent workflows need durable state, retries, and observability.
+The 10x path is not faster inference—
+it's caching intermediate outputs and parallelizing independent agent calls to cut token spend.
 
 ## Distribution
 
-ProductHunt and "no-code communities" are not a distribution strategy. They're a launch-day sugar high. Reaching 10,000 users without paid ads requires **viral loops** or **open-source gravity**. Open-source the execution engine, charge for the hosted orchestration. Become the standard so Stack Overflow answers mention you. Templates are content marketing, not distribution.
+ProductHunt + LinkedIn is a press release, not a distribution strategy.
+To reach 10,000 users without paid ads, you need
+(a) a viral loop inside the product,
+(b) a marketplace network effect, or
+(c) an SEO/content flywheel.
+The PRD offers none.
+Also, "first-mover advantage" is fiction—
+n8n, LangFlow, Flowise, Dify, and CrewAI already exist.
+You are a 10th-mover.
 
 ## What to CUT
 
-1. **Visual builder** — v1 should be config-first (YAML/JSON). Drag-and-drop is 80% of the frontend work for 20% of the value.
-2. **WordPress plugin** — separate auth model, separate hosting, separate security surface. Kill it.
-3. **Freemium pricing tiers** — Pricing complexity before product-market fit is founder theater. Free until 1,000 MAU.
-4. **"Workers AI"** — You have zero users. Global edge infra is premature optimization.
+- Drag-and-drop builder for v1. Use a structured config editor.
+- "Web app or WordPress plugin"—pick ONE. Dual-platform splits focus and doubles QA surface.
+- Freemium. You have no COGS model. One user running 3 workflows on a cron job could cost $500/month in API calls. Start usage-based or paid-only.
+- Marketplace/template features. Templates don't create themselves; that's v2.
+- "Workers AI"—you have zero users. Global edge infra is premature optimization.
 
 ## Technical Feasibility
 
-Claimed "HIGH." Reality: **One agent session can build the execution engine and a basic CRUD UI.** It cannot build a real-time collaborative visual builder, versioned workflows, and a plugin ecosystem in one session. Scope to config-driven v1 and feasibility is high. Scope to the PRD's implied vision and it's medium-to-low.
+Can one agent session build this? No.
+A production-grade workflow engine with state persistence,
+LLM orchestration, error handling, auth, and a visual editor
+is a 3–4 engineer, 6-month minimum.
+One session can build a prototype that runs two hardcoded agents in sequence.
+That's it.
 
 ## Scaling
 
-What breaks at 100x? **COGS.** A multi-agent workflow costs $0.10–$2.00 per run in LLM tokens. 100 users × 10 workflows/day × $0.50 = $500/day = $15K/mo in API costs. Freemium dies here. You need usage-based pricing, token budgeting per workflow, and model-tier fallback (GPT-3.5 for drafts, Claude for final output) or the business model capsizes before the servers do.
+At 100x usage, your LLM API bill bankrupts you before your database melts.
+Stateful execution at scale requires a job queue (Temporal/BullMQ),
+idempotency keys, and per-user cost caps.
+The PRD mentions none of this.
+The failure mode is inference spend and retry storms, not "edge latency."
+
+## Verdict
+
+This is a market category, not a product spec. It says "Zapier for agents" but skips every hard decision: what is a node, how do agents share state, what's the execution model, who pays the inference tax? Go back and define the core loop with code, not buzzwords.

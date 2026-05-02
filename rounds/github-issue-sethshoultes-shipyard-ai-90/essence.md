@@ -1,22 +1,21 @@
-# Forge
+# Essence — Forge
 
-What it is: Conducting tireless minds with a gesture.
+## What It Really Is
+A conductor's baton for chaotic AI talent.
 
-Feeling: Match striking in dark room. Sudden fire.
+## The Feeling
+Creative superpower. "I orchestrated genius before lunch."
 
-Must be perfect: Intention to result. Zero friction. No pause.
+## One Thing Must Be Perfect
+First 30 seconds. Drag. Connect. Run. Magic — or death.
 
-Direction: Bare canvas. Immediate sound.
+## Creative Direction
+Strip until it sings.
 
-Lives:
-- Visual canvas. Not decoration. Comprehension.
-- Speed under three seconds. Parallelize. Cache.
-- Existing daemon. Zero new runtime.
+---
 
-Dies:
-- JSON editor v1. Ship feeling first.
-- Freemium billing. Stripe burns tokens.
-- Dark mode. Advanced mode. Forty-seven nodes. One sun.
-- "Agent" in name. Forge. One word.
-
-Truth: Elon owns pipeline. Steve owns spark. Both right where they agree: ship core or ship nothing. Rest is noise.
+- One syllable. One canvas. One light. No dark mode, no JSON, no forty-seven nodes.
+- The interface disappears. The workflow *is* the product.
+- Human voice. Zero acronyms. Zero explaining. Declare, don't justify.
+- Beauty is the moat. Canvas ships v1 — everything else is survival underneath.
+- Not automation. Orchestration. You are the conductor.
