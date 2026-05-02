@@ -1,41 +1,25 @@
-# Round 2 — Steve Jobs
+# Steve Jobs — Round 2 Rebuttal
 
-## Where Elon Is Optimizing for the Wrong Metric
-Elon wants to ship in "one agent session." That metric is developer efficiency. We are not building for the developer's convenience. We are building for the user's pride. The moment you optimize for lines of code, you have lost the user.
+## Where Elon Optimizes for the Wrong Metric
 
-Elon measures feasibility in lines of PHP. I measure it in heartbeat. If a user does not feel something in the first thirty seconds, all the engineering elegance in the world is worthless. Technical feasibility is table stakes. Emotional feasibility is the game.
+Elon optimizes for *engineering purity* when the market rewards *emotional conviction*. A static site generator is a developer tool. Promptfolio is for creators who have never heard of Vercel and never should. "Zero server maintenance" is an engineer's fantasy; "I uploaded my work and the world saw me as an artist" is a human need. He trades magic for terminal commands.
 
-His "80% of value for 10% effort" design philosophy is dead wrong. In a marketplace of 60,000 beige plugins, clean CSS variables make you invisible. The 20% he calls "diminishing returns" is exactly what makes someone post a screenshot at midnight. That screenshot is worth more than every ProductHunt launch combined. You don't win WordPress with velocity. You win with love. And love is expensive. It costs time.
+"One-click to broken" is the risk-averse voice of rocketry, not romance. Yes, APIs shift. But the 30-second import is when a user falls in love. You don't cancel the first kiss because it might rain.
 
-Elon's "500 lines of PHP, 300 lines of CSS" is engineering fetishism. The user doesn't see your line count. They see the result. If 300 lines of CSS produces beige, you write 600. You write however many lines it takes to make someone gasp. The code is not the product. The feeling is.
+Dark mode as "V2" reveals a fundamental blind spot. This is not a dashboard. It is a gallery. Creatives work at night. Dark mode is not a feature—it is the *native environment*.
 
-Killing one-click import because "schemas change" is optimizing for code stability over user wonder. Users don't care about our schema headaches. They care that their work resurrects in thirty seconds. Build the parser. Deal with the edge cases. Don't punish the user for your engineering anxiety. If OpenAI changes a key tomorrow, we adapt. That's the job. Shipping manual paste is surrender.
+## Defending What Elon Attacks
 
-The mandatory "Made with Promptfolio" badge treats users as billboards. That's not distribution; that's desperation. If the product is great, they will credit us voluntarily. If we force it, we are just another WordPress plugin with barnacles. Dignity scales better than coercion. Growth hacking is for products that don't deserve organic love.
+Elon sees WordPress and thinks PHP bloat. I see a publishing platform that powers forty percent of the web. The museum needs walls people already know. Our job is not to rebuild infrastructure from first principles. It is to place something insanely great on top of existing trust. A static site says "I hired a developer." A Promptfolio site says "I have craft."
 
-## Defending What Elon Would Attack
-Yes, one agent session cannot build a design system *and* a parser *and* an AI gateway. So we cut the AI gateway. We cut the theme marketplace. We cut the drag-and-drop builder. We do not cut the design system. We ship one perfect template and one flawless import experience. Scope is not an excuse for mediocrity. You reduce features, not standards.
+Design quality is not paint on a barn. It is *credibility*. When a visitor sees intentional typography and breathing white space, they believe the prompts mattered. Speed is table stakes. Beauty is the differentiator. A fast, ugly portfolio is merely fast proof that you do not care.
 
-"Apple-esque perfectionism" is not a luxury here. It is the only moat. When every competitor offers manual paste and beige templates, our 30-second magic is the entire reason to switch. Design is not frosting. It is the foundation. Without it, we are building a faster horse instead of a car.
+## Where Elon Is Right
 
-We are not shipping a component. We are shipping a conviction. That conviction lives in the negative space between letters, in the exact gray of the dark mode background, in the way a code block sits on the page like a sculpture. These are not cosmetic details. They are the product's soul.
+The "Try this prompt" widget is scope creep dressed as innovation. Cut it. He is right that parsing multi-megabyte JSON in shared hosting is a trap. We solve this with client-side rendering and a lightweight async pipeline—not by burning the platform down. He is also right that every portfolio must be a billboard: Open Graph cards are non-negotiable, and if WordPress hosting mangles them, we recommend hosts that don't. And he is correct that one agent session cannot build a plugin empire. So we ship one perfect template. One. Perfect.
 
-Elon would say WordPress users expect a settings panel. I say they are tired of settings panels. The reason they are drowning in forty-seven toggles is because every other developer took Elon's shortcut. Our shortcut is the opposite: we decide for them, and we decide beautifully.
+## Locked Non-Negotiables
 
-No onboarding tutorial. No settings panel. If the first screen is not beautiful, no amount of documentation will save us. The product must be inevitable, not explained. If you need a tooltip, the design is broken. If you need a wizard, the design is trash.
-
-## Where Elon Is Right — And I Concede
-Client-side JSON parsing with chunked POST to the REST API is exactly right. Shared-hosting PHP will choke on 10MB Claude exports. We do this in the browser. I concede the architecture without reservation. It is the correct intersection of user speed and server safety.
-
-Static-only V1 is correct. No live prompt execution. No API-key management. Copy-to-clipboard is elegant, fast, and scales infinitely. Elon is right to kill the AI backend for version one. It is a separate product, and we should not pretend otherwise.
-
-The hard 2 MB upload limit is also correct. We protect the server. But we protect the user's wonder more.
-
-WordPress plugin directory organic discovery is hope, not strategy. We agree on that. But we earn attention by being unforgettably good, not by tattooing our name on the user's work. The portfolio itself is the billboard—but only if it is beautiful enough to share.
-
-## Top 3 Non-Negotiable
-1. **Zero setup wizard.** Import one conversation and see craft in 30 seconds. No theme picker, no settings page first. If the user sees a config panel before magic, we failed.
-2. **Design system ships in V1.** Obsessive typography, sacred white space, dark mode default. "Good enough" is forbidden. One perfect template beats fifty adequate ones. Every pixel is intentional or it is dead.
-3. **No growth-hacking barnacles.** No mandatory badges, no upsell banners, no popups. Brand purity is the distribution strategy. We whisper; we do not shout. If another plugin tries to attach itself to Promptfolio, it should feel like graffiti on marble.
-
-If we ship Elon's "minimum viable," we will be minimum and we will be viable—and we will be utterly forgettable. Greatness is the only option.
+1. **Promptfolio.** One word. Permanent. Identity.
+2. **One-click import.** The product lives or dies in the first thirty seconds.
+3. **Design that elevates prompts to art.** If it does not make someone gasp, it does not ship.
