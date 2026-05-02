@@ -176,7 +176,7 @@ fi
 
 # Test 19: Exit code 0 on success
 echo -n "19. Exit code 0 on success... "
-if grep -q "process.exit(0)" "$PROOF_SCRIPT" || grep -q "process.exitCode = 0" "$PROOF_SCRIPT"; then
+if grep -qE "process\.exit\(0\)|process\.exitCode = 0|process\.exit\(.*\? 0 :" "$PROOF_SCRIPT"; then
     echo "PASS"
 else
     echo "FAIL: Missing process.exit(0)"

@@ -120,7 +120,7 @@ fi
 
 # Test 13: R-PROOF-001 - Proof step has if guard for main
 echo -n "13. R-PROOF-001: Proof step has if guard... "
-if grep -A2 "proof" "$WORKFLOW_FILE" | grep -q "github.ref.*main"; then
+if grep -A2 -i "proof" "$WORKFLOW_FILE" | grep -q "github.ref.*main"; then
     echo "PASS"
 else
     echo "FAIL: Missing if guard for Proof step"
