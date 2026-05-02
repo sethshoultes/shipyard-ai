@@ -1,21 +1,30 @@
-# Round 1 — Elon (CPO)
+# Round 1: First Principles Assessment
 
-## Architecture
-The simplest system is a post-deploy health check. Not a new microservice, not an alerting platform — a single `curl` with retry. If it fails, the deploy fails. That's it. The PRD's bash script is directionally correct but hand-wavy: `wrangler pages project list ... | grep custom-domains` is not a real command. First principles: use the Cloudflare API to list custom domains for the project, then probe each one.
+This is not a product feature. It is a fix for a broken deploy process. Treating it like a roadmap item is how you ship a "Verification Platform" in Q3 instead of fixing the bug today.
 
-## Performance
-Bottleneck is DNS propagation, not compute. A single `curl` without backoff will flake. The 10x path is exponential retry (3x, 5s backoff) not parallel probes. Better yet: CF Pages already tracks custom-domain validation status via API. Query that instead of HTTP from CI — it's the source of truth and avoids DNS cache poisoning on the runner.
+**Architecture**
 
-## Distribution
-This isn't a user-facing feature; it's infrastructure. "Distribution" means every customer deploy runs this by default. If it requires opt-in or per-project config, it won't reach 10,000 sites. Bake it into the shared deploy action/template so no human remembers to enable it.
+The simplest system that works: the deploy script exits non-zero if `curl -sf https://shipyard.company/` fails. Inline. Same process. No microservices, no "post-deploy verification stage," no human QA gate. If the pipeline lacks a hook, fix the pipeline. Do not build a second pipeline around the first.
 
-## What to CUT
-- **Build-ID body matching** — scope creep. Checking status 200 proves DNS and routing are correct. Build-ID injection requires touching every build tool (Vite, Next, etc.) and parsing HTML. v2.
-- **"Few key routes"** — cut. Check `/` only. If the domain is misconfigured, `/` 404s just like `/about`.
-- **Alerting infrastructure** — cut. The deploy should fail loudly in CI. Adding PagerDuty/Slack complexity is a separate project.
+**Performance**
 
-## Technical Feasibility
-Yes, one agent session can build this — but only if we keep it to status checks. The moment we add build-ID extraction and HTML parsing, we need build-system changes across the monorepo. That crosses into multi-session territory. Stick to CF API + curl + retry.
+The bottleneck is DNS propagation and edge-cache poisoning, not CPU. A serial bash loop is 1970s thinking. Parallelize domain checks. Retry with exponential backoff for 60 seconds. The 10x path is querying Cloudflare's own custom-domain status API rather than blind-curling and hoping DNS has converged. Ask the source.
 
-## Scaling
-At 100x usage, a CI runner curling N customer domains serially becomes the bottleneck. 50 domains × 3 retries × 5s = 750s. Also, egress from CI and rate limits on customer origins. Fix: query CF's domain status API in bulk (one authenticated call), or run probes in parallel with a 10s global timeout. What breaks first is the runner, not the sites.
+**Distribution**
+
+Category error. This is not user-facing software. "Distribution" means every customer deployment runs this check by default. That requires no marketing—it requires making the check the default in your deploy template. If it is opt-in, it does not exist.
+
+**What to CUT**
+
+- **Build-ID body grep:** Scope creep. Status 200 is the signal. Injecting build metadata into every page to feed a verification script is v2 theater.
+- **"Key routes" verification:** If `/` 404s, the launch is dead. Check `/`. Done.
+- **`wrangler pages project list` dependency:** Cut. Hardcode the domain or read from `domains.json`. Adding a runtime Cloudflare API call to discover what you already know is fragile, slow, and breaks at API rate limits.
+- **Human owner (Margaret Hamilton):** Cut. Automation owns verification. If a human is the gate, you will have 6-day outages.
+
+**Technical Feasibility**
+
+Yes. One agent session, 20–30 minutes. The code is trivial. The only hard part is choosing the exact hook point in the deploy pipeline.
+
+**Scaling**
+
+At 100x (100 domains, 100 projects), serial curls timeout the pipeline. Parallelize. The real breakage is false negatives: DNS caches the old A record and your check passes because the old server (Vercel) still returns 200. You must validate the response against the expected origin (CF Pages IP/CNAME), not merely HTTP status. Otherwise you verify that *something* is live, not that *your deploy* is live.

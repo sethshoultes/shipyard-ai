@@ -1,28 +1,28 @@
 # Hindsight Report
-**Generated:** 2026-05-02T16:35:15.195Z
+**Generated:** 2026-05-02T18:51:37.999Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 9 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 12 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
-- e96d31f daemon: auto-commit 2 files
-- 1d69029 daemon: auto-commit after build phase for daemon-fix-watcher-skip-loop
-- 438df8e daemon: auto-commit 2 files
-- bb69890 daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-90
-- 5ac87be daemon: auto-commit 2 files
-- bcaf986 Ship github-issue-sethshoultes-shipyard-ai-86: all deliverables + retrospective
-- 73998d4 daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-86
-- f655c8e micromanager: dirty auto-reconcile
-- 6049280 daemon: auto-commit 3 files
-- d69ef28 micromanager: dirty auto-reconcile
+- f2dd523 micromanager: dirty auto-reconcile
+- d996300 daemon: auto-commit 5 files
+- d081a1f daemon: auto-commit 1 files
+- 0d7da11 daemon: auto-commit 3 files
+- 0eb5408 daemon: auto-commit 2 files
+- 2d73012 micromanager: dirty auto-reconcile
+- befb06e daemon: auto-commit 1 files
+- 7874af8 daemon: auto-commit 1 files
+- 40e8202 daemon: auto-commit 1 files
+- 809c9fe daemon: auto-commit 3 files
 
 ## High-Churn Files
-- `.daemon-queue.json` (116 changes)
-- `.planning/sara-blakely-review.md` (85 changes)
+- `.daemon-queue.json` (120 changes)
+- `.planning/sara-blakely-review.md` (86 changes)
 - `.planning/phase-1-plan.md` (51 changes)
 - `.planning/REQUIREMENTS.md` (48 changes)
+- `.great-minds/hindsight-report.md` (33 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
-- `.great-minds/hindsight-report.md` (32 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
 - `HEARTBEAT.md` (13 changes)
@@ -30,8 +30,8 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 9 uncommitted changes.
 - `website/src/app/layout.tsx` (11 changes)
 - `STATUS.md` (11 changes)
 - `website/src/app/work/page.tsx` (11 changes)
-- `plugins/membership/src/index.ts` (9 changes)
-- `rounds/finish-plugins/board-verdict.md` (9 changes)
+- `prds/github-issue-sethshoultes-shipyard-ai-91.md` (10 changes)
+- `prds/github-issue-sethshoultes-shipyard-ai-90.md` (9 changes)
 
 ## Bug-Associated Files
 - `.daemon-queue.json`
@@ -57,15 +57,18 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 9 uncommitted changes.
 
 ## Uncommitted State
 ```
-M .daemon-queue.json
- M .great-minds/hindsight-report.md
- M .planning/sara-blakely-review.md
- M rounds/github-issue-sethshoultes-shipyard-ai-91/decisions.md
- M rounds/github-issue-sethshoultes-shipyard-ai-91/essence.md
- M rounds/github-issue-sethshoultes-shipyard-ai-91/round-1-elon.md
- M rounds/github-issue-sethshoultes-shipyard-ai-91/round-1-steve.md
- M rounds/github-issue-sethshoultes-shipyard-ai-91/round-2-elon.md
- M rounds/github-issue-sethshoultes-shipyard-ai-91/round-2-steve.md
+M .agent-logs/debate/elon-musk-r1-1777747435387.jsonl
+ M .agent-logs/debate/steve-jobs-r1-1777747435378.jsonl
+ M rounds/github-issue-sethshoultes-shipyard-ai-98/essence.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-98/round-1-elon.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-98/round-1-steve.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-98/round-2-steve.md
+?? .agent-logs/debate/elon-musk-r2-1777747561645.jsonl
+?? .agent-logs/debate/phil-jackson-consolidation-1777747744456.jsonl
+?? .agent-logs/debate/rick-rubin-essence-1777747713784.jsonl
+?? .agent-logs/debate/steve-jobs-r2-1777747561635.jsonl
+?? rounds/github-issue-sethshoultes-shipyard-ai-98/decisions.md
+?? rounds/github-issue-sethshoultes-shipyard-ai-98/round-2-elon.md
 ```
 
 ---

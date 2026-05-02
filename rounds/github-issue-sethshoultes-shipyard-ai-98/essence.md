@@ -1,7 +1,6 @@
-Proof that your code lives on the customer's real domain with the right build ID.
+# Essence
 
-Certainty. Swagger at 2 AM. No pit in your stomach.
-
-Truth. Build ID must match via real HTTP. A green lie is worse than an honest red light.
-
-Proof, not promises.
+- Product: Automated confirmation deploy is live, correct origin, right build.
+- Feeling: Lock clicking shut at 2 AM. No pit in stomach.
+- Must be perfect: Cannot lie. Origin validation beats green status code.
+- Direction: Invisible truth.
