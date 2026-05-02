@@ -1,10 +1,12 @@
 # Hindsight Report
-**Generated:** 2026-05-02T01:10:46.508Z
+**Generated:** 2026-05-02T02:17:37.412Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 4 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 6 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- cb75952 daemon: auto-commit 2 files
+- 6ab781a daemon: auto-commit after build phase for standalone-apps-portfolio-v2
 - e8e9a20 daemon: auto-commit 2 files
 - 0f856e5 daemon: auto-commit after build phase for standalone-apps-portfolio
 - 2e88748 daemon: auto-commit 2 files
@@ -13,17 +15,15 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 4 uncommitted changes.
 - c0b0280 daemon: auto-commit 6 files
 - 66a926c daemon: auto-commit 2 files
 - 0358bcf daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-91
-- eaeca82 clipcraft-backend v1: archive hollow deliverable; v2 is canonical
-- 276cf3a daemon: auto-commit 2 files
 
 ## High-Churn Files
 - `.daemon-queue.json` (113 changes)
-- `.planning/sara-blakely-review.md` (80 changes)
+- `.planning/sara-blakely-review.md` (81 changes)
 - `.planning/phase-1-plan.md` (50 changes)
 - `.planning/REQUIREMENTS.md` (47 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
+- `.great-minds/hindsight-report.md` (28 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
-- `.great-minds/hindsight-report.md` (27 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
 - `HEARTBEAT.md` (13 changes)
 - `website/src/app/layout.tsx` (11 changes)
@@ -58,9 +58,11 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 4 uncommitted changes.
 ## Uncommitted State
 ```
 M .great-minds/hindsight-report.md
+ M .planning/REQUIREMENTS.md
+ M .planning/phase-1-plan.md
  M .planning/sara-blakely-review.md
-?? prds/standalone-apps-portfolio-v2.md
-?? rounds/standalone-apps-portfolio-v2/
+?? prds/build-model-canary.md
+?? rounds/build-model-canary/
 ```
 
 ---

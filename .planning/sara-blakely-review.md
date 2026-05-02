@@ -1,17 +1,11 @@
-No one pays for scaffolding. One-and-done tools don't build businesses.
-
-- Would a customer pay? No. CLI scaffolding is free on GitHub. Devs copy-paste. Zero recurring value. Monetize hosting, model switching, or monitoring—not generators.
-
-- Confusing: ANV-001 through ANV-010. "Wave 1.2." "Risk Notes." Corporate kabuki wearing startup jeans. Brand says plainspoken; plan screams IBM.
-
-- Bounce points: Zero screenshots. No live demo. No "try before npm install." Each click kills conversion.
-
-- Elevator pitch: "Anvil scaffolds a streaming AI worker on Cloudflare in one command. Two files. Sixty seconds. No config."
-
-- $0 test: Coffee shop. Find a dev. Watch them run `npx anvil create --llm`. Time it. No grin in 60 seconds? Fix it. Film it. Post on X. Zero blog posts. Zero landing pages. Just video.
-
-- Retention hook: None. User scaffolds once, ghosts forever. Add model hot-swapping. Usage alerts. Cost dashboards. Give them a reason to log in next month.
-
-- Biggest risk: "Zero static templates." Cloudflare changes spec at 2am? Every user breaks. Customers hate surprise breakage. Ship one fallback. Pride is expensive.
-
-- Real question: Where does money come in? If answer is "later," cut scope 50% and find revenue by Week 1.
+- Verdict: No paying customer. Two string functions aren't a product; they're copy-paste code.
+- "Model canary" means nothing to buyer. Immediate bounce.
+- Flat-file + no-README + no docs = hostile to npm user. Looks abandoned.
+- Plan requires 3 hidden docs (decisions.md, REQUIREMENTS.md, hindsight). Gatekeeping confusion.
+- 300-line XML plan for 20 lines of code. Signals bloat, not velocity.
+- Elevator pitch: "Zero-dependency TypeScript string utilities that compile clean and never break." Still wouldn't pay. Lodash exists. AI writes this free.
+- $0 test: Post on X: "Would you npm install a no-README 2-function package?" Crickets = no market.
+- Better $0 test: Use it in a real project. If you reach for lodash instead, product fails.
+- Retention hook: None. No docs, no versions, no community. One and done.
+- If you want retention, solve a real string-parsing pain (URLs, i18n slugs) that lodash misses.
+- Currently: build a blog post about the constraints, not a repo. Content markets better than code here.

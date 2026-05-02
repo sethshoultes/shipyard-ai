@@ -1,0 +1,4 @@
+- Internal diagnostic testing whether AI emits clean, complete code reliably, setting craft floor for every future file.
+- Trust. Cold clean air. Relief that someone gave a damn.
+- 100 identical emissions. Zero hallucinations. Zero TODOs. No empty bodies.
+- Strip to absolute trust.
