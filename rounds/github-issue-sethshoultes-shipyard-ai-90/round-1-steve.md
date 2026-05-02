@@ -1,26 +1,59 @@
-# Steve Jobs — Chief Design & Brand Officer
+# Round 1: Chief Design & Brand Officer — Steve
 
-## Product Naming
-"AgentForge" is dead on arrival. It sounds like a server utility from 2003. The word "Agent" is redundant—it's 2026, everything is an agent. Putting it in the name is like calling a car a "Horseless Carriage."
-
-The name is **Forge.** One word. One syllable. Strong. It means heat, transformation, shaping raw intelligence into something beautiful. iPod wasn't "MP3MusicPlayer." Say it: Forge.
+## Naming
+"AgentForge" is dead on arrival.
+It sounds like a factory floor where robots sweat and sparks fly.
+We don't forge—we orchestrate.
+One word, memorable, human.
+I want a name that evokes a group of brilliant minds working in harmony, not blacksmithing metal.
+Think *Chorus*.
+Think *Relay*.
+Never two words. Never "AgentAnything."
+The name should feel like a proper noun, not a job description.
 
 ## Design Philosophy
-This must feel like a Leica camera crossed with a draftsman's table. The interface disappears. No floating panels. No 1990s "palette everywhere" junk. The workflow *is* the interface—direct manipulation, magnetic connections, infinite canvas. Every button, every line, every shadow must justify its existence or be fired. Insanely great means you can see the beauty in a screenshot.
+Insanely great means the interface disappears.
+No visible "nodes and wires" like some engineer's circuit board porn.
+The canvas is a clean white sheet.
+Agents are cards that breathe.
+They hand off tasks with the elegance of a relay runner passing a baton—no friction, no noise, no exposed gears.
+Every animation has intent.
+Every pixel earns its place.
+If it isn't beautiful, it isn't finished.
 
 ## The First 30 Seconds
-You land on a blank canvas. You drag one block. It snaps alive. You connect a second. The line breathes—literally pulses with light when you hit Run. You don't read a manual. You don't watch a tutorial. You feel the physics, like the first time you flick-scrolled an iPhone. If the user isn't running a two-step workflow inside 60 seconds, we have failed.
+You don't land on a blank canvas.
+Blank canvases are terrifying—staring at infinite whiteness is a designer's arrogance.
+You land on a living, breathing workflow: agents already moving, already talking, already solving.
+You touch one card, change one word, and watch the whole chain react like dominoes falling in silk.
+It’s like picking up a Stradivarius and hearing it sing before you’ve learned sheet music.
+Instant delight. Immediate power.
 
 ## Brand Voice
-Human. Precise. Confident. We do not "leverage synergies" or "empower stakeholders." We speak like a master craftsperson standing beside you. Short sentences. No exclamation points—the product is the excitement. "Drag. Connect. Run." Understated power.
+We don't "leverage multi-agent orchestration to drive efficiencies."
+We speak like humans who actually care.
+"Your team works while you sleep."
+"Ideas become workflows before your coffee gets cold."
+Warm, confident, poetic, slightly rebellious.
+If a sentence could appear in a Microsoft annual report or a Salesforce whitepaper, burn it and rewrite it.
 
-## What We Say NO To
-NO to shipping a WordPress plugin—that anchor drags you into support hell and mediocrity. Pick one canvas and make it sacred.
-NO to freemium complexity. Give them the full instrument for 14 days, then ask for money.
-NO to template marketplaces on day one—crutches for broken UX.
-NO to admin dashboards with 40 toggles.
-NO to dark mode as a priority. Pick one perfect light palette and own it.
-NO to feature checklists. Simplicity means removing, not adding.
+## What to Say NO To
+NO to the WordPress plugin.
+WordPress is a horse cart from 2003; we're building a Ferrari and we won't bolt it to rotting wood.
+NO to dark mode as default—light, airy, optimistic.
+NO to exposed JSON, logs, or "API configuration" screens in the first hour.
+NO to freemium bean-counting.
+"Three workflows free" is small-minded and punishing.
+Give the first taste free, then charge boldly for power.
+NO to node spaghetti.
+NO to tooltips that explain bad design.
+Remove everything that isn't essential.
+Simplicity is the ultimate sophistication.
 
-## Emotional Hook
-People will love this because it makes them feel like a conductor. Five chaotic AIs become a single, perfect chord at the wave of their hand. We are not selling automation; we are selling *creative superpower*. The hook is this: "You are the conductor of infinite talent." That feeling—going from "I can't code" to "I orchestrated genius before lunch"—is addictive.
+## The Emotional Hook
+People will love this because it makes them feel like a conductor standing before a symphony they built.
+Yesterday they couldn't code.
+Today they command intelligent labor at scale.
+That feeling—going from powerless to orchestrator—is addictive.
+This isn't software. This is a bicycle for the orchestrational mind.
+Once they feel that rush, they'll never go back to Zapier.
