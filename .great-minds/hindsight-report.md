@@ -1,10 +1,13 @@
 # Hindsight Report
-**Generated:** 2026-05-01T09:13:20.066Z
+**Generated:** 2026-05-02T00:22:06.890Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 7 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 4 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- 2e88748 daemon: auto-commit 2 files
+- cc897a9 Ship prd-agentbridge-wordpress-mcp-server: all deliverables + retrospective
+- f622baf daemon: auto-commit after build phase for prd-agentbridge-wordpress-mcp-server
 - c0b0280 daemon: auto-commit 6 files
 - 66a926c daemon: auto-commit 2 files
 - 0358bcf daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-91
@@ -12,18 +15,15 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 7 uncommitted changes.
 - 276cf3a daemon: auto-commit 2 files
 - b8908ad Ship localgenius-frontend-and-benchmark-engine: all deliverables + retrospective
 - 4fc6b3f Replace placeholder business URL with live WordPress site URL
-- a17c848 daemon: auto-commit after build phase for localgenius-frontend-and-benchmark-engine
-- a7bc3bc daemon: auto-commit 2 files
-- 4b764c9 daemon: auto-commit after build phase for shipyard-auto-pipeline-and-care-subscription
 
 ## High-Churn Files
 - `.daemon-queue.json` (113 changes)
-- `.planning/sara-blakely-review.md` (78 changes)
+- `.planning/sara-blakely-review.md` (79 changes)
 - `.planning/phase-1-plan.md` (50 changes)
 - `.planning/REQUIREMENTS.md` (47 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
-- `.great-minds/hindsight-report.md` (25 changes)
+- `.great-minds/hindsight-report.md` (26 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
 - `HEARTBEAT.md` (13 changes)
 - `website/src/app/layout.tsx` (11 changes)
@@ -59,11 +59,8 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 7 uncommitted changes.
 ```
 M .great-minds/hindsight-report.md
  M .planning/sara-blakely-review.md
-?? dreams/dream-2026-05-01T08-5-elon.md
-?? dreams/dream-2026-05-01T08-5-steve.md
-?? dreams/dream-2026-05-01T08-5-votes.md
-?? prds/prd-agentbridge-wordpress-mcp-server.md
-?? rounds/prd-agentbridge-wordpress-mcp-server/
+?? prds/standalone-apps-portfolio.md
+?? rounds/standalone-apps-portfolio/
 ```
 
 ---

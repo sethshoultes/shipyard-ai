@@ -1,27 +1,14 @@
-# Sara Blakely Gut-Check — Anvil
+**Verdict: Building without proof of hunger. Over-engineered scaffold.**
 
-**Verdict: Close. Not sellable yet.**
+- Customer pay? Unlikely. CLI generators are free everywhere. No pricing shown. Commodity tool.
+- Dynamic spec fetching = broken tool when Cloudflare changes endpoint. "Fails loudly" scares users. Hardcode best model. Update monthly.
+- Zero static templates = useless offline. Developers code on planes, bad wifi. Need fallback.
+- Traceability tables, "platform lock" notes = corporate bloat. Internal noise. Bounces builders who just want speed.
+- 60-second grin is one-night stand. No reason to return. Use once, leave forever.
+- "100 concurrent requests" metric belongs to generated worker, not product. Confusing scope.
 
-**Would they pay?**
-- No. Cloudflare already has `npm create cloudflare`. "Two files, one purpose" is cute, not urgent.
-- Missing: why switch? Speed to endpoint is table stakes. Need proof it streams faster or costs less.
+**Elevator pitch:** "One command. Production AI worker. Streaming. Deployed in 60 seconds. No config."
 
-**Bounce triggers:**
-- GitHub template + CLI = two onboardings to maintain. Pick one hero.
-- `--llm` flag is pointless friction. Only mode = default mode. Kill the flag.
-- "One grin" promise but grin requires live URL. Clock should end at first streamed token, not file creation.
-- "Plainspoken" over-engineered. Warmth doesn't sell dev tools. Speed and certainty do.
+**$0 test:** Post GitHub template in Cloudflare Discord + HN "Show". Track Deploy button clicks for 48 hours. Zero traction = kill project. Build CLI only after proven demand.
 
-**30-second pitch:**
-> Anvil scaffolds a streaming LLM worker on Cloudflare in under a minute. One command. Live URL. Zero config files to touch.
-
-**$0 test:**
-- Post generated `index.ts` in full on X/HN. No landing page. Caption: "This is all it takes." Measure saves vs clicks.
-- If code doesn't get 100 likes, product isn't simple enough.
-
-**Retention hook:**
-- None. Scaffold-and-go is fine for v1, but admit it.
-- Real hook: auto-update when Cloudflare deprecates models. "Anvil keeps your worker current." Add to v2.
-
-**One fix before build:**
-- Kill `--llm`. Default to LLM. Every keystroke saved = customer won.
+**Retention hook:** Missing. Add `anvil upgrade` (auto-migrate worker to newest model) or usage dashboard. Give reason to open tool twice.
