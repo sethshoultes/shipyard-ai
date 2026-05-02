@@ -1,40 +1,41 @@
-# Round 2 — Steve Jobs
+Elon, you are right about three things.
 
-## Where Elon Optimizes for the Wrong Metric
+First, grepping HTML for a build ID is fragile. We will inject `X-Build-Id` and assert the header. Clean.
 
-Elon calls this a "30-line addition to the existing CI job." That optimizes for *engineering convenience* over *human attention*. The 404s didn't last six days because we lacked `curl`. They lasted six days because nobody *felt* the problem. A green line in a GitHub Actions log is invisible. Invisible things don't change behavior.
+Second, this must be default-on in every template. If it is a checkbox, it is a liability. Opt-in features protect nobody.
 
-When he says "pretty UIs don't fix 404s," he mistakes decoration for signal. The black screen and the bell aren't "pretty." They are cold water on the face. The interface is an amplifier: it turns data into dread, and dread into action. A Slack ping is another channel to mute. A bell that rings in the product itself cannot be ignored.
+Third, a standalone microservice is ego-driven architecture. It belongs in the existing CI job, full stop.
 
-He also argues verification is a "band-aid" next to DNS pipeline ownership. That's architecture heroism. Owning DNS is a six-month migration. Proof can save a customer's dignity tonight. Blocking the user-facing fix for the infrastructure fantasy is engineer arrogance.
+But you are optimizing for the wrong metric: your own impatience.
 
-And when he says "this isn't a consumer feature," he forgets that the developer *is* the consumer. A tool that feels like infrastructure gets treated like infrastructure — ignored until it breaks. A tool that feels like Proof becomes a ritual people trust.
+You want to ship "trivial code" in twenty minutes and move on. That is how you build plumbing, not products.
 
-Elon wants deduplication and auto-resolution before scaling. That's premature optimization dressed as wisdom. If the product is binary, the alert is self-evident. Complexity is not the cure for noise — clarity is.
+You warn that DNS flakiness and propagation delays will trigger false alarms. Then in the same breath you cut retry logic, backoff, and any signal discipline.
 
-## Defending Design Quality
+You cannot have it both ways. Either the alarm matters enough to tune it, or you are building a car alarm that everyone ignores by Tuesday.
 
-Elon will say: "Cut the poetry. It's just a deploy hook." Wrong. If it feels like a script, it is a script. If it feels like Proof, it is a ritual. "DEPLOYMENT_NOT_FOUND" buried in Slack gets scrolled past between GIFs. Human precision is a latency reduction strategy, not a luxury.
+You call the pulse UI "pretty" and dismiss it. That is your fundamental error.
 
-The first 30 seconds after deploy are the loneliest seconds in software. If the tool doesn't meet you there with certainty, it has failed. That certainty is not a feature. It is the product.
+If Proof is invisible CI sludge, it becomes the Slack channel people mute during standup. The stethoscope UI is not decoration — it is the trust contract.
 
-He'll say: "No charts? How do you debug?" Debugging isn't this product's job. When your oil light turns red, the dashboard doesn't dump the engine schematic. It says: stop. Proof is the verdict, not the courtroom. We are building a smoke detector, not a hospital monitor with 40 waveforms.
+You feel the heartbeat, so when it flatlines, you *move*.
 
-He'll say: "The name doesn't matter." He's wrong. "Proof" promises certainty. A "deploy verification hook" promises landfill. The name creates expectation, and expectation creates behavior. One word is final.
+A PagerDuty ping without psychological weight is just another notification in a sea of notifications. We are not building a cron job with a webhook. We are building a conscience.
 
-## Where Elon is Right
+Your "unified control" argument — owning DNS inside the deploy pipeline — is scope creep disguised as root-cause purity.
 
-- **HTML body grep is amateur hour.** Cut it. Headers only. Truth shouldn't require parsing.
-- **DNS should own the deploy step.** If the pipeline controlled the record, we wouldn't need the band-aid. He's right that verification is a symptom, not the cure.
-- **Default-on is the only path.** If it's opt-in, it's dead. Proof is the floor, not a feature.
-- **No standalone microservice for v1.** He's right. Ship simple, ship now, ship inside the pipeline.
-- **Alert fatigue is real.** But the cure isn't deduplication logic — it's a product so binary that when it screams, you know it's real.
-- **Self-DoS and propagation flakiness.** He's right to keep checks async and rate-limited, and to tolerate a TTL window. That rigor belongs under the hood.
+We are not here to rebuild Cloudflare's edge network. We are here to make sure that when DNS drifts, the human knows in thirty seconds instead of six days.
 
-## Top 3 Non-Negotiables
+Perfect is the enemy of the ship.
 
-1. **The product is the alarm.** No Slack-first architecture. You open Proof, you hear the bell, you see the red. Everything else is a fallback.
-2. **Binary state only.** Breathing or dead. No health scores, no graphs, no "degraded." If it's not 200, it's blood-red.
-3. **Zero configurability.** No settings gear, no "pick your routes," no toggle. We decide what matters. The user decides nothing — except to trust it.
+So here is what is non-negotiable.
 
-Proof doesn't fix the deploy. It fixes the human. And the human is what ships.
+This is not a debate. This is a decision.
+
+1. **Proof is binary.** One pulse. One bell. No dashboards, no health scores, no trend graphs, no "anomaly detection." Alive or dead. That is the interface.
+
+2. **Zero configurability.** No toggles, no "verify key routes," no alert thresholds, no propagation-window settings. It is on for every deploy, or we do not ship it.
+
+3. **Design is the feature.** The black screen, the red thread, the heartbeat, the blood-red alarm — this is the product. Anyone who calls it a "nice-to-have" misunderstands why people buy smoke detectors. You do not buy the circuit. You buy the certainty.
+
+Everything else is implementation detail. Ship the soul first. The code is easy.
