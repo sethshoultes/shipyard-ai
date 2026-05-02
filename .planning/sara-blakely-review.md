@@ -1,33 +1,17 @@
-# Sara Blakely Gut-Check — Phase 1 Plan
+Verdict: useful insurance, buried in process bloat.
 
-- Verdict: solves real pain. 6-day silent 404s cost trust. Worth building.
-- But over-wrapped. 100-line script buried in XML task plans and 14 requirement IDs. Engineer reading this would bounce before line 20.
+- Customer pay? No. Internal tool, not product. Value = one prevented 2 AM outage.
 
-## Would a real customer pay?
-- Yes — in avoided embarrassment.
-- Customer here is operator/team. One caught misconfiguration pays for itself in hours saved + reputation.
-- Not a revenue product. Internal insurance. Price = engineering time.
+- Confusing / bounce:
+  - 4 tasks, 3 waves, 14 requirement IDs for DNS + HTTP check. Bureaucracy blanket.
+  - "Parallel-ready architecture" for one domain. Pretentious.
+  - XML task-plan format makes simple script look like government contract.
+  - Note at bottom: "spawn haiku sub-agent as Sara Blakely." Navel-gazing.
 
-## What's confusing / bounce-worthy
-- "Proof" tells me nothing. Name is jargon.
-- PRD promises build-ID body grep; plan silently drops it via decisions.md override. Mismatch will confuse QA Margaret later.
-- `routes` array in domains.json is dead weight for v1. Feels like pretending to be future-proof instead of shipping tight.
-- Wave/task-plan XML format is ceremony. Makes simple script look like enterprise procurement.
-- "Margaret Hamilton (QA) — owner" but script is automated. Who owns what? Unclear.
+- Elevator pitch: "After every deploy, Proof checks your domain actually lives on Cloudflare and loads. If not, pipeline fails in plain English before customers notice."
 
-## 30-Second Elevator Pitch
-- "After every deploy, Proof checks your custom domain actually points at Cloudflare and returns 200. If not, deploy fails instantly with one plain sentence. No more silent 404s for six days."
+- $0 test: Break DNS on next real deploy. Intentionally point domain wrong. See if Proof catches it and stops pipeline. Screenshot one-sentence failure. Post in team channel. Engineers trust pain, not pitches.
 
-## $0 Marketing Budget — First Test
-- Wait for next deploy. If DNS breaks, screenshot the one-sentence failure. Post in team channel.
-- Engineers trust pain, not pitches. One real catch > any demo.
-- Second test: hand script to newest engineer. If they run it locally in under 60 seconds, messaging is clear. If not, fix docs.
+- Retention hook: Fear. First caught outage creates scar tissue. Team never turns it off. Risk: if silent 30 days, ripped out as noise.
 
-## Retention Hook
-- Emotional scar tissue. First time it prevents a customer-facing 404, team will never turn it off.
-- Default-on helps, but memory of last humiliation is the real lock-in.
-- Risk: if it never catches anything real for 30 days, team forgets it exists and rips it out as "noise."
-
-## Bottom Line
-- Build it. Strip the wrappers. Cut the XML plans, cut `routes`, cut the 14 requirement IDs in daily use.
-- One script. One config file. One sentence on failure. Ship.
+- Bottom line: Ship smaller. One script. One config. One workflow edit. Three commits. Less planning, more deploying.
