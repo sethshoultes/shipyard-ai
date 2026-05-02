@@ -1,36 +1,35 @@
-# Steve's Positions: Standalone Apps Portfolio v2
+# Round 1 — Steve Jobs, Chief Design & Brand Officer
 
 ## Product Naming
-Tuned. That's a name. One word. Musical. It lands in your ear and stays there.
-Promptfolio. I can live with it — it teaches you what it does in two syllables. Clever is acceptable when it's also clear.
-Commandbar. That's not a name. It's a description of a UI element. If we ship it, we own it — but never again.
-Names are destiny. One word if possible. Two if necessary. Three is a committee, and committees build beige.
+
+**Tuned** is perfect. One word. Musical. Precise. It implies someone cared enough to calibrate.
+**Promptfolio** is a compromise — two concepts welded together with a blowtorch. It tells instead of sings. We ship it, but we do not love it.
+**CommandBar** is descriptive oatmeal. It says what it does and nothing more. Functional, not memorable. Acceptable for a shipped utility; unacceptable for a product with soul.
+
+The rule: if you cannot whisper the name in a crowded bar and have someone ask "what's that?" two minutes later, the name is dead.
 
 ## Design Philosophy
-This must feel like walking into a gallery, not a trade show.
-No gradients. No pulses. No theater. The locked decision from v1 was correct — restraint *is* the feature.
-When you remove the noise, what remains is truth. Each card is an object with weight, like matte paper on a white gallery wall. You don't decorate great work. You frame it. You let the light hit it just so.
 
-## User Experience — The First 30 Seconds
-In 30 seconds, a visitor must know exactly three things: we ship, we're honest, and we don't waste your time.
-They land on /work. Three apps. Status badges that tell the truth — SHIPPED, BUILD, SCAFFOLD. No mystery. No fog.
-Click one. One breath. Name. Tagline. What it does. How we built it. A door to GitHub.
-If it takes longer than a heartbeat to understand, we have designed a maze instead of a door.
+No gradients, no pulses, no theater — Elon won that fight, and I will sleep peacefully. The restraint is the design. Think of a Leica M6: no chrome flourishes, no LCD screen crying for attention, just aperture, shutter speed, and the decisive moment. Every pixel here must earn its rent. Typography is the image. Whitespace is the chorus. The absence of decoration is not austerity — it is arrogance, the good kind. We are so confident in the work that we refuse to dress it up.
+
+## User Experience (The First 30 Seconds)
+
+A user lands on `/work` and knows three things instantly: what we built, how real it is, and where to touch it. No hero video. No "empowering creators" manifesto. The page loads in 80 milliseconds and feels like a library card catalog machined from aluminum — cool to the touch, utterly legible, no ambiguity. You scan, you see a `SCAFFOLD` badge next to an honest label, and you trust us more because we admitted it. Trust is the only currency that compounds.
 
 ## Brand Voice
-We don't sell. We show.
-The copy is a confident whisper, not a billboard. No "revolutionary." No "AI-powered." No superlatives.
-We say exactly what the code does, because the code is the superlative.
-If you have to tell someone you're innovative, you're not. The work speaks, or we are silent.
+
+We speak like craftsmen at the bench, not SaaS marketers at a webinar. Short sentences. No "leveraging AI to drive synergy." No "unlock your potential." We say: "Tuned is a CLI that measures prompt latency." Period. The product is the prose. If the sentence would fit on a Kickstarter page with a video of someone staring wistfully out a window, burn it.
 
 ## What to Say NO To
-NO to search. NO to filters. If you need a search bar to find our work, we have built too much garbage and not enough gold.
-NO to "coming soon" — it's a lie dressed as optimism. SCAFFOLD is honest. Use it proudly.
-NO to screenshots of apps that don't exist yet. A photo of a dream is a lie.
-NO to the other four apps until these three are perfect. Simplicity is not the absence of clutter. It is the presence of only what matters.
+
+NO search bars for seven items. If you need search, you have already failed at curation.
+NO "Coming Soon" badges. They are the sweat stains of insecurity.
+NO filter chips, no category pills, no animated counters spinning up to "12 projects."
+NO screenshots inside browser chrome mockups. A scaffold in a pretty frame is still a scaffold.
+NO demo links that 404. A dead link is a broken promise, and broken promises are the only thing people remember forever.
+
+Simplicity is not the art of adding white space. It is the discipline of removing everything that is not the truth.
 
 ## The Emotional Hook
-People don't fall in love with portfolios. They fall in love with proof.
-The hook is radical credibility. You look at this page and you feel it in your gut: *these people are relentless.*
-They build in public. They label their scars. They ship when it's hard and say "scaffold" when it's early.
-Trust is the only emotion that matters. Everything else is decoration. And decoration is the enemy of great.
+
+People will love this because it is the first portfolio that refuses to lie. In an industry drunk on vaporware, we label our unfinished work `SCAFFOLD` with the same pride we label our shipped work `SHIPPED`. That honesty is magnetic. It is the equivalent of showing the movement through the sapphire crystal caseback of a watch — we are not hiding the mechanics. We are saying: *look, this is how it works, this is where it lives, and if it is not done yet, we will not pretend it is.* That radical transparency creates advocacy. People do not just bookmark honest portfolios. They send them to friends at 1 AM with a note that says "finally, someone gets it."
