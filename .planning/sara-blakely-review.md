@@ -1,14 +1,17 @@
-**Verdict: Building without proof of hunger. Over-engineered scaffold.**
+No one pays for scaffolding. One-and-done tools don't build businesses.
 
-- Customer pay? Unlikely. CLI generators are free everywhere. No pricing shown. Commodity tool.
-- Dynamic spec fetching = broken tool when Cloudflare changes endpoint. "Fails loudly" scares users. Hardcode best model. Update monthly.
-- Zero static templates = useless offline. Developers code on planes, bad wifi. Need fallback.
-- Traceability tables, "platform lock" notes = corporate bloat. Internal noise. Bounces builders who just want speed.
-- 60-second grin is one-night stand. No reason to return. Use once, leave forever.
-- "100 concurrent requests" metric belongs to generated worker, not product. Confusing scope.
+- Would a customer pay? No. CLI scaffolding is free on GitHub. Devs copy-paste. Zero recurring value. Monetize hosting, model switching, or monitoring—not generators.
 
-**Elevator pitch:** "One command. Production AI worker. Streaming. Deployed in 60 seconds. No config."
+- Confusing: ANV-001 through ANV-010. "Wave 1.2." "Risk Notes." Corporate kabuki wearing startup jeans. Brand says plainspoken; plan screams IBM.
 
-**$0 test:** Post GitHub template in Cloudflare Discord + HN "Show". Track Deploy button clicks for 48 hours. Zero traction = kill project. Build CLI only after proven demand.
+- Bounce points: Zero screenshots. No live demo. No "try before npm install." Each click kills conversion.
 
-**Retention hook:** Missing. Add `anvil upgrade` (auto-migrate worker to newest model) or usage dashboard. Give reason to open tool twice.
+- Elevator pitch: "Anvil scaffolds a streaming AI worker on Cloudflare in one command. Two files. Sixty seconds. No config."
+
+- $0 test: Coffee shop. Find a dev. Watch them run `npx anvil create --llm`. Time it. No grin in 60 seconds? Fix it. Film it. Post on X. Zero blog posts. Zero landing pages. Just video.
+
+- Retention hook: None. User scaffolds once, ghosts forever. Add model hot-swapping. Usage alerts. Cost dashboards. Give them a reason to log in next month.
+
+- Biggest risk: "Zero static templates." Cloudflare changes spec at 2am? Every user breaks. Customers hate surprise breakage. Ship one fallback. Pride is expensive.
+
+- Real question: Where does money come in? If answer is "later," cut scope 50% and find revenue by Week 1.

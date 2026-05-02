@@ -1,10 +1,12 @@
 # Hindsight Report
-**Generated:** 2026-05-02T00:22:06.890Z
+**Generated:** 2026-05-02T01:10:46.508Z
 
 ## Summary
 Risk: HIGH. 15 high-churn files, 20 bug-associated files, 4 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- e8e9a20 daemon: auto-commit 2 files
+- 0f856e5 daemon: auto-commit after build phase for standalone-apps-portfolio
 - 2e88748 daemon: auto-commit 2 files
 - cc897a9 Ship prd-agentbridge-wordpress-mcp-server: all deliverables + retrospective
 - f622baf daemon: auto-commit after build phase for prd-agentbridge-wordpress-mcp-server
@@ -13,17 +15,15 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 4 uncommitted changes.
 - 0358bcf daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-91
 - eaeca82 clipcraft-backend v1: archive hollow deliverable; v2 is canonical
 - 276cf3a daemon: auto-commit 2 files
-- b8908ad Ship localgenius-frontend-and-benchmark-engine: all deliverables + retrospective
-- 4fc6b3f Replace placeholder business URL with live WordPress site URL
 
 ## High-Churn Files
 - `.daemon-queue.json` (113 changes)
-- `.planning/sara-blakely-review.md` (79 changes)
+- `.planning/sara-blakely-review.md` (80 changes)
 - `.planning/phase-1-plan.md` (50 changes)
 - `.planning/REQUIREMENTS.md` (47 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
-- `.great-minds/hindsight-report.md` (26 changes)
+- `.great-minds/hindsight-report.md` (27 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
 - `HEARTBEAT.md` (13 changes)
 - `website/src/app/layout.tsx` (11 changes)
@@ -59,8 +59,8 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 4 uncommitted changes.
 ```
 M .great-minds/hindsight-report.md
  M .planning/sara-blakely-review.md
-?? prds/standalone-apps-portfolio.md
-?? rounds/standalone-apps-portfolio/
+?? prds/standalone-apps-portfolio-v2.md
+?? rounds/standalone-apps-portfolio-v2/
 ```
 
 ---
