@@ -1,5 +1,6 @@
-Aura turns Claude exports into a single beautiful URL.
+Promptfolio turns Claude exports into art.
 
-- Feeling: Pride. Craft, not chat logs.
-- Must be perfect: 30-second resurrection. Upload to breathtaking. No setup. No settings. Just magic.
-- Direction: Sacred dark gallery. One frame.
+- Product is: resurrection. buried threads become gallery.
+- Feeling: pride. obsession. not utility.
+- Must be perfect: 30 seconds. upload to breathtaking. zero knobs.
+- Direction: sacred dark gallery. one frame.
