@@ -1,5 +1,5 @@
-Promptfolio resurrects dead prompt threads into living legacy.
+Aura turns Claude exports into instant, shareable art — one upload, one URL, zero knobs.
 
-- Feeling: Pride. Breath catching. Forgotten work, hung on wall.
-- Must be perfect: One template. Sacred whitespace. Typography cuts. No knobs.
-- Direction: Midnight gallery, sacred whitespace.
+- Feeling: Pride. Your prompts look like craft, not chat logs.
+- Must be perfect: 30-second resurrection. Upload to breathtaking. No setup. No settings. Just magic.
+- Direction: Sacred whitespace. Dark gallery. One template.

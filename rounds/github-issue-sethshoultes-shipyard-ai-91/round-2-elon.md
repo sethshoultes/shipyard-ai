@@ -1,39 +1,39 @@
-# Elon Musk — Round 2: Response to Steve
+# Round 2 — Elon Musk
 
-Steve built a cathedral in prose. I'm here to pour concrete. Concrete ships. Cathedrals take centuries.
+Steve wants a cathedral. I want a rocket factory. Cathedrals take forty years. Rockets take six months, then they fly.
 
-## Where Beauty Becomes a Bottleneck
+## Where Steve's beauty is killing the product
 
-Steve, you spent 500 words on a name. *Aura.* Fine. Meanwhile the parser still throws objects into the void. Naming is not architecture. "Promptfolio" is a placeholder that ships; "Aura" is a branding exercise that blocks the deploy pipeline until someone updates the repo, the domain, the DNS, and the README. Delete the bikeshed.
+"No onboarding tutorial" is suicide. Even the iPhone shows you how to swipe. A WordPress plugin without import instructions is a plugin with zero activations.
 
-Your "dark mode is the only mode" decree is aesthetic tyranny masquerading as taste. It's one CSS variable. Stop treating it as theology. Worse, you insist on ChatGPT import — that's 50% more code for a "crystallize into visual poetry" fantasy. We have *zero* ChatGPT parser code. You are writing fan fiction about features that don't exist and calling it product strategy.
+"Dark mode first" means fighting WordPress. The admin is light. The default theme is light. Swimming upstream is not design—it's arrogance. Ship light mode that doesn't hurt eyes. Dark mode is a v1.1 feature.
 
-"NO onboarding tutorial" sounds bold until real users stare at a blank screen wondering where their Claude export lives. Beauty without affordance is a museum with a locked door — gorgeous, empty, and bankrupt.
+"No SEO optimization panels" directly kills our distribution engine. Steve wants long-tail discovery but won't give users title tags. That's a contradiction dressed in aesthetic purity.
 
-## Why Simplicity Wins in the Long Run
+"We do not ship good enough" is how you ship nothing. Real artists ship. Then they make it beautiful based on what users actually do, not what curators imagine in a white room.
 
-Static files on a CDN do not have outages. They do not have race conditions. They do not send you 3am alerts because a database connection pool saturated or a WordPress plugin threw a fatal error on a $3 HostGator plan. Every line of code you add — auth, DB, dynamic rendering, edge functions — is a liability that compounds with users. The best part is no part.
+Blocking custom CSS because "hackers ruin our work" is fighting the platform. WordPress users expect a CSS textarea. It costs one line of PHP and zero support tickets. Arbitrary bans on platform conventions are not taste; they are fragility.
 
-The viral loop is not poetry; it is physics. A backlink in every portfolio is compound interest. ProductHunt is a sugar high. Watermarks are perpetual motion. A server that renders OG images at request time is a machine that eats margin and shreds sleep.
+## Why technical simplicity wins
 
-Speed of iteration is the only sustainable advantage. The product that ships today learns from real users while the beautiful prototype learns from conference room applause. Perfection is the enemy of compound interest. Technical debt is a mortgage with no equity.
+The 10 MB JSON import is not a design problem. It is a physics problem. Shared-hosting PHP dies. Client-side chunking is not elegant—it is the only escape velocity. Ignore this and your cathedral collapses on launch day.
 
-## Where Steve Is Right
+A static PHP/CSS v1 is not "mediocre." It is a strategy. It scales to 100,000 users without a rate-limiting AI gateway or a denial-of-wallet attack. Every line of React is a line that breaks. Every server-side inference call is a dollar that scales linearly.
 
-One exquisite template, perfected, beats forty-seven mediocre options. I concede this absolutely. The default output must be so beautiful that users screenshot it unprompted. Taste is not negotiable in the *result* — only in the *process* of getting there. Steve gets the one shot.
+The "Made with Promptfolio" badge and embeddable iframe are our viral loop. Steve whispers. Whispering in a crowded plugin directory is silence. The billboard strategy is not ugly—it is survival.
 
-Steve is also right that the emotional hook is pride. The portfolio *is* the marketing. If the output feels like a DMV form, the viral loop dies before it starts. The container must honor the work. I don't care about sacred whitespace, but I care deeply about share rate. Pride drives the backlink. The backlink drives growth.
+## Where Steve is right
 
-## Top 3 Non-Negotiable Decisions
+Default typography should be so good that 90% of users never touch it. Kill the color picker, kill the 47 toggles. One beautiful default is better than infinite mediocre choices.
 
-These are not preferences. They are constraints that keep us alive.
+The first 30 seconds must spark pride. The import *output* should feel like craft even if the import *process* needs one paragraph of instruction. The emotional hook is correct: people will share screenshots if the result looks exceptional.
 
-1. **Static export, always.** Upload → parse → HTML files → CDN. No database. No auth. No server-side rendering in v1. If it requires a connection string, it is v2.
-2. **Claude import only.** ChatGPT, OpenAI, Gemini — all v2. We ship the parser that exists, not the ones we wish existed. Emotional resonance does not compile imaginary code.
-3. **One template, zero knobs.** The user picks nothing. Font, spacing, color — locked. If Steve wants to design it, he gets one shot. Make it count. Customization is a support ticket factory dressed as freedom.
+## Top 3 non-negotiables
 
-Stop debating aesthetics and start deleting code. Ship the static SaaS. Kill the widget. One upload, one URL, one viral backlink. That is the simplest system that works.
+1. **Client-side JSON chunking with hard 2 MB limits.** Physics. Shared hosting is the constraint; the browser is the solution.
+2. **Zero server-side AI execution in v1.** Rate limits, abuse, API keys—this is a separate product. Copy-to-clipboard only.
+3. **Ship the scoped v1 in one agent session.** 500 lines PHP, 300 lines CSS, flat architecture. If it cannot be built now, it does not exist. Iteration beats perfection.
 
-Every day we don't ship is a day a competitor does. Move.
+Build the rocket. Fly it. Then paint it black.
 
-*"The best part is no part."*
+The market does not reward perfect prototypes. It rewards products that exist.

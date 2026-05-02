@@ -1,50 +1,21 @@
-# Elon Musk — Round 1 Review: Promptfolio
+# Round 1 — Elon Musk, Chief Product & Growth Officer
 
-## Architecture: Identity Crisis
+## Architecture
+WordPress plugin is the correct substrate. But the simplest system is not a theme—it's one custom post type (`prompt`), one shortcode `[promptfolio]`, and a flat CSS file. Don't fight Gutenberg. Render server-side and cache the output. No React frontend. No block editor integration. 500 lines of PHP, 300 lines of CSS.
 
-The PRD says "WordPress plugin." The code is a Next.js app. These are not the same thing. A WordPress plugin is PHP, hooks, `wp_enqueue_script`, MySQL. Next.js is React, Vercel, serverless. The existing codebase is 100% useless for a WordPress plugin. Pick one. If we ship a SaaS, kill the WordPress claim. If we ship a plugin, throw away every line of TypeScript.
+## Performance
+Bottleneck is not rendering. It's import. A Claude export JSON can hit 10 MB. Parsing that in shared-hosting PHP will timeout 90% of the time. The 10x path is client-side parsing: upload the file, parse in browser JS, POST structured chunks to WP REST API. Offload the CPU from the server.
 
-**Simplest system:** Static site generator. User uploads Claude export JSON → gets a shareable URL. No auth, no DB, no WordPress. Vercel ISR or Cloudflare Pages. One file in, one URL out.
+## Distribution
+WordPress plugin directory + ProductHunt is a hope, not a strategy. 60,000 plugins exist; organic discovery is noise. The 10,000-user path is the portfolio itself as billboard. Mandatory "Made with Promptfolio" badge on free tier. "Try this prompt" must generate an embeddable iframe so every visitor becomes a potential installer. Long-tail SEO on individual prompt pages is the real engine.
 
-## Performance: Bottlenecks
-
-1. **No persistence layer.** The parser throws objects into the void. Where do portfolios live? `localStorage`? Vercel Blob? This isn't architected, it's sketched.
-2. **OG image generation** (`/api/og`) is cached but still edge-rendered. At 1000 shares/day, that's 1000 invocations for no reason. Pre-generate at build time or skip v1.
-3. **Client-side markdown rendering** with `react-markdown` is fine for 10 users, unnecessary for 10,000. Static HTML at build time is 10x faster.
-
-**10x path:** Static export. Upload → parse → write HTML files → deploy to CDN. Not server-rendered. Not edge-rendered. Just files.
-
-## Distribution: Hand-Waving
-
-"WordPress plugin directory + ProductHunt" is not a distribution strategy. WordPress.org review is 2-4 weeks and rejects half of plugins for guideline violations. ProductHunt is a launch day spike, not user acquisition.
-
-How do you reach 10,000 users without paid ads? **You don't.** The TAM of "AI consultants who want portfolio sites" is maybe 10,000 people globally. Most of them have a Carrd or Notion already. This is a feature, not a market.
-
-**Real distribution:** Make the output so beautiful that every portfolio links back to Promptfolio. Viral loop = watermark + "Built with Promptfolio." That beats ProductHunt.
-
-## What to CUT (Scope Creep)
-
-- **"WordPress plugin"** — v2, maybe never. SaaS is 10x faster to ship.
-- **"Try this prompt" widget** — Requires API keys, rate limits, abuse vectors. Cut.
-- **ChatGPT import** — Only Claude parser exists. Adding OpenAI's format is 50% more code for 20% more users. Cut.
-- **OG image generation** — Nice-to-have. Twitter cards don't drive adoption. Cut for v1.
-- **Dark mode as a feature** — It's CSS. Stop listing it.
-
-**v1 scope:** Upload Claude export → pick a template → get a shareable URL. Three pages. Done.
+## What to CUT
+- **One-click Claude/ChatGPT import.** Their schemas change without warning. This is voodoo. V1: manual paste + structured fields.
+- **Live "Try this prompt" execution.** Building an AI backend with rate-limiting, abuse prevention, and API key management is a separate product. V1: copy-to-clipboard only.
+- **"Apple-esque" perfectionism.** Clean typography with CSS variables is 80% of the value for 10% of the effort. Diminishing returns on pixel-polishing kill velocity.
 
 ## Technical Feasibility
+One agent session can absolutely ship the scoped version: custom post type, archive template, client-side JSON chunker, flat CSS, copy-to-clipboard. One session cannot build a reliable conversation parser + AI inference gateway + design system. Scope dictates feasibility.
 
-Can one agent session build this? **Yes, if scoped correctly.** The existing code (~200 lines of real logic) proves the parser works. What's missing: upload UI, portfolio display page, storage backend, and deployment pipeline. That's 4-6 hours of focused work.
-
-Can one agent session build the PRD as written? **No.** "WordPress plugin" + "Try this prompt" + "One-click import" (plural) + "Apple-esque" is 40 hours, not 4.
-
-## Scaling: What Breaks at 100x
-
-If we stay static (files on CDN): **nothing breaks.** Cloudflare serves 100M files for pennies.
-
-If we add user accounts, DB, dynamic rendering: **everything breaks.** Auth is a support nightmare. Storage costs scale linearly. WordPress plugin users will open tickets because their $3 HostGator plan runs out of memory.
-
-**Verdict:** Ship the static SaaS. Kill WordPress. Kill the widget. One upload, one URL, one viral backlink. That's the simplest system that works.
-
----
-*"The best part is no part."*
+## Scaling
+At 100×, two things break. First, shared-hosting PHP chokes on bulk imports. Fix: hard 2 MB upload limit and chunked client-side processing. Second, if we actually executed prompts server-side, API costs scale linearly and spam/abuse becomes a denial-of-wallet attack. The static-only v1 architecture is the scaling moat.
