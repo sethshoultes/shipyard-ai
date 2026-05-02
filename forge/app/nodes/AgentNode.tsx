@@ -1,84 +1,60 @@
+/**
+ * AgentNode — AI agent node component
+ * Extends BaseNode with agent-specific configuration
+ */
+
 import React from 'react';
-import { BaseNode, BaseNodeProps } from './BaseNode';
+import { BaseNode } from './BaseNode.js';
 
-/**
- * Configuration specific to agent nodes
- */
 export interface AgentConfig {
-  prompt?: string;
-  model?: string;
-  temperature?: number;
-  maxTokens?: number;
-  systemPrompt?: string;
+  systemPrompt: string;
+  temperature: number;
+  maxTokens: number;
+  model: string;
 }
 
-/**
- * Properties for the AgentNode component
- */
-export interface AgentNodeProps extends Omit<BaseNodeProps, 'type' | 'config'> {
+export interface AgentNodeProps {
+  id: string;
+  x: number;
+  y: number;
+  label: string;
   agentConfig: AgentConfig;
+  isSelected: boolean;
+  isConnecting: boolean;
+  onSelect: (id: string | null) => void;
+  onMove: (id: string, x: number, y: number) => void;
+  onOutputClick: (nodeId: string) => void;
+  onInputClick: (nodeId: string) => void;
 }
 
-/**
- * Agent node component — extends BaseNode with agent-specific configuration
- * Represents a Claude agent in the workflow
- */
 export function AgentNode({
   id,
-  position,
+  x,
+  y,
+  label,
   agentConfig,
   isSelected,
+  isConnecting,
   onSelect,
-  onDragStart,
-  onDragEnd,
-  onStartConnection,
-  onEndConnection,
+  onMove,
+  onOutputClick,
+  onInputClick,
 }: AgentNodeProps): JSX.Element {
-  const config: Record<string, unknown> = {
-    prompt: agentConfig.prompt || 'No prompt set',
-    model: agentConfig.model || 'claude-sonnet-4-20250514',
-    temperature: agentConfig.temperature ?? 0.7,
-  };
-
   return (
     <BaseNode
       id={id}
       type="agent"
-      position={position}
-      config={config}
+      x={x}
+      y={y}
+      label={label}
       isSelected={isSelected}
+      isConnecting={isConnecting}
       onSelect={onSelect}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onStartConnection={onStartConnection}
-      onEndConnection={onEndConnection}
+      onMove={onMove}
+      onOutputClick={onOutputClick}
+      onInputClick={onInputClick}
     />
   );
 }
 
-/**
- * Creates a new agent node with default configuration
- */
-export function createAgentNode(
-  id: string,
-  position: { x: number; y: number },
-  config?: Partial<AgentConfig>
-): {
-  id: string;
-  type: 'agent';
-  position: { x: number; y: number };
-  config: Record<string, unknown>;
-} {
-  return {
-    id,
-    type: 'agent',
-    position,
-    config: {
-      prompt: config?.prompt || '',
-      model: config?.model || 'claude-sonnet-4-20250514',
-      temperature: config?.temperature ?? 0.7,
-      maxTokens: config?.maxTokens ?? 1024,
-      systemPrompt: config?.systemPrompt || '',
-    },
-  };
-}
+export default AgentNode;

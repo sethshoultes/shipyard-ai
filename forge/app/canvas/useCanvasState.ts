@@ -1,57 +1,36 @@
-import { useState, useCallback, useMemo } from 'react';
-
 /**
- * Represents a node in the canvas workflow
+ * useCanvasState — Canvas state management hook
+ * Manages nodes, connections, pan/zoom, and selection state
  */
-export interface CanvasNode {
+
+import { useState, useCallback } from 'react';
+
+export interface Node {
   id: string;
-  type: 'trigger' | 'agent';
-  position: { x: number; y: number };
+  type: 'agent' | 'trigger';
+  x: number;
+  y: number;
+  label: string;
   config: Record<string, unknown>;
 }
 
-/**
- * Represents a connection between two nodes
- */
-export interface CanvasConnection {
+export interface Connection {
   id: string;
-  from: string; // source node id
-  to: string;   // target node id
+  from: string;
+  to: string;
 }
 
-/**
- * Canvas state for managing the visual workflow
- */
 export interface CanvasState {
-  nodes: CanvasNode[];
-  connections: CanvasConnection[];
+  nodes: Node[];
+  connections: Connection[];
   scale: number;
   offsetX: number;
   offsetY: number;
   selectedNodeId: string | null;
+  selectedConnectionId: string | null;
   isDragging: boolean;
-  dragNodeId: string | null;
-  isConnecting: boolean;
-  connectionStartId: string | null;
-}
-
-/**
- * Actions available for canvas state management
- */
-export interface CanvasActions {
-  addNode: (node: CanvasNode) => void;
-  updateNodePosition: (id: string, position: { x: number; y: number }) => void;
-  removeNode: (id: string) => void;
-  addConnection: (connection: CanvasConnection) => void;
-  removeConnection: (id: string) => void;
-  setScale: (scale: number) => void;
-  setOffset: (offsetX: number, offsetY: number) => void;
-  selectNode: (id: string | null) => void;
-  startDrag: (nodeId: string) => void;
-  endDrag: () => void;
-  startConnection: (nodeId: string) => void;
-  endConnection: () => void;
-  resetView: () => void;
+  dragStart: { x: number; y: number } | null;
+  connectingFrom: string | null;
 }
 
 const initialState: CanvasState = {
@@ -61,157 +40,122 @@ const initialState: CanvasState = {
   offsetX: 0,
   offsetY: 0,
   selectedNodeId: null,
+  selectedConnectionId: null,
   isDragging: false,
-  dragNodeId: null,
-  isConnecting: false,
-  connectionStartId: null,
+  dragStart: null,
+  connectingFrom: null,
 };
 
-/**
- * Hook for managing canvas state
- * Provides state management for nodes, connections, and view transformations
- */
-export function useCanvasState(): { state: CanvasState; actions: CanvasActions } {
+export function useCanvasState() {
   const [state, setState] = useState<CanvasState>(initialState);
 
-  const addNode = useCallback((node: CanvasNode) => {
-    setState((prev) => ({
+  const addNode = useCallback((node: Node) => {
+    setState(prev => ({
       ...prev,
       nodes: [...prev.nodes, node],
     }));
   }, []);
 
-  const updateNodePosition = useCallback((id: string, position: { x: number; y: number }) => {
-    setState((prev) => ({
+  const updateNodePosition = useCallback((id: string, x: number, y: number) => {
+    setState(prev => ({
       ...prev,
-      nodes: prev.nodes.map((node) =>
-        node.id === id ? { ...node, position } : node
+      nodes: prev.nodes.map(node =>
+        node.id === id ? { ...node, x, y } : node
       ),
     }));
   }, []);
 
   const removeNode = useCallback((id: string) => {
-    setState((prev) => ({
+    setState(prev => ({
       ...prev,
-      nodes: prev.nodes.filter((node) => node.id !== id),
+      nodes: prev.nodes.filter(node => node.id !== id),
       connections: prev.connections.filter(
-        (conn) => conn.from !== id && conn.to !== id
+        conn => conn.from !== id && conn.to !== id
       ),
       selectedNodeId: prev.selectedNodeId === id ? null : prev.selectedNodeId,
     }));
   }, []);
 
-  const addConnection = useCallback((connection: CanvasConnection) => {
-    setState((prev) => ({
+  const addConnection = useCallback((connection: Connection) => {
+    setState(prev => ({
       ...prev,
       connections: [...prev.connections, connection],
-      isConnecting: false,
-      connectionStartId: null,
     }));
   }, []);
 
   const removeConnection = useCallback((id: string) => {
-    setState((prev) => ({
+    setState(prev => ({
       ...prev,
-      connections: prev.connections.filter((conn) => conn.id !== id),
+      connections: prev.connections.filter(conn => conn.id !== id),
+      selectedConnectionId: prev.selectedConnectionId === id ? null : prev.selectedConnectionId,
     }));
   }, []);
 
   const setScale = useCallback((scale: number) => {
-    setState((prev) => ({
-      ...prev,
-      scale: Math.max(0.1, Math.min(2, scale)),
-    }));
+    setState(prev => ({ ...prev, scale: Math.max(0.1, Math.min(3, scale)) }));
   }, []);
 
   const setOffset = useCallback((offsetX: number, offsetY: number) => {
-    setState((prev) => ({
-      ...prev,
-      offsetX,
-      offsetY,
-    }));
+    setState(prev => ({ ...prev, offsetX, offsetY }));
   }, []);
 
   const selectNode = useCallback((id: string | null) => {
-    setState((prev) => ({
+    setState(prev => ({
       ...prev,
       selectedNodeId: id,
+      selectedConnectionId: null,
     }));
   }, []);
 
-  const startDrag = useCallback((nodeId: string) => {
-    setState((prev) => ({
+  const selectConnection = useCallback((id: string | null) => {
+    setState(prev => ({
+      ...prev,
+      selectedConnectionId: id,
+      selectedNodeId: null,
+    }));
+  }, []);
+
+  const startDrag = useCallback((x: number, y: number) => {
+    setState(prev => ({
       ...prev,
       isDragging: true,
-      dragNodeId: nodeId,
+      dragStart: { x, y },
     }));
   }, []);
 
   const endDrag = useCallback(() => {
-    setState((prev) => ({
+    setState(prev => ({
       ...prev,
       isDragging: false,
-      dragNodeId: null,
+      dragStart: null,
     }));
   }, []);
 
-  const startConnection = useCallback((nodeId: string) => {
-    setState((prev) => ({
-      ...prev,
-      isConnecting: true,
-      connectionStartId: nodeId,
-    }));
+  const startConnecting = useCallback((nodeId: string) => {
+    setState(prev => ({ ...prev, connectingFrom: nodeId }));
   }, []);
 
-  const endConnection = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      isConnecting: false,
-      connectionStartId: null,
-    }));
+  const cancelConnecting = useCallback(() => {
+    setState(prev => ({ ...prev, connectingFrom: null }));
   }, []);
 
-  const resetView = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      scale: 1,
-      offsetX: 0,
-      offsetY: 0,
-    }));
-  }, []);
+  const getConnectingFrom = useCallback(() => state.connectingFrom, [state.connectingFrom]);
 
-  const actions: CanvasActions = useMemo(
-    () => ({
-      addNode,
-      updateNodePosition,
-      removeNode,
-      addConnection,
-      removeConnection,
-      setScale,
-      setOffset,
-      selectNode,
-      startDrag,
-      endDrag,
-      startConnection,
-      endConnection,
-      resetView,
-    }),
-    [
-      addNode,
-      updateNodePosition,
-      removeNode,
-      addConnection,
-      removeConnection,
-      setScale,
-      setOffset,
-      selectNode,
-      startDrag,
-      endDrag,
-      startConnection,
-      endConnection,
-      resetView,
-    ]
-  );
-
-  return { state, actions };
+  return {
+    state,
+    addNode,
+    updateNodePosition,
+    removeNode,
+    addConnection,
+    removeConnection,
+    setScale,
+    setOffset,
+    selectNode,
+    selectConnection,
+    startDrag,
+    endDrag,
+    startConnecting,
+    cancelConnecting,
+    getConnectingFrom,
+  };
 }

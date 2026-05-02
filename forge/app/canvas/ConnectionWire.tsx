@@ -1,84 +1,51 @@
+/**
+ * ConnectionWire — SVG wire rendering for node connections
+ * Renders bezier curves between node output and input ports
+ */
+
 import React from 'react';
 
-/**
- * Properties for the ConnectionWire component
- */
 export interface ConnectionWireProps {
   from: { x: number; y: number };
   to: { x: number; y: number };
-  color?: string;
-  strokeWidth?: number;
-  animated?: boolean;
+  isSelected?: boolean;
+  onClick?: () => void;
 }
 
-/**
- * Renders an SVG path connecting two nodes on the canvas
- * Uses a bezier curve for smooth visual connection
- */
-export function ConnectionWire({
-  from,
-  to,
-  color = '#666666',
-  strokeWidth = 2,
-  animated = false,
-}: ConnectionWireProps): JSX.Element {
+export function ConnectionWire({ from, to, isSelected = false, onClick }: ConnectionWireProps): JSX.Element {
   // Calculate control points for bezier curve
   const dx = Math.abs(to.x - from.x) * 0.5;
-  const controlPoint1 = { x: from.x + dx, y: from.y };
-  const controlPoint2 = { x: to.x - dx, y: to.y };
+  const control1X = from.x + dx;
+  const control2X = to.x - dx;
 
-  // Create bezier path
-  const path = `M ${from.x} ${from.y} C ${controlPoint1.x} ${controlPoint1.y}, ${controlPoint2.x} ${controlPoint2.y}, ${to.x} ${to.y}`;
+  const path = `M ${from.x} ${from.y} C ${control1X} ${from.y}, ${control2X} ${to.y}, ${to.x} ${to.y}`;
 
   return (
-    <svg
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'none',
-        overflow: 'visible',
-      }}
-    >
+    <g onClick={onClick} style={{ cursor: 'pointer' }}>
+      {/* Invisible thick path for easier clicking */}
       <path
         d={path}
+        stroke="transparent"
+        strokeWidth={20}
         fill="none"
-        stroke={color}
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
-        style={
-          animated
-            ? {
-                strokeDasharray: '5,5',
-                animation: 'dashAnimation 1s linear infinite',
-              }
-            : undefined
-        }
       />
-      <style>
-        {`
-          @keyframes dashAnimation {
-            to {
-              stroke-dashoffset: -10;
-            }
-          }
-        `}
-      </style>
-    </svg>
+      {/* Visible wire */}
+      <path
+        d={path}
+        stroke={isSelected ? '#3b82f6' : '#94a3b8'}
+        strokeWidth={isSelected ? 3 : 2}
+        fill="none"
+      />
+      {/* Animated flow indicator */}
+      <circle r={4} fill={isSelected ? '#3b82f6' : '#64748b'}>
+        <animateMotion
+          dur="1.5s"
+          repeatCount="indefinite"
+          path={path}
+        />
+      </circle>
+    </g>
   );
 }
 
-/**
- * Renders a temporary wire being dragged during connection creation
- */
-export function ConnectionWirePreview({
-  from,
-  to,
-}: {
-  from: { x: number; y: number };
-  to: { x: number; y: number };
-}): JSX.Element {
-  return <ConnectionWire from={from} to={to} color="#999999" strokeWidth={1} animated />;
-}
+export default ConnectionWire;

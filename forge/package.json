@@ -2,9 +2,7 @@
   "name": "forge",
   "version": "0.1.0",
   "type": "module",
-  "description": "AgentForge — Visual canvas for multi-agent AI workflows",
-  "license": "MIT",
-  "dependencies": {
-    "react": "^18.2.0"
-  }
+  "description": "Forge — multi-agent AI workflow builder",
+  "main": "app/canvas/index.tsx",
+  "dependencies": {}
 }
