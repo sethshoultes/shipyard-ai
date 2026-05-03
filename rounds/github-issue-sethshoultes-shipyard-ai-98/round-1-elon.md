@@ -1,36 +1,27 @@
+# Round 1 — Elon Musk (CPO/CGO)
+
 ## Architecture
-
-Simplest system that works: after `pages publish`, query the Cloudflare API for the project's custom domains. Don't shell out to `wrangler` and pipe through `grep` — CLI output formats change and that breaks. Hit each domain with `curl -I`, assert `200 OK`. Done.
-
-Verifying the build revision? Don't grep the HTML body. That's fragile. Inject an `X-Build-Id` response header in the build and assert that. Parsing HTML with `grep` is amateur hour.
+The simplest system is a 10-line shell step in the existing deploy job: `curl -sf $DOMAIN` and grep for a known string. No new microservice. No `wrangler pages project list` CLI scraping—that breaks the moment Cloudflare changes JSON formatting. Read the domain from the environment variable you already set.
 
 ## Performance
+The bottleneck is human reaction time, not compute. The 10x path is eliminating the 6-day detection delay, not optimizing the curl. The actual latency risk is DNS propagation and CDN cache invalidation. If you check immediately after deploy, you will false-fail ~30% of the time. Add retry with exponential backoff: 5 attempts over 60 seconds. Total cost: negligible.
 
-The bottleneck isn't the check — it's human latency. The 404s lasted **6 days** because nobody got paged. The 10x path is instant alerting (Slack/PagerDuty), not a dashboard you check when you feel like it.
-
-Real 10x? Stop treating DNS as separate from deploy. The root cause is DNS still pointing at a dead Vercel project. If the pipeline owned the DNS record update alongside the publish step, they could never drift. Verification is a band-aid; unified control is the cure.
-
-## Distribution
-
-This isn't a consumer feature. "Distribution" means making it the default in every deploy template. If it's an opt-in checkbox, adoption is <5%. Make it default-on for every customer project. Zero friction is the only way to reach 10,000 users without paid ads — they get the protection before they know they need it.
+## Distribution (Internal Adoption)
+This is infrastructure, not a product. "10,000 users" means every customer project. The only way is to bake the check into the base deployment template so it runs by default. If it is an opt-in step, adoption will be under 10%. Make it impossible to skip.
 
 ## What to CUT
-
-- **HTML body build-id grep.** v2 masquerading as v1. Cut it. Use headers.
-- **"Verify a few key routes."** Check `/` first. Deep-route smoke tests are v2.
-- **Retry loops with exponential backoff and dashboards.** Fail fast and alert. Pretty UIs don't fix 404s.
-- **Standalone microservice.** This is a 30-line addition to the existing CI job, not a new service.
+- **CUT build-id injection for v1.** Checking that the HTML contains the build hash requires build-system changes. For v1, HTTP 200 + presence of `<title>` is sufficient. Build-id verification is v2.
+- **CUT "every key route."** Check `/` only. Route-level verification is a separate test suite, not a deploy gate.
+- **CUT generalization to all customers in the first PR.** Fix Shipyard's pipeline first. Abstract only after it works in production for 2 weeks.
+- **CUT a standalone verification service.** This is a CI step, not a new repo.
 
 ## Technical Feasibility
+One agent session can build this. Scope is ~30 lines of shell or a small GitHub Actions step. The only non-trivial piece is the retry/backoff logic. Do not over-engineer.
 
-Yes. This is trivial code: fetch URLs, assert status. One agent session can write it in 20 minutes. The real time sink is archaeological: finding where the existing pipeline lives (GitHub Action? CF Worker? Bash script in a cron?). If the agent can locate the deploy orchestrator, the fix is trivial. If not, the session becomes a treasure hunt.
+## Scaling (100x Usage)
+At 100x projects, two things break:
+1. **Alert fatigue** — transient DNS blips or regional CDN cache misses will trigger failures. Without retries and timeout discipline, engineers disable the check.
+2. **Brittle scraping** — parsing `wrangler` CLI output collapses when Cloudflare updates the tool. Use deterministic inputs (env vars, project config files) instead of runtime CLI scraping.
 
-## Scaling
-
-Three failure modes at 100x:
-
-1. **Self-DoS.** 100 projects × N domains × deploy frequency = you're now load-testing your own origins. Keep checks async and rate-limited.
-2. **DNS propagation flakiness.** At scale, TTL delays and geo-variance mean post-deploy checks flake. You'll false-alarm constantly unless you tolerate a propagation window.
-3. **Alert fatigue.** 100x more transient failures = 100x more pages. The team will mute the channel. Build deduplication and auto-resolution before you scale, or the system becomes noise.
-
-Bottom line: a basic health check would have caught this in 60 seconds instead of 6 days. Don't gold-plate it. Ship the simplest version now.
+## Bottom Line
+This is a deploy-step bug, not a platform feature. Add a retrying curl check to the existing pipeline. Ship in one session. Abstract later.

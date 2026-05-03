@@ -1,7 +1,7 @@
-Proof is a post-deploy heartbeat check: one curl, one verdict. Alive or dead.
+Product: the breath after deploy when you know it's real.
 
-Feeling: the click of a door latch at 2 AM. Relief, then silence. Terror only when it breaks.
+Feeling: 2 AM door latch. Click. Safe.
 
-One thing perfect: origin validation. A green check from the wrong server is a lie. If it lies, it doesn't ship.
+Must be perfect: origin validation. Green light from wrong server is a lie. Burn it before it ships.
 
-Creative direction: One breath. One answer.
+Creative direction: Verdict, not courtroom.
