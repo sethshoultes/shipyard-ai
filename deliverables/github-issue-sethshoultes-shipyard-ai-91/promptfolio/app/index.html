@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0a0f">
+  <title>Promptfolio — Portfolio Generator for Claude Exports</title>
+  <link rel="stylesheet" href="../public/assets/landing.css">
+</head>
+<body>
+  <main class="landing">
+    <div class="container">
+      <header class="hero">
+        <h1>Promptfolio</h1>
+        <p class="subtitle">Transform your Claude conversations into beautiful portfolios</p>
+      </header>
+
+      <section class="upload-section">
+        <div
+          id="drop-zone"
+          class="drop-zone"
+          role="button"
+          tabindex="0"
+          aria-label="Upload Claude export JSON file"
+        >
+          <div class="drop-zone-content">
+            <svg class="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17,8 12,3 7,8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <p class="drop-text">Drop your Claude export here</p>
+            <p class="drop-subtext">Claude → Settings → Data → Export</p>
+            <input type="file" id="file-input" accept=".json,application/json" hidden>
+            <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">
+              Select File
+            </button>
+          </div>
+        </div>
+
+        <div id="progress-container" class="progress-container hidden">
+          <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+          <p id="progress-text" class="progress-text">Processing...</p>
+        </div>
+
+        <div id="error-container" class="error-container hidden">
+          <p id="error-message" class="error-message"></p>
+          <button class="btn btn-secondary" onclick="resetUpload()">Try Again</button>
+        </div>
+
+        <div id="success-container" class="success-container hidden">
+          <p class="success-message">Your portfolio is ready!</p>
+          <a id="portfolio-link" class="btn btn-primary" href="#" target="_blank">
+            View Portfolio
+          </a>
+          <button class="btn btn-secondary" onclick="resetUpload()">Create Another</button>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p>No accounts. No configuration. Just your prompts, beautifully presented.</p>
+      </footer>
+    </div>
+  </main>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
