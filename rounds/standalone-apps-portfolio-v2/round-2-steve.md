@@ -1,39 +1,41 @@
-# Round 2 — Steve Jobs
+# Steve Jobs — Round 2
 
 ## Where Elon Optimizes for the Wrong Metric
 
-**Build speed is not user experience.** Elon wants this done in one session under thirty seconds. I want it done *right*. You can ship garbage fast; that is not a virtue. The metric that matters is what the user feels in the first second on `/work`. If we save four hours of pipeline but ship something forgettable, we optimized for the wrong variable.
+Elon wants to cut spec.md and todo.md because they are "process overhead." That is optimizing for *agent tokens*, not *shipping quality*. The failure mode in v1 was skipped Write calls, not complexity. Those checklists are the discipline that prevents empty hands. I would rather the agent spend forty tokens on a todo than ship nothing.
 
-**Lighthouse 90 is mediocrity dressed as pragmatism.** The last five points are not "theater" on a portfolio page—they are the difference between a page that loads and a page that *breathes*. Proper image decoding, accessible contrast, and stable layout shifts are felt before they are measured. A builder who stops at 90 accepts "good enough." We do not.
+He says Lighthouse 90 is "fine" and the last five points are "theater." On a static page of text, 90 is sloppiness masquerading as pragmatism. There is no database, no animation, no excuse. The last five points are where you prove you stayed up until three in the morning. That is not theater; that is love.
 
-**A portfolio is not residue.** Elon says distribution comes from the apps alone. He is wrong. People absolutely share portfolios at 1 AM when the portfolio itself is a product of taste. The frame is part of the painting. If the portfolio is residue, the apps are orphans.
+He calls the portfolio "residue." But the portfolio is the *first* app every user touches. If the wrapper is residue, why did we spend a hundred million dollars on Apple Stores? Packaging is the product when attention is the scarcest resource.
 
-**"Weak entries dilute credibility" is spreadsheet thinking.** Three strong entries do not beat three strong plus one honest scaffold. They beat three strong plus four lies. SCAFFOLD is not weak. It is a category of its own, and its presence makes the shipped work more believable.
+Pragmatism without taste is just efficient mediocrity.
 
 ## Defending What Elon Would Cut
 
-**SCAFFOLD entries stay.** Elon calls them resume padding. He optimizes for the appearance of completeness over the reality of honesty. Cutting unfinished work is not curation—it is cowardice. The `SCAFFOLD` badge is the sapphire caseback showing the movement. It says: we are not pretending. That radical transparency creates the trust that converts visitors into advocates.
+Elon would put GitHub links front and center because "developers want source." You do not invite someone into your cathedral and hand them a wrench. Source is backstage. Show them the performance first; the scaffolding is for those who already believe.
 
-**Restraint is not austerity; it is arrogance.** No gradients, no pulses. Elon might call this frosting, but a Leica M6 has no chrome flourishes because it does not need them. Every decorative element we refuse to add is a statement of confidence in the underlying work. Typography is the image. Whitespace is the chorus.
+He would scatter tech-stack chips like confetti because engineers love dependencies. Users do not care about your dependency array. They care what it does for their heartbeat. Every chip above the fold is an admission that you are talking to yourself, not them.
 
-**The name is the first interface.** "Tuned" is not a ticket item to iterate later. You do not A/B test your way out of a name that tells instead of sings. It is the first word a user reads and the last one they remember. "Promptfolio" ships, but we do not love it. "CommandBar" is oatmeal. Acceptable for a utility, fatal for anything with ambition.
+He would ship three strong entries and four weak ones because "more is more." Weak entries do not add value; they dilute credibility. That is math I agree with — three strong beats seven mixed. But I go further: if it is not in a user's hands, it is vapor, not product. A painting half-painted is not hung in the museum.
 
-## Where Elon Is Right
+## Where Elon is Right
 
-Cut the meta-documents. `spec.md`, `todo.md`, `MIGRATION.md`—if the agent cannot write directly to `website/src/`, fix the agent, not the file path. Process bloat is not rigor.
+Static export with Server Components only — correct. No database, no CMS, no auth, no edge functions for seven pages of text.
 
-Cut the live-URL curl checks. A build gate that fails because GitHub hiccuped is insanity.
+Cutting live URL curl checks from the build gate — correct. A build should not fail because GitHub hiccuped.
 
-Cut the retrospective requirement. Documentation is not shipping. If it does not ship, it does not exist.
+Cutting SCAFFOLD entries from `/work` — correct. Resume padding is not product.
 
-Feature bullet archaeology through stub code is waste. The honest output is "not enough substance." I concede that.
+Writing directly to `website/src/` instead of deliverables-dir — correct. At 100 PRDs, you have 100 orphaned backlogs waiting for a merge that never comes.
 
-He is also right that `node --test` validation of static data the agent just wrote is a tautology. TypeScript already proves structure. Do not worship process for its own sake.
+The monorepo is a prison at scale — correct. Plan the content model, not the load balancer.
+
+Accent color audits for three cards is bike-shedding — correct. Pick a color, move on.
 
 ## Top 3 Non-Negotiables
 
-1. **SCAFFOLD entries with honest badges.** This is the moral center of the product. We label unfinished work with the same pride as shipped work, or we are liars.
-2. **No decorative theater.** No gradients, no pulses, no animated counters. Restraint is the design. Confidence needs no costume.
-3. **Language is interface.** Short sentences. No SaaS marketing. No "leveraging AI to drive synergy." The product is the prose. If it would fit on a Kickstarter page with someone staring wistfully out a window, burn it.
+1. **Curated scarcity on `/work`**: Only shipped, working tools. No BUILD status badges, no SCAFFOLD padding, no "coming soon." A half-painted painting is not hung in the museum.
 
-Simplicity is not efficiency. It is the discipline of removing everything that is not the truth.
+2. **Invisible design at 95+**: Not 90. Not "good enough." The interface disappears. Zero gradients, zero pulses, zero theater. On static text, 95 is proof you care, not theater.
+
+3. **Names are prayers, not labels**: One word. Emotional. Unforgettable. If the name does not make someone *feel* something before they understand it, it is dead. Promptfolio dies. Commandbar dies. Tuned lives.

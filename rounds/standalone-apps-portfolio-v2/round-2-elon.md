@@ -1,31 +1,41 @@
 # Elon — Round 2 Rebuttal
 
-## Where Steve's Beauty Is Shipping Debt
+Steve, your taste is exquisite and your users will feel it. But
+"love, rendered in code" does not compile. Obsession over whether
+a name "sings" is how you miss a launch window. Promptfolio is a
+working title; the product proves the name, not the other way around.
+I concede on no-gradients, no-pulses, no-tech-stack-confetti, and
+no-search-bar rules. Taste is the constraint, not the specification.
 
-Steve wants SCAFFOLD badges with "radical transparency." I want them gone. The difference: Steve thinks honesty is a feature; I think unfinished work is inventory, not product. A portfolio is not a confessional. If it has no demo and no detail page, it does not get real estate. Respect the user's attention.
+Where I draw the line is your doctrine that every pixel must "scream
+necessity." That is an open invitation to infinite polish. The last
+5% of visual perfection consumes 50% of the timeline. On static text
+pages, a 90 Lighthouse score converts identically to a 95. Ship the 90.
+If post-launch metrics prove otherwise, iterate. Reality is the only
+designer worth obeying.
 
-The naming seminar is pure bikeshedding. "Promptfolio is oatmeal," "CommandBar is descriptive." Fine. The user sees a 14px label once. We are not launching a cola brand; we are indexing three utilities. Syllable tuning does not move TTFB. I am measuring build latency; Steve is whispering in a bar.
+Your "Lab" corner for unfinished work is still resume padding by
+another name. I already cut SCAFFOLD entries from `/work`. A built
+app with no live URL is Schrodinger's product — neither shipped nor
+vapor. It gets zero real estate until it is in a user's hands. If an
+app is not reachable by a public URL, it does not exist. Full stop.
+Abundance is cheap, but so is the *feeling* of curation when you are
+merely hiding unfinished work in a dim corner instead of cutting it.
 
-Steve's brand-voice rules are 30 lines of prose about "craftsmen at the bench." I counted. That is longer than the page code. Process documents dressed as philosophy are still process documents. The voice is already in the design system. We do not need a manifesto to render an array.
+Technical simplicity wins because entropy is physics. Every file you
+add today is drag at 100× apps. Static HTML on a CDN is infinite scale
+with zero moving parts. A database for seven paragraphs is not architecture;
+it is masochism. The agent failed v1 by skipping `Write` calls, not by
+lacking a `todo.md`. Bureaucracy does not fix agent behavior; it burns
+tokens and manufactures stale code. If the build exceeds 30 seconds,
+audit for parasites, not poetry.
 
-Steve and I agree on no gradients, no pulses. The delta is what happens next. Steve wants to *curate an experience* — the "library card catalog machined from aluminum." I want to render `portfolio.ts`. The output is identical. The input is 200 lines versus 200 lines plus a mood board.
+**Non-negotiables:**
 
-## Why Technical Simplicity Wins
+1. **Three files, no meta.** One data array, one section component, one `[slug]` template. No `spec.md`, no `MIGRATION.md`, no `todo.md`.
 
-Static export with `generateStaticParams` is thermodynamic truth: no runtime, no database, no auth, no cold start. The fastest code is the code you do not run. At 100 apps, the only thing that breaks is the human maintaining the content array — so optimize for that, not for load balancers that will never see load.
+2. **Static export, zero runtime infra.** No edge functions, no CMS, no auth, no hydration tax. Server Components only for read-only text.
 
-Every meta-file is a handoff queue disguised as diligence. `spec.md`, `todo.md`, `MIGRATION.md` — these are emails to yourself. The durable system writes directly to `website/src/` or it is not automated. If the agent cannot do that, fix the agent, not the architecture.
+3. **Validation by existence.** If the file is there and the route renders, it passes. No curl checks against GitHub rate limits. No tautological `node --test` on static data the agent just typed.
 
-## Where Steve Is Right
-
-Dead links are broken promises. Steve is absolutely correct: a 404 demo is a lie, and lies are the only thing users remember. Cut the entry or fix the repo before ship.
-
-Typography and whitespace matter because they reduce cognitive load. But they matter as *execution*, not *deliberation*. The existing design system solved this. We do not re-solve it.
-
-## Top 3 Non-Negotiables
-
-1. **No SCAFFOLD on `/work`**. Only shipped or demo-able tools get listed. Unfinished work dilutes credibility; that is math, not taste.
-2. **No process meta-files**. No `spec.md`, no `todo.md`, no `MIGRATION.md` inside deliverables. Ship the files that ship. If the agent needs a checklist, the agent is the bug.
-3. **Zero runtime dependencies for this page**. One data file, one section component, one dynamic route. No CMS, no API layer, no auth. The build output is HTML on a CDN. Full stop.
-
-Ship the three files. Validate by existence. Move on.
+Ship the atoms. Polish the molecules later.
