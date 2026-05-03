@@ -1,13 +1,29 @@
-**Verdict: Wrong customer. Fix before code.**
+Verdict: Over-engineered middleware. Real value is thin.
 
-- Real customer? Developer maybe. WordPress plugin buyers expect point-and-click. Plan builds developer tool, prices like plugin. Painful mismatch.
+Would a real customer pay?
+No.
+Plugin is a router with a log.
+Customer still brings Claude key, Cloudflare Worker, and writes cURL.
+Paying for convenience that barely saves time.
+WordPress owners want buttons, not endpoints.
 
-- Confusing: Activate plugin. See API key field. Empty log table. No button. No textarea. Customer thinks "broken," bounces in 8 seconds.
+What's confusing / bounce?
+No task runner in admin.
+User installs, sees settings + empty logs, hits dead end. Bounce.
+Two external configs before first win. Too many gates.
+"One mind, not a bag of tools" but only two tools. Copy oversells reality.
 
-- 30-second pitch: "AgentPress puts an AI content team inside your WordPress dashboard. Write a sentence. Get a blog post or featured image. No ChatGPT login, no copy-paste."
+30-second elevator pitch
+AgentPress turns your WordPress site into a private AI hub. One API call. Smart routing. Content and images returned in seconds. No SaaS fees. You own the stack.
 
-- $0 test: Coffee shop. Five strangers with WordPress sites. Ask them to generate a blog post. Do not help. Record where they curse. Build that.
+$0 marketing test
+Loom demo: type task in terminal, see blog post appear in WordPress.
+Post in 3 WordPress dev Slack groups.
+If nobody DMs you for a link, kill it.
 
-- Retention hook: Missing. One-and-done generation isn't sticky. Need "Regenerate in my tone" or scheduled batch runs. Logs are worthless for retention.
-
-- Bold move: Kill "no manual runner" rule. One textarea + submit button on admin page. Demo does talking, not readme.
+Retention hook
+None.
+Admin is a log viewer.
+No weekly stats, no failure alerts, no "saved X hours" counter.
+User forgets plugin exists.
+Add a weekly tasks-completed email or dashboard widget showing value delivered.
