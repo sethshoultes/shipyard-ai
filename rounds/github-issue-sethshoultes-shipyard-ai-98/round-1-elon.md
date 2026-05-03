@@ -2,15 +2,13 @@
 
 ## Architecture
 
-The simplest system that works is a **10-line shell step in the existing deploy job**: `curl -sf $DOMAIN` with a retry loop.
-
-No new microservice. No "verification platform." No `wrangler pages project list` CLI scraping — that breaks the moment Cloudflare changes JSON formatting. Read the domain from the environment variable you already set for the project. If the CI runner can deploy, it can verify. Adding a network hop to a separate verification service just gives you another thing to debug when DNS breaks.
+The simplest system: a 10-line shell step in the existing deploy job. `curl -sf https://$CUSTOM_DOMAIN` with a retry loop. No new microservice. No "verification platform." No `wrangler pages project list` CLI scraping — that breaks the moment Cloudflare changes JSON formatting. Read the domain from the environment variable you already set for the project. If the CI runner can deploy, it can verify. Adding a network hop to a separate service just gives you another thing to debug when DNS breaks.
 
 This is an integration test, not a product. Treat it like one.
 
 ## Performance
 
-The bottleneck isn't compute; it's **detection latency**. Six days to find a 404 is a catastrophic failure mode. The 10x path is eliminating that delay entirely — from 6 days to 60 seconds.
+The bottleneck isn't compute; it's **detection latency**. Six days to find a 404 is catastrophic. The 10x path is eliminating that delay entirely — from 6 days to 60 seconds.
 
 The real latency risk is DNS propagation and CDN cache invalidation. If you check immediately after deploy, you will false-fail ~30% of the time due to stale DNS or edge cache. Add retry with exponential backoff: 5 attempts over 60 seconds. Total cost: milliseconds of CI time and zero dollars.
 
@@ -18,7 +16,7 @@ A centralized polling service would add network hops and be slower; keep it in t
 
 ## Distribution
 
-This is infrastructure, not a growth feature. Nobody signs up for a "deploy verification tool." If you want to reach 10,000 users, **stop shipping 404s to the ones you already have.** The distribution mechanism here is the base deployment template: bake the check in so it runs by default on every project. If it's opt-in, adoption will be under 10%. Make it impossible to skip. Trust is the distribution channel. Reliability compounds faster than marketing spend.
+This is infrastructure, not a growth feature. Nobody signs up for a "deploy verification tool." If you want to reach 10,000 users, **stop shipping 404s to the ones you already have.** The distribution mechanism is the base deployment template: bake the check in so it runs by default on every project. If it's opt-in, adoption will be under 10%. Make it impossible to skip. Trust is the distribution channel. Reliability compounds faster than marketing spend.
 
 ## What to CUT
 

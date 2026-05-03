@@ -1,0 +1,184 @@
+/* Relay Admin Styles */
+
+.wrap.relay-inbox,
+.wrap.relay-settings {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	color: #0F172A;
+}
+
+/* Filter bar */
+.relay-filter-bar form {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	flex-wrap: wrap;
+	margin-bottom: 16px;
+	padding: 12px;
+	background: #F8FAFC;
+	border: 1px solid #E2E8F0;
+	border-radius: 6px;
+}
+
+.relay-filter-bar input[type="search"],
+.relay-filter-bar select {
+	padding: 6px 10px;
+	border: 1px solid #E2E8F0;
+	border-radius: 4px;
+	font-size: 13px;
+	background: #FFFFFF;
+	color: #0F172A;
+}
+
+.relay-filter-bar input[type="search"] {
+	min-width: 220px;
+}
+
+/* Pending banner */
+.relay-pending-banner {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 16px;
+	padding: 8px 14px;
+	background: #F8FAFC;
+	border: 1px solid #E2E8F0;
+	border-radius: 6px;
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.relay-pending-count {
+	font-weight: 700;
+	color: #F97316;
+}
+
+/* Table */
+.relay-leads-table {
+	border: 1px solid #E2E8F0;
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.relay-leads-table th {
+	background: #F8FAFC;
+	color: #0F172A;
+	font-weight: 600;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.4px;
+	padding: 12px 14px;
+}
+
+.relay-leads-table td {
+	padding: 12px 14px;
+	font-size: 13px;
+	vertical-align: middle;
+}
+
+/* Badges */
+.relay-badge {
+	display: inline-block;
+	padding: 4px 10px;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.4;
+	white-space: nowrap;
+}
+
+/* Status indicators */
+.relay-status {
+	display: inline-block;
+	padding: 3px 8px;
+	border-radius: 4px;
+	font-size: 11px;
+	font-weight: 600;
+	background: #E2E8F0;
+	color: #0F172A;
+}
+
+.status-pending {
+	background: #FEF3C7;
+	color: #92400E;
+}
+
+.status-classified {
+	background: #D1FAE5;
+	color: #065F46;
+}
+
+.status-quarantined {
+	background: #F3F4F6;
+	color: #374151;
+}
+
+.status-failed {
+	background: #FEE2E2;
+	color: #991B1B;
+}
+
+/* Pagination */
+.relay-pagination {
+	margin-top: 16px;
+}
+
+.relay-pagination .page-numbers {
+	display: inline-block;
+	padding: 6px 12px;
+	margin-right: 4px;
+	border: 1px solid #E2E8F0;
+	border-radius: 4px;
+	background: #FFFFFF;
+	color: #0F172A;
+	font-size: 13px;
+	text-decoration: none;
+	transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.relay-pagination .page-numbers:hover {
+	background: #F8FAFC;
+	border-color: #CBD5E1;
+}
+
+.relay-pagination .page-numbers.current {
+	background: #F97316;
+	border-color: #F97316;
+	color: #FFFFFF;
+	font-weight: 600;
+}
+
+/* Reply link */
+.relay-reply-link {
+	font-size: 12px;
+}
+
+/* Settings page */
+.relay-settings .form-table th {
+	font-weight: 600;
+	color: #0F172A;
+}
+
+.relay-settings .description {
+	font-size: 12px;
+	color: #64748B;
+}
+
+/* Dashboard widget */
+#relay_dashboard_widget .relay-pending-count {
+	font-size: 18px;
+	font-weight: 700;
+	color: #F97316;
+}
+
+/* Process status */
+#relay-process-status {
+	font-size: 12px;
+	color: #22C55E;
+	font-weight: 600;
+}
+
+/* Button transitions */
+.button-primary,
+.button-secondary {
+	transition: background 0.15s ease, border-color 0.15s ease;
+}
