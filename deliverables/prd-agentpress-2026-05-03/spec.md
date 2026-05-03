@@ -59,7 +59,7 @@
 | Parses valid JSON directly | Test case: `{"capability":"content_writer"}` → parsed array |
 | Strips markdown fences | Test case: ` ```json {"capability":"x"} ``` ` → parsed array |
 | Handles truncated JSON | Test case: `{"capability":"content` → WP_Error with `agentpress_parser_error` |
-| Handles hallucinated slugs | Test case: `{"capability":"seo_meta"}` → WP_Error (invalid capability) |
+| Handles hallucinated slugs | Test case: `{"capability":"video_editor"}` → WP_Error (invalid capability) |
 | Sanitizes payload strings | Test case: payload with `<script>` tags → `wp_kses_post` strips tags |
 
 ### 3.3 Admin CSS (Task 3)
@@ -153,11 +153,11 @@
 | `agentpress/admin/class-admin.php` | Admin screen | 5 |
 | `agentpress/readme.txt` | WordPress.org readme | 5 |
 
-### Reserved Placeholder (1 file)
+### Third Agent (1 file)
 
 | File | Purpose |
 |------|---------|
-| `agentpress/includes/agents/class-agent-third.php` | Reserved slot for v2 third agent |
+| `agentpress/includes/agents/class-seo-meta.php` | SEO Meta agent — generates title tags and meta descriptions via Claude API |
 
 ### Modified Files
 

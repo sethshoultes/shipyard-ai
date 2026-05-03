@@ -142,7 +142,7 @@
 - [ ] Write Installation section — verify: upload, activate, configure steps
 - [ ] Write API Example with cURL — verify: working cURL command included
 - [ ] Add API disclosure — verify: Anthropic TOS mention present
-- [ ] Create `class-agent-third.php` placeholder — verify: stub file exists
+- [x] Create `class-seo-meta.php` with real SEO Meta agent — verify: file exists with full implementation
 - [ ] Run exclusion audit — verify: no matches for excluded features
 - [ ] Run smoke test — verify: both agents respond via cURL
 - [ ] Verify plugin ZIP structure — verify: all files in `agentpress/` directory
