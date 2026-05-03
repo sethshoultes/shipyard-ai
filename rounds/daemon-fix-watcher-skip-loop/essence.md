@@ -1,12 +1,12 @@
-# Essence
+Unsupervised pipeline. Blueprint in. Product out.
 
-Invisible engine. Blueprint in. Product out.
+- Feeling: Close-the-laptop trust.
+- Must be perfect: Zero silent drops. Every skip screams.
+- Direction: Ship loud. Fix quiet.
 
-- **Feeling:** Trust. You sleep because it never lies.
-- **Must be perfect:** Zero silent skips. Every burial screams.
-- **Direction:** Ship the tourniquet. Build the spine.
+Tourniquet today. Spine tomorrow.
 
-No poetry until the patient is stable.
-No rename until the queue is real.
+No poetry until queue is real.
+No rename until v2 ships.
 
-The brand is a system that never pages you at midnight.
+The product is the absence of midnight pages.

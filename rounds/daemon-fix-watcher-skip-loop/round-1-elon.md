@@ -36,3 +36,6 @@ At 100× usage, three things break — all predictable:
 3. **Precision collapse.** The PRD acknowledges the `<=` mtime tie-risk. On many Linux hosts, ext4 timestamps have 1-second precision. Under load, intake recreates a PRD within the same second it was moved to `failed/`. The watcher drops a valid retry. The PRD calls this a "safe default." It is not. It is **guaranteed data loss** at scale. One drop per day at 100× volume is 365 silent failures per year.
 
 Ship the band-aid. But do not confuse shipping with solving. If you 100× this system without replacing the filesystem queue with a real state store, you will be back here in three months with a harder outage, angrier users, and more retro files.
+
+## Bottom Line
+Approve the PRD as a tactical patch with a hard expiration. File the SQLite rewrite ticket before this merges, or the band-aid becomes permanent by organizational inertia. Tourniquets save limbs; pretending they are veins gets you gangrene.

@@ -1,41 +1,43 @@
 # Round 2 — Elon (CPGO)
 
-## Where Steve is Wrong
-
-**Naming is bikeshedding at the wrong altitude.** We just lost two days of PRDs to a filesystem race, and Steve wants to burn cycles renaming the daemon to "Pulse." That is a v2 luxury. When the rocket is on fire, you do not repaint the logo. Ship the fix; argue about syllables in a sprint that is not on the critical path. A team that debates brand names while data is silently dropped has forgotten what shipping means.
-
-**Great products own a word, but first they must own a working state machine.** Pulse is a fine name for the relaunch. It is a dangerous distraction for the rescue mission.
-
-**Hiding the plumbing is how you lose weekends.** Steve says users must never see `failed/` or `parked/`. But our *only* users are engineers debugging at 3 a.m. during an outage. Obscuring the state machine behind a "human" abstraction adds cognitive latency to incident response. Taste is not visibility reduction; taste is predictable paths and deterministic recovery. If you cannot `ls` a directory and know the system state, you have built a black box, not a tool.
-
-**"No configuration knobs" is operational malpractice.** Steve argues that retry logic should have no dials because "we have not finished thinking." That is design absolutism. At 10× scale, a thundering herd against a flaky downstream will require backoff tuning. The right default is table stakes; the right override keeps the site up. Simplicity does not mean removing the circuit breaker from the wall.
-
-**Emotion is not an architecture.** The baby monitor analogy is vivid, but it does not address that `statSync` blocks the event loop or that ext4 timestamps have 1-second precision under load. We need fewer metaphors and more WAL mode. A covenant without an atomic commit is just poetry, and poetry does not survive concurrency.
-
-**Aesthetic purity delays the patch.** Steve wants no exposed plumbing, no knobs, and a full brand voice redesign. That is a three-week project disguised as a bug fix. If we scope-creep the fix into a product relaunch, we will miss the Friday deadline and lose another weekend to silent drops. Ship small; iterate.
-
 ## Where Steve is Right
+Steve is correct on three counts, and I will not waste energy disputing gravity.
 
-**Silent failures are the actual disease.** The two-day detection window was not caused by a missing mtime check; it was caused by the absence of signal. A system that drops work quietly is worse than one that drops it noisily. The mtime patch stops the bleeding, but without a screaming log line on every skip, we will repeat the delay. I will add an explicit `logger.error` on every `isAlreadyProcessed` skip path, with the full file path and reason. If a PRD is ignored, the log must roar.
+**Silent failures are evil.** If the watcher drops a file, the absence of signal is not stability—it is abandonment. Every skip must emit a structured log line. No exceptions. No "unavailable." No "skipped."
 
-**Log clarity is free performance.** "Failed" instead of "degraded" costs nothing and cuts MTTR in half. I concede the brand voice point entirely: if a log line confuses the on-call engineer, it is a severity-1 bug, not a copywriting preference. Words are UI, even in a terminal.
+**Dual sources of truth are poison.** Steve and I agree: `completed/` versus `failed/` versus a memory cache is exactly how you lose two days to existential dread. One source of truth or none. If you need two clocks to know the time, you have no clock.
 
-**The first 30 seconds matter even for piston rings.** I still maintain that virality is irrelevant here, but Steve is correct that even internal tools need zero-friction onboarding. The shell script must verify Node version, check disk space, and print a single green line on success. That is taste applied to infrastructure, and I accept it.
+**Words matter under pressure.** "Skipped" and "unavailable" are administrative evasions. If something failed, the word is *failed*. Clarity under fire is a form of taste I respect, and I will defend it against anyone who wants prettier euphemisms.
 
-**Observability is the one place where taste is non-negotiable for me too.** Dashboards, log formatting, and alert tone are user experience for the operator. I will not fight him on a single severity label or color hex code. Make it loud, make it clear, make it human.
+## Where Beauty Blocks Shipping
+Steve wants to christen this daemon "Forge" and teach it to speak like a master craftsperson. That is beautiful—and entirely irrelevant.
 
-## Defense of Simplicity
+This system has **zero external users**. A poetic name and brand voice do not fix the fact that `mv` is not atomic across processes. "Forge" is a luxury good; we are in triage. You do not name a tourniquet. You apply it.
 
-SQLite is not "over-engineering." It is *less* engineering than a distributed filesystem consensus protocol built from `mv`, `existsSync`, and prayer. One table, one query, zero races, 10,000 writes/sec on a Raspberry Pi. The beauty of SQLite in WAL mode is that it turns a distributed consensus problem into a single-writer transaction. You do not reason about `mv` atomicity or stale `fs.existsSync` caches. You write a row and commit.
+Worse, Steve demands invisibility. He wants to hide `failed/` and `parked/` because "you do not sell a house by showing the septic tank." But the septic tank is currently overflowing into the yard. The filesystem queue is the *only* observable state we have. Hiding it before we have a real state store is not design; it is a cover-up.
 
-Technical simplicity wins in the long run because it reduces the surface area for races, cuts the cognitive load for new engineers, and eliminates O(n) filesystem pressure at scale. Complexity is the enemy of reliability, and right now the filesystem queue is nothing but complexity dressed up as "simple" file moves.
+Invisibility is a privilege you earn after correctness, not before. When the system drops a PRD for two days, the operator needs to see the corpse, not a velvet curtain.
 
-Steve calls the mtime patch a tourniquet. He is right. But a tourniquet keeps the patient alive long enough to reach the operating theater. The mistake is not using a tourniquet; the mistake is pretending it is a cure. My requirement for the SQLite comment is exactly that admission: we are stopping the bleed, not healing the artery.
+"Every log line is a conversation" is also dangerous. Logs are not literature; they are telemetry. Engineers grep at 3 a.m. They need structured JSON, not metaphors. Brand voice in a log line is cargo-culting Apple at a water utility. Poetry does not survive `jq`.
+
+Steve also demands "NO configuration knobs." That is absolutism masquerading as philosophy. Good defaults are mandatory; escape hatches are survival gear. When the queue corrupts at 2 a.m. under load, you will want a dial, not a sermon. Simplicity is not the absence of controls; it is the absence of unnecessary ones.
+
+## Why Technical Simplicity Wins
+Steve thinks I am chasing elegance. I am chasing **survivability**.
+
+A single SQLite table with WAL mode is not beautiful; it is *durable*. It removes entire classes of races that no amount of taste can paper over. Taste cannot serialize concurrent file moves. Taste cannot make ext4 timestamps nanosecond-precise. Taste cannot prevent a second process from `mv`-ing a file you just `stat`-ed.
+
+One query beats three directory checks every time.
+
+The mtime patch is a tourniquet, not surgery. I will ship it because bleeding out is worse than limping. But I will not let the team mistake the tourniquet for a vein. Technical simplicity wins because it reduces the state space. Fewer moving parts means fewer weekends lost.
+
+Shipping the band-aid is correct; pretending it is skin is malpractice. The only thing worse than a broken system is a broken system that everyone believes is fixed.
 
 ## Top 3 Non-Negotiables
+1. **File the SQLite rewrite ticket before the mtime patch merges.** No band-aid becomes permanent by organizational inertia. Tourniquets save limbs; pretending they are veins gets you gangrene.
 
-1. **Ship the mtime patch this week.** No SQLite rewrite blocks the hotfix. Tourniquet first, surgery second. A delayed perfect fix is indistinguishable from a new outage. If the patch is not in production by Friday, we have failed.
+2. **Zero manual smoke tests.** If a human must read a log to verify correctness, the acceptance criteria is broken. Automate it with a temp directory and a vitest assertion, or delete it.
 
-2. **No rebrand during incident response.** The words "daemon" and "watcher skip-loop" stay until the system is stable. Marketing is a parallel track, not a prerequisite for stopping data loss. Call it Pulse in the docs when the pager stops beeping.
+3. **No silent skips.** Every watcher decision—process, skip, or retry—must emit a structured, grep-able log line. Clarity is not poetry; it is observability.
 
-3. **Keep `failed/` and `parked/` visible on disk.** Internal tools are debugged by reading directories, not by calling an abstraction layer. Debuggability beats aesthetic purity when the pager goes off at 2 a.m. We will hide them from external UX when we actually have external UX.
+*Ship the patch. Ticket the rewrite. Tell the truth in the logs.*
