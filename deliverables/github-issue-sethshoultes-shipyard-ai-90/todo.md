@@ -1,181 +1,188 @@
-# Forge Build — To-Do List
+# AgentPress v1 — To-Do List
 
-> **Project:** github-issue-sethshoultes-shipyard-ai-90
-> **Target:** Forge MVP (web app, config UI, execution engine)
-> **Status:** Pre-build — awaiting open question resolution
-> **Last Updated:** 2026-05-03
-
----
-
-## Phase 0: Open Question Resolution (BLOCKING)
-
-- [ ] Resolve Open Question #1: Exact node type roster (2 agents, inputs, outputs, config surfaces) — verify: decisions.md updated with roster
-- [ ] Resolve Open Question #2: Distribution channel (viral loop, embed, or SEO) — verify: distribution strategy documented in spec
-- [ ] Resolve Open Question #3: Trial mechanics without Stripe (prepaid credits? honor system?) — verify: trial flow documented
-- [ ] Resolve Open Question #4: Developer API scope (ships in v1 or deferred?) — verify: API decision in decisions.md
-- [ ] Resolve Open Question #5: Hosting/deployment target (Cloudflare Pages + D1 + R2?) — verify: deployment target documented
-- [ ] Resolve Open Question #6: Auth model (when auth appears, state preservation) — verify: auth flow documented
-- [ ] Resolve Open Question #7: Execution runtime substrate (existing daemon or new executor?) — verify: architecture decision documented
-- [ ] Resolve Open Question #8: First-run experience without canvas (30s magic moment) — verify: UX flow documented
+**Project**: AgentPress WordPress Plugin
+**Issue**: sethshoultes/shipyard-ai#90
+**Total Tasks**: 11 (5 waves)
+**Generated**: 2026-05-03
 
 ---
 
-## Phase 1: Project Bootstrap
+## Wave 1 — Foundation (Parallel)
 
-- [ ] Create `forge/` directory — verify: `ls -la forge/` shows directory exists
-- [ ] Create `forge/package.json` with project metadata — verify: `cat forge/package.json` shows valid JSON with name "forge"
-- [ ] Create `forge/tsconfig.json` with TypeScript config — verify: `tsc --noEmit` passes
-- [ ] Create `forge/.gitignore` with Node.js exclusions — verify: contains `node_modules`, `dist`, `.env`
-- [ ] Create `forge/app/index.html` entry point — verify: file opens in browser, no console errors
-- [ ] Create `forge/app/voice/brand.ts` with brand constants — verify: exports `tone`, `style`, `acronymBlacklist`
-- [ ] Create `forge/README.md` with setup instructions — verify: contains `npm install`, `npm start` commands
+### Task 1: Plugin Bootstrap + CPT Registration
+- [ ] Create `agentpress/agentpress.php` with standard WP plugin header — verify: file exists and contains "Plugin Name: AgentPress"
+- [ ] Define plugin constants (AGENTPRESS_VERSION, PLUGIN_DIR, PLUGIN_URL) — verify: constants defined in main file
+- [ ] Write activation hook registering `agentpress_capability` CPT — verify: CPT appears in wp-admin after activation
+- [ ] Write activation hook registering `agentpress_log` CPT with no revisions/autosave — verify: CPT registered with correct supports array
+- [ ] Insert built-in capability posts on activation (content_writer, image_generator) — verify: two posts exist with correct slugs
+- [ ] Create default settings option with wp-config.php constant support — verify: option exists in wp_options table
+- [ ] Implement `agentpress_get_setting()` helper with constant fallback — verify: returns constant value when defined
+- [ ] Write autoloader for classes in `includes/` and `includes/agents/` — verify: classes load without require_once
+- [ ] Hook plugin initialization on `plugins_loaded` — verify: no PHP fatal errors on activation
+- [ ] Write deactivation hook flushing rewrite rules — verify: plugin deactivates cleanly
 
----
+### Task 2: JSON Parser Hardening (Critical)
+- [ ] Create `includes/class-parser.php` with namespace — verify: class exists and is namespaced
+- [ ] Implement `extract_json()` with layered extraction (direct → strip fences → regex) — verify: handles markdown-fenced JSON
+- [ ] Implement `validate_routing_json()` with schema checks — verify: returns WP_Error for missing capability key
+- [ ] Implement `sanitize_payload()` with recursive wp_kses_post — verify: HTML tags are stripped from string values
+- [ ] Create test harness with 10+ edge cases — verify: all test cases produce expected results
+- [ ] Test valid JSON parsing — verify: returns parsed array
+- [ ] Test markdown fence stripping — verify: `` ```json{"test": "value"}``` `` parses correctly
+- [ ] Test truncated JSON handling — verify: returns WP_Error with `agentpress_parser_error`
+- [ ] Test hallucinated slug rejection — verify: `{"capability":"seo_meta"}` returns error
+- [ ] Test HTML-wrapped JSON extraction — verify: extracts JSON from HTML responses
 
-## Phase 2: Config UI — Form-Based Node Editor
-
-- [ ] Create `forge/app/config-ui/` directory — verify: `ls forge/app/config-ui/` shows subdirectories
-- [ ] Create `forge/app/config-ui/node-forms/` directory — verify: directory exists
-- [ ] Create `forge/app/config-ui/node-forms/base-form.tsx` — verify: exports `BaseForm` component with validation
-- [ ] Create `forge/app/config-ui/node-forms/content-writer-form.tsx` — verify: form has topic/tone/length inputs
-- [ ] Create `forge/app/config-ui/node-forms/image-generator-form.tsx` — verify: form has prompt/size inputs
-- [ ] Create `forge/app/config-ui/workflow-list/` directory — verify: directory exists
-- [ ] Create `forge/app/config-ui/workflow-list/workflow-list.tsx` — verify: displays workflow name, version
-- [ ] Create `forge/app/config-ui/workflow-list/version-history.tsx` — verify: shows version number, created date
-- [ ] Create `forge/app/config-ui/run-preview/` directory — verify: directory exists
-- [ ] Create `forge/app/config-ui/run-preview/output-viewer.tsx` — verify: renders text output or image URL
-- [ ] Create `forge/app/config-ui/styles.css` — verify: under 200 lines, no `!important`, no dark mode
-
----
-
-## Phase 3: Node Components
-
-- [ ] Create `forge/app/nodes/` directory — verify: directory exists
-- [ ] Create `forge/app/nodes/types.ts` — verify: exports `NodeType`, `NodeInput`, `NodeOutput` interfaces
-- [ ] Create `forge/app/nodes/node-registry.ts` — verify: exports `registerNode()`, `getNode()` functions
-- [ ] Create `forge/app/nodes/content-writer-node.ts` — verify: exports `ContentWriterNode` with `run()` method
-- [ ] Create `forge/app/nodes/image-generator-node.ts` — verify: exports `ImageGeneratorNode` with `run()` method
-- [ ] Create `forge/app/nodes/connection-node.ts` — verify: exports `ConnectionNode` with source/target IDs
-
----
-
-## Phase 4: Execution Engine — DAG
-
-- [ ] Create `forge/engine/` directory — verify: directory exists
-- [ ] Create `forge/engine/dag/` directory — verify: directory exists
-- [ ] Create `forge/engine/dag/dag.ts` — verify: exports `Dag` class with `addNode()`, `addEdge()` methods
-- [ ] Create `forge/engine/dag/topological-sort.ts` — verify: exports `topologicalSort()` function
-- [ ] Create `forge/engine/dag/dependency-resolver.ts` — verify: exports `resolveDependencies()` function
-- [ ] Create `forge/engine/validator/` directory — verify: directory exists
-- [ ] Create `forge/engine/validator/config-validator.ts` — verify: exports `validateConfig()` function
-- [ ] Create `forge/engine/validator/schema-validator.ts` — verify: exports `validateSchema()` function
+### Task 3: Admin CSS — Minimal Native Styling
+- [ ] Create `admin/css/agentpress-admin.css` — verify: file exists and is under 100 lines
+- [ ] Add `.agentpress-wrap` container styles — verify: max-width 1200px applied
+- [ ] Style `.agentpress-form-table` with tight spacing — verify: row margin reduced to 12px
+- [ ] Create `.agentpress-status-pill` styles (success/error) — verify: green/red pills display correctly
+- [ ] Style `.agentpress-log-table` as compact list-table — verify: row height 36px, zebra striping
+- [ ] Add `.agentpress-section-title` typography — verify: 16px font, 600 weight, proper color
+- [ ] Verify no !important declarations — verify: grep for "!important" returns zero matches
+- [ ] Verify all selectors prefixed with `.agentpress-` — verify: no conflicts with other plugins
+- [ ] Check file size under 3KB — verify: wc -l shows under 100 lines
+- [ ] Validate CSS syntax — verify: no parse errors in browser dev tools
 
 ---
 
-## Phase 5: Execution Engine — State Machine
+## Wave 2 — Core Classes (Parallel)
 
-- [ ] Create `forge/engine/state/` directory — verify: directory exists
-- [ ] Create `forge/engine/state/state-machine.ts` — verify: exports `StateMachine` class with state transitions
-- [ ] Create `forge/engine/state/idempotency.ts` — verify: exports `generateIdempotencyKey()` function
-- [ ] Create `forge/engine/state/retry-logic.ts` — verify: exports `retryWithBackoff()` function (max 3 retries)
-- [ ] Create `forge/engine/state/durable-storage.ts` — verify: exports `saveState()`, `loadState()` functions
+### Task 4: Agents Base Class + Capability Registry
+- [ ] Create `includes/class-agents.php` with namespace — verify: class loads via autoloader
+- [ ] Implement `get_capabilities()` querying agentpress_capability CPT — verify: returns array with 2 capabilities
+- [ ] Implement `get_capability($slug)` returning single capability — verify: returns null for missing slug
+- [ ] Implement `build_manifest()` with compact schema — verify: returns JSON-serializable array
+- [ ] Implement `run_internal()` calling handler functions — verify: calls `agentpress_run_content_writer()`
+- [ ] Define `agentpress_init` action hook — verify: fires during plugin initialization
+- [ ] Verify no public `agentpress_register_capability()` function — verify: grep returns zero matches
+- [ ] Test capability retrieval with correct metadata — verify: all meta fields populated
+- [ ] Test manifest serialization to JSON — verify: json_encode() succeeds without errors
+- [ ] Test internal handler dispatch — verify: correct handler called for each capability
 
----
+### Task 5: Activity Logger
+- [ ] Create `includes/class-logger.php` with namespace — verify: class loads without errors
+- [ ] Implement `log()` method inserting agentpress_log post — verify: post appears in database
+- [ ] Store post_meta fields (capability, payload, result, latency, status) — verify: meta exists in wp_postmeta
+- [ ] Implement `prune()` deleting oldest 50 when count > 500 — verify: count never exceeds 550
+- [ ] Call prune() automatically on every log insertion — verify: pruning triggers without manual call
+- [ ] Implement `get_recent($limit)` returning last N logs — verify: returns ordered array with meta
+- [ ] Disable revisions for agentpress_log CPT — verify: no _wp_post_revision rows exist
+- [ ] Disable autosave for agentpress_log CPT — verify: wp_is_post_autosave returns false
+- [ ] Test pruning with 505 entries — verify: oldest 50 deleted, count = 455
+- [ ] Test log retrieval with limit — verify: correct number and order returned
 
-## Phase 6: Parallel Execution
+### Task 6: ContentWriter Agent
+- [ ] Create `includes/agents/class-content-writer.php` — verify: class exists under correct namespace
+- [ ] Implement `run($payload)` with input validation — verify: WP_Error for missing topic
+- [ ] Build Claude prompt with topic/tone/length variables — verify: prompt contains correct format
+- [ ] Call Anthropic Messages API with proper headers — verify: API request succeeds with valid key
+- [ ] Parse response using Parser::extract_json() — verify: extracts JSON from Claude response
+- [ ] Validate result contains 'text' field — verify: WP_Error for malformed response
+- [ ] Truncate text to 2048 characters — verify: longer responses trimmed correctly
+- [ ] Extract tokens_used from API response — verify: returns usage.output_tokens or 0
+- [ ] Register handler function `agentpress_run_content_writer()` — verify: function exists and calls class
+- [ ] Test with valid API key — verify: returns array with text and tokens_used
 
-- [ ] Create `forge/engine/parallelizer/` directory — verify: directory exists
-- [ ] Create `forge/engine/parallelizer/parallelizer.ts` — verify: exports `findIndependentNodes()` function
-- [ ] Create `forge/engine/parallelizer/fork-join.ts` — verify: exports `forkJoin()` function
-- [ ] Create `forge/engine/parallelizer/promise-pool.ts` — verify: exports `PromisePool` class with concurrency limit
-
----
-
-## Phase 7: Caching Layer
-
-- [ ] Create `forge/cache/` directory — verify: directory exists
-- [ ] Create `forge/cache/key-builder/` directory — verify: directory exists
-- [ ] Create `forge/cache/key-builder/key-builder.ts` — verify: exports `buildCacheKey()` function (deterministic hash)
-- [ ] Create `forge/cache/store/` directory — verify: directory exists
-- [ ] Create `forge/cache/store/cache-store.ts` — verify: exports `CacheStore` class with TTL
-- [ ] Create `forge/cache/store/eviction.ts` — verify: exports `lruEviction()` function
-- [ ] Create `forge/cache/cache-integration.ts` — verify: integrates cache with node execution
-
----
-
-## Phase 8: Token Budgets
-
-- [ ] Create `forge/budgets/` directory — verify: directory exists
-- [ ] Create `forge/budgets/per-user-caps/` directory — verify: directory exists
-- [ ] Create `forge/budgets/per-user-caps/user-caps.ts` — verify: exports `trackTokenUsage()`, `checkCap()` functions
-- [ ] Create `forge/budgets/per-user-caps/daily-quota.ts` — verify: exports `checkDailyQuota()`, `resetDailyQuota()` functions
-- [ ] Create `forge/budgets/dedup/` directory — verify: directory exists
-- [ ] Create `forge/budgets/dedup/fingerprint.ts` — verify: exports `fingerprintRequest()` function
-- [ ] Create `forge/budgets/dedup/dedup-check.ts` — verify: exports `checkDuplicate()` function
-
----
-
-## Phase 9: Async Job Queue
-
-- [ ] Create `forge/queue/` directory — verify: directory exists
-- [ ] Create `forge/queue/dispatcher/` directory — verify: directory exists
-- [ ] Create `forge/queue/dispatcher/dispatcher.ts` — verify: exports `enqueue()`, `dequeue()` functions
-- [ ] Create `forge/queue/workers/` directory — verify: directory exists
-- [ ] Create `forge/queue/workers/worker.ts` — verify: exports `Worker` class that processes queue items
-- [ ] Create `forge/queue/workers/agent-handler.ts` — verify: exports `handleAgentCall()` function
+### Task 7: ImageGenerator Agent
+- [ ] Create `includes/agents/class-image-generator.php` — verify: class exists and loads
+- [ ] Implement `run($payload)` with prompt/size validation — verify: WP_Error for invalid size
+- [ ] Call Cloudflare Worker URL via wp_remote_post — verify: request succeeds with valid URL
+- [ ] Parse Worker response JSON — verify: extracts url, format, size fields
+- [ ] Validate HTTPS URL scheme — verify: WP_Error for http:// URLs
+- [ ] Handle relative URLs with known Worker domain — verify: prepends https:// when appropriate
+- [ ] Return array with url, format, size — verify: response structure matches spec
+- [ ] Register handler function `agentpress_run_image_generator()` — verify: function calls class method
+- [ ] Add timeout guard with user-friendly error — verify: timeout returns proper error message
+- [ ] Test with valid Worker endpoint — verify: returns HTTPS URL with correct metadata
 
 ---
 
-## Phase 10: REST API
+## Wave 3 — Orchestration (Sequential)
 
-- [ ] Create `forge/api/` directory — verify: directory exists
-- [ ] Create `forge/api/v1/` directory — verify: directory exists
-- [ ] Create `forge/api/v1/routes.ts` — verify: exports route definitions for `/workflows`, `/execute`
-- [ ] Create `forge/api/v1/workflows.ts` — verify: exports CRUD handlers for workflows
-- [ ] Create `forge/api/v1/execute.ts` — verify: exports `executeWorkflow()` handler
-- [ ] Create `forge/api/v1/auth.ts` — verify: exports `authenticate()` middleware
-
----
-
-## Phase 11: Integration & Polish
-
-- [ ] Wire config UI to execution engine — verify: form submission triggers workflow execution
-- [ ] Wire execution engine to cache layer — verify: repeated runs hit cache
-- [ ] Wire execution engine to budget tracker — verify: token usage tracked, caps enforced
-- [ ] Wire execution engine to job queue — verify: workflows run async
-- [ ] Wire job queue to REST API — verify: API triggers queue, returns job ID
-- [ ] Add loading states to UI — verify: user sees progress during execution
-- [ ] Add error states to UI — verify: user sees clear error messages
-- [ ] Add success states to UI — verify: user sees result on completion
+### Task 8: Router — Keyword Map + Claude Fallback
+- [ ] Create `includes/class-router.php` with namespace — verify: class loads via autoloader
+- [ ] Define locked keyword whitelist arrays — verify: ContentWriter and ImageGenerator triggers defined
+- [ ] Implement `route_local()` with case-insensitive matching — verify: 'write' routes to content_writer
+- [ ] Implement `route_claude()` with system prompt and manifest — verify: calls Claude API correctly
+- [ ] Parse Claude response using parser methods — verify: validates routing JSON schema
+- [ ] Return WP_Error for 'capability': 'none' — verify: agentpress_no_match error code
+- [ ] Implement `route()` trying local first, then Claude — verify: local routing avoids API calls
+- [ ] Log routing decisions for debugging — verify: log entries show source (local/claude)
+- [ ] Test local routing with exact keywords — verify: no HTTP requests made for local matches
+- [ ] Test Claude fallback with ambiguous input — verify: Claude API called for unclear intents
+- [ ] Test invalid capability handling — verify: returns error for unknown capabilities
 
 ---
 
-## Phase 12: Testing & QA
+## Wave 4 — Integration (Sequential)
 
-- [ ] Run all test scripts in `deliverables/github-issue-sethshoultes-shipyard-ai-90/tests/` — verify: all tests pass (exit 0)
-- [ ] Test first-run experience (<60 seconds to first result) — verify: new user can create and run workflow in 60s
-- [ ] Test token budget enforcement — verify: execution blocked when cap reached
-- [ ] Test workflow versioning — verify: editing creates new version, old runs unaffected
-- [ ] Test parallel execution — verify: independent nodes run concurrently
-- [ ] Test caching — verify: identical runs return cached result
-- [ ] Test retry logic — verify: failed nodes retry up to 3 times
+### Task 9: REST API Endpoint — Single Public Interface
+- [ ] Create `includes/class-rest-api.php` with namespace — verify: class registers REST routes
+- [ ] Register `POST /agentpress/v1/run` endpoint — verify: route appears in WP REST API index
+- [ ] Implement permission callback checking capabilities — verify: returns 401 for unauthenticated requests
+- [ ] Validate request args (task required, context optional) — verify: 400 error for missing task
+- [ ] Capture start time for latency calculation — verify: latency_ms > 0 in responses
+- [ ] Call Router::route() for capability determination — verify: routing results included in response
+- [ ] Handle routing errors with proper HTTP codes — verify: 500 with structured error data
+- [ ] Execute agent via Agents::run_internal() — verify: agent results returned in response
+- [ ] Log all executions via Logger::log() — verify: CPT entries created for API calls
+- [ ] Return standardized success response — verify: 200 with success, routing, result, latency_ms
+- [ ] Test with ContentWriter task — verify: returns text and routing data
+- [ ] Test with ImageGenerator task — verify: returns HTTPS URL and proper routing
+- [ ] Test error handling — verify: structured errors with codes and messages
+- [ ] Verify authentication requirement — verify: Application Password or manage_options required
 
 ---
 
-## Phase 13: Documentation
+## Wave 5 — Admin & Polish (Parallel)
 
-- [ ] Write `forge/README.md` with setup and usage — verify: new developer can follow steps
-- [ ] Write `forge/ARCHITECTURE.md` with system overview — verify: diagrams show data flow
-- [ ] Write `forge/API.md` with REST API documentation — verify: all endpoints documented
-- [ ] Write `forge/BRAND.md` with voice and style guide — verify: copy examples included
+### Task 10: Admin UI — One Crafted Screen
+- [ ] Create `admin/class-admin.php` with namespace — verify: class loads without errors
+- [ ] Add submenu page under Tools → AgentPress — verify: menu item appears and loads page
+- [ ] Render page with single div.wrap and h1 — verify: page title "AgentPress" displays
+- [ ] Register settings fields with sanitization — verify: settings save and persist correctly
+- [ ] Add API key field with password input type — verify: field masks input value
+- [ ] Add Worker URL field with URL validation — verify: saves only valid URLs
+- [ ] Add model dropdown with default option — verify: dropdown populates and saves selection
+- [ ] Implement wp-config.php constant override UI — verify: fields disabled with note when constants defined
+- [ ] Query and display recent logs in table — verify: log viewer shows last 50 entries
+- [ ] Add status pill styling for log entries — verify: success/error pills display with colors
+- [ ] Show placeholder message when no logs exist — verify: message appears with endpoint URL
+- [ ] Enqueue admin CSS only on AgentPress pages — verify: CSS loads on admin page, not elsewhere
+- [ ] Test settings save and reload — verify: values persist after page refresh
+- [ ] Test constant override behavior — verify: defined constants disable fields correctly
+
+### Task 11: Readme + Integration + Exclusion Verification
+- [ ] Create readme.txt with WordPress.org header — verify: proper format and metadata
+- [ ] Write Description section (exactly 3 paragraphs) — verify: concise, clear description
+- [ ] Write Installation instructions — verify: upload, activate, configure steps
+- [ ] Add API Example section with cURL command — verify: valid curl syntax with auth
+- [ ] Add Anthropic Terms of Service disclosure — verify: compliance notice present
+- [ ] Create placeholder third-agent stub — verify: class-agent-third.php with not_implemented error
+- [ ] Run exclusion audit for banned features — verify: zero matches for all 10 excluded patterns
+- [ ] Perform smoke test with both agents — verify: cURL requests succeed with valid keys
+- [ ] Verify log entries appear in admin — verify: smoke test logs show correctly
+- [ ] Check plugin ZIP structure — verify: all files in agentpress/ directory, no build artifacts
+- [ ] Verify plugin size under 500KB — verify: du -sh shows acceptable size
+- [ ] Validate readme.txt for WordPress.org — verify: header format and required sections present
+
+---
+
+## Final Verification
+
+- [ ] All PHP files load without fatal errors — verify: plugin activates on clean WordPress install
+- [ ] All tests pass without exceptions — verify: test scripts return exit code 0
+- [ ] Average latency under 4000ms — verify: both agents respond within time limit
+- [ ] Plugin ready for WordPress.org submission — verify: meets all guidelines and requirements
 
 ---
 
 ## Notes
 
-- Each task should be completable in <5 minutes
-- Each task has a verification step (how to check it worked)
-- Tasks are atomic and independent where possible
-- Phase 0 (open questions) must be resolved before Phase 1 begins
-- Waves 1, 2, and 5 can run in parallel within their phase
-- Phases 3, 4, 9, 10 are sequential (each depends on previous)
+- Each task should be completable in under 5 minutes
+- Verification steps must be concrete and testable
+- Mark tasks as completed only when verification passes
+- Failed verification means task is not complete
+- Do not proceed to dependent tasks until prerequisites are verified

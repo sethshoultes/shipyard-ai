@@ -1,0 +1,93 @@
+/* AgentPress Admin Styles - Native WordPress styling, under 100 lines */
+
+.agentpress-wrap {
+    max-width: 1200px;
+}
+
+.agentpress-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 24px 0 12px;
+}
+
+.agentpress-form-table th {
+    padding: 12px 10px 12px 0;
+    width: 200px;
+    font-weight: 600;
+}
+
+.agentpress-form-table td {
+    padding: 12px 0;
+}
+
+.agentpress-form-table input[type="text"],
+.agentpress-form-table input[type="password"],
+.agentpress-form-table select {
+    width: 300px;
+    padding: 8px;
+}
+
+.agentpress-status-pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.agentpress-status-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.agentpress-status-error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.agentpress-log-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+.agentpress-log-table th,
+.agentpress-log-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.agentpress-log-table th {
+    background-color: #f9f9f9;
+    font-weight: 600;
+}
+
+.agentpress-log-table tr:hover {
+    background-color: #f0f6fc;
+}
+
+.agentpress-log-table tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.agentpress-log-table tr:nth-child(even):hover {
+    background-color: #f0f6fc;
+}
+
+.agentpress-latency {
+    font-family: monospace;
+    color: #666;
+}
+
+.agentpress-settings-note {
+    font-style: italic;
+    color: #666;
+    margin-top: 4px;
+}
+
+.agentpress-disabled-field {
+    background-color: #f0f0f1;
+    cursor: not-allowed;
+}
