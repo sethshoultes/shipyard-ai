@@ -1,39 +1,27 @@
-# Round 2: Steve
+# Steve Jobs — Round 2
 
 ## Where Elon Optimizes for the Wrong Metric
 
-Elon is solving for engineering velocity when he should solve for user love. He wants a JSON config editor because it is "6+ months faster." But users already have n8n, LangFlow, and YAML. A table view is not a product; it is a resignation letter.
+Elon wants to ship a JSON schema editor and call it v1. That's optimizing for *developer velocity* when you should optimize for *emotional conversion*. A form-based UI is what you build when you don't trust the user. It's a spreadsheet pretending to be a product. People don't fall in love with JSON.
 
-He measures lines of backend code. I measure whether a stranger falls in love in thirty seconds. If the answer is no, there is no v2. There is only a GitHub repo nobody clones.
+He says "async by default — users want reliable, not instant." Wrong metric again. The first workflow isn't about throughput; it's about **belief**. The user needs to see the agent respond while their finger is still warm on the trackpad. Latency matters in the magic window. Async is an engineering optimization. Magic is the requirement.
 
-He says the canvas is expensive. Good. That means the 10th mover cannot clone it in a weekend. The hard part is the moat. JSON is infinitely copyable; beauty is not. Optimizing for speed-to-config gets you a faster horse in 2026.
+"Cut freemium" is optimizing for cash flow before we have a congregation. You don't charge admission to a church still building its pews.
 
-Elon would ship an admin dashboard with forty toggles and call it power. I call it fear. If you need forty toggles, you have not decided what the product is.
+## Defending What Elon Would Cut
 
-## Defending What He'd Attack
+The canvas isn't "Figma." It's the instrument. Remove it and you remove the entire thesis: that a non-developer can orchestrate intelligence by *touching* it. A config UI makes them feel like they're filling out a tax form. The canvas makes them feel like a conductor. That feeling is what gets screenshotted and posted on Twitter. It *is* the distribution strategy.
 
-Elon calls design "frosting." He is wrong. In a crowded market, interaction quality is the only unfair advantage you cannot rent. The canvas is not decoration—it forces clarity. A card is an agent. A handoff is state passing. If you cannot draw it beautifully, you do not understand it.
-
-He wants to cut drag-and-drop because it is expensive. But in a world where everyone can buy GPT-4, the interface is the only IP you cannot rent. You do not compete on COGS when you are a 10th mover. You compete on belonging.
-
-AI agents are invisible and terrifying to normal humans. The canvas makes the invisible visible. A JSON file is invisible; the canvas is unforgettable. ProductHunt does not feature YAML. No-code communities do not gather around config files.
-
-The interaction model is the architecture. You do not spec a gesture in a PRD. You build it, you hate it, you rebuild it, and then it disappears into muscle memory. This is why the iPhone had a touchscreen before anyone else thought it was possible. Canvas v1 is not reckless; it is the entire reason we exist.
+Onboarding modals are a confession of design failure. If you need seven tooltips to explain a node, you built a tool, not an experience. The product must teach itself through gesture and reward.
 
 ## Where Elon Is Right
 
-He is right that "workflow" is undefined under the hood. We need a linear execution model, durable state, and idempotency before the first pixel ships. He is right that inference spend is existential. A free-for-all trial without per-user cost caps is reckless. I concede that immediately. Hard caps, daily limits, and prepaid credits ship alongside the first invitation, not after.
+One agent session will not build this. He's right that LLM costs scale like a runaway reactor — per-user cost caps and usage hard-stops are infrastructure, not billing details. He's right that workflow versioning is mandatory; users will edit a live run and blame us when it breaks. He's right that ProductHunt is a spike, not a strategy. And he's right that "React + drag-drop" is a stack, not an architecture — we need the state machine and execution engine defined in code, not slides.
 
-He is right that one agent session cannot build a production orchestrator. I never said it could. I said one session could prove the soul of the interaction. Production is 3 engineers, 6 months, minimum.
+## Non-Negotiables
 
-He is right that "Workers AI" is premature infrastructure theater before we have ten users. No edge execution in v1. And he is right that dual-platform is stupid. One sacred canvas. One. He is also right that template marketplaces on day one are founder theater. We earn templates by watching what users actually build, not by guessing in a vacuum.
+1. **The canvas ships in v1.** Not as a feature. As the core interaction model.
+2. **Free tier exists.** We monetize limits and power users, not access. Evangelism beats extraction in year one.
+3. **The name is Forge.** One syllable. No compound, no category marker, no committee residue.
 
-## Top 3 Non-Negotiables
-
-1. **The canvas ships in v1.** A config editor is surrender. Two agents, one connection, one play button—but it must feel like a Stradivarius, not a spreadsheet.
-
-2. **Living first-run experience.** No blank canvas. The user lands on a working symphony, touches one note, and hears the orchestra respond. Blank canvases are designer arrogance; living workflows are user empathy.
-
-3. **Free to taste, then premium to scale.** No "three workflows free." Give the full orchestra for a generous taste, then charge boldly for unlimited command. Addiction first, invoice second—but never give away the piano and charge for the keys. Elon was right: we cap the spend before we uncap the wonder.
-
-Build the engine in JSON underneath. Cache like a hawk. Parallelize so the wait never kills the wonder. But what the human touches must feel like magic, or we have already lost.
+Build the cathedral. The plumbing can catch up.
