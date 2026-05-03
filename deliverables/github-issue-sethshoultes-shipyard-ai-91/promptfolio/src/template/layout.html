@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0a0f">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{portfolioTitle}}">
+  <meta property="og:description" content="A portfolio of AI prompts and responses">
+  <meta property="og:image" content="{{ogImageUrl}}">
+  <meta property="og:url" content="{{portfolioUrl}}">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <title>{{portfolioTitle}} — Promptfolio</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <h1 class="header-title">{{portfolioTitle}}</h1>
+      <p class="header-meta">Created {{createdAt}}</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="prompts-grid">
+      {{promptCards}}
+    </div>
+
+    <section class="share-section">
+      <p>Share this portfolio</p>
+      <div class="share-buttons">
+        <button class="btn btn-share" onclick="sharePortfolio()">Share</button>
+        <button class="btn btn-copy" onclick="copyLink()">Copy Link</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Built with Promptfolio</p>
+    </div>
+  </footer>
+
+  <script>
+    async function sharePortfolio() {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: '{{portfolioTitle}}',
+            text: 'Check out this portfolio of AI prompts',
+            url: window.location.href
+          });
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            copyLink();
+          }
+        }
+      } else {
+        copyLink();
+      }
+    }
+
+    async function copyLink() {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        const btn = document.querySelector('.btn-copy');
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.classList.add('copy-success');
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.classList.remove('copy-success');
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    }
+
+    async function copyPrompt(promptId) {
+      const card = document.getElementById(promptId);
+      const body = card.querySelector('.prompt-body').textContent;
+      try {
+        await navigator.clipboard.writeText(body);
+        const btn = card.querySelector('.btn-copy');
+        const originalText = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.classList.add('copy-success');
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.classList.remove('copy-success');
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "promptfolio",
+  "version": "1.0.0",
+  "description": "Static SaaS portfolio generator for Claude conversation exports",
+  "type": "module",
+  "main": "src/generator/build.js",
+  "scripts": {
+    "build": "node src/generator/build.js",
+    "test": "bash tests/test-parser.sh && bash tests/test-generator.sh && bash tests/test-exclusions.sh"
+  },
+  "keywords": [
+    "portfolio",
+    "claude",
+    "ai",
+    "static",
+    "generator"
+  ],
+  "author": "Shipyard AI",
+  "license": "MIT",
+  "dependencies": {
+    "sharp": "^0.33.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
