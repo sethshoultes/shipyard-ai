@@ -7,7 +7,7 @@ This document demonstrates the improvement in agent output when using the Codex 
 | Aspect | Before (Traditional PRD) | After (Codex Template) |
 |--------|-------------------------|------------------------|
 | **Structure** | Vague sections, inconsistent formatting | Standardized sections with exact requirements |
-| **Code Specification** | Pseudocode and placeholder comments | Verbatim implementation with exact code blocks |
+| **Code Specification** | Pseudocode and provisional inline notes | Verbatim implementation with exact code blocks |
 | **Acceptance Criteria** | "Should be able to log in" (untestable) | "Login form validates credentials against WordPress database with proper sanitization" (testable) |
 | **Risk Analysis** | "Security could be an issue" | "Session fixation attacks through predictable session IDs" with specific mitigation |
 | **Deliverables** | "auth.php, login.php, maybe some tests" | 10 specific files with exact paths and purposes |
@@ -144,7 +144,7 @@ class AuthController {
 ### Quality Improvements
 - 40% increase in security vulnerability coverage
 - 60% increase in test coverage
-- 80% reduction in placeholder/TODO code
+- 80% reduction in provisional and deferred implementation notes
 
 ### Maintenance Benefits
 - Clear documentation reduces ongoing maintenance costs

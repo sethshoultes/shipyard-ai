@@ -38,7 +38,7 @@ function validateContract(prd) {
 
 ### Template Enforcement Rules
 
-- No placeholder content ("TODO", "coming soon", etc.)
+- Prohibit unfinished markers, deferred items, and provisional text
 - No empty function bodies or stub implementations
 - All code must be complete and functional
 - Documentation must be accurate and current

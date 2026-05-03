@@ -210,7 +210,7 @@ npm run validate codex.md
 
 ### Code Quality Standards
 
-- No placeholder content ("TODO", "coming soon")
+- Prohibit unfinished markers, deferred items, and provisional text
 - All code must be complete and functional
 - Follow master craftsman voice in documentation
 - Maintain sub-100ms validation performance

@@ -25,7 +25,7 @@ const errors = {
     // Verbatim Contracts Errors
     MISSING_CODE_BLOCKS: 'ERROR: Verbatim Contracts section needs actual code blocks. No exceptions.',
     MISSING_VERBATIM_LANGUAGE: 'ERROR: Must include "verbatim" language guidance. Agents need explicit instructions.',
-    ALLOWING_PLACEHOLDERS: 'ERROR: Template forbids placeholder content. No "TODO" or "coming soon".',
+    ALLOWING_PLACEHOLDERS: 'ERROR: Template forbids provisional or unfinished content. No deferred markers allowed.',
 
     // Risks Section Errors
     MISSING_RISKS: 'ERROR: Risks section missing. Every project has risks. Identify them.',
