@@ -1,208 +1,201 @@
 #!/usr/bin/env node
-
-/**
- * Proof — Post-Deploy Domain Verification
- *
- * Verifies that production custom domains serve the deployed build.
- * Checks DNS origin and HTTPS response for each configured domain.
- *
- * Exit codes:
- *   0 - All domains verified successfully
- *   1 - One or more domains failed verification
- */
+'use strict';
 
 const https = require('https');
-const dns = require('dns');
+const dns = require('dns').promises;
 const fs = require('fs');
 const path = require('path');
-const { promisify } = require('util');
-
-const dnsResolveCname = promisify(dns.resolveCname);
-const dnsResolve4 = promisify(dns.resolve4);
-
-const TIMEOUT_MS = 5000;
-const USER_AGENT = 'Shipyard-Proof/1.0';
 
 /**
- * Load domain configuration
+ * Load domains configuration from domains.json or PROOF_DOMAINS_PATH env var
  */
-function loadConfig() {
-  const configPath = process.env.PROOF_DOMAINS_PATH || path.join(__dirname, '..', 'domains.json');
-  const absolutePath = path.isAbsolute(configPath) ? configPath : path.join(process.cwd(), configPath);
+function loadDomains() {
+  const domainsPath = process.env.PROOF_DOMAINS_PATH
+    ? path.resolve(process.cwd(), process.env.PROOF_DOMAINS_PATH)
+    : path.join(__dirname, '..', 'domains.json');
 
-  try {
-    const content = fs.readFileSync(absolutePath, 'utf8');
-    return JSON.parse(content);
-  } catch (err) {
-    if (err.code === 'ENOENT') {
-      console.error(`Configuration file not found: ${absolutePath}`);
-    } else if (err instanceof SyntaxError) {
-      console.error(`Invalid JSON in configuration file: ${absolutePath}`);
-    } else {
-      console.error(`Failed to load configuration: ${err.message}`);
-    }
+  if (!fs.existsSync(domainsPath)) {
+    console.log('Configuration file not found: ' + domainsPath);
     process.exit(1);
   }
+
+  let content;
+  try {
+    content = fs.readFileSync(domainsPath, 'utf8');
+  } catch (err) {
+    console.log('Failed to read configuration file: ' + err.message);
+    process.exit(1);
+  }
+
+  let domains;
+  try {
+    domains = JSON.parse(content);
+  } catch (err) {
+    console.log('Invalid JSON in configuration file: ' + err.message);
+    process.exit(1);
+  }
+
+  return domains;
 }
 
 /**
- * Check if domain has expected CNAME record
+ * Resolve DNS CNAME or A record for a domain to get the origin
  */
-async function checkCname(domain, expectedOrigin) {
+async function resolveOrigin(domain) {
   try {
-    const records = await dnsResolveCname(domain);
-    if (Array.isArray(records) && records.length > 0) {
-      // Check if any CNAME record matches expected origin
-      return records.some(record => record.includes(expectedOrigin));
+    // Try CNAME first
+    const cname = await dns.resolveCname(domain);
+    return cname;
+  } catch (cnameErr) {
+    try {
+      // Fall back to A record for apex domains
+      const addresses = await dns.resolve4(domain);
+      if (addresses && addresses.length > 0) {
+        return addresses[0];
+      }
+    } catch (aErr) {
+      throw new Error('DNS resolution failed');
     }
-    return false;
-  } catch (err) {
-    // CNAME lookup failed - might be apex domain using A records
-    return null;
   }
+  throw new Error('Could not resolve origin');
 }
 
 /**
- * Check if domain resolves to A records (fallback for apex domains)
+ * Check if the resolved origin matches the expected origin
  */
-async function checkARecords(domain) {
-  try {
-    const records = await dnsResolve4(domain);
-    return Array.isArray(records) && records.length > 0;
-  } catch (err) {
+function validateOrigin(resolved, expected) {
+  if (!resolved || !expected) {
     return false;
   }
+  const resolvedLower = resolved.toLowerCase();
+  const expectedLower = expected.toLowerCase();
+  return resolvedLower.includes(expectedLower) || expectedLower.includes(resolvedLower);
 }
 
 /**
- * Perform HTTPS GET request and validate response
+ * Perform HTTPS GET request to verify the domain responds
  */
-async function checkHttps(domain, route) {
-  return new Promise((resolve) => {
-    const url = `https://${domain}${route}`;
-    const startTime = Date.now();
-
-    const req = https.get(url, {
-      headers: { 'User-Agent': USER_AGENT },
-      timeout: TIMEOUT_MS
+function httpsGet(domain) {
+  return new Promise((resolve, reject) => {
+    const req = https.get('https://' + domain + '/', {
+      timeout: 10000,
+      headers: {
+        'User-Agent': 'Shipyard-Proof/1.0'
+      }
     }, (res) => {
-      const elapsed = Date.now() - startTime;
+      // Collect headers for Cloudflare validation
+      const headers = res.headers;
 
-      // Check for Cloudflare headers
-      const hasCfRay = !!res.headers['cf-ray'];
-      const hasCfServer = res.headers['server']?.toLowerCase().includes('cloudflare');
-      const isCloudflare = hasCfRay || hasCfServer;
+      if (res.statusCode !== 200) {
+        reject(new Error('HTTP ' + res.statusCode));
+        return;
+      }
 
-      resolve({
-        status: res.statusCode,
-        isCloudflare,
-        hasCfRay,
-        elapsed,
-        headers: res.headers
-      });
+      // Check for Cloudflare headers (CF-RAY or Server: cloudflare)
+      const hasCfRay = !!headers['cf-ray'];
+      const serverHeader = (headers['server'] || '').toLowerCase();
+      const hasCloudflareServer = serverHeader.includes('cloudflare');
+
+      if (!hasCfRay && !hasCloudflareServer) {
+        reject(new Error('Missing Cloudflare headers'));
+        return;
+      }
+
+      resolve({ statusCode: res.statusCode, headers: headers });
     });
 
-    req.on('error', (err) => {
-      resolve({ error: err.message });
-    });
-
+    req.on('error', reject);
     req.on('timeout', () => {
       req.destroy();
-      resolve({ error: 'Request timeout' });
+      reject(new Error('Request timeout'));
     });
   });
 }
 
 /**
- * Verify a single domain
+ * Sleep for specified milliseconds using setTimeout for retry backoff
  */
-async function verifyDomain(config) {
-  const { domain, expected_origin: expectedOrigin, routes } = config;
-  const results = { domain, passed: false, checks: {} };
-
-  // Check 1: DNS CNAME validation
-  const cnameResult = await checkCname(domain, expectedOrigin);
-  results.checks.cname = cnameResult;
-
-  // Check 2: A records (fallback for apex domains)
-  if (cnameResult === null || cnameResult === false) {
-    const aResult = await checkARecords(domain);
-    results.checks.aRecords = aResult;
-  }
-
-  // Check 3: HTTPS GET for each route
-  const httpsChecks = [];
-  for (const route of routes || ['/']) {
-    httpsChecks.push(checkHttps(domain, route));
-  }
-  results.checks.https = await Promise.all(httpsChecks);
-
-  // Determine pass/fail
-  const dnsPass = cnameResult === true || results.checks.aRecords === true;
-  const httpsPass = results.checks.https.some(
-    check => !check.error && check.status === 200
-  );
-  const cfPass = results.checks.https.some(
-    check => !check.error && check.isCloudflare
-  );
-
-  // Pass if: DNS matches expected origin OR (HTTPS 200 + Cloudflare headers)
-  results.passed = dnsPass || (httpsPass && cfPass);
-
-  return results;
+function sleep(ms) {
+  return new Promise(function(resolve) {
+    setTimeout(resolve, ms);
+  });
 }
 
 /**
- * Format failure message (≤140 chars, one sentence, no stack trace)
+ * Verify a single domain with retry and exponential backoff
+ * Retry: 5 attempts with delays (1s, 2s, 4s, 8s, 15s) = ~30s total + overhead
  */
-function formatFailure(domain, results) {
-  const httpsCheck = results.checks.https?.[0];
+async function verifyDomain(domainConfig) {
+  const { domain, expected_origin } = domainConfig;
+  const maxAttempts = 5;
+  const delays = [1000, 2000, 4000, 8000, 15000]; // exponential backoff
 
-  if (httpsCheck?.error) {
-    return `Verification failed for ${domain}: ${httpsCheck.error}`;
-  }
+  let lastError = null;
 
-  if (httpsCheck?.status !== 200) {
-    return `Verification failed for ${domain}: received HTTP ${httpsCheck?.status} instead of 200`;
-  }
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      // Perform HTTPS request with Cloudflare header validation
+      await httpsGet(domain);
 
-  if (!results.checks.cname && !results.checks.aRecords) {
-    return `Verification failed for ${domain}: DNS does not resolve to expected origin`;
-  }
+      // Resolve DNS and validate origin
+      const resolvedOrigin = await resolveOrigin(domain);
 
-  return `Verification failed for ${domain}: origin validation failed`;
-}
+      if (!validateOrigin(resolvedOrigin, expected_origin)) {
+        throw new Error('Origin mismatch');
+      }
 
-/**
- * Main entry point
- */
-async function main() {
-  const config = loadConfig();
+      // Success - print verification message with ISO8601 timestamp
+      const timestamp = new Date().toISOString();
+      console.log('✓ Verified ' + domain + ' at ' + timestamp);
+      return { success: true, domain: domain };
+    } catch (error) {
+      lastError = error;
 
-  if (!Array.isArray(config) || config.length === 0) {
-    console.error('No domains configured for verification');
-    process.exit(1);
-  }
-
-  const results = await Promise.all(config.map(verifyDomain));
-
-  let allPassed = true;
-  const timestamp = new Date().toISOString();
-
-  for (const result of results) {
-    if (result.passed) {
-      console.log(`Verified ${result.domain} ${timestamp}`);
-    } else {
-      console.error(formatFailure(result.domain, result));
-      allPassed = false;
+      // If this was the last attempt, don't retry
+      if (attempt < maxAttempts - 1) {
+        await sleep(delays[attempt]);
+      }
     }
   }
 
-  process.exit(allPassed ? 0 : 1);
+  // All retries exhausted - fail with one plain-English sentence ≤140 chars
+  const message = 'Your domain isn\'t pointing here.';
+  console.log(message);
+  return { success: false, domain: domain, error: lastError ? lastError.message : 'Unknown error' };
 }
 
-main().catch((err) => {
-  // Catch any unhandled errors and exit cleanly without stack trace
-  console.error(`Verification failed: ${err.message}`);
+/**
+ * Verify all domains in parallel using Promise.all
+ */
+async function verifyAllDomains() {
+  const domains = loadDomains();
+
+  if (!Array.isArray(domains) || domains.length === 0) {
+    console.log('No domains to verify');
+    process.exit(0);
+  }
+
+  // Run all verifications in parallel with Promise.all
+  const results = await Promise.all(
+    domains.map(function(config) {
+      return verifyDomain(config);
+    })
+  );
+
+  // Check results - fail fast on first failure
+  for (let i = 0; i < results.length; i++) {
+    if (!results[i].success) {
+      console.log('Deploy verification failed');
+      process.exit(1);
+    }
+  }
+
+  console.log('All domains verified successfully');
+  process.exit(0);
+}
+
+// Main entry point
+verifyAllDomains().catch(function(error) {
+  console.log('Verification failed: An unexpected error occurred.');
   process.exit(1);
 });

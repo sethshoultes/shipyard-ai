@@ -113,7 +113,7 @@ function httpsGet(domain) {
 }
 
 /**
- * Sleep for specified milliseconds
+ * Sleep for specified milliseconds using setTimeout for retry backoff
  */
 function sleep(ms) {
   return new Promise(function(resolve) {
