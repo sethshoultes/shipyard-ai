@@ -113,31 +113,55 @@ function httpsGet(domain) {
 }
 
 /**
- * Verify a single domain - fail fast, no retry
+ * Sleep for specified milliseconds
+ */
+function sleep(ms) {
+  return new Promise(function(resolve) {
+    setTimeout(resolve, ms);
+  });
+}
+
+/**
+ * Verify a single domain with retry and exponential backoff
+ * Retry: 5 attempts with delays (1s, 2s, 4s, 8s, 15s) = ~30s total + overhead
  */
 async function verifyDomain(domainConfig) {
   const { domain, expected_origin } = domainConfig;
+  const maxAttempts = 5;
+  const delays = [1000, 2000, 4000, 8000, 15000]; // exponential backoff
 
-  try {
-    // Perform HTTPS request with Cloudflare header validation
-    await httpsGet(domain);
+  let lastError = null;
 
-    // Resolve DNS and validate origin
-    const resolvedOrigin = await resolveOrigin(domain);
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      // Perform HTTPS request with Cloudflare header validation
+      await httpsGet(domain);
 
-    if (!validateOrigin(resolvedOrigin, expected_origin)) {
-      throw new Error('Origin mismatch');
+      // Resolve DNS and validate origin
+      const resolvedOrigin = await resolveOrigin(domain);
+
+      if (!validateOrigin(resolvedOrigin, expected_origin)) {
+        throw new Error('Origin mismatch');
+      }
+
+      // Success - print verification message with ISO8601 timestamp
+      const timestamp = new Date().toISOString();
+      console.log('✓ Verified ' + domain + ' at ' + timestamp);
+      return { success: true, domain: domain };
+    } catch (error) {
+      lastError = error;
+
+      // If this was the last attempt, don't retry
+      if (attempt < maxAttempts - 1) {
+        await sleep(delays[attempt]);
+      }
     }
-
-    // Success - print verification message with ISO8601 timestamp
-    const timestamp = new Date().toISOString();
-    console.log('Verified ' + domain + ' ' + timestamp);
-    return { success: true, domain: domain };
-  } catch (error) {
-    // Fail fast - one plain-English sentence, no stack traces
-    console.log('Failed to verify ' + domain + ': ' + error.message + '.');
-    return { success: false, domain: domain, error: error.message };
   }
+
+  // All retries exhausted - fail with one plain-English sentence ≤140 chars
+  const message = 'Your domain isn\'t pointing here.';
+  console.log(message);
+  return { success: false, domain: domain, error: lastError ? lastError.message : 'Unknown error' };
 }
 
 /**

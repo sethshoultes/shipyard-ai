@@ -1,10 +1,11 @@
 # Hindsight Report
-**Generated:** 2026-05-03T18:17:20.088Z
+**Generated:** 2026-05-03T18:22:45.429Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 14 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 3 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- 28c9578 micromanager: dirty auto-reconcile
 - e64b7b6 daemon: auto-commit 2 files
 - e67de86 Ship github-issue-sethshoultes-shipyard-ai-91: all deliverables + retrospective
 - fb58d61 micromanager: dirty auto-reconcile
@@ -14,17 +15,16 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 14 uncommitted changes
 - 9db2d12 micromanager: dirty auto-reconcile
 - ca1028f daemon: auto-commit 1 files
 - 033b6fa daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-90
-- 3cc9d94 micromanager: dirty auto-reconcile
 
 ## High-Churn Files
-- `.daemon-queue.json` (162 changes)
+- `.daemon-queue.json` (163 changes)
 - `.planning/sara-blakely-review.md` (105 changes)
-- `.great-minds/hindsight-report.md` (60 changes)
+- `.great-minds/hindsight-report.md` (61 changes)
 - `.planning/phase-1-plan.md` (53 changes)
 - `.planning/REQUIREMENTS.md` (50 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
-- `prds/github-issue-sethshoultes-shipyard-ai-91.md` (25 changes)
+- `prds/github-issue-sethshoultes-shipyard-ai-91.md` (26 changes)
 - `prds/github-issue-sethshoultes-shipyard-ai-90.md` (24 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
 - `prds/github-issue-sethshoultes-shipyard-ai-98.md` (23 changes)
@@ -57,20 +57,9 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 14 uncommitted changes
 
 ## Uncommitted State
 ```
-M .daemon-queue.json
- M rounds/github-issue-sethshoultes-shipyard-ai-98/decisions.md
- M rounds/github-issue-sethshoultes-shipyard-ai-98/essence.md
- M rounds/github-issue-sethshoultes-shipyard-ai-98/round-1-elon.md
- M rounds/github-issue-sethshoultes-shipyard-ai-98/round-1-steve.md
- M rounds/github-issue-sethshoultes-shipyard-ai-98/round-2-elon.md
- M rounds/github-issue-sethshoultes-shipyard-ai-98/round-2-steve.md
-?? .agent-logs/debate/elon-musk-r1-1777831679365.jsonl
-?? .agent-logs/debate/elon-musk-r2-1777831837874.jsonl
-?? .agent-logs/debate/phil-jackson-consolidation-1777832005241.jsonl
-?? .agent-logs/debate/rick-rubin-essence-1777831947251.jsonl
-?? .agent-logs/debate/steve-jobs-r1-1777831679348.jsonl
-?? .agent-logs/debate/steve-jobs-r2-1777831837864.jsonl
-?? prds/github-issue-sethshoultes-shipyard-ai-91.md
+M .agent-logs/plan/planner-1777832240088.jsonl
+ M .planning/sara-blakely-review.md
+?? .agent-logs/plan/sara-blakely-gutcheck-1777832506057.jsonl
 ```
 
 ---

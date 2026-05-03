@@ -1,13 +1,7 @@
-# Sara Blakely Gut-Check
+Verdict: Product solves a problem that doesn't exist.
 
-**Verdict: Build is solid. Product market fit is shaky.**
-
-- Real customer pay? **Not yet.** Plugin is plumbing, not outcome. Customer with cURL skills already uses Claude directly. Blogger without cURL skills can't use it at all. Gap = huge.
-- No front-end runner per Decision 5 = death for 99% of WordPress users. Admin screen is settings + logs. Nothing to DO. Immediate bounce.
-- "Orchestration" means nothing to buyer. Jargon. Customers buy "writes my blog posts," not "agent routing layer."
-- 30-second pitch: *"AgentPress writes blog posts and makes featured images inside WordPress. No monthly fee. Just add your Claude key, type a topic, get content in seconds."*
-- $0 test: Post in 3 WordPress Facebook groups. "Would you pay $49 for a plugin that auto-writes posts from your WP dashboard?" Count "yes." If <50%, stop building UI-less REST API. Build the button first.
-- Retention hook: **None.** No editor integration. No scheduled drafts. No "your post is ready" ping. CPT logs are not retention; they're autopsy. Retention = WordPress block sidebar or weekly draft queue. Add one or churn = 100%.
-- Third-agent placeholder is scope creep theater. Kill it. Two agents done well beats three mediocre.
-- Risk register misses biggest risk: **no one installs a plugin they can't click.** REST-only MVP is a dev tool wearing WP plugin clothes.
-- Rebuild plan: Wave 1 = text box + "Generate" button in admin. REST API is Wave 4, fine. But admin runner is non-negotiable for Sara-level obsession.
+- Customer pays? No. WordPress user can already copy-paste into ChatGPT. Developer can already call Claude API. Middleman plugin adds friction, not value.
+- Confusing: Jargon-heavy name. Two external API keys to set up. Admin screen is a settings form plus a tombstone of past logs. No "try it now" button. Bounce in 30 seconds.
+- Elevator pitch: WordPress site that takes a text order and returns AI content or images. No chat. No clutter. One endpoint.
+- $0 test: Walk into coffee shop. Ask 10 WordPress users to install plugin and generate a blog post. Watch where they get stuck. If stuck before result, fix that or quit.
+- Retention hook: Missing entirely. One-and-done tool. User generates image, leaves forever. Need recurring pain like scheduled content or batch publishing. v1 has neither.

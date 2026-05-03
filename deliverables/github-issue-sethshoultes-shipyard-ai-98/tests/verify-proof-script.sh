@@ -66,13 +66,13 @@ else
     exit 1
 fi
 
-# Test 7: No retry logic (setTimeout, setInterval, backoff)
-echo -n "7. No retry logic... "
-if grep -E "(setTimeout|setInterval|backoff|retry)" "$PROOF_SCRIPT" | grep -v "^//" | grep -v "retry-ready" > /dev/null 2>&1; then
-    echo "FAIL: Retry logic found (not allowed in v1)"
-    exit 1
-else
+# Test 7: Has retry logic with exponential backoff (Decision 1.3: 5 attempts over 60s)
+echo -n "7. Has retry logic with exponential backoff... "
+if grep -E "(setTimeout|backoff)" "$PROOF_SCRIPT" | grep -v "^//" > /dev/null 2>&1; then
     echo "PASS"
+else
+    echo "FAIL: Missing retry logic (required per spec Decision 1.3)"
+    exit 1
 fi
 
 # Test 8: Reads domains.json or PROOF_DOMAINS_PATH
