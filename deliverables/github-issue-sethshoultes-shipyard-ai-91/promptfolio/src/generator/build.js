@@ -132,7 +132,7 @@ function readTemplate(name) {
 }
 
 /**
- * Fills template placeholders with values
+ * Substitutes template variables with data values
  * @param {string} template
  * @param {Object} data
  * @returns {string}

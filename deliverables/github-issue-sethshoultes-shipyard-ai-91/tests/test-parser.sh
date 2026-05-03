@@ -6,7 +6,7 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")/promptfolio"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")/promptfolio"
 PARSER_FILE="$PROJECT_DIR/src/parser/claude.js"
 TEST_PASSED=0
 TEST_FAILED=0
@@ -21,73 +21,26 @@ if [ ! -f "$PARSER_FILE" ]; then
 fi
 
 echo "PASS: Parser file exists"
-((TEST_PASSED++))
+TEST_PASSED=$((TEST_PASSED + 1))
 
-# Test 1: Valid Claude JSON
+# Run the Node.js test suite
 echo ""
-echo "Test 1: Valid Claude JSON parsing"
-VALID_JSON='{"conversation": {"messages": [{"role": "user", "content": "Hello"}]}}'
-# Node.js test would go here - placeholder for actual implementation
-echo "SKIP: Node.js test harness not yet implemented"
-((TEST_PASSED++))
+echo "Running parser unit tests via Node.js ..."
 
-# Test 2: Markdown-fenced JSON
-echo ""
-echo "Test 2: Markdown fence stripping"
-FENCED_JSON='```json
-{"conversation": {"messages": []}}
-```'
-echo "SKIP: Node.js test harness not yet implemented"
-((TEST_PASSED++))
+JS_OUTPUT=$(node "$SCRIPT_DIR/parser.test.mjs" 2>&1) && JS_EXIT=0 || JS_EXIT=1
+echo "$JS_OUTPUT"
 
-# Test 3: Truncated JSON
-echo ""
-echo "Test 3: Truncated JSON handling"
-TRUNCATED='{"conversation": {"messages": [{"role":'
-echo "SKIP: Node.js test harness not yet implemented"
-((TEST_PASSED++))
+# Count PASS/FAIL lines emitted by the JS runner
+JS_PASSED=$(echo "$JS_OUTPUT" | grep -c '^PASS:' || true)
+JS_FAILED=$(echo "$JS_OUTPUT" | grep -c '^FAIL:' || true)
+TEST_PASSED=$((TEST_PASSED + JS_PASSED))
+TEST_FAILED=$((TEST_FAILED + JS_FAILED))
 
-# Test 4: Empty file
-echo ""
-echo "Test 4: Empty file handling"
-echo "SKIP: Node.js test harness not yet implemented"
-((TEST_PASSED++))
-
-# Test 5: Missing prompts array
-echo ""
-echo "Test 5: Missing prompts array"
-echo "SKIP: Node.js test harness not yet implemented"
-((TEST_PASSED++))
-
-# Test 6: Base64 image extraction
-echo ""
-echo "Test 6: Base64 image extraction"
-echo "SKIP: Node.js test harness not yet implemented"
-((TEST_PASSED++))
-
-# Test 7: Schema validation
-echo ""
-echo "Test 7: Schema validation"
-echo "SKIP: Node.js test harness not yet implemented"
-((TEST_PASSED++))
-
-# Test 8: Raw text fallback
-echo ""
-echo "Test 8: Raw text fallback for unknown schema"
-echo "SKIP: Node.js test harness not yet implemented"
-((TEST_PASSED++))
-
-# Test 9: 5 MB size cap
-echo ""
-echo "Test 9: 5 MB file size cap enforcement"
-echo "SKIP: Node.js test harness not yet implemented"
-((TEST_PASSED++))
-
-# Test 10: Nested prompt structure
-echo ""
-echo "Test 10: Nested prompt structure"
-echo "SKIP: Node.js test harness not yet implemented"
-((TEST_PASSED++))
+# If the runner crashed without printing FAIL lines, count it as a failure
+if [ "$JS_EXIT" -ne 0 ] && [ "$JS_FAILED" -eq 0 ]; then
+    echo "FAIL: JS test runner crashed or exited with an unexpected error"
+    TEST_FAILED=$((TEST_FAILED + 1))
+fi
 
 # Summary
 echo ""
