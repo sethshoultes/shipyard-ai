@@ -1,25 +1,25 @@
 # Hindsight Report
-**Generated:** 2026-05-03T22:36:17.504Z
+**Generated:** 2026-05-03T23:11:57.828Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 15 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 14 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- a97e336 daemon: auto-commit 2 files
+- 7570fa2 Ship CODE-TEMPLATE: all deliverables + retrospective
+- 4959a81 Fix QA placeholder scanner false-positives by rephrasing rule text
+- cf3d593 daemon: auto-commit after build phase for CODE-TEMPLATE
+- 9dec0a3 micromanager: dirty auto-reconcile
+- 103d2ee micromanager: dirty auto-reconcile
 - a8ea914 daemon: auto-commit 1 files
 - a519495 daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-98
 - fd998c1 micromanager: dirty auto-reconcile
 - dc2927d micromanager: dirty auto-reconcile
-- f6c176d micromanager: dirty auto-reconcile
-- 9b3fe5f daemon: auto-commit 12 files
-- 5e83e93 daemon: auto-commit 1 files
-- 4560e3d daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-98
-- 3a51257 micromanager: dirty auto-reconcile
-- a1cbc0f micromanager: dirty auto-reconcile
 
 ## High-Churn Files
-- `.daemon-queue.json` (174 changes)
-- `.planning/sara-blakely-review.md` (111 changes)
-- `.great-minds/hindsight-report.md` (70 changes)
+- `.daemon-queue.json` (175 changes)
+- `.planning/sara-blakely-review.md` (112 changes)
+- `.great-minds/hindsight-report.md` (71 changes)
 - `.planning/phase-1-plan.md` (53 changes)
 - `.planning/REQUIREMENTS.md` (51 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
@@ -29,11 +29,15 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 15 uncommitted changes
 - `prds/github-issue-sethshoultes-shipyard-ai-98.md` (24 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
 - `.daemon-retry-state.json` (20 changes)
+- `data/costs.db` (15 changes)
 - `HEARTBEAT.md` (13 changes)
 - `rounds/github-issue-sethshoultes-shipyard-ai-98/round-1-steve.md` (12 changes)
-- `.github-intake-state.json` (12 changes)
 
 ## Bug-Associated Files
+- `deliverables/CODE-TEMPLATE/README.md`
+- `deliverables/CODE-TEMPLATE/codex.md`
+- `deliverables/CODE-TEMPLATE/examples/before-after.md`
+- `deliverables/CODE-TEMPLATE/parser/errors.js`
 - `deliverables/build-model-canary-glm/spec.md`
 - `deliverables/build-model-canary-glm/tests/03-quality-audit.sh`
 - `deliverables/build-model-canary-glm/todo.md`
@@ -50,28 +54,23 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 15 uncommitted changes
 - `.planning/sara-blakely-review.md`
 - `deliverables/daemon-fix-watcher-skip-loop/spec.md`
 - `deliverables/daemon-fix-watcher-skip-loop/todo.md`
-- `domains-test-cname.json`
-- `domains-test-fail.json`
-- `domains.json`
-- `scripts/proof.js`
 
 ## Uncommitted State
 ```
 M .daemon-queue.json
- M .great-minds/hindsight-report.md
- M .planning/sara-blakely-review.md
  M data/costs.db
- D prds/github-issue-sethshoultes-shipyard-ai-98.md
-?? .agent-logs/debate/elon-musk-r1-1777847277300.jsonl
-?? .agent-logs/debate/elon-musk-r2-1777847345125.jsonl
-?? .agent-logs/debate/phil-jackson-consolidation-1777847519718.jsonl
-?? .agent-logs/debate/rick-rubin-essence-1777847446321.jsonl
-?? .agent-logs/debate/steve-jobs-r1-1777847277292.jsonl
-?? .agent-logs/debate/steve-jobs-r2-1777847345116.jsonl
-?? .agent-logs/plan/planner-1777847624731.jsonl
-?? .agent-logs/plan/sara-blakely-gutcheck-1777847750650.jsonl
-?? prds/lint-failed/
-?? rounds/CODE-TEMPLATE/
+ M prds/lint-failed/github-issue-sethshoultes-shipyard-ai-98.lint-report.md
+ M rounds/standalone-apps-portfolio-v3/round-1-steve.md
+ M rounds/standalone-apps-portfolio-v3/round-2-elon.md
+?? .agent-logs/debate/elon-musk-r1-1777849405846.jsonl
+?? .agent-logs/debate/elon-musk-r2-1777849508103.jsonl
+?? .agent-logs/debate/phil-jackson-consolidation-1777849715994.jsonl
+?? .agent-logs/debate/rick-rubin-essence-1777849682940.jsonl
+?? .agent-logs/debate/steve-jobs-r1-1777849405835.jsonl
+?? .agent-logs/debate/steve-jobs-r2-1777849508094.jsonl
+?? rounds/standalone-apps-portfolio-v3/decisions.md
+?? rounds/standalone-apps-portfolio-v3/essence.md
+?? rounds/standalone-apps-portfolio-v3/round-2-steve.md
 ```
 
 ---

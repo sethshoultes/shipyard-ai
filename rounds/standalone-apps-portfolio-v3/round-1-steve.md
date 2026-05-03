@@ -1,19 +1,54 @@
-# Steve Jobs — Round 1 Positions
+## Steve Jobs — Chief Design & Brand Officer
+### Round 1 Review: Standalone Apps Portfolio v3
 
-## Product Naming
-Names are the face of your product. "Tuned" is perfect — it's a verb, an idea, a promise. You tune a guitar, you tune your craft. "Beam" is brilliant — light-speed, focused, weightless. But **"Promptfolio" is a Frankenstein**. It smells like a committee compromise. If you must keep it, fine, but never, ever write "Beam (Commandbar)." Parentheticals are apologies. If the product needs a subtitle, the name failed. One word. Own it.
+#### Product Naming
+**Tuned** is the only name here that doesn't embarrass me. One word. Musical. It suggests precision, craft, care. It has *resonance*.
 
-## Design Philosophy
-This is a Braun calculator, not a Vegas casino. The PRD already bans gradients, pulses, theater — **good**. The absence of noise *is* the luxury. Every pixel that doesn't serve the story is a thief stealing the user's attention. I want someone to look at this portfolio and feel the same calm they feel walking into an Apple Store: *someone with taste was here.*
+**Promptfolio** is a Frankenstein. It sounds like a startup that died in 2014. Names that mash two concepts together are names that failed to have a single clear thought. Kill it. Find a word that evokes *creation*, *curation*, *memory* — something human.
 
-## User Experience (The First 30 Seconds)
-In thirty seconds, a visitor must answer one question: **Does this team ship real things?** The current design does this well. The status badges — SHIPPED, BUILD, SCAFFOLD — are honest. That honesty builds trust faster than any animation ever could. The first screen should hit like a hammer: three objects, beautifully lit, clearly labeled. No mystery. Mystery is for movies, not portfolios.
+**Beam (Commandbar)** — pick ONE. Parentheticals in product names are a confession that you don't know what the product is. "Beam" is good. "Commandbar" is a feature description, not a name. If the product is Beam, the world will learn what it does. If you have to explain it in the name, you've already lost.
 
-## Brand Voice
-We speak like we have nothing to prove. Short sentences. Active verbs. No "synergy," no "leverage," no "solutions." If a word wouldn't appear in a letter to a friend you respect, delete it. The taglines in the PRD read like specs. Specs are fine, but **temper them with humanity**. "Track, version, and roll out prompts" is a grocery list. Try: *"Never lose a good prompt again."* Feel the difference?
+#### Design Philosophy
+This PRD doesn't contain design. It contains *accounting*. Rounded corners, border tokens, status badges — this is what happens when you let a design system do the thinking for you.
 
-## What To Say NO To
-Say NO to showing all apps as equals. Beam is **shipped**. It leads. The others follow. Say NO to "Coming Soon" — it trains users to distrust you. Say NO to browser mockups, fake screenshots, and demo videos that buffer. Say NO to feature lists longer than five bullets — if you need six, you don't understand the product yet. Say NO to dark mode toggles, parallax, and scroll-jacking. Simplicity is not the absence of clutter; it is the **presence of restraint**.
+Insanely great design is like a great piece of music: every note is essential, and if you remove one, the whole thing collapses. What I see here is an orchestra where every instrument is playing at once and nobody is listening.
 
-## The Emotional Hook
-People don't love "developer tools." They love the feeling of being **competent, prepared, and in control.** Tuned says: *"You are a craftsman who cares about your tools."* Beam says: *"You move at the speed of thought."* Promptfolio says: *"Your work has value; curate it."* The portfolio isn't a graveyard of side projects. It's a **proof of life.** Visitors should leave thinking: *"If I hire these people, my problem will be solved, beautifully."*
+Design is not how it looks. Design is how it *works*. And right now, this works like a spreadsheet that learned to walk.
+
+#### User Experience
+The first 30 seconds should feel like the first time you saw the iPhone scroll with momentum. It should feel *inevitable*, like gravity.
+
+What does this PRD give us? "Auto-generated OG images via @vercel/og." That is not an experience. That is a metadata field.
+
+The first 30 seconds must answer one question: *Why does this exist?* Not what it does — **why it matters**. Right now, a visitor lands on this page and sees three cards with status badges and tech chips. It feels like visiting a hospital: organized, sterile, and vaguely depressing.
+
+#### Brand Voice
+"Things we built along the way."
+
+*Things we built along the way.*
+
+That is not a voice. That is a shrug. That is an apology for your own existence.
+
+If Shipyard builds tools, it builds them because the world *needed* them. Because someone was frustrated, someone stayed up late, someone cared enough to push back against the garbage that exists. Speak like that person. Speak with conviction.
+
+"We craft tools we wish existed." That is a voice.
+
+#### What to Say NO To
+Say NO to feature lists as content. Nobody ever fell in love with a product because it had "Zod-validated schema." That's a spec sheet. Spec sheets are for people who already bought the product and need to justify it to their manager.
+
+Say NO to tech stack badges as decoration. They are not credentials. They are confetti. If the user cares about your stack, they'll read the source. If they don't, you're just cluttering their mind.
+
+Say NO to status badges that scream "BUILD" in amber. It looks like a warning label on a toaster. A portfolio is not a Kanban board.
+
+Say NO to pages that repeat what the card already said. The detail page should *deepen* the story, not *restate* it. If clicking "Read more" just shows me the same five bullets again, you've broken a promise.
+
+Say NO to generic CTAs. "Start a Project" is what a contractor says. What do you actually do? Make that the button.
+
+#### The Emotional Hook
+People don't love tools. People love what tools let them *become*.
+
+Tuned isn't prompt version control. Tuned is the moment you stop fearing your own AI pipeline because you finally *own* it.
+
+The portfolio shouldn't be a catalog. It should be a manifesto. Every app is an argument against the status quo. If you can't feel the anger that made this app necessary, the visitor won't feel the relief of using it.
+
+Make them feel like they found something that was made *for them*, not something that was made for *everyone*.
