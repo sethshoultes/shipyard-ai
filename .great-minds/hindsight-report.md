@@ -1,10 +1,12 @@
 # Hindsight Report
-**Generated:** 2026-05-03T18:56:25.112Z
+**Generated:** 2026-05-03T19:12:05.628Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 6 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 9 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- 9da7099 daemon: auto-commit 11 files
+- ee2d228 micromanager: dirty auto-reconcile
 - 9456732 micromanager: dirty auto-reconcile
 - 2b79e24 micromanager: dirty auto-reconcile
 - 20819e9 daemon: auto-commit 1 files
@@ -13,15 +15,13 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 6 uncommitted changes.
 - 28c9578 micromanager: dirty auto-reconcile
 - e64b7b6 daemon: auto-commit 2 files
 - e67de86 Ship github-issue-sethshoultes-shipyard-ai-91: all deliverables + retrospective
-- fb58d61 micromanager: dirty auto-reconcile
-- 19d56cb Fix placeholders: reword JSDoc comment and implement real parser tests
 
 ## High-Churn Files
-- `.daemon-queue.json` (164 changes)
+- `.daemon-queue.json` (165 changes)
 - `.planning/sara-blakely-review.md` (106 changes)
-- `.great-minds/hindsight-report.md` (62 changes)
+- `.great-minds/hindsight-report.md` (63 changes)
 - `.planning/phase-1-plan.md` (53 changes)
-- `.planning/REQUIREMENTS.md` (50 changes)
+- `.planning/REQUIREMENTS.md` (51 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
 - `plugins/eventdash/src/sandbox-entry.ts` (28 changes)
 - `prds/github-issue-sethshoultes-shipyard-ai-91.md` (26 changes)
@@ -57,12 +57,15 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 6 uncommitted changes.
 
 ## Uncommitted State
 ```
-M .agent-logs/debate/elon-musk-r2-1777833627174.jsonl
- M rounds/github-issue-sethshoultes-shipyard-ai-90/decisions.md
- M rounds/github-issue-sethshoultes-shipyard-ai-90/essence.md
- M rounds/github-issue-sethshoultes-shipyard-ai-90/round-2-elon.md
-?? .agent-logs/debate/phil-jackson-consolidation-1777834414089.jsonl
-?? .agent-logs/debate/rick-rubin-essence-1777834376456.jsonl
+M .daemon-queue.json
+?? .agent-logs/debate/elon-musk-r1-1777835150489.jsonl
+?? .agent-logs/debate/elon-musk-r2-1777835221813.jsonl
+?? .agent-logs/debate/phil-jackson-consolidation-1777835290053.jsonl
+?? .agent-logs/debate/rick-rubin-essence-1777835268997.jsonl
+?? .agent-logs/debate/steve-jobs-r1-1777835150480.jsonl
+?? .agent-logs/debate/steve-jobs-r2-1777835221802.jsonl
+?? prds/build-model-canary-glm.md
+?? rounds/build-model-canary-glm/
 ```
 
 ---

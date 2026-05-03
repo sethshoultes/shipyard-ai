@@ -1,0 +1,4 @@
+- What it is: 7-file wiring test. Proof the agent writes code after a model swap.
+- Feeling: 2am relief. Green light. Quiet confidence that craft survived.
+- Must be perfect: No hollow files. Every line earns its place. Run test, green.
+- Direction: Cut to bone. Stay green.
