@@ -1,4 +1,4 @@
-# Spec: Proof — Production Domain Verification Pipeline
+# Spec: Deploy verification: production custom domain not validated, 404s shipped silently
 
 **Issue**: sethshoultes/shipyard-ai#98
 **Name**: Proof
@@ -15,17 +15,17 @@ Production custom domain `shipyard.company` DNS pointed at Vercel IPs from a pre
 
 ### Expected Behavior
 After every deploy, the pipeline must:
-1. Fetch `/` at each custom domain attached to the CF Pages project
-2. Verify HTTP 200 status AND that response originates from expected Cloudflare Pages origin
-3. Retry with exponential backoff (5 attempts over 60 seconds) to accommodate DNS propagation
-4. Fail the deploy and alert the operator if verification fails
+1. For each custom domain attached to the CF Pages project, fetch `/` and verify status 200
+2. Verify that the body matches the just-deployed build (contains build-id or unique string from new release)
+3. Fail the deploy as failed and alert the operator if mismatch
+4. Handle DNS propagation with retry logic
 
 ### Success Criteria
 - Issue #98 requirements met
 - All tests pass
-- Default-on, zero opt-in
-- Terminal output only (no dashboards, no knobs)
-- One breath, one answer: success = `Verified` + domain + timestamp; failure = one plain-English sentence ≤140 chars
+- Default-on for every deploy (zero opt-in)
+- Pipeline halts on verification failure
+- Clear terminal output (no dashboards, no knobs)
 
 ---
 
@@ -34,58 +34,53 @@ After every deploy, the pipeline must:
 ### Architecture Decisions (from decisions.md)
 | Decision | Resolution |
 |----------|------------|
-| 1.1 | Inline pipeline step — verification runs as job step inside existing deploy pipeline |
-| 1.2 | No `wrangler` CLI or HTML-grep — machine-readable inputs only (env vars, config files) |
-| 1.3 | Retry with exponential backoff — 5 attempts over 60 seconds (Elon + Steve consensus) |
-| 1.4 | Check `/` only for v1 — root path is the v1 signal |
-| 1.5 | Origin validation ships, or nothing ships — validate response from expected CF Pages origin |
-| 1.6 | Cut build-ID body grep for v1 — no HTML meta-tag injection |
+| 1.1 | Pipeline-native verification — verification runs as post-deploy step inside `.github/workflows/deploy-website.yml` |
+| 1.2 | Header-based verification — inject and assert `X-Shipyard-Build` header against commit SHA (no HTML body parsing) |
+| 1.3 | Default-on for every deploy — zero opt-in, zero toggles |
+| 1.4 | Pipeline halts on verification failure — failed check fails the deploy, CI badge is the alert |
+| 1.5 | Retry with exponential backoff — handle DNS propagation physics (5 attempts, ~30s total) |
+| 1.6 | Redirect following — handle apex → www redirects (max 5 hops) |
+| 1.7 | Parallel domain checks — use concurrency cap (10) to avoid pipeline bottlenecks |
+| 1.8 | Check `/` only for v1 — root path verification only (deep routes deferred) |
+| 1.9 | No HTML body matching — do not scrape HTML for build hashes in v1 |
+| 1.10 | No QA handoff gate — Margaret does not manually curl domains |
 | 2.1 | Name: "Proof" |
-| 2.2 | One breath, one answer — binary output |
+| 2.2 | Verdict output, not dashboards — one authoritative signal: Confirmed or Failed |
 | 2.3 | No dashboards, no knobs, no configurable thresholds |
-| 2.4 | Terminal screen is primary experience in v1 |
-| 3.1 | Default-on in deploy template — zero opt-in |
+| 2.4 | Primary experience is the CI terminal in v1 |
+| 2.5 | Human voice, not sysadmin prose — one sentence, plain English, no jargon |
+| 3.1 | Proof is pipeline conscience, not a SKU — infrastructure hygiene |
 
 ### File Structure
 ```
 github-issue-sethshoultes-shipyard-ai-98/
 ├── .github/
 │   └── workflows/
-│       └── deploy-website.yml      # Build + deploy + Proof (inline step)
-├── scripts/
-│   └── proof.js                    # Verification engine
-├── domains.json                    # Domain list + expected CF origins
-└── decisions.md                    # Debate record
+│       └── deploy-website.yml      # Build + deploy + Proof step (MODIFY/CREATE)
+├── website/                        # EXISTING — Next.js site (build context)
+│   ├── package.json
+│   └── ...
+└── rounds/github-issue-sethshoultes-shipyard-ai-98/
+    ├── decisions.md                # This document
+    └── ...                         # Other debate artifacts
 ```
 
 ### Pipeline Flow (deploy-website.yml)
 1. **Trigger**: `push` to `main` when `website/**` changes
 2. **Build**: `npm ci && npm run build` in `website/` → `website/out/`
 3. **Deploy**: `wrangler pages deploy website/out/` to project `shipyard-ai`
-4. **Proof**: Run `scripts/proof.js` — inline post-deploy check
+4. **Proof**: Post-deploy verification step (inline or invoked script)
 
-### Proof Script Behavior (proof.js)
-- **Input**: `domains.json` + env vars (`PROOF_DOMAINS`, `PROOF_EXPECTED_ORIGIN`)
-- **Method**: HTTP GET to `https://{domain}/` with origin validation
-- **Retry**: 5 attempts, exponential backoff (1s, 2s, 4s, 8s, 15s = ~30s total + overhead)
-- **Origin Check**: Validate `server` header or resolved CNAME matches expected Cloudflare Pages origin
-- **Success Output**: `✓ Verified shipyard.company at 2026-05-03T12:34:56Z`
-- **Failure Output**: `Your domain isn't pointing here.` (or similar, ≤140 chars)
+### Proof Verification Step
+- **Domain Detection**: Read custom domains from `wrangler pages project get --json`
+- **Target**: Root path `/` via HTTPS
+- **Redirect Handling**: Follow 301/302 redirects (max 5 hops)
+- **Build Validation**: Validate `X-Shipyard-Build` header matches `$CF_PAGES_COMMIT_SHA`
+- **Retry**: Up to 5 times with exponential backoff (~30s total)
+- **Parallelization**: Parallel domain checks with concurrency cap (10)
+- **Success Output**: `Proof: <domain> confirmed.`
+- **Failure Output**: One plain-English sentence explaining specific failure
 - **Exit Code**: 0 on success, 1 on failure
-
-### domains.json Schema
-```json
-[
-  {
-    "domain": "shipyard.company",
-    "expected_origin": "pages.cloudflare.com"
-  },
-  {
-    "domain": "www.shipyard.company",
-    "expected_origin": "pages.cloudflare.com"
-  }
-]
-```
 
 ---
 
@@ -144,18 +139,18 @@ github-issue-sethshoultes-shipyard-ai-98/
 
 ## 4. Files to Create/Modify
 
-### New Files
+### Modified Files
 | File | Purpose |
 |------|---------|
-| `.github/workflows/deploy-website.yml` | GitHub Actions pipeline with Proof step |
-| `scripts/proof.js` | Verification engine (origin check, retry, output) |
-| `domains.json` | Domain configuration with expected origins |
+| `.github/workflows/deploy-website.yml` | Add build, deploy, and Proof verification steps |
+
+### New Files (Optional)
+| File | Purpose |
+|------|---------|
+| `scripts/proof.js` | Verification engine (if inline workflow exceeds ~50 lines) |
 | `deliverables/github-issue-sethshoultes-shipyard-ai-98/spec.md` | This specification |
 | `deliverables/github-issue-sethshoultes-shipyard-ai-98/todo.md` | Task breakdown |
 | `deliverables/github-issue-sethshoultes-shipyard-ai-98/tests/*.sh` | Verification test scripts |
-
-### Modified Files
-- None (this is net-new infrastructure)
 
 ---
 
@@ -163,14 +158,15 @@ github-issue-sethshoultes-shipyard-ai-98/
 
 | Feature | Deferred To |
 |---------|-------------|
-| Multi-route verification (`/pricing`, `/checkout`) | v1.1 |
-| Slack/Discord/PagerDuty notifications | v1.1 |
-| Build-ID body grep / meta-tag verification | v2 |
-| `wrangler pages project list` runtime API calls | Never (use `domains.json`) |
-| Human approval gate | Never |
-| Configurable retry policies / thresholds | Never |
-| Dashboards, charts, knobs | Never |
-| DNS ownership migration | v2 |
+| Multi-route verification (`/about`, `/pricing`, etc.) | v1.1 or v2 |
+| BUILD_ID body grep or HTML meta-tag scraping | v2 |
+| Slack/Discord/PagerDuty/alerting integrations | v1.1 |
+| Monitoring dashboards, latency percentile graphs, or health matrices | Never |
+| Configurable retry policies, alert thresholds, or propagation windows | Never |
+| Cron syntax or scheduled checks outside the deploy pipeline | Never |
+| Human approval gate or QA handoff step | Never |
+| Standalone microservice, container, or queue | Never |
+| Multi-region validation for v1 vs later | v1.1 or v2 |
 
 ---
 
