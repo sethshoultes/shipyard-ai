@@ -8,31 +8,31 @@
 
 ## Phase 1: Pipeline Workflow
 
-- [ ] Create `.github/workflows/deploy-website.yml` with proper header — verify: file exists, `yq` or manual check shows `on.push.paths: ['website/**']`
-- [ ] Add trigger for push to `main` branch — verify: `on.push.branches` includes `main`
-- [ ] Add build step with `npm ci` in `website/` directory — verify: step contains `working-directory: ./website` and `npm ci`
-- [ ] Add build step with `npm run build` — verify: step runs `npm run build` and outputs to `website/out/`
-- [ ] Add deploy step with `wrangler pages deploy` — verify: command includes `website/out/` and project name `shipyard-ai`
-- [ ] Configure deploy step with CF secrets — verify: uses `${{ secrets.CLOUDFLARE_API_TOKEN }}` and `${{ secrets.CLOUDFLARE_ACCOUNT_ID }}`
-- [ ] Add Proof step after deploy — verify: step has `needs: deploy` or runs sequentially after deploy
-- [ ] Ensure Proof step is NOT optional — verify: no `continue-on-error: true` in Proof step
-- [ ] Add Proof step runs `node scripts/proof.js` — verify: `run: node scripts/proof.js` or equivalent
+- [x] Create `.github/workflows/deploy-website.yml` with proper header — verify: file exists, `yq` or manual check shows `on.push.paths: ['website/**']`
+- [x] Add trigger for push to `main` branch — verify: `on.push.branches` includes `main`
+- [x] Add build step with `npm ci` in `website/` directory — verify: step contains `working-directory: ./website` and `npm ci`
+- [x] Add build step with `npm run build` — verify: step runs `npm run build` and outputs to `website/out/`
+- [x] Add deploy step with `wrangler pages deploy` — verify: command includes `website/out/` and project name `shipyard-ai`
+- [x] Configure deploy step with CF secrets — verify: uses `${{ secrets.CLOUDFLARE_API_TOKEN }}` and `${{ secrets.CLOUDFLARE_ACCOUNT_ID }}`
+- [x] Add Proof step after deploy — verify: step has `needs: deploy` or runs sequentially after deploy
+- [x] Ensure Proof step is NOT optional — verify: no `continue-on-error: true` in Proof step
+- [x] Add Proof step runs `node scripts/proof.js` — verify: `run: node scripts/proof.js` or equivalent
 
 ---
 
 ## Phase 2: Proof Script
 
-- [ ] Create `scripts/proof.js` with Node.js shebang — verify: file starts with `#!/usr/bin/env node` or is valid JS
-- [ ] Implement domains.json loader — verify: script reads `domains.json` or `PROOF_DOMAINS` env var
-- [ ] Implement origin config loader — verify: script reads `expected_origin` from config or `PROOF_EXPECTED_ORIGIN` env
-- [ ] Implement HTTP GET function — verify: uses `https.get` or `fetch` to request `https://{domain}/`
-- [ ] Implement origin validation — verify: checks `server` header or resolved hostname against expected origin
-- [ ] Implement retry loop with 5 attempts — verify: code has loop with max 5 iterations
-- [ ] Implement exponential backoff — verify: delays follow pattern (1s, 2s, 4s, 8s, 15s or similar)
-- [ ] Implement success output format — verify: prints `✓ Verified {domain} at {ISO8601 timestamp}`
-- [ ] Implement failure output format — verify: prints single sentence ≤140 chars, no stack traces
-- [ ] Implement exit code 0 on success — verify: `process.exit(0)` on verification pass
-- [ ] Implement exit code 1 on failure — verify: `process.exit(1)` on verification fail or origin mismatch
+- [x] Create `scripts/proof.js` with Node.js shebang — verify: file starts with `#!/usr/bin/env node` or is valid JS
+- [x] Implement domains.json loader — verify: script reads `domains.json` or `PROOF_DOMAINS` env var
+- [x] Implement origin config loader — verify: script reads `expected_origin` from config or `PROOF_EXPECTED_ORIGIN` env
+- [x] Implement HTTP GET function — verify: uses `https.get` or `fetch` to request `https://{domain}/`
+- [x] Implement origin validation — verify: checks `server` header or resolved hostname against expected origin
+- [x] Implement retry loop with 5 attempts — verify: code has loop with max 5 iterations
+- [x] Implement exponential backoff — verify: delays follow pattern (1s, 2s, 4s, 8s, 15s or similar)
+- [x] Implement success output format — verify: prints `✓ Verified {domain} at {ISO8601 timestamp}`
+- [x] Implement failure output format — verify: prints single sentence ≤140 chars, no stack traces
+- [x] Implement exit code 0 on success — verify: `process.exit(0)` on verification pass
+- [x] Implement exit code 1 on failure — verify: `process.exit(1)` on verification fail or origin mismatch
 
 ---
 
