@@ -8,11 +8,15 @@ Banning the words "workflow" and "orchestration" is branding malpractice. Those 
 
 Steve's "no empty states" and "no configuration panels" doctrine is equally delusional. Every real system has loading, errors, and first-run moments. Pretending otherwise means we ship a UI that lies to users and a product that cannot be debugged. When a customer's workflow silently fails because an LLM hit a context limit, they don't want chimes and glow effects. They want logs, token counts, and a retry button.
 
+Steve's lightsaber metaphor is backwards. A lightsaber has no guardrails, no error handling, and no logs when it cuts the wrong wire. Users don't want infinite precision; they want a tool that doesn't let them accidentally duplicate their data. That requires the "debris" Steve despises: validation, limits, and confirmation dialogs.
+
 ## Why Technical Simplicity Wins
 
 Technical simplicity means you ship the engine that survives 100x usage before you paint it. A JSON workflow definition forces you to solve the hard problems: DAG validation, idempotent retries, state recovery, and execution logs. A visual builder lets you hide those problems behind drag-and-drop until they explode at 2 AM with a customer whose data is duplicated. I have seen this movie at Tesla and Twitter. The teams that survived were the ones who defined the state machine first and added the touchscreen second.
 
 The real bottleneck is not pixels; it is N sequential LLM calls with 5–15 second latency each. The 10x path is parallelization where the DAG allows it, aggressive caching of intermediate states, and async webhook-triggered execution. Every second you keep a request open is a dollar burned and a user lost. You cannot solve that with white space and direct manipulation. You solve it with a job queue, backpressure, and exponential backoff.
+
+At 100x scale, three things break: COGS, rate limits, and the state database. One active user running ten workflows a day at five LLM calls each is roughly $15 per month in API costs. Without a hard cost cap and idempotent retries, you are insolvent before you are popular. Technical simplicity means architecting for the economics on day one, not discovering them in a post-mortem.
 
 WordPress isn't a constraint; it's an accelerant. Existing auth, cron, user roles, and plugin-directory SEO mean we focus on the orchestration engine instead of billing portals and OAuth flows. Technical simplicity is choosing not to rebuild the universe. When we later abstract to SaaS, the engine stays identical. Only the authentication wrapper changes. The best design decision is the component you didn't have to build because the platform already had it.
 
@@ -22,6 +26,8 @@ WordPress isn't a constraint; it's an accelerant. Existing auth, cron, user role
 
 I concede that emotional resonance matters for the buyer. A consultant purchasing a tool for their stack is still a human who wants to feel like they hired a team, not bought a cable. The brand voice should be confident and warm. But a beautiful promise on a broken product is a fraud, not a brand.
 
+Templates are the right thirty-second experience: a user clicks, watches a real agent team finish a task, and sees the JSON that produced it. That is momentum with substance.
+
 ## Non-Negotiables
 
 1. **JSON/YAML workflow definitions ship before any visual builder.** No exceptions. If you cannot hand-edit a config file and have the system recover from a mid-run API timeout, we do not have a product. Drag-and-drop is v3, not v1. The engine is the product; the canvas is documentation.
@@ -30,4 +36,4 @@ I concede that emotional resonance matters for the buyer. A consultant purchasin
 
 3. **Paywall on day one.** $29/month minimum. No freemium. Free tiers attract users who cost more in support and API credits than they will ever pay. Revenue is the only validation that matters. A user who pays and stays is signal; a user who downloads and ghosts is noise.
 
-Ship the engine. Charge for it. Make it so reliable that users trust it with their business. Wrap it in a single working template that proves value in thirty seconds. Then—*only then*—let Steve make it beautiful.
+Ship the engine. Charge for it. Make it so reliable that users trust it with their business. Wrap it in a single working template that proves value in thirty seconds. A working product with ugly CSS is still a product. A beautiful UI on a broken engine is a slide deck. Then—*only then*—let Steve make it beautiful.

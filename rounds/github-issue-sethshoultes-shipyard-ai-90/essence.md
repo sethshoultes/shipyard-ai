@@ -1,15 +1,15 @@
-Forge orchestrates AI agents for humans who don't speak code.
+Relay is a team of AI agents that works while you sleep.
 
-Feeling: effortless power. Conductor, not code monkey.
+Feeling: multiplication. Cloned yourself. Enough hands for all your ambition.
 
-One thing perfect: first 30 seconds. One workflow. Hit run. Magic. No manual. No tooltip.
+One thing perfect: first 30 seconds. Open app. Agents already moving. No setup. No blank canvas. Pure momentum.
 
 Direction: strip until it sings.
 
 —
-No canvas v1. Engine first. Baton later.
-One free workflow. Hard cost caps. No bankruptcy.
-White. Airy. No dark mode.
-Human voice. Zero acronyms.
-Not automation. Orchestration.
-If DAG doesn't run, brand is lie. If user doesn't feel power in first minute, engine is invisible.
+- Name: Relay. Two syllables. Human. Active.
+- Engine first. Baton later. No canvas v1.
+- One free workflow. Hard cost caps. No bankruptcy.
+- White. Airy. Optimistic. No dark mode.
+- Speak human. Zero acronyms. No sludge.
+- Not automation. Multiplication.
