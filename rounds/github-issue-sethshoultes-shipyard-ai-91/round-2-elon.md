@@ -1,41 +1,39 @@
-# Round 2: Elon — Promptfolio
+# Round 2 — Elon Musk
 
-Steve, your taste is exquisite, but taste without shipping is a gallery opening in an empty lot. Let me separate the signal from the noise.
+Steve, your eye for taste is sharp, but taste without shipping is just Pinterest.
 
-## Where beauty blocks shipping
+We are not building a mood board; we are building a rocket that must fly on the first try. Beauty that misses orbit is just expensive debris. The goal is not to impress a dinner party; it is to land in ten thousand browsers by Friday. A portfolio tool that never launches is indistinguishable from a fantasy.
 
-"Poetry" and "a punch in the chest" are uncompileable instructions. You cannot ship a museum curator in one agent session — that is how you ship nothing. The Leica metaphor is elegant, but Leica did not ship a darkroom in v1; they shipped a light-tight box with a lens. Start with the box.
+Fantasy does not generate revenue. Only shipped code does.
 
-Keeping WordPress as the engine while calling it a Porsche is physics denial. If WordPress is the fuel injection, you inherit twenty years of PHP debt, plugin conflicts, and outdated hosting variance. You cannot claim ruthless subtraction on a platform built for bloggers in 2003. Static HTML is the only Leica here.
+## Where Beauty Blocks Shipping
 
-"No loading spinners" while parsing 10 MB JSON is thermodynamics denial. The browser locks up without Web Workers and progress feedback. Elegance must respect physics, not pretend it away. A locked browser feels worse than a minimalist spinner.
+**"Folio" is unsearchable real estate.** Generic dictionary words are SEO quicksand. Try buying `folio.com` without selling a kidney. "Promptfolio" is specific, ownable, and domain-cheap. Portmanteaus built empires: Microsoft, Pinterest, Netflix. Elegance is not brevity; it is memorability plus availability. Folio is a word in a thesaurus; Promptfolio is a category you can own today for the price of a pizza.
 
-Renaming before product-market fit is bikeshedding. "Promptfolio" is descriptive, searchable, and domain-available enough. Perfect names are for companies that have already survived their first year. Ship first, rebrand later if the product still exists.
+**"Flawless" Claude/ChatGPT import is a booby trap.** OpenAI and Anthropic mutate JSON schemas without warning. Chasing flawless automation for v1 is a rabbit hole that swallows entire sprints. You don't need a film lab; you need a darkroom that works today. Manual paste plus smart formatting ships in hours, not weeks. Perfection is the enemy of the deposit. Ship the pipeline, then polish the nozzle. A parser that breaks in ninety days is worse than no parser at all.
 
-## Why simplicity wins
+**"Looks like a design studio" is over-promising.** That promise requires a design system, component library, and edge-case testing that turns one session into five. Steve wants two themes; I want one. Two themes means twice the CSS debt, twice the responsive breakpoints, twice the "it looks weird on my phone" tickets. Ship one dark, gallery-grade template. If users aren't sharing it, no amount of design-studio illusion will save it. Start with a single exquisite room, not a virtual MOMA that takes a year to build.
 
-Static sites scale horizontally at zero marginal cost. WordPress scales as support tickets — linearly with every janky shared host and plugin collision. SQL injection disappears when there is no SQL. A database is not an asset for text that changes quarterly; it is a liability that requires backups, patches, and hosting fees. Ship one flat HTML file. Host on GitHub Pages or Cloudflare for free. Sleep through traffic spikes without waking up to a support queue.
+## Why Simplicity Wins in the Long Run
 
-Manual paste beats "one-click import" because OpenAI and Anthropic change JSON schemas quarterly without warning. One-click becomes one-click breakage within months. Smart client-side auto-formatting is robust; brittle parsers are a maintenance tax you cannot afford while reaching 10,000 users.
+Static sites are physics. No database means no SQL injection, no migrations, no $5 shared-hosting timeouts. One template means one CSS surface to debug, not a theme marketplace. Manual input means zero brittle parsers to maintain when OpenAI changes their export format next Tuesday.
 
-The live widget is not a feature. At 1,000 visits per day it is $300 per month in inference burn. That is a bankruptcy mechanism dressed as engagement. If users want to try prompts, they can paste them into ChatGPT themselves. We are building a portfolio, not a chat client.
+Every line of code you don't write is a line you don't debug at 2 AM when a user in Kiev says their portfolio broke. Technical debt compounds faster than venture debt. The simplest system that can work is the only system that will survive contact with reality.
 
-Simplicity also means iteration speed. A static generator can be rebuilt in a day. A WordPress plugin requires testing across five PHP versions and twenty themes before every deploy. Velocity compounds.
+Shipping is a feature; everything else is a ticket backlog that breeds while you sleep. You cannot iterate on a product that is still inside a Figma file.
 
-## Where Steve is right
+## Where Steve Is Right
 
-One template, obsessed over, is correct. Template libraries are an admission that you have no opinion. "Show your work" is the exact voice — no adverbs, no "unlock potential." And the emotional hook is dead-on: users share what makes them look exceptional. Distribution is output quality, not directory placement. I concede that beauty is the only marketing channel we can afford at zero budget — but only when it actually ships to a server and loads in under two seconds.
+Taste is the multiplier. One exceptional dark template with obsessive whitespace and restrained typography will outperform ten mediocre themes by orders of magnitude. The emotional hook — invisible labor made visible — is the exact reason people will share.
 
-Steve is also right about dark mode. One beautiful mode is enough. A toggle is state management and cookie clutter. Build it dark, make it stunning, and stop there.
+Brand voice should be warm and human; nobody shares a utility, they share a statement. Steve's instinct for gallery-level presentation is correct, but it must be packed into one template we can actually finish in a single session. Quality is not the enemy; unbounded scope is. A Ferrari engine in a shipping container still moves zero freight. We need the engine that ships, and it can still be beautiful.
 
-Steve is right that if you must have an engine, you should hide it from marketing. But I am arguing we should remove the engine entirely.
+## Top 3 Non-Negotiable Decisions
 
-## Non-negotiable
+1. **Static generator, zero backend.** No PHP, no database, no plugin architecture. Host on GitHub Pages or Cloudflare for $0. Scale to millions on a CDN without a single support ticket about incompatible shared hosting or outdated PHP versions.
 
-1. **Static output only.** Zero databases. Zero PHP. Flat HTML on a CDN.
+2. **No live inference widget.** No API keys, no rate limits, no abuse detection, no $300-per-month-per-user inference burn. The portfolio is read-only art, not a chat app inside a website. Monetize attention, not tokens.
 
-2. **No live prompt execution.** Paste and display. No API keys. No inference costs. No chat widgets.
+3. **One dark template, manual paste import v1.** No theme system, no flawless multi-format parsers, no light-dark toggle, no cookie state, no FOUC bugs. Ship the single best view, then let user demand pull the next feature. If they don't ask for it, they didn't need it.
 
-3. **One template shipped in session one.** Iterate with real users, not in private perfection.
-
-Build the light-tight box. Add the cathedral in v10.
+Build the engine that ships. Aesthetics ride for free inside ruthless scope. Ship now, gallery later. The market does not wait for perfect kerning.

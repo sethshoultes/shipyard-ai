@@ -1,39 +1,23 @@
-# Steve Jobs — Chief Design & Brand Officer
+# Steve's Position: Promptfolio
 
-## Product Naming
-
-**Promptfolio is a coward's name.** It's what you get when you're too afraid to pick a lane, so you smash two words together and hope the collision looks intentional. It doesn't. It looks like a startup generator spat it out at 2 AM.
-
-The name must be **one word.** Clean. A declaration. I don't care if we call it **Folio, Stage,** or **Show** — but it must be something a human being can say without feeling embarrassed at a dinner party. Promptfolio sounds like a medication for prompt engineers. Kill it.
+## Name
+Kill "Promptfolio." It's a train wreck of two words duct-taped together — the kind of lazy portmanteau a committee invents at 2 AM. The name is **Folio**. One word. Elegant. A folio is what a master craftsman carries: leather-bound, curated, precious. It says *this is my finest work.* Folio is confident. Memorable. You can say it at a dinner party without blushing.
 
 ## Design Philosophy
-
-This isn't a WordPress plugin. **It's a stage.** When someone opens a portfolio built with our tool, they shouldn't see "a website." They should see a single beam of light in a dark room, illuminating something beautiful.
-
-The philosophy is **ruthless subtraction.** Every pixel that doesn't serve the user's work is a pixel that insults them. We are not building a Swiss Army knife. We're building a Leica camera. One button. Infinite craft.
+This is not a website builder. It is a **gallery for invisible craft**. Every prompt is work that took intelligence, iteration, and taste to create. Right now that craft lives in chat logs — like a master carpenter keeping dovetail joints in a shoebox. Folio opens the drawer and lets the light hit the joinery. The design must feel *expensive*. Restrained typography. Obsessive whitespace. One dark mode that looks like a dimmed gallery at midnight — not inverted colors slapped on by an engineer.
 
 ## The First 30 Seconds
-
-In the first thirty seconds, the visitor should feel a **punch in the chest.** Not from animation. Not from parallax scroll nonsense. From **clarity.** They land, and they instantly understand: *this person is exceptional.*
-
-The prompts read like poetry. The case studies unfold like blueprints to a cathedral. No loading spinners. No "choose your theme" modals. No admin bar clutter. Just the work, presented with the confidence of a museum curator.
+You drop in your Claude export and — **boom** — it looks like you hired a design studio. Not like a plugin. Not like WordPress. Like an app built *just for you*. The first 30 seconds should feel like dropping a roll of film at a lab and getting back gallery-quality prints. If the user thinks about settings, we have failed.
 
 ## Brand Voice
+We speak like a master craftsman talking to another. Warm. Proud. Human. No "leverage our solution," no "scalable platforms." We say: *"Your prompts deserve to be seen."* We never say "plugin." We never say "WordPress." We say "your work."
 
-We don't "enable creators." We don't "leverage AI workflows." We speak like someone who knows exactly what they're doing and has nothing to prove.
+## What We Say NO To
+NO to twenty mediocre themes. There is one perfect way to show this work. Maybe two — light and dark. That's it.
+NO to settings panels that require a tutorial. If you need a manual, we blew it.
+NO to SEO modules, analytics dashboards, and email popups. This shows work. Period.
+NO to importing from fifteen formats imperfectly. Claude and ChatGPT exports, done flawlessly. Add others later.
+NO to the word "prompt" in every sentence. The user knows what they do. We elevate it.
 
-Short sentences. No adverbs. We say **"Show your work"** not "Unlock your potential." We are the friend who pushes you on stage, not the consultant who hands you a forty-seven-page strategy deck.
-
-## What to Say NO To
-
-- **NO** to theme panels with 400 options. If the user wants to change every border radius, they can write their own plugin.
-- **NO** to "dark mode as a feature." It should just look stunning at every hour. Like a great photograph, it works in any light.
-- **NO** to one-click import that opens a modal asking for five more clicks. One click means **one click.**
-- **NO** to template libraries. If you need twenty templates, you don't have a product — you have a directory. We ship **ONE** template, obsessed over until it hums.
-- **NO** to calling it a "WordPress plugin" in our marketing. It's a portfolio system. WordPress is the engine. Nobody buys a Porsche because of the fuel injection.
-
-## The Emotional Hook
-
-People will love this because for the first time, their scattered ChatGPT threads won't feel like digital junk. They'll feel like a **body of work.**
-
-This product takes the invisible craft of prompt engineering and turns it into **PROOF.** Proof that they think deeply. Proof that they iterate. Proof that they're not just typing into a chatbot — they're sculpting with language. That's intoxicating. That's the hook.
+## Emotional Hook
+People spend hours in solitary conversation with AI, refining, coaxing, crafting — and then what? It vanishes into the ether. Folio takes that invisible labor and turns it into something you **proudly sign your name to**. It's the difference between a poet's notebook and a bound, letterpressed volume. That's why people will love it. Not because it "saves time." Because it finally says: *I made this, and it matters.*
