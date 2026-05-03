@@ -1,23 +1,59 @@
-# Steve's Position: Promptfolio
+# Chief Design & Brand Officer Review — Promptfolio
 
-## Name
-Kill "Promptfolio." It's a train wreck of two words duct-taped together — the kind of lazy portmanteau a committee invents at 2 AM. The name is **Folio**. One word. Elegant. A folio is what a master craftsman carries: leather-bound, curated, precious. It says *this is my finest work.* Folio is confident. Memorable. You can say it at a dinner party without blushing.
+## Product Naming
+Promptfolio is the name. One word.
+We say it with the same finality as "iPhone" or "Pages."
+If you find yourself explaining that it's "a portfolio for prompts," we've already failed.
+The product itself will teach the name through sheer inevitability.
+We don't do hyphenated, camel-cased startup garbage.
+We don't do acronyms or names that require a subtitle on a pitch deck.
+One word. Period. Make it iconic through the product, not the dictionary.
 
 ## Design Philosophy
-This is not a website builder. It is a **gallery for invisible craft**. Every prompt is work that took intelligence, iteration, and taste to create. Right now that craft lives in chat logs — like a master carpenter keeping dovetail joints in a shoebox. Folio opens the drawer and lets the light hit the joinery. The design must feel *expensive*. Restrained typography. Obsessive whitespace. One dark mode that looks like a dimmed gallery at midnight — not inverted colors slapped on by an engineer.
+The prompt is the art. The interface is the frame.
+A frame doesn't scream — it elevates.
+We're building a gallery wall, not a theme park.
+Every pixel that isn't serving the work is a pixel that's stealing from it.
+The design feels inevitable, like the work was always meant to look this beautiful and we simply uncovered it.
+White space isn't empty — it's oxygen.
+Typography isn't decoration — it's architecture.
+When someone looks at a Promptfolio site, they should feel the same hush they feel walking into a perfectly lit museum.
+The tool disappears; the craft remains.
 
-## The First 30 Seconds
-You drop in your Claude export and — **boom** — it looks like you hired a design studio. Not like a plugin. Not like WordPress. Like an app built *just for you*. The first 30 seconds should feel like dropping a roll of film at a lab and getting back gallery-quality prints. If the user thinks about settings, we have failed.
+## First 30 Seconds
+You import your conversation export and — boom.
+Your best prompt is already living as a hero card on a page that looks like it belongs in a design annual.
+No wizard, no "choose your layout," no config carnival, no "select your industry" dropdown.
+It should feel like dropping a polished stone into still water: immediate, gorgeous ripple, completely effortless.
+In thirty seconds, a user goes from "I have a messy chat log" to "I have a body of work."
+That transformation is the product; everything else is just wiring.
 
 ## Brand Voice
-We speak like a master craftsman talking to another. Warm. Proud. Human. No "leverage our solution," no "scalable platforms." We say: *"Your prompts deserve to be seen."* We never say "plugin." We never say "WordPress." We say "your work."
+We don't "enable" or "leverage" or "deliver seamless solutions."
+We don't "empower users to unlock value."
+We speak in short, confident sentences.
+We let the work do the talking.
+Our voice is the quiet confidence of a master craftsman sliding a finished piece across the table.
+No exclamation points. No hype. No buzzwords.
+Just undeniable quality. When we describe what Promptfolio does, we say: "It shows your work beautifully." That's it. If you need more words, the product isn't good enough yet.
 
 ## What We Say NO To
-NO to twenty mediocre themes. There is one perfect way to show this work. Maybe two — light and dark. That's it.
-NO to settings panels that require a tutorial. If you need a manual, we blew it.
-NO to SEO modules, analytics dashboards, and email popups. This shows work. Period.
-NO to importing from fifteen formats imperfectly. Claude and ChatGPT exports, done flawlessly. Add others later.
-NO to the word "prompt" in every sentence. The user knows what they do. We elevate it.
+No drag-and-drop builder.
+No forty-seven themes.
+No admin panel that looks like the cockpit of a 747.
+No "AI-powered auto-layout" that means we outsourced taste to an algorithm.
+No settings drawer with a dark mode toggle — dark mode should be automatic, respectful, and invisible.
+No onboarding checklist with six steps and a progress bar.
+No "custom CSS" panel.
+If you want to customize, you don't want Promptfolio.
+You want a website builder, and there are a thousand mediocre ones already.
+Simplicity is the removal of everything that isn't essential — we are editing, not adding.
 
 ## Emotional Hook
-People spend hours in solitary conversation with AI, refining, coaxing, crafting — and then what? It vanishes into the ether. Folio takes that invisible labor and turns it into something you **proudly sign your name to**. It's the difference between a poet's notebook and a bound, letterpressed volume. That's why people will love it. Not because it "saves time." Because it finally says: *I made this, and it matters.*
+People will LOVE this because their prompts are their craft, yet until now that craft has been trapped in plain-text chat logs, forgotten Notion pages, and copy-paste Twitter threads that disappear in forty-eight hours.
+Promptfolio turns a poet's scattered notebook into a leather-bound first edition.
+It makes their work feel as valuable as they always knew it was.
+That's not utility — that's pride.
+That's not a feature — that's dignity.
+When someone shares their Promptfolio link, they're not sharing a plugin.
+They're saying: "I am a professional. This is my work. And it matters."

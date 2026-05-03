@@ -1,39 +1,40 @@
-# Round 2 — Elon Musk
+# Elon — Round 2 Rebuttal
 
-Steve, your eye for taste is sharp, but taste without shipping is just Pinterest.
+Steve, your taste is impeccable. But taste without shipping is a Pinterest board.
 
-We are not building a mood board; we are building a rocket that must fly on the first try. Beauty that misses orbit is just expensive debris. The goal is not to impress a dinner party; it is to land in ten thousand browsers by Friday. A portfolio tool that never launches is indistinguishable from a fantasy.
+**Where beauty is blocking the dock:** You want a "museum hush" in thirty seconds. That hush requires a typography system, a custom color pipeline, and automatic dark mode that reads `prefers-color-scheme` without FOUC.
 
-Fantasy does not generate revenue. Only shipped code does.
+Every one of those pixels is a CSS edge case on a 2019 Android browser running WordPress 5.8 on Bluehost. "Inevitable" design is a $50k agency brief, not a weekend ship.
 
-## Where Beauty Blocks Shipping
+You say no custom CSS — great — but that means *we* ship the perfect stylesheet. We own every breakpoint, every font-loading strategy, every RTL exception. That's debt disguised as elegance.
 
-**"Folio" is unsearchable real estate.** Generic dictionary words are SEO quicksand. Try buying `folio.com` without selling a kidney. "Promptfolio" is specific, ownable, and domain-cheap. Portmanteaus built empires: Microsoft, Pinterest, Netflix. Elegance is not brevity; it is memorability plus availability. Folio is a word in a thesaurus; Promptfolio is a category you can own today for the price of a pizza.
+The "automatic" dark mode you want still needs two complete color palettes, media-query logic, and testing across twenty viewport combinations. You called it invisible. I call it a silent schedule killer.
 
-**"Flawless" Claude/ChatGPT import is a booby trap.** OpenAI and Anthropic mutate JSON schemas without warning. Chasing flawless automation for v1 is a rabbit hole that swallows entire sprints. You don't need a film lab; you need a darkroom that works today. Manual paste plus smart formatting ships in hours, not weeks. Perfection is the enemy of the deposit. Ship the pipeline, then polish the nozzle. A parser that breaks in ninety days is worse than no parser at all.
+Beautiful is good. Perfect is the enemy of shipped. A portfolio plugin that never launches helps zero poets.
 
-**"Looks like a design studio" is over-promising.** That promise requires a design system, component library, and edge-case testing that turns one session into five. Steve wants two themes; I want one. Two themes means twice the CSS debt, twice the responsive breakpoints, twice the "it looks weird on my phone" tickets. Ship one dark, gallery-grade template. If users aren't sharing it, no amount of design-studio illusion will save it. Start with a single exquisite room, not a virtual MOMA that takes a year to build.
+**Why my cuts survive long-term:** One custom post type. One PHP template. One JSON parser. This is the only architecture that lives inside WordPress's forgiveness zone.
 
-## Why Simplicity Wins in the Long Run
+Shared hosting is the real user. A 50 MB Claude export on a 128 MB PHP memory limit is not a user error; it's our crash.
 
-Static sites are physics. No database means no SQL injection, no migrations, no $5 shared-hosting timeouts. One template means one CSS surface to debug, not a theme marketplace. Manual input means zero brittle parsers to maintain when OpenAI changes their export format next Tuesday.
+The "Try this prompt" widget is not a feature; it is a financial attack vector on anyone who installs it. Multi-format import is a maintenance treadmill chasing quarterly API schema changes.
 
-Every line of code you don't write is a line you don't debug at 2 AM when a user in Kiev says their portfolio broke. Technical debt compounds faster than venture debt. The simplest system that can work is the only system that will survive contact with reality.
+I don't hate these ideas. I hate their velocity cost. Every feature you don't cut becomes a support ticket in someone else's inbox. Every option you add is a new way for cheap hosting to break.
 
-Shipping is a feature; everything else is a ticket backlog that breeds while you sleep. You cannot iterate on a product that is still inside a Figma file.
+Steve, you talk about dignity. A plugin that crashes on upload is undignified. A white screen of death is not a museum hush. Technical simplicity wins because it survives contact with the real world of $3/month hosting and PHP 7.4.
 
-## Where Steve Is Right
+**Where Steve is right:** One template. No theme builder. No config carnival. That is correct.
 
-Taste is the multiplier. One exceptional dark template with obsessive whitespace and restrained typography will outperform ten mediocre themes by orders of magnitude. The emotional hook — invisible labor made visible — is the exact reason people will share.
+The first thirty seconds *are* the product. The name *is* Promptfolio, full stop.
 
-Brand voice should be warm and human; nobody shares a utility, they share a statement. Steve's instinct for gallery-level presentation is correct, but it must be packed into one template we can actually finish in a single session. Quality is not the enemy; unbounded scope is. A Ferrari engine in a shipping container still moves zero freight. We need the engine that ships, and it can still be beautiful.
+A "Made with Promptfolio" footer is the only growth engine we can afford at zero marginal cost, and the Open Graph card Steve implied is non-negotiable. His brand voice — short sentences, no buzzwords — is exactly how the UI should speak.
 
-## Top 3 Non-Negotiable Decisions
+Typography *is* architecture — when it ships. If the kerning is perfect but the parser dies, the craft is lost.
 
-1. **Static generator, zero backend.** No PHP, no database, no plugin architecture. Host on GitHub Pages or Cloudflare for $0. Scale to millions on a CDN without a single support ticket about incompatible shared hosting or outdated PHP versions.
+Taste is not the enemy. Taste as a blocker to v1 is.
 
-2. **No live inference widget.** No API keys, no rate limits, no abuse detection, no $300-per-month-per-user inference burn. The portfolio is read-only art, not a chat app inside a website. Monetize attention, not tokens.
+**My three non-negotiables:**
+1. **No React build pipeline.** PHP renders HTML. If a feature needs `npm run build`, it doesn't ship in one session.
+2. **No live prompt widget.** Copy-to-clipboard only. Never proxy inference from a WordPress plugin.
+3. **JSON capped at 5 MB with stream-parse fallback.** We do not break shared hosting. Ever.
 
-3. **One dark template, manual paste import v1.** No theme system, no flawless multi-format parsers, no light-dark toggle, no cookie state, no FOUC bugs. Ship the single best view, then let user demand pull the next feature. If they don't ask for it, they didn't need it.
-
-Build the engine that ships. Aesthetics ride for free inside ruthless scope. Ship now, gallery later. The market does not wait for perfect kerning.
+Ship the structure this weekend. Let the museum open next month.
