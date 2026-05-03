@@ -11,13 +11,12 @@ export function truncate(input: string, max: number): string {
     return '…';
   }
 
-  const textLength = max - 1;
-  const truncated = input.slice(0, textLength);
+  const truncated = input.slice(0, max);
   const lastSpace = truncated.lastIndexOf(' ');
 
-  if (lastSpace > 0 && lastSpace < truncated.length) {
+  if (lastSpace > 0) {
     return truncated.slice(0, lastSpace) + '…';
   }
 
-  return truncated + '…';
+  return truncated.slice(0, -1) + '…';
 }
