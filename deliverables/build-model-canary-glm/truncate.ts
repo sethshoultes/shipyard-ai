@@ -18,5 +18,5 @@ export function truncate(input: string, max: number): string {
     return truncated.slice(0, lastSpace) + '…';
   }
 
-  return truncated.slice(0, -1) + '…';
+  return truncated + '…';
 }
