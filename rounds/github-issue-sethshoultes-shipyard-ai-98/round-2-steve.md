@@ -1,27 +1,29 @@
-## Steve Jobs — Round 2 Rebuttal
+# Round 2 — Steve Jobs
 
-### Where Elon Is Optimizing for the Wrong Metric
+Elon is the best engineer alive. But he is optimizing for the wrong metric: lines of code, not lines of trust.
 
-Elon wants to ship thirty lines of shell. He's optimizing for *engineering ego* — the dopamine hit of merging fast. The metric that matters is whether the user trusts us at 3 AM when they share their link. A curl script that false-flags because of DNS blips doesn't build trust; it builds resentment. And resentful engineers bypass "infrastructure."
+## Where Elon Is Wrong
 
-He wants to CUT build-id verification for v1. That's not cutting scope; that's cutting *truth*. HTTP 200 with the wrong build is a lie in a green wrapper. If Greenlight says go, it must be the real build.
+**"Red pipeline is the alert."** No. A red pipeline is an angry blip in a dashboard only engineers open. When Margaret's 6 AM launch is a 404, Margaret does not read CI logs. Elon is optimizing for *his* convenience — fewer notifications — instead of the customer's dignity. The metric that matters is: does the right human know, in words they understand, before their customer does?
 
-### Defending What Elon Will Attack
+**"Check `/` only."** This is checking the doormat and declaring the house safe. Cloudflare serves stale cache with a 200. Your 10-line script calls that "verified." It is not proof. It is hope dressed as code. The metric should be certainty, not brevity. If `/pricing` is a 404, you have shipped a broken product and your "verification" lied to you. False security is more dangerous than no security.
 
-Elon says "Greenlight is marketing fluff." Wrong. Names are interfaces. "Post-deploy verification" is a chore you skip. Greenlight is a decision you remember.
+**"CUT build-id matching."** Without it, you are verifying that *a* website loads, not that *this* deploy reached the world. Elon optimizes for implementation speed; I optimize for the sleep of the person who pressed deploy. A green checkmark on stale code is worse than no checkmark at all. It is a placebo, not a medicine.
 
-He says engineers need logs first. No. Engineers need *certainty* first, diagnostics second. The green circle isn't hiding data; it's prioritizing clarity. When your heart is pounding because you just pushed to a client demo, you don't need a spreadsheet. You need a heartbeat. One light. One breath.
+## Defending What Elon Would Cut
 
-He says forcing it is tyranny. Only if the product is garbage. A seatbelt you can't unbuckle isn't tyranny — it's a car worth driving.
+Elon will say the name doesn't matter. He is wrong. "Proof" is not marketing fluff. It is the promise. When a customer asks "Does Shipyard guarantee my deploy?" and we say "We have Proof," we have created a category in their mind. Categories own markets. Acronyms fill spreadsheets.
 
-### Where Elon Is Right
+He will say alerting the operator is scope creep. But scope creep is adding work for the user. Alerting Margaret *removes* work and saves her from public humiliation. It is not a feature. It is the conscience of the pipeline reaching out to the only human who can act.
 
-Retry logic with exponential backoff is essential. DNS propagation blips aren't failures; they're physics. I'll take his 5-attempts-over-60-seconds proposal verbatim.
+He will say invisible design is wasteful. Invisible design is the *highest* form — the airbag, the foundation, the silence after dread disappears. Proof does not need a dashboard. It needs a soul.
 
-He's also right that baking it into the base template is the only way to reach every project. But I want it baked in because users will *miss* it when it's gone. He wants it baked in because he doesn't trust them to opt in. Same mechanism, opposite philosophy.
+## Where Elon Is Right
 
-### Top 3 Non-Negotiables
+He is right that a standalone microservice is absurd for v1. Bake it into the pipeline. He is right about retry logic — DNS propagation is physics, not philosophy. He is right that brittle CLI scraping will break; use environment variables. He is right that we should ship fast, and that premature abstraction is the enemy. But fast does not mean thoughtless. A 10-line script with taste beats a 1,000-line platform without it.
 
-1. **The product is Greenlight.** Not a step, not a script, not a ticket. It has a name, a soul, and a story.
-2. **One light, one sentence.** The interface is certainty. Logs exist, but they are never the first thing you see.
-3. **Build-id verification is v1.** If we can't confirm the right build is live, we confirm nothing. HTTP 200 is hope, not proof.
+## Non-Negotiables
+
+1. **It must verify identity, not just pulse.** Build-id matching or equivalent. Otherwise it is a comforting lie.
+2. **Failure must speak to humans.** "Stopped. Margaret notified." Not a hex code in a log she will never open.
+3. **It must be called Proof.** One word. A promise. If we ship it as `deploy_verify_step_v1.sh`, we have already surrendered to the committee that names by consensus.
