@@ -1,24 +1,41 @@
-# Round 1 — Elon Musk
+# Round 1: First Principles — Deploy Verification
 
 ## Architecture
-The simplest system is already 80% built. `scripts/proof.js` exists and `deploy-website.yml` already calls it. The real gap is `pipeline/deploy/deploy.sh` — the script that ships every customer site — which deploys, prints a green banner, and exits with **zero verification**. Don't build a new abstraction. Reuse the Node script. The PRD's suggested bash `curl | grep` is brittle trash: no retry, no timeout, no JSON config, no parallelization, and it scrapes `wrangler` CLI output which breaks the moment Cloudflare changes formatting. Kill it. Read the domain from the environment variable or config file you already set for the project. If the CI runner can deploy, it can verify.
+
+The simplest system is a 15-line shell script in the deploy pipeline, not a new service. After `wrangler pages deploy`, run `curl -H "Host: shipyard.company"` against the CF Pages origin and validate status == 200 plus a build identifier. That's it. No microservices, no queues, no "verification engine." If it doesn't fit in the existing CI step, it's over-engineered.
 
 ## Performance
-Bottleneck isn't request throughput; it's **DNS propagation latency**. Cloudflare DNS can take 30–90 seconds to globally converge after a deploy. The deliverable's 5-attempt exponential backoff (1s → 2s → 4s → 8s → 15s ≈ 30s wall time) is the right physics. The 10x path is **redirect following** — the current `https.get` doesn't follow 301/302s. Apex → `www` redirects will false-negative and burn retries. Add `maxRedirects: 5`. Body reading for BUILD_ID adds ~100–300ms per domain; acceptable only for `/`. Deep route checks are waste — they multiply noise without catching the core failure mode (domain points at wrong origin).
+
+The bottleneck isn't speed — it's **false confidence**. A single curl from GitHub Actions in Virginia tells you nothing about global DNS resolution. The 10x path: inject a custom HTTP header (`X-Shipyard-Build: $BUILD_ID`) and check it, instead of brittle `grep` against HTML body that breaks with minification. DNS propagation takes 0–300 seconds; add retries with exponential backoff, not a fixed sleep.
 
 ## Distribution
-This isn't a user-facing product; it's a pipeline gate. Nobody signs up for a "deploy verification tool." Distribution means **every customer deploy runs it automatically without opt-in**. The `deploy-website.yml` has it. `deploy.sh` does not. One post-deploy line in `deploy.sh` — `node ../../scripts/proof.js` — covers 100% of customer launches. If it's opt-in, adoption will be under 10%. Make it impossible to skip. Trust compounds faster than marketing spend.
+
+Wrong question. This isn't a consumer feature you market — it's **infrastructure hygiene**. You don't "distribute" a smoke test; you wire it into every customer deploy by default. The growth effect is retention: when a customer's launch doesn't 404, they don't churn. Word of mouth among developers whose DNS doesn't silently break is your distribution.
 
 ## What to CUT
-- **BUILD_ID body matching**: V2 masquerading as V1. The bug was a Vercel 404 caused by DNS pointing at the wrong origin. Catching that requires only **DNS origin + HTTPS 200 + Cloudflare headers**. Injecting a build hash into every Astro/Next.js build output is a cross-cutting build-system change. Cut it from v1.
-- **"A few key routes"**: Cut to `/` only. The homepage 404ing is the failure mode. More routes = more noise, same signal.
-- **"Alert the operator"**: GitHub already emails on workflow failure. A red pipeline *is* the alert. Don't build a pager.
-- **The bash snippet in the PRD**: Delete it. No retry, no DNS validation, will false-positive on cached error pages.
-- **Generalization to all customers in the first PR**: Fix Shipyard's own pipeline first. Wire it into `deploy.sh`, run it for 2 weeks without flaking, then abstract. Premature abstraction is the enemy.
-- **A standalone verification service**: If you build a new microservice to check HTTP, you now have two things to deploy and one of them will break.
+
+- **Multi-route checking.** Start with `/`. Checking `/about` and `/pricing` is v2 theater.
+- **"Alert the operator."** If the check fails, fail the deploy. A red CI badge is the alert. Building a paging system is scope creep.
+- **Body parsing.** `grep "$BUILD_ID"` breaks on every framework update. Use an HTTP header or a `<meta>` tag you control.
+- **QA handoff gate.** Margaret should not be manually curling domains. This is automation, not human process.
 
 ## Technical Feasibility
-Trivial. One agent session. The proof script, workflow hook, and `domains.json` config already exist. The delta is ~3 lines in `deploy.sh` and redirect handling in `proof.js`. If an agent can't add a post-deploy verification call to a bash script, the agency has a hiring problem. Scope tightly: curl the domain, expect 200, retry with backoff, fail the pipeline. If the agent spends more than 20 minutes on this, the requirements are too broad. Ship.
+
+Trivial. One agent session, ~30 minutes. The script is:
+1. Read custom domains from `wrangler pages project get --json`.
+2. `curl -sfI https://$domain/` and assert `X-Shipyard-Build` matches `$CF_PAGES_COMMIT_SHA`.
+3. Retry 5× with 10s backoff.
+
+The only dependency is ensuring the build injects that header.
 
 ## Scaling
-At 100× (1,000 customers × 3 domains each), a single GitHub Actions runner doing 3,000 HTTPS checks + DNS lookups via `Promise.all` will hit OS file-descriptor limits. Deploys will hang for minutes. The break point is roughly **50 domains**. Fix: move verification to a fire-and-forget async worker, or consume Cloudflare's API for domain validation status instead of HTTP polling. For v1, add a hard `Promise.all` concurrency limit of `10`. Otherwise this becomes a deploy-time DOS of itself. Without disciplined retry jitter, a Cloudflare edge hiccup could fail 100 pipelines simultaneously. Retry logic with jitter is not optional at scale; it is required. Human QA does not scale — "Margaret should have caught this" breaks at 10 projects. The pipeline either catches it automatically, or the failure goes live.
+
+At 100× usage — 1,000 customers, multiple domains each — what breaks?
+
+1. **Sequential checks in CI.** 10 domains × 5 retries × 10s = 500s added to every deploy. Parallelize with `xargs -P` or it becomes the pipeline bottleneck.
+2. **Single-point DNS.** Your CI runner's resolver might cache stale records. At scale you need distributed checks (even just 2–3 regions) or you're verifying Virginia, not the internet.
+3. **False positives from DNS TTL edge cases.** A domain can be "up" for 80% of users and down for 20%. At 100×, partial outages become certainties. You need to validate from multiple resolvers, not one.
+
+## Bottom Line
+
+This is a smoke test, not a product. Build it in the pipeline in one session. Cut everything that doesn't fit in `.github/workflows/deploy.yml`. If it takes longer than 50 lines of shell, you're doing it wrong.

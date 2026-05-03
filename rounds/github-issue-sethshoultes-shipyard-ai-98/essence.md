@@ -1,10 +1,10 @@
 # Proof
 
-The latch that clicks after deploy: your build reached the world, not a ghost.
+The latch that clicks after deploy.
 
-- **What it is:** Pipeline conscience. One inline step. Default-on. No opt-out.
-- **Feeling:** 2 AM door lock. Click. Dread evaporates. Sleep.
-- **Must be perfect:** Origin validation. A green light from the wrong server is a lie.
+- **What it really is:** A smoke test that stops you from pasting a dead link into a board deck.
+- **Feeling:** 2 AM. Tug the handle. Click. Sleep.
+- **Must be perfect:** The verdict. One word. Confirmed or Failed. No log dumps, no ambiguity. Origin validation or nothing ships.
 - **Direction:** Invisible certainty.
 
-Not a product. Not a dashboard. The verdict, not the courtroom.
+Not a product. Not a dashboard. The door handle, and it doesn't budge.

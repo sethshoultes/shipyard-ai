@@ -153,6 +153,38 @@ This happened 2026-05-02 18:59: a builder's "fix pass" overwrote write-counter p
 
 ---
 
+## PRD Lint (pre-flight)
+
+Every PRD dropped in `prds/` runs through `pipeline/auto/prd-lint.sh` before queueing. The watcher calls it; if exit != 0, the PRD moves to `prds/lint-failed/` with a `.lint-report.md` next to it. **No agent time is spent on a failed-lint PRD.**
+
+### What lint catches
+
+Hard fails (block the PRD):
+- File <500 bytes
+- Anti-pattern: "READ each X" + "synthesize" without "EXACT contents" or pre-baked data
+- Missing `## Acceptance Criteria` (or `## Success Criteria`)
+- No `## Required Files` / `## Required Output` AND no explicit file paths in the body
+- No source-code file extensions (.ts/.tsx/.js/.php/.py/.go/.rs) — would trigger hollow-build gate
+
+Warnings (logged, do not block):
+- Missing Test Commands section
+- Missing Out of Scope / Done When
+- No rock mapping
+- Vague language ("should work", "looks good")
+
+### Templates
+
+- `prds/TEMPLATE.md` — client website/theme/plugin work
+- `prds/CODE-TEMPLATE.md` — internal code work (daemon, libraries, tools, integrations)
+
+Both templates are exempt from lint. The `github-issue-*` auto-converted PRDs from intake bypass HARD fails (they need to flow through dream-promotion logic) but get a strong WARN if too thin.
+
+### To bypass lint (rarely needed)
+
+Don't. Fix the PRD instead. If you genuinely need to bypass, drop the PRD with a leading `# PRD-LINT: SKIP` comment and edit the linter rules — but every skip reason should land in this section as a permanent rule update.
+
+---
+
 ## Banned Behaviors
 
 - **No orphan PRDs.** Every build must be traceable to a GitHub issue or a quarterly rock.
