@@ -1,0 +1,50 @@
+{
+  "name": "codex-template",
+  "version": "1.0.0",
+  "description": "Deterministic PRD template validation for AgentPress",
+  "main": "parser/validate.js",
+  "bin": {
+    "codex-validate": "parser/validate.js"
+  },
+  "scripts": {
+    "validate": "node parser/validate.js",
+    "test": "./tests/validate-structure.sh",
+    "test-template": "./tests/validate-template.sh",
+    "test-parser": "./tests/validate-parser.sh",
+    "test-gate": "./tests/validate-gate.sh",
+    "install": "echo 'No dependencies required'",
+    "lint": "echo 'Linting not configured'",
+    "build": "echo 'Build not required - template files are static'"
+  },
+  "keywords": [
+    "template",
+    "validation",
+    "prd",
+    "agentpress",
+    "deterministic",
+    "codex"
+  ],
+  "author": "AgentPress",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agentpress/codex-template.git"
+  },
+  "bugs": {
+    "url": "https://github.com/agentpress/codex-template/issues"
+  },
+  "homepage": "https://github.com/agentpress/codex-template#readme",
+  "files": [
+    "codex.md",
+    "parser/",
+    "gate/",
+    "examples/",
+    "tests/",
+    "README.md"
+  ],
+  "devDependencies": {},
+  "dependencies": {}
+}

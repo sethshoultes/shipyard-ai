@@ -1,0 +1,139 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Codex PRD Template Schema",
+  "description": "Deterministic validation schema for Codex PRD templates",
+  "type": "object",
+  "properties": {
+    "frontmatter": {
+      "type": "object",
+      "required": ["slug", "title", "author", "date", "version", "parent", "dependencies"],
+      "properties": {
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "minLength": 3,
+          "maxLength": 100
+        },
+        "title": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 200
+        },
+        "author": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "parent": {
+          "type": "string",
+          "enum": ["none", "feature", "fix", "refactor", "docs"]
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "sections": {
+      "type": "object",
+      "required": ["Background", "Acceptance Criteria", "Verbatim Contracts", "Risks", "Deliverables"],
+      "properties": {
+        "Background": {
+          "type": "object",
+          "properties": {
+            "wordCount": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 200
+            },
+            "hasContent": {
+              "type": "boolean"
+            }
+          },
+          "required": ["wordCount", "hasContent"]
+        },
+        "Acceptance Criteria": {
+          "type": "object",
+          "properties": {
+            "minimumCriteria": {
+              "type": "integer",
+              "minimum": 3
+            },
+            "hasTestableCriteria": {
+              "type": "boolean"
+            },
+            "hasVerificationMethod": {
+              "type": "boolean"
+            }
+          },
+          "required": ["minimumCriteria", "hasTestableCriteria", "hasVerificationMethod"]
+        },
+        "Verbatim Contracts": {
+          "type": "object",
+          "properties": {
+            "hasCodeBlocks": {
+              "type": "boolean"
+            },
+            "hasVerbatimLanguage": {
+              "type": "boolean"
+            },
+            "hasEnforcementRules": {
+              "type": "boolean"
+            }
+          },
+          "required": ["hasCodeBlocks", "hasVerbatimLanguage", "hasEnforcementRules"]
+        },
+        "Risks": {
+          "type": "object",
+          "properties": {
+            "hasRiskIdentifications": {
+              "type": "boolean"
+            },
+            "hasMitigations": {
+              "type": "boolean"
+            }
+          },
+          "required": ["hasRiskIdentifications", "hasMitigations"]
+        },
+        "Deliverables": {
+          "type": "object",
+          "properties": {
+            "minimumDeliverables": {
+              "type": "integer",
+              "minimum": 5
+            },
+            "hasFileSpecifications": {
+              "type": "boolean"
+            }
+          },
+          "required": ["minimumDeliverables", "hasFileSpecifications"]
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "hasVerificationCommands": {
+          "type": "boolean"
+        },
+        "hasPerformanceRequirements": {
+          "type": "boolean"
+        },
+        "hasIntegrationNotes": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "required": ["frontmatter", "sections"]
+}

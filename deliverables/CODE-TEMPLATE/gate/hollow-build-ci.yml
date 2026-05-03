@@ -1,0 +1,107 @@
+# Hollow Build CI - GitHub Actions Workflow Stub
+# Version 2 CI configuration for automated validation
+
+name: Hollow Build Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-template:
+    name: Validate Codex Template
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Validate Template Structure
+      run: ./tests/validate-template.sh
+
+    - name: Validate Parser Functionality
+      run: ./tests/validate-parser.sh
+
+    - name: Validate Build Gate
+      run: ./tests/validate-gate.sh
+
+  validate-project:
+    name: Validate Project Artifacts
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Run Hollow Build Gate
+      run: ./gate/hollow-build.sh
+
+    - name: Check Project Structure
+      run: ./tests/validate-structure.sh
+
+  performance-test:
+    name: Performance Validation
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Test Parser Performance
+      run: |
+        echo "Testing parser performance..."
+        time node parser/validate.js codex.md
+
+    - name: Validate Memory Usage
+      run: |
+        echo "Checking memory usage..."
+        /usr/bin/time -v node parser/validate.js codex.md 2>&1 | grep "Maximum resident set size"
+
+  security-scan:
+    name: Security Validation
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Check for Sensitive Data
+      run: |
+        echo "Scanning for sensitive patterns..."
+        if grep -r "password\|secret\|key\|token" . --exclude-dir=.git --exclude="*.md"; then
+          echo "WARNING: Found potential sensitive patterns"
+        fi
+
+    - name: Validate File Permissions
+      run: |
+        echo "Checking executable permissions..."
+        find . -name "*.sh" -type f -exec chmod +x {} \;
+        ls -la gate/ tests/
+
+  integration-test:
+    name: End-to-End Integration
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Test Template Validation Workflow
+      run: |
+        echo "Testing complete workflow..."
+        node parser/validate.js codex.md
+        ./gate/hollow-build.sh
+
+    - name: Validate Example PRDs
+      run: |
+        echo "Testing example validation..."
+        if [ -f "examples/with-codex/example.md" ]; then
+          node parser/validate.js examples/with-codex/example.md
+        fi
