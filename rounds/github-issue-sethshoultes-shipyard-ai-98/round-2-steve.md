@@ -1,19 +1,51 @@
-# Steve's Take — Round 2
+# Round 2 — Steve Jobs
 
-Elon wants to ship a heartbeat monitor and declare victory. HTTP 200 with a `<title>` tag? That's not verification — it's theater. The bug that cost us six days wasn't a dead server; it was the *wrong build* serving a 200. If we ship v1 without build-id matching, we haven't solved the problem. We've solved the metric.
+Elon, you're optimizing for *implementation velocity* when you should optimize for *developer trust*.
 
-Elon is right about three things. Retry logic with exponential backoff is non-negotiable — DNS propagation and CDN cache invalidation will kill us otherwise. He's right that we shouldn't scrape `wrangler` CLI output like amateurs. And he's right that building a separate microservice is absurd for v1. A CI step is the correct integration point; I just refuse to let it feel like a cron job.
+You want to duct-tape `proof.js` into `deploy.sh`, cut BUILD_ID body matching, slash the output to a log dump, and call it shipped by lunch. That's building a faster horse, not a car.
 
-Where Elon is dangerously wrong is distribution. "Make it impossible to skip" is how you get shadow IT. Engineers disable noisy, ugly checks. At 100x projects, enforcement doesn't scale — desire does. A beautiful tool becomes a ritual. An ugly tool becomes a todo list item that mysteriously stays unchecked.
+Speed to merge is the wrong metric when the consequence of a false positive is a production incident at scale.
 
-Elon will say "design is scope creep." But design IS the distribution strategy. If the output is a log dump, people learn to ignore it. If the output is one perfect line — `Canary verified: shipyard.company is you, build a1f2d9` — people remember it. They trust it. They *want* it running.
+Conceded, and honestly: the bash snippet in the PRD is brittle trash. No retry logic. No timeout discipline. No JSON config.
 
-My non-negotiables:
+Scraping `wrangler` CLI output is amateur hour. The moment Cloudflare changes a whitespace character, the whole thing collapses.
 
-1. **Build ID verification in v1.** Not v2. Without it we are monitoring liveness, not correctness.
+Redirect following is absolutely essential. Apex to www redirects will false-negative and burn our retry budget on every single deploy. Without it, we're not verifying — we're guessing.
 
-2. **Canary is the product name and voice.** One word. No hedging. Confidence is the feature.
+Every deploy must run this automatically with zero opt-in. Pipeline integration is the only distribution strategy that actually scales to 100% adoption. If it's opt-in, it dies.
 
-3. **One-line diagnosis.** Exact domain, exact build, exact mismatch. No dashboards. No log archaeology.
+And `Promise.all` without a concurrency leash will DOS itself at roughly fifty domains. Retry jitter at scale is not optional.
 
-Everything else is implementation detail.
+Without it, one Cloudflare edge hiccup fails a hundred pipelines simultaneously. You're right on the physics. I take those points entirely.
+
+But "this isn't a user-facing product" is dangerously, fundamentally wrong. The developer staring at that terminal output for thirty seconds after a deploy *is* the user. They are tired. They are anxious. They want to go home.
+
+If they see JSON vomit, exit codes, and grid tables, they learn to tune it out. When they tune it out, the failure goes live anyway — red pipeline or not.
+
+Design quality isn't veneer here; it's the mechanism of attention. A beautiful signal cuts through noise; an ugly signal becomes noise. This is not decoration. This is survival.
+
+BUILD_ID matching is non-negotiable. You want to cut it because it's a "cross-cutting build change" that touches Astro and Next.js build output.
+
+I want to keep it because it's the exact bug we already suffered: V1 masquerading as V2. DNS plus 200 only confirms a plane landed at the right airport.
+
+BUILD_ID confirms the right passengers actually got off. We don't verify presence. We verify *identity*.
+
+Without it, we're not solving the problem. We're solving the metric that makes the sprint look complete while the user sees the wrong version.
+
+Cutting deep routes to `/` only? That's betting everything on the homepage. Homepage CDN cache can serve stale gold while `/pricing` 404s from a bad rewrite and `/docs` serves a white screen.
+
+One route is hope. Three strategic routes is certainty. That's not noise — that's signal you cannot afford to lose at 2am when you're alone with the deploy and everyone's asleep.
+
+Your metric is lines of code merged before lunch. My metric is peace of mind. Engineers don't tell friends about "a pipeline gate." They tell friends about the thing that let them finally sleep.
+
+## Non-Negotiables
+
+1. **BUILD_ID body matching stays.** Identity verification, not presence detection. If we don't confirm the right build is live, we haven't solved the bug — we've hidden it.
+
+2. **The output is emotional and human.** No JSON blocks. No grid tables. No terminal fetishism. No Slack bots vomiting curl output. Certainty you can feel in thirty seconds. The product speaks like a best friend who checked, then left before you had to thank them.
+
+3. **Integration is invisible and automatic.** No opt-in, no switches, no "configure Beacon," no advanced settings screens. It just happens, beautifully, on every single deploy. If a developer has to remember to turn it on, we've already failed.
+
+Build the infrastructure right. Tune the backoff, follow the redirects, leash the concurrency. But never forget: we're not shipping a verification script.
+
+We're shipping the moment a developer exhales, closes their laptop, and actually sleeps.

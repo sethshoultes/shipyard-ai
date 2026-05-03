@@ -1,25 +1,49 @@
-# Steve's Take — Round 1
+# Steve Jobs — Design & Brand Review
 
-## Product Naming
+## Naming: Beacon
 
-This isn't "deploy verification" or "post-deploy health checks." Those are feature lists, not poetry. The product is **Canary**. One word. A canary in the coal mine — beautiful, alive, and unmistakably clear when something is wrong. You don't "run a verification script." You **release the Canary**. That's memorable. That's a verb people want to say.
+One word. Nautical. Memorable.
 
-## Design Philosophy
+We build ships; Beacon is the light that proves shore is real. "Shipyard Beacon." Not "Deploy Verification Service" — that's a tax form, not a product. If you need two words to explain it, you don't understand it.
 
-Great design is about removing fear. Every developer who hits "deploy" is standing on a cliff with their eyes closed. The current pipeline is a blindfold that tells you "congratulations, you jumped" while you're still falling. Canary rips off the blindfold. It answers the only question that matters: *Did my change reach the people I actually care about?* Insanely great means turning paranoia into confidence with zero cognitive load.
+Alternatives like "Canary" or "Pulse" are fine, but Beacon owns the harbor. It doesn't warn of danger; it confirms you're home safe. A product name should be a gift the user gives their own memory. Say it once, never forget it.
 
-## First 30 Seconds
+## Design Philosophy: Radical Certainty
 
-You push code. The terminal goes quiet — then a single line appears: `Canary verified: shipyard.company is you, build a1f2d9`. Green. Done. No dashboards. No tabs. It feels like a bank vault clicking shut — secure, precise, final. If it fails, you see the exact domain, the exact mismatch, and the exact moment it broke. Not a log dump. A diagnosis.
+This isn't monitoring. Monitoring is what hospitals do to sick patients — beeping, charts, anxiety, waiting for something to die. This is a standing ovation after a perfect performance. It confirms the magic actually happened.
 
-## Brand Voice
+Every pixel must scream *yes*. A dashboard that looks like a server room is a catastrophic failure. Make it feel like flicking a light switch in a dark room: instantaneous, total, beautiful illumination. If Margaret Hamilton opens this and doesn't exhale with relief, we've built a spreadsheet. Insanely great means turning the invisible into the inevitable.
 
-Canary doesn't apologize, hedge, or explain. It states. "Your domain serves the wrong build." Not "An error may have occurred during the validation phase." Speak like a pilot reporting altitude: clear, calm, unarguable. Confidence is the product.
+## The First 30 Seconds
 
-## What We Say NO To
+You hit deploy. For six seconds, nothing. Then — *cascade*.
 
-NO configuration wizards. NO "set up your verification rules." NO Slack bots that spam channels with animated gifs. NO health-check dashboards that become wallpaper. The customer already has a build ID and a domain — we verify them automatically, or we don't ship. Simplicity means the user does nothing. If they have to think about it, we failed.
+One by one, your domains light up like bulbs on a Broadway marquee. Amber melts to green with the fluidity of warm honey. The build ID materializes with the satisfying certainty of a key turning in a well-oiled lock.
 
-## Emotional Hook
+No logs. No tables. No terminal fetishism. Just proof. It should feel like watching dominoes fall perfectly in slow motion, not like debugging DNS at 3am. Thirty seconds in, you should feel like you just launched a rocket and heard "orbit confirmed" crackle through your headset. That's the bar. Anything less is a toy.
 
-People will love this because it lets them sleep. The 3 AM deploy. The client demo in an hour. The "is it actually live?" refresh loop. Canary kills all of it. The emotion is relief — pure, addictive relief. It's the feeling of knowing the door is locked without having to get up and check.
+## Brand Voice: The Best Friend Who Checked
+
+We don't say "Deployment verification completed with status code 200."
+
+We say: "Your ship is in the water. Your users see it." Speak like a human who cares. Confident, warm, absolute. No passive voice. No maybes. No "an error may have occurred." "It's live" — period. "Build a1f2d9 is what they see" — full stop.
+
+The product speaks like someone who stayed up to make sure you got home safe, then left before you had to thank them. Authority without ego. Truth without noise.
+
+## Say NO To
+
+NO to green checkmarks in grid tables. NO to `curl -sf` aesthetics. NO to exit codes shown to humans. NO to "advanced configuration" screens. NO to cron job mentality. NO to Slack bots vomiting JSON blocks. NO to making the user interpret anything.
+
+If it looks like Jenkins, kill it. If it looks like Nagios, burn it. If it needs a manual, we failed.
+
+Simplicity isn't adding a beautiful skin to complexity — it's removing the complexity until only truth remains. We don't ship a monitoring tool. We ship peace of mind in a box that opens itself.
+
+## The Emotional Hook: Sleep
+
+Every developer has lain awake at 2am wondering: *Did it actually go live?*
+
+Beacon is the warm hand on your shoulder saying *Yes. Sleep.*
+
+This isn't about DevOps metrics or pipeline hygiene or MTTR. It's about the joy of shipping without fear. Margaret shouldn't feel like a nag running a checklist — she should feel like a guardian angel. When your customer hits "share" the next morning, they're not rolling the dice. They're holding a sure thing.
+
+That's not a feature. That's love. And love is what makes people tell their friends.
