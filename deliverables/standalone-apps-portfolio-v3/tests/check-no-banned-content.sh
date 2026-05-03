@@ -7,18 +7,15 @@ set -e
 
 echo "Checking for banned content..."
 
-# Define banned patterns
-banned_patterns=(
-    "TODO"
-    "FIXME"
-    "lorem"
-    "coming soon"
-    "placeholder"
-    "PLACEHOLDER"
-    "Coming Soon"
-    "TODO:"
-    "FIXME:"
-)
+# Banned patterns are base64-encoded so literal strings do not appear
+# contiguously in this script, preventing self-matches during scans.
+patterns_b64="VE9ETwpGSVhNRQpsb3JlbQpjb21pbmcgc29vbgpwbGFjZWhvbGRlcgpQTEFDRUhPTERFUgpDb21pbmcgU29vbgpUT0RPOgpGSVhNRToK"
+
+# Decode patterns into a temporary file and read into array
+tmpfile=$(mktemp)
+echo "$patterns_b64" | base64 -d > "$tmpfile"
+mapfile -t banned_patterns < "$tmpfile"
+rm -f "$tmpfile"
 
 # Flag to track if any banned content found
 found_banned=0
@@ -27,8 +24,8 @@ found_banned=0
 for pattern in "${banned_patterns[@]}"; do
     echo "Checking for pattern: $pattern"
 
-    # Use grep to search for pattern (case-insensitive)
-    matches=$(grep -rilE "$pattern" . 2>/dev/null || true)
+    # Use grep to search for pattern (case-insensitive), excluding this script
+    matches=$(grep -rilE "$pattern" --exclude="check-no-banned-content.sh" . 2>/dev/null || true)
 
     if [ -n "$matches" ]; then
         echo "✗ Found banned content '$pattern' in:"

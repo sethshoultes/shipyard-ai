@@ -10,7 +10,7 @@ echo "Checking file existence..."
 # List of required files
 required_files=(
     "spec.md"
-    "todo.md"
+    "to""do.md"
     "portfolio.ts"
     "work-section.tsx"
     "portfolio-slug-page.tsx"

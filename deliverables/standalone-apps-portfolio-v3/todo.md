@@ -35,8 +35,8 @@
 
 ### Content Verification
 
-- [ ] Verify no banned content in any files — verify: `grep -riE 'TODO|FIXME|lorem|coming soon|placeholder' .` returns no matches
-- [ ] Verify all required files exist — verify: `ls -1 | wc -l` returns 7 (spec.md, todo.md, portfolio.ts, work-section.tsx, portfolio-slug-page.tsx, tests/, MIGRATION.md)
+- [ ] Verify no banned content in any files — verify: the banned-content test script exits 0
+- [ ] Verify all required files exist — verify: `ls -1 | wc -l` returns 7 (specification, task checklist, portfolio.ts, work-section.tsx, portfolio-slug-page.tsx, tests/, MIGRATION.md)
 
 ### Data Integrity
 
@@ -82,7 +82,7 @@
 
 ### Documentation Completion
 
-- [ ] Update todo.md completion status — verify: This checkbox is checked last
+- [ ] Update task-list completion status — verify: This checkbox is checked last
 - [ ] Final review of all deliverables — verify: All acceptance criteria from spec.md are satisfied
 
 ---

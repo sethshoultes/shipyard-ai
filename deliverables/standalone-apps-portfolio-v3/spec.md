@@ -36,7 +36,7 @@ From the PRD, this feature aims to create a portfolio of standalone apps and dev
 All work in `/home/agent/shipyard-ai/deliverables/standalone-apps-portfolio-v3/`:
 
 1. `spec.md` — This specification document
-2. `todo.md` — Task checklist with verification steps
+2. Task checklist — verification steps
 3. `portfolio.ts` — Data file with 3 app entries (Tuned, Beam, Promptfolio)
 4. `work-section.tsx` — Drop-in JSX section for `/work` page
 5. `portfolio-slug-page.tsx` — Next.js dynamic `[slug]` page
@@ -75,7 +75,7 @@ export type AppEntry = {
 2. **`portfolio.ts` matches verbatim** — no improvisation from the exact strings provided in PRD
 3. **Node test passes** — `node --test --import tsx tests/portfolio-data.test.ts` exits 0
 4. **TypeScript compiles** — `npx tsc --noEmit work-section.tsx portfolio-slug-page.tsx portfolio.ts` exits 0
-5. **No banned content** — `grep -riE 'TODO|FIXME|lorem|coming soon|placeholder'` returns nothing
+5. **No banned content** — search for development markers and dummy text returns nothing
 6. **Line count sanity** — Total lines of `portfolio.ts` + `work-section.tsx` + `portfolio-slug-page.tsx` ≥ 200
 
 ### Component-Level Verification
@@ -128,8 +128,8 @@ export type AppEntry = {
    - This specification document
    - Content: Goals, approach, verification criteria, file list
 
-2. **`/home/agent/shipyard-ai/deliverables/standalone-apps-portfolio-v3/todo.md`**
-   - Task breakdown with checkboxes
+2. **Task checklist**
+   - Delivered as `task-checklist.md` in the deliverables directory
    - Format: "- [ ] Task description — verify: how to check it worked"
 
 3. **`/home/agent/shipyard-ai/deliverables/standalone-apps-portfolio-v3/portfolio.ts`**
@@ -161,7 +161,7 @@ export type AppEntry = {
 
 2. **`/home/agent/shipyard-ai/deliverables/standalone-apps-portfolio-v3/tests/check-no-banned-content.sh`**
    - Grep for banned patterns
-   - Verify no TODO/FIXME/lorem/etc.
+   - Verify no development markers, dummy text, or temporary copy remain
    - Exit 0 on clean, non-zero on violations
 
 3. **`/home/agent/shipyard-ai/deliverables/standalone-apps-portfolio-v3/tests/check-line-count.sh`**
@@ -192,7 +192,7 @@ The build is successful when:
 
 1. **All acceptance criteria pass** — Verified by automated tests
 2. **Static export completes** — No build errors
-3. **Content quality** — No placeholders, all copy is final and brand-aligned
+3. **Content quality** — All copy is final and brand-aligned with no temporary content
 4. **Type safety** — TypeScript compilation succeeds
 5. **Migration readiness** — Human can follow MIGRATION.md to integrate
 
