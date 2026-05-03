@@ -1,7 +1,20 @@
-Verdict: Product solves a problem that doesn't exist.
+Verdict: Hard no. No customer pays for middleware.
 
-- Customer pays? No. WordPress user can already copy-paste into ChatGPT. Developer can already call Claude API. Middleman plugin adds friction, not value.
-- Confusing: Jargon-heavy name. Two external API keys to set up. Admin screen is a settings form plus a tombstone of past logs. No "try it now" button. Bounce in 30 seconds.
-- Elevator pitch: WordPress site that takes a text order and returns AI content or images. No chat. No clutter. One endpoint.
-- $0 test: Walk into coffee shop. Ask 10 WordPress users to install plugin and generate a blog post. Watch where they get stuck. If stuck before result, fix that or quit.
-- Retention hook: Missing entirely. One-and-done tool. User generates image, leaves forever. Need recurring pain like scheduled content or batch publishing. v1 has neither.
+- Bloggers can't use cURL. Developers won't buy a WP plugin to call Claude API. No buyer.
+- Two API keys before first win. Too much friction. Most quit during setup.
+- No Gutenberg block. No post editor button. "Agent orchestration" means nothing to someone writing a blog post.
+- Content truncated to 2048 chars. Gives them homework. They wanted done.
+- Cloudflare Worker setup for images is a dealbreaker for 99% of WordPress users.
+- CPT memory is invisible. Customer sees zero benefit.
+
+30-second pitch:
+"AgentPress drafts complete blog posts and featured images inside your WordPress editor. One click. No copy-paste."
+
+$0 test:
+- Post in 3 blogger Facebook groups: "One-click blog post drafts inside WordPress. Want early access?"
+- If crickets, kill it. If 50+ replies, build the Gutenberg block first. Not REST.
+
+Retention hook:
+- None right now. REST calls are forgettable.
+- Real hook: sidebar inside the editor they see every time they write.
+- Be where they work. Not in a terminal.
