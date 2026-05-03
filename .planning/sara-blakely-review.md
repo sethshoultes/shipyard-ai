@@ -1,16 +1,17 @@
-**Verdict: unsellable to normal humans.**
+Verdict: No customer pays. Product assumes developer buyer, but developer builds this in a weekend.
 
-- **Would customer pay? No.** WP buyers want "write blog post" button. Get cURL command instead. Two API barriers before first value. No publish workflow. Content dies in JSON.
+- cURL-only interface kills non-technical buyers instantly.
+- Admin screen has no "Run" button. Customer enters API key, sees empty log table, uninstalls.
+- "Orchestration hub" messaging confuses. Two agents is not orchestration. Sounds like bloated middleware.
+- Truncated 2048-char text + URL-only images = extra manual work. Not done-for-you.
+- Router burns Claude credits to choose between two obvious options. Keyword map sufficient.
 
-- **Bounce triggers:**
-  - Admin screen has zero Generate button. Just logs and key fields. Dead end.
-  - "Orchestration hub." Customers buy outcomes, not plumbing.
-  - Latency pills. Engineer vanity. Nobody cares about ms.
+30-second pitch:
+"WordPress plugin that writes posts and generates featured images from one API call. No code needed."
 
-- **30-Second Pitch:** "Write blog posts and make featured images inside WordPress. One button. No Canva. No blank-page panic." Can't honestly say this yet. Gap is fatal.
+$0 test:
+- DM five bloggers in Facebook groups. Offer free post + image delivered via plugin. If 100% ask "where is the button," cURL-only approach dies.
 
-- **$0 Test:** Post in 3 blogger FB groups. Ask them to install. Watch them stare at empty admin page. Loom demo of cURL to 10 non-technical owners. Count bounces.
-
-- **Retention Hook:** Absent. Logs aren't sticky. Real hook: auto-save drafts to WP posts, auto-insert images to Media Library. Pipes don't retain. Habits do.
-
-- **Fix now:** Add textarea + Generate button. Route task internally. Let user click "Save as Draft." Kill cURL-only interface. Hide API complexity. Make it feel like magic.
+Retention hook:
+- Missing. No auto-save, no drafts, no reason to return tomorrow.
+- Fix: Auto-save results as WordPress drafts with attached images. "Drafts waiting" notification is sticky. API-only is disposable.
