@@ -1,43 +1,33 @@
-# Round 2: Steve
+# Round 2: Steve Jobs
 
-Elon, I'm not convinced. You're optimizing for engineering purity when you should be optimizing for human pride. A CLI that emits static HTML is elegant *for you*. But the consultant, the photographer, the novelist who just had a breakthrough Claude session — she doesn't want to learn Git or wrestle a CDN. She wants to paste her genius into the platform she already owns and hit publish.
+## Where Elon Optimizes for the Wrong Metric
 
-WordPress powers 43% of the web because it meets humans where they are. "Static HTML" is a monastery for nerds; wp-admin is where the practitioners live.
+Elon worships at the altar of **engineering purity** while the user burns. A CLI static-site generator is a developer's toy, not a creator's tool. The prompt engineers we serve do not want to wrestle GitHub Pages or Cloudflare — they want to press *Publish* and feel done. WordPress powers 43% of the web because it meets humans where they are. A terminal command is a monastery for nerds.
 
-Your terror of WordPress support tickets is also overblown. You get support tickets when you give users forty levers and infinite permutations. We are shipping one shortcode, one post type, and zero customization. There is nothing to conflict because there is nothing to configure.
+"Ship structure first, aesthetics second" is how you build a bridge nobody crosses. For a portfolio, **aesthetics IS the infrastructure.** A page that loads in 0.8 seconds but looks like a Bootstrap template humiliates the user. Elon measures TTFB; I measure *pride.* Pride drives the share. Pride is the viral loop.
 
-The hosting nightmares you describe are caused by theme builders and page bloat, not by a lightweight plugin that does exactly one thing with surgical precision.
+Manual paste import is another optimization for the builder, not the buyer. Users have 400 ChatGPT threads. "Paste them one by one" is a feature designed by someone who has never used the product. One-click import is not scope creep — it is **respect.**
 
-Your "sub-2-second load or don't ship" metric is equally misguided. You're optimizing for Lighthouse scores when the customer is optimizing for self-respect. A page that loads in 800 milliseconds but looks like a Bootstrap template is still a failure.
+## Defending What Elon Would Cut
 
-Emotional resonance beats milliseconds every time. The share happens because it looks breathtaking, not because it shaved forty milliseconds off TTFB.
+**One template, but not "one dark template."** Elon wants to ship something that "actually looks good." I want to ship something that stops the scroll. Every type choice, every margin, every transition must feel inevitable. This isn't CSS debt — this is **the product.** Without it, we are a file converter wearing ambition.
 
-You also fetishize "ship in one session." That's a builder's vanity metric, not a customer's. Nobody cares how fast we built it. They care how it makes them feel in the first thirty seconds.
+**Workflows are not "taxonomy theater."** A prompt in isolation is a party trick. The magic is the *arc* — the failure, the pivot, the breakthrough. Elon wants to ship prompts. I want to ship **proof of craft.** That narrative structure is why people hire prompt engineers instead of buying a $20 prompt book.
 
-"Structure first, polish later" is how you get another forgettable SaaS template. Folio dies if it looks like a weekend project. In this market, polish *is* the structure. The first thirty seconds are the entire sales funnel.
+## Where Elon Is Right
 
-You're also wrong about design debt. One adaptive layout that follows the sun is LESS debt than your "one exquisite dark template" because we remove the choice entirely. The debt isn't CSS files; it's decision fatigue.
+The "Try this prompt" widget is a second startup. Cut it immediately.
 
-When the user has nothing to configure, there is nothing to break. One flawless execution beats two options every time. We don't need a dark mode toggle because the layout is intelligent enough to be beautiful in every light.
+Multi-format import is a maintenance nightmare. OpenAI's format is the 80/20. Ship one perfect parser, validate, then expand.
 
-That said, you're devastatingly right on three counts.
+Analytics and view counters are vanity infrastructure — agree completely.
 
-First, the "Try this prompt" widget is a second startup disguised as a feature. $600 per month per user in inference spend? API keys, abuse, rate limits? Cut it. You win that round.
+Distribution is shareability, not directory placement. Every portfolio must be a billboard when shared on X or LinkedIn. Elon nailed this.
 
-Second, multi-format import is a maintenance nightmare. OpenAI changes their JSON schema on a whim. One perfect Claude parser, shipped with obsessive care, beats five brittle importers that break at midnight.
+## Top 3 Non-Negotiables
 
-Third, distribution is shareability, not directory placement. Open Graph cards matter. A "Made with Folio" footer link matters. Every portfolio must be a billboard when shared on X or LinkedIn. You nailed this.
+1. **One template that belongs in a museum.** Not "dark and functional." Extraordinary. If it doesn't make someone whisper "how did they do that," we ship nothing.
+2. **One-click ChatGPT JSON import.** Manual paste is a friction wall that kills activation before it begins. Respect the user's volume.
+3. **WordPress as the primary vehicle.** Meet creators where they already publish. But we never call it a plugin — it is a portfolio system that happens to run on the world's publishing platform.
 
-I also concede that client-side parsing is the right solve for the 10MB JSON problem — don't let cheap hosting touch the heavy lifting.
-
-Now my non-negotiables:
-
-**1. The name is Folio.** Not Promptfolio. One word. Permanent. Names are the first note of the symphony, and Promptfolio sounds like a sinus medication. Identity begins with a name that doesn't require explanation. Folio implies a collected work of distinction, not a folder on a server.
-
-**2. Zero configuration, zero compromise.** One adaptive layout that follows the sun. No customizer. No theme builder. No dark mode toggle. No settings page with forty checkboxes. It just knows what to do because we cared enough to decide for the user. Simplicity isn't the absence of features; it's the presence of only the essential ones, perfectly executed.
-
-**3. Gallery-worthy or dead.** If an exported Claude conversation doesn't look like a curated museum exhibition in thirty seconds, we haven't built a product — we've built a utility. Utilities compete on price and die in GitHub stars. Folio competes on pride, and pride is the only infinite resource.
-
-The whole problem we're solving is that brilliant AI conversations are buried in ugly threads. Beauty isn't a coat of paint; it IS the product.
-
-Elon wants to build a tool that gets a star on GitHub from people who love terminals. I want to build an obsession that gets shared by writers, artists, and thinkers who've never typed a command. Design isn't lipstick — it's the reason they'll pay, the reason they'll share, and the reason they'll remember. Folio doesn't manage prompts; it elevates them to art. That's the difference between a utility and an obsession.
+Elon wants to build what is easy to engineer. I want to build what is impossible to ignore.

@@ -1,6 +1,6 @@
-Promptfolio turns Claude exports into art.
+Proof of craft — your scattered AI conversations, made undeniable.
 
-- Product is: resurrection. buried threads become gallery.
-- Feeling: pride. obsession. not utility.
-- Must be perfect: 30 seconds. upload to breathtaking. zero knobs.
-- Direction: sacred dark gallery. one frame.
+- Product is: resurrection. buried threads become a museum wall.
+- Feeling: pride. obsession. the first time your prompts feel like *work*.
+- Must be perfect: the frame. one template. no knobs. gasp-worthy.
+- Direction: sacred dark gallery.
