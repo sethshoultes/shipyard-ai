@@ -8,17 +8,17 @@ to get work done. One word. Human. Active. **Relay.** Short. Punchy.
 If you need two words to explain your product, you've already lost.
 "Agent" screams technology. "Forge" screams effort. A great name sits on
 the tip of your tongue before you even know why. iPod. iPhone. Relay.
-Say it out loud. It travels.
+Say it out loud and it travels.
 
 ## Design Philosophy
 
 This is not a builder. It's not a canvas. It's a **conductor's podium.**
 The interface disappears until only the work remains. White space. Direct
-manipulation. Every node should feel like a person you know, not a
-server in a rack. If it looks like Zapier, we have failed. Zapier is
-plumbing. Plumbing is necessary. Nobody falls in love with plumbing.
-People fall in love with the feeling that technology has vanished and
-only intent remains. You think, it happens. That is the bar.
+manipulation. Every node should feel like a person you know, not a server
+in a rack. If it looks like Zapier, we have failed. Zapier is plumbing.
+Plumbing is necessary. Nobody falls in love with plumbing. People fall in
+love with the feeling that technology has vanished and only intent
+remains. You think, it happens. That is the bar.
 
 ## The First 30 Seconds
 
