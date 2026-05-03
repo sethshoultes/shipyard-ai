@@ -1,18 +1,15 @@
-- Useful painkiller buried in enterprise fat. Cut aggressively.
-- Nobody buys DNS checks. Internal plumbing. Sell saved launches, not mechanism.
-- Overbuilt: 4 tasks, 3 waves, XML plans for ~50 lines of Node.
-- "Parallel-ready schema" = scope creep. Ship v1. Refactor when pain is real.
-- Jargon bounce: R-PROOF-009, waves, 5 risk notes for DNS check. Consultant smell.
-- Real pain valid: "deploy green, site down." That stings.
-- Fix: one file, one workflow line, test against broken domain.
+Verdict: Over-built pipe. No customer pays for plumbing they can't turn on.
 
-## 30-Second Pitch
-"Automatic deploy verification. Catches DNS screwups before Twitter does."
+- Pay? No. Site owners don't cURL. Developers bypass a middleman. Two external API keys before first win = abandon cart.
 
-## $0 Test
-Break DNS on purpose. Run script. Does it fail deploy? Message make sense at 2am? Only test that matters. Skip mocks.
+- Confusing / bounce:
+  - "Agent orchestration hub" = jargon nobody asks for.
+  - No Run button in admin. Testing via Postman only.
+  - 30s timeout on cheap shared hosting = white screen of death.
+  - CPT registry for two hardcoded agents = architect theater.
 
-## Retention Hook
-Weak as-is. Green checks become wallpaper. Hook = fear + clarity.
-Make failure messages loud, human, unforgettable.
-Add 3-bullet recovery checklist. Developer bookmarks for next panic.
+- Elevator pitch: "Write and publish your next WordPress post in 60 seconds. One button. No tabs. No tokens." (The plan as written cannot deliver this.)
+
+- $0 test: Post in three WordPress Facebook groups: "Free AI-written blog post this week. DM me your topic." Write them manually in Claude behind the scenes. Zero repeat requests = kill the build before you write another line.
+
+- Retention hook: Auto-save generated text as a WordPress draft with the image attached as featured media. Right now the output is a ghost — it appears and vanishes. Make it sticky. A workspace, not a pipe.
