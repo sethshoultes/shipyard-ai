@@ -1,53 +1,49 @@
-# Steve Jobs — Chief Design & Brand Officer
+# Relay
 
-## AgentForge Response
+## Product Naming
 
-### Product Naming
+AgentForge is dead on arrival. It sounds like a server rack humming in a basement. Industrial, cold, utterly inhuman.
 
-**AgentForge is two words. That’s one too many.**
+We're calling it **Relay**. One word. Two syllables. It evokes the baton passing between runners—between agents. It's athletic, human, and effortless. Nobody falls in love with a forge. They fall in love with a relay.
 
-The name is **Forge**. Period.
+A name is a promise. Relay promises that work flows naturally from one mind to another.
 
-One syllable. Solid. Memorable. You don’t say "PhotoShop" or "PowerPoint" anymore — you say Photoshop. PowerPoint. Forge. It suggests creation, heat, transformation. It’s what blacksmiths and artists both do. That duality is the product.
+## Design Philosophy
 
-A name should be a sound you can shout across a room and have everyone turn their head. Forge.
+Insanely great means the interface disappears completely. Users shouldn't see "nodes" and "edges." They should see intent flowing into action like water downhill.
 
-### Design Philosophy
+Think of conducting an orchestra with a wand, not programming a telephone switchboard from 1972. Every pixel must feel inevitable. Every gesture must feel obvious. If it needs a tooltip, we've failed. If it needs a manual, we've humiliated the user.
 
-We are not building a "visual builder." We are building a **conductor’s baton**.
+The technology must become invisible so the human intention becomes visible. We are not building a dashboard. We are building a stage.
 
-The insanely great thing is this: a non-developer will orchestrate intelligence and never once feel like they’re "programming." The interface disappears. Nodes snap like magnets. Connections glow with intent. It feels less like software and more like directing a symphony — every agent an instrument, every workflow a movement.
+## The First 30 Seconds
 
-If it feels like machinery, we’ve failed. If it feels like magic, we’ve won.
+You land on a blank canvas. Not a dashboard. Not a wizard. Not another cluttered grid of widgets. A canvas.
 
-### The First 30 Seconds
+You drag one circle. You give it a name. You drag a second. You draw a line between them. You hit play. The agents talk. You watch the conversation bloom in real time like flowers opening to the sun.
 
-You land on a blank canvas.
+In thirty seconds, you've built a team that works while you sleep. That's the feeling: effortless power. That's the promise: you are the conductor, not the code monkey. No onboarding video required. No engineering degree necessary.
 
-No "Welcome to Forge!" modal. No tutorial video. No seven-step onboarding. No condescending tooltips. You see one glowing node labeled "Start." You drag it. It works. You add a second node. It connects with a satisfying snap and a soft chime.
+## Brand Voice
 
-In thirty seconds, you’ve built something that would have taken a developer three days. The product teaches itself by letting you touch it. Every gesture rewards you. Every connection delights you. You don’t learn Forge. You feel it.
+We speak like the smartest person in the room who actually respects your time. Short sentences. No jargon. No "leverage," no "synergize," no "enablement."
 
-### Brand Voice
+We say: "Your agents are ready." We do not say: "Your multi-agent orchestration pipeline has been successfully deployed."
 
-We speak like we’re sitting across from you at a café, not like we’re filling out an RFP.
+Confidence without arrogance. Warmth without fluff. Clarity above all. We talk like a brilliant colleague sitting next to you, not a vendor shouting across a trade show floor. Every word must pass one test: would a human actually say this to another human over coffee?
 
-No "leverage our platform to streamline your workflows." No "synergistic agent orchestration." No "scalable multi-modal deployments." Short sentences. Verbs that move. We say: "Build it. Run it. Done."
+## What We Say NO To
 
-If it sounds like it could be on an enterprise SaaS website, burn it and rewrite it. Warmth is a feature. Humanity is the moat.
+NO to node-based spaghetti that looks like a server rack exploded. NO to exposing system prompts, temperature sliders, context windows, or any other engineering debris.
 
-### What to Say NO To
+NO to templates that look like Excel spreadsheets had children with flowcharts. NO to freemium banners screaming for attention like desperate street vendors. NO to dark patterns, nag screens, and "upgrade now" badges that reek of insecurity.
 
-NO to feature creep masquerading as innovation. Every "wouldn’t it be cool if" is a distraction from the one thing we must nail.
+NO to feature parity with competitors who have no taste. Every "yes" to a mediocre feature is a "no" to excellence. We will say no to a thousand features so we can say yes to one perfect experience. Simplicity is the ultimate sophistication.
 
-NO to dashboards cluttered with metrics nobody asked for. NO to "enterprise-grade" bloat that suffocates the soul of the product. NO to explaining what an "agent" is — if they don’t already feel the need, they’re not ready for Forge.
+## The Emotional Hook
 
-Simplicity means removing, not adding. We are editing the world down to what matters. If a feature doesn’t make someone gasp in the first week, it doesn’t ship.
+People will love Relay because for the first time, they won't feel stupid around AI. They'll feel like a conductor standing before a brilliant orchestra. Like a CEO with the best staff on earth working tirelessly behind them.
 
-### The Emotional Hook
+It's the feeling of mastery without study, of power without pain, of orchestration without overhead. And once someone feels powerful, they never go back.
 
-People will love Forge because it’s the moment automation stops being someone else’s job — IT’s job, the engineering team’s job, the consultant’s job — and becomes **yours**.
-
-You went from begging for a six-month sprint to orchestrating intelligence between your morning coffee and your first meeting. You are the conductor. You are the forge.
-
-That feeling — of power without permission — is addictive. We’re not selling software. We’re selling the moment someone realizes they were never as helpless as they were told.
+They become evangelists because we made them feel like geniuses. We don't sell software. We sell self-respect.
