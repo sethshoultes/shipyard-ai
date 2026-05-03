@@ -1,25 +1,25 @@
 # Hindsight Report
-**Generated:** 2026-05-03T20:58:59.377Z
+**Generated:** 2026-05-03T21:37:52.616Z
 
 ## Summary
-Risk: HIGH. 15 high-churn files, 20 bug-associated files, 7 uncommitted changes. Tread carefully on flagged files.
+Risk: HIGH. 15 high-churn files, 20 bug-associated files, 9 uncommitted changes. Tread carefully on flagged files.
 
 ## Recent Changes
+- 7a515e3 micromanager: dirty auto-reconcile
+- cf74af6 daemon: auto-commit 4 files
+- 735f935 micromanager: dirty auto-reconcile
+- bbd4df0 micromanager: dirty auto-reconcile
 - 52200b1 micromanager: dirty auto-reconcile
 - 05303c3 daemon: auto-commit 19 files
 - e7057c6 daemon: auto-commit 2 files
 - a630edd Ship github-issue-sethshoultes-shipyard-ai-90: all deliverables + retrospective
 - e308cf9 micromanager: dirty auto-reconcile
 - 0cd1e0d daemon: auto-commit after build phase for github-issue-sethshoultes-shipyard-ai-90
-- 83faca0 micromanager: dirty auto-reconcile
-- 7ff5a42 micromanager: dirty auto-reconcile
-- 11b47f1 daemon: auto-commit 2 files
-- cdd689d Ship build-model-canary-glm: all deliverables + retrospective
 
 ## High-Churn Files
-- `.daemon-queue.json` (169 changes)
-- `.planning/sara-blakely-review.md` (108 changes)
-- `.great-minds/hindsight-report.md` (67 changes)
+- `.daemon-queue.json` (171 changes)
+- `.planning/sara-blakely-review.md` (109 changes)
+- `.great-minds/hindsight-report.md` (68 changes)
 - `.planning/phase-1-plan.md` (53 changes)
 - `.planning/REQUIREMENTS.md` (51 changes)
 - `plugins/membership/src/sandbox-entry.ts` (33 changes)
@@ -28,10 +28,10 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 7 uncommitted changes.
 - `prds/github-issue-sethshoultes-shipyard-ai-90.md` (26 changes)
 - `prds/github-issue-sethshoultes-shipyard-ai-98.md` (24 changes)
 - `pipeline/auto/cagan-dispatch-history.json` (24 changes)
-- `.daemon-retry-state.json` (17 changes)
+- `.daemon-retry-state.json` (18 changes)
 - `HEARTBEAT.md` (13 changes)
 - `.github-intake-state.json` (12 changes)
-- `rounds/github-issue-sethshoultes-shipyard-ai-90/round-1-steve.md` (11 changes)
+- `rounds/github-issue-sethshoultes-shipyard-ai-98/round-1-steve.md` (11 changes)
 
 ## Bug-Associated Files
 - `deliverables/build-model-canary-glm/spec.md`
@@ -57,13 +57,15 @@ Risk: HIGH. 15 high-churn files, 20 bug-associated files, 7 uncommitted changes.
 
 ## Uncommitted State
 ```
-M .agent-logs/debate/phil-jackson-consolidation-1777841591948.jsonl
+M .agent-logs/debate/rick-rubin-essence-1777843663732.jsonl
  M .great-minds/hindsight-report.md
  M .planning/sara-blakely-review.md
  M data/costs.db
- M rounds/standalone-apps-portfolio-v2/decisions.md
-?? .agent-logs/plan/planner-1777841781889.jsonl
-?? .agent-logs/plan/sara-blakely-gutcheck-1777841888035.jsonl
+ M rounds/github-issue-sethshoultes-shipyard-ai-98/decisions.md
+ M rounds/github-issue-sethshoultes-shipyard-ai-98/essence.md
+?? .agent-logs/debate/phil-jackson-consolidation-1777843689287.jsonl
+?? .agent-logs/plan/planner-1777843946317.jsonl
+?? .agent-logs/plan/sara-blakely-gutcheck-1777844178819.jsonl
 ```
 
 ---

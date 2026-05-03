@@ -1,29 +1,7 @@
-Verdict: Over-engineered middleware. Real value is thin.
+Verdict: no paying customer yet. Product is plumbing, not outcome.
 
-Would a real customer pay?
-No.
-Plugin is a router with a log.
-Customer still brings Claude key, Cloudflare Worker, and writes cURL.
-Paying for convenience that barely saves time.
-WordPress owners want buttons, not endpoints.
-
-What's confusing / bounce?
-No task runner in admin.
-User installs, sees settings + empty logs, hits dead end. Bounce.
-Two external configs before first win. Too many gates.
-"One mind, not a bag of tools" but only two tools. Copy oversells reality.
-
-30-second elevator pitch
-AgentPress turns your WordPress site into a private AI hub. One API call. Smart routing. Content and images returned in seconds. No SaaS fees. You own the stack.
-
-$0 marketing test
-Loom demo: type task in terminal, see blog post appear in WordPress.
-Post in 3 WordPress dev Slack groups.
-If nobody DMs you for a link, kill it.
-
-Retention hook
-None.
-Admin is a log viewer.
-No weekly stats, no failure alerts, no "saved X hours" counter.
-User forgets plugin exists.
-Add a weekly tasks-completed email or dashboard widget showing value delivered.
+- Customers pay for published posts, not cURL commands. ContentWriter returns 2048-char snippet. ImageGenerator returns URL, never inserts media. Zero publishing workflow. Site owners don't POST to REST APIs.
+- Confusing: target user unclear. Developers? Agencies? Bloggers? "No front-end chat" kills 99% of WordPress buyers. Two external configs (Claude key + Cloudflare Worker) equals friction death. "Latency ms" in logs is engineer vanity, not customer value.
+- Elevator pitch: "AgentPress turns one sentence into written content and images inside WordPress. No dashboards to learn, no files to upload. Describe what you need, publish what you get." Can't say this honestly yet. Gap is fatal.
+- $0 test: post in 3 WordPress developer Slacks. Ask: would you pay $49/year for AI routing without UI? If crickets, pivot to UI-first. Loom cURL demo, send to 10 non-technical site owners. Watch them bounce. That's gold.
+- Retention hook: absent. Logs aren't sticky. Real hook: auto-publish drafts weekly, auto-insert images into Media Library, email admin "your next post is ready." Pipes don't retain. Habits do.
