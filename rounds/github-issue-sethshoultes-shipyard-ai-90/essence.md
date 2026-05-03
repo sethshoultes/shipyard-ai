@@ -1,12 +1,15 @@
-- Forge lets non-developers command AI agents by touch.
-- Feeling: power without permission.
-- One thing perfect: first 30 seconds. Drag. Connect. Run. Magic or death.
-- Direction: strip until it sings.
+Forge orchestrates AI agents for humans who don't speak code.
 
-One syllable. One canvas. One light.
-No dark mode. No JSON. No forty nodes.
-Interface disappears. Workflow is the product.
+Feeling: effortless power. Conductor, not code monkey.
+
+One thing perfect: first 30 seconds. One workflow. Hit run. Magic. No manual. No tooltip.
+
+Direction: strip until it sings.
+
+—
+No canvas v1. Engine first. Baton later.
+One free workflow. Hard cost caps. No bankruptcy.
+White. Airy. No dark mode.
 Human voice. Zero acronyms.
 Not automation. Orchestration.
-Engine first. Baton later.
-Beauty is moat. Survival is foundation.
+If DAG doesn't run, brand is lie. If user doesn't feel power in first minute, engine is invisible.
