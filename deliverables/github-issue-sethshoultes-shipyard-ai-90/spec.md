@@ -1,45 +1,33 @@
-# Spec: Forge — AgentForge MVP
+# Relay v1 — Build Specification
 
-> **PRD:** [dream] AgentForge (Issue #90)
-> **Plan:** Phase 1 Plan — AgentPress v1 WordPress Plugin
-> **Decisions:** Forge — Locked Decisions (rounds/github-issue-sethshoultes-shipyard-ai-90/decisions.md)
-> **Project Slug:** `github-issue-sethshoultes-shipyard-ai-90`
-> **Status:** Pre-build — awaiting open question resolution
+> **PRD:** [dream] AgentForge (GitHub Issue #90)
+> **Implementation:** Relay Web App (Config UI + Execution Engine)
+> **Phase:** 1 (MVP)
+> **Generated:** 2026-05-03
 
 ---
 
 ## Goals (from PRD)
 
-### Primary Goal
-Build **Forge** — a web app that lets non-developers design, test, and deploy multi-agent AI workflows. Think Zapier, but for orchestrating Claude agents.
-
-### Success Criteria
-1. Issue sethshoultes/shipyard-ai#90 requirements are met
-2. All tests pass
-3. Web app runs locally without errors
-4. Both built-in agents (ContentWriter, ImageGenerator) respond via execution engine
-5. Workflow versioning preserves in-flight runs
-6. Average latency < 3000ms for cached/parallel paths
-7. Zero fatal errors after 100 workflow runs
-8. Token budgets enforced (hard caps prevent runaway spend)
-
-### Target Users
-- Operations teams
-- No-code builders
-- Consultants
-
-### Distribution Channels
-- TBD (Open Question #2 — must resolve before launch)
+| Goal | Description |
+|------|-------------|
+| **Visual Agent Builder** | A web app that lets non-developers design, test, and deploy multi-agent AI workflows |
+| **Zapier for Agents** | Think Zapier, but for orchestrating Claude agents |
+| **Freemium Model** | Free for 3 workflows, then pricing tiers |
+| **First-Mover Advantage** | Capture the visual agent building market early |
+| **Target Users** | Operations teams, no-code builders, consultants |
 
 ---
 
-## Implementation Approach (from Plan + Debate Decisions)
+## Implementation Approach (from Plan + Locked Decisions)
+
+The v1 implementation is a **web app** called **Relay** that provides:
 
 ### Locked Decisions (Supersede Plan)
 
 | Decision # | Decision | Outcome |
 |------------|----------|---------|
-| 1 | Name | **Forge** (one syllable, solid) |
+| 1 | Name | **Relay** (Steve won; Elon conceded) |
 | 5 | Platform | **Web app only** — NO WordPress plugin |
 | 4 | Canvas | **No drag-and-drop for v1** — Config UI first (form-based) |
 | 14 | JSON exposure | **No JSON/YAML in app UI** — Humans use forms |
@@ -49,11 +37,13 @@ Build **Forge** — a web app that lets non-developers design, test, and deploy 
 | 12 | Aesthetic | **White, airy, optimistic** — No dark mode |
 | 10 | Billing | **No freemium billing stack in v1** |
 | 11 | Templates | **No template marketplace in v1** |
+| 3 | Engine First | **Execution model defined before pixels** |
+| 13 | Admin Dashboard | **No admin dashboard with 40 toggles** |
 
-### Forge Architecture
+### Relay Architecture
 
 ```
-forge/
+relay/
 ├── app/                          # Web application (single platform)
 │   ├── config-ui/                # Form-based node editor
 │   │   ├── node-forms/           # Input surfaces per node type
@@ -83,7 +73,7 @@ forge/
 ### v1 MVP Feature Set
 
 **Core Experience:**
-- Forge web app (single platform)
+- Relay web app (single platform)
 - Clean config UI (form-based, serializes to JSON)
 - Limited node palette (2 agents: ContentWriter, ImageGenerator)
 - White, airy interface (no dark mode toggle)
@@ -109,6 +99,7 @@ forge/
 - Template marketplace
 - JSON/YAML editor in UI
 - Admin dashboard with 40 toggles
+- Onboarding wizards, tooltips, tutorial videos
 
 ### Wave Sequencing
 
@@ -124,128 +115,182 @@ forge/
 
 ## Verification Criteria
 
-### V1. Project Bootstrap
-| Criterion | Verification Method |
-|-----------|---------------------|
-| `forge/` directory exists | `ls -la forge/` shows directories |
-| `forge/package.json` exists | `cat forge/package.json` shows valid JSON |
-| `npm install` runs without errors | Run command, verify exit 0 |
-| `tsc --noEmit` passes | Run command, verify no TypeScript errors |
-| `forge/app/index.html` opens in browser | File opens, no console errors |
+### Wave 1 — Foundation
 
-### V2. Form-Based Config UI
-| Criterion | Verification Method |
-|-----------|---------------------|
-| At least one node form exists | `ls forge/app/config-ui/node-forms/` shows `.tsx` files |
-| Form serializes to valid JSON | Submit form, verify JSON output matches schema |
-| No raw JSON editor visible | Grep for `textarea.*json`, verify zero matches |
-| UI uses white/airy aesthetic | CSS has light backgrounds, no dark mode toggle |
+#### 1. Project Bootstrap (`relay/package.json`, `relay/tsconfig.json`)
+- [ ] `relay/` directory exists
+- [ ] `relay/package.json` contains valid JSON with name "relay"
+- [ ] `npm install` runs without errors
+- [ ] `tsc --noEmit` passes with no TypeScript errors
+- [ ] `relay/app/index.html` opens in browser with no console errors
 
-### V3. Execution Engine — DAG
-| Criterion | Verification Method |
-|-----------|---------------------|
-| DAG data structure exists | `forge/engine/dag/dag.ts` exports `Dag` class |
-| Can add nodes and edges | Test: create DAG, add node, add edge, verify no errors |
-| Cycle detection works | Test: create cycle, verify error thrown |
-| Topological sort returns valid order | Test: sort DAG, verify order respects dependencies |
+#### 2. Config UI — Form-Based Node Editor
+- [ ] At least one node form exists in `relay/app/config-ui/node-forms/`
+- [ ] Form serializes to valid JSON matching schema
+- [ ] No raw JSON editor visible (grep for `textarea.*json` returns zero)
+- [ ] UI uses white/airy aesthetic (light backgrounds, no dark mode toggle)
 
-### V4. Execution Engine — State Machine
-| Criterion | Verification Method |
-|-----------|---------------------|
-| State machine handles transitions | Test: pending → running → completed |
-| Idempotency keys prevent duplicates | Test: same input = same key, second run blocked |
-| Retry logic works (up to 3 times) | Test: fail node, verify retries then marks failed |
-| State persists across refresh | Test: save state, reload, verify state restored |
+#### 3. Admin CSS (`relay/app/config-ui/styles.css`)
+- [ ] File size under 200 lines
+- [ ] No `!important` declarations
+- [ ] No dark mode classes or variables
+- [ ] All selectors prefixed with `.relay-` to avoid conflicts
 
-### V5. Caching Layer
-| Criterion | Verification Method |
-|-----------|---------------------|
-| Cache key builder hashes inputs | Test: same inputs = same hash, different = different |
-| Identical prompts hit cache | Test: run twice, second returns cached result |
-| TTL eviction works | Test: set short TTL, verify expired entry removed |
-| LRU eviction works | Test: fill cache, verify least-recently-used evicted |
+### Wave 2 — Core Classes
 
-### V6. Token Budgets
-| Criterion | Verification Method |
-|-----------|---------------------|
-| Per-user token usage tracked | Test: increment counter on each API call |
-| Daily quotas enforced | Test: exceed quota, verify execution blocked |
-| Request deduplication works | Test: identical requests return cached result |
+#### 4. Node Components (`relay/app/nodes/`)
+- [ ] `types.ts` exports `NodeType`, `NodeInput`, `NodeOutput` interfaces
+- [ ] `node-registry.ts` exports `registerNode()`, `getNode()` functions
+- [ ] `content-writer-node.ts` exports `ContentWriterNode` with `run()` method
+- [ ] `image-generator-node.ts` exports `ImageGeneratorNode` with `run()` method
 
-### V7. Workflow Versioning
-| Criterion | Verification Method |
-|-----------|---------------------|
-| Editing creates new version | Test: edit workflow, verify version increments |
-| In-flight runs pinned to version | Test: start run, edit, verify run uses original version |
+#### 5. Execution Engine — DAG (`relay/engine/dag/`)
+- [ ] `dag.ts` exports `Dag` class with `addNode()`, `addEdge()` methods
+- [ ] `topological-sort.ts` exports `topologicalSort()` function
+- [ ] Cycle detection throws error on cyclic graph
+- [ ] Topological sort returns valid dependency-respecting order
 
-### V8. Brand Voice
-| Criterion | Verification Method |
-|-----------|---------------------|
-| Copy is human, confident | Review: no acronyms, no enterprise sludge |
-| White/airy aesthetic | CSS: light backgrounds, optimistic colors |
-| No dark mode toggle | Grep for `dark.*mode`, verify zero matches |
+#### 6. Execution Engine — State Machine (`relay/engine/state/`)
+- [ ] `state-machine.ts` exports `StateMachine` class with state transitions
+- [ ] State transitions: pending → running → completed
+- [ ] `idempotency.ts` exports `generateIdempotencyKey()` function
+- [ ] `retry-logic.ts` exports `retryWithBackoff()` function (max 3 retries)
+- [ ] State persists across page refresh
 
----
+#### 7. Caching Layer (`relay/cache/`)
+- [ ] `key-builder.ts` exports `buildCacheKey()` function (deterministic hash)
+- [ ] `cache-store.ts` exports `CacheStore` class with TTL support
+- [ ] Identical prompts return cached result on second run
+- [ ] TTL eviction removes expired entries
+- [ ] LRU eviction removes least-recently-used when cache full
 
-## Exclusion Audit (v1 Boundaries)
+#### 8. Token Budgets (`relay/budgets/`)
+- [ ] `user-caps.ts` exports `trackTokenUsage()`, `checkCap()` functions
+- [ ] `daily-quota.ts` exports `checkDailyQuota()`, `resetDailyQuota()` functions
+- [ ] `fingerprint.ts` exports `fingerprintRequest()` function
+- [ ] `dedup-check.ts` exports `checkDuplicate()` function
+- [ ] Execution blocked when token cap reached
 
-The following features are **explicitly NOT in v1**. Verify zero matches:
+### Wave 3 — Orchestration
+
+#### 9. Parallel Execution (`relay/engine/parallelizer/`)
+- [ ] `parallelizer.ts` exports `findIndependentNodes()` function
+- [ ] `fork-join.ts` exports `forkJoin()` function
+- [ ] `promise-pool.ts` exports `PromisePool` class with concurrency limit
+- [ ] Independent nodes run concurrently (not serially)
+
+### Wave 4 — Integration
+
+#### 10. Async Job Queue (`relay/queue/`)
+- [ ] `dispatcher.ts` exports `enqueue()`, `dequeue()` functions
+- [ ] `worker.ts` exports `Worker` class that processes queue items
+- [ ] `agent-handler.ts` exports `handleAgentCall()` function
+- [ ] Workflows execute asynchronously (not blocking)
+
+#### 11. REST API (`relay/api/v1/`)
+- [ ] `routes.ts` exports route definitions for `/workflows`, `/execute`
+- [ ] `workflows.ts` exports CRUD handlers for workflows
+- [ ] `execute.ts` exports `executeWorkflow()` handler
+- [ ] `auth.ts` exports `authenticate()` middleware
+- [ ] API triggers queue and returns job ID
+
+### Wave 5 — Admin & Polish
+
+#### 12. Workflow Versioning
+- [ ] Editing a workflow creates a new version (version increments)
+- [ ] In-flight runs remain pinned to original version
+- [ ] Version history displays version number and created date
+
+#### 13. Brand Voice (`relay/app/voice/`)
+- [ ] `brand.ts` exports `tone`, `style`, `acronymBlacklist`
+- [ ] Copy is human, confident, zero acronyms
+- [ ] No enterprise sludge or jargon
+
+#### 14. Exclusion Audit
+Verify zero matches for excluded features:
 
 | Excluded Feature | Search Pattern | Expected Result |
 |-----------------|----------------|-----------------|
 | Drag-and-drop canvas | `canvas`, `drag.*drop`, `figma` | Zero matches |
 | Freemium billing | `stripe`, `billing`, `subscription`, `freemium` | Zero matches |
 | Dark mode | `dark.*mode`, `theme.*toggle` | Zero matches |
-| WordPress plugin | `wordpress`, `wp-`, `plugin` | Zero matches (in forge/) |
+| WordPress plugin | `wordpress`, `wp-`, `add_action` | Zero matches |
 | Workers AI edge | `workers.*ai`, `edge.*runtime` | Zero matches |
 | Template marketplace | `marketplace`, `template.*store` | Zero matches |
-| JSON editor in UI | `json.*editor`, `yaml.*editor` | Zero matches |
-| 40-toggle admin | `wizard`, `onboarding`, `tour` | Zero matches |
+| JSON editor in UI | `json.*editor`, `yaml.*editor`, `codemirror` | Zero matches |
+| Onboarding wizard | `onboarding`, `wizard`, `tour`, `intro\.js` | Zero matches |
 
 ---
 
 ## Files to Create or Modify
 
-### New Files (20+ total)
+### New Files (26 total)
 
-| File | Purpose |
-|------|---------|
-| `forge/package.json` | Project metadata and dependencies |
-| `forge/tsconfig.json` | TypeScript configuration |
-| `forge/.gitignore` | Node.js/TypeScript exclusions |
-| `forge/app/index.html` | Web app entry point |
-| `forge/app/config-ui/node-forms/base-form.tsx` | Base form component |
-| `forge/app/config-ui/node-forms/content-writer-form.tsx` | ContentWriter config |
-| `forge/app/config-ui/node-forms/image-generator-form.tsx` | ImageGenerator config |
-| `forge/app/config-ui/workflow-list/workflow-list.tsx` | List saved workflows |
-| `forge/app/config-ui/workflow-list/version-history.tsx` | Version history UI |
-| `forge/app/config-ui/run-preview/output-viewer.tsx` | Output display |
-| `forge/app/config-ui/styles.css` | White/airy aesthetic |
-| `forge/app/nodes/node-registry.ts` | Node type registry |
-| `forge/app/nodes/types.ts` | Node type definitions |
-| `forge/app/nodes/content-writer-node.ts` | ContentWriter implementation |
-| `forge/app/nodes/image-generator-node.ts` | ImageGenerator implementation |
-| `forge/engine/dag/dag.ts` | DAG data structure |
-| `forge/engine/dag/topological-sort.ts` | Execution order |
-| `forge/engine/state/state-machine.ts` | Workflow state |
-| `forge/engine/state/idempotency.ts` | Idempotency keys |
-| `forge/engine/state/retry-logic.ts` | Retry on failure |
-| `forge/cache/key-builder/key-builder.ts` | Cache key hashing |
-| `forge/cache/store/cache-store.ts` | In-memory cache |
-| `forge/budgets/per-user-caps/user-caps.ts` | Token tracking |
-| `forge/budgets/dedup/fingerprint.ts` | Request fingerprinting |
-| `forge/queue/dispatcher/dispatcher.ts` | Job queue |
-| `forge/api/v1/routes.ts` | REST routes |
-| `forge/README.md` | Setup instructions |
-| `forge/ARCHITECTURE.md` | System overview |
+| File | Purpose | Wave |
+|------|---------|------|
+| `relay/package.json` | Project metadata and dependencies | 1 |
+| `relay/tsconfig.json` | TypeScript configuration | 1 |
+| `relay/.gitignore` | Node.js/TypeScript exclusions | 1 |
+| `relay/app/index.html` | Web app entry point | 1 |
+| `relay/app/config-ui/node-forms/base-form.tsx` | Base form component | 2 |
+| `relay/app/config-ui/node-forms/content-writer-form.tsx` | ContentWriter config | 2 |
+| `relay/app/config-ui/node-forms/image-generator-form.tsx` | ImageGenerator config | 2 |
+| `relay/app/config-ui/workflow-list/workflow-list.tsx` | List saved workflows | 2 |
+| `relay/app/config-ui/workflow-list/version-history.tsx` | Version history UI | 2 |
+| `relay/app/config-ui/run-preview/output-viewer.tsx` | Output display | 2 |
+| `relay/app/config-ui/styles.css` | White/airy aesthetic | 1 |
+| `relay/app/voice/brand.ts` | Brand constants | 1 |
+| `relay/app/nodes/types.ts` | Node type definitions | 2 |
+| `relay/app/nodes/node-registry.ts` | Node type registry | 2 |
+| `relay/app/nodes/content-writer-node.ts` | ContentWriter implementation | 2 |
+| `relay/app/nodes/image-generator-node.ts` | ImageGenerator implementation | 2 |
+| `relay/engine/dag/dag.ts` | DAG data structure | 2 |
+| `relay/engine/dag/topological-sort.ts` | Execution order | 2 |
+| `relay/engine/dag/cycle-detection.ts` | Cycle detection | 2 |
+| `relay/engine/state/state-machine.ts` | Workflow state | 2 |
+| `relay/engine/state/idempotency.ts` | Idempotency keys | 2 |
+| `relay/engine/state/retry-logic.ts` | Retry on failure | 2 |
+| `relay/engine/state/durable-storage.ts` | State persistence | 2 |
+| `relay/engine/parallelizer/parallelizer.ts` | Find independent nodes | 3 |
+| `relay/engine/parallelizer/fork-join.ts` | Fork-join execution | 3 |
+| `relay/cache/key-builder/key-builder.ts` | Cache key hashing | 2 |
+| `relay/cache/store/cache-store.ts` | In-memory cache with TTL | 2 |
+| `relay/cache/store/eviction.ts` | LRU eviction | 2 |
+| `relay/budgets/per-user-caps/user-caps.ts` | Token tracking | 2 |
+| `relay/budgets/per-user-caps/daily-quota.ts` | Daily quotas | 2 |
+| `relay/budgets/dedup/fingerprint.ts` | Request fingerprinting | 2 |
+| `relay/budgets/dedup/dedup-check.ts` | Duplicate check | 2 |
+| `relay/queue/dispatcher/dispatcher.ts` | Job queue | 4 |
+| `relay/queue/workers/worker.ts` | Queue processor | 4 |
+| `relay/queue/workers/agent-handler.ts` | Agent call handler | 4 |
+| `relay/api/v1/routes.ts` | REST routes | 4 |
+| `relay/api/v1/workflows.ts` | Workflow CRUD | 4 |
+| `relay/api/v1/execute.ts` | Execute handler | 4 |
+| `relay/api/v1/auth.ts` | Auth middleware | 4 |
+| `relay/README.md` | Setup instructions | 5 |
+| `relay/ARCHITECTURE.md` | System overview | 5 |
+| `relay/BRAND.md` | Voice and style guide | 5 |
 
 ### Modified Files
 
 | File | Reason |
 |------|--------|
-| `STATUS.md` | Update pipeline state for Forge project |
-| `TASKS.md` | Add Forge build tasks |
-| `rounds/github-issue-sethshoultes-shipyard-ai-90/decisions.md` | Resolve open questions before build |
+| `STATUS.md` | Update pipeline state for Relay project |
+| `TASKS.md` | Add Relay build tasks |
+
+---
+
+## Test Scripts
+
+All test scripts are in `deliverables/github-issue-sethshoultes-shipyard-ai-90/tests/`:
+
+| Script | Purpose |
+|--------|---------|
+| `verify-structure.sh` | Verify relay directory structure and file existence |
+| `verify-no-banned-patterns.sh` | Ensure no excluded features in codebase |
+| `verify-typescript.sh` | TypeScript compilation check |
+| `verify-caching-budgets.sh` | Verify caching and budget enforcement |
+| `run-all-tests.sh` | Run all verification tests |
 
 ---
 
@@ -259,7 +304,7 @@ The following features are **explicitly NOT in v1**. Verify zero matches:
 | 4 | **Developer API scope** — Ships in v1 or deferred? | Elon | Before Phase 1 |
 | 5 | **Hosting/deployment target** — Cloudflare Pages + D1 + R2? | Elon | Before Phase 1 |
 | 6 | **Auth model** — When does auth appear? | Elon + Steve | Before Phase 1 |
-| 7 | **Execution runtime substrate** — Existing daemon or new? | Elon | Before Phase 1 |
+| 7 | **Execution runtime substrate** — Existing daemon or new executor? | Elon | Before Phase 1 |
 | 8 | **First-run experience** — 30s magic moment without canvas? | Steve + Elon | Before Phase 1 |
 
 ---
@@ -279,7 +324,7 @@ The following features are **explicitly NOT in v1**. Verify zero matches:
 
 ## Notes
 
-- **Name:** Forge (one syllable, solid, memorable)
+- **Name:** Relay (Steve won; Elon conceded Round 2)
 - **Brand voice:** Human, confident, zero acronyms, no enterprise sludge
 - **Phil Jackson's note:** Elon owns the foundation. Steve owns the soul. Both must agree for the product to ship.
 - **Essence:** Engine first. Baton later. The engine is the product; the UI is documentation.
