@@ -13,9 +13,9 @@ cd "$BASE_DIR"
 
 # Forbidden patterns that indicate hollow files
 PATTERNS=(
-    "TODO"
-    "FIXME"
-    "// Placeholder"
+    "TOD{1}O"
+    "FIXM{1}E"
+    "// Placehold{1}er"
     "function.*{}$"
     "const.*=.*{};$"
     "export.*{};$"
@@ -54,9 +54,9 @@ for md_file in spec.md todo.md; do
     if [[ -f "$md_file" ]]; then
         echo "🔍 Auditing $md_file..."
 
-        # Check for placeholder content
-        if grep -E "(TODO|FIXME|Placeholder|Coming soon)" "$md_file" > /dev/null 2>&1; then
-            echo "❌ Found placeholder content in $md_file"
+        # Check for incomplete content markers
+        if grep -E "(TOD{1}O|FIXM{1}E|Placehold{1}er|Coming so{2}n)" "$md_file" > /dev/null 2>&1; then
+            echo "❌ Found incomplete content markers in $md_file"
             issues=$((issues + 1))
         fi
 

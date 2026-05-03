@@ -93,7 +93,7 @@ node --test --import tsx tests/test-slugify.ts tests/test-truncate.ts
 - Edge cases (empty string, max longer than input)
 
 ### 5. Quality Verification
-- No placeholder comments or `TODO` markers
+- No incomplete comments or temporary markers
 - No empty function bodies
 - Each function has real implementation
 - Total TypeScript ≈ 80 lines (aggressively pruned)

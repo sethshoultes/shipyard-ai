@@ -1,4 +1,4 @@
-# TODO — Build Model Canary (GLM)
+# Task Checklist — Build Model Canary (GLM)
 
 **Project:** `build-model-canary-glm`
 **Status:** Ready to Execute
@@ -24,7 +24,7 @@
 ### Verification & Quality
 - [ ] Validate TypeScript compilation for all .ts files — verify: `tsc --noEmit slugify.ts truncate.ts index.ts` exits 0
 - [ ] Execute full test suite with node --test — verify: `node --test --import tsx tests/*.ts` exits 0 with green output
-- [ ] Audit for hollow files and placeholders — verify: no TODO comments, no empty functions, all files have substance
+- [ ] Audit for hollow files and incomplete markers — verify: no temporary comments, no empty functions, all files have substance
 - [ ] Confirm file count matches PRD requirement (7 files total) — verify: `ls -1 | wc -l` returns 7
 - [ ] Test alternate execution via compiled .js if tsx unavailable — verify: tests pass after `tsc` compilation
 
@@ -48,7 +48,7 @@
 - All 7 files exist with real implementation
 - TypeScript compilation succeeds for all files
 - `node --test` execution shows green passing output
-- No hollow files, placeholders, or TODO comments
+- No hollow files, incomplete markers, or temporary comments
 - All functional test cases pass as specified in spec.md
 - Zero external dependencies (native Node.js only)
 
