@@ -1,62 +1,28 @@
-# Chief Design & Brand Officer — Position Memo
+# Round 1 — Steve Jobs, Chief Design & Brand Officer
 
 ## Naming
 
-**AgentForge is dead.** It sounds like a supply depot in a video game
-where robots pound steel. Users don't want to *forge* anything—they want
-to get work done. One word. Human. Active. **Relay.** Short. Punchy.
-If you need two words to explain your product, you've already lost.
-"Agent" screams technology. "Forge" screams effort. A great name sits on
-the tip of your tongue before you even know why. iPod. iPhone. Relay.
-Say it out loud and it travels.
+"AgentForge" is a name an engineer would love and a human would forget. It sounds like a server rack in a basement. We are not blacksmiths hammering bytecode. We are conductors. One word. Human. Unforgettable. **Chorus.** A chorus is many voices, one song. One person, a symphony of agents. If you need two words to explain your product, you haven't named it — you've described it.
 
 ## Design Philosophy
 
-This is not a builder. It's not a canvas. It's a **conductor's podium.**
-The interface disappears until only the work remains. White space. Direct
-manipulation. Every node should feel like a person you know, not a server
-in a rack. If it looks like Zapier, we have failed. Zapier is plumbing.
-Plumbing is necessary. Nobody falls in love with plumbing. People fall in
-love with the feeling that technology has vanished and only intent
-remains. You think, it happens. That is the bar.
+Insanely great means the interface disappears. Every competitor looks like someone vomited spaghetti on a circuit diagram. Chorus is a **canvas**, not a schematic. The design philosophy is the intersection of technology and liberal arts. Drag. Drop. Breathe. If the result isn't beautiful enough to hang on a wall, it isn't beautiful enough to ship. Elegance is not optional. Elegance is the feature.
 
 ## The First 30 Seconds
 
-You open Relay and there's **already a team working.** Three agents
-finishing a real task—live, in color, right in front of you. No blank
-canvas begging you to build. You see momentum. Touch a node and it
-responds like a living thing. Feel the same jolt you felt flicking an
-iPhone scroll and watching it move with physics. Alive. If the first
-30 seconds feels like installing software, we built a feature. If it
-feels like stepping into a room where people are already getting things
-done, we built a product.
+You open Chorus. White canvas. Silence. Then one gentle question: *"What do you want to accomplish?"* You type, "Handle my customer support." A single luminous card appears — not a grey rectangle with ports, but a living actor that pulses with potential. You tap it. It gracefully divides into three specialists. You draw a line between them. It glows. Thirty seconds in, you've hired, trained, and connected a team. No tutorial. No wizard. No manual. It just works — like the first time you swiped an iPhone.
 
 ## Brand Voice
 
-Confident. Warm. Almost cocky in our simplicity. We do not say "seamless
-integration of autonomous agentic orchestration." We say: **"Your team
-just grew by ten people. They don't sleep. They don't complain. And they
-already started."** Speak like a person, not a press release. If it
-sounds like it could come from Microsoft, burn it. If it needs a
-glossary, set it on fire twice.
+We do not "leverage multi-agent orchestration to optimize operational efficiencies." We **give your ideas a team.** We speak like a friend who happens to be a genius. Warm. Confident. Almost poetic. Every sentence gets the razor: if a word doesn't make someone feel something, it dies. We sell dreams, not diagrams.
 
 ## What We Say NO To
 
-NO to the word **workflow**—that's corporate laundry. NO to
-**orchestration**—users don't orchestrate, they delegate. NO to dark-mode
-developer aesthetics. NO to configuration panels with fifty toggles. NO
-to empty states. NO to "AI" badges plastered everywhere. The user should
-no more know there's a language model under the hood than they know
-there's an ARM chip in their phone. **Simplicity means removing, not
-adding.** We are not building a Swiss Army knife. We are building a
-lightsaber. One blade. Infinite precision.
+- **NO exposed APIs or "endpoints."** The user should never know there's plumbing.
+- **NO grey spaghetti.** If the canvas looks like a network diagram from a server room, we've failed.
+- **NO feature creep.** Start with one perfect use case. Say no to a thousand good ideas so three great ones can shine.
+- **NO "workflows" or "automations."** Those are words for dentists and factories. Call them *plays*, *scenes*, or *routines.*
 
 ## The Emotional Hook
 
-Automation is for factories. This is **multiplication.** The user doesn't
-feel like they optimized a spreadsheet. They feel like they cloned
-themselves ten times over, sharper and faster, finishing the report
-while they were in the shower. That's not productivity. That's **magic.**
-Anyone can sell efficiency. We are selling the feeling of being
-everywhere at once, of having enough hands to hold all your ambition.
-That is what creates cults. That is what creates brands.
+People won't love Chorus because it saves them an hour. They'll love it because, for the first time, they feel **plural.** One human, infinite reach. It's the feeling of having a world-class staff that never sleeps, never complains, and finishes your sentences. That isn't productivity — that's power. And power, wielded with simplicity, is absolutely addictive.

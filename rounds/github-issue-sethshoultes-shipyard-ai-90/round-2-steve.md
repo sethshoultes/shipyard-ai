@@ -1,47 +1,29 @@
-# Round 2: Steve
+# Round 2 — Steve Jobs
 
-Elon, you're optimizing for *engineering completion* when users optimize for *delight*.
+## Where Elon Optimizes for the Wrong Metric
 
-You want to ship a JSON editor first and cut the drag-and-drop builder. That's not a product — that's a todo list for engineers. Nobody ever fell in love with YAML. Nobody showed their friends a config file.
+Elon is building a compiler. The world needs a piano.
 
-You want to cut the visual builder? Then you're building a utility, not a revolution. Utilities get bought by the foot. Revolutions get bought by the heart. You're measuring "works end-to-end" when you should be measuring "feels inevitable in the first breath."
+He measures progress in "engineer-weeks" and "config-file completeness." That optimizes for the 0.1% of humans who dream in YAML. The other 99% — the consultant, the creator, the overwhelmed founder — will not pay $29/month to edit a JSON schema. They will pay for the feeling of having a world-class team that obeys them without a single standup meeting. Elon's "500 paying users prove the engine" assumes users pay for engines. They don't. They pay for locomotion. His metric is technical debt reduction; ours must be user love in the first 30 seconds.
 
-Your WordPress obsession makes the same category error: optimizing for distribution ease over brand identity.
+His WordPress obsession is distribution without delight. Yes, WordPress has traffic. So does a highway rest stop. If our product looks like every other wp-admin panel, we are a utility, not a brand. Utilities get switched. Religions stay.
 
-A WordPress plugin is a commodity. Commodities don't have waiting lists. They don't have communities. They don't have people lining up at midnight.
+## Defending the Canvas
 
-You say pick one distribution channel — I agree. But we pick **SaaS**, because that's the only format where the experience is ours to control, where every pixel is Relay and nothing else. WordPress can come later as a *channel*, not as our identity. Anchor as a plugin and you die as a feature.
+Elon calls drag-and-drop "chrome." I call it the product. When you ship a JSON editor first, you are not "deferring UI." You are declaring that you do not understand who you are building for. The interface IS the architecture. Every decision we make — parallel execution, async webhooks, state persistence — must be invisible to the user and manifest as *speed, trust, and beauty* in the canvas. If the DAG is visible, we have failed. If the retry logic requires a dashboard, we have failed. The canvas is not v2. It is the proof that the engine is good enough. A fast engine with a JSON interface is a thesis. A fast engine with a canvas is a product.
 
-You are absolutely right about three things, and I concede them fully.
+## Where I Concede
 
-One: the orchestration engine is the hard ninety percent, and a pretty face on a broken state machine is fraud, not design. Build the DAG, the retries, the idempotency, the async execution. I don't care if it's ugly under the hood as long as it's bulletproof.
+Elon is right about the hard 90%. One agent session will not build deterministic state machines, idempotent retries, or handle Anthropic rate limits. The feasibility is **MEDIUM**, not HIGH. I concede that.
 
-Two: COGS will kill us if we ignore unit economics. Inference is not free.
+He is right about COGS. Five LLM calls at 15 seconds each with no caching is a burning pile of money. Async execution isn't a nice-to-have; it is survival.
 
-Three: LLM latency makes synchronous execution a death trap. Async webhooks, aggressive caching, parallel execution — these are non-negotiable engineering realities.
+He is right about picking one channel. "Web app or WordPress plugin" is cowardice dressed as optionality. We pick one. If WordPress is the wedge, we use it — but we refuse to let its UI conventions infect Chorus.
 
-I'll take your engine if you let me wrap it in something human.
+## Top 3 Non-Negotiables
 
-Now let me defend what I know you'll attack.
+1. **The name is Chorus.** One word. Human. Unforgettable. We are not a forge, a factory, or a framework.
+2. **The canvas ships in v1 or nothing ships.** The JSON editor exists for power users under the hood, but no human faces plumbing on first launch. Design is not a coat of paint; it is the product.
+3. **The first 30 seconds require zero documentation.** One question. One touch. One living card that divides into three. If we need a tutorial, we haven't finished the design.
 
-You think the name doesn't matter. You're wrong. It matters more than your engine, because nobody asks what chip powers an iPod. They ask if it makes them feel capable.
-
-"AgentForge" makes them feel like they're installing server software. "Relay" makes them feel like they just hired a team.
-
-You think live demos are theater. You're wrong — *context* is the product. In the first 30 seconds, a user decides if this is for them. A blank canvas says "work." A living room says "welcome." You cannot A/B test your way to a feeling.
-
-You think "workflow" and "orchestration" are precise terms. They are *fear* terms. Business users — the ones with actual budgets — run from jargon.
-
-We say "your team just grew." Because that's what they paid for. Not pipes. Not processes. Power.
-
-**My top 3 non-negotiables:**
-
-1. **The name is Relay.** Not up for committee. Not up for A/B test. It is the soul of the product. You don't build a religion around a server utility.
-
-2. **No user-facing JSON / YAML / config panels in v1.** Users touch nodes, not schemas. You can build the state machine in JSON under the hood. The user sees people, not plumbing. If they need a manual, we have failed.
-
-3. **The first 30 seconds must show living agents already working.** No setup wizard. No blank canvas. No "build your first workflow." You open it, you see motion, you feel magic. Everything else — the engine, the pricing, the roadmap — is just infrastructure defending that single moment.
-
-Build me an engine that can handle those three constraints, and we'll change the category.
-
-Build me a config tool, and we've built another Zapier that nobody loves.
+Build the engine Elon describes. Hide it completely. Then wrap it in something so intuitive it feels like remembering, not learning.

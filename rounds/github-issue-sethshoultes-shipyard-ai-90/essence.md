@@ -1,15 +1,14 @@
-Relay is a team of AI agents that works while you sleep.
+Relay gives one person a team that never sleeps.
 
-Feeling: multiplication. Cloned yourself. Enough hands for all your ambition.
+Feeling: enough hands, finally.
 
-One thing perfect: first 30 seconds. Open app. Agents already moving. No setup. No blank canvas. Pure momentum.
+One thing perfect: first 30 seconds. Open. Click. Real agents move. Real output. No setup.
 
-Direction: strip until it sings.
+Direction: space is the feature.
 
 —
-- Name: Relay. Two syllables. Human. Active.
-- Engine first. Baton later. No canvas v1.
-- One free workflow. Hard cost caps. No bankruptcy.
-- White. Airy. Optimistic. No dark mode.
-- Speak human. Zero acronyms. No sludge.
-- Not automation. Multiplication.
+Engine first. Soul second. Both ship.
+One free workflow. Hard caps. No bankruptcy.
+White. Airy. No dark mode.
+Human voice. Zero acronyms.
+Not automation. Multiplication.
