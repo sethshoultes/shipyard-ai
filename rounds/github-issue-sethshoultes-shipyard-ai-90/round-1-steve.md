@@ -1,49 +1,62 @@
-# Relay
+# Chief Design & Brand Officer — Position Memo
 
-## Product Naming
+## Naming
 
-AgentForge is dead on arrival. It sounds like a server rack humming in a basement. Industrial, cold, utterly inhuman.
-
-We're calling it **Relay**. One word. Two syllables. It evokes the baton passing between runners—between agents. It's athletic, human, and effortless. Nobody falls in love with a forge. They fall in love with a relay.
-
-A name is a promise. Relay promises that work flows naturally from one mind to another.
+**AgentForge is dead.** It sounds like a supply depot in a video game
+where robots pound steel. Users don't want to *forge* anything—they want
+to get work done. One word. Human. Active. **Relay.** Short. Punchy.
+If you need two words to explain your product, you've already lost.
+"Agent" screams technology. "Forge" screams effort. A great name sits on
+the tip of your tongue before you even know why. iPod. iPhone. Relay.
+Say it out loud. It travels.
 
 ## Design Philosophy
 
-Insanely great means the interface disappears completely. Users shouldn't see "nodes" and "edges." They should see intent flowing into action like water downhill.
-
-Think of conducting an orchestra with a wand, not programming a telephone switchboard from 1972. Every pixel must feel inevitable. Every gesture must feel obvious. If it needs a tooltip, we've failed. If it needs a manual, we've humiliated the user.
-
-The technology must become invisible so the human intention becomes visible. We are not building a dashboard. We are building a stage.
+This is not a builder. It's not a canvas. It's a **conductor's podium.**
+The interface disappears until only the work remains. White space. Direct
+manipulation. Every node should feel like a person you know, not a
+server in a rack. If it looks like Zapier, we have failed. Zapier is
+plumbing. Plumbing is necessary. Nobody falls in love with plumbing.
+People fall in love with the feeling that technology has vanished and
+only intent remains. You think, it happens. That is the bar.
 
 ## The First 30 Seconds
 
-You land on a blank canvas. Not a dashboard. Not a wizard. Not another cluttered grid of widgets. A canvas.
-
-You drag one circle. You give it a name. You drag a second. You draw a line between them. You hit play. The agents talk. You watch the conversation bloom in real time like flowers opening to the sun.
-
-In thirty seconds, you've built a team that works while you sleep. That's the feeling: effortless power. That's the promise: you are the conductor, not the code monkey. No onboarding video required. No engineering degree necessary.
+You open Relay and there's **already a team working.** Three agents
+finishing a real task—live, in color, right in front of you. No blank
+canvas begging you to build. You see momentum. Touch a node and it
+responds like a living thing. Feel the same jolt you felt flicking an
+iPhone scroll and watching it move with physics. Alive. If the first
+30 seconds feels like installing software, we built a feature. If it
+feels like stepping into a room where people are already getting things
+done, we built a product.
 
 ## Brand Voice
 
-We speak like the smartest person in the room who actually respects your time. Short sentences. No jargon. No "leverage," no "synergize," no "enablement."
-
-We say: "Your agents are ready." We do not say: "Your multi-agent orchestration pipeline has been successfully deployed."
-
-Confidence without arrogance. Warmth without fluff. Clarity above all. We talk like a brilliant colleague sitting next to you, not a vendor shouting across a trade show floor. Every word must pass one test: would a human actually say this to another human over coffee?
+Confident. Warm. Almost cocky in our simplicity. We do not say "seamless
+integration of autonomous agentic orchestration." We say: **"Your team
+just grew by ten people. They don't sleep. They don't complain. And they
+already started."** Speak like a person, not a press release. If it
+sounds like it could come from Microsoft, burn it. If it needs a
+glossary, set it on fire twice.
 
 ## What We Say NO To
 
-NO to node-based spaghetti that looks like a server rack exploded. NO to exposing system prompts, temperature sliders, context windows, or any other engineering debris.
-
-NO to templates that look like Excel spreadsheets had children with flowcharts. NO to freemium banners screaming for attention like desperate street vendors. NO to dark patterns, nag screens, and "upgrade now" badges that reek of insecurity.
-
-NO to feature parity with competitors who have no taste. Every "yes" to a mediocre feature is a "no" to excellence. We will say no to a thousand features so we can say yes to one perfect experience. Simplicity is the ultimate sophistication.
+NO to the word **workflow**—that's corporate laundry. NO to
+**orchestration**—users don't orchestrate, they delegate. NO to dark-mode
+developer aesthetics. NO to configuration panels with fifty toggles. NO
+to empty states. NO to "AI" badges plastered everywhere. The user should
+no more know there's a language model under the hood than they know
+there's an ARM chip in their phone. **Simplicity means removing, not
+adding.** We are not building a Swiss Army knife. We are building a
+lightsaber. One blade. Infinite precision.
 
 ## The Emotional Hook
 
-People will love Relay because for the first time, they won't feel stupid around AI. They'll feel like a conductor standing before a brilliant orchestra. Like a CEO with the best staff on earth working tirelessly behind them.
-
-It's the feeling of mastery without study, of power without pain, of orchestration without overhead. And once someone feels powerful, they never go back.
-
-They become evangelists because we made them feel like geniuses. We don't sell software. We sell self-respect.
+Automation is for factories. This is **multiplication.** The user doesn't
+feel like they optimized a spreadsheet. They feel like they cloned
+themselves ten times over, sharper and faster, finishing the report
+while they were in the shower. That's not productivity. That's **magic.**
+Anyone can sell efficiency. We are selling the feeling of being
+everywhere at once, of having enough hands to hold all your ambition.
+That is what creates cults. That is what creates brands.
