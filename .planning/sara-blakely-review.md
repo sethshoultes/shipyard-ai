@@ -1,20 +1,13 @@
-Verdict: Hard no. No customer pays for middleware.
+**Verdict: Wrong customer. Fix before code.**
 
-- Bloggers can't use cURL. Developers won't buy a WP plugin to call Claude API. No buyer.
-- Two API keys before first win. Too much friction. Most quit during setup.
-- No Gutenberg block. No post editor button. "Agent orchestration" means nothing to someone writing a blog post.
-- Content truncated to 2048 chars. Gives them homework. They wanted done.
-- Cloudflare Worker setup for images is a dealbreaker for 99% of WordPress users.
-- CPT memory is invisible. Customer sees zero benefit.
+- Real customer? Developer maybe. WordPress plugin buyers expect point-and-click. Plan builds developer tool, prices like plugin. Painful mismatch.
 
-30-second pitch:
-"AgentPress drafts complete blog posts and featured images inside your WordPress editor. One click. No copy-paste."
+- Confusing: Activate plugin. See API key field. Empty log table. No button. No textarea. Customer thinks "broken," bounces in 8 seconds.
 
-$0 test:
-- Post in 3 blogger Facebook groups: "One-click blog post drafts inside WordPress. Want early access?"
-- If crickets, kill it. If 50+ replies, build the Gutenberg block first. Not REST.
+- 30-second pitch: "AgentPress puts an AI content team inside your WordPress dashboard. Write a sentence. Get a blog post or featured image. No ChatGPT login, no copy-paste."
 
-Retention hook:
-- None right now. REST calls are forgettable.
-- Real hook: sidebar inside the editor they see every time they write.
-- Be where they work. Not in a terminal.
+- $0 test: Coffee shop. Five strangers with WordPress sites. Ask them to generate a blog post. Do not help. Record where they curse. Build that.
+
+- Retention hook: Missing. One-and-done generation isn't sticky. Need "Regenerate in my tone" or scheduled batch runs. Logs are worthless for retention.
+
+- Bold move: Kill "no manual runner" rule. One textarea + submit button on admin page. Demo does talking, not readme.
