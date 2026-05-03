@@ -109,7 +109,7 @@ agentpress/
 │   └── agents/
 │       ├── class-content-writer.php  # ContentWriter agent
 │       ├── class-image-generator.php # ImageGenerator agent
-│       └── class-agent-third.php     # Placeholder stub
+│       └── class-seo-meta.php       # SEO Meta agent
 ├── admin/
 │   ├── class-admin.php               # Admin screen
 │   └── css/

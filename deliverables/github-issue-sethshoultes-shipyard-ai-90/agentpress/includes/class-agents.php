@@ -33,6 +33,12 @@ class Agents {
             'description' => 'Generates images using Cloudflare Workers AI.',
             'handler' => 'agentpress_run_image_generator',
         ),
+        'seo_meta' => array(
+            'slug' => 'seo_meta',
+            'title' => 'SEO Meta',
+            'description' => 'Generates SEO title tags and meta descriptions using Claude API.',
+            'handler' => 'agentpress_run_seo_meta',
+        ),
     );
 
     /**

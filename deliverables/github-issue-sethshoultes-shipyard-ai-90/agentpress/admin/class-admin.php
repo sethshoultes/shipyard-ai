@@ -166,7 +166,7 @@ class Admin {
             : '';
 
         printf(
-            '<input type="url" name="agentpress_settings[cf_worker_url]" value="%s" %s class="regular-text" placeholder="https://your-worker.workers.dev" />%s',
+            '<input type="url" name="agentpress_settings[cf_worker_url]" value="%s" %s class="regular-text" />%s',
             esc_attr($value),
             $disabled,
             $note

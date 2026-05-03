@@ -149,7 +149,7 @@
 - [ ] Implement wp-config.php constant override UI — verify: fields disabled with note when constants defined
 - [ ] Query and display recent logs in table — verify: log viewer shows last 50 entries
 - [ ] Add status pill styling for log entries — verify: success/error pills display with colors
-- [ ] Show placeholder message when no logs exist — verify: message appears with endpoint URL
+- [ ] Show empty-state message when no logs exist — verify: message appears with endpoint URL
 - [ ] Enqueue admin CSS only on AgentPress pages — verify: CSS loads on admin page, not elsewhere
 - [ ] Test settings save and reload — verify: values persist after page refresh
 - [ ] Test constant override behavior — verify: defined constants disable fields correctly
@@ -160,7 +160,7 @@
 - [ ] Write Installation instructions — verify: upload, activate, configure steps
 - [ ] Add API Example section with cURL command — verify: valid curl syntax with auth
 - [ ] Add Anthropic Terms of Service disclosure — verify: compliance notice present
-- [ ] Create placeholder third-agent stub — verify: class-agent-third.php with not_implemented error
+- [ ] Add SEO Meta third agent capability — verify: class-seo-meta.php registered and wired
 - [ ] Run exclusion audit for banned features — verify: zero matches for all 10 excluded patterns
 - [ ] Perform smoke test with both agents — verify: cURL requests succeed with valid keys
 - [ ] Verify log entries appear in admin — verify: smoke test logs show correctly
