@@ -2,7 +2,7 @@
 
 PRD: `/home/agent/shipyard-ai/prds/github-issue-sethshoultes-shipyard-ai-98.md`
 Size: 2725 bytes / 58 lines
-Date: 2026-05-04T01:23:44Z
+Date: 2026-05-04T01:28:55Z
 
 ## ❌ HARD FAILS (2)
 
